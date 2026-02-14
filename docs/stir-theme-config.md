@@ -106,17 +106,11 @@ analytics: {
 }
 ```
 
-### 💬 `appPopup`
+### 💬 `popup`
 
 ```ts
-appPopup: {
-  enabled: false,
-  trigger: 'scroll', // 'delay' | 'scroll' | 'exit'
-  delay: 5000, // only applies if trigger === 'delay'
-  pages: '*', // or an array like ['/', '/weddings']
-  excludePages: ['/login', '/checkout'],
-  scrollThreshold: 0.25,
-  showOnce: false,
+popup: {
+  enabled: false, // global mount switch for <LazyAppPopup />
 }
 ```
 

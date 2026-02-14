@@ -40,6 +40,7 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
     <UTabs
       v-if="items.length"
       v-model="active"
+      :items="items"
       :orientation="orientation"
       :ui="{
         root: 'items-start gap-2 m-auto w-full',
@@ -47,7 +48,6 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
         trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
         marker: 'bg-primary',
       }"
-      :items="items"
       variant="link"
     >
       <template #content>

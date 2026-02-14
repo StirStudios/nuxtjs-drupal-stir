@@ -57,6 +57,13 @@ Use these rules for all changes.
   - Composables: camelCase with `use*` naming.
   - Server utilities/routes: clear, purpose-driven names that match Nitro conventions.
 
+## Nuxt UI reference priority
+- For Nuxt UI component/composable APIs, props, slots, events, theming, and patterns, prefer official sources in this order:
+  - Nuxt UI MCP server: `https://ui.nuxt.com/mcp`
+  - Nuxt UI LLM index: `https://ui.nuxt.com/llms.txt`
+  - Nuxt UI docs pages (`https://ui.nuxt.com/docs/...`)
+- This is recommended guidance, not a hard requirement; do not block work if MCP is unavailable.
+
 ## Drupal CE integration guidance
 - Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
 - Keep schema and mapping assumptions explicit with types or concise inline notes.

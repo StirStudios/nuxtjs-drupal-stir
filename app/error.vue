@@ -2,6 +2,7 @@
 import type { NuxtError } from '#app'
 
 const { navigation, error: errorConfig } = useAppConfig().stirTheme
+const { isAdministrator } = usePageContext()
 
 defineProps<{ error: NuxtError }>()
 
@@ -14,8 +15,8 @@ const clearAction = computed(() => ({
 
 <template>
   <LazyRegionArea area="top" />
-  <LazyDrupalTabs />
-  <AppHeader :mode="navigation.mode" />
+  <LazyDrupalTabs v-if="isAdministrator" />
+  <LazyAppHeader :mode="navigation.mode" />
 
   <UMain id="main-content" as="main" role="main">
     <UError

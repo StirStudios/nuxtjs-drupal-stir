@@ -112,7 +112,6 @@ const onOpen = (val: boolean) => {
     <template #title>
       <LazyAppLogo
         v-if="theme.navigation.logo"
-        class="app-logo"
         :add-classes="
           [
             'transition-all duration-300',
@@ -121,6 +120,7 @@ const onOpen = (val: boolean) => {
               : theme.navigation.logoSize,
           ].join(' ')
         "
+        class="app-logo"
       />
       <template v-else>
         {{ page?.site_info?.name }}

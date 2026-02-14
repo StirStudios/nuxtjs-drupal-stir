@@ -17,6 +17,10 @@ export default defineAppConfig({
     enabled: false,
   },
 
+  popup: {
+    enabled: false,
+  },
+
   stirTheme: {
     pdf: false,
     crumbs: false,
