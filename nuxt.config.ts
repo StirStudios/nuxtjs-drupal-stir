@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2025-12-09',
+  compatibilityDate: '2026-02-14',
 
   css: ['~/assets/css/main.css'],
 
@@ -43,6 +43,10 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: process.env.NODE_ENV === 'development',
+  },
+
+  experimental: {
+    appManifest: false,
   },
 
   routeRules: {

@@ -7,9 +7,9 @@ const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
 const { y } = useWindowScroll()
 const open = ref(false)
-const seen = useCookie<boolean>('marketing_popup', {
+const seen = useCookie<boolean | undefined>('marketing_popup', {
   maxAge: 60 * 60 * 24 * 7,
-  default: () => false,
+  sameSite: 'lax',
 })
 const hasTriggered = ref(false)
 
@@ -108,7 +108,7 @@ watch(open, (isOpen) => {
 })
 
 function showModalOnce() {
-  if (open.value || (config.value.showOnce && seen.value)) return
+  if (open.value || (config.value.showOnce && seen.value === true)) return
 
   open.value = true
 

@@ -35,6 +35,10 @@ type CookieConsentConfig = {
   privacyUrl?: string
 } & LooseRecord
 
+type PopupConfig = {
+  enabled?: boolean
+} & LooseRecord
+
 type ColorModeConfig = {
   forced?: boolean
   preference?: 'light' | 'dark' | 'system'
@@ -49,6 +53,7 @@ declare module 'nuxt/schema' {
     analytics?: AnalyticsConfig
     userway?: UserwayConfig
     cookieConsent?: CookieConsentConfig
+    popup?: PopupConfig
     colorMode?: ColorModeConfig
   }
 
@@ -57,6 +62,7 @@ declare module 'nuxt/schema' {
     analytics: AnalyticsConfig
     userway: UserwayConfig
     cookieConsent: CookieConsentConfig
+    popup: PopupConfig
     colorMode: ColorModeConfig
   }
 }

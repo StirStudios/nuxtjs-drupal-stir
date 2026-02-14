@@ -120,6 +120,7 @@ const onOpen = (val: boolean) => {
               : theme.navigation.logoSize,
           ].join(' ')
         "
+        class="app-logo"
       />
       <template v-else>
         {{ page?.site_info?.name }}
@@ -128,6 +129,7 @@ const onOpen = (val: boolean) => {
 
     <LazyUNavigationMenu
       aria-label="Site Navigation"
+      class="app-nav app-nav-desktop"
       :color="theme.navigation.color"
       :highlight="theme.navigation.highlight.show"
       :highlight-color="
@@ -144,6 +146,7 @@ const onOpen = (val: boolean) => {
     <template #body>
       <LazyUNavigationMenu
         aria-label="Mobile Navigation"
+        class="app-nav app-nav-mobile"
         :items="navLinks"
         orientation="vertical"
         :ui="{ link: theme.navigation.slideover.link }"

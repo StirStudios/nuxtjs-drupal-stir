@@ -27,6 +27,14 @@ A production-ready Nuxt 4 starter template with Nuxt UI 4, Tailwind CSS 4, and f
 - `assets/css/main.css` — Tailwind CSS entry point
 - `utils/uiVariants.ts` — Custom Nuxt UI material variant tokens
 
+## 🎨 Styling Conventions
+
+- Prefer nested CSS for readability.
+- In scoped styles, use `:global(...)` + `:deep(...)` when targeting global theme/state classes.
+- Prefer stable class hooks over ARIA/attribute selectors for reusable styling targets.
+- Keep `app/assets/css/custom.css` as an import/index file and place new rules in focused partials under `app/assets/css/custom/`.
+- If a custom stylesheet grows past roughly 80-120 lines or mixes concerns, split it during the same change.
+
 ## 🛠️ Scripts
 
 ```bash
