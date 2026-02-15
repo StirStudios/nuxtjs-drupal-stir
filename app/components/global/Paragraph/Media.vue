@@ -71,6 +71,12 @@ const lanes = computed(() => {
 })
 
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
+const hydrated = ref(false)
+const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
+
+onMounted(() => {
+  hydrated.value = true
+})
 </script>
 
 <template>
@@ -82,7 +88,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
 
       <WrapAnimate class="relative" :effect="direction">
         <UScrollArea
-          v-if="masonry"
+          v-if="useMasonryVirtualized"
           ref="scrollArea"
           v-slot="{ item: node, index: i }"
           class="w-full overflow-hidden"
