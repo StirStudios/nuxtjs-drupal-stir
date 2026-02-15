@@ -114,13 +114,13 @@ const onOpen = (val: boolean) => {
         v-if="theme.navigation.logo"
         :add-classes="
           [
+            'app-logo',
             'transition-all duration-300',
             finalIsScrolled
               ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
               : theme.navigation.logoSize,
           ].join(' ')
         "
-        class="app-logo"
       />
       <template v-else>
         {{ page?.site_info?.name }}

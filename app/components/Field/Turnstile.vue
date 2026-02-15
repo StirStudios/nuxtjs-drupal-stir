@@ -8,22 +8,62 @@ const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
 const hasLabel = computed(() => Boolean(themeTurnstile.label))
+const container = ref<HTMLElement | null>(null)
+const shouldRenderTurnstile = ref(false)
+let observer: IntersectionObserver | null = null
+
+const revealTurnstile = () => {
+  if (shouldRenderTurnstile.value) return
+  shouldRenderTurnstile.value = true
+  observer?.disconnect()
+  observer = null
+}
+
+onMounted(() => {
+  if (!import.meta.client || shouldRenderTurnstile.value) return
+  if (!container.value) {
+    revealTurnstile()
+    return
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    revealTurnstile()
+    return
+  }
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) revealTurnstile()
+    },
+    { rootMargin: '300px 0px' },
+  )
+
+  observer.observe(container.value)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+})
 </script>
 
 <template>
-  <UFormField
-    :label="hasLabel ? themeTurnstile.label : undefined"
-    :ui="{
-      label:
-        themeTurnstile.appearance !== 'interaction-only' && themeTurnstile.label
-          ? ''
-          : 'sr-only',
-    }"
-  >
-    <NuxtTurnstile
-      v-model="turnstileToken"
-      class="max-w-xs overflow-x-hidden"
-      :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
-    />
-  </UFormField>
+  <div ref="container">
+    <UFormField
+      :label="hasLabel ? themeTurnstile.label : undefined"
+      :ui="{
+        label:
+          themeTurnstile.appearance !== 'interaction-only' && themeTurnstile.label
+            ? ''
+            : 'sr-only',
+      }"
+    >
+      <NuxtTurnstile
+        v-if="shouldRenderTurnstile"
+        v-model="turnstileToken"
+        class="max-w-xs overflow-x-hidden"
+        :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
+      />
+    </UFormField>
+  </div>
 </template>
