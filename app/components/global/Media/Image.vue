@@ -25,7 +25,11 @@ const props = defineProps<{
 
 const theme = useAppConfig().stirTheme
 const { isFront } = usePageContext()
-const isEager = computed(() => props.loading === 'eager')
+const normalizedLoading = computed<'lazy' | 'eager'>(() => {
+  if (props.loading === 'eager') return 'eager'
+  return 'lazy'
+})
+const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
 const isHero = computed(() => props.isHero === true || injectedIsHero)
 const isBare = computed(() => isHero.value || props.noWrapper === true)
@@ -48,7 +52,7 @@ const linkAriaLabel = computed(
     "
     :fetchpriority="fetchpriority || undefined"
     :height="height"
-    :loading="loading || 'lazy'"
+    :loading="normalizedLoading"
     :sizes="sizes || '100vw'"
     :src="src"
     :srcset="srcset"
@@ -73,26 +77,20 @@ const linkAriaLabel = computed(
       theme.media.rounded,
     ]"
   >
-    <ClientOnly v-if="!isEager" fallback-tag="div">
-      <template #default>
-        <img
-          :alt="alt || ''"
-          :class="[
-            theme.media.base,
-            platform === 'instagram' ? 'aspect-3/4' : '',
-          ]"
-          :height="height"
-          :loading="loading || 'lazy'"
-          :sizes="sizes || '100vw'"
-          :src="src"
-          :srcset="srcset"
-          :width="width"
-        />
-      </template>
-      <template #fallback>
-        <USkeleton class="aspect-[4/3] max-h-[30%] w-full" />
-      </template>
-    </ClientOnly>
+    <img
+      v-if="!isEager"
+      :alt="alt || ''"
+      :class="[
+        theme.media.base,
+        platform === 'instagram' ? 'aspect-3/4' : '',
+      ]"
+      :height="height"
+      :loading="normalizedLoading"
+      :sizes="sizes || '100vw'"
+      :src="src"
+      :srcset="srcset"
+      :width="width"
+    />
 
     <img
       v-else
@@ -100,7 +98,7 @@ const linkAriaLabel = computed(
       :class="[theme.media.base]"
       fetchpriority="high"
       :height="height"
-      loading="eager"
+      :loading="normalizedLoading"
       :sizes="sizes || '100vw'"
       :src="src"
       :srcset="srcset"
