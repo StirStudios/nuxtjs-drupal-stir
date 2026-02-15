@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
+import { defineAsyncComponent } from 'vue'
 import type { PopupNode } from '~/composables/usePopupData'
 import { usePopupData } from '~/composables/usePopupData'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
 const { y } = useWindowScroll()
+const LazyParagraphPopup = defineAsyncComponent(
+  () => import('~/components/global/Paragraph/Popup.vue'),
+)
 const open = ref(false)
 const seen = useCookie<boolean | undefined>('marketing_popup', {
   maxAge: 60 * 60 * 24 * 7,
   sameSite: 'lax',
 })
 const hasTriggered = ref(false)
+const readyForPopupTriggers = ref(!import.meta.client)
 
 type PopupWebform = {
   webformTitle?: string
@@ -33,6 +38,8 @@ type PopupMedia = Record<string, unknown>
 let delayTimer: ReturnType<typeof setTimeout> | null = null
 let stopScrollWatch: (() => void) | null = null
 let onExitIntent: ((event: MouseEvent) => void) | null = null
+let idleTimer: ReturnType<typeof setTimeout> | null = null
+let removeReadyListeners: (() => void) | null = null
 
 function cleanupTriggerHandlers() {
   if (delayTimer) {
@@ -49,6 +56,65 @@ function cleanupTriggerHandlers() {
     document.removeEventListener('mouseout', onExitIntent)
     onExitIntent = null
   }
+}
+
+function cleanupReadyHandlers() {
+  if (idleTimer) {
+    clearTimeout(idleTimer)
+    idleTimer = null
+  }
+
+  if (removeReadyListeners) {
+    removeReadyListeners()
+    removeReadyListeners = null
+  }
+}
+
+function markReadyForPopupTriggers() {
+  if (readyForPopupTriggers.value) return
+  readyForPopupTriggers.value = true
+  cleanupReadyHandlers()
+}
+
+function setupReadyForPopupTriggers() {
+  if (!import.meta.client) return
+  if (readyForPopupTriggers.value) return
+
+  const onFirstInteraction = () => {
+    markReadyForPopupTriggers()
+  }
+
+  const events: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'scroll']
+  events.forEach((eventName) => {
+    window.addEventListener(eventName, onFirstInteraction, {
+      once: true,
+      passive: true,
+    })
+  })
+
+  removeReadyListeners = () => {
+    events.forEach((eventName) => {
+      window.removeEventListener(eventName, onFirstInteraction)
+    })
+  }
+
+  const win = window as Window & {
+    requestIdleCallback?: (
+      callback: IdleRequestCallback,
+      options?: IdleRequestOptions,
+    ) => number
+  }
+
+  if (typeof win.requestIdleCallback === 'function') {
+    win.requestIdleCallback(() => {
+      markReadyForPopupTriggers()
+    }, { timeout: 3000 })
+    return
+  }
+
+  idleTimer = setTimeout(() => {
+    markReadyForPopupTriggers()
+  }, 1500)
 }
 
 function getPopupProps(node: PopupNode | null): PopupProps {
@@ -88,6 +154,8 @@ const popupRenderProps = computed(() => {
 })
 
 const selectedMedia = ref<PopupMedia | null>(null)
+const shouldRenderPopupContent = computed(() => open.value)
+
 const closeModal = () => {
   open.value = false
 }
@@ -160,18 +228,23 @@ function handleTrigger() {
 }
 
 watch(
-  popup,
-  (val) => {
+  [popup, readyForPopupTriggers],
+  ([val, isReady]) => {
     cleanupTriggerHandlers()
-    if (val) {
+    if (val && isReady) {
       handleTrigger()
     }
   },
   { immediate: true },
 )
 
+onMounted(() => {
+  setupReadyForPopupTriggers()
+})
+
 onBeforeUnmount(() => {
   cleanupTriggerHandlers()
+  cleanupReadyHandlers()
 })
 </script>
 
@@ -196,26 +269,28 @@ onBeforeUnmount(() => {
       }"
     >
       <template #body>
-        <UButton
-          aria-label="Close"
-          class="absolute end-5 top-5 z-100"
-          color="neutral"
-          icon="i-lucide-x"
-          variant="solid"
-          @click="open = false"
-        />
+        <template v-if="shouldRenderPopupContent">
+          <UButton
+            aria-label="Close"
+            class="absolute end-5 top-5 z-100"
+            color="neutral"
+            icon="i-lucide-x"
+            variant="solid"
+            @click="open = false"
+          />
 
-        <ParagraphPopup
-          v-bind="popupRenderProps"
-          :on-close="closeModal"
-        >
-          <template #media>
-            <component
-              :is="renderCustomElements(selectedMedia)"
-              v-if="selectedMedia"
-            />
-          </template>
-        </ParagraphPopup>
+          <LazyParagraphPopup
+            v-bind="popupRenderProps"
+            :on-close="closeModal"
+          >
+            <template #media>
+              <component
+                :is="renderCustomElements(selectedMedia)"
+                v-if="selectedMedia"
+              />
+            </template>
+          </LazyParagraphPopup>
+        </template>
       </template>
     </UModal>
   </ClientOnly>
