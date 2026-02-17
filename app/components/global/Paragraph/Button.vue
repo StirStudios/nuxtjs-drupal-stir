@@ -95,10 +95,12 @@ const pdfUrl = computed(() => pdfProps.value?.url as string | undefined)
     :description="pdfDescription"
     fullscreen
     :title="pdfTitle"
-    :ui="{ body: 'flex-1 !pt-0 mt-4 sm:mt-6' }"
+    :ui="{
+      body: 'flex-1 !pt-0 mt-4 sm:mt-6',
+    }"
   >
     <template #body>
-      <PdfViewer :src="pdfUrl" />
+      <LazyPdfViewer :src="pdfUrl" />
     </template>
   </UModal>
 </template>

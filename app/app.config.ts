@@ -216,6 +216,12 @@ export default defineAppConfig({
       },
     },
 
+    modal: {
+      slots: {
+        title: 'mb-0',
+      },
+    },
+
     carousel: {
       slots: {
         root: 'group relative focus:outline-none',
