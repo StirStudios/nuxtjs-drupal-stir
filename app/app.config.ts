@@ -186,8 +186,10 @@ export default defineAppConfig({
     },
 
     error: {
-      label: 'Take me back home',
+      label: 'Back to home',
       color: 'primary',
+      size: 'xl',
+      icon: 'i-lucide-arrow-left',
       variant: 'solid',
     },
   },

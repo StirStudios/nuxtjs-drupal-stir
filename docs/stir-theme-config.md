@@ -323,9 +323,11 @@ modal: { header: true },
 
 ```ts
 error: {
-  label: 'Take me back home',
+  label: 'Back to home',
   color: 'primary',
-  variant: 'solid'
+  size: 'xl',
+  icon: 'i-lucide-arrow-left',
+  variant: 'solid',
 },
 ```
 
