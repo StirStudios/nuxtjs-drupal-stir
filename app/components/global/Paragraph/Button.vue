@@ -52,8 +52,8 @@ const hasPdf = computed(() => !!pdf.value)
 const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
 const pdfProps = computed(() => tk.propsOf(pdf.value ?? undefined))
 const pdfTitle = computed(() => String(pdfProps.value?.title || btnLabel.value))
-const pdfDescription = computed(
-  () => String(pdfProps.value?.alt || 'PDF document preview'),
+const pdfDescription = computed(() =>
+  String(pdfProps.value?.alt || 'PDF document preview'),
 )
 const pdfUrl = computed(() => pdfProps.value?.url as string | undefined)
 </script>
@@ -95,6 +95,7 @@ const pdfUrl = computed(() => pdfProps.value?.url as string | undefined)
     :description="pdfDescription"
     fullscreen
     :title="pdfTitle"
+    :ui="{ body: 'flex-1 m-4 sm:mt-6' }"
   >
     <template #body>
       <PdfViewer :src="pdfUrl" />
