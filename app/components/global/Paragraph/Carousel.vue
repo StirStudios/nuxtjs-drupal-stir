@@ -27,6 +27,12 @@ const props = defineProps<{
 const carousel = useTemplateRef<'carousel'>('carousel')
 const theme = useAppConfig().stirTheme
 const slots = useSlots()
+const mounted = ref(false)
+
+onMounted(() => {
+  mounted.value = true
+})
+
 const slides = computed(() => {
   const slotItems = slots.media?.() ?? []
   const raw: unknown[] = (props.items?.length ?? 0) > 0 ? (props.items ?? []) : slotItems
@@ -93,7 +99,7 @@ function handleSelect() {
       v-if="slides.length"
       ref="carousel"
       v-slot="{ item }"
-      :arrows="carouselArrows"
+      :arrows="mounted ? carouselArrows : false"
       :auto-height="carouselAutoheight"
       :auto-scroll="autoScrollOptions"
       :autoplay="autoplayOptions"
