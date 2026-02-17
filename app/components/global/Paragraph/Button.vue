@@ -100,7 +100,7 @@ const pdfUrl = computed(() => pdfProps.value?.url as string | undefined)
     }"
   >
     <template #body>
-      <PdfViewer :src="pdfUrl" />
+      <LazyPdfViewer :src="pdfUrl" />
     </template>
   </UModal>
 </template>
