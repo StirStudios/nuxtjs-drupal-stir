@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { usePageContext } from '~/composables/usePageContext'
 
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps<{
   title?: string
   alt?: string
