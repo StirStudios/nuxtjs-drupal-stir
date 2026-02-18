@@ -57,8 +57,8 @@ export function useCalendlyWidget(
     {
       manual: true,
       attrs: {
-        async: true,
-        defer: true,
+        async: 'true',
+        defer: 'true',
       },
     },
   )
