@@ -70,6 +70,13 @@ const blocks = ref<DateTimeBlock[]>(
   }),
 )
 
+const dateTriggerId = (index: number) => `${props.fieldName}-date-${index + 1}`
+const dateTriggerLabelId = (index: number) =>
+  `${props.fieldName}-date-label-${index + 1}`
+const timeSelectId = (index: number) => `${props.fieldName}-time-${index + 1}`
+const timeSelectName = (index: number) =>
+  `${props.fieldName}_time_${index + 1}`
+
 watchEffect(() => {
   if (!Array.isArray(props.state[props.fieldName])) {
     props.state[props.fieldName] = []
@@ -107,14 +114,16 @@ watch(
   <div class="space-y-6">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <template v-for="(block, i) in blocks" :key="i">
-        <UFormField
-          v-if="multiple > 1"
-          :label="`${field['#title']} ${i + 1}`"
-          :required="!!field['#required']"
-        >
+        <UFormField v-if="multiple > 1" :required="!!field['#required']">
+          <p :id="dateTriggerLabelId(i)" class="mb-2 block font-medium text-dimmed">
+            {{ `${field['#title']} ${i + 1}` }}
+            <span v-if="field['#required']" class="ms-0.5 text-error">*</span>
+          </p>
           <UPopover :class="{ 'w-full': isMaterial }">
             <UButton
+              :id="dateTriggerId(i)"
               :aria-label="`${field['#title']} ${i + 1}: ${block.date ? 'Change date' : 'Select date'}`"
+              :aria-labelledby="dateTriggerLabelId(i)"
               icon="i-lucide-calendar"
               size="md"
               :variant="webform.variant"
@@ -129,6 +138,7 @@ watch(
 
         <UPopover v-else :class="{ 'w-full': isMaterial }">
           <UButton
+            :id="dateTriggerId(i)"
             :aria-label="`${field['#title']}: ${block.date ? 'Change date' : 'Select date'}`"
             icon="i-lucide-calendar"
             size="md"
@@ -143,10 +153,13 @@ watch(
 
         <UFormField :label="`Time ${i + 1}`" :required="!!field['#required']">
           <USelect
+            :id="timeSelectId(i)"
             v-model="block.start"
+            :aria-label="`Time ${i + 1}`"
             class="w-full"
             :items="timeOptions"
             label-key="label"
+            :name="timeSelectName(i)"
             placeholder="Select time"
             value-key="value"
             :variant="webform.variant"
