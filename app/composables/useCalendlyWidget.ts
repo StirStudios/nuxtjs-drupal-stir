@@ -1,3 +1,5 @@
+import { useEventListener, useScriptTag } from '@vueuse/core'
+
 declare global {
   interface Window {
     Calendly: {
@@ -11,7 +13,9 @@ declare global {
 
 let calendlyScriptLoaded: Promise<Window['Calendly'] | undefined> | null = null
 
-function loadCalendlyScript(): Promise<Window['Calendly'] | undefined> {
+function loadCalendlyScript(
+  loadScript: () => Promise<unknown>,
+): Promise<Window['Calendly'] | undefined> {
   if (calendlyScriptLoaded) return calendlyScriptLoaded
 
   calendlyScriptLoaded = new Promise((resolve) => {
@@ -23,19 +27,14 @@ function loadCalendlyScript(): Promise<Window['Calendly'] | undefined> {
       return resolve(window.Calendly)
     }
 
-    const script = document.createElement('script')
-    script.src = 'https://assets.calendly.com/assets/external/widget.js'
-    script.async = true
-    script.defer = true
-    script.onload = () => resolve(window.Calendly)
-    script.onerror = () => {
-      if (import.meta.dev) {
-        console.error('[Calendly] Failed to load script')
-      }
-      resolve(undefined)
-    }
-
-    document.head.appendChild(script)
+    loadScript()
+      .then(() => resolve(window.Calendly))
+      .catch(() => {
+        if (import.meta.dev) {
+          console.error('[Calendly] Failed to load script')
+        }
+        resolve(undefined)
+      })
   })
 
   return calendlyScriptLoaded
@@ -52,10 +51,21 @@ export function useCalendlyWidget(
   url: string,
   onReady?: () => void,
 ) {
-  let handler: ((e: MessageEvent) => void) | null = null
+  const { load } = useScriptTag(
+    'https://assets.calendly.com/assets/external/widget.js',
+    undefined,
+    {
+      manual: true,
+      attrs: {
+        async: true,
+        defer: true,
+      },
+    },
+  )
+  let stopMessageListener: (() => void) | null = null
 
   onMounted(async () => {
-    const calendly = await loadCalendlyScript()
+    const calendly = await loadCalendlyScript(load)
     if (!calendly || !container.value) return
 
     calendly.initInlineWidget({
@@ -65,7 +75,7 @@ export function useCalendlyWidget(
 
     onReady?.()
 
-    handler = (e: MessageEvent) => {
+    stopMessageListener = useEventListener(window, 'message', (e: MessageEvent) => {
       if (
         isCalendlyEvent(e) &&
         e.data.event === 'calendly.page_height' &&
@@ -76,14 +86,11 @@ export function useCalendlyWidget(
           container.value.style.height = `${height}px`
         }
       }
-    }
-
-    window.addEventListener('message', handler)
+    })
   })
 
   onBeforeUnmount(() => {
-    if (handler) {
-      window.removeEventListener('message', handler)
-    }
+    stopMessageListener?.()
+    stopMessageListener = null
   })
 }
