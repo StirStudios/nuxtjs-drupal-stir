@@ -12,6 +12,12 @@ const props = defineProps<{
 const descriptionContent = shallowRef('')
 const checkboxValue = ref<boolean>(false)
 const optionProps = props.field['#optionProperties'] || {}
+const checkboxId = computed(
+  () => props.field['#id'] || `checkbox-${props.fieldName}`,
+)
+const checkboxLabel = computed(() =>
+  String(props.field['#title'] || props.fieldName),
+)
 const { disabled, checked } = useEvaluateState(
   props.field['#states'] ?? {},
   props.state,
@@ -51,10 +57,13 @@ const handleModelUpdate = (val: boolean) => {
 
 <template>
   <UCheckbox
+    :id="checkboxId"
     v-model="checkboxValue"
+    :aria-label="checkboxLabel"
     class="form-input w-full"
     :disabled="disabled"
-    :label="field['#title']"
+    :label="checkboxLabel"
+    name=""
     :ui="{
       label: descriptionContent ? 'sr-only' : '',
     }"

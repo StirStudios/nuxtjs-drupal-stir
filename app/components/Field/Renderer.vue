@@ -110,7 +110,7 @@ const labelClass = computed(() => props.field['#class'] || '')
       v-if="resolvedComponent"
       :field="field"
       :field-name="fieldName"
-      :floating-label="useFloatingLabels"
+      :floating-label="field['#type'] === 'checkbox' ? undefined : useFloatingLabels"
       :state="state"
     />
 
