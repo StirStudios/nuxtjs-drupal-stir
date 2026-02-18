@@ -65,6 +65,11 @@ export default defineNuxtConfig({
   },
 
   icon: {
+    clientBundle: {
+      scan: true,
+      includeCustomCollections: true,
+      sizeLimitKb: 256,
+    },
     customCollections: [
       {
         prefix: 'social',
