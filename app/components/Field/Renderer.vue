@@ -62,6 +62,8 @@ const resolvedComponent = computed(
 const shouldShowLabel = computed(
   () =>
     props.field['#type'] !== 'checkbox' &&
+    props.field['#type'] !== 'datetime' &&
+    props.field['#type'] !== 'date' &&
     props.field['#type'] !== 'hidden' &&
     !useFloatingLabels.value,
 )

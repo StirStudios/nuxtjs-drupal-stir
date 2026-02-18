@@ -10,6 +10,7 @@ const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
 const hasLabel = computed(() => Boolean(themeTurnstile.label))
+const labelId = useId()
 const container = ref<HTMLElement | null>(null)
 const shouldRenderTurnstile = ref(false)
 let stopObserver: (() => void) | null = null
@@ -51,18 +52,22 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="container">
-    <UFormField
-      :label="hasLabel ? themeTurnstile.label : undefined"
-      :ui="{
-        label:
-          themeTurnstile.appearance !== 'interaction-only' && themeTurnstile.label
-            ? ''
-            : 'sr-only',
-      }"
-    >
+    <UFormField>
+      <p
+        v-if="hasLabel"
+        :id="labelId"
+        :class="
+          themeTurnstile.appearance !== 'interaction-only' ? '' : 'sr-only'
+        "
+      >
+        {{ themeTurnstile.label }}
+      </p>
+
       <NuxtTurnstile
         v-if="shouldRenderTurnstile"
         v-model="turnstileToken"
+        :aria-label="hasLabel ? undefined : 'Let us know you are human'"
+        :aria-labelledby="hasLabel ? labelId : undefined"
         class="max-w-xs overflow-x-hidden"
         :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
       />
