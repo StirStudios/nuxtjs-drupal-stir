@@ -74,6 +74,7 @@ const selectedDatesLabel = computed(() =>
 <template>
   <UPopover :class="{ 'w-full': isMaterial }">
     <UButton icon="i-lucide-calendar" size="md" :variant="webform.variant">
+      <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}
     </UButton>
     <template #content>

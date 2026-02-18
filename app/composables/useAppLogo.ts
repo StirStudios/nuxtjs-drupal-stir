@@ -1,11 +1,11 @@
+import { useMounted } from '@vueuse/core'
 import useDarkMode from '~/composables/useDarkMode'
 import { usePageContext } from '~/composables/usePageContext'
 
 export function useAppLogo(props: { addClasses?: string }) {
   const { isDark } = useDarkMode()
   const { page } = usePageContext()
-  const mounted = ref(false)
-  onMounted(() => (mounted.value = true))
+  const mounted = useMounted()
 
   const fillClass = computed(() =>
     mounted.value ? (isDark.value ? 'fill-white' : 'fill-black') : '',

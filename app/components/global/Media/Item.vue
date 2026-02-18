@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import { createSpringLinearEasing } from '../../../utils/animations'
 
 interface SlotNode {
@@ -66,7 +67,7 @@ const revealStyle = computed(() =>
       }
     : undefined,
 )
-let observer: IntersectionObserver | null = null
+let stopObserver: (() => void) | null = null
 
 onMounted(() => {
   if (!shouldAnimateOnScroll || !rootEl.value) return
@@ -75,23 +76,23 @@ onMounted(() => {
     return
   }
 
-  observer = new IntersectionObserver(
+  const { stop } = useIntersectionObserver(
+    rootEl,
     (entries) => {
       if (entries.some((entry) => entry.isIntersecting)) {
         isRevealed.value = true
-        observer?.disconnect()
-        observer = null
+        stopObserver?.()
+        stopObserver = null
       }
     },
     { rootMargin: '120px 0px' },
   )
-
-  observer.observe(rootEl.value)
+  stopObserver = stop
 })
 
 onBeforeUnmount(() => {
-  observer?.disconnect()
-  observer = null
+  stopObserver?.()
+  stopObserver = null
 })
 </script>
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
+
 type TurnstileTheme = {
   appearance?: 'always' | 'execute' | 'interaction-only'
   label?: string
@@ -10,13 +12,13 @@ const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
 const hasLabel = computed(() => Boolean(themeTurnstile.label))
 const container = ref<HTMLElement | null>(null)
 const shouldRenderTurnstile = ref(false)
-let observer: IntersectionObserver | null = null
+let stopObserver: (() => void) | null = null
 
 const revealTurnstile = () => {
   if (shouldRenderTurnstile.value) return
   shouldRenderTurnstile.value = true
-  observer?.disconnect()
-  observer = null
+  stopObserver?.()
+  stopObserver = null
 }
 
 onMounted(() => {
@@ -31,19 +33,19 @@ onMounted(() => {
     return
   }
 
-  observer = new IntersectionObserver(
+  const { stop } = useIntersectionObserver(
+    container,
     (entries) => {
       if (entries.some((entry) => entry.isIntersecting)) revealTurnstile()
     },
     { rootMargin: '300px 0px' },
   )
-
-  observer.observe(container.value)
+  stopObserver = stop
 })
 
 onBeforeUnmount(() => {
-  observer?.disconnect()
-  observer = null
+  stopObserver?.()
+  stopObserver = null
 })
 </script>
 

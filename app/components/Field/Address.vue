@@ -43,6 +43,8 @@ const useFloatingLabels = computed(
 if (!props.state[props.fieldName]) {
   props.state[props.fieldName] = {}
 }
+
+const getFieldId = (key: string) => `${props.fieldName}-${key}`
 </script>
 
 <template>
@@ -56,6 +58,7 @@ if (!props.state[props.fieldName]) {
     >
       <UInput
         v-if="key !== 'country'"
+        :id="getFieldId(String(key))"
         v-model="state[fieldName][key]"
         class="w-full"
         :placeholder="useFloatingLabels ? ' ' : ''"
@@ -65,7 +68,7 @@ if (!props.state[props.fieldName]) {
         <label
           v-if="useFloatingLabels"
           :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
-          :for="fieldName"
+          :for="getFieldId(String(key))"
         >
           <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
             {{ String(fieldData['#title'] ?? key) }}
@@ -75,6 +78,7 @@ if (!props.state[props.fieldName]) {
 
       <USelectMenu
         v-else
+        :id="getFieldId(String(key))"
         v-model="state[fieldName].country"
         class="w-full"
         :items="countryOptions"

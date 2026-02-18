@@ -114,7 +114,7 @@ watch(
         >
           <UPopover :class="{ 'w-full': isMaterial }">
             <UButton
-              :aria-label="block.date ? 'Change date' : 'Select date'"
+              :aria-label="`${field['#title']} ${i + 1}: ${block.date ? 'Change date' : 'Select date'}`"
               icon="i-lucide-calendar"
               size="md"
               :variant="webform.variant"
@@ -129,7 +129,7 @@ watch(
 
         <UPopover v-else :class="{ 'w-full': isMaterial }">
           <UButton
-            :aria-label="block.date ? 'Change date' : 'Select date'"
+            :aria-label="`${field['#title']}: ${block.date ? 'Change date' : 'Select date'}`"
             icon="i-lucide-calendar"
             size="md"
             :variant="webform.variant"
