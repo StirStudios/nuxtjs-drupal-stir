@@ -117,7 +117,8 @@ export default defineNuxtConfig({
             '@nuxtjs/sitemap',
             {
               sources: [`${process.env.DRUPAL_URL}/api/sitemap`],
-              cacheMaxAgeSeconds: 3600,
+              runtimeCacheStorage: { driver: 'memory' },
+              cacheMaxAgeSeconds: 0,
               xslColumns: [
                 { label: 'URL', width: '50%' },
                 {
