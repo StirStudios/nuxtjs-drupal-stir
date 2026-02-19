@@ -66,8 +66,6 @@ onBeforeUnmount(() => {
       <NuxtTurnstile
         v-if="shouldRenderTurnstile"
         v-model="turnstileToken"
-        :aria-label="hasLabel ? undefined : 'Let us know you are human'"
-        :aria-labelledby="hasLabel ? labelId : undefined"
         class="max-w-xs overflow-x-hidden"
         :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
       />
