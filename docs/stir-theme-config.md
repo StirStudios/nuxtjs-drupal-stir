@@ -74,7 +74,7 @@ userway: {
   enabled: false,
   account: '',
   position: 3,
-  size: 'small', // or 'medium' | 'large'
+  size: 'small',
   color: '#ffffff',
   type: '1',
 }
@@ -85,12 +85,8 @@ userway: {
 ```ts
 protectedRoutes: {
   loginPath: '/login',
-  redirectOnLogin: '/example',
-  requireLoginPaths: [
-	'/example',
-	'/admin/',
-  ],
-  loginHeading: 'Login',
+  redirectOnLogin: '/',
+  requireLoginPaths: [],
 }
 ```
 
@@ -127,12 +123,48 @@ Popup path matching rules:
 ```ts
 cookieConsent: {
   enabled: false,
-  title: 'We value your privacy',
-  message: 'We use cookies to enhance your experience and collect the information you provide through our booking forms to help plan your wedding. We do not sell your data.',
+  mode: 'notice', // 'notice' | 'consent'
+  position: 'center', // 'left' | 'center' | 'right'
+  dismissible: true,
+  title: '',
+  message: '',
   messageLinks: 'For more information please review our',
-  termsUrl: '/terms',
-  privacyUrl: '/privacy',
+  termsUrl: '',
+  privacyUrl: '',
+  buttonLabel: 'Got it',
+  declineButtonLabel: 'Decline',
+}
+```
+
+`notice` mode example (no consent gate, simple acknowledgement):
+
+```ts
+cookieConsent: {
+  enabled: true,
+  mode: 'notice',
+  position: 'center',
+  title: 'Privacy Notice',
+  message: 'We use essential cookies to run this website.',
+  buttonLabel: 'Got it',
+  termsUrl: '/terms-service',
+  privacyUrl: '/privacy-policy',
+}
+```
+
+`consent` mode example (explicit accept/decline):
+
+```ts
+cookieConsent: {
+  enabled: true,
+  mode: 'consent',
+  position: 'center',
+  dismissible: false,
+  title: 'Cookie Consent',
+  message: 'We use analytics cookies to improve your experience.',
   buttonLabel: 'Accept',
+  declineButtonLabel: 'Decline',
+  termsUrl: '/terms-service',
+  privacyUrl: '/privacy-policy',
 }
 ```
 

@@ -27,10 +27,14 @@ type UserwayConfig = {
 
 type CookieConsentConfig = {
   enabled?: boolean
+  mode?: 'consent' | 'notice'
+  position?: 'left' | 'center' | 'right'
+  dismissible?: boolean
   title?: string
   message?: string
   messageLinks?: string
   buttonLabel?: string
+  declineButtonLabel?: string
   termsUrl?: string
   privacyUrl?: string
 } & LooseRecord

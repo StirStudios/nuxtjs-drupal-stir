@@ -22,6 +22,6 @@ const cookieConsentEnabled = computed(
     <NuxtPage />
     <LazyAppScrollToTop />
     <LazyAppPopup v-if="popupEnabled" />
-    <LazyCookieConsent v-if="cookieConsentEnabled" />
+    <LazyPrivacyNotice v-if="cookieConsentEnabled" />
   </UApp>
 </template>

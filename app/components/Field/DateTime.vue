@@ -122,7 +122,7 @@ watch(
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <template v-for="(block, i) in blocks" :key="i">
         <UFormField v-if="multiple > 1" :required="!!field['#required']">
-          <p :id="dateTriggerLabelId(i)" class="mb-2 block font-medium text-dimmed">
+          <p :id="dateTriggerLabelId(i)" class="mb-2 block font-medium text-default/80">
             {{ `${field['#title']} ${i + 1}` }}
             <span v-if="field['#required']" class="ms-0.5 text-error">*</span>
           </p>
