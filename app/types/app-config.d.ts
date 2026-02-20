@@ -37,6 +37,8 @@ type CookieConsentConfig = {
 
 type PopupConfig = {
   enabled?: boolean
+  includePaths?: string[]
+  excludePaths?: string[]
 } & LooseRecord
 
 type ColorModeConfig = {

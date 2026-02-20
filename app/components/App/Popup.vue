@@ -6,6 +6,8 @@ import { usePopupData } from '~/composables/usePopupData'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
+const route = useRoute()
+const appConfig = useAppConfig()
 const { y } = useWindowScroll()
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),
@@ -41,6 +43,22 @@ let stopScrollWatch: (() => void) | null = null
 let onExitIntent: ((event: MouseEvent) => void) | null = null
 let idleTimer: ReturnType<typeof setTimeout> | null = null
 let removeReadyListeners: (() => void) | null = null
+
+function normalizePath(path: string): string {
+  if (!path || path === '/') return '/'
+  return path.endsWith('/') ? path.slice(0, -1) : path
+}
+
+function matchesPopupPath(routePath: string, rule: string): boolean {
+  const normalizedRule = normalizePath(rule.trim())
+  const normalizedRoute = normalizePath(routePath)
+  if (!normalizedRule) return false
+  if (normalizedRule === '/') return normalizedRoute === '/'
+  return (
+    normalizedRoute === normalizedRule ||
+    normalizedRoute.startsWith(`${normalizedRule}/`)
+  )
+}
 
 function cleanupTriggerHandlers() {
   if (delayTimer) {
@@ -156,6 +174,26 @@ const popupRenderProps = computed(() => {
 
 const selectedMedia = ref<PopupMedia | null>(null)
 const shouldRenderPopupContent = computed(() => open.value)
+const includePaths = computed(() =>
+  (appConfig.popup?.includePaths ?? []).filter(
+    (path): path is string => typeof path === 'string' && path.trim().length > 0,
+  ),
+)
+const excludePaths = computed(() =>
+  (appConfig.popup?.excludePaths ?? []).filter(
+    (path): path is string => typeof path === 'string' && path.trim().length > 0,
+  ),
+)
+const isPopupRouteAllowed = computed(() => {
+  const routePath = route.path
+  const includeMatch =
+    includePaths.value.length === 0 ||
+    includePaths.value.some((path) => matchesPopupPath(routePath, path))
+  const excludeMatch = excludePaths.value.some((path) =>
+    matchesPopupPath(routePath, path),
+  )
+  return includeMatch && !excludeMatch
+})
 
 const closeModal = () => {
   open.value = false
@@ -177,6 +215,7 @@ watch(open, (isOpen) => {
 })
 
 function showModalOnce() {
+  if (!isPopupRouteAllowed.value) return
   if (open.value || (config.value.showOnce && seen.value === true)) return
 
   open.value = true
@@ -189,6 +228,7 @@ function showModalOnce() {
 function handleTrigger() {
   if (!import.meta.client) return
   if (!popup.value) return
+  if (!isPopupRouteAllowed.value) return
   if (hasTriggered.value) return
 
   hasTriggered.value = true
@@ -230,14 +270,24 @@ function handleTrigger() {
 }
 
 watch(
-  [popup, readyForPopupTriggers],
-  ([val, isReady]) => {
+  [popup, readyForPopupTriggers, isPopupRouteAllowed],
+  ([val, isReady, isRouteAllowed]) => {
     cleanupTriggerHandlers()
-    if (val && isReady) {
+    if (val && isReady && isRouteAllowed) {
       handleTrigger()
     }
   },
   { immediate: true },
+)
+
+watch(
+  () => route.path,
+  () => {
+    if (!isPopupRouteAllowed.value) {
+      open.value = false
+      cleanupTriggerHandlers()
+    }
+  },
 )
 
 onMounted(() => {

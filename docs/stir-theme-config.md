@@ -112,8 +112,15 @@ analytics: {
 ```ts
 popup: {
   enabled: false, // global mount switch for <LazyAppPopup />
+  includePaths: [], // optional allowlist; empty = all routes
+  excludePaths: [], // optional blocklist; takes precedence over includePaths
 }
 ```
+
+Popup path matching rules:
+
+- `'/'` matches only homepage.
+- Non-root entries use exact-or-prefix matching (for example `'/pricing'` matches `/pricing` and `/pricing/team`).
 
 ### 🍪 `cookieConsent`
 
