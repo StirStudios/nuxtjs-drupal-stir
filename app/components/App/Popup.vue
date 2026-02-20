@@ -282,9 +282,10 @@ watch(
 watch(
   () => route.path,
   () => {
+    hasTriggered.value = false
+    cleanupTriggerHandlers()
     if (!isPopupRouteAllowed.value) {
       open.value = false
-      cleanupTriggerHandlers()
     }
   },
 )
