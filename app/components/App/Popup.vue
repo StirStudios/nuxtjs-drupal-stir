@@ -17,6 +17,7 @@ const seen = useCookie<boolean | undefined>('marketing_popup', {
 })
 const hasTriggered = ref(false)
 const readyForPopupTriggers = ref(!import.meta.client)
+const MIN_POPUP_DELAY_MS = 3000
 
 type PopupWebform = {
   webformTitle?: string
@@ -193,7 +194,8 @@ function handleTrigger() {
   hasTriggered.value = true
 
   if (config.value.trigger === 'delay') {
-    delayTimer = setTimeout(showModalOnce, config.value.delay)
+    const safeDelay = Math.max(config.value.delay ?? 0, MIN_POPUP_DELAY_MS)
+    delayTimer = setTimeout(showModalOnce, safeDelay)
   }
 
   if (config.value.trigger === 'scroll') {
