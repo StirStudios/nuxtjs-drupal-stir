@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 const appConfig = useAppConfig()
 const popupEnabled = computed(() => appConfig.popup?.enabled === true)
-const cookieConsentEnabled = computed(
-  () => appConfig.cookieConsent?.enabled === true,
+const privacyNoticeEnabled = computed(
+  () => appConfig.privacyNotice?.enabled === true,
 )
 </script>
 
@@ -22,6 +22,6 @@ const cookieConsentEnabled = computed(
     <NuxtPage />
     <LazyAppScrollToTop />
     <LazyAppPopup v-if="popupEnabled" />
-    <LazyPrivacyNotice v-if="cookieConsentEnabled" />
+    <LazyPrivacyNotice v-if="privacyNoticeEnabled" />
   </UApp>
 </template>

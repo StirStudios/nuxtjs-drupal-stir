@@ -25,7 +25,7 @@ type UserwayConfig = {
   type?: string
 } & LooseRecord
 
-type CookieConsentConfig = {
+type PrivacyNoticeConfig = {
   enabled?: boolean
   mode?: 'consent' | 'notice'
   position?: 'left' | 'center' | 'right'
@@ -58,7 +58,7 @@ declare module 'nuxt/schema' {
     protectedRoutes?: ProtectedRoutesConfig
     analytics?: AnalyticsConfig
     userway?: UserwayConfig
-    cookieConsent?: CookieConsentConfig
+    privacyNotice?: PrivacyNoticeConfig
     popup?: PopupConfig
     colorMode?: ColorModeConfig
   }
@@ -67,7 +67,7 @@ declare module 'nuxt/schema' {
     protectedRoutes: ProtectedRoutesConfig
     analytics: AnalyticsConfig
     userway: UserwayConfig
-    cookieConsent: CookieConsentConfig
+    privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig
     colorMode: ColorModeConfig
   }

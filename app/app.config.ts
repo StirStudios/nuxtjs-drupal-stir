@@ -13,7 +13,7 @@ export default defineAppConfig({
     darkRoutes: [],
   },
 
-  cookieConsent: {
+  privacyNotice: {
     enabled: false,
     mode: 'notice',
     position: 'center',

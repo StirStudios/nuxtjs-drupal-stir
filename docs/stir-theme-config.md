@@ -118,10 +118,10 @@ Popup path matching rules:
 - `'/'` matches only homepage.
 - Non-root entries use exact-or-prefix matching (for example `'/pricing'` matches `/pricing` and `/pricing/team`).
 
-### 🍪 `cookieConsent`
+### 🍪 `privacyNotice`
 
 ```ts
-cookieConsent: {
+privacyNotice: {
   enabled: false,
   mode: 'notice', // 'notice' | 'consent'
   position: 'center', // 'left' | 'center' | 'right'
@@ -139,7 +139,7 @@ cookieConsent: {
 `notice` mode example (no consent gate, simple acknowledgement):
 
 ```ts
-cookieConsent: {
+privacyNotice: {
   enabled: true,
   mode: 'notice',
   position: 'center',
@@ -154,7 +154,7 @@ cookieConsent: {
 `consent` mode example (explicit accept/decline):
 
 ```ts
-cookieConsent: {
+privacyNotice: {
   enabled: true,
   mode: 'consent',
   position: 'center',
