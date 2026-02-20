@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { useWindowScroll } from '@vueuse/core'
 import { defineAsyncComponent } from 'vue'
-import type { PopupNode } from '~/composables/usePopupData'
-import { usePopupData } from '~/composables/usePopupData'
+import { type PopupNode, usePopupData } from '~/composables/usePopupData'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
-const { y } = useWindowScroll()
+const { open, shouldRenderPopupContent } = usePopupBehavior({ popup, config })
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),
 )
-const open = ref(false)
-const seen = useCookie<boolean | undefined>('marketing_popup', {
-  maxAge: 60 * 60 * 24 * 7,
-  sameSite: 'lax',
-})
-const hasTriggered = ref(false)
-const readyForPopupTriggers = ref(!import.meta.client)
-const MIN_POPUP_DELAY_MS = 3000
 
 type PopupWebform = {
   webformTitle?: string
@@ -36,101 +26,10 @@ type PopupProps = {
 
 type PopupMedia = Record<string, unknown>
 
-let delayTimer: ReturnType<typeof setTimeout> | null = null
-let stopScrollWatch: (() => void) | null = null
-let onExitIntent: ((event: MouseEvent) => void) | null = null
-let idleTimer: ReturnType<typeof setTimeout> | null = null
-let removeReadyListeners: (() => void) | null = null
-
-function cleanupTriggerHandlers() {
-  if (delayTimer) {
-    clearTimeout(delayTimer)
-    delayTimer = null
-  }
-
-  if (stopScrollWatch) {
-    stopScrollWatch()
-    stopScrollWatch = null
-  }
-
-  if (onExitIntent && import.meta.client) {
-    document.removeEventListener('mouseout', onExitIntent)
-    onExitIntent = null
-  }
-}
-
-function cleanupReadyHandlers() {
-  if (idleTimer) {
-    clearTimeout(idleTimer)
-    idleTimer = null
-  }
-
-  if (removeReadyListeners) {
-    removeReadyListeners()
-    removeReadyListeners = null
-  }
-}
-
-function markReadyForPopupTriggers() {
-  if (readyForPopupTriggers.value) return
-  readyForPopupTriggers.value = true
-  cleanupReadyHandlers()
-}
-
-function setupReadyForPopupTriggers() {
-  if (!import.meta.client) return
-  if (readyForPopupTriggers.value) return
-
-  const onFirstInteraction = () => {
-    markReadyForPopupTriggers()
-  }
-
-  const events: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'scroll']
-  events.forEach((eventName) => {
-    window.addEventListener(eventName, onFirstInteraction, {
-      once: true,
-      passive: true,
-    })
-  })
-
-  removeReadyListeners = () => {
-    events.forEach((eventName) => {
-      window.removeEventListener(eventName, onFirstInteraction)
-    })
-  }
-
-  const win = window as Window & {
-    requestIdleCallback?: (
-      callback: IdleRequestCallback,
-      options?: IdleRequestOptions,
-    ) => number
-  }
-
-  if (typeof win.requestIdleCallback === 'function') {
-    win.requestIdleCallback(() => {
-      markReadyForPopupTriggers()
-    }, { timeout: 3000 })
-    return
-  }
-
-  idleTimer = setTimeout(() => {
-    markReadyForPopupTriggers()
-  }, 1500)
-}
-
 function getPopupProps(node: PopupNode | null): PopupProps {
   if (!node?.props || typeof node.props !== 'object') return {}
   return node.props as PopupProps
 }
-
-watch(
-  () => popup.value?.props?.uuid,
-  () => {
-    cleanupTriggerHandlers()
-    hasTriggered.value = false
-    selectedMedia.value = null
-  },
-)
 
 const hasPopup = computed(() => !!popup.value)
 const title = computed(
@@ -155,11 +54,17 @@ const popupRenderProps = computed(() => {
 })
 
 const selectedMedia = ref<PopupMedia | null>(null)
-const shouldRenderPopupContent = computed(() => open.value)
 
 const closeModal = () => {
   open.value = false
 }
+
+watch(
+  () => popup.value?.props?.uuid,
+  () => {
+    selectedMedia.value = null
+  },
+)
 
 watch(open, (isOpen) => {
   if (!isOpen) return
@@ -174,79 +79,6 @@ watch(open, (isOpen) => {
     media.length === 1
       ? media[0]
       : media[Math.floor(Math.random() * media.length)]
-})
-
-function showModalOnce() {
-  if (open.value || (config.value.showOnce && seen.value === true)) return
-
-  open.value = true
-
-  if (config.value.showOnce) {
-    seen.value = true
-  }
-}
-
-function handleTrigger() {
-  if (!import.meta.client) return
-  if (!popup.value) return
-  if (hasTriggered.value) return
-
-  hasTriggered.value = true
-
-  if (config.value.trigger === 'delay') {
-    const safeDelay = Math.max(config.value.delay ?? 0, MIN_POPUP_DELAY_MS)
-    delayTimer = setTimeout(showModalOnce, safeDelay)
-  }
-
-  if (config.value.trigger === 'scroll') {
-    stopScrollWatch = watch(
-      y,
-      (val) => {
-        const scrollRoot = document.documentElement
-        const scrollable = scrollRoot.scrollHeight - window.innerHeight
-        if (scrollable <= 0) return
-
-        const percent = val / scrollable
-
-        if (percent > config.value.scrollThreshold) {
-          showModalOnce()
-          cleanupTriggerHandlers()
-        }
-      },
-      { immediate: true },
-    )
-  }
-
-  if (config.value.trigger === 'exit') {
-    onExitIntent = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !e.relatedTarget) {
-        showModalOnce()
-        cleanupTriggerHandlers()
-      }
-    }
-
-    document.addEventListener('mouseout', onExitIntent)
-  }
-}
-
-watch(
-  [popup, readyForPopupTriggers],
-  ([val, isReady]) => {
-    cleanupTriggerHandlers()
-    if (val && isReady) {
-      handleTrigger()
-    }
-  },
-  { immediate: true },
-)
-
-onMounted(() => {
-  setupReadyForPopupTriggers()
-})
-
-onBeforeUnmount(() => {
-  cleanupTriggerHandlers()
-  cleanupReadyHandlers()
 })
 </script>
 
