@@ -6,16 +6,6 @@ type ProtectedRoutesConfig = {
   redirectOnLogin?: string
 } & LooseRecord
 
-type PlausibleConfig = {
-  enabled?: boolean
-  domain?: string
-  scriptUrl?: string
-} & LooseRecord
-
-type AnalyticsConfig = {
-  plausible?: PlausibleConfig
-} & LooseRecord
-
 type UserwayConfig = {
   enabled?: boolean
   account?: string
@@ -50,7 +40,6 @@ type ColorModeConfig = {
 declare module 'nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
-    analytics?: AnalyticsConfig
     userway?: UserwayConfig
     cookieConsent?: CookieConsentConfig
     popup?: PopupConfig
@@ -59,7 +48,6 @@ declare module 'nuxt/schema' {
 
   interface AppConfig {
     protectedRoutes: ProtectedRoutesConfig
-    analytics: AnalyticsConfig
     userway: UserwayConfig
     cookieConsent: CookieConsentConfig
     popup: PopupConfig

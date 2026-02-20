@@ -96,15 +96,13 @@ protectedRoutes: {
 
 ### 📊 `analytics`
 
-```ts
-analytics: {
-  plausible: {
-	enabled: false,
-	domain: 'domainname.com', // without https://www
-	scriptUrl: 'https://analytics.stirstudiosdesign.com/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js',
-  },
-}
-```
+Plausible is configured via Nuxt public runtime config (env vars), not `app.config.ts`.
+
+Use:
+
+- `NUXT_PUBLIC_PLAUSIBLE_ENABLED` (`'true'` or `'false'`)
+- `NUXT_PUBLIC_PLAUSIBLE_DOMAIN` (for example `sbpublicmarket.com`)
+- `NUXT_PUBLIC_PLAUSIBLE_SCRIPT_URL` (for example your proxied script URL)
 
 ### 💬 `popup`
 

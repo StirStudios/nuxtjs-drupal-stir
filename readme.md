@@ -27,6 +27,21 @@ A production-ready Nuxt 4 starter template with Nuxt UI 4, Tailwind CSS 4, and f
 - `assets/css/main.css` — Tailwind CSS entry point
 - `utils/uiVariants.ts` — Custom Nuxt UI material variant tokens
 
+## 🔐 Environment Variables
+
+- `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
+- `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
+- `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
+- `NUXT_NAME`: Site name used in SEO/meta defaults
+- `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
+- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables sitemap/robots indexing behavior)
+- `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
+- `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
+- `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
+- `NUXT_PUBLIC_PLAUSIBLE_ENABLED`: Enable Plausible (`'true'` or `'false'`)
+- `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Plausible domain (for example `sbpublicmarket.com`)
+- `NUXT_PUBLIC_PLAUSIBLE_SCRIPT_URL`: Plausible script URL (for example proxied `pa-*.js` URL)
+
 ## 🎨 Styling Conventions
 
 - Prefer nested CSS for readability.
