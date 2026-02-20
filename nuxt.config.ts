@@ -162,11 +162,6 @@ export default defineNuxtConfig({
     },
     public: {
       api: process.env.DRUPAL_URL,
-      plausible: {
-        enabled: process.env.NUXT_PUBLIC_PLAUSIBLE_ENABLED === 'true',
-        domain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
-        scriptUrl: process.env.NUXT_PUBLIC_PLAUSIBLE_SCRIPT_URL || '',
-      },
     },
   },
 })

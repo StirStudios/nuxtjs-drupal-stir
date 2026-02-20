@@ -38,9 +38,6 @@ A production-ready Nuxt 4 starter template with Nuxt UI 4, Tailwind CSS 4, and f
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
-- `NUXT_PUBLIC_PLAUSIBLE_ENABLED`: Enable Plausible (`'true'` or `'false'`)
-- `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Plausible domain (for example `sbpublicmarket.com`)
-- `NUXT_PUBLIC_PLAUSIBLE_SCRIPT_URL`: Plausible script URL (for example proxied `pa-*.js` URL)
 
 ## 🎨 Styling Conventions
 

@@ -1,12 +1,14 @@
-import { defineNuxtPlugin, useRuntimeConfig, useScript } from '#imports'
+import { defineNuxtPlugin, useAppConfig, useScript } from '#imports'
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
 
-  const cfg = useRuntimeConfig().public.plausible
-  if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.scriptUrl)
+  const cfg = useAppConfig().analytics?.plausible
+  if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.domain)
     return
-  const scriptUrl = cfg.scriptUrl
+  const scriptUrl =
+    cfg.scriptUrl ||
+    'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js'
 
   type PlausibleQueueFunction = ((
     event: string,
