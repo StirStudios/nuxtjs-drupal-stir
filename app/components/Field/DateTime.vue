@@ -76,6 +76,13 @@ const dateTriggerLabelId = (index: number) =>
 const timeSelectId = (index: number) => `${props.fieldName}-time-${index + 1}`
 const timeSelectName = (index: number) =>
   `${props.fieldName}_time_${index + 1}`
+const datePopoverOpen = ref<boolean[]>(
+  Array.from({ length: multiple }, () => false),
+)
+
+const closeDatePopover = (index: number) => {
+  datePopoverOpen.value[index] = false
+}
 
 watchEffect(() => {
   if (!Array.isArray(props.state[props.fieldName])) {
@@ -119,7 +126,10 @@ watch(
             {{ `${field['#title']} ${i + 1}` }}
             <span v-if="field['#required']" class="ms-0.5 text-error">*</span>
           </p>
-          <UPopover :class="{ 'w-full': isMaterial }">
+          <UPopover
+            v-model:open="datePopoverOpen[i]"
+            :class="{ 'w-full': isMaterial }"
+          >
             <UButton
               :id="dateTriggerId(i)"
               :aria-label="`${field['#title']} ${i + 1}: ${block.date ? 'Change date' : 'Select date'}`"
@@ -131,12 +141,20 @@ watch(
               {{ block.date ? formatDateLabel(block.date) : 'Select Date' }}
             </UButton>
             <template #content>
-              <UCalendar v-model="block.date" class="p-2" />
+              <UCalendar
+                v-model="block.date"
+                class="p-2"
+                @update:model-value="() => closeDatePopover(i)"
+              />
             </template>
           </UPopover>
         </UFormField>
 
-        <UPopover v-else :class="{ 'w-full': isMaterial }">
+        <UPopover
+          v-else
+          v-model:open="datePopoverOpen[i]"
+          :class="{ 'w-full': isMaterial }"
+        >
           <UButton
             :id="dateTriggerId(i)"
             :aria-label="`${field['#title']}: ${block.date ? 'Change date' : 'Select date'}`"
@@ -147,7 +165,11 @@ watch(
             {{ block.date ? formatDateLabel(block.date) : 'Select Date' }}
           </UButton>
           <template #content>
-            <UCalendar v-model="block.date" class="p-2" />
+            <UCalendar
+              v-model="block.date"
+              class="p-2"
+              @update:model-value="() => closeDatePopover(i)"
+            />
           </template>
         </UPopover>
 

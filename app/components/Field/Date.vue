@@ -19,6 +19,7 @@ const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = Number(props.field['#multiple']) || 1
 
 const models = ref<CalendarDate[]>([])
+const popoverOpen = ref(false)
 const stored = props.state[props.fieldName]
 
 if (Array.isArray(stored)) {
@@ -56,6 +57,9 @@ watchEffect(() => {
 watch(
   models,
   () => {
+    if (max <= 1 && models.value.length > 0) {
+      popoverOpen.value = false
+    }
     emitFormInput()
     emitFormChange()
   },
@@ -72,7 +76,7 @@ const selectedDatesLabel = computed(() =>
 </script>
 
 <template>
-  <UPopover :class="{ 'w-full': isMaterial }">
+  <UPopover v-model:open="popoverOpen" :class="{ 'w-full': isMaterial }">
     <UButton icon="i-lucide-calendar" size="md" :variant="webform.variant">
       <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}
