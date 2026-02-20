@@ -27,15 +27,19 @@ if (Array.isArray(stored)) {
     .filter((val): val is string => typeof val === 'string')
     .map((val) => {
       const datePart = val.split('T')[0]
+
       if (!datePart) return null
       const [y, m, d] = datePart.split('-').map(Number)
+
       return y && m && d ? new CalendarDate(y, m, d) : null
     })
     .filter(Boolean) as CalendarDate[]
 } else if (typeof stored === 'string' && stored.includes('-')) {
   const datePart = stored.split('T')[0]
+
   if (datePart) {
     const [y, m, d] = datePart.split('-').map(Number)
+
     if (y && m && d) {
       models.value = [new CalendarDate(y, m, d)]
     }

@@ -25,9 +25,11 @@ export function handleValidationError(
   if (!event?.errors?.length) return
 
   const firstError = event.errors[0]
+
   if (!firstError) return
 
   const element = options.getElementById(firstError.id)
+
   element?.focus?.()
   element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
 

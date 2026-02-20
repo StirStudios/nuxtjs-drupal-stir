@@ -2,9 +2,10 @@ import { defineNuxtRouteMiddleware, useColorMode, useAppConfig } from '#imports'
 
 function matchesRoute(path: string, rule: string): boolean {
   const normalizedRule = rule.trim()
+
   if (!normalizedRule) return false
   if (normalizedRule === '/') return path === '/'
-  return path.startsWith(normalizedRule)
+  return path === normalizedRule || path.startsWith(`${normalizedRule}/`)
 }
 
 export default defineNuxtRouteMiddleware((to) => {

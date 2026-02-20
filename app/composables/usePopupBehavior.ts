@@ -29,6 +29,7 @@ function normalizePath(path: string): string {
 function matchesPopupPath(routePath: string, rule: string): boolean {
   const normalizedRule = normalizePath(rule.trim())
   const normalizedRoute = normalizePath(routePath)
+
   if (!normalizedRule) return false
   if (normalizedRule === '/') return normalizedRoute === '/'
   return (
@@ -77,6 +78,7 @@ export const usePopupBehavior = ({
     const excludeMatch = excludePaths.value.some((path) =>
       matchesPopupPath(routePath, path),
     )
+
     return includeMatch && !excludeMatch
   })
   const shouldRenderPopupContent = computed(() => open.value)
@@ -131,6 +133,7 @@ export const usePopupBehavior = ({
     }
 
     const events: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'scroll']
+
     events.forEach((eventName) => {
       window.addEventListener(eventName, onFirstInteraction, {
         once: true,
@@ -186,6 +189,7 @@ export const usePopupBehavior = ({
 
     if (config.value.trigger === 'delay') {
       const safeDelay = Math.max(config.value.delay ?? 0, minDelayMs)
+
       delayTimer = setTimeout(showModalOnce, safeDelay)
     }
 
@@ -195,6 +199,7 @@ export const usePopupBehavior = ({
         (val) => {
           const scrollRoot = document.documentElement
           const scrollable = scrollRoot.scrollHeight - window.innerHeight
+
           if (scrollable <= 0) return
 
           const percent = val / scrollable

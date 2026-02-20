@@ -40,22 +40,35 @@ const btnSize = computed(() => props.size || 'xl')
 const btnBlock = computed(() => props.block ?? false)
 const iconName = computed(() => props.icon || null)
 const slotMedia = computed(() => tk.mediaItems())
-const pdf = computed(() => {
-  return (
-    slotMedia.value.find(
-      (node) => tk.propsOf(node)?.type === 'document' && tk.propsOf(node)?.url,
-    ) || null
-  )
+
+type MediaDocumentProps = {
+  type?: unknown
+  url?: unknown
+  title?: unknown
+  alt?: unknown
+}
+
+const pdfProps = computed(() => {
+  for (const node of slotMedia.value) {
+    const media = tk.propsOf(node) as MediaDocumentProps
+
+    if (media.type !== 'document' || typeof media.url !== 'string' || !media.url) {
+      continue
+    }
+    return media
+  }
+  return null
 })
 
-const hasPdf = computed(() => !!pdf.value)
+const hasPdf = computed(() => !!pdfProps.value)
 const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
-const pdfProps = computed(() => tk.propsOf(pdf.value ?? undefined))
 const pdfTitle = computed(() => String(pdfProps.value?.title || btnLabel.value))
 const pdfDescription = computed(() =>
   String(pdfProps.value?.alt || 'PDF document preview'),
 )
-const pdfUrl = computed(() => pdfProps.value?.url as string | undefined)
+const pdfUrl = computed(() =>
+  typeof pdfProps.value?.url === 'string' ? pdfProps.value.url : undefined,
+)
 </script>
 
 <template>

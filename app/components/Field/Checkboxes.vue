@@ -51,6 +51,7 @@ const getComparisonValue = (key?: string): number | null => {
     (k) => normalizeValue(k) === normalizeValue(key),
   )
   const val = normalizedKey ? props.state[normalizedKey] : null
+
   return typeof val === 'number' || typeof val === 'string' ? Number(val) : null
 }
 

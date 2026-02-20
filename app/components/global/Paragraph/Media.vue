@@ -64,6 +64,7 @@ const {
 const { width } = useElementSize(() => scrollArea.value?.$el)
 const lanes = computed(() => {
   const config = props.masonry?.lanes
+
   if (!config) return 1
   if (width.value >= 768 && config.md) return config.md
   if (width.value >= 640 && config.sm) return config.sm

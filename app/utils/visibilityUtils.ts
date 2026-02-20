@@ -11,6 +11,7 @@ export const isVisibleForTab = (
   return conditions.some((condition) => {
     if (typeof condition === 'object') {
       const tabCondition = condition[':input[name="tabs"]']
+
       return tabCondition?.value === tabValue
     }
     return false

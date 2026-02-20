@@ -4,6 +4,7 @@ import { usePageContext } from '~/composables/usePageContext'
 const { page } = usePageContext()
 const theme = useAppConfig().stirTheme
 const currentYear = new Date().getFullYear()
+
 type SocialIconConfig = {
   title?: string
   url?: string
@@ -14,10 +15,21 @@ type SocialIconConfig = {
 }
 const iconsSocialConfig = computed<SocialIconConfig[]>(() => {
   const socials = (theme as { socials?: unknown }).socials
+
   return Array.isArray(socials) ? (socials as SocialIconConfig[]) : []
 })
+
+type FooterMenuItem = {
+  title?: string
+  url?: string
+}
+const footerMenu = computed<FooterMenuItem[]>(() => {
+  const menu = page.value?.footer_menu
+
+  return Array.isArray(menu) ? (menu as FooterMenuItem[]) : []
+})
 const footerMenuItems = computed(() =>
-  (page.value?.footer_menu || []).map((item: { title?: string; url?: string }) => ({
+  footerMenu.value.map((item) => ({
     label: item.title || '',
     to: item.url || '',
   })),

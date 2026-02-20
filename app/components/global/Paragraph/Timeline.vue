@@ -33,6 +33,7 @@ const timelineNodes = computed(() => tk.slot('timeline'))
 const timelineItems = computed<UITimelineItem[]>(() =>
   timelineNodes.value.map((vnode) => {
     const p = tk.propsOf(vnode)
+
     return {
       date: p.date ?? 'Present',
       title: p.header ?? '',

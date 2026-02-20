@@ -17,6 +17,7 @@ const props = withDefaults(
 )
 
 const safeHeroText = computed(() => cleanHTML(props.heroText ?? ''))
+
 defineSlots<{ button?(): unknown }>()
 </script>
 

@@ -15,6 +15,31 @@ export default defineAppConfig({
 
   cookieConsent: {
     enabled: false,
+    mode: 'notice',
+    position: 'center',
+    dismissible: true,
+    title: '',
+    message: '',
+    messageLinks: 'For more information please review our',
+    termsUrl: '',
+    privacyUrl: '',
+    buttonLabel: 'Got it',
+    declineButtonLabel: 'Decline',
+  },
+
+  protectedRoutes: {
+    requireLoginPaths: [],
+    loginPath: '/login',
+    redirectOnLogin: '/',
+  },
+
+  userway: {
+    enabled: false,
+    account: '',
+    position: 3,
+    size: 'small',
+    color: '#ffffff',
+    type: '1',
   },
 
   popup: {
@@ -136,8 +161,8 @@ export default defineAppConfig({
       labels: {
         floating: false,
         base: [
-          'pointer-events-none absolute -top-1.5 left-0 text-xs font-medium text-dimmed transition-all',
-          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-dimmed',
+          'pointer-events-none absolute -top-1.5 left-0 text-xs font-medium text-default/80 transition-all',
+          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-default/70',
           'peer-focus:-top-1.5 peer-focus:text-xs peer-focus:font-medium peer-focus:text-highlighted',
         ],
       },
@@ -250,7 +275,7 @@ export default defineAppConfig({
 
     formField: {
       slots: {
-        label: 'block font-medium text-dimmed',
+        label: 'block font-medium text-default/80',
         container: 'mt-1',
         error: 'mt-1 text-error',
       },

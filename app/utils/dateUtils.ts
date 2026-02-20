@@ -11,11 +11,13 @@ export function getOffsetString(
   const offset = parts.find((p) => p.type === 'timeZoneName')?.value || 'GMT+0'
 
   const match = offset.match(/GMT([+-]?\d+)(?::(\d+))?/)
+
   if (match && match[1] !== undefined) {
     const rawHours = match[1]
     const sign = rawHours.startsWith('-') ? '-' : '+'
     const hours = String(Math.abs(Number(rawHours))).padStart(2, '0')
     const minutes = String(match[2] || '0').padStart(2, '0')
+
     return `${sign}${hours}${minutes}`
   }
 
@@ -29,9 +31,11 @@ export function generateTimeOptions(min: string, max: string, step: number) {
   const [maxH, maxM] = max.split(':').map(Number)
 
   const current = new Date()
+
   current.setHours(minH ?? 0, minM ?? 0, 0, 0)
 
   const end = new Date()
+
   end.setHours(maxH ?? 0, maxM ?? 0, 0, 0)
 
   while (current <= end) {

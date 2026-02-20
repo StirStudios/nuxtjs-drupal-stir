@@ -14,6 +14,7 @@ const isBackendError = computed(() =>
 
 const displayError = computed<NuxtError>(() => {
   const statusCode = props.error?.statusCode
+
   if (statusCode !== 502 && statusCode !== 503 && statusCode !== 504) {
     return props.error
   }

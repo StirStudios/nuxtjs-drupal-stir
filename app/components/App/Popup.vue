@@ -32,14 +32,12 @@ function getPopupProps(node: PopupNode | null): PopupProps {
 }
 
 const hasPopup = computed(() => !!popup.value)
-const title = computed(
-  () => getPopupProps(popup.value).webform?.webformTitle ?? 'Announcement',
-)
-
-const description = computed(() => getPopupProps(popup.value).text ?? '')
+const popupProps = computed(() => getPopupProps(popup.value))
+const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
+const description = computed(() => popupProps.value.text ?? '')
 const popupRenderProps = computed(() => {
   const { id, uuid, parentUuid, region, text, webform, editLink, direction } =
-    getPopupProps(popup.value)
+    popupProps.value
 
   return {
     id,
@@ -70,6 +68,7 @@ watch(open, (isOpen) => {
   if (!isOpen) return
 
   const media = popup.value?.slots?.media
+
   if (!Array.isArray(media) || !media.length) {
     selectedMedia.value = null
     return

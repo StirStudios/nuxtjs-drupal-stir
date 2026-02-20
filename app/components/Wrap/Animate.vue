@@ -46,6 +46,7 @@ function getSharedObserver(): IntersectionObserver | null {
     (entries) => {
       for (const entry of entries) {
         const target = entry.target as HTMLElement
+
         observerCallbacks.get(target)?.(Boolean(entry.isIntersecting))
       }
     },
@@ -63,6 +64,7 @@ function observeInView(
   onVisibleChange: (visible: boolean) => void,
 ): () => void {
   const observer = getSharedObserver()
+
   if (!observer) {
     onVisibleChange(true)
     return () => {}

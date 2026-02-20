@@ -73,6 +73,7 @@ const groupedFields = computed(() => {
   return orderedFieldNames.value.reduce(
     (acc, fieldName) => {
       const parent = fields[fieldName]?.parent
+
       if (parent) {
         if (!acc[parent]) acc[parent] = []
         acc[parent].push(fieldName)
@@ -126,6 +127,7 @@ const resetFormState = (options: { bumpKey?: boolean } = {}) => {
     if (composite) {
       state[key] = {} as Record<string, unknown>
       const compositeState = state[key] as Record<string, unknown>
+
       for (const [subKey, subField] of Object.entries(composite)) {
         compositeState[subKey] = subField['#value'] || ''
       }

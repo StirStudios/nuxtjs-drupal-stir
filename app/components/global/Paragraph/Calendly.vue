@@ -24,6 +24,7 @@ const props = defineProps<{
 const container = ref<HTMLElement | null>(null)
 const calendlyUrl = computed(() => {
   const rawUrl = props.calendlyUrl?.trim()
+
   if (!rawUrl) return ''
 
   const backgroundColor = props.calendlyBg?.replace('#', '')
@@ -32,6 +33,7 @@ const calendlyUrl = computed(() => {
 
   try {
     const url = new URL(rawUrl)
+
     if (backgroundColor) url.searchParams.set('background_color', backgroundColor)
     if (primaryColor) url.searchParams.set('primary_color', primaryColor)
     if (textColor) url.searchParams.set('text_color', textColor)

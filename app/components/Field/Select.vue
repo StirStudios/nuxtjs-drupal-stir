@@ -7,7 +7,7 @@ const props = defineProps<{
   field?: WebformFieldProps
   fieldName: string
   state: Record<string, string>
-  items?: Record<string, string>
+  items?: Record<string, string> | Array<{ label: string; value: string }>
   placeholder?: string
 }>()
 
@@ -15,6 +15,7 @@ const { webform } = useAppConfig().stirTheme
 
 const getDefaultValue = () => {
   const value = props.field?.['#defaultValue']
+
   return typeof value === 'string' ? value : ''
 }
 

@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '../../../types'
 import { useEvaluateState } from '~/composables/useEvaluateState'
+import { cleanHTML } from '~/utils/cleanHTML'
 
 const props = withDefaults(
   defineProps<{
@@ -78,8 +79,10 @@ const { visible, checked } = useEvaluateState(
   props.state,
 )
 
-const descriptionContent = props.field['#description'] || ''
-const helpContent = props.field['#help'] || ''
+const descriptionContent = computed(() =>
+  cleanHTML(String(props.field['#description'] ?? '')),
+)
+const helpContent = computed(() => cleanHTML(String(props.field['#help'] ?? '')))
 const labelClass = computed(() => props.field['#class'] || '')
 </script>
 

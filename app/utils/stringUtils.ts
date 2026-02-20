@@ -10,6 +10,7 @@ export function toSnakeCase(str: string): string {
 
 export const extractFieldName = (selector: string): string | null => {
   const match = selector.match(/name="(.+?)"/)
+
   if (!match || !match[1]) {
     return null
   }

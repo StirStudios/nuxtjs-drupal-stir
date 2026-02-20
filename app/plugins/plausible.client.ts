@@ -4,6 +4,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
 
   const cfg = useAppConfig().analytics?.plausible
+
   if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.domain)
     return
   const scriptUrl =

@@ -5,6 +5,7 @@ export function usePageContext() {
 
   const slug = computed(() => {
     const p = route.params.slug
+
     return Array.isArray(p) ? p[0] : p || null
   })
 

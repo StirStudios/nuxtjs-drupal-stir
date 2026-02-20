@@ -53,6 +53,7 @@ Use these rules for all changes.
 - Keep comments minimal and only for non-obvious logic or external constraints.
 - Do not wrap imports in `try/catch` (project-wide rule).
 - Use single-quoted strings in JS/TS/Vue config and code unless escaping would reduce readability; keep style aligned with ESLint/Prettier.
+- In `<script setup>`, group related declarations with a single blank line between logical blocks (imports, props/emits, composables/context, local types, refs/state, computed values, methods/watch/lifecycle). Avoid extra blank lines within a single block.
 - Naming:
   - Vue components: PascalCase unless Drupal custom-element mapping requires kebab-case.
   - Composables: camelCase with `use*` naming.

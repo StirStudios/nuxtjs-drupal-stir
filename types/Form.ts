@@ -105,7 +105,8 @@ export interface WebformActionProps {
   [key: string]: unknown
   '#type': string
   '#title': string
-  '#submit_label': string
+  '#submit_label'?: string
+  '#submit_Label'?: string
 }
 
 export type WebformState = Record<

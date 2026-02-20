@@ -56,6 +56,7 @@ describe('buildYupSchema', () => {
     const state: WebformState = {}
 
     const schemaOne = buildYupSchema(fields, state)
+
     state.unrelated = 'changed'
     const schemaTwo = buildYupSchema(fields, state)
 
@@ -84,10 +85,12 @@ describe('buildYupSchema', () => {
     const state: WebformState = { mode: 'none' }
 
     const hiddenSchema = buildYupSchema(fields, state)
+
     await expect(hiddenSchema.validate({ mode: 'none' })).resolves.toBeTruthy()
 
     state.mode = 'email'
     const visibleSchema = buildYupSchema(fields, state)
+
     expect(visibleSchema).not.toBe(hiddenSchema)
 
     await expect(visibleSchema.validate({ mode: 'email' })).rejects.toBeTruthy()
@@ -119,10 +122,12 @@ describe('buildYupSchema', () => {
     const state: WebformState = { showDates: 'no' }
 
     const hiddenSchema = buildYupSchema(fields, state)
+
     await expect(hiddenSchema.validate({ showDates: 'no' })).resolves.toBeTruthy()
 
     state.showDates = 'yes'
     const visibleSchema = buildYupSchema(fields, state)
+
     await expect(visibleSchema.validate({ showDates: 'yes' })).rejects.toBeTruthy()
 
     await expect(

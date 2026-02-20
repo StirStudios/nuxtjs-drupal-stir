@@ -35,6 +35,7 @@ type AccountMenuItem = { title?: string; relative?: string; url?: string }
 const getValidTo = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
+
   return trimmed.length ? trimmed : null
 }
 
@@ -51,6 +52,7 @@ const localTaskLinks = computed(() =>
   tabs.value.primary
     .map((tab: LocalTask) => {
       const to = getValidTo(tab.url)
+
       if (!to) return null
 
       return {
@@ -78,6 +80,7 @@ const loadAccountMenu = async () => {
       .map((item) => {
         const label = item.title || ''
         const to = getValidTo(item.relative || item.url)
+
         if (!label || !to) return null
 
         return {

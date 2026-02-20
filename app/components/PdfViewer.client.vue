@@ -1,6 +1,13 @@
 <script setup lang="ts">
+declare global {
+  interface Window {
+    __stirPdfViewerWarned?: boolean
+  }
+}
+
 // Stub component for projects that do not include PDF Viewer
-if (import.meta.dev) {
+if (import.meta.dev && !window.__stirPdfViewerWarned) {
+  window.__stirPdfViewerWarned = true
   console.warn(
     '[PdfViewer] PDF Viewer is not installed. Add a real PdfViewer.vue in your root app if needed.',
   )

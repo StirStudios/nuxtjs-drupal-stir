@@ -1,7 +1,10 @@
 <script setup lang="ts">
-defineProps<{
+import { cleanHTML } from '~/utils/cleanHTML'
+
+const props = defineProps<{
   content?: string
 }>()
+const safeHtml = computed(() => cleanHTML(props.content ?? ''))
 
 defineSlots<{
   default(): unknown
@@ -10,5 +13,5 @@ defineSlots<{
 
 <template>
   <slot />
-  <div v-if="content" v-html="content" />
+  <div v-if="safeHtml" v-html="safeHtml" />
 </template>

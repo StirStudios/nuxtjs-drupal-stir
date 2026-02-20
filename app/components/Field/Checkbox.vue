@@ -40,6 +40,7 @@ onMounted(() => {
 if (props.field['#states']?.checked) {
   watch(checked, (value) => {
     const safe = !!value
+
     checkboxValue.value = safe
     props.state[props.fieldName] = safe
   })

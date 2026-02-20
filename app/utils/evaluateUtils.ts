@@ -24,6 +24,7 @@ export const evaluateCondition = (
       const typedEntry = entry as ConditionEntry
 
       const [selector, valueCondition] = Object.entries(typedEntry)[0] ?? []
+
       if (!selector) continue
       const targetFieldName = extractFieldName(selector)
 
@@ -31,6 +32,7 @@ export const evaluateCondition = (
       if (typeof valueCondition !== 'object') continue
 
       const currentValue = getNestedStateValue(state, targetFieldName)
+
       shouldBeVisible = matchesCondition(currentValue, valueCondition)
     }
     return shouldBeVisible
@@ -38,6 +40,7 @@ export const evaluateCondition = (
 
   for (const [selector, valueCondition] of Object.entries(condition)) {
     const targetFieldName = extractFieldName(selector)
+
     if (!targetFieldName) continue
     if (typeof valueCondition !== 'object') continue
 

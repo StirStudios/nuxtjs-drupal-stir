@@ -59,11 +59,11 @@ const hideHeroSection = computed(
   () => props.mode !== 'simple' && pageHide.value && !isFrontEffective.value,
 )
 
-const hasMediaSlot = computed(() => tk.slot('media').length > 0)
+const slotMedia = computed(() => tk.slot('media'))
+const hasMediaSlot = computed(() => slotMedia.value.length > 0)
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
-  tk
-    .slot('media')
+  slotMedia.value
     .some((node) => node?.props?.type === 'video' || node?.props?.mediaEmbed),
 )
 

@@ -87,6 +87,7 @@ onMounted(() => {
     },
     { rootMargin: '120px 0px' },
   )
+
   stopObserver = stop
 })
 
