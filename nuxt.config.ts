@@ -82,7 +82,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/scripts',
-
     [
       'nuxt-vitalizer',
       {
@@ -164,4 +163,4 @@ export default defineNuxtConfig({
       api: process.env.DRUPAL_URL,
     },
   },
-})
+});

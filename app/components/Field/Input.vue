@@ -13,6 +13,10 @@ const isMaterial = computed(() => webform.variant === 'material')
 const id = ref(useId())
 const isNumber = computed(() => props.field['#type'] === 'number')
 const isTel = computed(() => props.field['#type'] === 'tel')
+const inputType = computed(() => {
+  const rawType = String(props.field['#type'] ?? 'text')
+  return rawType === 'textfield' ? 'text' : rawType
+})
 </script>
 
 <template>
@@ -25,7 +29,7 @@ const isTel = computed(() => props.field['#type'] === 'tel')
     :min="isNumber ? field['#min'] : undefined"
     :placeholder="floatingLabel ? ' ' : ''"
     :step="isNumber ? field['#step'] || 1 : undefined"
-    :type="field['#type'] || 'text'"
+    :type="inputType"
     :ui="floatingLabel ? { base: 'peer' } : {}"
     :variant="webform.variant"
   >
