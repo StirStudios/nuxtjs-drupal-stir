@@ -1,27 +1,35 @@
 <script setup lang="ts">
-const { cookieConsent: config } = useAppConfig()
+const appConfig = useAppConfig()
 const route = useRoute()
 const open = ref(false)
 const isDev = import.meta.dev
+const config = computed(() =>
+  appConfig.privacyNotice ?? appConfig.cookieConsent,
+)
 const consent = useCookie<boolean | string>('cookie_consent', {
   maxAge: 60 * 60 * 24 * 365,
 })
-const isConsentMode = computed(() => config?.mode === 'consent')
-const isDismissible = computed(() => config?.dismissible !== false)
+const isConsentMode = computed(() => config.value?.mode === 'consent')
+const isDismissible = computed(() => config.value?.dismissible !== false)
 const primaryButtonLabel = computed(() =>
-  config?.buttonLabel || (isConsentMode.value ? 'Accept' : 'Got it'),
+  config.value?.buttonLabel || (isConsentMode.value ? 'Accept' : 'Got it'),
 )
-const declineButtonLabel = computed(() => config?.declineButtonLabel || 'Decline')
+const declineButtonLabel = computed(() => config.value?.declineButtonLabel || 'Decline')
 const hasDecision = computed(() =>
   consent.value === true ||
   (typeof consent.value === 'string' && consent.value.length > 0),
 )
 
 const isConfigured = computed(() => {
-  if (!config?.enabled) return false
+  if (!config.value?.enabled) return false
 
-  return Boolean(config.title && config.message)
+  return Boolean(config.value.title?.trim() && config.value.message?.trim())
 })
+const isSetupNotice = computed(() =>
+  isDev && Boolean(config.value?.enabled) && !isConfigured.value,
+)
+
+let hasWarnedInvalidConfig = false
 
 function setDecision(status: 'accepted' | 'declined' | 'dismissed') {
   consent.value = status
@@ -41,18 +49,32 @@ function dismiss() {
 }
 
 const ignorePaths = computed(() =>
-  [config?.termsUrl, config?.privacyUrl].filter(
+  [config.value?.termsUrl, config.value?.privacyUrl].filter(
     (path): path is string => typeof path === 'string' && path.length > 0,
   ),
 )
 
 const positionClass = computed(() => {
-  const position = config?.position ?? 'center'
+  const position = config.value?.position ?? 'center'
 
   if (position === 'left') return 'left-3 sm:left-4'
   if (position === 'right') return 'right-3 sm:right-4'
   return 'left-1/2 -translate-x-1/2'
 })
+
+const noticeTitle = computed(() =>
+  isSetupNotice.value ? 'Privacy notice config required' : config.value?.title,
+)
+const noticeMessage = computed(() =>
+  isSetupNotice.value
+    ? 'Set `privacyNotice.title` and `privacyNotice.message` in `app.config.ts` to enable this notice.'
+    : config.value?.message,
+)
+const noticeCardRootClass = computed(() =>
+  isSetupNotice.value
+    ? 'bg-default text-default shadow-xl ring-1 ring-warning/40'
+    : 'bg-default text-default shadow-xl ring-1 ring-neutral-200 dark:ring-neutral-700',
+)
 
 watch(
   () => route.path,
@@ -65,7 +87,7 @@ watch(
 
     if (
       !hasDecision.value &&
-      isConfigured.value &&
+      (isConfigured.value || isSetupNotice.value) &&
       !isBot &&
       !ignorePaths.value.includes(route.path)
     ) {
@@ -74,12 +96,22 @@ watch(
   },
   { immediate: true },
 )
+
+watchEffect(() => {
+  if (!isDev || hasWarnedInvalidConfig) return
+  if (!config.value?.enabled || isConfigured.value) return
+
+  hasWarnedInvalidConfig = true
+  console.warn(
+    '[PrivacyNotice] Enabled but missing required config: privacyNotice.title and privacyNotice.message.',
+  )
+})
 </script>
 
 <template>
   <div
-    v-if="isConfigured && open"
-    :aria-label="config.title"
+    v-if="open && (isConfigured || isSetupNotice)"
+    :aria-label="noticeTitle"
     aria-live="polite"
     :class="[
       'fixed bottom-3 z-50 w-[min(26rem,calc(100vw-1.5rem))] sm:bottom-4',
@@ -89,13 +121,13 @@ watch(
   >
     <UCard
       :ui="{
-        root: 'bg-default text-default shadow-xl ring-1 ring-neutral-200 dark:ring-neutral-700',
+        root: noticeCardRootClass,
         body: 'space-y-3 text-sm leading-relaxed text-default',
       }"
     >
       <div class="flex items-start justify-between gap-3">
         <p class="text-sm font-semibold text-default">
-          {{ config.title }}
+          {{ noticeTitle }}
         </p>
         <UButton
           v-if="isDismissible"
@@ -109,9 +141,9 @@ watch(
         />
       </div>
 
-      <p class="text-default">{{ config.message }}</p>
+      <p class="text-default">{{ noticeMessage }}</p>
 
-      <p v-if="config.termsUrl || config.privacyUrl" class="text-default">
+      <p v-if="isConfigured && (config.termsUrl || config.privacyUrl)" class="text-default">
         {{ config.messageLinks }}
         <ULink
           v-if="config.termsUrl"
@@ -135,7 +167,7 @@ watch(
         .
       </p>
 
-      <div class="flex justify-end gap-2">
+      <div v-if="isConfigured" class="flex justify-end gap-2">
         <UButton
           v-if="isConsentMode"
           color="neutral"
@@ -149,16 +181,4 @@ watch(
     </UCard>
   </div>
 
-  <UAlert
-    v-else-if="config?.enabled && isDev"
-    color="warning"
-    description="Cookie consent is enabled but not fully configured. Please provide title,
-      and message."
-    title="Heads up!"
-    :ui="{
-      root: `fixed bottom-3 w-[min(26rem,calc(100vw-1.5rem))] rounded-xl sm:bottom-4 ${positionClass}`,
-      wrapper: 'text-center',
-      description: 'opacity-100',
-    }"
-  />
 </template>
