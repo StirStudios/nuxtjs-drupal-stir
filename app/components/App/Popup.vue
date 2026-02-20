@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
 import { defineAsyncComponent } from 'vue'
-import type { PopupNode } from '~/composables/usePopupData'
-import { usePopupData } from '~/composables/usePopupData'
+import { type PopupNode, usePopupData } from '~/composables/usePopupData'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
