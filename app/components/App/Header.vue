@@ -13,8 +13,7 @@ const hydrated = ref(false)
 const forceScrolled = ref(false)
 const isFixed = computed(() => {
   if (props.mode === 'fixed') return true
-  if (props.mode === 'static') return false
-  return isFront.value
+  return isFront.value || isScrolled.value
 })
 
 // Fetch menu items
