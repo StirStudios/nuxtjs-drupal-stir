@@ -52,6 +52,7 @@ Use these rules for all changes.
 - If custom styles in one file grow beyond roughly 80-120 lines or mix unrelated concerns, split them in the same PR.
 - Keep comments minimal and only for non-obvious logic or external constraints.
 - Do not wrap imports in `try/catch` (project-wide rule).
+- Use single-quoted strings in JS/TS/Vue config and code unless escaping would reduce readability; keep style aligned with ESLint/Prettier.
 - Naming:
   - Vue components: PascalCase unless Drupal custom-element mapping requires kebab-case.
   - Composables: camelCase with `use*` naming.
