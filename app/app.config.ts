@@ -21,6 +21,14 @@ export default defineAppConfig({
     enabled: false,
   },
 
+  analytics: {
+    plausible: {
+      enabled: false,
+      domain: '',
+      scriptUrl: '',
+    },
+  },
+
   stirTheme: {
     pdf: false,
     crumbs: false,
