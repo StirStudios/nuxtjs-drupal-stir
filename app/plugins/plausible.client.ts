@@ -4,15 +4,38 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
 
   const cfg = useAppConfig().analytics?.plausible
-  if (
-    process.env.NODE_ENV !== 'production' ||
-    !cfg?.enabled ||
-    !cfg.domain ||
-    !cfg.scriptUrl
-  )
+  if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.domain)
     return
-  const scriptUrl = cfg.scriptUrl
-  const domain = cfg.domain
+  const scriptUrl =
+    cfg.scriptUrl ||
+    'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js'
+
+  type PlausibleQueueFunction = ((
+    event: string,
+    options?: Record<string, unknown>,
+  ) => void) & {
+    init?: (options?: Record<string, unknown>) => void
+    q?: unknown[]
+    o?: Record<string, unknown>
+  }
+
+  const win = window as unknown as {
+    plausible?: PlausibleQueueFunction
+  }
+
+  // Predefine the queue + init API to mirror Plausible's new embed snippet.
+  win.plausible =
+    win.plausible ??
+    Object.assign(
+      (event: string, options?: Record<string, unknown>) => {
+        ;(win.plausible!.q ??= []).push([event, options])
+      },
+      {
+        init: (options?: Record<string, unknown>) => {
+          win.plausible!.o = options ?? {}
+        },
+      },
+    )
 
   const loadPlausible = () =>
     useScript({
@@ -20,34 +43,20 @@ export default defineNuxtPlugin((nuxtApp) => {
       src: scriptUrl,
       async: true,
       defer: true,
-      'data-domain': domain,
+      ...(cfg.domain ? { 'data-domain': cfg.domain } : {}),
     })
 
   const onScriptLoaded = ({ onLoaded }: ReturnType<typeof loadPlausible>) =>
     onLoaded(() => {
-      type PlausibleQueueFunction = ((
-        event: string,
-        options?: Record<string, unknown>,
-    ) => void) & {
-      q?: unknown[]
-    }
+      const plausibleFn = win.plausible
 
-    const win = window as unknown as {
-      plausible?: PlausibleQueueFunction
-    }
-
-    const plausibleFn: PlausibleQueueFunction =
-      win.plausible ??
-      function (event, options) {
-        ;(plausibleFn.q ??= []).push([event, options])
-      }
-
-    win.plausible = plausibleFn
-    plausibleFn('pageview')
-    nuxtApp.hook('page:finish', () => {
-      plausibleFn('pageview')
+      // Keep explicit SPA tracking to avoid duplicate pageviews from auto capture.
+      plausibleFn?.init?.({ autoCapturePageviews: false })
+      plausibleFn?.('pageview')
+      nuxtApp.hook('page:finish', () => {
+        plausibleFn?.('pageview')
+      })
     })
-  })
 
   const idleApi = globalThis as typeof globalThis & {
     requestIdleCallback?: (callback: IdleRequestCallback) => number

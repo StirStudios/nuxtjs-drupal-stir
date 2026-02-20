@@ -99,9 +99,10 @@ protectedRoutes: {
 ```ts
 analytics: {
   plausible: {
-	enabled: false,
-	domain: 'domainname.com', // without https://www
-	scriptUrl: 'https://analytics.stirstudiosdesign.com/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js',
+    enabled: false,
+    domain: 'domainname.com', // without https://www
+    // Optional: overrides plugin default script URL
+    scriptUrl: 'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js',
   },
 }
 ```
