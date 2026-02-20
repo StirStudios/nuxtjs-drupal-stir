@@ -13,6 +13,7 @@ const gradientClass = computed(() => {
   if (!props.layout.card) return ''
 
   const key = props.layout.gradient ?? card.defaultGradient ?? '1'
+
   return gradientMap[key] || ''
 })
 

@@ -39,7 +39,7 @@ const slotRows = tk.hydrateOrder(
       (vnode, index) => {
         return {
           ...vnode,
-          key: vnode.key ?? `slide-${index}-${Math.random()}`,
+          key: vnode.key ?? `slide-${index}`,
         }
       },
     ),

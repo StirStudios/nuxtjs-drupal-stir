@@ -43,6 +43,7 @@ function formatCalendarDate(date: CalendarDateLike): string {
 
 function formatDateLabel(date: CalendarDateLike): string {
   const dateValue = date.toDate(siteTimezone)
+
   return df.format(dateValue)
 }
 
@@ -54,15 +55,18 @@ const blocks = ref<DateTimeBlock[]>(
 
     if (typeof stored === 'string' && stored.includes('T')) {
       const [dateStr, timeStr] = stored.split('T')
+
       if (!dateStr) return { date, start }
       const [y = Number.NaN, m = Number.NaN, d = Number.NaN] = dateStr
         .split('-')
         .map(Number)
+
       if (Number.isFinite(y) && Number.isFinite(m) && Number.isFinite(d)) {
         date = new CalendarDate(y, m, d)
       }
 
       const [sH, sM] = (timeStr || '').split(':')
+
       if (sH && sM) start = `${sH}:${sM}`
     }
 
@@ -95,11 +99,13 @@ watchEffect(() => {
     if (block.date && block.start) {
       const dateStr = formatCalendarDate(block.date)
       const [h = '', m = ''] = block.start.split(':')
+
       if (!h || !m) return
 
       const jsDate = new Date(`${dateStr}T${h}:${m}:00`)
       const offset = getOffsetString(siteTimezone, jsDate)
       const full = `${dateStr}T${h}:${m}:00${offset}`
+
       values.push(full)
     }
   })

@@ -39,14 +39,15 @@ const slides = computed(() => {
 
   return raw.map((vnode, i) => {
     const typedNode = vnode as VNode
+
     return {
       vnode: typedNode,
-      key: typedNode.key || i,
+      key: typedNode.key ?? i,
     }
   })
 })
 
-const interval = computed(() => props.carouselInterval || 5000)
+const interval = computed(() => props.carouselInterval ?? 5000)
 const autoScrollSpeed = computed(() => {
   const minInterval = 1000
   const maxInterval = 10000

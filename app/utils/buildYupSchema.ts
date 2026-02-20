@@ -25,6 +25,7 @@ function stableStringify(value: unknown): string {
   const entries = Object.entries(value as Record<string, unknown>).sort(
     ([a], [b]) => a.localeCompare(b),
   )
+
   return `{${entries.map(([k, v]) => `${k}:${stableStringify(v)}`).join(',')}}`
 }
 
@@ -42,6 +43,7 @@ function fieldSignature(field: WebformFieldProps): string {
     optionProperties: field['#optionProperties'],
     composite: field['#composite'],
   }
+
   return stableStringify(signature)
 }
 
@@ -50,6 +52,7 @@ function getVisibleEntries(
   state: WebformState,
 ): Array<[string, WebformFieldProps]> {
   const visible: Array<[string, WebformFieldProps]> = []
+
   for (const [key, field] of Object.entries(fields)) {
     if (evaluateCondition(field['#states']?.visible, state, true)) {
       visible.push([key, field])
@@ -73,12 +76,14 @@ export function buildYupSchema(
   const visibleEntries = getVisibleEntries(fields, state)
   const cacheKey = getSchemaCacheKey(visibleEntries)
   let perFieldsCache = schemaCache.get(fields)
+
   if (!perFieldsCache) {
     perFieldsCache = new Map()
     schemaCache.set(fields, perFieldsCache)
   }
 
   const cached = perFieldsCache.get(cacheKey)
+
   if (cached) return cached
 
   const shape: Record<string, AnySchema> = {}
@@ -100,6 +105,7 @@ export function buildYupSchema(
 
     if ('#composite' in field && typeof field['#composite'] === 'object') {
       const subShape: Record<string, AnySchema> = {}
+
       for (const [subKey, subField] of Object.entries(
         field['#composite'] as Record<string, WebformFieldProps>,
       )) {
@@ -116,6 +122,7 @@ export function buildYupSchema(
 
     if (isCheckboxes || isMultiple) {
       let validator = array().of(string())
+
       if (isRequired) {
         validator = validator
           .min(requiredMultipleCount, requiredError)
@@ -188,6 +195,7 @@ export function buildYupSchema(
 
   if (perFieldsCache.size >= SCHEMA_CACHE_LIMIT) {
     const oldestKey = perFieldsCache.keys().next().value
+
     if (oldestKey) perFieldsCache.delete(oldestKey)
   }
   perFieldsCache.set(cacheKey, schema)

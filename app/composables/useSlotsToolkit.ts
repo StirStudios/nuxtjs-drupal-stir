@@ -6,6 +6,7 @@ type SlotMap = Record<string, (() => VNode[]) | undefined>
 export function useSlotVNode(slots: unknown, name: string): VNode[] {
   const slotMap = slots as SlotMap
   const content = slotMap[name]?.()
+
   return Array.isArray(content) ? content : []
 }
 
@@ -15,12 +16,15 @@ export function getVNodeProps(vnode: VNode | undefined) {
 
 export function extractHeroMedia(slots: unknown) {
   const heroNodes = useSlotVNode(slots, 'hero')
+
   if (!heroNodes.length) return null
 
   const heroVNode = heroNodes[0]
+
   if (!heroVNode) return null
   const children = heroVNode.children as { media?: () => VNode[] } | undefined
   const nested = children?.media?.()
+
   return Array.isArray(nested) ? (nested[0] ?? null) : null
 }
 
@@ -30,15 +34,18 @@ export function extractMediaItems(slots: unknown): VNode[] {
 
 export function isVNodeMediaEmbed(vnode: VNode | undefined): boolean {
   const props = getVNodeProps(vnode)
+
   return !!props.mediaEmbed
 }
 
 export function shuffleArray<T>(items: T[]): T[] {
   const arr = [...items]
+
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     const current = arr[i]
     const next = arr[j]
+
     if (current === undefined || next === undefined) continue
     arr[i] = next
     arr[j] = current
@@ -57,28 +64,10 @@ function hydrateOrder<T>(baseFn: () => T[], clientFn: () => T[]) {
 }
 
 export function useSlotsToolkit(slots: unknown) {
-  const slotMap = slots as SlotMap
-  const slot = (name: string): VNode[] => {
-    const content = slotMap[name]?.()
-    return Array.isArray(content) ? content : []
-  }
-
-  const heroMedia = () => {
-    const heroNodes = slot('hero')
-    if (!heroNodes.length) return null
-
-    const heroVNode = heroNodes[0]
-    if (!heroVNode) return null
-    const children = heroVNode.children as { media?: () => VNode[] } | undefined
-    const nested = children?.media?.()
-    return Array.isArray(nested) ? (nested[0] ?? null) : null
-  }
-
-  const mediaItems = () => slot('media')
-  const isMediaEmbed = (vnode: VNode | undefined) => {
-    const props = getVNodeProps(vnode)
-    return !!props.mediaEmbed
-  }
+  const slot = (name: string): VNode[] => useSlotVNode(slots, name)
+  const heroMedia = () => extractHeroMedia(slots)
+  const mediaItems = () => extractMediaItems(slots)
+  const isMediaEmbed = (vnode: VNode | undefined) => isVNodeMediaEmbed(vnode)
 
   return {
     slots,

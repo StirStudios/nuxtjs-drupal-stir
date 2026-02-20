@@ -18,18 +18,23 @@ export function useNode(slots: unknown) {
     const props = computed(() => tk.propsOf(vnode.value) ?? {})
     const mediaProps = computed(() => {
       const node = vnode.value
+
       if (!node) return {}
 
       type SlotDict = Record<string, (() => VNode[]) | undefined>
       const children = node.children as unknown as SlotDict
       const mediaFn = children.media
+
       if (!mediaFn) return {}
 
       const mediaVNode = mediaFn()?.[0]
+
       return tk.propsOf(mediaVNode) ?? {}
     })
 
-    const text = computed(() => props.value.text || '')
+    const text = computed(() =>
+      typeof props.value.text === 'string' ? props.value.text : '',
+    )
 
     return {
       get vnode() {

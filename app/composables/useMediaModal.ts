@@ -40,6 +40,7 @@ export function useMediaModal(
         const modalSrc = typeof item.modalSrc === 'string' ? item.modalSrc : ''
         const modalSrcset = typeof item.modalSrcset === 'string' ? item.modalSrcset : ''
         const modalSizes = typeof item.modalSizes === 'string' ? item.modalSizes : ''
+
         if (modalSrc !== '') {
           item.src = modalSrc
         }
@@ -67,14 +68,17 @@ export function useMediaModal(
 
   const normalizeIndex = (index: number) => {
     const count = itemsOrdered.value.length
+
     if (count === 0) return 0
     const safeIndex = Number.isFinite(index) ? Math.trunc(index) : 0
+
     return Math.min(Math.max(safeIndex, 0), count - 1)
   }
 
   function openModal(index: number) {
     if (itemsOrdered.value.length === 0) return
     const normalizedIndex = normalizeIndex(index)
+
     startIndex.value = normalizedIndex
     activeIndex.value = normalizedIndex
     open.value = true

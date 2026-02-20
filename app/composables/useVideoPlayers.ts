@@ -51,8 +51,10 @@ export function useVideoPlayers() {
     const iframes = document.querySelectorAll<HTMLIFrameElement>(
       'iframe[data-mid]',
     )
+
     iframes.forEach((iframe) => {
       const iframeKey = iframe.getAttribute('data-mid')
+
       if (!iframeKey || videoPlayers.value.has(iframeKey)) return
       if (pendingIframes.has(iframeKey)) return
 
@@ -62,6 +64,7 @@ export function useVideoPlayers() {
         try {
           if (typeof window.playerjs?.Player === 'function') {
             const player = new window.playerjs.Player(iframe)
+
             playersReady(iframeKey, player)
             return
           }

@@ -5,6 +5,7 @@ function normalizeErrorStatus(error: unknown): number {
   const statusCode =
     (error as { statusCode?: unknown; status?: unknown }).statusCode ??
     (error as { status?: unknown }).status
+
   return typeof statusCode === 'number' ? statusCode : 500
 }
 
@@ -13,11 +14,13 @@ function normalizeErrorMessage(error: unknown): string {
     return 'Form submission failed. Please try again later.'
 
   const statusMessage = (error as { statusMessage?: unknown }).statusMessage
+
   if (typeof statusMessage === 'string' && statusMessage.trim()) {
     return statusMessage
   }
 
   const message = (error as { message?: unknown }).message
+
   if (typeof message === 'string' && message.trim()) {
     return message
   }
@@ -46,15 +49,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const { csrfToken } = await $fetch<{ csrfToken: string | null }>(
+    const { csrfToken } = await $fetch<{ csrfToken: string }>(
       '/api/auth/csrf',
     )
-    if (!csrfToken) {
-      throw createError({
-        statusCode: 502,
-        statusMessage: 'Unable to fetch CSRF token',
-      })
-    }
 
     const drupalApiUrl = `${config.public.api}/api/stir_webform_rest/submit`
 
@@ -71,7 +68,6 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: normalizeErrorStatus(error),
       statusMessage: normalizeErrorMessage(error),
-      data: error,
     })
   }
 })

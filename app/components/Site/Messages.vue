@@ -4,15 +4,15 @@ import { cleanHTML } from '~/utils/cleanHTML'
 const { getMessages } = useDrupalCe()
 const toast = useToast()
 
-// Global state to track shown messages across the app
-const shownMessages = useState('shownMessages', () => new Set<string>())
+// Use an array in state to keep payload serialization simple.
+const shownMessages = useState<string[]>('shownMessages', () => [])
 
 onMounted(() => {
   const messages = getMessages().value as Array<{ message: string; type: string }>
 
   messages.forEach((message) => {
     // Check if the message has already been shown
-    if (!shownMessages.value.has(message.message)) {
+    if (!shownMessages.value.includes(message.message)) {
       // Show the toast
       toast.add({
         title: message.type === 'success' ? 'Success!' : 'Error!',
@@ -22,7 +22,7 @@ onMounted(() => {
       })
 
       // Track the shown message
-      shownMessages.value.add(message.message)
+      shownMessages.value.push(message.message)
     }
   })
 })

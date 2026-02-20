@@ -48,6 +48,7 @@ const ignorePaths = computed(() =>
 
 const positionClass = computed(() => {
   const position = config?.position ?? 'center'
+
   if (position === 'left') return 'left-3 sm:left-4'
   if (position === 'right') return 'right-3 sm:right-4'
   return 'left-1/2 -translate-x-1/2'

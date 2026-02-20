@@ -51,6 +51,7 @@ export function useCalendlyWidget(
   url: string,
   onReady?: () => void,
 ) {
+  const resolvedUrl = url.trim()
   const { load } = useScriptTag(
     'https://assets.calendly.com/assets/external/widget.js',
     undefined,
@@ -65,11 +66,14 @@ export function useCalendlyWidget(
   let stopMessageListener: (() => void) | null = null
 
   onMounted(async () => {
+    if (!resolvedUrl) return
+
     const calendly = await loadCalendlyScript(load)
+
     if (!calendly || !container.value) return
 
     calendly.initInlineWidget({
-      url,
+      url: resolvedUrl,
       parentElement: container.value,
     })
 
@@ -82,6 +86,7 @@ export function useCalendlyWidget(
         container.value
       ) {
         const height = parseInt(e.data.payload?.height || '', 10)
+
         if (!isNaN(height)) {
           container.value.style.height = `${height}px`
         }

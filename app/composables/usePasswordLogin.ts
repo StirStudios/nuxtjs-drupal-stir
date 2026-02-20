@@ -7,6 +7,7 @@ export function usePasswordLogin() {
   const state = reactive({ password: '' })
   const validate = (formState: typeof state) => {
     const errors: { id?: string; name?: string; message: string }[] = []
+
     if (!formState.password) {
       errors.push({
         name: 'password',
@@ -59,11 +60,13 @@ export function usePasswordLogin() {
     if (import.meta.server) return
 
     const passwordFromUrl = route.query.password
+
     if (typeof passwordFromUrl === 'string') {
       state.password = passwordFromUrl
       onSubmit({ data: { password: passwordFromUrl } })
 
       const { password, ...cleanedQuery } = route.query
+
       router.replace({ query: cleanedQuery })
     }
   })

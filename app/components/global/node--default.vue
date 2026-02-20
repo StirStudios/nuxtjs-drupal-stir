@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePageContext } from '~/composables/usePageContext'
+
 const { pageLayout } = usePageContext()
 
 defineOptions({

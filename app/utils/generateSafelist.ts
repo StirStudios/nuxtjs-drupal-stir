@@ -77,8 +77,10 @@ function generateInlineSources(classes: Set<string>): string {
   const sorted = Array.from(classes).sort()
 
   const chunkSize = 20
+
   for (let i = 0; i < sorted.length; i += chunkSize) {
     const chunk = sorted.slice(i, i + chunkSize).join(' ')
+
     lines.push(`@source inline("${chunk}");`)
   }
 
@@ -87,6 +89,7 @@ function generateInlineSources(classes: Set<string>): string {
 
 const safelistPath = path.resolve('app/assets/css/safelist.inline.css')
 const inlineCSS = generateInlineSources(safelist)
+
 fs.writeFileSync(safelistPath, inlineCSS)
 
 console.log(

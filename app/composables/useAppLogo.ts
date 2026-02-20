@@ -15,7 +15,7 @@ export function useAppLogo(props: { addClasses?: string }) {
     [props.addClasses, fillClass.value].filter(Boolean).join(' '),
   )
 
-  const logoTitle = computed(() => page?.value?.site_info?.name || '')
+  const logoTitle = computed(() => page.value?.site_info?.name ?? '')
 
   return {
     svgClasses,

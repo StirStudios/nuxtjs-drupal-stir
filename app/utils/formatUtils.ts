@@ -19,7 +19,13 @@ export function formatUnixDate(
     day: 'numeric',
   },
 ): string {
-  const date = new Date(Number(unix) * 1000)
+  const numeric = Number(unix)
+
+  if (!Number.isFinite(numeric)) return ''
+
+  const date = new Date(numeric * 1000)
+
+  if (Number.isNaN(date.getTime())) return ''
   return date.toLocaleDateString(locale, options)
 }
 
@@ -37,6 +43,8 @@ export function formatZonedDateTime(
   },
 ): string {
   const date = typeof value === 'string' ? new Date(value) : value
+
+  if (Number.isNaN(date.getTime())) return ''
 
   return new Intl.DateTimeFormat(locale, {
     timeZone,

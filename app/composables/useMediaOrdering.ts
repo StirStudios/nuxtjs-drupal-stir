@@ -9,10 +9,12 @@ export function useMediaOrdering(
 
   function computeRandomOrder() {
     const arr = [...baseIndices.value]
+
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       const current = arr[i]
       const next = arr[j]
+
       if (current === undefined || next === undefined) continue
       arr[i] = next
       arr[j] = current

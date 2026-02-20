@@ -22,6 +22,7 @@ export const enforceGroupLimit = (
 
   const groupFields = Object.keys(webformState.fields).filter((key) => {
     const field = webformState.fields[key]
+
     return field && field['#group'] === group
   })
 

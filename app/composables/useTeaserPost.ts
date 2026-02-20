@@ -1,3 +1,5 @@
+import { unref } from 'vue'
+
 export function useTeaserPost(
   input: unknown,
   extra: {
@@ -11,12 +13,32 @@ export function useTeaserPost(
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null
 
+  const formatCreatedDate = (value: unknown) => {
+    if (value === null || value === undefined || value === '') return ''
+
+    const raw = typeof value === 'string' ? value.trim() : value
+
+    if (raw === '') return ''
+
+    const asNumber = Number(raw)
+
+    if (Number.isFinite(asNumber) && asNumber > 0) {
+      return new Date(asNumber * 1000).toISOString().slice(0, 10)
+    }
+
+    const parsed = new Date(String(raw))
+
+    if (Number.isNaN(parsed.getTime())) return ''
+    return parsed.toISOString().slice(0, 10)
+  }
+
   const teaserSource = computed(() => {
-    const source = isRecord(input) && 'value' in input ? input.value : input
+    const source = unref(input)
     const raw = isRecord(source) ? source : {}
     const props = isRecord(raw.props) ? raw.props : {}
     const media = isRecord(raw.media) ? raw.media : {}
     const text = typeof raw.text === 'string' ? raw.text : ''
+
     return {
       props,
       media,
@@ -27,6 +49,7 @@ export function useTeaserPost(
   const orientation = computed(() => extra.orientation ?? 'horizontal')
   const image = computed(() => {
     const m = teaserSource.value.media
+
     if (!m?.src) return null
     return {
       src: m.src,
@@ -45,9 +68,7 @@ export function useTeaserPost(
     title: extra.title ?? '',
     description: teaserSource.value.text ?? '',
     image: image.value,
-    date: extra.created
-      ? new Date(Number(extra.created) * 1000).toISOString().slice(0, 10)
-      : '',
+    date: formatCreatedDate(extra.created),
     to: extra.url ?? '',
     editLink: extra.nid ? `/node/${extra.nid}/edit` : undefined,
   }))

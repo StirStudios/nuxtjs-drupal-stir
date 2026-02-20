@@ -13,10 +13,12 @@ defineProps<{
 const vueSlots = useSlots()
 const active = ref<string>('0')
 const contentRef = ref<HTMLElement | null>(null)
+
 type TabsItem = { label: string; value: string }
 
 const tabNodes = computed(() => {
   const nodes = vueSlots.tab?.()
+
   return Array.isArray(nodes) ? nodes : []
 })
 
@@ -29,6 +31,7 @@ const items = computed<TabsItem[]>(() =>
 
 const activeTabNode = computed(() => {
   const index = Number(active.value)
+
   return tabNodes.value[index]
 })
 
@@ -37,6 +40,7 @@ const isMobile = breakpoints.smaller('lg')
 const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
 
 const ready = ref(false)
+
 onMounted(() => {
   ready.value = true
 })

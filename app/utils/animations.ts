@@ -30,6 +30,7 @@ function springResponseAt(timeSeconds: number, config: SpringConfig): number {
     const omegaD = omegaN * Math.sqrt(1 - zeta * zeta)
     const envelope = Math.exp(-zeta * omegaN * timeSeconds)
     const c = zeta / Math.sqrt(1 - zeta * zeta)
+
     return 1 - envelope * (Math.cos(omegaD * timeSeconds) + c * Math.sin(omegaD * timeSeconds))
   }
 
@@ -53,6 +54,7 @@ export function createSpringLinearEasing(
 
   if (!Number.isFinite(endValue) || endValue <= 0) {
     const ease = config.ease ?? [0.42, 0, 0.58, 1]
+
     return `cubic-bezier(${ease.join(', ')})`
   }
 

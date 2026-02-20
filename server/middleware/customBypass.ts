@@ -1,11 +1,30 @@
 import { defineEventHandler, readFormData, createError } from 'h3'
 
+function normalizeStatusCode(error: unknown): number {
+  if (!error || typeof error !== 'object') return 500
+  const statusCode = (error as { statusCode?: unknown }).statusCode
+
+  return typeof statusCode === 'number' ? statusCode : 500
+}
+
+function normalizeMessage(error: unknown): string {
+  if (!error || typeof error !== 'object') return 'Error submitting to Drupal.'
+  const message = (error as { message?: unknown }).message
+
+  return typeof message === 'string' && message.trim()
+    ? message
+    : 'Error submitting to Drupal.'
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const drupalApiUrl = config.public.api
   const url = event.node.req.url || ''
   const method = event.node.req.method || 'GET'
-  const contentType = event.req.headers['content-type'] || ''
+  const contentTypeHeader = event.req.headers['content-type']
+  const contentType = Array.isArray(contentTypeHeader)
+    ? contentTypeHeader.join(';')
+    : (contentTypeHeader ?? '')
 
   // Only handle form submissions (not JSON)
   const isFormContentType =
@@ -19,6 +38,7 @@ export default defineEventHandler(async (event) => {
   if (!url.startsWith('/api/webform/submit')) return
 
   const formData = await readFormData(event)
+
   if (!formData) {
     throw createError({
       statusCode: 400,
@@ -36,8 +56,8 @@ export default defineEventHandler(async (event) => {
     })
     .catch((error) => {
       throw createError({
-        statusCode: error.statusCode || 500,
-        message: error.message || 'Error submitting to Drupal.',
+        statusCode: normalizeStatusCode(error),
+        message: normalizeMessage(error),
       })
     })
 
