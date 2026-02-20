@@ -3,9 +3,7 @@ const appConfig = useAppConfig()
 const route = useRoute()
 const open = ref(false)
 const isDev = import.meta.dev
-const config = computed(() =>
-  appConfig.privacyNotice ?? appConfig.cookieConsent,
-)
+const config = computed(() => appConfig.privacyNotice)
 const consent = useCookie<boolean | string>('cookie_consent', {
   maxAge: 60 * 60 * 24 * 365,
 })

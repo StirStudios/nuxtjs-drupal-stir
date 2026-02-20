@@ -2,9 +2,7 @@
 const appConfig = useAppConfig()
 const popupEnabled = computed(() => appConfig.popup?.enabled === true)
 const privacyNoticeEnabled = computed(
-  () =>
-    appConfig.privacyNotice?.enabled === true ||
-    appConfig.cookieConsent?.enabled === true,
+  () => appConfig.privacyNotice?.enabled === true,
 )
 </script>
 

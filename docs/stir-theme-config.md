@@ -168,11 +168,6 @@ privacyNotice: {
 }
 ```
 
-Legacy compatibility:
-
-- `cookieConsent` is still accepted as a fallback key.
-- Prefer `privacyNotice` for new and updated projects.
-
 ---
 
 ## 🎨 `stirTheme`
