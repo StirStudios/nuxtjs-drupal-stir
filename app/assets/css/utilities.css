@@ -8,6 +8,17 @@
   }
 }
 
+@utility media-hover-zoom {
+  .media > img {
+    @apply transition-transform duration-500 ease-out;
+  }
+
+  &:hover .media > img,
+  &:focus-within .media > img {
+    @apply scale-105;
+  }
+}
+
 .align-left {
   @apply mx-auto max-w-sm sm:float-left sm:me-5 sm:mb-5;
 }
