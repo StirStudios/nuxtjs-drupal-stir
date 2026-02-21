@@ -8,6 +8,7 @@ const props = defineProps<{
   floatingLabel?: boolean
 }>()
 
+const { webform } = useAppConfig().stirTheme
 const id = useId()
 
 const getDefaultValue = () => {
@@ -34,15 +35,38 @@ const modelValue = computed<number>({
     props.state[props.fieldName] = value
   },
 })
+
+const minValue = computed(() => {
+  const value = Number(props.field['#min'])
+
+  return Number.isFinite(value) ? value : undefined
+})
+
+const maxValue = computed(() => {
+  const value = Number(props.field['#max'])
+
+  return Number.isFinite(value) ? value : undefined
+})
 </script>
 
 <template>
-  <USlider
-    :id="id"
-    v-model="modelValue"
-    :max="field['#max']"
-    :min="field['#min']"
-    :step="field['#step'] || 1"
-    tooltip
-  />
+  <div class="space-y-3">
+    <USlider
+      :id="id"
+      v-model="modelValue"
+      :class="webform.fieldInput"
+      :max="field['#max']"
+      :min="field['#min']"
+      :step="field['#step'] || 1"
+      tooltip
+    />
+
+    <div class="text-default/80 flex items-center justify-between text-xs">
+      <span v-if="minValue !== undefined">{{ minValue }}</span>
+      <span v-else />
+      <span class="text-default font-medium">Selected: {{ modelValue }}</span>
+      <span v-if="maxValue !== undefined">{{ maxValue }}</span>
+      <span v-else />
+    </div>
+  </div>
 </template>

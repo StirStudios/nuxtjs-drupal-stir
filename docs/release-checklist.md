@@ -10,6 +10,8 @@ Run safe updates:
 pnpm deps:update:safe
 ```
 
+This command updates dependencies, syncs the README tech stack section, and runs the full verification gate.
+
 If you are not updating dependencies, skip to step 2.
 
 ## 2. Quality gate
