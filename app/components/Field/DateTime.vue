@@ -87,6 +87,17 @@ const datePopoverOpen = ref<boolean[]>(
 const closeDatePopover = (index: number) => {
   datePopoverOpen.value[index] = false
 }
+const dateFieldLabel = (index: number) =>
+  multiple > 1 ? `${props.field['#title']} ${index + 1}` : String(props.field['#title'] ?? 'Date')
+const timeFieldLabel = (index: number) =>
+  multiple > 1 ? `Time ${index + 1}` : 'Time'
+const dateButtonVariant = computed(() => isMaterial.value ? webform.variant : 'outline')
+const dateButtonColor = computed(() => isMaterial.value ? webform.color ?? 'primary' : 'neutral')
+const dateButtonClass = computed(() =>
+  isMaterial.value
+    ? 'w-full justify-start text-left'
+    : 'w-full justify-start text-left font-normal',
+)
 
 watchEffect(() => {
   if (!Array.isArray(props.state[props.fieldName])) {
@@ -124,27 +135,26 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+  <div class="space-y-3">
+    <div class="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
       <template v-for="(block, i) in blocks" :key="i">
-        <UFormField v-if="multiple > 1" :required="!!field['#required']">
-          <p :id="dateTriggerLabelId(i)" class="mb-2 block font-medium text-default/80">
-            {{ `${field['#title']} ${i + 1}` }}
-            <span v-if="field['#required']" class="ms-0.5 text-error">*</span>
-          </p>
+        <UFormField :label="dateFieldLabel(i)" :required="!!field['#required']">
           <UPopover
             v-model:open="datePopoverOpen[i]"
-            :class="{ 'w-full': isMaterial }"
+            class="w-full"
           >
             <UButton
               :id="dateTriggerId(i)"
-              :aria-label="`${field['#title']} ${i + 1}: ${block.date ? 'Change date' : 'Select date'}`"
+              :aria-label="`${dateFieldLabel(i)}: ${block.date ? 'Change date' : 'Select date'}`"
               :aria-labelledby="dateTriggerLabelId(i)"
+              :class="dateButtonClass"
+              :color="dateButtonColor"
               icon="i-lucide-calendar"
-              size="md"
-              :variant="webform.variant"
+              size="xl"
+              :ui="{ leadingIcon: 'size-4' }"
+              :variant="dateButtonVariant"
             >
-              {{ block.date ? formatDateLabel(block.date) : 'Select Date' }}
+              {{ block.date ? formatDateLabel(block.date) : 'Select date' }}
             </UButton>
             <template #content>
               <UCalendar
@@ -156,30 +166,7 @@ watch(
           </UPopover>
         </UFormField>
 
-        <UPopover
-          v-else
-          v-model:open="datePopoverOpen[i]"
-          :class="{ 'w-full': isMaterial }"
-        >
-          <UButton
-            :id="dateTriggerId(i)"
-            :aria-label="`${field['#title']}: ${block.date ? 'Change date' : 'Select date'}`"
-            icon="i-lucide-calendar"
-            size="md"
-            :variant="webform.variant"
-          >
-            {{ block.date ? formatDateLabel(block.date) : 'Select Date' }}
-          </UButton>
-          <template #content>
-            <UCalendar
-              v-model="block.date"
-              class="p-2"
-              @update:model-value="() => closeDatePopover(i)"
-            />
-          </template>
-        </UPopover>
-
-        <UFormField :label="`Time ${i + 1}`" :required="!!field['#required']">
+        <UFormField :label="timeFieldLabel(i)" :required="!!field['#required']">
           <USelect
             :id="timeSelectId(i)"
             v-model="block.start"
