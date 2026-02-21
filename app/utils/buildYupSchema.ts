@@ -92,7 +92,7 @@ export function buildYupSchema(
     const requiredError = field['#requiredError'] || 'This field is required'
     const isRequired = field['#required'] === true
     const isEmail = field['#type'] === 'email'
-    const isNumber = field['#type'] === 'number'
+    const isNumber = field['#type'] === 'number' || field['#type'] === 'range'
     const isCheckboxes = field['#type'] === 'checkboxes'
     const isCheckbox = field['#type'] === 'checkbox'
     const isDateLike = field['#type'] === 'date' || field['#type'] === 'datetime'
