@@ -92,7 +92,11 @@ const dateFieldLabel = (index: number) =>
 const timeFieldLabel = (index: number) =>
   multiple > 1 ? `Time ${index + 1}` : 'Time'
 const dateButtonVariant = computed(() => isMaterial.value ? webform.variant : 'outline')
-const dateButtonColor = computed(() => isMaterial.value ? 'primary' : 'neutral')
+const dateButtonColor = (index: number) => {
+  if (isMaterial.value) return 'primary'
+
+  return datePopoverOpen.value[index] ? 'primary' : 'neutral'
+}
 const dateButtonClass = computed(() =>
   isMaterial.value
     ? 'w-full justify-start text-left'
@@ -148,7 +152,7 @@ watch(
               :aria-label="`${dateFieldLabel(i)}: ${block.date ? 'Change date' : 'Select date'}`"
               :aria-labelledby="dateTriggerLabelId(i)"
               :class="dateButtonClass"
-              :color="dateButtonColor"
+              :color="dateButtonColor(i)"
               icon="i-lucide-calendar"
               size="xl"
               :ui="{ leadingIcon: 'size-4' }"
