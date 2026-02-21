@@ -174,7 +174,7 @@ export default defineAppConfig({
       help: 'desc my-3 text-muted',
       submitAlign: '',
       buttonSize: '2xl',
-      variant: 'outline',
+      variant: 'material',
     },
 
     turnstile: {
@@ -282,6 +282,17 @@ export default defineAppConfig({
     },
 
     input: {
+      variants: {
+        variant: {
+          material: materialVariant,
+        },
+      },
+      defaultVariants: {
+        size: 'xl',
+      },
+    },
+
+    inputNumber: {
       variants: {
         variant: {
           material: materialVariant,

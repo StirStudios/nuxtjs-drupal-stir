@@ -34,11 +34,7 @@ const modelValue = computed<number | undefined>({
   get() {
     const rawValue = props.state[props.fieldName]
 
-    if (
-      rawValue === '' ||
-      rawValue === null ||
-      rawValue === undefined
-    ) {
+    if (rawValue === '' || rawValue === null || rawValue === undefined) {
       return defaultValue.value
     }
 
