@@ -13,12 +13,18 @@ const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
 const placeholder = computed(() => {
   const value = props.field['#placeholder']
-    ? String(props.field['#placeholder'])
-    : undefined
+    ? String(props.field['#placeholder']).trim()
+    : ''
 
   if (props.floatingLabel && !isMaterial.value) return ' '
 
-  return value
+  if (value) return value
+
+  const minValue = Number(props.field['#min'])
+
+  if (Number.isFinite(minValue)) return String(minValue)
+
+  return '0'
 })
 
 const defaultValue = computed(() => {
