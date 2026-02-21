@@ -52,7 +52,11 @@ const pdfProps = computed(() => {
   for (const node of slotMedia.value) {
     const media = tk.propsOf(node) as MediaDocumentProps
 
-    if (media.type !== 'document' || typeof media.url !== 'string' || !media.url) {
+    if (
+      media.type !== 'document' ||
+      typeof media.url !== 'string' ||
+      !media.url
+    ) {
       continue
     }
     return media
@@ -77,7 +81,7 @@ const pdfUrl = computed(() =>
       <UButton
         v-if="hasPdf"
         :block="btnBlock"
-        class="mt-4"
+        class="my-2"
         :color="btnColor"
         :icon="iconName ?? 'i-lucide-file-text'"
         :label="pdfTitle"
@@ -89,7 +93,7 @@ const pdfUrl = computed(() =>
       <UButton
         v-else-if="hasLink"
         :block="btnBlock"
-        class="mt-4"
+        class="my-2"
         :color="btnColor"
         :icon="iconName"
         :label="btnLabel"
