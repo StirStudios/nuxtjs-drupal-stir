@@ -135,7 +135,7 @@ const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] =>
   if (isRangeLikeField(field)) {
     const minValue = Number(field['#min'])
 
-    return Number.isFinite(minValue) ? minValue : 0
+    return Number.isFinite(minValue) ? Math.max(1, minValue) : 1
   }
 
   return ''

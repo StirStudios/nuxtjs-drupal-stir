@@ -164,19 +164,21 @@ export function buildYupSchema(
         .typeError('Must be a number')
         .nullable() as NumberSchema<number | undefined>
 
-      const minValue = Number(field['#min'])
+      const minimumAllowedValue = 1
+      const minRawValue = Number(field['#min'])
       const maxValue = Number(field['#max'])
+      const minValue = Number.isFinite(minRawValue)
+        ? Math.max(minimumAllowedValue, minRawValue)
+        : minimumAllowedValue
 
-      if (Number.isFinite(minValue)) {
-        numSchema = numSchema.min(
-          minValue,
-          `Minimum value is ${minValue}`,
-        )
-      }
+      numSchema = numSchema.min(
+        minValue,
+        `Minimum value is ${minValue}`,
+      )
       if (Number.isFinite(maxValue)) {
         numSchema = numSchema.max(
-          maxValue,
-          `Maximum value is ${maxValue}`,
+          Math.max(minValue, maxValue),
+          `Maximum value is ${Math.max(minValue, maxValue)}`,
         )
       }
       base = numSchema

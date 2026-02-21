@@ -11,15 +11,20 @@ const props = defineProps<{
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
+const minimumAllowedValue = 1
 const minValue = computed(() => {
   const value = Number(props.field['#min'])
 
-  return Number.isFinite(value) ? value : undefined
+  if (Number.isFinite(value)) return Math.max(minimumAllowedValue, value)
+
+  return minimumAllowedValue
 })
 const maxValue = computed(() => {
   const value = Number(props.field['#max'])
 
-  return Number.isFinite(value) ? value : undefined
+  if (!Number.isFinite(value)) return undefined
+
+  return Math.max(minValue.value, value)
 })
 const stepValue = computed(() => {
   const value = Number(props.field['#step'])
@@ -44,7 +49,9 @@ const defaultValue = computed(() => {
   const rawDefault = props.field['#defaultValue'] ?? props.field['#value']
   const numberValue = Number(rawDefault)
 
-  if (Number.isFinite(numberValue)) return numberValue
+  if (Number.isFinite(numberValue)) {
+    return Math.max(minValue.value, numberValue)
+  }
 
   return minValue.value
 })
@@ -59,12 +66,28 @@ const modelValue = computed<number | undefined>({
 
     const numberValue = Number(rawValue)
 
-    if (Number.isFinite(numberValue)) return numberValue
+    if (Number.isFinite(numberValue)) {
+      if (maxValue.value !== undefined) {
+        return Math.min(maxValue.value, Math.max(minValue.value, numberValue))
+      }
+
+      return Math.max(minValue.value, numberValue)
+    }
 
     return defaultValue.value
   },
   set(value) {
-    props.state[props.fieldName] = typeof value === 'number' ? value : ''
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      props.state[props.fieldName] = ''
+      return
+    }
+
+    const clampedValue =
+      maxValue.value !== undefined
+        ? Math.min(maxValue.value, Math.max(minValue.value, value))
+        : Math.max(minValue.value, value)
+
+    props.state[props.fieldName] = clampedValue
   },
 })
 </script>
