@@ -23,7 +23,12 @@ const { webform } = useAppConfig().stirTheme
 const componentMap: Record<string, Component> = {
   textfield: defineAsyncComponent(() => import('~/components/Field/Input.vue')),
   email: defineAsyncComponent(() => import('~/components/Field/Input.vue')),
-  number: defineAsyncComponent(() => import('~/components/Field/Input.vue')),
+  number: defineAsyncComponent(
+    () => import('~/components/Field/Input/Number.vue'),
+  ),
+  range: defineAsyncComponent(
+    () => import('~/components/Field/Input/Slider.vue'),
+  ),
   tel: defineAsyncComponent(() => import('~/components/Field/Input.vue')),
   textarea: defineAsyncComponent(
     () => import('~/components/Field/Textarea.vue'),
@@ -55,9 +60,27 @@ const shouldRender = computed(() => {
 const useFloatingLabels = computed(
   () => props.field['#floating_label'] ?? webform.labels.floating,
 )
+const resolvedFieldType = computed(() => {
+  const rawType = String(props.field['#type'] ?? '').trim().toLowerCase()
+  const inputType =
+    props.field['#input_type'] ??
+    props.field['#inputType'] ??
+    props.field['#widget'] ??
+    (props.field['#attributes'] as Record<string, unknown> | undefined)?.type
+  const normalizedInputType = String(inputType ?? '').trim().toLowerCase()
+
+  if (rawType === 'range') return 'range'
+  if (rawType.includes('range')) return 'range'
+
+  if (rawType === 'number' && normalizedInputType === 'range') {
+    return 'range'
+  }
+
+  return rawType
+})
 
 const resolvedComponent = computed(
-  () => componentMap[props.field['#type']] || null,
+  () => componentMap[resolvedFieldType.value] || null,
 )
 
 const shouldShowLabel = computed(
@@ -66,7 +89,9 @@ const shouldShowLabel = computed(
     props.field['#type'] !== 'datetime' &&
     props.field['#type'] !== 'date' &&
     props.field['#type'] !== 'hidden' &&
-    !useFloatingLabels.value,
+    (resolvedFieldType.value === 'number' ||
+      resolvedFieldType.value === 'range' ||
+      !useFloatingLabels.value),
 )
 
 const shouldShowDescription = computed(
@@ -115,7 +140,13 @@ const labelClass = computed(() => props.field['#class'] || '')
       v-if="resolvedComponent"
       :field="field"
       :field-name="fieldName"
-      :floating-label="field['#type'] === 'checkbox' ? undefined : useFloatingLabels"
+      :floating-label="
+        resolvedFieldType === 'checkbox' ||
+          resolvedFieldType === 'number' ||
+          resolvedFieldType === 'range'
+          ? undefined
+          : useFloatingLabels
+      "
       :state="state"
     />
 

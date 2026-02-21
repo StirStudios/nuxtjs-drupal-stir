@@ -113,6 +113,11 @@ const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] =>
 
   if (type === 'checkboxes' || multiple) return []
   if (type === 'checkbox') return false
+  if (type === 'range') {
+    const minValue = Number(field['#min'])
+
+    return Number.isFinite(minValue) ? minValue : 0
+  }
 
   return ''
 }

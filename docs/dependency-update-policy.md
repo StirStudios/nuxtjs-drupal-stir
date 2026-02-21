@@ -24,7 +24,13 @@ pnpm deps:verify
 pnpm deps:update:safe
 ```
 
-This runs `pnpm update` and then:
+This runs:
+
+- `pnpm update`
+- `pnpm docs:sync-tech-stack`
+- `pnpm verify:ci`
+
+Where `pnpm verify:ci` runs:
 
 - `pnpm test`
 - `pnpm lint`

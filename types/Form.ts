@@ -17,6 +17,7 @@ export type InputType =
   | 'radio'
   | 'checkbox'
   | 'checkboxes'
+  | 'range'
   | 'hidden'
   | 'processed_text'
   | 'datetime'
@@ -76,6 +77,9 @@ export interface WebformFieldProps {
   '#name': string
   '#description'?: string
   '#placeholder'?: string
+  '#input_type'?: string
+  '#inputType'?: string
+  '#widget'?: string
   '#required'?: boolean
   '#requiredError'?: string
   '#options'?: Record<string, string>

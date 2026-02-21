@@ -395,6 +395,7 @@ turnstile: {
 
 ```ts
 webform: {
+  scrollToTopOnSuccess: true,
   spacing: 'space-y-5',
   spacingLarge: 'space-y-10',
   labels: {
