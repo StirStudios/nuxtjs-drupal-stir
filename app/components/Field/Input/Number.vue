@@ -11,6 +11,21 @@ const props = defineProps<{
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
+const minValue = computed(() => {
+  const value = Number(props.field['#min'])
+
+  return Number.isFinite(value) ? value : undefined
+})
+const maxValue = computed(() => {
+  const value = Number(props.field['#max'])
+
+  return Number.isFinite(value) ? value : undefined
+})
+const stepValue = computed(() => {
+  const value = Number(props.field['#step'])
+
+  return Number.isFinite(value) && value > 0 ? value : 1
+})
 const placeholder = computed(() => {
   const value = props.field['#placeholder']
     ? String(props.field['#placeholder']).trim()
@@ -20,9 +35,7 @@ const placeholder = computed(() => {
 
   if (value) return value
 
-  const minValue = Number(props.field['#min'])
-
-  if (Number.isFinite(minValue)) return String(minValue)
+  if (minValue.value !== undefined) return String(minValue.value)
 
   return '0'
 })
@@ -33,7 +46,7 @@ const defaultValue = computed(() => {
 
   if (Number.isFinite(numberValue)) return numberValue
 
-  return undefined
+  return minValue.value
 })
 
 const modelValue = computed<number | undefined>({
@@ -61,10 +74,10 @@ const modelValue = computed<number | undefined>({
     :id="id"
     v-model="modelValue"
     :class="webform.fieldInput"
-    :max="field['#max']"
-    :min="field['#min']"
+    :max="maxValue"
+    :min="minValue"
     :placeholder="placeholder"
-    :step="field['#step'] || 1"
+    :step="stepValue"
     :variant="webform.variant"
   />
 </template>
