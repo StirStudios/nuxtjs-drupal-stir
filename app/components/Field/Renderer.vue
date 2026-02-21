@@ -109,6 +109,19 @@ const descriptionContent = computed(() =>
 )
 const helpContent = computed(() => cleanHTML(String(props.field['#help'] ?? '')))
 const labelClass = computed(() => props.field['#class'] || '')
+const fieldUi = computed(() => {
+  if (
+    resolvedFieldType.value === 'checkbox' ||
+    resolvedFieldType.value === 'checkboxes'
+  ) {
+    return {
+      label: labelClass.value,
+      error: 'mt-1 ms-6 text-error',
+    }
+  }
+
+  return { label: labelClass.value }
+})
 </script>
 
 <template>
@@ -125,7 +138,7 @@ const labelClass = computed(() => props.field['#class'] || '')
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
     :required="!!field['#required']"
-    :ui="{ label: labelClass }"
+    :ui="fieldUi"
   >
     <ButtonModal v-if="field['#modal'] === true" :modal-id="field['#name']" />
 
