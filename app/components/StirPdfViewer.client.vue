@@ -9,7 +9,7 @@ declare global {
 if (import.meta.dev && !window.__stirPdfViewerWarned) {
   window.__stirPdfViewerWarned = true
   console.warn(
-    '[PdfViewer] PDF Viewer is not installed. Add a real PdfViewer.vue in your root app if needed.',
+    '[StirPdfViewer] PDF Viewer is not installed. Add a real StirPdfViewer.client.vue in your root app if needed.',
   )
 }
 </script>

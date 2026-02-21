@@ -117,7 +117,7 @@ const pdfUrl = computed(() =>
     }"
   >
     <template #body>
-      <LazyPdfViewer :src="pdfUrl" />
+      <LazyStirPdfViewer :src="pdfUrl" />
     </template>
   </UModal>
 </template>
