@@ -25,6 +25,15 @@ const getDefaultValue = () => {
 const modelValue = computed<number>({
   get() {
     const rawValue = props.state[props.fieldName]
+
+    if (
+      rawValue === '' ||
+      rawValue === null ||
+      rawValue === undefined
+    ) {
+      return getDefaultValue()
+    }
+
     const numberValue = Number(rawValue)
 
     if (Number.isFinite(numberValue)) return numberValue

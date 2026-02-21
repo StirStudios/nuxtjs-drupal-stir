@@ -9,7 +9,17 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
+const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
+const placeholder = computed(() => {
+  const value = props.field['#placeholder']
+    ? String(props.field['#placeholder'])
+    : undefined
+
+  if (props.floatingLabel && !isMaterial.value) return ' '
+
+  return value
+})
 
 const defaultValue = computed(() => {
   const rawDefault = props.field['#defaultValue'] ?? props.field['#value']
@@ -23,6 +33,15 @@ const defaultValue = computed(() => {
 const modelValue = computed<number | undefined>({
   get() {
     const rawValue = props.state[props.fieldName]
+
+    if (
+      rawValue === '' ||
+      rawValue === null ||
+      rawValue === undefined
+    ) {
+      return defaultValue.value
+    }
+
     const numberValue = Number(rawValue)
 
     if (Number.isFinite(numberValue)) return numberValue
@@ -42,7 +61,7 @@ const modelValue = computed<number | undefined>({
     :class="webform.fieldInput"
     :max="field['#max']"
     :min="field['#min']"
-    :placeholder="field['#placeholder'] ? String(field['#placeholder']) : undefined"
+    :placeholder="placeholder"
     :step="field['#step'] || 1"
     :variant="webform.variant"
   />
