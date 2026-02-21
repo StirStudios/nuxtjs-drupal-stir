@@ -92,7 +92,7 @@ const dateFieldLabel = (index: number) =>
 const timeFieldLabel = (index: number) =>
   multiple > 1 ? `Time ${index + 1}` : 'Time'
 const dateButtonVariant = computed(() => isMaterial.value ? webform.variant : 'outline')
-const dateButtonColor = computed(() => isMaterial.value ? webform.color ?? 'primary' : 'neutral')
+const dateButtonColor = computed(() => isMaterial.value ? 'primary' : 'neutral')
 const dateButtonClass = computed(() =>
   isMaterial.value
     ? 'w-full justify-start text-left'
