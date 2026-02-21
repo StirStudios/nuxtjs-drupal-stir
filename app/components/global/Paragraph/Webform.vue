@@ -85,6 +85,25 @@ const groupedFields = computed(() => {
 })
 
 const formResetKey = ref(0)
+const isRangeLikeField = (field: WebformFieldProps) => {
+  const type = String(field['#type'] ?? '').trim().toLowerCase()
+  const inputType = String(
+    field['#input_type'] ??
+      field['#inputType'] ??
+      field['#widget'] ??
+      (field['#attributes'] as Record<string, unknown> | undefined)?.type ??
+      '',
+  )
+    .trim()
+    .toLowerCase()
+
+  return (
+    type === 'range' ||
+    type.includes('range') ||
+    (type === 'number' && inputType === 'range')
+  )
+}
+
 const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] => {
   const defaultValue =
     field['#default'] ?? field['#defaultValue'] ?? field['#default_value']
@@ -113,10 +132,10 @@ const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] =>
 
   if (type === 'checkboxes' || multiple) return []
   if (type === 'checkbox') return false
-  if (type === 'range') {
+  if (isRangeLikeField(field)) {
     const minValue = Number(field['#min'])
 
-    return Number.isFinite(minValue) ? minValue : 0
+    return Number.isFinite(minValue) ? Math.max(1, minValue) : 1
   }
 
   return ''

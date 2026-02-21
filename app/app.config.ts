@@ -314,6 +314,17 @@ export default defineAppConfig({
       },
     },
 
+    inputNumber: {
+      variants: {
+        size: {
+          md: 'px-2.5 py-1.5 text-base gap-1.5',
+        },
+        variant: {
+          material: materialVariant,
+        },
+      },
+    },
+
     textarea: {
       variants: {
         variant: {
