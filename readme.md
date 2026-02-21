@@ -1,24 +1,58 @@
-A production-ready Nuxt 4 starter template with Nuxt UI 4, Tailwind CSS 4, and full decoupled Drupal 11 (Lupus CE) integration for content-driven, SSR-optimized web apps.
+# Nuxt 4 Drupal Layer (Nuxt UI 4 + Tailwind 4)
+
+A production-ready Nuxt 4 layer/base theme for decoupled Drupal (Lupus Custom Elements) sites.  
+Built with Nuxt UI 4 and Tailwind CSS 4 for SSR-friendly, SEO-aware, content-driven web apps.
+
+Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, content hubs, and custom page-builder experiences.
 
 ## 🚀 Features
 
 - ✅ **Nuxt 4** with full SSR and Vite support
 - 🎨 **Nuxt UI 4** with customized design tokens, material-style form variants, and Tailwind 4
-- 🧩 **Drupal CE** integration for decoupled content, slot-based layouts, and dynamic form rendering
-- 📊 Turnstile CAPTCHA, Sitemap, and Robots support
+- 🧩 **Drupal CE** integration for decoupled content, slot-based layouts, paragraph mapping, and dynamic form rendering
+- 🖼️ Rich media support with overlays, modal/gallery display, and content-driven image handling
+- 🧱 Flexible content patterns including layout sections, carousel/tabs, and masonry-style gallery implementations in downstream themes
+- 📝 Full Drupal webform rendering flow with schema-based validation and SSR-safe behavior
+- 📊 Built-in integrations for Turnstile CAPTCHA, Plausible analytics, Sitemap, and Robots
+- ♿ Accessibility-focused defaults (form labeling, semantics, keyboard-aware UI, contrast-friendly text tokens)
 - 🌀 Smooth scrolling and page transitions
 - ⚙️ Vitalizer: Delayed hydration for performance optimization
 - 🔐 Environment-aware route rules, protected admin redirects
-- 🧪 ESLint, Prettier, and Release It pre-configured
+- 🧪 ESLint, TypeScript checks, Vitest, and Release It pre-configured
 - 📁 Cloudflare-optimized asset compression via Nitro
+
+## 👥 Who This Is For
+
+- Teams building decoupled Drupal + Nuxt websites
+- Agencies shipping reusable Nuxt layers across multiple client projects
+- Projects that need SSR, sitemap/robots support, webforms, and strong accessibility defaults
+
+## ⚡ Quick Start
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Then configure environment variables (see `## 🔐 Environment Variables`) and app-level options in `app/app.config.ts`.
 
 ## 🧱 Tech Stack
 
-- **[Nuxt 4](https://nuxt.com/)**: `^4.3.0`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.4.0`
-- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.1.18`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.5.1`
-- **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: asset compression and custom build rules
+<!-- tech-stack:start -->
+- **[Nuxt 4](https://nuxt.com/)**: `^4.3.1`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `pinned PR build (6e66015)`
+- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.2.0`
+- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.5.3`
+- **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
+<!-- tech-stack:end -->
+
+## ✅ Quality Baseline
+
+- Linting: `pnpm lint` (ESLint)
+- Type safety: `pnpm typecheck` (Nuxt + Vue TS)
+- Unit testing: `pnpm test` (Vitest)
+- CI/local gate: `pnpm verify:ci` (test + lint + typecheck + build)
+- Bundle/perf visibility: `pnpm perf:report`
 
 ## 📦 Project Structure
 
