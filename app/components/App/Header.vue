@@ -88,6 +88,9 @@ const onOpen = (val: boolean) => {
 </script>
 
 <template>
+  <LazyRegionArea area="top" />
+  <LazyDrupalTabs v-if="isAdministrator" />
+
   <LazyUHeader
     aria-label="Site header"
     :menu="{
