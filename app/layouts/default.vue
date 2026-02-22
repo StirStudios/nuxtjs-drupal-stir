@@ -1,18 +1,16 @@
 <script setup lang="ts">
 const { navigation } = useAppConfig().stirTheme
-const { isAdministrator } = usePageContext()
 </script>
 
 <template>
-  <LazyRegionArea area="top" />
-  <LazyDrupalTabs v-if="isAdministrator" />
-  <LazyAppHeader :mode="navigation.mode" />
+  <div class="grid min-h-dvh grid-rows-[auto_1fr_auto]">
+    <LazyAppHeader :mode="navigation.mode" />
 
-  <UMain id="main-content" as="main" role="main">
-    <LazySiteMessages />
-    <slot />
-  </UMain>
+    <UMain id="main-content" role="main">
+      <LazySiteMessages />
+      <slot />
+    </UMain>
 
-  <LazyRegionArea area="sub_footer" />
-  <LazyAppFooter />
+    <LazyAppFooter />
+  </div>
 </template>

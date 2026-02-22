@@ -37,6 +37,8 @@ const footerMenuItems = computed(() =>
 </script>
 
 <template>
+  <LazyRegionArea area="sub_footer" />
+
   <UFooter
     aria-label="Site Footer"
     :ui="{
