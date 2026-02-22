@@ -1,29 +1,4 @@
 @layer base {
-  .page-enter-active,
-  .page-leave-active {
-    @apply transition-all duration-220 ease-out;
-  }
-
-  .page-enter-from {
-    @apply translate-y-1 opacity-0;
-  }
-
-  .page-leave-to {
-    @apply -translate-y-1 opacity-0;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .page-enter-active,
-    .page-leave-active {
-      @apply duration-0;
-    }
-
-    .page-enter-from,
-    .page-leave-to {
-      @apply translate-y-0 opacity-100;
-    }
-  }
-
   h1,
   h2 {
     @apply font-serif;
