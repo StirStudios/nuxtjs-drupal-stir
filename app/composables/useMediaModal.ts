@@ -61,9 +61,22 @@ export function useMediaModal(
   )
 
   const modalTitle = computed(() => activeItem.value?.title || '')
-  const modalDescription = computed(
-    () => activeItem.value?.alt || activeItem.value?.credit || '',
-  )
+  const modalDescription = computed(() => {
+    const description = activeItem.value?.alt || activeItem.value?.credit || ''
+
+    return description.trim() !== '' ? description : undefined
+  })
+  const modalA11yDescription = computed(() => {
+    const description = modalDescription.value
+
+    if (description) return description
+    const type = activeItem.value?.type || 'media'
+    const title = activeItem.value?.title?.trim() || ''
+    const typeLabel = `${type.charAt(0).toUpperCase()}${type.slice(1)}`
+
+    if (title !== '') return `${typeLabel} preview: ${title}`
+    return `${typeLabel} preview`
+  })
   const modalCredit = computed(() => activeItem.value?.credit || '')
 
   const normalizeIndex = (index: number) => {
@@ -96,6 +109,7 @@ export function useMediaModal(
     activeItem,
     modalTitle,
     modalDescription,
+    modalA11yDescription,
     modalCredit,
     openModal,
     onSelect,

@@ -2,6 +2,7 @@
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
+import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
 import { useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -57,11 +58,13 @@ const {
   open,
   startIndex,
   itemsOrdered,
+  activeItem,
   modalTitle,
   modalDescription,
+  modalA11yDescription,
   modalCredit,
   openModal,
-  onSelect,
+  onSelect: onSelectModal,
 } = useMediaModal(slotMediaOrdered, tk)
 
 const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
@@ -77,6 +80,11 @@ const lanes = computed(() => {
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
 const hydrated = ref(false)
 const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
+const { handleCarouselSelect } = useModalMediaPlayback({
+  getCurrentMid: () => String(activeItem.value?.mid ?? ''),
+  getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
+  onSelect: onSelectModal,
+})
 
 onMounted(() => {
   hydrated.value = true
@@ -132,7 +140,7 @@ onMounted(() => {
     v-model:open="open"
     aria-modal="true"
     :close="false"
-    :description="modalDescription"
+    :description="modalA11yDescription"
     fullscreen
     :title="modalTitle"
     :ui="{
@@ -178,7 +186,7 @@ onMounted(() => {
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{ container: 'items-center h-full' }"
-        @select="onSelect"
+        @select="handleCarouselSelect"
       >
         <template #default="{ item }">
           <div :class="['overflow-hidden', theme.media.rounded]">
