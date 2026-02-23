@@ -26,9 +26,11 @@ const { initializePlayers } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const isProcessing = computed(() => props.width === 180)
-const aspectClass = computed(() =>
-  aspectRatios(props.width ?? 16, props.height ?? 9),
-)
+const aspectClass = computed(() => {
+  const ratio = aspectRatios(props.width ?? null, props.height ?? null)
+
+  return ratio || 'aspect-video'
+})
 
 onMounted(() => {
   if (!isBare.value && props.mediaEmbed && !isProcessing.value) {
