@@ -2,6 +2,10 @@
 import { aspectRatios } from '~/utils/aspectRatios'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{
   mid?: string | number
   title?: string
