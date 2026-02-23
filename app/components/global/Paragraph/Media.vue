@@ -12,6 +12,7 @@ const props = defineProps<{
 
   gridItems?: string
   spacing?: string
+  width?: string
   widthClass?: string
   align?: string
   direction?: string
@@ -29,6 +30,8 @@ const props = defineProps<{
 
   editLink?: string
 }>()
+
+const resolvedWidth = computed(() => props.widthClass || props.width || '')
 
 const scrollArea = ref<{ $el?: HTMLElement } | null>(null)
 const vueSlots = useSlots()
@@ -61,13 +64,13 @@ const {
   onSelect,
 } = useMediaModal(slotMediaOrdered, tk)
 
-const { width } = useElementSize(() => scrollArea.value?.$el)
+const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
 const lanes = computed(() => {
   const config = props.masonry?.lanes
 
   if (!config) return 1
-  if (width.value >= 768 && config.md) return config.md
-  if (width.value >= 640 && config.sm) return config.sm
+  if (scrollWidth.value >= 768 && config.md) return config.md
+  if (scrollWidth.value >= 640 && config.sm) return config.sm
   return config.default ?? 1
 })
 
@@ -109,7 +112,7 @@ onMounted(() => {
           v-else
           :grid-items="gridItems"
           :spacing="spacing"
-          :width="widthClass"
+          :width="resolvedWidth"
         >
           <MediaItem
             v-for="(node, i) in slotMediaOrdered"
