@@ -1,3 +1,8 @@
+import { dirname, resolve as resolvePath } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const layerDir = dirname(fileURLToPath(import.meta.url))
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-02-14',
 
@@ -73,7 +78,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'social',
-        dir: './app/assets/icons',
+        dir: resolvePath(layerDir, 'app/assets/icons'),
       },
     ],
   },
