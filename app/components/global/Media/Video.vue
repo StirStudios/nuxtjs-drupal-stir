@@ -70,18 +70,10 @@ onMounted(() => {
 
     <iframe
       v-else
-      allow="
-        accelerometer;
-        autoplay;
-        clipboard-write;
-        encrypted-media;
-        gyroscope;
-        picture-in-picture;
-      "
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
       :class="['absolute inset-0 h-full w-full bg-black', theme.media.rounded]"
       :data-mid="mid"
-      frameborder="0"
       loading="lazy"
       :src="mediaEmbed"
       :title="title"
