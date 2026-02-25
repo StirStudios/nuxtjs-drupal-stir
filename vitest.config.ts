@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.spec.ts'],
+    exclude: ['tests/nuxt/**/*.spec.ts'],
   },
   resolve: {
     alias: {
