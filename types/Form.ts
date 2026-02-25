@@ -77,6 +77,8 @@ export interface WebformFieldProps {
   '#name': string
   '#description'?: string
   '#placeholder'?: string
+  '#autocomplete'?: string
+  '#pattern'?: string
   '#input_type'?: string
   '#inputType'?: string
   '#widget'?: string
