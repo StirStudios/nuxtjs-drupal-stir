@@ -30,7 +30,7 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
   it('does not render relocated non-hidden fields unless bypassed', async () => {
     const field: WebformFieldProps = {
-      '#type': 'textfield',
+      '#type': 'text',
       '#title': 'Full name',
       '#name': 'full_name',
       '#relocated': true,

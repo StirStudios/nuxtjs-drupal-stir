@@ -31,9 +31,16 @@ describe('FieldRelocated (Nuxt runtime)', () => {
     })
 
     const hiddenInputs = wrapper.findAll('input[type="hidden"]')
+    const movedHiddenInput = hiddenInputs[0]
 
     expect(hiddenInputs).toHaveLength(1)
-    expect(hiddenInputs[0].attributes('name')).toBe('movedHidden')
-    expect(hiddenInputs[0].attributes('value')).toBe('yes')
+    expect(movedHiddenInput).toBeDefined()
+
+    if (!movedHiddenInput) {
+      throw new Error('Expected relocated hidden input')
+    }
+
+    expect(movedHiddenInput.attributes('name')).toBe('movedHidden')
+    expect(movedHiddenInput.attributes('value')).toBe('yes')
   })
 })
