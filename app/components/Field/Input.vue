@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '../../../types'
 import {
-  sanitizeTelValue,
+  formatTelDisplayValue,
   shouldPreventTelBeforeInput,
   shouldPreventTelKeydown,
   telPattern,
@@ -19,6 +19,32 @@ const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
 const isNumber = computed(() => props.field['#type'] === 'number')
 const isTel = computed(() => props.field['#type'] === 'tel')
+const fieldPlaceholder = computed(() => {
+  const value = props.field['#placeholder']
+
+  return typeof value === 'string' ? value : ''
+})
+const inputPlaceholder = computed(() => {
+  if (props.floatingLabel) return ' '
+  if (fieldPlaceholder.value) return fieldPlaceholder.value
+  if (isTel.value) return '(555) 123-4567'
+
+  return ''
+})
+const inputAutocomplete = computed(() => {
+  const value = props.field['#autocomplete']
+
+  if (typeof value === 'string' && value.length) return value
+
+  return isTel.value ? 'tel' : undefined
+})
+const inputPattern = computed(() => {
+  const value = props.field['#pattern']
+
+  if (typeof value === 'string' && value.length) return value
+
+  return isTel.value ? telPattern : undefined
+})
 const inputType = computed(() => {
   const rawType = String(props.field['#type'] ?? 'text')
 
@@ -47,7 +73,7 @@ function handleTelKeydown(event: KeyboardEvent): void {
 
 function updateFieldValue(value: string | number | null | undefined): void {
   if (isTel.value) {
-    props.state[props.fieldName] = sanitizeTelValue(value)
+    props.state[props.fieldName] = formatTelDisplayValue(value)
     return
   }
 
@@ -58,14 +84,14 @@ function updateFieldValue(value: string | number | null | undefined): void {
 <template>
   <UInput
     :id="id"
-    :autocomplete="isTel ? 'tel' : undefined"
+    :autocomplete="inputAutocomplete"
     :class="webform.fieldInput"
     :inputmode="isTel ? 'tel' : undefined"
     :max="isNumber ? field['#max'] : undefined"
     :min="isNumber ? field['#min'] : undefined"
     :model-value="state[fieldName]"
-    :pattern="isTel ? telPattern : undefined"
-    :placeholder="floatingLabel ? ' ' : ''"
+    :pattern="inputPattern"
+    :placeholder="inputPlaceholder"
     :step="isNumber ? field['#step'] || 1 : undefined"
     :type="inputType"
     :ui="floatingLabel ? { base: 'peer' } : {}"

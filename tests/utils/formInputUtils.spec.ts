@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   clampNumberToBounds,
+  formatTelDisplayValue,
   isTelCharacterAllowed,
   normalizeNumberBounds,
   sanitizeTelValue,
@@ -17,6 +18,30 @@ describe('formInputUtils', () => {
     it('keeps a single leading plus and strips extra plus symbols', () => {
       expect(sanitizeTelValue('++1+ (555) 123-4567')).toBe('+1 (555) 123-4567')
       expect(sanitizeTelValue('1+555+123')).toBe('1555123')
+    })
+  })
+
+  describe('formatTelDisplayValue', () => {
+    it('formats local US numbers as the user types', () => {
+      expect(formatTelDisplayValue('555')).toBe('(555')
+      expect(formatTelDisplayValue('555123')).toBe('(555) 123')
+      expect(formatTelDisplayValue('5551234567')).toBe('(555) 123-4567')
+    })
+
+    it('formats +1 numbers and strips unsupported characters', () => {
+      expect(formatTelDisplayValue('+15551234567')).toBe('+1 (555) 123-4567')
+      expect(formatTelDisplayValue('+1 (555) 123-4567 ext 99')).toBe('+1 (555) 123-4567')
+    })
+
+    it('falls back to a plain digit string for non-US long values', () => {
+      expect(formatTelDisplayValue('555123456789')).toBe('(555) 123-4567')
+      expect(formatTelDisplayValue('+442071838750')).toBe('(442) 071-8387')
+    })
+
+    it('limits long +1 values to US country code + 10 digits', () => {
+      expect(formatTelDisplayValue('+1123123123123123123')).toBe(
+        '+1 (123) 123-1231',
+      )
     })
   })
 
