@@ -33,6 +33,7 @@ This runs:
 Where `pnpm verify:ci` runs:
 
 - `pnpm test`
+- `pnpm test:nuxt`
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm build`

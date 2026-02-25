@@ -51,7 +51,8 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - Linting: `pnpm lint` (ESLint)
 - Type safety: `pnpm typecheck` (Nuxt + Vue TS)
 - Unit testing: `pnpm test` (Vitest)
-- CI/local gate: `pnpm verify:ci` (test + lint + typecheck + build)
+- Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
+- CI/local gate: `pnpm verify:ci` (test + test:nuxt + lint + typecheck + build)
 - Bundle/perf visibility: `pnpm perf:report`
 
 ## 📦 Project Structure
@@ -90,8 +91,10 @@ pnpm preview    # Preview production build
 pnpm lint       # Lint project
 pnpm typecheck  # Nuxt + Vue TypeScript checks
 pnpm test       # Run unit tests
+pnpm test:nuxt  # Run Nuxt runtime tests
+pnpm test:e2e   # Run E2E smoke tests (optional/local)
 pnpm test:watch # Run unit tests in watch mode
-pnpm verify:ci  # Full local quality gate (test/lint/typecheck/build)
+pnpm verify:ci  # Full local quality gate (test/test:nuxt/lint/typecheck/build)
 pnpm perf:report # Build + output top client chunk size report
 pnpm deps:update:safe # Safe dependency update flow
 pnpm release    # Tag + prepare release
@@ -103,6 +106,7 @@ pnpm release    # Tag + prepare release
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:nuxt
 pnpm build
 ```
 

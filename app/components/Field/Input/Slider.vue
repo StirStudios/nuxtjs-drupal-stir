@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
+import { clampNumberToBounds, normalizeNumberBounds } from '~/utils/formInputUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -15,12 +16,17 @@ const minimumAllowedValue = 1
 const getDefaultValue = () => {
   const rawDefault = props.field['#defaultValue'] ?? props.field['#value']
   const numberValue = Number(rawDefault)
+  const bounds = normalizeNumberBounds(
+    props.field['#min'],
+    props.field['#max'],
+    minimumAllowedValue,
+  )
 
-  if (Number.isFinite(numberValue)) return numberValue
+  if (Number.isFinite(numberValue)) {
+    return clampNumberToBounds(numberValue, bounds)
+  }
 
-  const minValue = Number(props.field['#min'])
-
-  return Number.isFinite(minValue) ? Math.max(minimumAllowedValue, minValue) : minimumAllowedValue
+  return bounds.min
 }
 
 const modelValue = computed<number>({
@@ -42,35 +48,30 @@ const modelValue = computed<number>({
     return getDefaultValue()
   },
   set(value) {
-    const minValue = Number(props.field['#min'])
-    const maxValue = Number(props.field['#max'])
-    const normalizedMin = Number.isFinite(minValue)
-      ? Math.max(minimumAllowedValue, minValue)
-      : minimumAllowedValue
-    const normalizedMax = Number.isFinite(maxValue)
-      ? Math.max(normalizedMin, maxValue)
-      : undefined
+    const bounds = normalizeNumberBounds(
+      props.field['#min'],
+      props.field['#max'],
+      minimumAllowedValue,
+    )
 
-    props.state[props.fieldName] = normalizedMax === undefined
-      ? Math.max(normalizedMin, value)
-      : Math.min(normalizedMax, Math.max(normalizedMin, value))
+    props.state[props.fieldName] = clampNumberToBounds(value, bounds)
   },
 })
 
 const minValue = computed(() => {
-  const value = Number(props.field['#min'])
-
-  if (Number.isFinite(value)) return Math.max(minimumAllowedValue, value)
-
-  return minimumAllowedValue
+  return normalizeNumberBounds(
+    props.field['#min'],
+    props.field['#max'],
+    minimumAllowedValue,
+  ).min
 })
 
 const maxValue = computed(() => {
-  const value = Number(props.field['#max'])
-
-  if (!Number.isFinite(value)) return undefined
-
-  return Math.max(minValue.value, value)
+  return normalizeNumberBounds(
+    props.field['#min'],
+    props.field['#max'],
+    minimumAllowedValue,
+  ).max
 })
 
 const stepValue = computed(() => {

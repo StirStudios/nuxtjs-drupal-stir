@@ -25,6 +25,7 @@ pnpm verify:ci
 This runs:
 
 - `pnpm test`
+- `pnpm test:nuxt`
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm build`

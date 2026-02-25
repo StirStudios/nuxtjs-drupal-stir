@@ -13,8 +13,12 @@
     "perf:report": "node scripts/perf/report.mjs",
     "docs:sync-tech-stack": "node scripts/docs/sync-tech-stack.mjs",
     "test": "vitest run",
+    "test:nuxt:runtime": "vitest run --config vitest.nuxt.config.ts",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:nuxt": "pnpm test:nuxt:runtime",
+    "test:all": "pnpm test && pnpm test:nuxt",
     "test:watch": "vitest",
-    "verify:ci": "pnpm test && pnpm lint && pnpm typecheck && pnpm build",
+    "verify:ci": "pnpm test && pnpm test:nuxt && pnpm lint && pnpm typecheck && pnpm build",
     "deps:update": "pnpm update",
     "deps:verify": "pnpm verify:ci",
     "deps:update:safe": "pnpm deps:update && pnpm docs:sync-tech-stack && pnpm deps:verify",
@@ -38,6 +42,8 @@
   "devDependencies": {
     "@nuxt/eslint": "^1.15.1",
     "@nuxt/scripts": "^0.13.2",
+    "@nuxt/test-utils": "^4.0.0",
+    "@vue/test-utils": "^2.4.6",
     "@types/node": "^25.3.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
@@ -48,7 +54,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "release-it": "^19.2.4",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
+    "vitest": "^4.0.18",
     "vue-tsc": "^2.2.12"
   },
   "release-it": {

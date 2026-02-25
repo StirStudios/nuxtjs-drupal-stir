@@ -141,4 +141,79 @@ describe('buildYupSchema', () => {
       }),
     ).resolves.toBeTruthy()
   })
+
+  it('validates tel field format and rejects alphabetic characters', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      contactPhone: {
+        '#type': 'tel',
+        '#title': 'Phone',
+        '#name': 'contact_phone',
+        '#required': true,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(
+      schema.validate({
+        contactPhone: '(555) 111-2222',
+      }),
+    ).resolves.toBeTruthy()
+
+    await expect(
+      schema.validate({
+        contactPhone: '555-ABC-2222',
+      }),
+    ).rejects.toBeTruthy()
+  })
+
+  it('enforces numeric min and max bounds', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      guestCount: {
+        '#type': 'number',
+        '#title': 'Guest Count',
+        '#name': 'guest_count',
+        '#required': true,
+        '#min': 2,
+        '#max': 4,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(schema.validate({ guestCount: 1 })).rejects.toBeTruthy()
+    await expect(schema.validate({ guestCount: 5 })).rejects.toBeTruthy()
+    await expect(schema.validate({ guestCount: 3 })).resolves.toBeTruthy()
+  })
+
+  it('requires checkbox fields to be true when required', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      terms: {
+        '#type': 'checkbox',
+        '#title': 'Accept Terms',
+        '#name': 'terms',
+        '#required': true,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(schema.validate({ terms: false })).rejects.toBeTruthy()
+    await expect(schema.validate({ terms: true })).resolves.toBeTruthy()
+  })
+
+  it('enforces checkboxes min and max selection', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      interests: {
+        '#type': 'checkboxes',
+        '#title': 'Interests',
+        '#name': 'interests',
+        '#required': true,
+        '#minSelected': 2,
+        '#maxSelected': 3,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(schema.validate({ interests: ['a'] })).rejects.toBeTruthy()
+    await expect(schema.validate({ interests: ['a', 'b', 'c', 'd'] })).rejects.toBeTruthy()
+    await expect(schema.validate({ interests: ['a', 'b'] })).resolves.toBeTruthy()
+  })
 })
