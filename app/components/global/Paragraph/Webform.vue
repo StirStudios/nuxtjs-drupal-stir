@@ -6,6 +6,7 @@ import { transformPayloadToSnakeCase } from '~/utils/transformUtils'
 import { getHiddenDefaults } from '~/utils/getHiddenDefaults'
 import { useValidation } from '~/composables/useValidation'
 import { useWindowScroll } from '@vueuse/core'
+import { createScrollToTopRunner, getWebformScrollConfig } from '~/utils/webformScrollToTop'
 import { evaluateCondition } from '~/utils/evaluateUtils'
 import { buildYupSchema } from '~/utils/buildYupSchema'
 import type { WebformDefinition, WebformFieldProps, WebformState } from '../../../../types'
@@ -31,6 +32,17 @@ const { onError } = useValidation()
 const { y } = useWindowScroll()
 const toast = useToast()
 const { webform: themeWebform } = useAppConfig().stirTheme
+
+const webformScrollConfig = computed(() => getWebformScrollConfig(themeWebform))
+const scrollToTopRunner = createScrollToTopRunner({
+  y,
+  getDelayMs: () => webformScrollConfig.value.scrollToTopDelayMs,
+  getFallbackDelayMs: () => webformScrollConfig.value.scrollToTopFallbackDelayMs,
+})
+
+onUnmounted(() => {
+  scrollToTopRunner.cleanup()
+})
 const {
   fields: rawFields = {},
   webformId = '',
@@ -185,9 +197,12 @@ const isContainerVisible = (containerName: string) =>
 
 const handleResetSubmission = async () => {
   isFormSubmitted.value = false
-  y.value = 0
   await nextTick()
   formResetKey.value += 1
+
+  if (webformScrollConfig.value.scrollToTopOnReset) {
+    scrollToTopRunner.run()
+  }
 }
 
 async function onSubmit(_event: { data: Record<string, unknown> }) {
@@ -208,8 +223,8 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       body: JSON.stringify(payload),
     })
 
-    if (themeWebform.scrollToTopOnSuccess !== false) {
-      y.value = 0
+    if (webformScrollConfig.value.scrollToTopOnSuccess) {
+      scrollToTopRunner.run()
     }
     toast.add({
       title: 'Success!',
