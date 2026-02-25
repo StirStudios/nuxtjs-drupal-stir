@@ -156,6 +156,9 @@ export default defineAppConfig({
 
     webform: {
       scrollToTopOnSuccess: true,
+      scrollToTopOnReset: true,
+      scrollToTopDelayMs: 0,
+      scrollToTopFallbackDelayMs: 180,
       spacing: 'space-y-5',
       spacingLarge: 'space-y-10',
       labels: {
