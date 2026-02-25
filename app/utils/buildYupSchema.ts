@@ -187,7 +187,7 @@ export function buildYupSchema(
     } else if (field['#type'] === 'tel') {
       base = string()
         .nullable()
-        .matches(/^\+?[0-9\s\-\(\)\.]{7,20}$/, 'Invalid phone number')
+        .matches(/^\+?[0-9\s\-().]{7,20}$/, 'Invalid phone number')
     }
 
     shape[key] = base.when([], {
