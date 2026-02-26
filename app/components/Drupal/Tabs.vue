@@ -125,11 +125,11 @@ const links = computed(() => {
         children: accountMenu.value,
       }
     : {
-      label: user.value?.name || 'Account',
-      icon: getIconForLabel('My account'),
-      to: `${drupalBaseUrl}/user`,
-      target: '_self',
-    }
+        label: user.value?.name || 'Account',
+        icon: getIconForLabel('My account'),
+        to: `${drupalBaseUrl}/user`,
+        target: '_self',
+      }
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
@@ -140,11 +140,12 @@ const links = computed(() => {
     content-orientation="vertical"
     :items="links"
     :ui="{
-      root: 'sticky top-0 z-60 h-[3.1rem] w-full bg-zinc-200 p-4 text-zinc-800 shadow dark:bg-zinc-900 dark:text-white',
-      link: 'text-xs text-zinc-800 hover:before:bg-zinc-300/60 aria-[current=page]:text-zinc-950 dark:text-zinc-100 dark:hover:before:bg-zinc-700/60 dark:aria-[current=page]:text-white',
+      root: 'sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100',
+      link: 'text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-sky-100/80 aria-[current=page]:text-sky-700 dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-sky-400/20 dark:aria-[current=page]:text-sky-300',
       linkLabel: 'hidden md:block',
-      linkLeadingIcon: 'text-zinc-700 dark:text-zinc-300',
-      childLink: 'p-2 text-xs text-zinc-800 aria-[current=page]:text-zinc-950 dark:text-zinc-100 dark:aria-[current=page]:text-white',
+      linkLeadingIcon: 'text-zinc-500 dark:text-zinc-300',
+      childLink:
+        'p-2 text-xs text-zinc-700 hover:bg-sky-50 hover:text-zinc-900 aria-[current=page]:text-sky-700 dark:text-zinc-200 dark:hover:bg-sky-400/20 dark:hover:text-white dark:aria-[current=page]:text-sky-300',
     }"
   />
 </template>
