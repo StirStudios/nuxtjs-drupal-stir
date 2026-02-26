@@ -147,14 +147,14 @@ const links = computed(() => {
       link: 'before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15',
       linkLabel: 'hidden md:block',
       linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
-      linkTrailingIcon: 'text-current transition-transform duration-200',
+      linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
       content:
         'mt-1 rounded-md border border-zinc-200 bg-zinc-100 p-1 shadow-md dark:border-zinc-800 dark:bg-zinc-900',
       childList: 'space-y-0.5',
       childItem: '',
       childLink:
-        'p-2 text-xs text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10',
-      childLinkIcon: 'text-current',
+        'p-2 text-xs text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10',
+      childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
       childLinkLabel: 'truncate',
     }"
     variant="link"
