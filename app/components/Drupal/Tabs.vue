@@ -138,15 +138,13 @@ const links = computed(() => {
 <template>
   <UNavigationMenu
     content-orientation="vertical"
-    highlight
-    highlight-color="primary"
     :items="links"
     :ui="{
       root: 'sticky top-0 z-60 h-[3.1rem] w-full bg-zinc-200 p-4 text-zinc-800 shadow dark:bg-zinc-900 dark:text-white',
-      link: 'text-xs text-default hover:before:bg-zinc-200/50 dark:hover:before:bg-zinc-900',
+      link: 'text-xs text-zinc-800 hover:before:bg-zinc-300/60 aria-[current=page]:text-zinc-950 dark:text-zinc-100 dark:hover:before:bg-zinc-700/60 dark:aria-[current=page]:text-white',
       linkLabel: 'hidden md:block',
-      linkLeadingIcon: 'text-default',
-      childLink: 'p-2 text-xs',
+      linkLeadingIcon: 'text-zinc-700 dark:text-zinc-300',
+      childLink: 'p-2 text-xs text-zinc-800 aria-[current=page]:text-zinc-950 dark:text-zinc-100 dark:aria-[current=page]:text-white',
     }"
   />
 </template>
