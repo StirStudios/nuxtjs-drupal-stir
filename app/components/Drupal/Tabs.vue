@@ -148,8 +148,10 @@ const links = computed(() => {
       linkLabel: 'hidden md:block',
       linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
       linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
+      viewport:
+        'relative overflow-hidden rounded-md border border-zinc-200 bg-zinc-100 shadow-md dark:border-zinc-800 dark:bg-zinc-900',
       content:
-        'mt-1 rounded-md border border-zinc-200 bg-zinc-100 p-1 shadow-md dark:border-zinc-800 dark:bg-zinc-900',
+        'rounded-md border border-zinc-200 bg-zinc-100 p-1 dark:border-zinc-800 dark:bg-zinc-900',
       childList: 'space-y-0.5',
       childItem: '',
       childLink:
