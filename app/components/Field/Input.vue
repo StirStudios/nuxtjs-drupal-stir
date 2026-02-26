@@ -27,7 +27,6 @@ const fieldPlaceholder = computed(() => {
 const inputPlaceholder = computed(() => {
   if (props.floatingLabel) return ' '
   if (fieldPlaceholder.value) return fieldPlaceholder.value
-  if (isTel.value) return '(555) 123-4567'
 
   return ''
 })
