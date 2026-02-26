@@ -141,7 +141,7 @@ const links = computed(() => {
     :items="links"
     :ui="{
       root: 'sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100',
-      link: 'text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-sky-100/80 aria-[current=page]:text-sky-700 dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-sky-400/20 dark:aria-[current=page]:text-sky-300',
+      link: 'before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-sky-100/80 aria-[current=page]:text-sky-700 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-sky-400/20 dark:aria-[current=page]:text-sky-300',
       linkLabel: 'hidden md:block',
       linkLeadingIcon: 'text-zinc-500 dark:text-zinc-300',
       childLink:
