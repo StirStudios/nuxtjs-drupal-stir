@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useAppConfig, useScript } from '#imports'
+import { defineNuxtPlugin, useAppConfig } from '#app'
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
@@ -13,9 +13,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   type PlausibleQueueFunction = ((
     event: string,
-    options?: Record<string, unknown>,
+    eventOptions?: Record<string, unknown>,
   ) => void) & {
-    init?: (options?: Record<string, unknown>) => void
+    init?: (initOptions?: Record<string, unknown>) => void
     q?: unknown[]
     o?: Record<string, unknown>
   }
@@ -28,12 +28,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   win.plausible =
     win.plausible ??
     Object.assign(
-      (event: string, options?: Record<string, unknown>) => {
-        ;(win.plausible!.q ??= []).push([event, options])
+      (event: string, eventOptions?: Record<string, unknown>) => {
+        ;(win.plausible!.q ??= []).push([event, eventOptions])
       },
       {
-        init: (options?: Record<string, unknown>) => {
-          win.plausible!.o = options ?? {}
+        init: (initOptions?: Record<string, unknown>) => {
+          win.plausible!.o = initOptions ?? {}
         },
       },
     )
