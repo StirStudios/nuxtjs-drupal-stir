@@ -2,6 +2,7 @@
 const appConfig = useAppConfig()
 const route = useRoute()
 const open = ref(false)
+const isHydrated = ref(false)
 const isDev = import.meta.dev
 const config = computed(() => appConfig.privacyNotice)
 const consent = useCookie<boolean | string>('cookie_consent', {
@@ -28,6 +29,10 @@ const isSetupNotice = computed(() =>
 )
 
 let hasWarnedInvalidConfig = false
+
+onMounted(() => {
+  isHydrated.value = true
+})
 
 function setDecision(status: 'accepted' | 'declined' | 'dismissed') {
   consent.value = status
@@ -108,7 +113,7 @@ watchEffect(() => {
 
 <template>
   <div
-    v-if="open && (isConfigured || isSetupNotice)"
+    v-if="isHydrated && open && (isConfigured || isSetupNotice)"
     :aria-label="noticeTitle"
     aria-live="polite"
     :class="[
