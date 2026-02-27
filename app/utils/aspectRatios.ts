@@ -8,7 +8,7 @@ type AspectRatioConfig = {
 export const aspectRatios = (
   width: number | null,
   height: number | null,
-  options?: {
+  sizeConfig?: {
     portraitMax?: string
     landscapeMax?: string
     squareMax?: string
@@ -30,10 +30,10 @@ export const aspectRatios = (
   const squareRatio = ratioConfig.square || defaults.square
   const fourThreeRatio = ratioConfig.fourThree || defaults.fourThree
 
-  const portraitMax = options?.portraitMax || 'max-h-[40%]'
-  const landscapeMax = options?.landscapeMax || 'max-h-[30%]'
-  const squareMax = options?.squareMax || 'max-h-[35%]'
-  const fourThreeMax = options?.fourThreeMax || 'max-h-[30%]'
+  const portraitMax = sizeConfig?.portraitMax || 'max-h-[40%]'
+  const landscapeMax = sizeConfig?.landscapeMax || 'max-h-[30%]'
+  const squareMax = sizeConfig?.squareMax || 'max-h-[35%]'
+  const fourThreeMax = sizeConfig?.fourThreeMax || 'max-h-[30%]'
 
   if (width && height) {
     const ratio = width / height

@@ -1,4 +1,4 @@
-import { defineNuxtRouteMiddleware, useColorMode, useAppConfig } from '#imports'
+import { defineNuxtRouteMiddleware, useAppConfig } from '#app'
 
 function matchesRoute(path: string, rule: string): boolean {
   const normalizedRule = rule.trim()

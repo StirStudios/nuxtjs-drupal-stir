@@ -20,9 +20,9 @@ function isAddressPayload(value: unknown): value is AddressPayload {
 }
 
 export function transformOptions(
-  options: Record<string, OptionValue>,
+  optionMap: Record<string, OptionValue>,
 ) {
-  return Object.entries(options).map(([value, option]) => {
+  return Object.entries(optionMap).map(([value, option]) => {
     return {
       value,
       label: isOptionObject(option) ? option.label : option,

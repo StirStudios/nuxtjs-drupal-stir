@@ -13,7 +13,7 @@ export function formatCurrency(
 export function formatUnixDate(
   unix: number | string,
   locale = 'en-US',
-  options: Intl.DateTimeFormatOptions = {
+  dateFormat: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -26,14 +26,14 @@ export function formatUnixDate(
   const date = new Date(numeric * 1000)
 
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleDateString(locale, options)
+  return date.toLocaleDateString(locale, dateFormat)
 }
 
 export function formatZonedDateTime(
   value: string | Date,
   timeZone = 'America/Los_Angeles',
   locale = 'en-US',
-  options: Intl.DateTimeFormatOptions = {
+  dateTimeFormat: Intl.DateTimeFormatOptions = {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -48,6 +48,6 @@ export function formatZonedDateTime(
 
   return new Intl.DateTimeFormat(locale, {
     timeZone,
-    ...options,
+    ...dateTimeFormat,
   }).format(date)
 }

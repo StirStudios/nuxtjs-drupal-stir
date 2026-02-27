@@ -17,9 +17,9 @@ export function shouldPreventTelBeforeInput(data?: string | null): boolean {
 
 export function shouldPreventTelKeydown(
   key: string,
-  options: { metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean } = {},
+  keyModifiers: { metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean } = {},
 ): boolean {
-  if (options.metaKey || options.ctrlKey || options.altKey) return false
+  if (keyModifiers.metaKey || keyModifiers.ctrlKey || keyModifiers.altKey) return false
   if (key.length !== 1) return false
 
   return !isTelCharacterAllowed(key)
