@@ -1,4 +1,4 @@
-import { defineNuxtPlugin, useAppConfig, useScript } from '#imports'
+import { defineNuxtPlugin, useAppConfig } from '#app'
 
 declare global {
   interface Window {

@@ -1,5 +1,4 @@
 import { defineNuxtPlugin, useAppConfig } from '#app'
-import { useScript } from '@nuxt/scripts'
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
