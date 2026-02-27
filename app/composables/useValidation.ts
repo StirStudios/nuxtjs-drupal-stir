@@ -12,28 +12,28 @@ type ToastLike = {
 
 export function handleValidationError(
   event: FormErrorEvent,
-  options: {
+  validationContext: {
     isClient: boolean
     toast: ToastLike
     getElementById: (id: string) => {
       focus?: () => void
-      scrollIntoView?: (options?: ScrollIntoViewOptions) => void
+      scrollIntoView?: (scrollOptions?: ScrollIntoViewOptions) => void
     } | null
   },
 ) {
-  if (!options.isClient) return
+  if (!validationContext.isClient) return
   if (!event?.errors?.length) return
 
   const firstError = event.errors[0]
 
   if (!firstError) return
 
-  const element = options.getElementById(firstError.id)
+  const element = validationContext.getElementById(firstError.id)
 
   element?.focus?.()
   element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
 
-  options.toast.add({
+  validationContext.toast.add({
     title: 'Form Incomplete',
     description: 'Some required fields are missing or incorrect.',
     color: 'error',

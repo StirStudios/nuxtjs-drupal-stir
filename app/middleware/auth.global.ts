@@ -1,4 +1,4 @@
-import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#imports'
+import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {
   const normalizedRule = rule.trim()

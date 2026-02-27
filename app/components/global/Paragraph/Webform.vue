@@ -153,7 +153,7 @@ const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] =>
   return ''
 }
 
-const resetFormState = (options: { bumpKey?: boolean } = {}) => {
+const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
   for (const [key, field] of Object.entries(fields)) {
     const composite =
       typeof field['#composite'] === 'object' && field['#composite'] !== null
@@ -172,7 +172,7 @@ const resetFormState = (options: { bumpKey?: boolean } = {}) => {
     }
   }
 
-  if (options.bumpKey !== false) {
+  if (resetOptions.bumpKey !== false) {
     formResetKey.value += 1
   }
 }
