@@ -11,10 +11,6 @@ const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
-const isFixed = computed(() => {
-  if (props.mode === 'fixed') return true
-  return isFront.value || isScrolled.value
-})
 
 // Fetch menu items
 const mainMenu = await fetchMenu('main')
@@ -40,6 +36,11 @@ const navLinks = computed(() =>
 const finalIsScrolled = computed(() => {
   if (!hydrated.value) return false
   return isScrolled.value || forceScrolled.value
+})
+
+const isFixed = computed(() => {
+  if (props.mode === 'fixed') return true
+  return isFront.value || finalIsScrolled.value
 })
 
 const headerRootClasses = computed(() => {
