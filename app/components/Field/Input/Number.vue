@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
-import { clampNumberToBounds, normalizeNumberBounds } from '~/utils/formInputUtils'
+import { clampNumberToBounds } from '~/utils/formInputUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -12,21 +12,27 @@ const props = defineProps<{
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
 const id = useId()
-const minimumAllowedValue = 1
+
 const minValue = computed(() => {
-  return normalizeNumberBounds(
-    props.field['#min'],
-    props.field['#max'],
-    minimumAllowedValue,
-  ).min
+  const value = Number(props.field['#min'])
+
+  return Number.isFinite(value) ? value : undefined
 })
+
 const maxValue = computed(() => {
-  return normalizeNumberBounds(
-    props.field['#min'],
-    props.field['#max'],
-    minimumAllowedValue,
-  ).max
+  const value = Number(props.field['#max'])
+
+  if (!Number.isFinite(value)) return undefined
+  if (minValue.value === undefined) return value
+
+  return Math.max(minValue.value, value)
 })
+
+const bounds = computed(() => ({
+  min: minValue.value ?? Number.NEGATIVE_INFINITY,
+  max: maxValue.value,
+}))
+
 const stepValue = computed(() => {
   const value = Number(props.field['#step'])
 
@@ -41,23 +47,21 @@ const placeholder = computed(() => {
 
   if (value) return value
 
-  if (minValue.value !== undefined) return String(minValue.value)
-
-  return '0'
+  return minValue.value !== undefined ? String(minValue.value) : ''
 })
 
 const defaultValue = computed(() => {
-  const rawDefault = props.field['#defaultValue'] ?? props.field['#value']
+  const rawDefault =
+    props.field['#defaultValue'] ??
+    props.field['#default_value'] ??
+    props.field['#value']
   const numberValue = Number(rawDefault)
 
   if (Number.isFinite(numberValue)) {
-    return clampNumberToBounds(numberValue, {
-      min: minValue.value,
-      max: maxValue.value,
-    })
+    return clampNumberToBounds(numberValue, bounds.value)
   }
 
-  return minValue.value
+  return undefined
 })
 
 const modelValue = computed<number | undefined>({
@@ -71,10 +75,7 @@ const modelValue = computed<number | undefined>({
     const numberValue = Number(rawValue)
 
     if (Number.isFinite(numberValue)) {
-      return clampNumberToBounds(numberValue, {
-        min: minValue.value,
-        max: maxValue.value,
-      })
+      return clampNumberToBounds(numberValue, bounds.value)
     }
 
     return defaultValue.value
@@ -85,10 +86,7 @@ const modelValue = computed<number | undefined>({
       return
     }
 
-    const clampedValue = clampNumberToBounds(value, {
-      min: minValue.value,
-      max: maxValue.value,
-    })
+    const clampedValue = clampNumberToBounds(value, bounds.value)
 
     props.state[props.fieldName] = clampedValue
   },
