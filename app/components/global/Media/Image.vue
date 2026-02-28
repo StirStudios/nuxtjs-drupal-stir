@@ -41,13 +41,29 @@ const linkAriaLabel = computed(
 const hasImageSource = computed(() =>
   Boolean(props.src?.trim() || props.srcset?.trim()),
 )
+const imageElement = ref<HTMLImageElement | null>(null)
 
 const isLoaded = ref(!hasImageSource.value)
+
+function syncLoadedFromImageElement() {
+  if (!hasImageSource.value) {
+    isLoaded.value = true
+    return
+  }
+
+  const img = imageElement.value
+
+  if (!img) return
+  if (img.complete) {
+    isLoaded.value = true
+  }
+}
 
 watch(
   () => [props.src, props.srcset, props.sizes, props.width, props.height],
   () => {
     isLoaded.value = !hasImageSource.value
+    nextTick(syncLoadedFromImageElement)
   },
   { immediate: true },
 )
@@ -59,11 +75,16 @@ function handleLoad() {
 function handleError() {
   isLoaded.value = true
 }
+
+onMounted(() => {
+  nextTick(syncLoadedFromImageElement)
+})
 </script>
 
 <template>
   <img
     v-if="isBare"
+    ref="imageElement"
     :alt="alt || ''"
     :class="
       isHero
@@ -109,6 +130,7 @@ function handleError() {
 
     <img
       v-if="!isEager"
+      ref="imageElement"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -127,6 +149,7 @@ function handleError() {
 
     <img
       v-else
+      ref="imageElement"
       :alt="alt || ''"
       :class="[theme.media.base, !isLoaded && 'opacity-0']"
       fetchpriority="high"
