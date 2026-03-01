@@ -7,8 +7,8 @@ type NodeLink = {
   url: string
 }
 
-const prevNode = computed(() => (page.value?.prev_node as NodeLink | null) ?? null)
-const nextNode = computed(() => (page.value?.next_node as NodeLink | null) ?? null)
+const prevNode = computed(() => (page.value?.prevNode as NodeLink | null) ?? null)
+const nextNode = computed(() => (page.value?.nextNode as NodeLink | null) ?? null)
 </script>
 
 <template>
