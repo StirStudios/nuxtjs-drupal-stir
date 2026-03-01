@@ -21,13 +21,13 @@ const props = defineProps<{
     langcode: string
   }
 
-  prev_node?: {
+  prevNode?: {
     nid: string
     title: string
     url: string
   } | null
 
-  next_node?: {
+  nextNode?: {
     nid: string
     title: string
     url: string
