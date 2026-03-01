@@ -7,7 +7,7 @@ defineProps<{
 
   align?: string
   iconName?: string
-  size?: number | string
+  iconSize?: number | string
 
   editLink?: string
 }>()
@@ -18,10 +18,7 @@ defineProps<{
     <WrapAlign :align="align">
       <UIcon
         v-if="iconName"
-        :class="[
-          'text-primary inline-block',
-          size ? `size-${size}` : undefined,
-        ]"
+        :class="['text-primary inline-block', iconSize ? `size-${iconSize}` : undefined]"
         :name="iconName"
       />
     </WrapAlign>
