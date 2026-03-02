@@ -7,14 +7,16 @@ type NodeLink = {
   url: string
 }
 
-type RelatedNodes = {
+type Related = {
   prevNode?: NodeLink | null
   nextNode?: NodeLink | null
 }
 
-const relatedNodes = computed(() => (page.value?.related_nodes as RelatedNodes | undefined) ?? undefined)
-const prevNode = computed(() => relatedNodes.value?.prevNode ?? null)
-const nextNode = computed(() => relatedNodes.value?.nextNode ?? null)
+const related = computed(
+  () => (page.value?.related as Related | undefined) ?? undefined,
+)
+const prevNode = computed(() => related.value?.prevNode ?? null)
+const nextNode = computed(() => related.value?.nextNode ?? null)
 </script>
 
 <template>
