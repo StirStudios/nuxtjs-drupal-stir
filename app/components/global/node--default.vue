@@ -21,17 +21,18 @@ const props = defineProps<{
     langcode: string
   }
 
-  prevNode?: {
-    nid: string
-    title: string
-    url: string
-  } | null
-
-  nextNode?: {
-    nid: string
-    title: string
-    url: string
-  } | null
+  related_nodes?: {
+    prevNode?: {
+      nid: string
+      title: string
+      url: string
+    } | null
+    nextNode?: {
+      nid: string
+      title: string
+      url: string
+    } | null
+  }
 }>()
 
 defineSlots<{
