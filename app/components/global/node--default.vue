@@ -21,7 +21,7 @@ const props = defineProps<{
     langcode: string
   }
 
-  related_nodes?: {
+  related?: {
     prevNode?: {
       nid: string
       title: string
