@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { usePageContext } from '~/composables/usePageContext'
-
-const { getDrupalBaseUrl, fetchMenu } = useDrupalCe()
-const { page } = usePageContext()
+const { getDrupalBaseUrl, fetchMenu, getPage } = useDrupalCe()
+const page = getPage()
 const drupalBaseUrl = getDrupalBaseUrl()
 const user = computed(() => page.value?.current_user || null)
 const isAdministrator = computed(

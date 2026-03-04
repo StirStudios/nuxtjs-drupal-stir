@@ -43,7 +43,8 @@ function findPopup(node: unknown): PopupNode | null {
 }
 
 export const usePopupData = () => {
-  const { page } = usePageContext()
+  const { getPage } = useDrupalCe()
+  const page = getPage()
   const popup = ref<PopupNode | null>(null)
 
   const contentSource = computed(() => page.value?.content)

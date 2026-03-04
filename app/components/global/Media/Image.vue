@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { usePageContext } from '~/composables/usePageContext'
-
 defineOptions({ inheritAttrs: false })
 
 const props = defineProps<{
@@ -26,7 +24,8 @@ const props = defineProps<{
 }>()
 
 const theme = useAppConfig().stirTheme
-const { isFront } = usePageContext()
+const route = useRoute()
+const isFront = computed(() => route.path === '/')
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
   return 'lazy'

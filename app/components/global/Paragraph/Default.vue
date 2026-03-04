@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { usePageContext } from '~/composables/usePageContext'
-
 const isDev = import.meta.dev
 
 const props = defineProps<{
@@ -19,7 +17,8 @@ type CustomElementNode = {
   slots?: Record<string, unknown>
 }
 
-const { page } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
 
 const toPascalCase = (value: string) =>
   value

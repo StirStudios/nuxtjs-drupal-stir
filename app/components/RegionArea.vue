@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const { renderCustomElements } = useDrupalCe()
-const { page } = usePageContext()
+const { renderCustomElements, getPage } = useDrupalCe()
+const page = getPage()
 const props = defineProps<{ area: string }>()
 
 type RegionBlock = {

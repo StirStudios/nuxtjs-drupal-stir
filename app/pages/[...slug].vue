@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-const { fetchPage, renderCustomElements, usePageHead } = useDrupalCe()
-const { bodyClasses, pageLayout } = usePageContext()
+const { fetchPage, renderCustomElements, usePageHead, getPage } = useDrupalCe()
+const pageState = getPage()
+const { pageLayout, isAdministrator } = usePageContext()
 const route = useRoute()
 const theme = useAppConfig().stirTheme
 
@@ -8,6 +9,18 @@ const page = await fetchPage(
   route.path,
   { query: route.query },
   customPageError,
+)
+
+const bodyClasses = computed(() =>
+  [
+    Array.isArray(route.params.slug)
+      ? route.params.slug[0]
+      : route.params.slug || 'front',
+    isAdministrator.value ? 'logged-in' : '',
+    pageState.value?.content?.element || '',
+  ]
+    .filter(Boolean)
+    .join(' '),
 )
 
 usePageHead(page)
