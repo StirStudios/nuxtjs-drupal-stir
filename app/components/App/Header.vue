@@ -4,8 +4,9 @@ import { usePageContext } from '~/composables/usePageContext'
 
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
-const { page, isFront, isAdministrator } = usePageContext()
-const { fetchMenu } = useDrupalCe()
+const { fetchMenu, getPage } = useDrupalCe()
+const page = getPage()
+const { isFront, isAdministrator } = usePageContext()
 const route = useRoute()
 const appConfig = useAppConfig()
 const theme = appConfig.stirTheme

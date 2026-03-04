@@ -24,9 +24,14 @@ defineSlots<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { observeVideos } = useIntersectionObserver()
-const { isFront, pageTitle, pageHide } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
+const { isFront } = usePageContext()
 const { locked } = useNavLock()
 const { hero: heroTheme } = useAppConfig().stirTheme
+const pageProps = computed(() => page.value?.content?.props || {})
+const pageTitle = computed(() => pageProps.value?.title || '')
+const pageHide = computed(() => pageProps.value?.hide || false)
 
 // Only needed in FULL mode
 if (props.mode !== 'simple') {

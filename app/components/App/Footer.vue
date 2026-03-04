@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { usePageContext } from '~/composables/usePageContext'
-
-const { page } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
 const theme = useAppConfig().stirTheme
 const currentYear = new Date().getFullYear()
 

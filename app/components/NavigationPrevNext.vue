@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { page } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
 
 type NodeLink = {
   nid: string
