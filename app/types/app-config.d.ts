@@ -79,7 +79,6 @@ declare module 'nuxt/schema' {
     privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig
     colorMode: ColorModeConfig
-    stirTheme: StirThemeConfig
   }
 }
 
