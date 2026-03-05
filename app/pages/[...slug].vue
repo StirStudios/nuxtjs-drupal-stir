@@ -3,10 +3,11 @@ const { fetchPage, renderCustomElements, usePageHead, getPage } = useDrupalCe()
 const pageState = getPage()
 const { pageLayout, isAdministrator } = usePageContext()
 const route = useRoute()
+const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
 
 const page = await fetchPage(
-  route.path,
+  pageRequest.path.value,
   { query: route.query },
   customPageError,
 )
@@ -32,7 +33,7 @@ useHead({
 })
 
 definePageMeta({
-  key: (route) => route.fullPath.split('#')[0] ?? route.path,
+  key: (route) => useResolvedPageRequest(route).key.value,
 })
 
 function customPageError(error: unknown) {
