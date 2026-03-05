@@ -12,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 
 const getDefaultValue = () => {
   const value = props.field?.['#defaultValue']
@@ -72,6 +73,7 @@ const handleButtonClick = (value: string) => {
     class="w-full"
     :items="selectItems"
     :placeholder="placeholder || 'Select'"
+    :portal="portal"
     :variant="webform.variant"
   />
 </template>

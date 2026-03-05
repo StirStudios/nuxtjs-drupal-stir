@@ -177,7 +177,7 @@ Recommended key order in `stirTheme`:
 1. Global flags and layout primitives:
    `pdf`, `crumbs`, `h1`, `container`, `header`, `navigation`, `hero`, `footer`
 2. Content/component behavior:
-   `media`, `carousel`, `modal`, `webform`, `turnstile`
+   `media`, `carousel`, `modal`, `overlay`, `webform`, `turnstile`
 3. Visual/system tokens and utilities:
    `card`, `gradients`, `animations`, `aspectRatios`, `scrollButton`, `error`
 
@@ -232,6 +232,18 @@ front: {
 ```ts
 container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
 ```
+
+### 🪟 `overlay`
+
+Use this to control Nuxt UI overlay portal behavior for popovers, modals, and select menus.
+
+```ts
+overlay: {
+  portal: true, // true, false, CSS selector, or HTMLElement
+},
+```
+
+Set `portal: false` when the layer is rendered inside a Shadow DOM host and you need overlays to remain in-tree.
 
 ### 🦶 `footer`
 

@@ -52,6 +52,7 @@ const popupRenderProps = computed(() => {
 })
 
 const selectedMedia = ref<PopupMedia | null>(null)
+const portal = useOverlayPortal()
 
 const closeModal = () => {
   open.value = false
@@ -87,6 +88,7 @@ watch(open, (isOpen) => {
       v-if="hasPopup"
       v-model:open="open"
       :description="description"
+      :portal="portal"
       :title="title"
       :ui="{
         overlay: 'fixed inset-0 bg-black/60',

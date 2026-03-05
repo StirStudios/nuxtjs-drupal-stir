@@ -30,6 +30,7 @@ const props = defineProps<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const open = ref(false)
+const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
 const linkData = computed(() => props.link || {})
 const isExternal = computed(() => !!linkData.value.external)
@@ -111,6 +112,7 @@ const pdfUrl = computed(() =>
     v-model:open="open"
     :description="pdfDescription"
     fullscreen
+    :portal="portal"
     :title="pdfTitle"
     :ui="{
       body: 'flex-1 !pt-0 mt-4 sm:mt-6',

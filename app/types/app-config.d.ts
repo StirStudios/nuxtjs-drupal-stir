@@ -53,6 +53,14 @@ type ColorModeConfig = {
   darkRoutes?: string[]
 } & LooseRecord
 
+type StirThemeOverlayConfig = {
+  portal?: boolean | string | HTMLElement
+} & LooseRecord
+
+type StirThemeConfig = {
+  overlay?: StirThemeOverlayConfig
+} & LooseRecord
+
 declare module 'nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
@@ -61,6 +69,7 @@ declare module 'nuxt/schema' {
     privacyNotice?: PrivacyNoticeConfig
     popup?: PopupConfig
     colorMode?: ColorModeConfig
+    stirTheme?: StirThemeConfig
   }
 
   interface AppConfig {

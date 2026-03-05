@@ -154,6 +154,10 @@ export default defineAppConfig({
       },
     },
 
+    overlay: {
+      portal: true,
+    },
+
     webform: {
       scrollToTopOnSuccess: true,
       scrollToTopOnReset: true,

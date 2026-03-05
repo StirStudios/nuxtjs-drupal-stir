@@ -9,6 +9,7 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
 
 const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
@@ -84,6 +85,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         :items="countryOptions"
         label-key="label"
         placeholder="Select Country"
+        :portal="portal"
         value-key="value"
         :variant="webform.variant"
       />

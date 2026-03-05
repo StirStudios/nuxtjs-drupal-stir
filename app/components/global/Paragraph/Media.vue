@@ -67,6 +67,7 @@ const {
   onSelect: onSelectModal,
 } = useMediaModal(slotMediaOrdered, tk)
 
+const portal = useOverlayPortal()
 const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
 const lanes = computed(() => {
   const config = props.masonry?.lanes
@@ -142,6 +143,7 @@ onMounted(() => {
     :close="false"
     :description="modalA11yDescription"
     fullscreen
+    :portal="portal"
     :title="modalTitle"
     :ui="{
       content: 'bg-transparent divide-none p-0',
