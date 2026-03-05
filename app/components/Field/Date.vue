@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const { emitFormInput, emitFormChange } = useFormField()
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = Number(props.field['#multiple']) || 1
@@ -80,7 +81,11 @@ const selectedDatesLabel = computed(() =>
 </script>
 
 <template>
-  <UPopover v-model:open="popoverOpen" :class="{ 'w-full': isMaterial }">
+  <UPopover
+    v-model:open="popoverOpen"
+    :class="{ 'w-full': isMaterial }"
+    :portal="portal"
+  >
     <UButton icon="i-lucide-calendar" size="md" :variant="webform.variant">
       <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}

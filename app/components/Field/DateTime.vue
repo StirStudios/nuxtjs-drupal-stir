@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const { emitFormInput, emitFormChange } = useFormField()
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const multiple = Number(props.field['#multiple']) || 1
@@ -146,6 +147,7 @@ watch(
           <UPopover
             v-model:open="datePopoverOpen[i]"
             class="w-full"
+            :portal="portal"
           >
             <UButton
               :id="dateTriggerId(i)"
@@ -180,6 +182,7 @@ watch(
             label-key="label"
             :name="timeSelectName(i)"
             placeholder="Select time"
+            :portal="portal"
             value-key="value"
             :variant="webform.variant"
           />

@@ -9,6 +9,7 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 const selectItems = computed(() => transformOptions(props.field['#options'] || {}))
 
 onMounted(() => {
@@ -24,6 +25,7 @@ onMounted(() => {
     class="w-full"
     :items="selectItems"
     placeholder="Select"
+    :portal="portal"
     :variant="webform.variant"
   />
 </template>
