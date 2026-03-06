@@ -221,6 +221,7 @@ export default defineAppConfig({
     },
 
     scrollButton: {
+      enabled: true,
       base: 'fixed bottom-4 left-4 z-50 rounded-full p-2 shadow-md transition-opacity duration-300',
       icon: 'i-lucide:arrow-up',
       variant: 'solid',
