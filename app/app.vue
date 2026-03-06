@@ -4,6 +4,9 @@ const popupEnabled = computed(() => appConfig.popup?.enabled === true)
 const privacyNoticeEnabled = computed(
   () => appConfig.privacyNotice?.enabled === true,
 )
+const scrollButtonEnabled = computed(
+  () => appConfig.stirTheme.scrollButton?.enabled !== false,
+)
 </script>
 
 <template>
@@ -20,7 +23,7 @@ const privacyNoticeEnabled = computed(
       Skip to main content
     </a>
     <NuxtPage />
-    <LazyAppScrollToTop />
+    <LazyAppScrollToTop v-if="scrollButtonEnabled" />
     <LazyAppPopup v-if="popupEnabled" />
     <LazyPrivacyNotice v-if="privacyNoticeEnabled" />
   </UApp>
