@@ -17,6 +17,10 @@ const schemaCache = new WeakMap<
   Map<string, ObjectSchema<Record<string, unknown>>>
 >()
 
+function emptyStringToNull(value: unknown, originalValue: unknown) {
+  return originalValue === '' ? null : value
+}
+
 function stableStringify(value: unknown): string {
   if (value === null || value === undefined) return ''
   if (typeof value !== 'object') return String(value)
@@ -161,6 +165,7 @@ export function buildYupSchema(
 
     if (isNumber) {
       let numSchema = number()
+        .transform(emptyStringToNull)
         .typeError('Must be a number')
         .nullable() as NumberSchema<number | undefined>
 
@@ -186,6 +191,7 @@ export function buildYupSchema(
       base = string().nullable().email('Invalid email')
     } else if (field['#type'] === 'tel') {
       base = string()
+        .transform(emptyStringToNull)
         .nullable()
         .matches(/^\+?[0-9\s\-().]{7,20}$/, 'Invalid phone number')
     }

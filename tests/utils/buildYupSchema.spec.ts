@@ -166,6 +166,24 @@ describe('buildYupSchema', () => {
     ).rejects.toBeTruthy()
   })
 
+  it('allows optional tel fields to be submitted empty', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      contactPhone: {
+        '#type': 'tel',
+        '#title': 'Phone',
+        '#name': 'contact_phone',
+        '#required': false,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(
+      schema.validate({
+        contactPhone: '',
+      }),
+    ).resolves.toBeTruthy()
+  })
+
   it('enforces numeric min and max bounds', async () => {
     const fields: Record<string, WebformFieldProps> = {
       guestCount: {
@@ -182,6 +200,22 @@ describe('buildYupSchema', () => {
     await expect(schema.validate({ guestCount: 1 })).rejects.toBeTruthy()
     await expect(schema.validate({ guestCount: 5 })).rejects.toBeTruthy()
     await expect(schema.validate({ guestCount: 3 })).resolves.toBeTruthy()
+  })
+
+  it('allows optional number fields to be submitted empty', async () => {
+    const fields: Record<string, WebformFieldProps> = {
+      guestCount: {
+        '#type': 'number',
+        '#title': 'Guest Count',
+        '#name': 'guest_count',
+        '#required': false,
+        '#min': 2,
+        '#max': 4,
+      },
+    }
+    const schema = buildYupSchema(fields, {})
+
+    await expect(schema.validate({ guestCount: '' })).resolves.toBeTruthy()
   })
 
   it('requires checkbox fields to be true when required', async () => {
