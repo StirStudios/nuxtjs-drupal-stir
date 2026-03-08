@@ -14,7 +14,7 @@ export function handleValidationError(
   event: FormErrorEvent,
   validationContext: {
     isClient: boolean
-    showToast: boolean
+    showToast?: boolean
     toast: ToastLike
     getElementById: (id: string) => {
       focus?: () => void
@@ -34,7 +34,7 @@ export function handleValidationError(
   element?.focus?.()
   element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
 
-  if (!validationContext.showToast) return
+  if (validationContext.showToast === false) return
 
   validationContext.toast.add({
     title: 'Form Incomplete',
