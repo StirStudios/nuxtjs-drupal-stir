@@ -16,6 +16,7 @@ describe('handleValidationError', () => {
       },
       {
         isClient: true,
+        showToast: true,
         toast: { add },
         getElementById: (id) =>
           id === 'email'
@@ -45,6 +46,7 @@ describe('handleValidationError', () => {
       },
       {
         isClient: false,
+        showToast: true,
         toast: { add },
         getElementById,
       },
