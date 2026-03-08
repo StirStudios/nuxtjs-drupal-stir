@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody, createError, getHeader } from 'h3'
 
 function normalizeErrorStatus(error: unknown): number {
   if (!error || typeof error !== 'object') return 500
@@ -54,6 +54,11 @@ export default defineEventHandler(async (event) => {
     )
 
     const drupalApiUrl = `${config.public.api}/api/stir_webform_rest/submit`
+    const origin = getHeader(event, 'origin')
+    const referer = getHeader(event, 'referer')
+    const forwardedFor = getHeader(event, 'x-forwarded-for')
+    const forwardedProto = getHeader(event, 'x-forwarded-proto')
+    const userAgent = getHeader(event, 'user-agent')
 
     return await $fetch(drupalApiUrl, {
       method: 'POST',
@@ -61,6 +66,11 @@ export default defineEventHandler(async (event) => {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         'X-CSRF-Token': csrfToken,
+        ...(origin ? { Origin: origin } : {}),
+        ...(referer ? { Referer: referer } : {}),
+        ...(forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {}),
+        ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
+        ...(userAgent ? { 'User-Agent': userAgent } : {}),
       },
       body,
     })
