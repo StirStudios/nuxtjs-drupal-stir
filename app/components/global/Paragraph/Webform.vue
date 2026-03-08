@@ -32,6 +32,7 @@ const { onError } = useValidation()
 const { y } = useWindowScroll()
 const toast = useToast()
 const { webform: themeWebform } = useAppConfig().stirTheme
+const shouldShowToasts = computed(() => themeWebform.showToasts !== false)
 
 const webformScrollConfig = computed(() => getWebformScrollConfig(themeWebform))
 const scrollToTopRunner = createScrollToTopRunner({
@@ -226,11 +227,13 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     if (webformScrollConfig.value.scrollToTopOnSuccess) {
       scrollToTopRunner.run()
     }
-    toast.add({
-      title: 'Success!',
-      description: 'Form submitted successfully!',
-      color: 'success',
-    })
+    if (shouldShowToasts.value) {
+      toast.add({
+        title: 'Success!',
+        description: 'Form submitted successfully!',
+        color: 'success',
+      })
+    }
     props.onClose?.()
 
     resetFormState({ bumpKey: false })
@@ -252,11 +255,13 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       errorData?.message ||
       'Form submission failed. Please try again.'
 
-    toast.add({
-      title: 'Error',
-      description: `Error submitting form: ${errorMessage}`,
-      color: 'error',
-    })
+    if (shouldShowToasts.value) {
+      toast.add({
+        title: 'Error',
+        description: `Error submitting form: ${errorMessage}`,
+        color: 'error',
+      })
+    }
   } finally {
     isLoading.value = false
   }

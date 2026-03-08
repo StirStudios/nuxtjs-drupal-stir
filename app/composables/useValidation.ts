@@ -14,6 +14,7 @@ export function handleValidationError(
   event: FormErrorEvent,
   validationContext: {
     isClient: boolean
+    showToast: boolean
     toast: ToastLike
     getElementById: (id: string) => {
       focus?: () => void
@@ -33,6 +34,8 @@ export function handleValidationError(
   element?.focus?.()
   element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
 
+  if (!validationContext.showToast) return
+
   validationContext.toast.add({
     title: 'Form Incomplete',
     description: 'Some required fields are missing or incorrect.',
@@ -42,10 +45,12 @@ export function handleValidationError(
 
 export const useValidation = () => {
   const toast = useToast()
+  const { webform } = useAppConfig().stirTheme
 
   const onError = (event: FormErrorEvent) => {
     handleValidationError(event, {
       isClient: import.meta.client,
+      showToast: webform.showToasts !== false,
       toast,
       getElementById: (id) => document.getElementById(id),
     })
