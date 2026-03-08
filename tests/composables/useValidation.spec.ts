@@ -16,6 +16,7 @@ describe('handleValidationError', () => {
       },
       {
         isClient: true,
+        showToast: true,
         toast: { add },
         getElementById: (id) =>
           id === 'email'
@@ -45,6 +46,7 @@ describe('handleValidationError', () => {
       },
       {
         isClient: false,
+        showToast: true,
         toast: { add },
         getElementById,
       },
@@ -52,5 +54,22 @@ describe('handleValidationError', () => {
 
     expect(add).not.toHaveBeenCalled()
     expect(getElementById).not.toHaveBeenCalled()
+  })
+
+  it('emits a toast by default when showToast is omitted', () => {
+    const add = vi.fn()
+
+    handleValidationError(
+      {
+        errors: [{ id: 'email', message: 'Required' }],
+      },
+      {
+        isClient: true,
+        toast: { add },
+        getElementById: () => null,
+      },
+    )
+
+    expect(add).toHaveBeenCalledTimes(1)
   })
 })

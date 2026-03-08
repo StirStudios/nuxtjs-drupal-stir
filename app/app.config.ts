@@ -159,6 +159,7 @@ export default defineAppConfig({
     },
 
     webform: {
+      showToasts: true,
       scrollToTopOnSuccess: true,
       scrollToTopOnReset: true,
       scrollToTopDelayMs: 0,

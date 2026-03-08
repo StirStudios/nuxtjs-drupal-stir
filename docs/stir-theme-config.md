@@ -408,6 +408,7 @@ turnstile: {
 
 ```ts
 webform: {
+  showToasts: true,
   scrollToTopOnSuccess: true,
   scrollToTopOnReset: true,
   scrollToTopDelayMs: 0,
