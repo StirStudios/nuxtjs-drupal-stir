@@ -30,6 +30,10 @@ function normalizeErrorMessage(error: unknown): string {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const apiKey =
+    typeof config.apiKey === 'string' && config.apiKey.trim()
+      ? config.apiKey
+      : ''
 
   try {
     const body = await readBody<Record<string, unknown>>(event)
@@ -71,6 +75,7 @@ export default defineEventHandler(async (event) => {
         ...(forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {}),
         ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
         ...(userAgent ? { 'User-Agent': userAgent } : {}),
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
       },
       body,
     })
