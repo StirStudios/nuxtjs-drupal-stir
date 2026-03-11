@@ -44,10 +44,11 @@ const slots = useSlots()
 const teaser = useNodeTeaser(slots)
 const isTeaser = computed(() => props.type?.includes('teaser'))
 const isArticle = computed(() => !!props.isArticle)
+const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
 </script>
 
 <template>
-  <slot v-if="pageLayout !== 'clear' && !isTeaser" name="hero" />
+  <slot v-if="showHero" name="hero" />
 
   <LazyRegionArea area="before_main" />
 
