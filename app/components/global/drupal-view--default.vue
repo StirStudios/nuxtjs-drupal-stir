@@ -51,7 +51,6 @@ const viewRows = computed(() =>
     cloneVNode(
       node,
       {
-        isHero: false,
         type: 'teaser',
       },
       true,
