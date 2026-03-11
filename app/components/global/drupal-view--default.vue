@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneVNode } from 'vue'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 
 const props = defineProps<{
@@ -44,6 +45,10 @@ const slotRows = tk.hydrateOrder(
       },
     ),
 )
+
+const viewRows = computed(() =>
+  slotRows.value.map((node) => cloneVNode(node, { isHero: false }, true)),
+)
 </script>
 
 <template>
@@ -56,7 +61,7 @@ const slotRows = tk.hydrateOrder(
     :carousel-indicators="carouselIndicators"
     :carousel-interval="carouselInterval"
     :grid-items="gridItems"
-    :items="slotRows"
+    :items="viewRows"
     :randomize="randomize"
     :spacing="spacing"
     :width="width"
@@ -69,7 +74,7 @@ const slotRows = tk.hydrateOrder(
     :spacing="spacing"
     :width="width"
   >
-    <template v-for="(node, i) in slotRows" :key="i">
+    <template v-for="(node, i) in viewRows" :key="i">
       <div class="item">
         <component :is="node" />
       </div>
