@@ -47,7 +47,16 @@ const slotRows = tk.hydrateOrder(
 )
 
 const viewRows = computed(() =>
-  slotRows.value.map((node) => cloneVNode(node, { isHero: false }, true)),
+  slotRows.value.map((node) =>
+    cloneVNode(
+      node,
+      {
+        isHero: false,
+        type: 'teaser',
+      },
+      true,
+    ),
+  ),
 )
 </script>
 
