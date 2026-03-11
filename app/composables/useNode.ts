@@ -78,11 +78,27 @@ export function useNodeTeaser(slots: unknown) {
   const source = computed(() => {
     const section = node.section
     const hero = node.hero
+    const sectionHasMedia = section?.vnode && hasMediaSource(section.media)
+    const heroHasMedia = hero?.vnode && hasMediaSource(hero.media)
+    const mediaSource = sectionHasMedia
+      ? section
+      : heroHasMedia
+        ? hero
+        : section?.vnode
+          ? section
+          : hero?.vnode
+            ? hero
+            : null
+    const textSource =
+      section?.text?.trim() ? section : hero?.text?.trim() ? hero : mediaSource
 
-    if (section?.vnode && hasMediaSource(section.media)) return section
-    if (hero?.vnode && hasMediaSource(hero.media)) return hero
-    if (section?.vnode) return section
-    if (hero?.vnode) return hero
+    if (mediaSource) {
+      return {
+        props: mediaSource.props ?? {},
+        media: mediaSource.media ?? {},
+        text: textSource?.text ?? '',
+      }
+    }
 
     return {
       props: {},
