@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
@@ -65,7 +66,13 @@ const hideHeroSection = computed(
 )
 
 const slotMedia = computed(() => tk.slot('media'))
-const hasMediaSlot = computed(() => slotMedia.value.length > 0)
+const heroMediaNode = computed(() => {
+  const node = slotMedia.value[0]
+
+  if (!node) return null
+  return cloneVNode(node, { isHero: true }, true)
+})
+const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
   slotMedia.value
@@ -145,7 +152,7 @@ const sectionClasses = computed(() => {
           </WrapAnimate>
         </div>
 
-        <slot name="media" />
+        <component :is="heroMediaNode" />
       </section>
     </template>
   </EditLink>
