@@ -32,7 +32,9 @@ const normalizedLoading = computed<'lazy' | 'eager'>(() => {
 })
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
-const isHero = computed(() => props.isHero === true || injectedIsHero)
+const isHero = computed(() =>
+  props.isHero !== undefined ? props.isHero : injectedIsHero,
+)
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
