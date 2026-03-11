@@ -67,9 +67,23 @@ export function useNode(slots: unknown) {
  */
 export function useNodeTeaser(slots: unknown) {
   const node = useNode(slots)
+  const hasMediaSource = (value: unknown) => {
+    if (!value || typeof value !== 'object') return false
+
+    const media = value as Record<string, unknown>
+
+    return typeof media.src === 'string' && media.src.trim().length > 0
+  }
+
   const source = computed(() => {
-    if (node.section?.vnode) return node.section
-    if (node.hero?.vnode) return node.hero
+    const section = node.section
+    const hero = node.hero
+
+    if (section?.vnode && hasMediaSource(section.media)) return section
+    if (hero?.vnode && hasMediaSource(hero.media)) return hero
+    if (section?.vnode) return section
+    if (hero?.vnode) return hero
+
     return {
       props: {},
       media: {},
