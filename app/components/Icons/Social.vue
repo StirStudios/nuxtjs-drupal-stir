@@ -1,19 +1,13 @@
 <script setup lang="ts">
-type IconsSocialProps = {
-  title: string
-  url: string
-  icon: string
-  iconSize?: string
-  activeClass?: string
-  inactiveClass?: string
-}
+import type { SocialIcon } from '../../../types/Social'
 
-const props = defineProps<IconsSocialProps>()
+const props = defineProps<SocialIcon>()
 const iconSize = props.iconSize || 'size-10'
 </script>
 
 <template>
   <ULink
+    v-if="url && icon"
     :aria-label="`Visit our ${title} page`"
     inactive-class="transition-colors hover:text-primary"
     raw

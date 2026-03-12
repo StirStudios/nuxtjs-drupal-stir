@@ -2,21 +2,8 @@
 const { getPage } = useDrupalCe()
 const page = getPage()
 const theme = useAppConfig().stirTheme
+const { iconsSocialConfig } = useSocialIcons()
 const currentYear = new Date().getFullYear()
-
-type SocialIconConfig = {
-  title?: string
-  url?: string
-  icon: string
-  iconSize?: string
-  activeClass?: string
-  inactiveClass?: string
-}
-const iconsSocialConfig = computed<SocialIconConfig[]>(() => {
-  const socials = (theme as { socials?: unknown }).socials
-
-  return Array.isArray(socials) ? (socials as SocialIconConfig[]) : []
-})
 
 type FooterMenuItem = {
   title?: string
