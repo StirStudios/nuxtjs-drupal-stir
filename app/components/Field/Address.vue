@@ -23,8 +23,15 @@ const getCompositeLabel = (fieldData: WebformFieldProps, key: string) =>
   String(fieldData.label ?? key)
 
 const countryOptions = computed(() => {
+  const countryField = compositeFields.value.country
   const options =
-    typeof props.field.options === 'object' ? props.field.options : undefined
+    (typeof props.field.options === 'object' ? props.field.options : undefined) ??
+    (countryField && typeof countryField.options === 'object'
+      ? countryField.options
+      : undefined) ??
+    (countryField && typeof countryField['#options'] === 'object'
+      ? countryField['#options']
+      : undefined)
 
   return options
     ? Object.entries(options).map(([key, label]) => ({
