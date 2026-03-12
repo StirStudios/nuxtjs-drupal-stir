@@ -46,7 +46,7 @@ const slotRows = tk.hydrateOrder(
     ),
 )
 
-const viewRows = computed(() =>
+const teaserRows = computed(() =>
   slotRows.value.map((node) =>
     cloneVNode(
       node,
@@ -69,7 +69,7 @@ const viewRows = computed(() =>
     :carousel-indicators="carouselIndicators"
     :carousel-interval="carouselInterval"
     :grid-items="gridItems"
-    :items="viewRows"
+    :items="slotRows"
     :randomize="randomize"
     :spacing="spacing"
     :width="width"
@@ -82,7 +82,7 @@ const viewRows = computed(() =>
     :spacing="spacing"
     :width="width"
   >
-    <template v-for="(node, i) in viewRows" :key="i">
+    <template v-for="(node, i) in teaserRows" :key="i">
       <div class="item">
         <component :is="node" />
       </div>
