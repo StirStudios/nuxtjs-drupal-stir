@@ -25,7 +25,9 @@ const getCompositeLabel = (fieldData: WebformFieldProps, key: string) =>
 const countryOptions = computed(() => {
   const countryField = compositeFields.value.country
   const options =
-    (typeof props.field.options === 'object' ? props.field.options : undefined) ??
+    (typeof props.field.options === 'object'
+      ? props.field.options
+      : undefined) ??
     (countryField && typeof countryField.options === 'object'
       ? countryField.options
       : undefined) ??
@@ -41,11 +43,10 @@ const countryOptions = computed(() => {
     : []
 })
 
-const useFloatingLabels = computed(
-  () =>
-    props.field['#floating_label'] !== undefined
-      ? props.field['#floating_label']
-      : webform.labels.floating,
+const useFloatingLabels = computed(() =>
+  props.field['#floating_label'] !== undefined
+    ? props.field['#floating_label']
+    : webform.labels.floating,
 )
 
 if (!props.state[props.fieldName]) {
@@ -60,7 +61,9 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
     <UFormField
       v-for="(fieldData, key) in compositeFields"
       :key="key"
-      :label="!useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''"
+      :label="
+        !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
+      "
       :name="`${fieldName}.${key}`"
       :required="!!field['#required']"
     >
