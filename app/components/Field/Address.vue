@@ -19,12 +19,12 @@ const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
     : {},
 )
 
+const getCompositeLabel = (fieldData: WebformFieldProps, key: string) =>
+  String(fieldData.label ?? key)
+
 const countryOptions = computed(() => {
-  const countryField = compositeFields.value.country
   const options =
-    countryField && typeof countryField['#options'] === 'object'
-      ? countryField['#options']
-      : undefined
+    typeof props.field.options === 'object' ? props.field.options : undefined
 
   return options
     ? Object.entries(options).map(([key, label]) => ({
@@ -53,7 +53,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
     <UFormField
       v-for="(fieldData, key) in compositeFields"
       :key="key"
-      :label="!useFloatingLabels ? String(fieldData['#title'] ?? key) : ''"
+      :label="!useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''"
       :name="`${fieldName}.${key}`"
       :required="!!field['#required']"
     >
@@ -72,7 +72,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
           :for="getFieldId(String(key))"
         >
           <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
-            {{ String(fieldData['#title'] ?? key) }}
+            {{ getCompositeLabel(fieldData, String(key)) }}
           </span>
         </label>
       </UInput>
