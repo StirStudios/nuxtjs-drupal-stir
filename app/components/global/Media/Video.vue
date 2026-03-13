@@ -109,7 +109,7 @@ onMounted(() => {
     />
 
     <button
-      v-else
+      v-else-if="!isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
         'absolute inset-0 z-10 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white',
