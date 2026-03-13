@@ -171,6 +171,7 @@ onMounted(() => {
             :is="componentMap[itemsOrdered[0].type]"
             v-bind="{
               ...itemsOrdered[0],
+              ...(itemsOrdered[0].type === 'video' ? { deferEmbed: false } : {}),
               ...(itemsOrdered[0].type === 'image' ? { noWrapper: true } : {}),
             }"
           />
@@ -198,6 +199,7 @@ onMounted(() => {
               class="shadow-2xl"
               v-bind="{
                 ...item,
+                ...(item.type === 'video' ? { deferEmbed: false } : {}),
                 ...(item.type === 'image' ? { noWrapper: true } : {}),
               }"
             />
