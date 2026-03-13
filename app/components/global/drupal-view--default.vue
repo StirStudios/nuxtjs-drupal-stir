@@ -17,7 +17,7 @@ const props = defineProps<{
 
   pager?: { current: number; totalPages: number } | unknown
 
-  randomize?: boolean
+  randomize?: boolean | string
   carousel?: boolean
   carouselArrows?: boolean
   carouselAutoheight?: boolean
