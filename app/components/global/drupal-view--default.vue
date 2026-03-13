@@ -17,7 +17,7 @@ const props = defineProps<{
 
   pager?: { current: number; totalPages: number } | unknown
 
-  randomize?: boolean
+  randomize?: boolean | string
   carousel?: boolean
   carouselArrows?: boolean
   carouselAutoheight?: boolean
@@ -32,11 +32,21 @@ const props = defineProps<{
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
+const randomizeEnabled = computed(() => {
+  if (props.randomize === true) return true
+  if (typeof props.randomize === 'string') {
+    const value = props.randomize.trim().toLowerCase()
+
+    return value === 'true' || value === '1'
+  }
+
+  return false
+})
 const rawRows = computed(() => tk.slot('rows'))
 const slotRows = tk.hydrateOrder(
   () => rawRows.value,
   () =>
-    (props.randomize ? tk.shuffle(rawRows.value) : rawRows.value).map(
+    (randomizeEnabled.value ? tk.shuffle(rawRows.value) : rawRows.value).map(
       (vnode, index) => {
         return {
           ...vnode,
@@ -70,7 +80,7 @@ const teaserRows = computed(() =>
     :carousel-interval="carouselInterval"
     :grid-items="gridItems"
     :items="slotRows"
-    :randomize="randomize"
+    :randomize="randomizeEnabled"
     :spacing="spacing"
     :width="width"
   />
