@@ -21,13 +21,15 @@ const props = defineProps<{
   hideCredit?: boolean
 
   isHero?: boolean
+  isFrontHero?: boolean
 }>()
 
 const theme = useAppConfig().stirTheme
 const route = useRoute()
 const isFront = computed(() => route.path === '/')
-const injectedHeroIsFront = inject('heroIsFront', null) as { value: boolean } | null
-const heroIsFront = computed(() => injectedHeroIsFront?.value ?? isFront.value)
+const heroIsFront = computed(() =>
+  props.isFrontHero !== undefined ? props.isFrontHero : isFront.value,
+)
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
   return 'lazy'

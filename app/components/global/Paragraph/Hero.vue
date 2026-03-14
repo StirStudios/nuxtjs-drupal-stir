@@ -57,10 +57,6 @@ const isFrontEffective = computed(() =>
   locked.value ? snap.isFront : isFront.value,
 )
 
-if (props.mode !== 'simple') {
-  provide('heroIsFront', isFrontEffective)
-}
-
 const pageTitleEffective = computed(() =>
   locked.value ? snap.title : pageTitle.value,
 )
@@ -74,7 +70,10 @@ const heroMediaNode = computed(() => {
   const node = slotMedia.value[0]
 
   if (!node) return null
-  return cloneVNode(node, { isHero: true }, true)
+  return cloneVNode(node, {
+    isHero: true,
+    isFrontHero: isFrontEffective.value,
+  }, true)
 })
 const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
