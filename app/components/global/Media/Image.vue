@@ -26,6 +26,8 @@ const props = defineProps<{
 const theme = useAppConfig().stirTheme
 const route = useRoute()
 const isFront = computed(() => route.path === '/')
+const injectedHeroIsFront = inject('heroIsFront', null) as { value: boolean } | null
+const heroIsFront = computed(() => injectedHeroIsFront?.value ?? isFront.value)
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
   return 'lazy'
@@ -91,7 +93,7 @@ onMounted(() => {
       isHero
         ? [
             theme.hero.image.base,
-            isFront.value ? theme.hero.image.isFront : 'max-w-none',
+            heroIsFront.value ? theme.hero.image.isFront : 'max-w-none',
           ]
         : [theme.media.base, theme.media.rounded, 'm-auto !object-contain']
     "

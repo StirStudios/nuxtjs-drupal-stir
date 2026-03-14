@@ -57,6 +57,10 @@ const isFrontEffective = computed(() =>
   locked.value ? snap.isFront : isFront.value,
 )
 
+if (props.mode !== 'simple') {
+  provide('heroIsFront', isFrontEffective)
+}
+
 const pageTitleEffective = computed(() =>
   locked.value ? snap.title : pageTitle.value,
 )
