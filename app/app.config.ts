@@ -102,7 +102,7 @@ export default defineAppConfig({
       isFront: 'h-screen',
       image: {
         base: 'absolute min-h-full w-auto max-w-none min-w-full',
-        isFront: 'object-right-85 object-cover',
+        isFront: 'object-cover',
       },
       text: {
         h1: 'mb-0 text-white',
