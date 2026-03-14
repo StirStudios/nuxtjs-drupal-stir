@@ -70,10 +70,7 @@ const heroMediaNode = computed(() => {
   const node = slotMedia.value[0]
 
   if (!node) return null
-  return cloneVNode(node, {
-    isHero: true,
-    isFrontHero: isFrontEffective.value,
-  }, true)
+  return cloneVNode(node, { isHero: true }, true)
 })
 const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
