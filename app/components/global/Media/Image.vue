@@ -21,15 +21,10 @@ const props = defineProps<{
   hideCredit?: boolean
 
   isHero?: boolean
-  isFrontHero?: boolean
 }>()
 
 const theme = useAppConfig().stirTheme
-const route = useRoute()
-const isFront = computed(() => route.path === '/')
-const heroIsFront = computed(() =>
-  props.isFrontHero !== undefined ? props.isFrontHero : isFront.value,
-)
+const { isFront } = usePageContext()
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
   return 'lazy'
@@ -95,7 +90,7 @@ onMounted(() => {
       isHero
         ? [
             theme.hero.image.base,
-            heroIsFront.value ? theme.hero.image.isFront : 'max-w-none',
+            isFront ? theme.hero.image.isFront : 'max-w-none',
           ]
         : [theme.media.base, theme.media.rounded, 'm-auto !object-contain']
     "
