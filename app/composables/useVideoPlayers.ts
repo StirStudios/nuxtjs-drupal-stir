@@ -18,6 +18,8 @@ export interface VideoPlayer {
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())
 const isScriptLoaded = ref(false)
 let scriptInjected = false
+const pendingIframes = new Set<string>()
+const endedBoundPlayers = new Set<string>()
 
 export function useVideoPlayers() {
   if (import.meta.client && !scriptInjected) {
@@ -35,7 +37,6 @@ export function useVideoPlayers() {
       ],
     })
 
-    // Only initialize players after script is loaded
     watchOnce(isScriptLoaded, (loaded) => {
       if (loaded) {
         initializePlayers()
@@ -44,41 +45,72 @@ export function useVideoPlayers() {
   }
 
   async function initializePlayers(): Promise<void> {
+    if (!import.meta.client) return
     await nextTick()
 
-    const iframes = document.querySelectorAll('iframe[data-mid]')
+    const iframes = document.querySelectorAll<HTMLIFrameElement>(
+      'iframe[data-mid]',
+    )
+
     iframes.forEach((iframe) => {
       const iframeKey = iframe.getAttribute('data-mid')
-      if (!iframeKey || videoPlayers.value.has(iframeKey)) return
 
-      iframe.addEventListener('load', () => {
+      if (!iframeKey || videoPlayers.value.has(iframeKey)) return
+      if (pendingIframes.has(iframeKey)) return
+
+      pendingIframes.add(iframeKey)
+
+      const attachPlayer = () => {
         try {
           if (typeof window.playerjs?.Player === 'function') {
-            const player = new window.playerjs.Player(
-              iframe as HTMLIFrameElement,
-            )
+            const player = new window.playerjs.Player(iframe)
+
             playersReady(iframeKey, player)
+            return
           }
         } catch (err) {
           console.error(`PlayerJS init failed for ${iframeKey}:`, err)
+        } finally {
+          pendingIframes.delete(iframeKey)
         }
-      })
+      }
+
+      const iframeReady =
+        iframe.contentDocument?.readyState === 'complete' &&
+        typeof window.playerjs?.Player === 'function'
+
+      if (iframeReady) {
+        attachPlayer()
+      } else {
+        iframe.addEventListener('load', attachPlayer, { once: true })
+      }
     })
   }
 
   function playersReady(iframeKey: string, player: VideoPlayer): void {
+    if (videoPlayers.value.has(iframeKey)) return
     player.on('ready', () => {
       videoPlayers.value.set(iframeKey, player)
-      addFullscreenExitOnEnd()
       resetOnEnd(iframeKey, player)
     })
   }
 
-  function resetOnEnd(_iframeKey: string, player: VideoPlayer): void {
-    player.on('ended', () => {
+  function resetOnEnd(iframeKey: string, player: VideoPlayer): void {
+    if (endedBoundPlayers.has(iframeKey)) return
+    endedBoundPlayers.add(iframeKey)
+
+    const onEnded = () => {
       player.setCurrentTime(0)
       player.pause()
-    })
+
+      if (document.fullscreenElement && 'exitFullscreen' in document) {
+        document
+          .exitFullscreen()
+          .catch((err) => console.error('Error exiting fullscreen:', err))
+      }
+    }
+
+    player.on('ended', onEnded)
   }
 
   function addEventToAllPlayers(event: string, callback: () => void): void {

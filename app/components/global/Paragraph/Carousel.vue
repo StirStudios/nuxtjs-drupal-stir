@@ -1,21 +1,19 @@
 <script setup lang="ts">
+import type { VNode } from 'vue'
+
 const props = defineProps<{
-  // Base identifiers
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  // Core content
   items?: unknown[]
   randomize?: boolean
 
-  // Layout
   gridItems?: string
   width?: string
   spacing?: string
 
-  // UI / Interaction
   carouselIndicators?: boolean
   carouselArrows?: boolean
   carouselFade?: boolean
@@ -28,31 +26,33 @@ const props = defineProps<{
 
 const carousel = useTemplateRef<'carousel'>('carousel')
 const theme = useAppConfig().stirTheme
-
 const slots = useSlots()
+const mounted = ref(false)
 
-const slides = computed(() => {
-  // Items from views OR media slot
-  const raw =
-    (props.items && props.items.length) || (slots.media && slots.media().length)
-      ? (props.items ?? slots.media())
-      : []
-
-  return raw.map((vnode, i) => ({
-    vnode,
-    key: vnode.key || i,
-  }))
+onMounted(() => {
+  mounted.value = true
 })
 
-// Autoscroll speed
-const interval = computed(() => props.carouselInterval || 5000)
+const slides = computed(() => {
+  const slotItems = slots.media?.() ?? []
+  const raw: unknown[] = (props.items?.length ?? 0) > 0 ? (props.items ?? []) : slotItems
 
+  return raw.map((vnode, i) => {
+    const typedNode = vnode as VNode
+
+    return {
+      vnode: typedNode,
+      key: typedNode.key ?? i,
+    }
+  })
+})
+
+const interval = computed(() => props.carouselInterval ?? 5000)
 const autoScrollSpeed = computed(() => {
   const minInterval = 1000
   const maxInterval = 10000
   const minSpeed = 1
   const maxSpeed = 10
-
   const clamped = Math.max(minInterval, Math.min(interval.value, maxInterval))
   const ratio = (maxInterval - clamped) / (maxInterval - minInterval)
   const speed = minSpeed + ratio * (maxSpeed - minSpeed)
@@ -80,9 +80,12 @@ const autoplayOptions = computed(() =>
     : false,
 )
 
-// Reset plugin timers on manual selection
 function handleSelect() {
-  const plugins = carousel.value?.emblaApi?.plugins?.()
+  const plugins = (
+    carousel.value as unknown as {
+      emblaApi?: { plugins?: () => Record<string, { reset: () => void }> }
+    } | null
+  )?.emblaApi?.plugins?.()
 
   if (plugins?.autoplay && !props.carouselAutoscroll) plugins.autoplay.reset()
 
@@ -97,7 +100,7 @@ function handleSelect() {
       v-if="slides.length"
       ref="carousel"
       v-slot="{ item }"
-      :arrows="carouselArrows"
+      :arrows="mounted ? carouselArrows : false"
       :auto-height="carouselAutoheight"
       :auto-scroll="autoScrollOptions"
       :autoplay="autoplayOptions"

@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { usePageContext } from '~/composables/usePageContext'
+defineOptions({ inheritAttrs: false })
 
 const props = defineProps<{
-  // Core media info
   title?: string
   alt?: string
   src?: string
   type?: string
   platform?: string
 
-  // Rendering attributes
   srcset?: string
   sizes?: string
   width?: number
@@ -18,52 +16,93 @@ const props = defineProps<{
   fetchpriority?: 'high' | 'auto'
   noWrapper?: boolean
 
-  // Optional link & metadata
   link?: string
   credit?: string
   hideCredit?: boolean
 
-  // Contextual flags
   isHero?: boolean
 }>()
 
 const theme = useAppConfig().stirTheme
 const { isFront } = usePageContext()
-const isEager = computed(() => props.loading === 'eager')
-
-// Try to get hero context
+const normalizedLoading = computed<'lazy' | 'eager'>(() => {
+  if (props.loading === 'eager') return 'eager'
+  return 'lazy'
+})
+const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
-
-// Explicit prop OR inherited hero → hero mode
-const isHero = computed(() => props.isHero === true || injectedIsHero)
-
-// Bare mode: Hero OR noWrapper
+const isHero = computed(() =>
+  props.isHero !== undefined ? props.isHero : injectedIsHero,
+)
 const isBare = computed(() => isHero.value || props.noWrapper === true)
+const linkAriaLabel = computed(
+  () => props.alt || props.title || 'Open media in new tab',
+)
+const hasImageSource = computed(() =>
+  Boolean(props.src?.trim() || props.srcset?.trim()),
+)
+const imageElement = ref<HTMLImageElement | null>(null)
+
+const isLoaded = ref(!hasImageSource.value)
+
+function syncLoadedFromImageElement() {
+  if (!hasImageSource.value) {
+    isLoaded.value = true
+    return
+  }
+
+  const img = imageElement.value
+
+  if (!img) return
+  if (img.complete) {
+    isLoaded.value = true
+  }
+}
+
+watch(
+  () => [props.src, props.srcset, props.sizes, props.width, props.height],
+  () => {
+    isLoaded.value = !hasImageSource.value
+    nextTick(syncLoadedFromImageElement)
+  },
+  { immediate: true },
+)
+
+function handleLoad() {
+  isLoaded.value = true
+}
+
+function handleError() {
+  isLoaded.value = true
+}
+
+onMounted(() => {
+  nextTick(syncLoadedFromImageElement)
+})
 </script>
 
 <template>
   <img
     v-if="isBare"
+    ref="imageElement"
     :alt="alt || ''"
     :class="
       isHero
         ? [
             theme.hero.image.base,
-            isFront.value ? theme.hero.image.isFront : 'max-w-none',
+            isFront ? theme.hero.image.isFront : 'max-w-none',
           ]
-        : [
-            theme.media.base,
-            theme.media.rounded,
-            'm-auto max-w-fit !object-contain',
-          ]
+        : [theme.media.base, theme.media.rounded, 'm-auto !object-contain']
     "
     :fetchpriority="fetchpriority || undefined"
     :height="height"
-    :loading="loading || 'lazy'"
+    :loading="normalizedLoading"
     :sizes="sizes || '100vw'"
     :src="src"
     :srcset="srcset"
     :width="width"
+    @error="handleError"
+    @load="handleLoad"
   />
 
   <component
@@ -74,8 +113,8 @@ const isBare = computed(() => isHero.value || props.noWrapper === true)
         ? {
             href: link,
             target: '_blank',
-            rel: 'noopener',
-            'aria-label': alt,
+            rel: 'noopener noreferrer',
+            'aria-label': linkAriaLabel,
           }
         : {}
     "
@@ -84,44 +123,50 @@ const isBare = computed(() => isHero.value || props.noWrapper === true)
       theme.media.rounded,
     ]"
   >
-    <ClientOnly v-if="!isEager" fallback-tag="div">
-      <template #default>
-        <img
-          :alt="alt || ''"
-          :class="[
-            theme.media.base,
-            platform === 'instagram' ? 'aspect-3/4' : '',
-          ]"
-          :height="height"
-          :loading="loading || 'lazy'"
-          :sizes="sizes || '100vw'"
-          :src="src"
-          :srcset="srcset"
-          :width="width"
-        />
-      </template>
-      <template #fallback>
-        <USkeleton class="aspect-[4/3] max-h-[30%] w-full" />
-      </template>
-    </ClientOnly>
+    <USkeleton
+      v-if="!isLoaded"
+      class="absolute inset-0 z-0 h-full w-full rounded-none"
+    />
 
     <img
-      v-else
+      v-if="!isEager"
+      ref="imageElement"
       :alt="alt || ''"
-      :class="[theme.media.base]"
-      fetchpriority="high"
+      :class="[
+        theme.media.base,
+        platform === 'instagram' ? 'aspect-3/4' : '',
+        !isLoaded && 'opacity-0',
+      ]"
       :height="height"
-      loading="eager"
+      :loading="normalizedLoading"
       :sizes="sizes || '100vw'"
       :src="src"
       :srcset="srcset"
       :width="width"
+      @error="handleError"
+      @load="handleLoad"
+    />
+
+    <img
+      v-else
+      ref="imageElement"
+      :alt="alt || ''"
+      :class="[theme.media.base, !isLoaded && 'opacity-0']"
+      fetchpriority="high"
+      :height="height"
+      :loading="normalizedLoading"
+      :sizes="sizes || '100vw'"
+      :src="src"
+      :srcset="srcset"
+      :width="width"
+      @error="handleError"
+      @load="handleLoad"
     />
 
     <ClientOnly>
       <div
         v-if="platform === 'instagram'"
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/90 px-4 text-center text-sm font-semibold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/90 px-4 text-center text-sm font-semibold text-white opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100"
       >
         <div class="line-clamp-5 max-w-full leading-relaxed break-words">
           {{ title }}
@@ -139,7 +184,7 @@ const isBare = computed(() => isHero.value || props.noWrapper === true)
 
       <span
         v-else-if="credit && !hideCredit"
-        class="absolute bottom-0 left-0 w-full translate-x-0 bg-black/40 px-2 py-1 text-center text-xs font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 @xs:left-1/2 @xs:w-auto @xs:-translate-x-1/2"
+        class="absolute bottom-0 left-0 w-full translate-x-0 bg-black/40 px-2 py-1 text-center text-xs font-bold text-white opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 @xs:left-1/2 @xs:w-auto @xs:-translate-x-1/2"
       >
         {{ credit }}
       </span>

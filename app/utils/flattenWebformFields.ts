@@ -34,7 +34,6 @@ export function flattenWebformFields(
       )
 
     if (isGroup && hasChildren) {
-      // Optionally keep section container itself (for rendering title/description)
       if (type === 'section') {
         flat[key] = {
           ...field,

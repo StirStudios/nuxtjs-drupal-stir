@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
@@ -23,11 +24,15 @@ defineSlots<{
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
-
 const { observeVideos } = useIntersectionObserver()
-const { isFront, pageTitle, pageHide } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
+const { isFront } = usePageContext()
 const { locked } = useNavLock()
 const { hero: heroTheme } = useAppConfig().stirTheme
+const pageProps = computed(() => page.value?.content?.props || {})
+const pageTitle = computed(() => pageProps.value?.title || '')
+const pageHide = computed(() => pageProps.value?.hide || false)
 
 // Only needed in FULL mode
 if (props.mode !== 'simple') {
@@ -60,15 +65,28 @@ const hideHeroSection = computed(
   () => props.mode !== 'simple' && pageHide.value && !isFrontEffective.value,
 )
 
-const hasMediaSlot = computed(() => tk.slot('media').length > 0)
+const slotMedia = computed(() => tk.slot('media'))
+const heroMediaNode = computed(() => {
+  const node = slotMedia.value[0]
+
+  if (!node) return null
+  return cloneVNode(node, { isHero: true }, true)
+})
+const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
+const containsVideo = computed(() =>
+  slotMedia.value
+    .some((node) => node?.props?.type === 'video' || node?.props?.mediaEmbed),
+)
 
 const h1Classes = computed(() => {
-  const base = isFrontEffective.value
-    ? heroTheme.text?.isFront
-    : heroTheme.text?.h1
+  const base = hasMediaSlot.value
+    ? isFrontEffective.value
+      ? heroTheme.text?.isFront
+      : heroTheme.text?.h1
+    : null
 
-  return [base, heroTheme.text?.container].flat().filter(Boolean)
+  return [base].filter(Boolean)
 })
 
 const sectionClasses = computed(() => {
@@ -77,13 +95,6 @@ const sectionClasses = computed(() => {
   }
 
   const hasHeroContent = hasHero.value
-
-  // Detect if the media slot contains a video
-  const containsVideo = computed(() =>
-    tk
-      .slot('media')
-      .some((node) => node?.props?.type === 'video' || node?.props?.mediaEmbed),
-  )
 
   return [
     heroTheme.base,
@@ -99,7 +110,6 @@ const sectionClasses = computed(() => {
     hasMediaSlot.value && heroTheme.overlay,
     isFrontEffective.value && heroTheme.isFront,
 
-    // Only add video height if the hero contains a video
     containsVideo.value && 'min-h-[75vh]',
   ]
     .flat()
@@ -142,7 +152,7 @@ const sectionClasses = computed(() => {
           </WrapAnimate>
         </div>
 
-        <slot name="media" />
+        <component :is="heroMediaNode" />
       </section>
     </template>
   </EditLink>

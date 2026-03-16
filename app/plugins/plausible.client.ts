@@ -1,46 +1,71 @@
-import { defineNuxtPlugin, useAppConfig, useScript } from '#imports'
+import { defineNuxtPlugin, useAppConfig } from '#app'
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (!import.meta.client) return
 
   const cfg = useAppConfig().analytics?.plausible
+
   if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.domain)
     return
+  const scriptUrl =
+    cfg.scriptUrl ||
+    'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js'
 
-  const { onLoaded } = useScript({
-    id: 'plausible-script',
-    src: cfg.scriptUrl,
-    async: true,
-    defer: true,
-    'data-domain': cfg.domain,
-  })
+  type PlausibleQueueFunction = ((
+    event: string,
+    eventOptions?: Record<string, unknown>,
+  ) => void) & {
+    init?: (initOptions?: Record<string, unknown>) => void
+    q?: unknown[]
+    o?: Record<string, unknown>
+  }
 
-  onLoaded(() => {
-    type PlausibleQueueFunction = ((
-      event: string,
-      options?: Record<string, unknown>,
-    ) => void) & {
-      q?: unknown[]
-    }
+  const win = window as unknown as {
+    plausible?: PlausibleQueueFunction
+  }
 
-    const win = window as unknown as {
-      plausible?: PlausibleQueueFunction
-    }
+  // Predefine the queue + init API to mirror Plausible's new embed snippet.
+  win.plausible =
+    win.plausible ??
+    Object.assign(
+      (event: string, eventOptions?: Record<string, unknown>) => {
+        ;(win.plausible!.q ??= []).push([event, eventOptions])
+      },
+      {
+        init: (initOptions?: Record<string, unknown>) => {
+          win.plausible!.o = initOptions ?? {}
+        },
+      },
+    )
 
-    const plausibleFn: PlausibleQueueFunction =
-      win.plausible ??
-      function (event, options) {
-        ;(plausibleFn.q ??= []).push([event, options])
-      }
-
-    win.plausible = plausibleFn
-
-    // Initial pageview
-    plausibleFn('pageview')
-
-    // SPA route tracking
-    nuxtApp.hook('page:finish', () => {
-      plausibleFn('pageview')
+  const loadPlausible = () =>
+    useScript({
+      id: 'plausible-script',
+      src: scriptUrl,
+      async: true,
+      defer: true,
+      ...(cfg.domain ? { 'data-domain': cfg.domain } : {}),
     })
-  })
+
+  const onScriptLoaded = ({ onLoaded }: ReturnType<typeof loadPlausible>) =>
+    onLoaded(() => {
+      const plausibleFn = win.plausible
+
+      // Keep explicit SPA tracking to avoid duplicate pageviews from auto capture.
+      plausibleFn?.init?.({ autoCapturePageviews: false })
+      plausibleFn?.('pageview')
+      nuxtApp.hook('page:finish', () => {
+        plausibleFn?.('pageview')
+      })
+    })
+
+  const idleApi = globalThis as typeof globalThis & {
+    requestIdleCallback?: (callback: IdleRequestCallback) => number
+  }
+
+  if (typeof idleApi.requestIdleCallback === 'function') {
+    idleApi.requestIdleCallback(() => onScriptLoaded(loadPlausible()))
+  } else {
+    setTimeout(() => onScriptLoaded(loadPlausible()), 1)
+  }
 })

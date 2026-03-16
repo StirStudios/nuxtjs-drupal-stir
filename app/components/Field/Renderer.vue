@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { Component } from 'vue'
+import type { WebformFieldProps, WebformState } from '../../../types'
 import { useEvaluateState } from '~/composables/useEvaluateState'
+import { cleanHTML } from '~/utils/cleanHTML'
 
 import {
   FieldInput,
@@ -13,6 +15,8 @@ import {
   FieldDateTime,
   FieldAddress,
   FieldProcessedText,
+  FieldInputNumber,
+  FieldInputSlider,
 } from '#components'
 
 const props = withDefaults(
@@ -31,11 +35,11 @@ const props = withDefaults(
 )
 
 const { webform } = useAppConfig().stirTheme
-
 const componentMap: Record<string, Component> = {
   textfield: FieldInput,
   email: FieldInput,
-  number: FieldInput,
+  number: FieldInputNumber,
+  range: FieldInputSlider,
   tel: FieldInput,
   textarea: FieldTextarea,
   select: FieldSelect,
@@ -57,16 +61,38 @@ const shouldRender = computed(() => {
 const useFloatingLabels = computed(
   () => props.field['#floating_label'] ?? webform.labels.floating,
 )
+const resolvedFieldType = computed(() => {
+  const rawType = String(props.field['#type'] ?? '').trim().toLowerCase()
+  const inputType =
+    props.field['#input_type'] ??
+    props.field['#inputType'] ??
+    props.field['#widget'] ??
+    (props.field['#attributes'] as Record<string, unknown> | undefined)?.type
+  const normalizedInputType = String(inputType ?? '').trim().toLowerCase()
+
+  if (rawType === 'range') return 'range'
+  if (rawType.includes('range')) return 'range'
+
+  if (rawType === 'number' && normalizedInputType === 'range') {
+    return 'range'
+  }
+
+  return rawType
+})
 
 const resolvedComponent = computed(
-  () => componentMap[props.field['#type']] || null,
+  () => componentMap[resolvedFieldType.value] || null,
 )
 
 const shouldShowLabel = computed(
   () =>
     props.field['#type'] !== 'checkbox' &&
+    props.field['#type'] !== 'datetime' &&
+    props.field['#type'] !== 'date' &&
     props.field['#type'] !== 'hidden' &&
-    !useFloatingLabels.value,
+    (resolvedFieldType.value === 'number' ||
+      resolvedFieldType.value === 'range' ||
+      !useFloatingLabels.value),
 )
 
 const shouldShowDescription = computed(
@@ -79,9 +105,24 @@ const { visible, checked } = useEvaluateState(
   props.state,
 )
 
-const descriptionContent = props.field['#description'] || ''
-const helpContent = props.field['#help'] || ''
+const descriptionContent = computed(() =>
+  cleanHTML(String(props.field['#description'] ?? '')),
+)
+const helpContent = computed(() => cleanHTML(String(props.field['#help'] ?? '')))
 const labelClass = computed(() => props.field['#class'] || '')
+const fieldUi = computed(() => {
+  if (
+    resolvedFieldType.value === 'checkbox' ||
+    resolvedFieldType.value === 'checkboxes'
+  ) {
+    return {
+      label: labelClass.value,
+      error: 'mt-1 ms-6 text-error',
+    }
+  }
+
+  return { label: labelClass.value }
+})
 </script>
 
 <template>
@@ -98,7 +139,7 @@ const labelClass = computed(() => props.field['#class'] || '')
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
     :required="!!field['#required']"
-    :ui="{ label: labelClass }"
+    :ui="fieldUi"
   >
     <ButtonModal v-if="field['#modal'] === true" :modal-id="field['#name']" />
 
@@ -113,7 +154,13 @@ const labelClass = computed(() => props.field['#class'] || '')
       v-if="resolvedComponent"
       :field="field"
       :field-name="fieldName"
-      :floating-label="useFloatingLabels"
+      :floating-label="
+        resolvedFieldType === 'checkbox' ||
+          resolvedFieldType === 'number' ||
+          resolvedFieldType === 'range'
+          ? undefined
+          : useFloatingLabels
+      "
       :state="state"
     />
 

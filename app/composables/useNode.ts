@@ -1,18 +1,14 @@
-import { useSlotsToolkit } from './useSlotsToolkit'
+import type { VNode } from 'vue'
+import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 
 /**
- * UNIVERSAL NODE SLOT PARSER
- * Extracts section, hero, or any paragraph-style slot.
+ * Extracts paragraph-like slot data (`section`, `hero`, or custom slots).
  */
 export function useNode(slots: unknown) {
   const tk = useSlotsToolkit(slots)
 
   /**
-   * Extract a paragraph from a named slot:
-   * - vnode
-   * - props
-   * - text
-   * - media (nested slot)
+   * Extracts `vnode`, `props`, `text`, and nested `media` from a slot.
    */
   const useParagraph = (slotName: string) => {
     const vnode = computed<VNode | undefined>(() => {
@@ -20,23 +16,25 @@ export function useNode(slots: unknown) {
     })
 
     const props = computed(() => tk.propsOf(vnode.value) ?? {})
-
     const mediaProps = computed(() => {
       const node = vnode.value
+
       if (!node) return {}
 
-      // Slots dictionary: { media(): VNode[] }
       type SlotDict = Record<string, (() => VNode[]) | undefined>
       const children = node.children as unknown as SlotDict
-
       const mediaFn = children.media
+
       if (!mediaFn) return {}
 
       const mediaVNode = mediaFn()?.[0]
+
       return tk.propsOf(mediaVNode) ?? {}
     })
 
-    const text = computed(() => props.value.text || '')
+    const text = computed(() =>
+      typeof props.value.text === 'string' ? props.value.text : '',
+    )
 
     return {
       get vnode() {
@@ -55,11 +53,9 @@ export function useNode(slots: unknown) {
   }
 
   return {
-    // Default slots nodes typically have
     section: useParagraph('section'),
     hero: useParagraph('hero'),
 
-    // Extensible for custom cases:
     paragraph(slotName: string) {
       return useParagraph(slotName)
     },
@@ -67,15 +63,43 @@ export function useNode(slots: unknown) {
 }
 
 /**
- * TEASER EXTRACTION
- * just returns `.section` from a node.
+ * Returns the first available teaser source (`section`, then `hero`).
  */
 export function useNodeTeaser(slots: unknown) {
   const node = useNode(slots)
+  const hasMediaSource = (value: unknown) => {
+    if (!value || typeof value !== 'object') return false
+
+    const media = value as Record<string, unknown>
+
+    return typeof media.src === 'string' && media.src.trim().length > 0
+  }
 
   const source = computed(() => {
-    if (node.section?.vnode) return node.section
-    if (node.hero?.vnode) return node.hero
+    const section = node.section
+    const hero = node.hero
+    const sectionHasMedia = section?.vnode && hasMediaSource(section.media)
+    const heroHasMedia = hero?.vnode && hasMediaSource(hero.media)
+    const mediaSource = sectionHasMedia
+      ? section
+      : heroHasMedia
+        ? hero
+        : section?.vnode
+          ? section
+          : hero?.vnode
+            ? hero
+            : null
+    const textSource =
+      section?.text?.trim() ? section : hero?.text?.trim() ? hero : mediaSource
+
+    if (mediaSource) {
+      return {
+        props: mediaSource.props ?? {},
+        media: mediaSource.media ?? {},
+        text: textSource?.text ?? '',
+      }
+    }
+
     return {
       props: {},
       media: {},

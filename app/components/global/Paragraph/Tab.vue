@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineProps<{
-  // Identity
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  // Meta
+  title?: string
+
   editLink?: string
 }>()
 </script>

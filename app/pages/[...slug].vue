@@ -1,38 +1,9 @@
-<script lang="ts" setup>
-const { fetchPage, renderCustomElements, usePageHead } = useDrupalCe()
-const { bodyClasses, pageLayout } = usePageContext()
-const theme = useAppConfig().stirTheme
-
-const page = await fetchPage(
-  useRoute().path,
-  { query: useRoute().query },
-  customPageError,
-)
-const layout = pageLayout
-
-usePageHead(page)
-
-useHead({
-  bodyAttrs: {
-    class: bodyClasses,
-  },
-})
-
+<script setup lang="ts">
 definePageMeta({
-  key: (route) => route.fullPath.split('#')[0],
+  key: (route) => useResolvedPageRequest(route).key.value,
 })
-
-function customPageError(error: Record<string, any>) {
-  const code = error?.value?.statusCode ?? 500
-  const message = error?.value?.statusMessage ?? 'Page not found'
-  throw createError({ statusCode: code, statusMessage: message })
-}
 </script>
 
 <template>
-  <NuxtLayout :name="layout">
-    <LazySiteBreadcrumbs v-if="theme.crumbs" />
-    <component :is="renderCustomElements(page.content)" v-if="page?.content" />
-    <LazyRegionArea area="after_main" />
-  </NuxtLayout>
+  <DrupalPageRoute />
 </template>

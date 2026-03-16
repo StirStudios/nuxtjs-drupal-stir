@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { page } = usePageContext()
+const { getPage } = useDrupalCe()
+const page = getPage()
 
 type NodeLink = {
   nid: string
@@ -7,8 +8,16 @@ type NodeLink = {
   url: string
 }
 
-const prevNode = page.value?.prev_node as NodeLink | null
-const nextNode = page.value?.next_node as NodeLink | null
+type Related = {
+  prevNode?: NodeLink | null
+  nextNode?: NodeLink | null
+}
+
+const related = computed(
+  () => (page.value?.related as Related | undefined) ?? undefined,
+)
+const prevNode = computed(() => related.value?.prevNode ?? null)
+const nextNode = computed(() => related.value?.nextNode ?? null)
 </script>
 
 <template>

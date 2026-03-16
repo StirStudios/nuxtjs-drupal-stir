@@ -1,10 +1,3 @@
-/**
- * Formats a number as currency.
- * @param value - The number to format.
- * @param currency - The currency code (default is USD).
- * @param locale - The locale for formatting (default is en-US).
- * @returns The formatted currency string.
- */
 export function formatCurrency(
   value: number,
   currency = 'USD',
@@ -17,22 +10,44 @@ export function formatCurrency(
   }).format(value)
 }
 
-/**
- * Converts a UNIX timestamp to a readable date string.
- * @param unix - The UNIX timestamp (in seconds).
- * @param locale - Optional locale (default: 'en-US').
- * @param options - Optional Intl.DateTimeFormat options.
- * @returns A formatted date string.
- */
 export function formatUnixDate(
   unix: number | string,
   locale = 'en-US',
-  options: Intl.DateTimeFormatOptions = {
+  dateFormat: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   },
 ): string {
-  const date = new Date(Number(unix) * 1000)
-  return date.toLocaleDateString(locale, options)
+  const numeric = Number(unix)
+
+  if (!Number.isFinite(numeric)) return ''
+
+  const date = new Date(numeric * 1000)
+
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleDateString(locale, dateFormat)
+}
+
+export function formatZonedDateTime(
+  value: string | Date,
+  timeZone = 'America/Los_Angeles',
+  locale = 'en-US',
+  dateTimeFormat: Intl.DateTimeFormatOptions = {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  },
+): string {
+  const date = typeof value === 'string' ? new Date(value) : value
+
+  if (Number.isNaN(date.getTime())) return ''
+
+  return new Intl.DateTimeFormat(locale, {
+    timeZone,
+    ...dateTimeFormat,
+  }).format(date)
 }

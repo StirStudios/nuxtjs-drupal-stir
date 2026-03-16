@@ -2,34 +2,28 @@
 import { slugify } from '~/utils/stringUtils'
 
 const props = defineProps<{
-  // Identity
   id?: number | string
   uuid?: string
 
-  // Layout behavior
   layout?: string
   container?: boolean
   card?: boolean
 
-  // Labels / heading
   label?: string
   header?: string
   headerTag?: string
 
-  // Styling / classes
   width?: string
   spacing?: string
   gridClass?: string
   classes?: string
   regionAlign?: Record<string, string>
 
-  // Options
   randomize?: boolean
 }>()
 
 const vueSlots = useSlots()
 const orderedSlots = computed(() => Object.entries(vueSlots))
-
 const sectionId = computed(() => {
   if (props.label) return slugify(props.label)
   return `section-${props.id ?? 'unknown'}`

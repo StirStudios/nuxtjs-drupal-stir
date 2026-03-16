@@ -1,38 +1,60 @@
-import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#imports'
+import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
+
+function matchesProtectedPath(routePath: string, rule: string): boolean {
+  const normalizedRule = rule.trim()
+
+  if (!normalizedRule) return false
+  if (normalizedRule === '/') return routePath === '/'
+  if (normalizedRule.endsWith('/')) return routePath.startsWith(normalizedRule)
+  return routePath === normalizedRule
+}
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const config = useAppConfig().protectedRoutes
+
   if (!config) return
 
-  const protectedPaths = config.requireLoginPaths || []
+  const protectedPaths = (config.requireLoginPaths ?? []).filter(
+    (path): path is string =>
+      typeof path === 'string' && path.trim().length > 0,
+  )
+  const loginPath = config.loginPath || '/login'
+  const redirectOnLogin = config.redirectOnLogin || '/'
+  const session =
+    typeof useUserSession === 'function' ? useUserSession() : undefined
+
+  if (to.path === loginPath && session) {
+    if (!session.ready.value) {
+      await session.fetch()
+    }
+
+    if (session.loggedIn.value) {
+      return navigateTo(redirectOnLogin)
+    }
+  }
+
   if (!protectedPaths.length) return
 
-  const isProtected = protectedPaths.some((path) => {
-    if (path.endsWith('/')) {
-      return to.path.startsWith(path)
-    } else {
-      return to.path === path
-    }
-  })
+  const isProtected = protectedPaths.some((path: string) =>
+    matchesProtectedPath(to.path, path),
+  )
 
   if (!isProtected) return
 
-  const session = useUserSession?.()
-  if (!session) return
+  if (!session) {
+    return navigateTo({
+      path: loginPath,
+      query: to.query,
+    })
+  }
 
   if (!session.ready.value) {
     await session.fetch()
   }
 
-  // Redirect logged-in user away from login page
-  if (to.path === config.loginPath && session.loggedIn.value) {
-    return navigateTo(config.redirectOnLogin)
-  }
-
-  // Not logged in → redirect to login, preserving query (e.g. ?password=...)
   if (!session.loggedIn.value) {
     return navigateTo({
-      path: config.loginPath,
+      path: loginPath,
       query: to.query,
     })
   }

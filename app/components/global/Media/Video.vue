@@ -2,42 +2,67 @@
 import { aspectRatios } from '~/utils/aspectRatios'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 
-const props = defineProps<{
-  // Core media
-  mid?: string | number
-  title?: string
-  alt?: string
-  src?: string
-  platform?: string
-  mediaEmbed?: string
+defineOptions({
+  inheritAttrs: false,
+})
 
-  // Dimensions
-  width?: number
-  height?: number
+const props = withDefaults(
+  defineProps<{
+    mid?: string | number
+    title?: string
+    alt?: string
+    src?: string
+    platform?: string
+    mediaEmbed?: string
 
-  // Rendering flags
-  noWrapper?: boolean
-}>()
+    width?: number
+    height?: number
+
+    noWrapper?: boolean
+    deferEmbed?: boolean
+  }>(),
+  {
+    mid: undefined,
+    title: undefined,
+    alt: undefined,
+    src: undefined,
+    platform: undefined,
+    mediaEmbed: undefined,
+    width: undefined,
+    height: undefined,
+    noWrapper: false,
+    deferEmbed: true,
+  },
+)
 
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
 const { initializePlayers } = useVideoPlayers()
-
-// Hero mode removes wrapper
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
-
-// Bunny placeholder size
 const isProcessing = computed(() => props.width === 180)
+const isEmbedActive = ref(false)
+const aspectClass = computed(() => {
+  const ratio = aspectRatios(props.width ?? null, props.height ?? null)
 
-// Aspect-ratio utility
-const aspectClass = computed(() =>
-  aspectRatios(props.width ?? 16, props.height ?? 9),
+  return ratio || 'aspect-video'
+})
+
+const shouldShowIframe = computed(
+  () =>
+    !!props.mediaEmbed &&
+    !isProcessing.value &&
+    (!props.deferEmbed || isEmbedActive.value),
 )
 
-// Init Bunny player for iframe embeds
+function activateEmbed() {
+  if (shouldShowIframe.value) return
+  isEmbedActive.value = true
+  initializePlayers()
+}
+
 onMounted(() => {
-  if (!isBare.value && props.mediaEmbed && !isProcessing.value) {
+  if (!isBare.value && shouldShowIframe.value) {
     initializePlayers()
   }
 })
@@ -73,22 +98,34 @@ onMounted(() => {
     </div>
 
     <iframe
-      v-else
-      allow="
-        accelerometer;
-        autoplay;
-        clipboard-write;
-        encrypted-media;
-        gyroscope;
-        picture-in-picture;
-      "
+      v-if="shouldShowIframe"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
       :class="['absolute inset-0 h-full w-full bg-black', theme.media.rounded]"
       :data-mid="mid"
-      frameborder="0"
       loading="lazy"
       :src="mediaEmbed"
       :title="title"
     />
+
+    <button
+      v-else-if="!isProcessing"
+      :aria-label="title ? `Play video: ${title}` : 'Play video'"
+      :class="[
+        'absolute inset-0 z-10 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white',
+        theme.media.rounded,
+      ]"
+      type="button"
+      @click="activateEmbed"
+    >
+      <img
+        v-if="src"
+        :alt="alt || title || 'Video thumbnail'"
+        class="absolute inset-0 h-full w-full object-cover"
+        :src="src"
+      />
+      <div class="absolute inset-0 bg-black/40" />
+      <UIcon class="relative z-10 size-16" name="i-lucide-play-circle" />
+    </button>
   </div>
 </template>

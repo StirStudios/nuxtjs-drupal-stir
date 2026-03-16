@@ -10,7 +10,60 @@ This document outlines the full structure of the StirStudios `app.config.ts` fil
 colorMode: {
   forced: false,
   preference: 'dark',
-  lightRoutes: ['about', 'help'],
+  showToggle: true,
+  lightRoutes: ['/clients', '/book'],
+  darkRoutes: ['/pricing'],
+}
+```
+
+#### `colorMode` behavior and precedence
+
+- `forced: true`
+  - Forces all routes to `preference`.
+  - Theme toggle is hidden.
+  - `lightRoutes` and `darkRoutes` are ignored while forced mode is on.
+- `forced: false`
+  - Route overrides apply first:
+    - `lightRoutes` => route forced to light.
+    - `darkRoutes` => route forced to dark.
+  - If no route override matches:
+    - `showToggle: false` => `preference` is enforced as baseline.
+    - `showToggle: true` => user preference is allowed.
+
+#### Toggle visibility notes
+
+- `showToggle: false` hides the color mode button.
+- Header right-slot spacing is collapsed when toggle is hidden (no empty right gap).
+
+#### Route matching rules
+
+- Use `'/'` for homepage only.
+- Route arrays use prefix matching for non-root entries (e.g. `'/pricing'` matches `/pricing` and child paths).
+- Empty entries are ignored (do not use `''`).
+
+#### Common patterns
+
+Hide toggle but keep route-based forcing:
+
+```ts
+colorMode: {
+  forced: false,
+  preference: 'dark',
+  showToggle: false,
+  lightRoutes: ['/clients', '/book', '/calculator', '/photos'],
+  darkRoutes: [],
+}
+```
+
+Force dark homepage, light elsewhere, no toggle:
+
+```ts
+colorMode: {
+  forced: false,
+  preference: 'light',
+  showToggle: false,
+  lightRoutes: [],
+  darkRoutes: ['/'],
 }
 ```
 
@@ -21,7 +74,7 @@ userway: {
   enabled: false,
   account: '',
   position: 3,
-  size: 'small', // or 'medium' | 'large'
+  size: 'small',
   color: '#ffffff',
   type: '1',
 }
@@ -32,12 +85,8 @@ userway: {
 ```ts
 protectedRoutes: {
   loginPath: '/login',
-  redirectOnLogin: '/example',
-  requireLoginPaths: [
-	'/example',
-	'/admin/',
-  ],
-  loginHeading: 'Login',
+  redirectOnLogin: '/',
+  requireLoginPaths: [],
 }
 ```
 
@@ -46,44 +95,91 @@ protectedRoutes: {
 ```ts
 analytics: {
   plausible: {
-	enabled: false,
-	domain: 'domainname.com', // without https://www
-	scriptUrl: 'https://analytics.stirstudiosdesign.com/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js',
+    enabled: false,
+    domain: 'domainname.com', // without https://www
+    // Optional: overrides plugin default script URL
+    scriptUrl: 'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js',
   },
 }
 ```
 
-### 💬 `appPopup`
+### 💬 `popup`
 
 ```ts
-appPopup: {
-  enabled: false,
-  trigger: 'scroll', // 'delay' | 'scroll' | 'exit'
-  delay: 5000, // only applies if trigger === 'delay'
-  pages: '*', // or an array like ['/', '/weddings']
-  excludePages: ['/login', '/checkout'],
-  scrollThreshold: 0.25,
-  showOnce: false,
+popup: {
+  enabled: false, // global mount switch for <LazyAppPopup />
+  includePaths: [], // optional allowlist; empty = all routes
+  excludePaths: [], // optional blocklist; takes precedence over includePaths
 }
 ```
 
-### 🍪 `cookieConsent`
+Popup path matching rules:
+
+- `'/'` matches only homepage.
+- Non-root entries use exact-or-prefix matching (for example `'/pricing'` matches `/pricing` and `/pricing/team`).
+
+### 🍪 `privacyNotice`
 
 ```ts
-cookieConsent: {
+privacyNotice: {
   enabled: false,
-  title: 'We value your privacy',
-  message: 'We use cookies to enhance your experience and collect the information you provide through our booking forms to help plan your wedding. We do not sell your data.',
+  mode: 'notice', // 'notice' | 'consent'
+  position: 'center', // 'left' | 'center' | 'right'
+  dismissible: true,
+  title: '',
+  message: '',
   messageLinks: 'For more information please review our',
-  termsUrl: '/terms',
-  privacyUrl: '/privacy',
+  termsUrl: '',
+  privacyUrl: '',
+  buttonLabel: 'Got it',
+  declineButtonLabel: 'Decline',
+}
+```
+
+`notice` mode example (no consent gate, simple acknowledgement):
+
+```ts
+privacyNotice: {
+  enabled: true,
+  mode: 'notice',
+  position: 'center',
+  title: 'Privacy Notice',
+  message: 'We use essential cookies to run this website.',
+  buttonLabel: 'Got it',
+  termsUrl: '/terms-service',
+  privacyUrl: '/privacy-policy',
+}
+```
+
+`consent` mode example (explicit accept/decline):
+
+```ts
+privacyNotice: {
+  enabled: true,
+  mode: 'consent',
+  position: 'center',
+  dismissible: false,
+  title: 'Cookie Consent',
+  message: 'We use analytics cookies to improve your experience.',
   buttonLabel: 'Accept',
+  declineButtonLabel: 'Decline',
+  termsUrl: '/terms-service',
+  privacyUrl: '/privacy-policy',
 }
 ```
 
 ---
 
 ## 🎨 `stirTheme`
+
+Recommended key order in `stirTheme`:
+
+1. Global flags and layout primitives:
+   `pdf`, `crumbs`, `h1`, `container`, `header`, `navigation`, `hero`, `footer`
+2. Content/component behavior:
+   `media`, `carousel`, `modal`, `overlay`, `webform`, `turnstile`
+3. Visual/system tokens and utilities:
+   `card`, `gradients`, `animations`, `aspectRatios`, `scrollButton`, `error`
 
 ### ✨ General
 
@@ -136,6 +232,18 @@ front: {
 ```ts
 container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
 ```
+
+### 🪟 `overlay`
+
+Use this to control Nuxt UI overlay portal behavior for popovers, modals, and select menus.
+
+```ts
+overlay: {
+  portal: true, // true, false, CSS selector, or HTMLElement
+},
+```
+
+Set `portal: false` when the layer is rendered inside a Shadow DOM host and you need overlays to remain in-tree.
 
 ### 🦶 `footer`
 
@@ -267,9 +375,11 @@ modal: { header: true },
 
 ```ts
 error: {
-  label: 'Take me back home',
+  label: 'Back to home',
   color: 'primary',
-  variant: 'solid'
+  size: 'xl',
+  icon: 'i-lucide-arrow-left',
+  variant: 'solid',
 },
 ```
 
@@ -277,6 +387,7 @@ error: {
 
 ```ts
 scrollButton: {
+  enabled: true,
   base: 'fixed bottom-4 left-4 z-50 rounded-full p-2 shadow-md transition-opacity duration-300',
   icon: 'i-lucide:arrow-up',
   variant: 'solid',
@@ -297,6 +408,11 @@ turnstile: {
 
 ```ts
 webform: {
+  showToasts: true,
+  scrollToTopOnSuccess: true,
+  scrollToTopOnReset: true,
+  scrollToTopDelayMs: 0,
+  scrollToTopFallbackDelayMs: 180,
   spacing: 'space-y-5',
   spacingLarge: 'space-y-10',
   labels: {

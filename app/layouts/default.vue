@@ -3,15 +3,14 @@ const { navigation } = useAppConfig().stirTheme
 </script>
 
 <template>
-  <LazyRegionArea area="top" />
-  <LazyDrupalTabs />
-  <AppHeader :mode="navigation.mode" />
+  <div class="flex min-h-dvh flex-col">
+    <LazyAppHeader :mode="navigation.mode" />
 
-  <UMain id="main-content" as="main" role="main">
-    <LazySiteMessages />
-    <slot />
-  </UMain>
+    <UMain id="main-content" class="flex-1" role="main">
+      <LazySiteMessages />
+      <slot />
+    </UMain>
 
-  <LazyRegionArea area="sub_footer" />
-  <LazyAppFooter />
+    <LazyAppFooter />
+  </div>
 </template>

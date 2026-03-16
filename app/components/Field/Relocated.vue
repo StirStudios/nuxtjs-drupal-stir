@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '../../../types'
 
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { heading, state, schema, onSubmit, onError, isLoading, showLogin } =
+const { heading, state, validate, onSubmit, onError, isLoading, showLogin } =
   usePasswordLogin()
 </script>
 
@@ -25,8 +25,8 @@ const { heading, state, schema, onSubmit, onError, isLoading, showLogin } =
       role="main"
     >
       <UForm
-        :schema="schema"
         :state="state"
+        :validate="validate"
         @error="onError"
         @submit="onSubmit"
       >

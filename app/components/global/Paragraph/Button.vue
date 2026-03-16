@@ -2,25 +2,21 @@
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 
 const props = defineProps<{
-  // Identity
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  // Layout
   align?: string
   spacing?: string
   width?: string
 
-  // Button appearance
   color?: string
   size?: string
   variant?: string
   icon?: string
   block?: boolean
 
-  // Link
   link?: {
     element?: string
     title?: string
@@ -28,16 +24,14 @@ const props = defineProps<{
     external?: boolean
   }
 
-  // Extras
   editLink?: string
 }>()
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
-
 const open = ref(false)
+const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
-
 const linkData = computed(() => props.link || {})
 const isExternal = computed(() => !!linkData.value.external)
 const btnLabel = computed(() => linkData.value.title || 'View link')
@@ -46,19 +40,40 @@ const btnVariant = computed(() => props.variant || 'solid')
 const btnSize = computed(() => props.size || 'xl')
 const btnBlock = computed(() => props.block ?? false)
 const iconName = computed(() => props.icon || null)
-
 const slotMedia = computed(() => tk.mediaItems())
 
-const pdf = computed(() => {
-  return (
-    slotMedia.value.find(
-      (node) => tk.propsOf(node)?.type === 'document' && tk.propsOf(node)?.url,
-    ) || null
-  )
+type MediaDocumentProps = {
+  type?: unknown
+  url?: unknown
+  title?: unknown
+  alt?: unknown
+}
+
+const pdfProps = computed(() => {
+  for (const node of slotMedia.value) {
+    const media = tk.propsOf(node) as MediaDocumentProps
+
+    if (
+      media.type !== 'document' ||
+      typeof media.url !== 'string' ||
+      !media.url
+    ) {
+      continue
+    }
+    return media
+  }
+  return null
 })
 
-const hasPdf = computed(() => !!pdf.value)
+const hasPdf = computed(() => !!pdfProps.value)
 const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
+const pdfTitle = computed(() => String(pdfProps.value?.title || btnLabel.value))
+const pdfDescription = computed(() =>
+  String(pdfProps.value?.alt || 'PDF document preview'),
+)
+const pdfUrl = computed(() =>
+  typeof pdfProps.value?.url === 'string' ? pdfProps.value.url : undefined,
+)
 </script>
 
 <template>
@@ -67,10 +82,10 @@ const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
       <UButton
         v-if="hasPdf"
         :block="btnBlock"
-        class="mt-4"
+        class="my-2"
         :color="btnColor"
         :icon="iconName ?? 'i-lucide-file-text'"
-        :label="tk.propsOf(pdf)?.title || btnLabel"
+        :label="pdfTitle"
         :size="btnSize"
         :variant="btnVariant"
         @click="open = true"
@@ -79,10 +94,11 @@ const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
       <UButton
         v-else-if="hasLink"
         :block="btnBlock"
-        class="mt-4"
+        class="my-2"
         :color="btnColor"
         :icon="iconName"
         :label="btnLabel"
+        :rel="isExternal ? 'noopener noreferrer' : undefined"
         :size="btnSize"
         :target="isExternal ? '_blank' : undefined"
         :to="linkData.url"
@@ -94,12 +110,16 @@ const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
   <UModal
     v-if="hasPdf && theme.pdf"
     v-model:open="open"
-    :description="tk.propsOf(pdf)?.alt"
+    :description="pdfDescription"
     fullscreen
-    :title="tk.propsOf(pdf)?.title || btnLabel"
+    :portal="portal"
+    :title="pdfTitle"
+    :ui="{
+      body: 'flex-1 !pt-0 mt-4 sm:mt-6',
+    }"
   >
     <template #body>
-      <PdfViewer :src="tk.propsOf(pdf)?.url" />
+      <LazyStirPdfViewer :src="pdfUrl" />
     </template>
   </UModal>
 </template>

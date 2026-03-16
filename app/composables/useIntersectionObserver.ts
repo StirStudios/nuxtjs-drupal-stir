@@ -1,8 +1,11 @@
+import { useIntersectionObserver as useVueUseIntersectionObserver } from '@vueuse/core'
+
 export function useIntersectionObserver() {
-  let observer: IntersectionObserver | null = null
+  let stopObservers: Array<() => void> = []
 
   const observeVideos = (threshold: number = 0.1) => {
     if (!import.meta.client) return
+    disconnectObserver()
 
     const videoElements = document.querySelectorAll(
       'video',
@@ -10,33 +13,33 @@ export function useIntersectionObserver() {
 
     if (videoElements.length === 0) return
 
-    // Create a new IntersectionObserver instance
-    observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const videoElement = entry.target as HTMLVideoElement
-          if (entry.isIntersecting) {
-            videoElement.play()
-          } else {
-            videoElement.pause()
-          }
-        })
-      },
-      { threshold },
-    )
+    videoElements.forEach((videoElement) => {
+      const { stop } = useVueUseIntersectionObserver(
+        videoElement,
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              videoElement.play().catch(() => {})
+            } else {
+              videoElement.pause()
+            }
+          })
+        },
+        { threshold },
+      )
 
-    // Start observing all video elements
-    videoElements.forEach((videoElement) => observer?.observe(videoElement))
+      stopObservers.push(stop)
+    })
   }
 
   const disconnectObserver = () => {
-    if (observer) {
-      observer.disconnect()
-      observer = null
-    }
+    if (stopObservers.length === 0) return
+    stopObservers.forEach((stop) => {
+      stop()
+    })
+    stopObservers = []
   }
 
-  // Ensure cleanup happens when the component is unmounted
   onBeforeUnmount(() => {
     disconnectObserver()
   })

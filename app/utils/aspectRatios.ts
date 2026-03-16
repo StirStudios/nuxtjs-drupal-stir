@@ -1,15 +1,14 @@
-/**
- * Returns Tailwind aspect ratio + max-height utility classes
- * based on image width/height or theme config.
- *
- * Example output:
- *  - "aspect-[9/16] max-h-[40%]"
- *  - "aspect-[16/9] max-h-[30%]"
- */
+type AspectRatioConfig = {
+  portrait?: string
+  landscape?: string
+  square?: string
+  fourThree?: string
+}
+
 export const aspectRatios = (
   width: number | null,
   height: number | null,
-  options?: {
+  sizeConfig?: {
     portraitMax?: string
     landscapeMax?: string
     squareMax?: string
@@ -17,7 +16,7 @@ export const aspectRatios = (
   },
 ) => {
   const appConfig = useAppConfig?.()
-  const ratioConfig = appConfig?.stirTheme?.aspectRatios || {}
+  const ratioConfig = (appConfig?.stirTheme?.aspectRatios || {}) as AspectRatioConfig
 
   const defaults = {
     portrait: 'aspect-[9/16]',
@@ -31,10 +30,10 @@ export const aspectRatios = (
   const squareRatio = ratioConfig.square || defaults.square
   const fourThreeRatio = ratioConfig.fourThree || defaults.fourThree
 
-  const portraitMax = options?.portraitMax || 'max-h-[40%]'
-  const landscapeMax = options?.landscapeMax || 'max-h-[30%]'
-  const squareMax = options?.squareMax || 'max-h-[35%]'
-  const fourThreeMax = options?.fourThreeMax || 'max-h-[30%]'
+  const portraitMax = sizeConfig?.portraitMax || 'max-h-[40%]'
+  const landscapeMax = sizeConfig?.landscapeMax || 'max-h-[30%]'
+  const squareMax = sizeConfig?.squareMax || 'max-h-[35%]'
+  const fourThreeMax = sizeConfig?.fourThreeMax || 'max-h-[30%]'
 
   if (width && height) {
     const ratio = width / height

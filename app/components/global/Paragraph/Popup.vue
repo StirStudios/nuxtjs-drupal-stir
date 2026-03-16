@@ -1,30 +1,37 @@
 <script setup lang="ts">
-defineProps<{
-  /* Identity */
-  id?: number | string
-  uuid?: string
+import { cleanHTML } from '~/utils/cleanHTML'
+
+const props = defineProps<{
+  id: number | string
+  uuid: string
   parentUuid?: string
   region?: string
 
-  /* Content */
   text?: string
+  alert?: string
   webform?: unknown
 
-  /* Behaviour */
   direction?: string
   onClose?: () => void
 
-  /* Editor tools */
   editLink?: string
 }>()
+
+const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
 </script>
 
 <template>
   <EditLink :link="editLink">
+    <slot name="media" />
+    <slot name="schedule" />
+
     <div class="space-y-6 p-5">
-      <slot name="media" />
-      <div v-if="text" v-html="text" />
-      <ParagraphWebform v-if="webform" :on-close="onClose" :webform="webform" />
+      <div v-if="safeTextHtml" class="prose max-w-none" v-html="safeTextHtml" />
+      <ParagraphWebform
+        v-if="props.webform"
+        :on-close="props.onClose"
+        :webform="props.webform"
+      />
     </div>
   </EditLink>
 </template>

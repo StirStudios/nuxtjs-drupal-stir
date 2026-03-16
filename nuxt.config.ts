@@ -1,5 +1,10 @@
+import { dirname, resolve as resolvePath } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const layerDir = dirname(fileURLToPath(import.meta.url))
+
 export default defineNuxtConfig({
-  compatibilityDate: '2025-12-09',
+  compatibilityDate: '2026-02-14',
 
   css: ['~/assets/css/main.css'],
 
@@ -19,7 +24,6 @@ export default defineNuxtConfig({
   nitro: {
     compressPublicAssets: true,
     experimental: {
-      parallel: true,
       asyncContext: true,
     },
   },
@@ -46,6 +50,10 @@ export default defineNuxtConfig({
     enabled: process.env.NODE_ENV === 'development',
   },
 
+  experimental: {
+    appManifest: false,
+  },
+
   routeRules: {
     '/admincontrol': {
       redirect: `${process.env.DRUPAL_URL}/admincontrol/login`,
@@ -62,10 +70,15 @@ export default defineNuxtConfig({
   },
 
   icon: {
+    clientBundle: {
+      scan: true,
+      includeCustomCollections: true,
+      sizeLimitKb: 256,
+    },
     customCollections: [
       {
         prefix: 'social',
-        dir: './app/assets/icons',
+        dir: resolvePath(layerDir, 'app/assets/icons'),
       },
     ],
   },
@@ -74,8 +87,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/scripts',
-    'motion-v/nuxt',
-
     [
       'nuxt-vitalizer',
       {
@@ -110,7 +121,8 @@ export default defineNuxtConfig({
             '@nuxtjs/sitemap',
             {
               sources: [`${process.env.DRUPAL_URL}/api/sitemap`],
-              cacheMaxAgeSeconds: 3600,
+              runtimeCacheStorage: { driver: 'memory' },
+              cacheMaxAgeSeconds: 0,
               xslColumns: [
                 { label: 'URL', width: '50%' },
                 {
@@ -144,7 +156,7 @@ export default defineNuxtConfig({
         customErrorPages: true,
       },
     ],
-  ],
+  ] as Array<string | [string, Record<string, unknown>]>,
 
   runtimeConfig: {
     api: process.env.DRUPAL_URL,
@@ -156,4 +168,4 @@ export default defineNuxtConfig({
       api: process.env.DRUPAL_URL,
     },
   },
-})
+});

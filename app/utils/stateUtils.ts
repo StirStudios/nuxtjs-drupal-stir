@@ -1,14 +1,6 @@
 import type { WebformState } from '~/types'
 import { normalizeValue } from './stringUtils'
 
-/**
- * Safely access nested properties in a state object using dot notation.
- * If it's an array, we check for inclusion instead of direct access.
- *
- * @param state - The form state object.
- * @param path - The dot notation path to the desired property.
- * @returns The value at the specified path or `false` if not found.
- */
 export const getNestedStateValue = (
   state: WebformState,
   path: string,
@@ -35,13 +27,6 @@ export const getNestedStateValue = (
   return current
 }
 
-/**
- * Checks if the current value matches the condition value.
- *
- * @param currentValue - The value from the state to check.
- * @param valueCondition - The expected condition value.
- * @returns A boolean indicating if the condition is met.
- */
 export const matchesCondition = (
   currentValue: unknown,
   valueCondition: { value: string },

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import { cleanHTML } from '~/utils/cleanHTML'
 
 type UITimelineItem = {
   date?: string
@@ -27,17 +28,17 @@ const props = defineProps<{
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
-
 const timelineNodes = computed(() => tk.slot('timeline'))
 
 const timelineItems = computed<UITimelineItem[]>(() =>
   timelineNodes.value.map((vnode) => {
     const p = tk.propsOf(vnode)
+
     return {
       date: p.date ?? 'Present',
       title: p.header ?? '',
       icon: p.icon ?? 'i-lucide-rocket',
-      description: p.text ?? '',
+      description: cleanHTML(typeof p.text === 'string' ? p.text : ''),
       slot: 'rich',
     }
   }),
@@ -60,7 +61,7 @@ const wrapperClasses = computed(() =>
             :items="timelineItems"
           >
             <template #rich-description="{ item }">
-              <div v-html="item.description" />
+              <div class="prose max-w-none" v-html="item.description" />
             </template>
           </UTimeline>
         </div>

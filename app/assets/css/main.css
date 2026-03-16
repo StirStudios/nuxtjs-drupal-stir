@@ -1,15 +1,10 @@
-/* Tailwind & Nuxt UI imports */
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
 @import './base';
 @import './utilities';
-@import './custom';
-
-/* Safelist for dynamic Tailwind classes */
 @import './safelist.inline';
 
-/* Tailwind Theme Variables */
 @theme static {
   --font-sans: 'InterVariable', system-ui, sans-serif;
 
@@ -18,11 +13,21 @@
 
   --color-white: #ffffff;
   --color-black: #14161a;
+
+  --animate-soft-pulse: softPulse 1.6s ease-in-out infinite;
+
+  @keyframes softPulse {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 }
 
 :root {
-  --ui-header-height: auto;
-
   --ui-primary: var(--ui-color-primary-500);
   --ui-container: var(--container-8xl);
 }

@@ -13,6 +13,7 @@ export function getHiddenDefaults(
 
   for (const [key, field] of Object.entries(fields)) {
     const f = field as HiddenField
+
     if (f['#type'] === 'hidden') {
       hidden[key] = f['#default_value'] ?? f['#defaultValue'] ?? ''
     }

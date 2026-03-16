@@ -1,5 +1,5 @@
 import type { WebformFieldProps, WebformState } from '~/types'
-import { useEvaluateState } from './useEvaluateState'
+import { evaluateCondition } from '~/utils/evaluateUtils'
 
 export function evaluateContainerVisibility(
   containerName: string,
@@ -8,10 +8,6 @@ export function evaluateContainerVisibility(
   getGroupFields: (parentName: string) => string[],
 ): boolean {
   return getGroupFields(containerName).some((fieldName) => {
-    const { visible } = useEvaluateState(
-      fields[fieldName]?.['#states'] || {},
-      state,
-    )
-    return visible.value
+    return evaluateCondition(fields[fieldName]?.['#states']?.visible, state, true)
   })
 }

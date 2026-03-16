@@ -6,9 +6,11 @@ export default defineNitroPlugin((nitroApp) => {
     // Apply only to GET requests targeting /api/*
     if (
       event.node.req.method === 'GET' &&
-      event.node.req.url?.startsWith('/api/')
+      event.node.req.url?.startsWith('/api/') &&
+      typeof apiKey === 'string' &&
+      apiKey.length > 0
     ) {
-      event.node.req.headers['X-API-Key'] = apiKey
+      event.node.req.headers['x-api-key'] = apiKey
     }
   })
 

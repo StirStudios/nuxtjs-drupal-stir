@@ -1,12 +1,10 @@
 <script setup lang="ts">
 defineProps<{
-  // Base identifiers
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  // Basic display
   header?: string
   gridItems?: string
   randomize?: boolean
@@ -15,12 +13,10 @@ defineProps<{
   editLink?: string
   direction?: string
 
-  // Views
   viewId?: string
   displayId?: string
   view?: unknown
 
-  // Carousel options
   carousel?: boolean
   carouselArrows?: boolean
   carouselAutoheight?: boolean

@@ -3,21 +3,35 @@ const props = defineProps<{
   layout: {
     card?: boolean
     gradient?: string
+    compact?: boolean
   }
 }>()
 
 const { gradients, card } = useAppConfig().stirTheme
+const gradientMap = gradients as Record<string, string>
+const gradientClass = computed(() => {
+  if (!props.layout.card) return ''
 
-// Compute the gradient class dynamically, only if card: true
-const gradientClass = computed(() =>
-  props.layout.card ? gradients[props.layout.gradient || '1'] || '' : '',
+  const key = props.layout.gradient ?? card.defaultGradient ?? '1'
+
+  return gradientMap[key] || ''
+})
+
+const effectClass = computed(() => card.effect ?? '')
+const sizeClass = computed(() =>
+  props.layout.compact ? (card.sizes?.compact ?? '') : (card.sizes?.default ?? ''),
 )
 </script>
 
 <template>
-  <div v-if="layout.card" aria-hidden="true" :class="card.effect">
+  <div
+    v-if="props.layout.card"
+    aria-hidden="true"
+    class="pointer-events-none"
+    :class="[effectClass, sizeClass]"
+  >
     <div
-      class="aspect-[1155/678] w-[72.1875rem] opacity-30"
+      class="h-full w-full"
       :class="gradientClass"
       style="
         clip-path: polygon(

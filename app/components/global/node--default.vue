@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePageContext } from '~/composables/usePageContext'
+
 const { pageLayout } = usePageContext()
 
 defineOptions({
@@ -7,7 +8,6 @@ defineOptions({
 })
 
 const props = defineProps<{
-  // Core media info
   title: string
   type?: string
   isArticle?: boolean | string
@@ -15,25 +15,24 @@ const props = defineProps<{
   uid?: string | object
   hide?: boolean | string
 
-  // Routing + path info
   path?: {
     alias: string
     pid: string
     langcode: string
   }
 
-  // Navigation (prev/next nodes)
-  prev_node?: {
-    nid: string
-    title: string
-    url: string
-  } | null
-
-  next_node?: {
-    nid: string
-    title: string
-    url: string
-  } | null
+  related?: {
+    prevNode?: {
+      nid: string
+      title: string
+      url: string
+    } | null
+    nextNode?: {
+      nid: string
+      title: string
+      url: string
+    } | null
+  }
 }>()
 
 defineSlots<{
@@ -43,13 +42,13 @@ defineSlots<{
 
 const slots = useSlots()
 const teaser = useNodeTeaser(slots)
-
 const isTeaser = computed(() => props.type?.includes('teaser'))
 const isArticle = computed(() => !!props.isArticle)
+const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
 </script>
 
 <template>
-  <slot v-if="pageLayout !== 'clear' && !isTeaser" name="hero" />
+  <slot v-if="showHero" name="hero" />
 
   <LazyRegionArea area="before_main" />
 

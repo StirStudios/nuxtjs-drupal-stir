@@ -1,68 +1,110 @@
-interface PopupData {
+export type PopupNode = {
   element?: string
-  popupDelay?: number
-  popupOnce?: boolean
-  popupTrigger?: 'delay' | 'scroll' | 'exit'
-  popupThreshold?: number
-  [key: string]: unknown
+  props?: Record<string, unknown>
+  slots?: Record<string, unknown>
 }
 
-interface ParagraphBlockItem {
-  element?: string
-  regions?: Record<string, PopupData[]>
-  [key: string]: unknown
+type UnknownRecord = Record<string, unknown>
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null
 }
 
-interface ParagraphBlockContainer {
-  paragraphBlock?: ParagraphBlockItem[]
-}
+function findPopup(node: unknown): PopupNode | null {
+  if (!isRecord(node)) return null
 
-type DecoupledBlocks = Record<string, ParagraphBlockContainer>
+  const stack: unknown[] = [node]
 
-export const usePopupData = () => {
-  const { page } = usePageContext()
+  while (stack.length) {
+    const current = stack.pop()
 
-  const popup = ref<unknown>(null)
+    if (!isRecord(current)) continue
 
-  // Walk CE tree looking for element === 'paragraph-popup'
-  function walk(node: unknown) {
-    if (!node) return
-
-    if (node.element === 'paragraph-popup') {
-      popup.value = node
-      return
+    if (current.element === 'paragraph-popup') {
+      return current as PopupNode
     }
 
-    if (node.slots) {
-      for (const slot of Object.values(node.slots)) {
-        if (Array.isArray(slot)) {
-          slot.forEach(walk)
-        } else {
-          walk(slot)
+    const slots = current.slots
+
+    if (!isRecord(slots)) continue
+
+    for (const slotValue of Object.values(slots)) {
+      if (Array.isArray(slotValue)) {
+        for (let i = slotValue.length - 1; i >= 0; i--) {
+          stack.push(slotValue[i])
         }
+      } else {
+        stack.push(slotValue)
       }
     }
   }
 
-  watchEffect(() => {
+  return null
+}
+
+export const usePopupData = () => {
+  const { getPage } = useDrupalCe()
+  const page = getPage()
+  const popup = ref<PopupNode | null>(null)
+
+  const contentSource = computed(() => page.value?.content)
+  const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+
+  watch([contentSource, decoupledSource], ([content, decoupled]) => {
     popup.value = null
-    walk(page.value?.content)
-  })
+
+    if (content) {
+      if (Array.isArray(content) && content.length) {
+        for (const entry of content) {
+          const found = findPopup(entry)
+
+          if (found) {
+            popup.value = found
+            break
+          }
+        }
+      } else {
+        popup.value = findPopup(content)
+      }
+    }
+
+    if (popup.value) return
+    if (!isRecord(decoupled)) return
+
+    Object.values(decoupled).forEach((block) => {
+      if (popup.value) return
+      if (!isRecord(block)) return
+      const paragraphBlocks = (block.slots as Record<string, unknown>)
+        ?.paragraphBlock
+
+      if (!Array.isArray(paragraphBlocks)) return
+
+      for (const entry of paragraphBlocks) {
+        const found = findPopup(entry)
+
+        if (found) {
+          popup.value = found
+          break
+        }
+      }
+    })
+  }, { immediate: true })
 
   const config = computed(() => {
-    const p = popup.value?.props || {}
+    const p = popup.value?.props ?? {}
 
     return {
+      trigger:
+        p.popupTrigger === 'delay' ||
+        p.popupTrigger === 'scroll' ||
+        p.popupTrigger === 'exit'
+          ? p.popupTrigger
+          : 'delay',
       delay: typeof p.popupDelay === 'number' ? p.popupDelay : 100,
       showOnce: p.popupOnce === true,
-      trigger: ['delay', 'scroll', 'exit'].includes(p.popupTrigger)
-        ? p.popupTrigger
-        : 'scroll',
       scrollThreshold:
-        typeof p.popupThreshold === 'number' &&
-        p.popupThreshold >= 0.25 &&
-        p.popupThreshold <= 1
-          ? p.popupThreshold
+        typeof p.popupScrollThreshold === 'number'
+          ? p.popupScrollThreshold
           : 0.25,
     }
   })

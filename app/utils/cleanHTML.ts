@@ -1,17 +1,7 @@
-export function cleanHTML(html: string): string {
-  // SSR: return original string (do NOT blank it out)
-  if (typeof window === 'undefined') return (html || '').trim()
-
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(html, 'text/html')
-
-  doc.querySelectorAll('script, style').forEach((el) => el.remove())
-
-  doc.querySelectorAll('*').forEach((el) => {
-    for (const attr of Array.from(el.attributes)) {
-      if (attr.name.startsWith('on')) el.removeAttribute(attr.name)
-    }
-  })
-
-  return doc.body.innerHTML.trim()
+export function cleanHTML(html?: string | null): string {
+  return (html ?? '')
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
+    .replace(/\son\w+=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .trim()
 }

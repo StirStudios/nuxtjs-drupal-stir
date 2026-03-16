@@ -1,4 +1,5 @@
-import { evaluateCondition } from '../utils/evaluateUtils'
+import type { WebformState } from '~/types'
+import { evaluateCondition } from '~/utils/evaluateUtils'
 
 interface VisibilityCondition {
   [selector: string]: { value: string }
@@ -11,15 +12,9 @@ interface States {
 }
 
 /**
- * useEvaluateState
- *
- * A composable to evaluate the visibility, disabled, and checked states
- * based on the `#states` conditions and current form state.
+ * Evaluates `#states` visibility, disabled, and checked flags for a field.
  */
-export function useEvaluateState(
-  states: States,
-  state: Record<string, unknown>,
-) {
+export function useEvaluateState(states: States, state: WebformState) {
   const visible = computed(() => evaluateCondition(states.visible, state, true))
   const disabled = computed(() =>
     evaluateCondition(states.disabled, state, false),

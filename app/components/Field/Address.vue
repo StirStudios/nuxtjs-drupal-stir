@@ -1,42 +1,59 @@
 <script setup lang="ts">
+import type { WebformFieldProps } from '../../../types'
+
 const props = defineProps<{
-  field: Record<string, unknown>
+  field: WebformFieldProps
   fieldName: string
   state: Record<string, Record<string, string>>
   floatingLabel?: boolean
 }>()
 
 const { webform } = useAppConfig().stirTheme
+const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
 
-// Ensure composite fields exist before accessing
-const compositeFields = computed(() => {
-  return typeof props.field?.['#composite'] === 'object'
+const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
+  typeof props.field['#composite'] === 'object' &&
+  props.field['#composite'] !== null
     ? props.field['#composite']
-    : {}
-})
+    : {},
+)
 
-// Ensure country options exist before accessing
+const getCompositeLabel = (fieldData: WebformFieldProps, key: string) =>
+  String(fieldData.label ?? key)
+
 const countryOptions = computed(() => {
-  return compositeFields.value.country?.options
-    ? Object.entries(compositeFields.value.country.options).map(
-        ([key, label]) => ({ value: key, label }),
-      )
+  const countryField = compositeFields.value.country
+  const options =
+    (typeof props.field.options === 'object'
+      ? props.field.options
+      : undefined) ??
+    (countryField && typeof countryField.options === 'object'
+      ? countryField.options
+      : undefined) ??
+    (countryField && typeof countryField['#options'] === 'object'
+      ? countryField['#options']
+      : undefined)
+
+  return options
+    ? Object.entries(options).map(([key, label]) => ({
+        value: key,
+        label: String(label),
+      }))
     : []
 })
 
-// Determine if floating labels should be used (configurable per field)
-const useFloatingLabels = computed(
-  () =>
-    props.field['#floating_label'] !== undefined
-      ? props.field['#floating_label'] // Per-field setting
-      : webform.labels.floating, // Global default
+const useFloatingLabels = computed(() =>
+  props.field['#floating_label'] !== undefined
+    ? props.field['#floating_label']
+    : webform.labels.floating,
 )
 
-// Ensure state[fieldName] is initialized before access
 if (!props.state[props.fieldName]) {
   props.state[props.fieldName] = {}
 }
+
+const getFieldId = (key: string) => `${props.fieldName}-${key}`
 </script>
 
 <template>
@@ -44,37 +61,42 @@ if (!props.state[props.fieldName]) {
     <UFormField
       v-for="(fieldData, key) in compositeFields"
       :key="key"
-      :label="!useFloatingLabels ? fieldData.label : ''"
+      :label="
+        !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
+      "
       :name="`${fieldName}.${key}`"
       :required="!!field['#required']"
     >
       <UInput
         v-if="key !== 'country'"
+        :id="getFieldId(String(key))"
         v-model="state[fieldName][key]"
         class="w-full"
-        :placeholder="floatingLabel ? ' ' : ''"
-        :ui="floatingLabel ? { base: 'peer' } : {}"
+        :placeholder="useFloatingLabels ? ' ' : ''"
+        :ui="useFloatingLabels ? { base: 'peer' } : {}"
         :variant="webform.variant"
       >
         <label
-          v-if="floatingLabel"
+          v-if="useFloatingLabels"
           :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
-          :for="fieldName"
+          :for="getFieldId(String(key))"
         >
           <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
-            {{ fieldData.label }}
+            {{ getCompositeLabel(fieldData, String(key)) }}
           </span>
         </label>
       </UInput>
 
       <USelectMenu
         v-else
+        :id="getFieldId(String(key))"
         v-model="state[fieldName].country"
         class="w-full"
         :items="countryOptions"
         label-key="label"
         placeholder="Select Country"
-        value-key="label"
+        :portal="portal"
+        value-key="value"
         :variant="webform.variant"
       />
     </UFormField>

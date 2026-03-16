@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
+import type { WebformFieldProps } from '../../../types'
 
-defineProps<{
+const props = defineProps<{
   field: WebformFieldProps
   fieldName: string
   state: Record<string, string | number>
@@ -15,21 +15,21 @@ const isMaterial = computed(() => webform.variant === 'material')
 <template>
   <UTextarea
     :id="fieldName"
-    v-model="state[fieldName]"
+    v-model="props.state[props.fieldName]"
     autoresize
     class="w-full"
-    placeholder=" "
+    :placeholder="props.floatingLabel ? ' ' : ''"
     :rows="1"
-    :ui="floatingLabel ? { base: 'peer' } : {}"
+    :ui="props.floatingLabel ? { base: 'peer' } : {}"
     :variant="webform.variant"
   >
     <label
-      v-if="floatingLabel"
+      v-if="props.floatingLabel"
       :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
-      :for="fieldName"
+      :for="props.fieldName"
     >
       <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
-        {{ field['#title'] }}
+        {{ props.field['#title'] }}
       </span>
     </label>
   </UTextarea>

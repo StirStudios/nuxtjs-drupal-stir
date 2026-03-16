@@ -8,3 +8,4 @@ node_modules
 .nova
 dist
 .DS_Store
+.nuxtrc

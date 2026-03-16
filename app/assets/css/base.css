@@ -1,5 +1,12 @@
 @layer base {
-  /* Headings */
+  ::selection {
+    @apply bg-primary/20 text-inherit;
+  }
+
+  .dark ::selection {
+    @apply bg-primary/25 text-inherit;
+  }
+
   h1,
   h2 {
     @apply font-serif;
@@ -25,7 +32,6 @@
     @apply cursor-pointer;
   }
 
-  /* Section Prose Styling */
   .prose {
     p,
     ul,
@@ -46,10 +52,15 @@
     a {
       @apply text-primary;
     }
+
+    section,
+    header {
+      @apply mb-15;
+    }
   }
 
-  /* Animations */
   section {
     @apply overflow-x-clip;
   }
+
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { DrupalFormProps } from '~/types'
+import type { DrupalFormProps } from '../../../types'
 
 defineProps<DrupalFormProps>()
+const route = useRoute()
 </script>
 
 <template>
@@ -9,7 +10,7 @@ defineProps<DrupalFormProps>()
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form
         v-bind="attributes"
-        :action="useRoute().fullPath"
+        :action="route.fullPath"
         class="drupal-form"
         :formId="formId"
         :method="method"
@@ -21,7 +22,7 @@ defineProps<DrupalFormProps>()
 </template>
 
 <style lang="css">
-@import '~/assets/css/main.css';
+@reference '~/assets/css/main.css';
 
 .drupal-form {
   .form-item {

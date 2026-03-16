@@ -1,4 +1,3 @@
-// app/router.options.ts
 import type { RouterOptions } from '@nuxt/schema'
 
 export default <RouterOptions>{
@@ -11,6 +10,7 @@ export default <RouterOptions>{
           resolve(savedPosition)
         } else if (to.hash) {
           const el = document.querySelector(to.hash)
+
           if (el) {
             resolve({
               top: el.getBoundingClientRect().top + window.scrollY - offset,

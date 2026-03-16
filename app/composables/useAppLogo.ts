@@ -1,12 +1,11 @@
-import useDarkMode from './useDarkMode'
-import { usePageContext } from './usePageContext'
+import { useMounted } from '@vueuse/core'
+import useDarkMode from '~/composables/useDarkMode'
 
 export function useAppLogo(props: { addClasses?: string }) {
   const { isDark } = useDarkMode()
-  const { page } = usePageContext()
-
-  const mounted = ref(false)
-  onMounted(() => (mounted.value = true))
+  const { getPage } = useDrupalCe()
+  const page = getPage()
+  const mounted = useMounted()
 
   const fillClass = computed(() =>
     mounted.value ? (isDark.value ? 'fill-white' : 'fill-black') : '',
@@ -16,7 +15,7 @@ export function useAppLogo(props: { addClasses?: string }) {
     [props.addClasses, fillClass.value].filter(Boolean).join(' '),
   )
 
-  const logoTitle = computed(() => page?.value?.site_info?.name || '')
+  const logoTitle = computed(() => page.value?.site_info?.name ?? '')
 
   return {
     svgClasses,

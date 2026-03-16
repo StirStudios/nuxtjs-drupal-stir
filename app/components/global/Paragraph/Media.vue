@@ -2,18 +2,18 @@
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
+import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
 import { useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
-  /* Identity */
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  /* Layout */
   gridItems?: string
   spacing?: string
+  width?: string
   widthClass?: string
   align?: string
   direction?: string
@@ -25,59 +25,71 @@ const props = defineProps<{
     gap?: Record<string, number>
   }
 
-  /* Content */
   label?: string
   header?: string
   headerTag?: string
 
-  /* Behavior */
   editLink?: string
 }>()
 
-const scrollArea = useTemplateRef('scrollArea')
+const resolvedWidth = computed(() => props.widthClass || props.width || '')
 
+const scrollArea = ref<{ $el?: HTMLElement } | null>(null)
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const theme = useAppConfig().stirTheme
-
 const slotMedia = computed(() => tk.mediaItems())
-
-const componentMap = {
-  image: resolveComponent('MediaImage'),
-  video: resolveComponent('MediaVideo'),
-  document: resolveComponent('MediaDocument'),
-  audio: resolveComponent('MediaAudio'),
-  link: resolveComponent('MediaLink'),
+const componentMap: Record<string, string> = {
+  image: 'MediaImage',
+  video: 'MediaVideo',
+  document: 'MediaDocument',
+  audio: 'MediaAudio',
+  link: 'MediaLink',
 }
 
 const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
-
 const slotMediaOrdered = computed(() =>
-  orderedIndices.value.map((i) => slotMedia.value[i]),
+  orderedIndices.value
+    .map((i) => slotMedia.value[i])
+    .filter((item): item is NonNullable<(typeof slotMedia.value)[number]> => !!item),
 )
 
 const {
   open,
   startIndex,
   itemsOrdered,
+  activeItem,
   modalTitle,
   modalDescription,
+  modalA11yDescription,
   modalCredit,
   openModal,
-  onSelect,
+  onSelect: onSelectModal,
 } = useMediaModal(slotMediaOrdered, tk)
 
-const { width } = useElementSize(() => scrollArea.value?.$el)
-
+const portal = useOverlayPortal()
+const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
 const lanes = computed(() => {
   const config = props.masonry?.lanes
+
   if (!config) return 1
-  if (width.value >= 768 && config.md) return config.md
-  if (width.value >= 640 && config.sm) return config.sm
+  if (scrollWidth.value >= 768 && config.md) return config.md
+  if (scrollWidth.value >= 640 && config.sm) return config.sm
   return config.default ?? 1
 })
 
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
+const hydrated = ref(false)
+const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
+const { handleCarouselSelect } = useModalMediaPlayback({
+  getCurrentMid: () => String(activeItem.value?.mid ?? ''),
+  getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
+  onSelect: onSelectModal,
+})
+
+onMounted(() => {
+  hydrated.value = true
+})
 </script>
 
 <template>
@@ -89,7 +101,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
 
       <WrapAnimate class="relative" :effect="direction">
         <UScrollArea
-          v-if="masonry"
+          v-if="useMasonryVirtualized"
           ref="scrollArea"
           v-slot="{ item: node, index: i }"
           class="w-full overflow-hidden"
@@ -109,7 +121,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
           v-else
           :grid-items="gridItems"
           :spacing="spacing"
-          :width="widthClass"
+          :width="resolvedWidth"
         >
           <MediaItem
             v-for="(node, i) in slotMediaOrdered"
@@ -129,8 +141,9 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
     v-model:open="open"
     aria-modal="true"
     :close="false"
-    :description="modalDescription"
+    :description="modalA11yDescription"
     fullscreen
+    :portal="portal"
     :title="modalTitle"
     :ui="{
       content: 'bg-transparent divide-none p-0',
@@ -158,6 +171,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
             :is="componentMap[itemsOrdered[0].type]"
             v-bind="{
               ...itemsOrdered[0],
+              ...(itemsOrdered[0].type === 'video' ? { deferEmbed: false } : {}),
               ...(itemsOrdered[0].type === 'image' ? { noWrapper: true } : {}),
             }"
           />
@@ -175,7 +189,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{ container: 'items-center h-full' }"
-        @select="onSelect"
+        @select="handleCarouselSelect"
       >
         <template #default="{ item }">
           <div :class="['overflow-hidden', theme.media.rounded]">
@@ -185,6 +199,7 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
               class="shadow-2xl"
               v-bind="{
                 ...item,
+                ...(item.type === 'video' ? { deferEmbed: false } : {}),
                 ...(item.type === 'image' ? { noWrapper: true } : {}),
               }"
             />

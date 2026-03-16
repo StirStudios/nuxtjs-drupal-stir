@@ -1,5 +1,7 @@
 <script setup lang="ts">
-withDefaults(
+import { cleanHTML } from '~/utils/cleanHTML'
+
+const props = withDefaults(
   defineProps<{
     pageTitle?: string
     siteSlogan?: string
@@ -13,6 +15,9 @@ withDefaults(
     isFront: false,
   },
 )
+
+const safeHeroText = computed(() => cleanHTML(props.heroText ?? ''))
+
 defineSlots<{ button?(): unknown }>()
 </script>
 
@@ -26,7 +31,7 @@ defineSlots<{ button?(): unknown }>()
     {{ pageTitle }}
   </h1>
 
-  <div v-if="heroText" class="hero-copy prose" v-html="heroText" />
+  <div v-if="safeHeroText" class="hero-copy prose" v-html="safeHeroText" />
 
   <slot name="button" />
 </template>
