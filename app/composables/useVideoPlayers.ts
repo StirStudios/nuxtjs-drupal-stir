@@ -26,7 +26,7 @@ export function useVideoPlayers() {
     useHead({
       script: [
         {
-          src: '//assets.mediadelivery.net/playerjs/player-0.1.0.min.js',
+          src: '//assets.mediadelivery.net/playerjs/playerjs-latest.min.js',
           defer: true,
           onload: () => {
             isScriptLoaded.value = true
