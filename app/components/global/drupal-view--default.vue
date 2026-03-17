@@ -131,6 +131,7 @@ const hasRows = computed(() =>
     ? dynamicRenderedRows.value.length > 0
     : staticTeaserRows.value.length > 0,
 )
+const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
 </script>
 
 <template>
@@ -162,6 +163,7 @@ const hasRows = computed(() =>
           />
 
           <UButton
+            v-if="hasMultipleFilters"
             class="h-10"
             color="neutral"
             icon="i-lucide-rotate-ccw"
@@ -255,7 +257,12 @@ const hasRows = computed(() =>
       </template>
 
       <template #actions>
-        <UButton color="neutral" variant="outline" @click="resetControls">
+        <UButton
+          v-if="hasMultipleFilters"
+          color="neutral"
+          variant="outline"
+          @click="resetControls"
+        >
           Reset filters
         </UButton>
       </template>

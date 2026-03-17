@@ -26,7 +26,7 @@ const controls = computed(() => {
     options: SortOption[]
   }> = []
 
-  if (props.sortByKey && props.sortByOptions.length > 0) {
+  if (props.sortByKey && props.sortByOptions.length > 1) {
     const label =
       props.sortByLabel || props.sortByOptions[0]?.label || 'Sort by'
 
