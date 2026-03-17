@@ -131,7 +131,7 @@ export default defineAppConfig({
       },
 
       effects: {
-        scale: 'group-hover:scale-105',
+        scale: 'group-hover:scale-105 group-hover/blog-post:scale-105',
       },
     },
 
