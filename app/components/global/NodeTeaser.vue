@@ -28,6 +28,25 @@ const { post, orientation } = useTeaserPost(props.teaser, {
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
 const titleOverlay = computed(() => props.titleOverlay ?? false)
+const teaserImage = computed(() => {
+  const image = post.value.image
+
+  if (!image) return null
+  if (typeof image === 'string') {
+    return {
+      src: image,
+      alt: post.value.title || props.title || '',
+    }
+  }
+
+  return {
+    ...image,
+    alt:
+      (typeof image.alt === 'string' && image.alt.length > 0
+        ? image.alt
+        : post.value.title || props.title || ''),
+  }
+})
 
 const postUi = computed(() => {
   if (!titleOverlay.value) {
@@ -52,12 +71,18 @@ const postUi = computed(() => {
     <UBlogPost
       :date="showDate ? post.date : undefined"
       :description="showDescription ? post.description : undefined"
-      :image="post.image"
       :orientation="orientation"
       :title="post.title"
       :to="post.to"
       :ui="postUi"
     >
+      <template #header>
+        <MediaImage
+          v-if="teaserImage"
+          v-bind="teaserImage"
+        />
+      </template>
+
       <template v-if="showDescription" #description>
         <div v-html="post.description" />
       </template>
