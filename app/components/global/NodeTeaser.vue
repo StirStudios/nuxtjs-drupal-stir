@@ -25,6 +25,7 @@ const { post, orientation } = useTeaserPost(props.teaser, {
   orientation: props.orientation,
 })
 
+const theme = useAppConfig().stirTheme
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
 const titleOverlay = computed(() => props.titleOverlay ?? false)
@@ -64,6 +65,7 @@ const postUi = computed(() => {
     body: 'absolute inset-0 flex items-center justify-center text-center bg-black/50',
   }
 })
+
 </script>
 
 <template>
@@ -77,10 +79,19 @@ const postUi = computed(() => {
       :ui="postUi"
     >
       <template #header>
-        <MediaImage
-          v-if="teaserImage"
-          v-bind="teaserImage"
-        />
+        <div
+          :class="[
+            theme.media.base,
+            'transform transition-transform',
+            theme.media.transitions.fast,
+            theme.media.effects.scale,
+          ]"
+        >
+          <MediaImage
+            v-if="teaserImage"
+            v-bind="teaserImage"
+          />
+        </div>
       </template>
 
       <template v-if="showDescription" #description>
