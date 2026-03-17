@@ -31,10 +31,12 @@ const page = computed({
 <template>
   <UPagination
     v-model:page="page"
-    class="views-pager"
     :items-per-page="1"
     show-edges
     :sibling-count="siblingCount"
     :total="totalPages"
+    :ui="{
+      root: 'mt-8 flex justify-center',
+    }"
   />
 </template>
