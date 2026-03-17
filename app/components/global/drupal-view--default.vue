@@ -200,10 +200,10 @@ const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
       :width="width"
     >
       <div v-for="index in 6" :key="`skeleton-${index}`" class="item">
-        <div class="space-y-3">
-          <USkeleton class="aspect-[4/3] w-full rounded-lg" />
-          <USkeleton class="h-4 w-11/12 rounded" />
-          <USkeleton class="h-4 w-2/3 rounded" />
+        <div class="space-y-4">
+          <USkeleton class="aspect-[16/9] w-full rounded-lg" />
+          <USkeleton class="h-5 w-10/12 rounded" />
+          <USkeleton class="h-4 w-8/12 rounded" />
         </div>
       </div>
     </WrapGrid>
