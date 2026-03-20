@@ -70,9 +70,14 @@ const loadAccountMenu = async () => {
   if (!isAdministrator.value || isAccountMenuLoaded.value) return
 
   try {
-    const rawMenu = await fetchMenu('account', {
-      key: accountMenuKey.value,
-    })
+    const rawMenu = await fetchMenu(
+      'account',
+      {
+        key: accountMenuKey.value,
+      },
+      undefined,
+      true,
+    )
     const menuItems = Array.isArray(rawMenu.value)
       ? (rawMenu.value as AccountMenuItem[])
       : []
