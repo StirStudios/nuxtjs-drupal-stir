@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { fetchMenu, getPage } = useDrupalCe()
 const page = getPage()
+const route = useRoute()
 const user = computed(() => page.value?.current_user || null)
 const isAdministrator = computed(
   () => !!user.value?.roles?.includes('administrator'),
@@ -63,12 +64,15 @@ const localTaskLinks = computed(() =>
 
 const accountMenu = ref<MenuLink[]>([])
 const isAccountMenuLoaded = ref(false)
+const accountMenuKey = computed(() => `menu-account-${String(user.value?.id ?? 'anon')}`)
 
 const loadAccountMenu = async () => {
   if (!isAdministrator.value || isAccountMenuLoaded.value) return
 
   try {
-    const rawMenu = await fetchMenu('account')
+    const rawMenu = await fetchMenu('account', {
+      key: accountMenuKey.value,
+    })
     const menuItems = Array.isArray(rawMenu.value)
       ? (rawMenu.value as AccountMenuItem[])
       : []
@@ -98,8 +102,28 @@ onMounted(() => {
   void loadAccountMenu()
 })
 
+watch(
+  () => user.value?.id,
+  () => {
+    accountMenu.value = []
+    isAccountMenuLoaded.value = false
+    if (isAdministrator.value) {
+      void loadAccountMenu()
+    }
+  },
+)
+
 watch(isAdministrator, (isAdmin) => {
-  if (isAdmin) void loadAccountMenu()
+  if (isAdmin) {
+    isAccountMenuLoaded.value = false
+    void loadAccountMenu()
+  }
+})
+
+watch(() => route.fullPath, () => {
+  if (!isAdministrator.value || accountMenu.value.length > 0) return
+  isAccountMenuLoaded.value = false
+  void loadAccountMenu()
 })
 
 const links = computed(() => {
