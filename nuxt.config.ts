@@ -1,7 +1,9 @@
+import { createRequire } from 'node:module'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const layerDir = dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-02-14',
@@ -66,6 +68,10 @@ export default defineNuxtConfig({
         dir: resolvePath(layerDir, 'app/assets/icons'),
       },
     ],
+  },
+
+  alias: {
+    yup: require.resolve('yup'),
   },
 
   modules: [
