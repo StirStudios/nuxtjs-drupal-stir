@@ -68,13 +68,15 @@ const isAccountMenuLoaded = ref(false)
 
 const getAccountMenuUrl = (): string => {
   const drupalCeConfig = config.public.drupalCe
+  const menuBaseUrl = String(drupalCeConfig.menuBaseUrl || '').replace(/\/$/, '')
   const drupalBaseUrl = String(drupalCeConfig.drupalBaseUrl || '').replace(/\/$/, '')
   const ceApiEndpoint = String(drupalCeConfig.ceApiEndpoint || '/ce-api')
   const normalizedCeApiEndpoint = ceApiEndpoint.startsWith('/') ? ceApiEndpoint : `/${ceApiEndpoint}`
   const menuEndpoint = String(drupalCeConfig.menuEndpoint || 'api/menu_items/$$$NAME$$$')
   const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
+  const baseUrl = menuBaseUrl || `${drupalBaseUrl}${normalizedCeApiEndpoint}`
 
-  return `${drupalBaseUrl}${normalizedCeApiEndpoint}/${menuPath}`
+  return `${baseUrl}/${menuPath}`
 }
 
 const loadAccountMenu = async () => {
@@ -84,8 +86,13 @@ const loadAccountMenu = async () => {
 
   try {
     const accountMenuUrl = getAccountMenuUrl()
+    const configuredFetchOptions
+      = (config.public.drupalCe.fetchOptions && typeof config.public.drupalCe.fetchOptions === 'object')
+          ? config.public.drupalCe.fetchOptions as Record<string, unknown>
+          : {}
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
-      credentials: 'include',
+      ...configuredFetchOptions,
+      credentials: configuredFetchOptions.credentials || 'include',
     })
     const menuItems = Array.isArray(rawMenu) ? rawMenu : []
 
