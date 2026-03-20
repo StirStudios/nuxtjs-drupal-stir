@@ -63,8 +63,10 @@ const localTaskLinks = computed(() =>
     .filter((tab): tab is MenuLink => tab !== null),
 )
 
-const accountMenu = ref<MenuLink[]>([])
-const isAccountMenuLoaded = ref(false)
+const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
+const isAccountMenuLoaded = useState<boolean>('drupal-tabs-account-menu-loaded', () => false)
+const accountMenuUserId = useState<string>('drupal-tabs-account-menu-user-id', () => '')
+const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
 
 const getAccountMenuUrl = (): string => {
   const drupalCeConfig = config.public.drupalCe
@@ -80,6 +82,12 @@ const getAccountMenuUrl = (): string => {
 }
 
 const loadAccountMenu = async () => {
+  if (accountMenuUserId.value !== currentUserId.value) {
+    accountMenu.value = []
+    isAccountMenuLoaded.value = false
+    accountMenuUserId.value = currentUserId.value
+  }
+
   if (!isAdministrator.value || isAccountMenuLoaded.value) {
     return
   }
@@ -122,10 +130,11 @@ onMounted(() => {
 })
 
 watch(
-  () => user.value?.id,
+  () => currentUserId.value,
   () => {
     accountMenu.value = []
     isAccountMenuLoaded.value = false
+    accountMenuUserId.value = currentUserId.value
     if (isAdministrator.value) {
       void loadAccountMenu()
     }
@@ -140,9 +149,9 @@ watch(isAdministrator, (isAdmin) => {
 })
 
 watch(() => route.fullPath, () => {
-  if (!isAdministrator.value || accountMenu.value.length > 0) return
-  isAccountMenuLoaded.value = false
-  void loadAccountMenu()
+  if (isAdministrator.value && !isAccountMenuLoaded.value) {
+    void loadAccountMenu()
+  }
 })
 
 const links = computed(() => {
