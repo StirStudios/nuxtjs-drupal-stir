@@ -1,7 +1,6 @@
 <script setup lang="ts">
-const { getDrupalBaseUrl, fetchMenu, getPage } = useDrupalCe()
+const { fetchMenu, getPage } = useDrupalCe()
 const page = getPage()
-const drupalBaseUrl = getDrupalBaseUrl()
 const user = computed(() => page.value?.current_user || null)
 const isAdministrator = computed(
   () => !!user.value?.roles?.includes('administrator'),
@@ -109,8 +108,7 @@ const links = computed(() => {
       {
         label: 'Drupal CMS',
         icon: getIconForLabel('Drupal CMS'),
-        to: `${drupalBaseUrl}/admin/content`,
-        target: '_self',
+        to: '/admin/content',
       },
     ],
   ]
@@ -125,8 +123,7 @@ const links = computed(() => {
     : {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
-        to: `${drupalBaseUrl}/user`,
-        target: '_self',
+        to: '/user',
       }
 
   return [...baseLinks, ...tasks, [accountItem]]

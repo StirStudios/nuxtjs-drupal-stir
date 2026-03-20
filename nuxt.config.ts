@@ -54,21 +54,6 @@ export default defineNuxtConfig({
     appManifest: false,
   },
 
-  routeRules: {
-    '/admincontrol': {
-      redirect: `${process.env.DRUPAL_URL}/admincontrol/login`,
-    },
-    '/admincontrol/login': {
-      redirect: `${process.env.DRUPAL_URL}/admincontrol/login`,
-    },
-    '/admincontrol/password': {
-      redirect: `${process.env.DRUPAL_URL}/admincontrol/password`,
-    },
-    '/front': {
-      redirect: `${process.env.NUXT_URL}/`,
-    },
-  },
-
   icon: {
     clientBundle: {
       scan: true,
