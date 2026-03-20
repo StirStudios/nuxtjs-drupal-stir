@@ -1,7 +1,8 @@
 <script setup lang="ts">
-const { fetchMenu, getPage } = useDrupalCe()
+const { getPage } = useDrupalCe()
 const page = getPage()
 const route = useRoute()
+const config = useRuntimeConfig()
 const user = computed(() => page.value?.current_user || null)
 const isAdministrator = computed(
   () => !!user.value?.roles?.includes('administrator'),
@@ -64,23 +65,29 @@ const localTaskLinks = computed(() =>
 
 const accountMenu = ref<MenuLink[]>([])
 const isAccountMenuLoaded = ref(false)
-const accountMenuKey = computed(() => `menu-account-${String(user.value?.id ?? 'anon')}`)
+
+const getAccountMenuUrl = (): string => {
+  const drupalCeConfig = config.public.drupalCe
+  const drupalBaseUrl = String(drupalCeConfig.drupalBaseUrl || '').replace(/\/$/, '')
+  const ceApiEndpoint = String(drupalCeConfig.ceApiEndpoint || '/ce-api')
+  const normalizedCeApiEndpoint = ceApiEndpoint.startsWith('/') ? ceApiEndpoint : `/${ceApiEndpoint}`
+  const menuEndpoint = String(drupalCeConfig.menuEndpoint || 'api/menu_items/$$$NAME$$$')
+  const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
+
+  return `${drupalBaseUrl}${normalizedCeApiEndpoint}/${menuPath}`
+}
 
 const loadAccountMenu = async () => {
-  if (!isAdministrator.value || isAccountMenuLoaded.value) return
+  if (!isAdministrator.value || isAccountMenuLoaded.value) {
+    return
+  }
 
   try {
-    const rawMenu = await fetchMenu(
-      'account',
-      {
-        key: accountMenuKey.value,
-      },
-      undefined,
-      true,
-    )
-    const menuItems = Array.isArray(rawMenu.value)
-      ? (rawMenu.value as AccountMenuItem[])
-      : []
+    const accountMenuUrl = getAccountMenuUrl()
+    const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
+      credentials: 'include',
+    })
+    const menuItems = Array.isArray(rawMenu) ? rawMenu : []
 
     accountMenu.value = menuItems
       .map((item) => {
