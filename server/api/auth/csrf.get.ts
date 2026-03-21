@@ -1,8 +1,15 @@
-import { defineEventHandler, createError } from 'h3'
+import { defineEventHandler, createError, getHeader } from 'h3'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const drupalApi = config.public.api
+  const drupalCeConfig =
+    config.public.drupalCe && typeof config.public.drupalCe === 'object'
+      ? (config.public.drupalCe as Record<string, unknown>)
+      : {}
+  const drupalApi = String(drupalCeConfig.drupalBaseUrl || config.public.api || '').replace(/\/+$/, '')
+  const apiKey = typeof config.apiKey === 'string' && config.apiKey.trim()
+    ? config.apiKey
+    : ''
 
   if (typeof drupalApi !== 'string' || !drupalApi.trim()) {
     throw createError({
@@ -12,7 +19,13 @@ export default defineEventHandler(async () => {
   }
 
   try {
-    const csrfToken = await $fetch(`${drupalApi}/session/token`)
+    const cookie = getHeader(event, 'cookie')
+    const csrfToken = await $fetch<string>(`${drupalApi}/session/token`, {
+      headers: {
+        ...(cookie ? { cookie: String(cookie) } : {}),
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      },
+    })
 
     return { csrfToken }
   } catch {

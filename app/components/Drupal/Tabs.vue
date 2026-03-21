@@ -9,17 +9,17 @@ const isAdministrator = computed(
 )
 
 const iconMap: Record<string, string> = {
-  'Drupal CMS': 'i-lucide-home',
+  'Drupal CMS': 'i-lucide-layout-dashboard',
   Settings: 'i-lucide-settings',
   View: 'i-lucide-eye',
-  Edit: 'i-lucide-pencil',
-  Delete: 'i-lucide-trash-2',
-  Revisions: 'i-lucide-copy',
-  Export: 'i-lucide-upload',
-  API: 'i-lucide-code',
+  Edit: 'i-lucide-square-pen',
+  Delete: 'i-lucide-trash',
+  Revisions: 'i-lucide-history',
+  Export: 'i-lucide-file-up',
+  API: 'i-lucide-braces',
   'Log out': 'i-lucide-log-out',
   'Log in': 'i-lucide-log-in',
-  'My account': 'i-lucide-user',
+  'My account': 'i-lucide-circle-user',
 }
 
 const getIconForLabel = (label: string): string | null => {
@@ -28,14 +28,35 @@ const getIconForLabel = (label: string): string | null => {
 
 type LocalTask = { label: string; url: string }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
-type MenuLink = { label: string; to: string; icon: string | null }
+type MenuLink = {
+  label: string
+  to: string
+  icon: string | null
+  tooltip: boolean
+}
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
+type AccountMenuFetchOptions = NonNullable<Parameters<typeof $fetch<AccountMenuItem[]>>[1]>
+type DrupalCeConfig = {
+  drupalBaseUrl?: string
+  ceApiEndpoint?: string
+  menuEndpoint?: string
+  menuBaseUrl?: string
+  fetchOptions?: AccountMenuFetchOptions
+}
 
 const getValidTo = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
 
   return trimmed.length ? trimmed : null
+}
+
+const isCompactTabs = ref(false)
+
+const updateCompactTabs = () => {
+  if (import.meta.client === false) return
+
+  isCompactTabs.value = window.matchMedia('(max-width: 767px)').matches
 }
 
 const tabs = computed<LocalTasks>(() => {
@@ -58,6 +79,7 @@ const localTaskLinks = computed(() =>
         label: tab.label,
         to,
         icon: getIconForLabel(tab.label),
+        tooltip: isCompactTabs.value,
       }
     })
     .filter((tab): tab is MenuLink => tab !== null),
@@ -67,14 +89,16 @@ const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
 const isAccountMenuLoaded = useState<boolean>('drupal-tabs-account-menu-loaded', () => false)
 const accountMenuUserId = useState<string>('drupal-tabs-account-menu-user-id', () => '')
 const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
+const drupalCeConfig = computed<DrupalCeConfig>(() => {
+  return (config.public.drupalCe || {}) as DrupalCeConfig
+})
 
 const getAccountMenuUrl = (): string => {
-  const drupalCeConfig = config.public.drupalCe
-  const menuBaseUrl = String(drupalCeConfig.menuBaseUrl || '').replace(/\/$/, '')
-  const drupalBaseUrl = String(drupalCeConfig.drupalBaseUrl || '').replace(/\/$/, '')
-  const ceApiEndpoint = String(drupalCeConfig.ceApiEndpoint || '/ce-api')
+  const menuBaseUrl = String(drupalCeConfig.value.menuBaseUrl || '').replace(/\/$/, '')
+  const drupalBaseUrl = String(drupalCeConfig.value.drupalBaseUrl || '').replace(/\/$/, '')
+  const ceApiEndpoint = String(drupalCeConfig.value.ceApiEndpoint || '/ce-api')
   const normalizedCeApiEndpoint = ceApiEndpoint.startsWith('/') ? ceApiEndpoint : `/${ceApiEndpoint}`
-  const menuEndpoint = String(drupalCeConfig.menuEndpoint || 'api/menu_items/$$$NAME$$$')
+  const menuEndpoint = String(drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$')
   const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
   const baseUrl = menuBaseUrl || `${drupalBaseUrl}${normalizedCeApiEndpoint}`
 
@@ -94,13 +118,11 @@ const loadAccountMenu = async () => {
 
   try {
     const accountMenuUrl = getAccountMenuUrl()
-    const configuredFetchOptions
-      = (config.public.drupalCe.fetchOptions && typeof config.public.drupalCe.fetchOptions === 'object')
-          ? config.public.drupalCe.fetchOptions as Record<string, unknown>
-          : {}
+    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions || {}) as AccountMenuFetchOptions
+    const credentials = drupalCeConfig.value.fetchOptions?.credentials || 'include'
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
       ...configuredFetchOptions,
-      credentials: configuredFetchOptions.credentials || 'include',
+      credentials,
     })
     const menuItems = Array.isArray(rawMenu) ? rawMenu : []
 
@@ -115,6 +137,7 @@ const loadAccountMenu = async () => {
           label,
           to,
           icon: getIconForLabel(label),
+          tooltip: isCompactTabs.value,
         }
       })
       .filter((item): item is MenuLink => item !== null)
@@ -126,7 +149,15 @@ const loadAccountMenu = async () => {
 }
 
 onMounted(() => {
+  updateCompactTabs()
+  window.addEventListener('resize', updateCompactTabs)
   void loadAccountMenu()
+})
+
+onBeforeUnmount(() => {
+  if (import.meta.client === false) return
+
+  window.removeEventListener('resize', updateCompactTabs)
 })
 
 watch(
@@ -161,6 +192,7 @@ const links = computed(() => {
         label: 'Drupal CMS',
         icon: getIconForLabel('Drupal CMS'),
         to: '/admin/content',
+        tooltip: isCompactTabs.value,
       },
     ],
   ]
@@ -170,16 +202,38 @@ const links = computed(() => {
     ? {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
+        tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
         to: '/user',
+        tooltip: isCompactTabs.value,
       }
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
+
+const adminTabsFontClass = 'app-admin-tabs-font'
+const adminTabsSurfaceClass = '!border !border-zinc-200 !ring-0 bg-zinc-100 dark:!border-zinc-800 dark:bg-zinc-900'
+
+const navigationUi = {
+  root: `${adminTabsFontClass} sticky top-0 z-60 h-[3.5rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100`,
+  list: 'isolate',
+  item: 'relative',
+  link: `${adminTabsFontClass} before:bg-transparent text-sm font-medium text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15`,
+  linkLabel: 'sr-only md:not-sr-only md:block',
+  linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
+  linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
+  viewport: `${adminTabsFontClass} relative overflow-hidden rounded-md ${adminTabsSurfaceClass} shadow-md`,
+  content: `${adminTabsFontClass} rounded-md ${adminTabsSurfaceClass} p-1`,
+  childList: 'space-y-0.5 !ms-0 !border-0',
+  childItem: '',
+  childLink: `${adminTabsFontClass} p-2 text-sm text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10`,
+  childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
+  childLinkLabel: 'truncate',
+}
 </script>
 
 <template>
@@ -187,25 +241,7 @@ const links = computed(() => {
     color="neutral"
     content-orientation="vertical"
     :items="links"
-    :ui="{
-      root: 'sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100',
-      list: 'isolate',
-      item: 'relative',
-      link: 'before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15',
-      linkLabel: 'hidden md:block',
-      linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
-      linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
-      viewport:
-        'relative overflow-hidden rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 shadow-md dark:!border-zinc-800 dark:bg-zinc-900',
-      content:
-        'rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 p-1 dark:!border-zinc-800 dark:bg-zinc-900',
-      childList: 'space-y-0.5 !ms-0 !border-0',
-      childItem: '',
-      childLink:
-        'p-2 text-xs text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10',
-      childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
-      childLinkLabel: 'truncate',
-    }"
+    :ui="navigationUi"
     variant="link"
   />
 </template>

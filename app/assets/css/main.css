@@ -7,6 +7,7 @@
 
 @theme static {
   --font-sans: 'InterVariable', system-ui, sans-serif;
+  --font-admin: system-ui, sans-serif;
 
   --container-8xl: 96rem;
   --breakpoint-xs: 30rem;
