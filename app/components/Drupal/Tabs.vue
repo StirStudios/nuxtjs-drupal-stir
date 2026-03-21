@@ -28,7 +28,12 @@ const getIconForLabel = (label: string): string | null => {
 
 type LocalTask = { label: string; url: string }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
-type MenuLink = { label: string; to: string; icon: string | null }
+type MenuLink = {
+  label: string
+  to: string
+  icon: string | null
+  tooltip: boolean
+}
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
 
 const getValidTo = (value: unknown): string | null => {
@@ -36,6 +41,14 @@ const getValidTo = (value: unknown): string | null => {
   const trimmed = value.trim()
 
   return trimmed.length ? trimmed : null
+}
+
+const isCompactTabs = ref(false)
+
+const updateCompactTabs = () => {
+  if (import.meta.client === false) return
+
+  isCompactTabs.value = window.matchMedia('(max-width: 767px)').matches
 }
 
 const tabs = computed<LocalTasks>(() => {
@@ -58,6 +71,7 @@ const localTaskLinks = computed(() =>
         label: tab.label,
         to,
         icon: getIconForLabel(tab.label),
+        tooltip: isCompactTabs.value,
       }
     })
     .filter((tab): tab is MenuLink => tab !== null),
@@ -69,7 +83,7 @@ const accountMenuUserId = useState<string>('drupal-tabs-account-menu-user-id', (
 const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
 
 const getAccountMenuUrl = (): string => {
-  const drupalCeConfig = config.public.drupalCe
+  const drupalCeConfig = config.public.drupalCe as Record<string, unknown>
   const menuBaseUrl = String(drupalCeConfig.menuBaseUrl || '').replace(/\/$/, '')
   const drupalBaseUrl = String(drupalCeConfig.drupalBaseUrl || '').replace(/\/$/, '')
   const ceApiEndpoint = String(drupalCeConfig.ceApiEndpoint || '/ce-api')
@@ -98,9 +112,12 @@ const loadAccountMenu = async () => {
       = (config.public.drupalCe.fetchOptions && typeof config.public.drupalCe.fetchOptions === 'object')
           ? config.public.drupalCe.fetchOptions as Record<string, unknown>
           : {}
+    const credentials: RequestCredentials = typeof configuredFetchOptions.credentials === 'string'
+      ? configuredFetchOptions.credentials as RequestCredentials
+      : 'include'
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
       ...configuredFetchOptions,
-      credentials: configuredFetchOptions.credentials || 'include',
+      credentials,
     })
     const menuItems = Array.isArray(rawMenu) ? rawMenu : []
 
@@ -115,6 +132,7 @@ const loadAccountMenu = async () => {
           label,
           to,
           icon: getIconForLabel(label),
+          tooltip: isCompactTabs.value,
         }
       })
       .filter((item): item is MenuLink => item !== null)
@@ -126,7 +144,15 @@ const loadAccountMenu = async () => {
 }
 
 onMounted(() => {
+  updateCompactTabs()
+  window.addEventListener('resize', updateCompactTabs)
   void loadAccountMenu()
+})
+
+onBeforeUnmount(() => {
+  if (import.meta.client === false) return
+
+  window.removeEventListener('resize', updateCompactTabs)
 })
 
 watch(
@@ -161,6 +187,7 @@ const links = computed(() => {
         label: 'Drupal CMS',
         icon: getIconForLabel('Drupal CMS'),
         to: '/admin/content',
+        tooltip: isCompactTabs.value,
       },
     ],
   ]
@@ -170,12 +197,14 @@ const links = computed(() => {
     ? {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
+        tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
         to: '/user',
+        tooltip: isCompactTabs.value,
       }
 
   return [...baseLinks, ...tasks, [accountItem]]
@@ -192,7 +221,7 @@ const links = computed(() => {
       list: 'isolate',
       item: 'relative',
       link: 'before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15',
-      linkLabel: 'hidden md:block',
+      linkLabel: 'sr-only md:not-sr-only md:block',
       linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
       linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
       viewport:
