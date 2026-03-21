@@ -214,7 +214,7 @@ const adminTabsFontClass = 'app-admin-tabs-font'
 const adminTabsSurfaceClass = '!border !border-zinc-200 !ring-0 bg-zinc-100 dark:!border-zinc-800 dark:bg-zinc-900'
 
 const navigationUi = {
-  root: `${adminTabsFontClass} sticky top-0 z-60 h-12 w-full border-b border-zinc-200 bg-zinc-100 px-4 py-0 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100`,
+  root: `${adminTabsFontClass} sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100`,
   list: 'isolate',
   item: 'relative',
   link: `${adminTabsFontClass} before:bg-transparent text-[13px] font-medium text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15`,
