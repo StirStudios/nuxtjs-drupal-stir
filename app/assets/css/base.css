@@ -63,4 +63,7 @@
     @apply overflow-x-clip;
   }
 
+  .app-admin-tabs {
+    font-family: var(--font-admin);
+  }
 }

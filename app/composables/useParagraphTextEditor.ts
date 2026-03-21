@@ -63,7 +63,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Italic' } },
     { kind: 'mark', mark: 'underline', icon: 'i-lucide-underline', tooltip: { text: 'Underline' } },
     { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: 'Strike' } },
-    { kind: 'linkEdit', icon: 'i-lucide-link', tooltip: { text: 'Edit link' } },
+    { kind: 'linkEdit', icon: 'i-lucide-link', tooltip: { text: 'Link' } },
     { kind: 'unlink', icon: 'i-lucide-link-2-off', tooltip: { text: 'Remove link' } },
   ]
 
