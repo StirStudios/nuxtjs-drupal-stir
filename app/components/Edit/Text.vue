@@ -103,7 +103,10 @@ function scrollEditorIntoViewIfNeeded(): void {
     .getPropertyValue('--ui-header-height')
     .trim()
   const headerHeight = Number.parseFloat(headerHeightRaw) || 0
-  const topSafeArea = headerHeight + 12
+  const rootFontSizeRaw = window.getComputedStyle(document.documentElement).fontSize
+  const rootFontSize = Number.parseFloat(rootFontSizeRaw) || 16
+  const extraTopOffset = 5 * rootFontSize
+  const topSafeArea = headerHeight + extraTopOffset
   const panelRect = editPanelRef.value.getBoundingClientRect()
   const isOutsideViewport = panelRect.top < topSafeArea || panelRect.bottom > window.innerHeight - 12
 
