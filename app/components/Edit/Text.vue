@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '~/composables/useParagraphTextEditor'
 
 const props = defineProps<{
@@ -16,6 +17,7 @@ const isSaving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
 const editPanelRef = ref<HTMLElement | null>(null)
+const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
 const toolbarClass = 'sticky top-0 z-10 mb-2 border-b border-default bg-default px-2 py-2'
@@ -94,8 +96,36 @@ async function saveInline() {
   }
 }
 
+function hasOverflowingEditorContent(): boolean {
+  if (import.meta.client === false || editPanelRef.value === null) return false
+
+  const contentEl = editPanelRef.value.querySelector<HTMLElement>('.ProseMirror')
+
+  if (contentEl === null) return false
+
+  return contentEl.scrollHeight > contentEl.clientHeight + 8
+}
+
+function scrollEditorIntoViewIfNeeded(): void {
+  if (import.meta.client === false || editPanelRef.value === null) return
+  if (hasOverflowingEditorContent() === false) return
+
+  const headerHeightRaw = window.getComputedStyle(document.documentElement)
+    .getPropertyValue('--ui-header-height')
+    .trim()
+  const headerHeight = Number.parseFloat(headerHeightRaw) || 0
+  const panelTop = window.scrollY + editPanelRef.value.getBoundingClientRect().top
+  const targetTop = Math.max(0, panelTop - headerHeight - 12)
+
+  if (Math.abs(window.scrollY - targetTop) > 8) {
+    y.value = targetTop
+  }
+}
+
 onMounted(async () => {
   syncEditorBuffers(sourceTextRef.value)
+  await nextTick()
+  scrollEditorIntoViewIfNeeded()
 })
 </script>
 
