@@ -22,6 +22,7 @@ const controlsClass =
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const hasLink = computed(() => typeof props.link === 'string' && props.link.length > 0)
+const hasBothActions = computed(() => hasQuickEdit.value && hasLink.value)
 const isExternalLink = computed(() => {
   if (hasLink.value === false) return false
 
@@ -30,11 +31,20 @@ const isExternalLink = computed(() => {
 
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
-const quickEditAriaLabel = computed(() => `${quickEditLabel.value} this section`)
+const singleActionLabel = computed(() => 'Edit')
+const quickButtonLabel = computed(() => (hasBothActions.value ? quickEditLabel.value : singleActionLabel.value))
+const fullButtonLabel = computed(() => (hasBothActions.value ? fullEditLabel.value : singleActionLabel.value))
+const quickEditAriaLabel = computed(() =>
+  hasBothActions.value ? `${quickEditLabel.value} this section` : `${singleActionLabel.value} this section`,
+)
 const fullEditAriaLabel = computed(() =>
-  isExternalLink.value
-    ? `${fullEditLabel.value} (opens in a new tab)`
-    : `${fullEditLabel.value} this section`,
+  hasBothActions.value
+    ? isExternalLink.value
+      ? `${fullEditLabel.value} (opens in a new tab)`
+      : `${fullEditLabel.value} this section`
+    : isExternalLink.value
+      ? `${singleActionLabel.value} (opens in a new tab)`
+      : `${singleActionLabel.value} this section`,
 )
 </script>
 
@@ -44,7 +54,7 @@ const fullEditAriaLabel = computed(() =>
       :class="[controlsClass, 'rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm']"
       size="xs"
     >
-      <UTooltip v-if="hasQuickEdit" :text="quickEditLabel">
+      <UTooltip v-if="hasQuickEdit" :text="quickButtonLabel">
         <UButton
           :aria-label="quickEditAriaLabel"
           color="neutral"
@@ -53,11 +63,12 @@ const fullEditAriaLabel = computed(() =>
           variant="soft"
           @click="emit('quick-edit')"
         >
-          <span class="sr-only">{{ quickEditAriaLabel }}</span>
+          <span v-if="hasBothActions === false">{{ singleActionLabel }}</span>
+          <span v-else class="sr-only">{{ quickEditAriaLabel }}</span>
         </UButton>
       </UTooltip>
 
-      <UTooltip v-if="hasLink" :text="fullEditLabel">
+      <UTooltip v-if="hasLink" :text="fullButtonLabel">
         <UButton
           :aria-label="fullEditAriaLabel"
           color="neutral"
@@ -67,7 +78,8 @@ const fullEditAriaLabel = computed(() =>
           :to="props.link"
           variant="outline"
         >
-          <span class="sr-only">{{ fullEditAriaLabel }}</span>
+          <span v-if="hasBothActions === false">{{ singleActionLabel }}</span>
+          <span v-else class="sr-only">{{ fullEditAriaLabel }}</span>
         </UButton>
       </UTooltip>
     </UFieldGroup>
