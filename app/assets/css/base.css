@@ -64,6 +64,15 @@
   }
 
   .app-admin-tabs-font {
-    font-family: var(--font-admin);
+    font-family:
+      system-ui,
+      'Segoe UI',
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif,
+      'Apple Color Emoji',
+      'Segoe UI Emoji',
+      'Segoe UI Symbol';
   }
 }
