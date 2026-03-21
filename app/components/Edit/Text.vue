@@ -94,21 +94,8 @@ async function saveInline() {
   }
 }
 
-function scrollToEditorTop() {
-  if (import.meta.client === false || editPanelRef.value === null) return
-
-  const rect = editPanelRef.value.getBoundingClientRect()
-  const headerHeightRaw = window.getComputedStyle(document.documentElement).getPropertyValue('--ui-header-height').trim()
-  const headerHeight = Number.parseFloat(headerHeightRaw) || 0
-  const top = window.scrollY + rect.top - headerHeight - 12
-
-  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
-}
-
 onMounted(async () => {
   syncEditorBuffers(sourceTextRef.value)
-  await nextTick()
-  scrollToEditorTop()
 })
 </script>
 
