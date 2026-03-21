@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const controlsClass =
-  'absolute end-0 top-0 z-100 pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
+  'sticky top-[calc(var(--ui-header-height)+0.5rem)] z-100 ml-auto w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const hasLink = computed(() => typeof props.link === 'string' && props.link.length > 0)
@@ -39,40 +39,38 @@ const fullEditAriaLabel = computed(() =>
 </script>
 
 <template>
-  <div v-if="hasQuickEdit || hasLink" class="group/edit relative">
-    <div :class="controlsClass">
-      <UFieldGroup
-        class="rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm"
-        size="xs"
-      >
-        <UTooltip v-if="hasQuickEdit" :text="quickEditLabel">
-          <UButton
-            :aria-label="quickEditAriaLabel"
-            color="neutral"
-            :disabled="props.quickEditDisabled === true"
-            icon="i-lucide-zap"
-            variant="soft"
-            @click="emit('quick-edit')"
-          >
-            <span class="sr-only">{{ quickEditAriaLabel }}</span>
-          </UButton>
-        </UTooltip>
+  <div v-if="hasQuickEdit || hasLink" class="group/edit">
+    <UFieldGroup
+      :class="[controlsClass, 'rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm']"
+      size="xs"
+    >
+      <UTooltip v-if="hasQuickEdit" :text="quickEditLabel">
+        <UButton
+          :aria-label="quickEditAriaLabel"
+          color="neutral"
+          :disabled="props.quickEditDisabled === true"
+          icon="i-lucide-zap"
+          variant="soft"
+          @click="emit('quick-edit')"
+        >
+          <span class="sr-only">{{ quickEditAriaLabel }}</span>
+        </UButton>
+      </UTooltip>
 
-        <UTooltip v-if="hasLink" :text="fullEditLabel">
-          <UButton
-            :aria-label="fullEditAriaLabel"
-            color="neutral"
-            icon="i-lucide-square-pen"
-            :rel="isExternalLink ? 'noopener noreferrer' : undefined"
-            :target="isExternalLink ? '_blank' : undefined"
-            :to="props.link"
-            variant="outline"
-          >
-            <span class="sr-only">{{ fullEditAriaLabel }}</span>
-          </UButton>
-        </UTooltip>
-      </UFieldGroup>
-    </div>
+      <UTooltip v-if="hasLink" :text="fullEditLabel">
+        <UButton
+          :aria-label="fullEditAriaLabel"
+          color="neutral"
+          icon="i-lucide-square-pen"
+          :rel="isExternalLink ? 'noopener noreferrer' : undefined"
+          :target="isExternalLink ? '_blank' : undefined"
+          :to="props.link"
+          variant="outline"
+        >
+          <span class="sr-only">{{ fullEditAriaLabel }}</span>
+        </UButton>
+      </UTooltip>
+    </UFieldGroup>
 
     <slot />
   </div>
