@@ -35,14 +35,13 @@ type MenuLink = {
   tooltip: boolean
 }
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
+type AccountMenuFetchOptions = NonNullable<Parameters<typeof $fetch<AccountMenuItem[]>>[1]>
 type DrupalCeConfig = {
   drupalBaseUrl?: string
   ceApiEndpoint?: string
   menuEndpoint?: string
   menuBaseUrl?: string
-  fetchOptions?: {
-    credentials?: RequestCredentials
-  }
+  fetchOptions?: AccountMenuFetchOptions
 }
 
 const getValidTo = (value: unknown): string | null => {
@@ -119,8 +118,10 @@ const loadAccountMenu = async () => {
 
   try {
     const accountMenuUrl = getAccountMenuUrl()
+    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions || {}) as AccountMenuFetchOptions
     const credentials = drupalCeConfig.value.fetchOptions?.credentials || 'include'
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
+      ...configuredFetchOptions,
       credentials,
     })
     const menuItems = Array.isArray(rawMenu) ? rawMenu : []
