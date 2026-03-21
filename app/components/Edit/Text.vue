@@ -53,10 +53,18 @@ function cancelEditing() {
   closeEditor('cancel')
 }
 
+function stripTrailingEmptyParagraphs(value: string): string {
+  return value
+    .replace(/(?:\s*<p>(?:\s|&nbsp;|<br\s*\/?>|\u00a0)*<\/p>\s*)+$/gi, '')
+    .trim()
+}
+
 async function saveInline() {
   if (props.paragraphId === 0) return
 
-  const valueToSave = (isSourceMode.value ? sourceEditorValue.value : editorValue.value).trim()
+  const valueToSave = stripTrailingEmptyParagraphs(
+    isSourceMode.value ? sourceEditorValue.value : editorValue.value,
+  )
 
   if (valueToSave === '') {
     saveError.value = 'Text is required.'
@@ -126,6 +134,7 @@ onMounted(async () => {
       :handlers="customHandlers"
       :inject-css="false"
       placeholder="Type / for commands..."
+      :starter-kit="{ trailingNode: false }"
       :ui="editorUi"
     >
       <div :class="sourceToolbarClass">
