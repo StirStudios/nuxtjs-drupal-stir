@@ -217,7 +217,7 @@ const navigationUi = {
   root: `${adminTabsFontClass} sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100`,
   list: 'isolate',
   item: 'relative',
-  link: `${adminTabsFontClass} before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15`,
+  link: `${adminTabsFontClass} before:bg-transparent text-[13px] font-medium text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15`,
   linkLabel: 'sr-only md:not-sr-only md:block',
   linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
   linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
@@ -225,7 +225,7 @@ const navigationUi = {
   content: `${adminTabsFontClass} rounded-md ${adminTabsSurfaceClass} p-1`,
   childList: 'space-y-0.5 !ms-0 !border-0',
   childItem: '',
-  childLink: `${adminTabsFontClass} p-2 text-xs text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10`,
+  childLink: `${adminTabsFontClass} p-2 text-[13px] text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10`,
   childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
   childLinkLabel: 'truncate',
 }
