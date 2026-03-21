@@ -35,6 +35,14 @@ type MenuLink = {
   tooltip: boolean
 }
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
+type AccountMenuFetchOptions = NonNullable<Parameters<typeof $fetch<AccountMenuItem[]>>[1]>
+type DrupalCeConfig = {
+  drupalBaseUrl?: string
+  ceApiEndpoint?: string
+  menuEndpoint?: string
+  menuBaseUrl?: string
+  fetchOptions?: AccountMenuFetchOptions
+}
 
 const getValidTo = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
@@ -81,14 +89,16 @@ const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
 const isAccountMenuLoaded = useState<boolean>('drupal-tabs-account-menu-loaded', () => false)
 const accountMenuUserId = useState<string>('drupal-tabs-account-menu-user-id', () => '')
 const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
+const drupalCeConfig = computed<DrupalCeConfig>(() => {
+  return (config.public.drupalCe || {}) as DrupalCeConfig
+})
 
 const getAccountMenuUrl = (): string => {
-  const drupalCeConfig = config.public.drupalCe as Record<string, unknown>
-  const menuBaseUrl = String(drupalCeConfig.menuBaseUrl || '').replace(/\/$/, '')
-  const drupalBaseUrl = String(drupalCeConfig.drupalBaseUrl || '').replace(/\/$/, '')
-  const ceApiEndpoint = String(drupalCeConfig.ceApiEndpoint || '/ce-api')
+  const menuBaseUrl = String(drupalCeConfig.value.menuBaseUrl || '').replace(/\/$/, '')
+  const drupalBaseUrl = String(drupalCeConfig.value.drupalBaseUrl || '').replace(/\/$/, '')
+  const ceApiEndpoint = String(drupalCeConfig.value.ceApiEndpoint || '/ce-api')
   const normalizedCeApiEndpoint = ceApiEndpoint.startsWith('/') ? ceApiEndpoint : `/${ceApiEndpoint}`
-  const menuEndpoint = String(drupalCeConfig.menuEndpoint || 'api/menu_items/$$$NAME$$$')
+  const menuEndpoint = String(drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$')
   const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
   const baseUrl = menuBaseUrl || `${drupalBaseUrl}${normalizedCeApiEndpoint}`
 
@@ -108,13 +118,8 @@ const loadAccountMenu = async () => {
 
   try {
     const accountMenuUrl = getAccountMenuUrl()
-    const configuredFetchOptions
-      = (config.public.drupalCe.fetchOptions && typeof config.public.drupalCe.fetchOptions === 'object')
-          ? config.public.drupalCe.fetchOptions as Record<string, unknown>
-          : {}
-    const credentials: RequestCredentials = typeof configuredFetchOptions.credentials === 'string'
-      ? configuredFetchOptions.credentials as RequestCredentials
-      : 'include'
+    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions || {}) as AccountMenuFetchOptions
+    const credentials = drupalCeConfig.value.fetchOptions?.credentials || 'include'
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
       ...configuredFetchOptions,
       credentials,
