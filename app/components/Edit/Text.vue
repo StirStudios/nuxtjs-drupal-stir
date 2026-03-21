@@ -96,26 +96,21 @@ async function saveInline() {
   }
 }
 
-function hasOverflowingEditorContent(): boolean {
-  if (import.meta.client === false || editPanelRef.value === null) return false
-
-  const contentEl = editPanelRef.value.querySelector<HTMLElement>('.ProseMirror')
-
-  if (contentEl === null) return false
-
-  return contentEl.scrollHeight > contentEl.clientHeight + 8
-}
-
 function scrollEditorIntoViewIfNeeded(): void {
   if (import.meta.client === false || editPanelRef.value === null) return
-  if (hasOverflowingEditorContent() === false) return
 
   const headerHeightRaw = window.getComputedStyle(document.documentElement)
     .getPropertyValue('--ui-header-height')
     .trim()
   const headerHeight = Number.parseFloat(headerHeightRaw) || 0
+  const topSafeArea = headerHeight + 12
+  const panelRect = editPanelRef.value.getBoundingClientRect()
+  const isOutsideViewport = panelRect.top < topSafeArea || panelRect.bottom > window.innerHeight - 12
+
+  if (isOutsideViewport === false) return
+
   const panelTop = window.scrollY + editPanelRef.value.getBoundingClientRect().top
-  const targetTop = Math.max(0, panelTop - headerHeight - 12)
+  const targetTop = Math.max(0, panelTop - topSafeArea)
 
   if (Math.abs(window.scrollY - targetTop) > 8) {
     y.value = targetTop
