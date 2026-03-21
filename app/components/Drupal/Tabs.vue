@@ -217,21 +217,21 @@ const links = computed(() => {
     content-orientation="vertical"
     :items="links"
     :ui="{
-      root: 'app-admin-tabs sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100',
+      root: 'app-admin-tabs-font sticky top-0 z-60 h-[3.1rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100',
       list: 'isolate',
       item: 'relative',
-      link: 'before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15',
+      link: 'app-admin-tabs-font before:bg-transparent text-xs text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15',
       linkLabel: 'sr-only md:not-sr-only md:block',
       linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
       linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
       viewport:
-        'relative overflow-hidden rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 shadow-md dark:!border-zinc-800 dark:bg-zinc-900',
+        'app-admin-tabs-font relative overflow-hidden rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 shadow-md dark:!border-zinc-800 dark:bg-zinc-900',
       content:
-        'rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 p-1 dark:!border-zinc-800 dark:bg-zinc-900',
+        'app-admin-tabs-font rounded-md !border !border-zinc-200 !ring-0 bg-zinc-100 p-1 dark:!border-zinc-800 dark:bg-zinc-900',
       childList: 'space-y-0.5 !ms-0 !border-0',
       childItem: '',
       childLink:
-        'p-2 text-xs text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10',
+        'app-admin-tabs-font p-2 text-xs text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10',
       childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
       childLinkLabel: 'truncate',
     }"
