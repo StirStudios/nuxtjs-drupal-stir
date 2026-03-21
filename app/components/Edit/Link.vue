@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const controlsClass =
-  'sticky top-[calc(var(--ui-header-height)+0.5rem)] z-100 ml-auto w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
+  'sticky top-[calc(var(--ui-header-height)+0.5rem)] z-100 flex ml-auto w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const hasLink = computed(() => typeof props.link === 'string' && props.link.length > 0)
