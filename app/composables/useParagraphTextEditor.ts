@@ -2,7 +2,7 @@ import { ref, watch, type Ref } from 'vue'
 import { Node, mergeAttributes } from '@tiptap/core'
 import type { Editor } from '@tiptap/vue-3'
 
-export function useParagraphTextEditor(sourceText: Ref<string>, isEditing: Ref<boolean>) {
+export function useParagraphTextEditor(sourceText: Ref<string>) {
   const SectionNode = Node.create({
     name: 'section',
     group: 'block',
@@ -46,9 +46,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>, isEditing: Ref<b
     },
   })
 
-  const isSourceMode = ref(false)
   const editorValue = ref('')
-  const sourceEditorValue = ref('')
 
   const richTextClass = 'prose max-w-none'
   const editorUi = { base: richTextClass }
@@ -155,87 +153,13 @@ export function useParagraphTextEditor(sourceText: Ref<string>, isEditing: Ref<b
   watch(
     sourceText,
     () => {
-      if (!isEditing.value) {
-        syncEditorBuffers(sourceText.value)
-      }
+      syncEditorBuffers(sourceText.value)
     },
     { immediate: true },
   )
 
-  function formatHtmlForSource(html: string): string {
-    const source = (html ?? '').trim()
-
-    if (!source) return ''
-
-    const rawTokens = source
-      .replace(/>\s+</g, '><')
-      .replace(/</g, '\n<')
-      .trim()
-      .split('\n')
-      .filter(Boolean)
-
-    const tokens = rawTokens
-      .map((token) => {
-        if (token.startsWith('<')) {
-          return token.trim()
-        }
-
-        const hasLeadingWhitespace = /^\s/.test(token)
-        const hasTrailingWhitespace = /\s$/.test(token)
-        const collapsed = token.replace(/\s+/g, ' ').trim()
-
-        if (!collapsed) {
-          return ''
-        }
-
-        const prefix = hasLeadingWhitespace ? ' ' : ''
-        const suffix = hasTrailingWhitespace ? ' ' : ''
-
-        return `${prefix}${collapsed}${suffix}`
-      })
-      .filter(Boolean)
-
-    let indent = 0
-    const lines: string[] = []
-
-    for (const token of tokens) {
-      const isClosing = /^<\//.test(token)
-      const isSelfClosing = /\/>$/.test(token) || /^<(br|hr|img|input|meta|link)\b/i.test(token)
-      const isOpening = /^<[^!/][^>]*>$/.test(token) && !isClosing && !isSelfClosing
-
-      if (isClosing) {
-        indent = Math.max(indent - 1, 0)
-      }
-
-      lines.push(`${'  '.repeat(indent)}${token}`)
-
-      if (isOpening) {
-        indent += 1
-      }
-    }
-
-    return lines.join('\n')
-  }
-
   function syncEditorBuffers(value: string): void {
     editorValue.value = value
-    sourceEditorValue.value = value
-  }
-
-  function setSourceMode(enabled: boolean): void {
-    if (!isEditing.value || isSourceMode.value === enabled) return
-
-    if (enabled) {
-      sourceEditorValue.value = formatHtmlForSource(editorValue.value)
-    } else {
-      editorValue.value = sourceEditorValue.value
-    }
-
-    isSourceMode.value = enabled
-  }
-
-  const toggleSourceMode = () => {
-    setSourceMode(!isSourceMode.value)
   }
 
   return {
@@ -245,12 +169,8 @@ export function useParagraphTextEditor(sourceText: Ref<string>, isEditing: Ref<b
     editorValue,
     extensions,
     fixedToolbarItems,
-    isSourceMode,
     richTextClass,
-    setSourceMode,
-    sourceEditorValue,
     suggestionItems,
     syncEditorBuffers,
-    toggleSourceMode,
   }
 }

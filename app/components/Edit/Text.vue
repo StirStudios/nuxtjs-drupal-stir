@@ -18,7 +18,7 @@ const saveSuccess = ref('')
 const editPanelRef = ref<HTMLElement | null>(null)
 
 const sourceTextRef = computed(() => props.sourceText)
-const sourceToolbarClass = 'sticky top-0 z-10 mb-2 flex items-center gap-2 border-b border-default bg-default px-2 py-2'
+const toolbarClass = 'sticky top-0 z-10 mb-2 border-b border-default bg-default px-2 py-2'
 const shouldShowBubbleToolbar = (payload: { view: { hasFocus: () => boolean }; state: { selection: { empty: boolean } } }) => {
   return payload.view.hasFocus() && payload.state.selection.empty === false
 }
@@ -29,12 +29,9 @@ const {
   editorValue,
   extensions,
   fixedToolbarItems,
-  isSourceMode,
-  sourceEditorValue,
   suggestionItems,
   syncEditorBuffers,
-  toggleSourceMode,
-} = useParagraphTextEditor(sourceTextRef, isEditing)
+} = useParagraphTextEditor(sourceTextRef)
 
 function resetEditMessages(): void {
   saveError.value = ''
@@ -47,7 +44,6 @@ function closeEditor(event: 'cancel' | 'saved'): void {
 }
 
 function cancelEditing() {
-  isSourceMode.value = false
   syncEditorBuffers(sourceTextRef.value)
   resetEditMessages()
   closeEditor('cancel')
@@ -62,9 +58,7 @@ function stripTrailingEmptyParagraphs(value: string): string {
 async function saveInline() {
   if (props.paragraphId === 0) return
 
-  const valueToSave = stripTrailingEmptyParagraphs(
-    isSourceMode.value ? sourceEditorValue.value : editorValue.value,
-  )
+  const valueToSave = stripTrailingEmptyParagraphs(editorValue.value)
 
   if (valueToSave === '') {
     saveError.value = 'Text is required.'
@@ -112,7 +106,6 @@ function scrollToEditorTop() {
 }
 
 onMounted(async () => {
-  isSourceMode.value = false
   syncEditorBuffers(sourceTextRef.value)
   await nextTick()
   scrollToEditorTop()
@@ -125,7 +118,6 @@ onMounted(async () => {
     :class="['rounded-md border border-default bg-default p-4', classes]"
   >
     <UEditor
-      v-if="isSourceMode === false"
       v-slot="{ editor }"
       v-model="editorValue"
       class="w-full min-h-32 max-h-[60vh] overflow-y-auto"
@@ -137,21 +129,12 @@ onMounted(async () => {
       :starter-kit="{ trailingNode: false }"
       :ui="editorUi"
     >
-      <div :class="sourceToolbarClass">
+      <div :class="toolbarClass">
         <UEditorToolbar
-          class="min-w-0 flex-1 border-0 bg-transparent p-0"
+          class="border-0 bg-transparent p-0"
           :editor="editor"
           :items="fixedToolbarItems"
         />
-        <UButton
-          color="neutral"
-          icon="i-lucide-code-xml"
-          size="xs"
-          variant="outline"
-          @click="toggleSourceMode"
-        >
-          Source off
-        </UButton>
       </div>
 
       <UEditorToolbar
@@ -163,26 +146,6 @@ onMounted(async () => {
 
       <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
     </UEditor>
-
-    <template v-else>
-      <div :class="`${sourceToolbarClass} justify-end`">
-        <UButton
-          color="neutral"
-          icon="i-lucide-code-xml"
-          size="xs"
-          variant="soft"
-          @click="toggleSourceMode"
-        >
-          Source on
-        </UButton>
-      </div>
-      <UTextarea
-        v-model="sourceEditorValue"
-        autoresize
-        class="w-full max-h-[60vh] overflow-y-auto"
-        :rows="14"
-      />
-    </template>
 
     <div class="mt-3 flex items-center gap-2">
       <UButton
