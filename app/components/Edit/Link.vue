@@ -41,7 +41,7 @@ const fullEditAriaLabel = computed(() =>
 <template>
   <div v-if="hasQuickEdit || hasLink" class="group/edit relative">
     <div :class="controlsClass">
-      <UButtonGroup
+      <UFieldGroup
         class="rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm"
         size="xs"
       >
@@ -71,7 +71,7 @@ const fullEditAriaLabel = computed(() =>
             <span class="sr-only">{{ fullEditAriaLabel }}</span>
           </UButton>
         </UTooltip>
-      </UButtonGroup>
+      </UFieldGroup>
     </div>
 
     <slot />
