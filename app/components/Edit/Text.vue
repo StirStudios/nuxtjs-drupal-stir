@@ -157,7 +157,7 @@ onMounted(async () => {
         content-type="html"
         :extensions="extensions"
         :handlers="customHandlers"
-        :inject-css="true"
+        :inject-css="false"
         placeholder="Type / for commands..."
         :starter-kit="{
           trailingNode: false,
