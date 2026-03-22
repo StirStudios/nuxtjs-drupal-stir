@@ -18,21 +18,30 @@ export const adminUiTheme = {
     },
   },
   button: {
-    base: 'admin-ui-btn-base',
+    slots: {
+      base: 'admin-ui-btn-base',
+    },
     defaultVariants: {
       color: 'neutral',
       variant: 'soft',
     },
-    variants: {
-      color: {
-        neutral: 'admin-ui-btn-neutral',
+    compoundVariants: [
+      {
+        color: 'neutral',
+        variant: 'soft',
+        class: 'admin-ui-btn-neutral admin-ui-btn-soft',
       },
-      variant: {
-        soft: 'admin-ui-btn-soft',
-        outline: 'admin-ui-btn-outline',
-        ghost: 'admin-ui-btn-ghost',
+      {
+        color: 'neutral',
+        variant: 'outline',
+        class: 'admin-ui-btn-neutral admin-ui-btn-outline',
       },
-    },
+      {
+        color: 'neutral',
+        variant: 'ghost',
+        class: 'admin-ui-btn-neutral admin-ui-btn-ghost',
+      },
+    ],
   },
   fieldGroup: {
     base: 'admin-ui-field-group',
