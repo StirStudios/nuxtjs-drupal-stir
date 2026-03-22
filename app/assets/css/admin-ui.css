@@ -211,15 +211,27 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: var(--admin-tooltip-bg);
-    color: var(--admin-tooltip-text);
-    border-color: var(--admin-tooltip-border);
-    --tw-ring-color: var(--admin-tooltip-border) !important;
+    background-color: #f4f4f5 !important;
+    color: #18181b !important;
+    border-color: #e4e4e7 !important;
+    --tw-ring-color: #e4e4e7 !important;
   }
 
   .admin-ui-tooltip-arrow {
-    fill: var(--admin-tooltip-bg) !important;
-    stroke: var(--admin-tooltip-border) !important;
+    fill: #f4f4f5 !important;
+    stroke: #e4e4e7 !important;
+  }
+
+  .dark .admin-ui-tooltip-content {
+    background-color: #18181b !important;
+    color: #fafafa !important;
+    border-color: #52525b !important;
+    --tw-ring-color: #52525b !important;
+  }
+
+  .dark .admin-ui-tooltip-arrow {
+    fill: #18181b !important;
+    stroke: #52525b !important;
   }
 
   .admin-ui-editor-root {
