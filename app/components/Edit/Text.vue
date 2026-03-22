@@ -56,6 +56,7 @@ function closeEditor(event: 'cancel' | 'saved', value = ''): void {
 }
 
 async function saveInline() {
+  if (isSaving.value) return
   if (props.paragraphId === 0) return
 
   const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
@@ -91,6 +92,11 @@ async function saveInline() {
   } finally {
     isSaving.value = false
   }
+}
+
+async function saveFromKeyboard(): Promise<void> {
+  await nextTick()
+  await saveInline()
 }
 
 function cancelEditing(): void {
@@ -137,15 +143,15 @@ onMounted(async () => {
 
       if (event.key === 'Enter' && event.metaKey) {
         event.preventDefault()
-        void saveInline()
+        void saveFromKeyboard()
       }
     }
 
     if (editPanelRef.value) {
       useEventListener(editPanelRef, 'keydown', handleKeydown, { capture: true })
+    } else {
+      useEventListener(window, 'keydown', handleKeydown, { capture: true })
     }
-
-    useEventListener(window, 'keydown', handleKeydown, { capture: true })
   }
 })
 </script>
