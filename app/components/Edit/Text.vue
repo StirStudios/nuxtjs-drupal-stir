@@ -206,22 +206,11 @@ onBeforeUnmount(() => {
         :ui="editorUi"
       >
         <div :class="toolbarClass">
-          <div class="flex items-center justify-between gap-2">
-            <UEditorToolbar
-              class="border-0 bg-transparent p-0"
-              :editor="editor"
-              :items="fixedToolbarItems"
-            />
-
-            <UButton
-              aria-label="Close editor"
-              color="neutral"
-              icon="i-lucide-x"
-              size="sm"
-              variant="outline"
-              @click="closeEditing"
-            />
-          </div>
+          <UEditorToolbar
+            class="border-0 bg-transparent p-0"
+            :editor="editor"
+            :items="fixedToolbarItems"
+          />
         </div>
 
         <UEditorToolbar
@@ -234,11 +223,20 @@ onBeforeUnmount(() => {
         <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
       </UEditor>
 
-      <div class="mt-3 flex items-center gap-3">
-        <span v-if="isSaving" class="text-sm text-muted">Saving...</span>
-        <span v-else-if="saveError" class="text-sm text-error">{{ saveError }}</span>
-        <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
+      <div class="mt-4 p-4 flex items-center justify-between gap-3">
+        <span v-if="isSaving" class="admin-ui-status-saving text-sm">Saving...</span>
+        <span v-else-if="saveError" class="admin-ui-status-error text-sm">{{ saveError }}</span>
+        <span v-else-if="saveSuccess" class="admin-ui-status-success text-sm">{{ saveSuccess }}</span>
+        <span v-else class="text-sm text-transparent">Status</span>
 
+        <UButton
+          aria-label="Close editor"
+          color="neutral"
+          icon="i-lucide-x"
+          size="sm"
+          variant="ghost"
+          @click="closeEditing"
+        />
       </div>
     </div>
   </UTheme>

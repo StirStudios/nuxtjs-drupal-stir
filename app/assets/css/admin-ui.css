@@ -45,6 +45,9 @@
     --admin-tooltip-bg: var(--admin-z-100) !important;
     --admin-tooltip-text: var(--admin-z-900) !important;
     --admin-tooltip-border: #d4d4d8 !important;
+    --admin-status-saving: var(--admin-text-muted) !important;
+    --admin-status-error: #b91c1c !important;
+    --admin-status-success: #047857 !important;
   }
 
   .dark .admin-ui-scope {
@@ -73,6 +76,9 @@
     --admin-tooltip-bg: var(--admin-z-900) !important;
     --admin-tooltip-text: var(--admin-z-50) !important;
     --admin-tooltip-border: #3f3f46 !important;
+    --admin-status-saving: var(--admin-text-muted) !important;
+    --admin-status-error: #f87171 !important;
+    --admin-status-success: #34d399 !important;
   }
 
   .admin-ui-panel {
@@ -204,6 +210,18 @@
   .admin-ui-editor-root .ProseMirror,
   .admin-ui-editor-root .tiptap {
     color: var(--admin-text) !important;
+  }
+
+  .admin-ui-status-saving {
+    color: var(--admin-status-saving) !important;
+  }
+
+  .admin-ui-status-error {
+    color: var(--admin-status-error) !important;
+  }
+
+  .admin-ui-status-success {
+    color: var(--admin-status-success) !important;
   }
 
   .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base {
