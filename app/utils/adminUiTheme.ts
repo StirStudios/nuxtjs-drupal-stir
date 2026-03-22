@@ -1,6 +1,10 @@
 export const adminUiTheme = {
   button: {
     base: 'admin-ui-btn-base',
+    defaultVariants: {
+      color: 'neutral',
+      variant: 'soft',
+    },
     variants: {
       color: {
         neutral: 'admin-ui-btn-neutral',
