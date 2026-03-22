@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
+import { adminUiTheme } from '~/utils/adminUiTheme'
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -38,14 +41,19 @@ const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const singleActionLabel = computed(() => 'Edit')
-const actionCount = computed(() => Number(hasQuickEdit.value) + Number(hasLink.value))
-const hasSingleAction = computed(() => actionCount.value === 1)
+const anchorRef = ref<HTMLElement | null>(null)
+const isTargetActive = ref(false)
+const isControlsHovered = ref(false)
+const controlsStyle = ref<Record<string, string>>({})
+const targetElement = ref<HTMLElement | null>(null)
+const stopTargetListeners = ref<Array<() => void>>([])
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
+  const hasSingleAction = Number(hasQuickEdit.value) + Number(hasLink.value) === 1
 
   if (hasQuickEdit.value) {
-    const tooltip = hasSingleAction.value ? singleActionLabel.value : quickEditLabel.value
+    const tooltip = hasSingleAction ? singleActionLabel.value : quickEditLabel.value
     const ariaLabel = `${tooltip} this section`
 
     result.push({
@@ -60,7 +68,7 @@ const actions = computed<EditAction[]>(() => {
   }
 
   if (hasLink.value) {
-    const tooltip = hasSingleAction.value ? singleActionLabel.value : fullEditLabel.value
+    const tooltip = hasSingleAction ? singleActionLabel.value : fullEditLabel.value
     const ariaLabel = isExternalLink.value
       ? `${tooltip} (opens in a new tab)`
       : `${tooltip} this section`
@@ -79,36 +87,130 @@ const actions = computed<EditAction[]>(() => {
 
   return result
 })
+
+const shouldShowControls = computed(() =>
+  actions.value.length > 0 && (isTargetActive.value || isControlsHovered.value),
+)
+
+function getStickyTopOffset(): number {
+  if (import.meta.client === false) return 8
+
+  const raw = window.getComputedStyle(document.documentElement)
+    .getPropertyValue('--ui-header-height')
+    .trim()
+  let headerHeight = Number.parseFloat(raw) || 0
+
+  if (headerHeight <= 0) {
+    const headerEl = document.querySelector<HTMLElement>('header, .app-header, [data-slot="header"]')
+
+    if (headerEl) {
+      headerHeight = headerEl.getBoundingClientRect().height
+    }
+  }
+
+  return headerHeight + 8
+}
+
+function updateControlsPosition(): void {
+  if (import.meta.client === false || targetElement.value === null) return
+
+  const rect = targetElement.value.getBoundingClientRect()
+  const stickyTopOffset = getStickyTopOffset()
+  const viewportPadding = 8
+  const maxRight = Math.max(viewportPadding, window.innerWidth - viewportPadding)
+  const right = Math.max(viewportPadding, window.innerWidth - Math.min(maxRight, rect.right))
+  const top = Math.max(stickyTopOffset, rect.top)
+
+  controlsStyle.value = {
+    position: 'fixed',
+    top: `${top}px`,
+    right: `${right}px`,
+    zIndex: '100',
+  }
+}
+
+function detachTargetListeners(): void {
+  for (const stop of stopTargetListeners.value) {
+    stop()
+  }
+  stopTargetListeners.value = []
+}
+
+function attachTargetListeners(): void {
+  if (import.meta.client === false || anchorRef.value === null) return
+
+  const siblingTarget = anchorRef.value.nextElementSibling
+  const target = siblingTarget instanceof HTMLElement
+    ? siblingTarget
+    : anchorRef.value.parentElement
+
+  if (target === null) return
+
+  if (targetElement.value === target && stopTargetListeners.value.length > 0) return
+
+  targetElement.value = target
+  detachTargetListeners()
+  stopTargetListeners.value = [
+    useEventListener(target, 'pointerenter', () => {
+      isTargetActive.value = true
+      updateControlsPosition()
+    }),
+    useEventListener(target, 'focusin', () => {
+      isTargetActive.value = true
+      updateControlsPosition()
+    }),
+    useEventListener(target, 'pointerleave', () => { isTargetActive.value = false }),
+    useEventListener(target, 'focusout', () => { isTargetActive.value = false }),
+  ]
+}
+
+onMounted(() => {
+  if (import.meta.client === false) return
+
+  attachTargetListeners()
+  useEventListener(window, 'scroll', updateControlsPosition, { passive: true })
+  useEventListener(window, 'resize', updateControlsPosition, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  detachTargetListeners()
+})
 </script>
 
 <template>
-  <div
-    v-if="actions.length > 0"
-    class="group/edit relative"
-  >
-    <UFieldGroup
-      class="pointer-events-none absolute end-0 top-0 z-100 rounded-md bg-default/95 opacity-0 shadow-lg ring-1 ring-default backdrop-blur-sm transition-opacity duration-300 group-focus-within/edit:pointer-events-auto group-focus-within/edit:opacity-100 group-hover/edit:pointer-events-auto group-hover/edit:opacity-100"
-      size="xs"
+  <span ref="anchorRef" aria-hidden="true" class="hidden" />
+  <slot />
+
+  <Teleport to="body">
+    <div
+      v-if="shouldShowControls"
+      class="pointer-events-none"
+      :style="controlsStyle"
+      @mouseenter="isControlsHovered = true"
+      @mouseleave="isControlsHovered = false"
     >
-      <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
-        <UButton
-          :aria-label="action.ariaLabel"
-          color="neutral"
-          :disabled="action.disabled"
-          :icon="action.icon"
-          :rel="action.rel"
-          :target="action.target"
-          :to="action.to"
-          :variant="action.variant"
-          @click="action.onClick?.()"
+      <UTheme :ui="adminUiTheme">
+        <UFieldGroup
+          class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
+          size="xs"
         >
-          <span class="sr-only">{{ action.ariaLabel }}</span>
-        </UButton>
-      </UTooltip>
-    </UFieldGroup>
-
-    <slot />
-  </div>
-
-  <slot v-else />
+          <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
+            <UButton
+              :aria-label="action.ariaLabel"
+              color="neutral"
+              :disabled="action.disabled"
+              :icon="action.icon"
+              :rel="action.rel"
+              :target="action.target"
+              :to="action.to"
+              :variant="action.variant"
+              @click="action.onClick?.()"
+            >
+              <span class="sr-only">{{ action.ariaLabel }}</span>
+            </UButton>
+          </UTooltip>
+        </UFieldGroup>
+      </UTheme>
+    </div>
+  </Teleport>
 </template>

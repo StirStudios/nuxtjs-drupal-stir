@@ -134,7 +134,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
 
   const editorValue = ref('')
 
-  const richTextClass = 'prose max-w-none'
+  const richTextClass = 'admin-editor-prose max-w-none'
   const editorUi = { base: richTextClass }
   const extensions = [
     HeadingWithClass,
