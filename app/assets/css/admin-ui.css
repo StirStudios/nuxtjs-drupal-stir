@@ -39,7 +39,11 @@
     --admin-border-strong: var(--admin-z-400) !important;
 
     --admin-accent-text: var(--admin-amber-700) !important;
-    --admin-accent-bg: color-mix(in srgb, var(--admin-amber-100) 70%, transparent) !important;
+    --admin-accent-bg: color-mix(
+      in srgb,
+      var(--admin-amber-100) 70%,
+      transparent
+    ) !important;
     --admin-accent-bg-subtle: var(--admin-amber-50) !important;
 
     --admin-tooltip-bg: var(--admin-z-100) !important;
@@ -70,8 +74,16 @@
     --admin-border-strong: #52525b !important;
 
     --admin-accent-text: var(--admin-amber-300) !important;
-    --admin-accent-bg: color-mix(in srgb, var(--admin-amber-500) 15%, transparent) !important;
-    --admin-accent-bg-subtle: color-mix(in srgb, var(--admin-amber-500) 10%, transparent) !important;
+    --admin-accent-bg: color-mix(
+      in srgb,
+      var(--admin-amber-500) 15%,
+      transparent
+    ) !important;
+    --admin-accent-bg-subtle: color-mix(
+      in srgb,
+      var(--admin-amber-500) 10%,
+      transparent
+    ) !important;
 
     --admin-tooltip-bg: var(--admin-z-900) !important;
     --admin-tooltip-text: var(--admin-z-50) !important;
@@ -126,7 +138,11 @@
   }
 
   .admin-ui-nav-link:hover::before {
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 80%,
+      transparent
+    ) !important;
   }
 
   .admin-ui-nav-link[data-state='open'],
@@ -145,7 +161,11 @@
   }
 
   .admin-ui-nav-child-link:hover {
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 80%,
+      transparent
+    ) !important;
     color: var(--admin-text-strong) !important;
   }
 
@@ -199,7 +219,11 @@
   }
 
   .admin-ui-btn-ghost:hover {
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 70%, transparent) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 70%,
+      transparent
+    ) !important;
     color: var(--admin-text-strong) !important;
   }
 
@@ -207,11 +231,19 @@
     background-color: var(--admin-text-strong) !important;
     color: var(--admin-bg-surface) !important;
     border-color: var(--admin-text-strong) !important;
-    --tw-ring-color: color-mix(in srgb, var(--admin-text-strong) 35%, transparent) !important;
+    --tw-ring-color: color-mix(
+      in srgb,
+      var(--admin-text-strong) 35%,
+      transparent
+    ) !important;
   }
 
   .admin-ui-btn-solid:hover {
-    background-color: color-mix(in srgb, var(--admin-text-strong) 85%, white 15%) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-text-strong) 85%,
+      white 15%
+    ) !important;
     color: var(--admin-bg-surface) !important;
   }
 
@@ -277,7 +309,11 @@
 
   .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base:hover {
     color: var(--admin-text-strong) !important;
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 70%, transparent) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 70%,
+      transparent
+    ) !important;
   }
 
   .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[data-state='open'],
@@ -311,10 +347,27 @@
   }
 
   .admin-editor-prose {
-    p,
-    ul,
-    ol {
-      @apply py-3 leading-7;
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p {
+      @apply !py-0;
+    }
+
+    h2 {
+      @apply !m-0 !text-2xl;
+    }
+
+    h3 {
+      @apply !text-lg;
+    }
+
+    h4,
+    h5,
+    h6 {
+      @apply !text-base;
     }
 
     p,
