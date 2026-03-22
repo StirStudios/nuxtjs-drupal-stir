@@ -142,6 +142,8 @@ onMounted(async () => {
         bulletList: false,
         orderedList: false,
         listItem: false,
+        taskList: false,
+        taskItem: false,
       }"
       :ui="editorUi"
     >
