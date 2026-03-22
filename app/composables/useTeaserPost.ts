@@ -1,21 +1,16 @@
 import { unref } from 'vue'
-import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
 
 export function useTeaserPost(
   input: unknown,
   extra: {
     title?: string
-    nid?: string
     url?: string
     created?: string
     orientation?: 'horizontal' | 'vertical'
   } = {},
 ) {
-  const config = useRuntimeConfig()
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null
-
-  const drupalOrigin = computed(() => getDrupalOrigin(config.public))
 
   const formatCreatedDate = (value: unknown) => {
     if (value === null || value === undefined || value === '') return ''
@@ -68,13 +63,20 @@ export function useTeaserPost(
     }
   })
 
+  const backendEditLink = computed(() => {
+    const source = unref(input)
+    const editLink = isRecord(source) ? source.editLink : undefined
+
+    return typeof editLink === 'string' && editLink !== '' ? editLink : undefined
+  })
+
   const post = computed(() => ({
     title: extra.title ?? '',
     description: teaserSource.value.text ?? '',
     image: image.value,
     date: formatCreatedDate(extra.created),
     to: extra.url ?? '',
-    editLink: extra.nid ? toDrupalUrl(`/node/${extra.nid}/edit`, drupalOrigin.value) : undefined,
+    editLink: backendEditLink.value,
   }))
 
   return { teaser: teaserSource, image, post, orientation }
