@@ -311,6 +311,20 @@
   }
 
   .admin-editor-prose {
+    h2 {
+      @apply text-2xl;
+    }
+
+    h3 {
+      @apply text-lg;
+    }
+
+    h4,
+    h5,
+    h6 {
+      @apply text-md;
+    }
+
     p,
     ul,
     ol {
