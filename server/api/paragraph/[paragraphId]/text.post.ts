@@ -4,7 +4,7 @@ import {
   createUpstreamParagraphTextError,
   parseParagraphId,
   resolveParagraphTextApiConfig,
-} from '~/server/utils/paragraphTextApi'
+} from '../../../utils/paragraphTextApi'
 
 interface ParagraphTextPayload {
   text?: unknown

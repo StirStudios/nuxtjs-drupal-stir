@@ -4,7 +4,7 @@ import {
   createUpstreamParagraphTextError,
   parseParagraphId,
   resolveParagraphTextApiConfig,
-} from '~/server/utils/paragraphTextApi'
+} from '../../../utils/paragraphTextApi'
 
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
