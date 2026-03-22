@@ -4,49 +4,140 @@
   }
 
   .admin-ui-scope {
-    --ui-bg: var(--ui-color-neutral-50);
-    --ui-text: var(--ui-color-neutral-900);
-    --ui-text-muted: var(--ui-color-neutral-600);
-    --ui-text-toned: var(--ui-color-neutral-700);
-    --ui-text-highlighted: var(--ui-color-neutral-900);
-    --ui-border: var(--ui-color-neutral-300);
+    --admin-z-50: #fafafa !important;
+    --admin-z-100: #f4f4f5 !important;
+    --admin-z-200: #e4e4e7 !important;
+    --admin-z-400: #a1a1aa !important;
+    --admin-z-700: #3f3f46 !important;
+    --admin-z-800: #27272a !important;
+    --admin-z-900: #18181b !important;
+    --admin-z-950: #09090b !important;
+    --admin-white: #ffffff !important;
+
+    --admin-amber-50: #fffbeb !important;
+    --admin-amber-100: #fef3c7 !important;
+    --admin-amber-700: #b45309 !important;
+    --admin-amber-300: #fcd34d !important;
+    --admin-amber-500: #f59e0b !important;
+
+    --ui-bg: #fafafa !important;
+    --ui-text: #18181b !important;
+    --ui-text-muted: #52525b !important;
+    --ui-text-toned: #3f3f46 !important;
+    --ui-text-highlighted: #18181b !important;
+    --ui-border: #d4d4d8 !important;
+
+    --admin-bg-surface: var(--admin-z-50) !important;
+    --admin-bg-muted: var(--admin-z-100) !important;
+    --admin-bg-strong: var(--admin-z-200) !important;
+    --admin-text: var(--admin-z-900) !important;
+    --admin-text-muted: var(--admin-z-700) !important;
+    --admin-text-strong: var(--admin-z-950) !important;
+    --admin-border: #d4d4d8 !important;
+    --admin-border-strong: var(--admin-z-400) !important;
+
+    --admin-accent-text: var(--admin-amber-700) !important;
+    --admin-accent-bg: color-mix(in srgb, var(--admin-amber-100) 70%, transparent) !important;
+    --admin-accent-bg-subtle: var(--admin-amber-50) !important;
+
+    --admin-tooltip-bg: var(--admin-z-100) !important;
+    --admin-tooltip-text: var(--admin-z-900) !important;
+    --admin-tooltip-border: #d4d4d8 !important;
   }
 
   .dark .admin-ui-scope {
-    --ui-bg: var(--ui-color-neutral-950);
-    --ui-text: var(--ui-color-neutral-100);
-    --ui-text-muted: var(--ui-color-neutral-400);
-    --ui-text-toned: var(--ui-color-neutral-300);
-    --ui-text-highlighted: var(--ui-color-neutral-100);
-    --ui-border: var(--ui-color-neutral-700);
+    --ui-bg: #09090b !important;
+    --ui-text: #f4f4f5 !important;
+    --ui-text-muted: #a1a1aa !important;
+    --ui-text-toned: #d4d4d8 !important;
+    --ui-text-highlighted: #f4f4f5 !important;
+    --ui-border: #3f3f46 !important;
+
+    --admin-bg-surface: var(--admin-z-950) !important;
+    --admin-bg-muted: var(--admin-z-900) !important;
+    --admin-bg-strong: var(--admin-z-800) !important;
+    --admin-text: #f4f4f5 !important;
+    --admin-text-muted: var(--admin-z-200) !important;
+    --admin-text-strong: var(--admin-white) !important;
+    --admin-border: #3f3f46 !important;
+    --admin-border-strong: #52525b !important;
+
+    --admin-accent-text: var(--admin-amber-300) !important;
+    --admin-accent-bg: color-mix(in srgb, var(--admin-amber-500) 15%, transparent) !important;
+    --admin-accent-bg-subtle: color-mix(in srgb, var(--admin-amber-500) 10%, transparent) !important;
+
+    --admin-tooltip-bg: var(--admin-z-900) !important;
+    --admin-tooltip-text: var(--admin-z-50) !important;
+    --admin-tooltip-border: #3f3f46 !important;
   }
 
   .admin-ui-panel {
-    @apply border border-zinc-300 bg-zinc-50 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100;
+    @apply border;
+    border-color: var(--admin-border);
+    background-color: var(--admin-bg-surface);
+    color: var(--admin-text);
   }
 
   .admin-ui-toolbar {
-    @apply border-b border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900;
+    @apply border-b;
+    border-color: var(--admin-border);
+    background-color: var(--admin-bg-muted);
   }
 
   .admin-ui-controls {
-    @apply border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900;
+    @apply border;
+    border-color: var(--admin-border);
+    background-color: var(--admin-bg-muted);
   }
 
   .admin-ui-nav-root {
-    @apply border-b border-zinc-300 bg-zinc-50 text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100;
+    @apply border-b shadow-sm;
+    border-color: var(--admin-border);
+    background-color: var(--admin-bg-surface);
+    color: var(--admin-text);
   }
 
   .admin-ui-nav-surface {
-    @apply !border !border-zinc-300 !ring-0 bg-zinc-50 dark:!border-zinc-700 dark:bg-zinc-950;
+    @apply !border !ring-0;
+    border-color: var(--admin-border) !important;
+    background-color: var(--admin-bg-surface);
   }
 
   .admin-ui-nav-link {
-    @apply text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15;
+    color: var(--admin-text-muted) !important;
+  }
+
+  .admin-ui-nav-link:hover {
+    color: var(--admin-text-strong) !important;
+  }
+
+  .admin-ui-nav-link:hover::before {
+    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent) !important;
+  }
+
+  .admin-ui-nav-link[data-state='open'],
+  .admin-ui-nav-link[aria-current='page'] {
+    color: var(--admin-accent-text) !important;
+  }
+
+  .admin-ui-nav-link[data-state='open']::before,
+  .admin-ui-nav-link[aria-current='page']::before {
+    background-color: var(--admin-accent-bg) !important;
   }
 
   .admin-ui-nav-child-link {
-    @apply p-2 text-sm text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:bg-amber-50 aria-[current=page]:text-amber-700 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-amber-400/10 dark:aria-[current=page]:text-amber-300;
+    @apply p-2 text-sm;
+    color: var(--admin-text-muted) !important;
+  }
+
+  .admin-ui-nav-child-link:hover {
+    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent) !important;
+    color: var(--admin-text-strong) !important;
+  }
+
+  .admin-ui-nav-child-link[aria-current='page'] {
+    background-color: var(--admin-accent-bg-subtle) !important;
+    color: var(--admin-accent-text) !important;
   }
 
   .admin-ui-btn-base {
@@ -54,27 +145,52 @@
   }
 
   .admin-ui-btn-neutral {
-    @apply !bg-zinc-100 !text-zinc-800 hover:!bg-zinc-200 dark:!bg-zinc-800 dark:!text-zinc-100 dark:hover:!bg-zinc-700;
+    background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text-muted) !important;
+  }
+
+  .admin-ui-btn-neutral:hover {
+    background-color: var(--admin-bg-strong) !important;
   }
 
   .admin-ui-btn-soft {
-    @apply !bg-zinc-100 ring-1 ring-inset !ring-zinc-300 hover:!bg-zinc-200 dark:!bg-zinc-800 dark:!ring-zinc-700 dark:hover:!bg-zinc-700;
+    @apply ring-1 ring-inset;
+    background-color: var(--admin-bg-muted) !important;
+    border-color: var(--admin-border) !important;
+  }
+
+  .admin-ui-btn-soft:hover {
+    background-color: var(--admin-bg-strong) !important;
   }
 
   .admin-ui-btn-outline {
-    @apply !bg-transparent ring-1 ring-inset !ring-zinc-400 hover:!bg-zinc-100 dark:!ring-zinc-600 dark:hover:!bg-zinc-800;
+    @apply ring-1 ring-inset;
+    background-color: transparent !important;
+    border-color: var(--admin-border-strong) !important;
+  }
+
+  .admin-ui-btn-outline:hover {
+    background-color: var(--admin-bg-muted) !important;
   }
 
   .admin-ui-field-group {
-    @apply rounded-md border !border-zinc-300 !bg-zinc-50 shadow-lg dark:!border-zinc-700 dark:!bg-zinc-900;
+    @apply rounded-md border shadow-lg;
+    border-color: var(--admin-border) !important;
+    background-color: var(--admin-bg-muted);
   }
 
   .admin-ui-tooltip-content {
-    @apply !bg-zinc-900 !text-zinc-50 border !border-zinc-800 dark:!bg-zinc-100 dark:!text-zinc-900 dark:!border-zinc-200;
+    @apply border;
+    background-color: var(--admin-tooltip-bg);
+    color: var(--admin-tooltip-text);
+    border-color: var(--admin-tooltip-border);
   }
 
   .admin-ui-editor-root {
-    @apply border !border-zinc-300 !bg-zinc-50 !text-zinc-900 dark:!border-zinc-700 dark:!bg-zinc-950 dark:!text-zinc-100;
+    @apply border;
+    border-color: var(--admin-border) !important;
+    background-color: var(--admin-bg-surface);
+    color: var(--admin-text);
   }
 
   .admin-editor-prose {
@@ -99,7 +215,7 @@
     }
 
     a {
-      @apply text-zinc-700 dark:text-zinc-300;
+      color: var(--admin-text-muted);
     }
 
     section,
