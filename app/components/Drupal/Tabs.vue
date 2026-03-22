@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
+
 const { getPage } = useDrupalCe()
 const page = getPage()
 const route = useRoute()
@@ -71,13 +73,13 @@ const tabs = computed<LocalTasks>(() => {
 const localTaskLinks = computed(() =>
   tabs.value.primary
     .map((tab: LocalTask) => {
-      const to = getValidTo(tab.url)
+      const rawTo = getValidTo(tab.url)
 
-      if (!to) return null
+      if (!rawTo) return null
 
       return {
         label: tab.label,
-        to,
+        to: normalizeAdminUrl(rawTo),
         icon: getIconForLabel(tab.label),
         tooltip: isCompactTabs.value,
       }
@@ -92,6 +94,11 @@ const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
 const drupalCeConfig = computed<DrupalCeConfig>(() => {
   return (config.public.drupalCe || {}) as DrupalCeConfig
 })
+const drupalOrigin = computed(() => getDrupalOrigin(config.public))
+
+const normalizeAdminUrl = (value: string): string => {
+  return toDrupalUrl(value, drupalOrigin.value)
+}
 
 const getAccountMenuUrl = (): string => {
   const menuBaseUrl = String(drupalCeConfig.value.menuBaseUrl || '').replace(/\/$/, '')
@@ -129,13 +136,13 @@ const loadAccountMenu = async () => {
     accountMenu.value = menuItems
       .map((item) => {
         const label = item.title || ''
-        const to = getValidTo(item.relative || item.url)
+        const rawTo = getValidTo(item.relative || item.url)
 
-        if (!label || !to) return null
+        if (!label || !rawTo) return null
 
         return {
           label,
-          to,
+          to: normalizeAdminUrl(rawTo),
           icon: getIconForLabel(label),
           tooltip: isCompactTabs.value,
         }
@@ -191,7 +198,7 @@ const links = computed(() => {
       {
         label: 'Drupal CMS',
         icon: getIconForLabel('Drupal CMS'),
-        to: '/admin/content',
+        to: normalizeAdminUrl('/admin/content'),
         tooltip: isCompactTabs.value,
       },
     ],
@@ -208,7 +215,7 @@ const links = computed(() => {
     : {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
-        to: '/user',
+        to: normalizeAdminUrl('/user'),
         tooltip: isCompactTabs.value,
       }
 
