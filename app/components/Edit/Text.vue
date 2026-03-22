@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '~/composables/useParagraphTextEditor'
+import { normalizeEditorHtmlForSave } from '~/utils/normalizeEditorHtmlForSave'
 
 const props = defineProps<{
   paragraphId: number
@@ -51,16 +52,10 @@ function cancelEditing() {
   closeEditor('cancel')
 }
 
-function stripTrailingEmptyParagraphs(value: string): string {
-  return value
-    .replace(/(?:\s*<p>(?:\s|&nbsp;|<br\s*\/?>|\u00a0)*<\/p>\s*)+$/gi, '')
-    .trim()
-}
-
 async function saveInline() {
   if (props.paragraphId === 0) return
 
-  const valueToSave = stripTrailingEmptyParagraphs(editorValue.value)
+  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
 
   if (valueToSave === '') {
     saveError.value = 'Text is required.'
