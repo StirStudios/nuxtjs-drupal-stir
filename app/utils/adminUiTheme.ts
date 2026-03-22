@@ -47,7 +47,10 @@ export const adminUiTheme = {
     base: 'admin-ui-field-group',
   },
   tooltip: {
-    content: 'admin-ui-tooltip-content',
+    slots: {
+      content: 'admin-ui-tooltip-content',
+      arrow: 'admin-ui-tooltip-arrow',
+    },
   },
   editor: {
     slots: {

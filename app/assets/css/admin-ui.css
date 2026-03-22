@@ -210,10 +210,16 @@
   }
 
   .admin-ui-tooltip-content {
-    @apply border;
+    @apply border ring ring-inset;
     background-color: var(--admin-tooltip-bg);
     color: var(--admin-tooltip-text);
     border-color: var(--admin-tooltip-border);
+    --tw-ring-color: var(--admin-tooltip-border) !important;
+  }
+
+  .admin-ui-tooltip-arrow {
+    fill: var(--admin-tooltip-bg) !important;
+    stroke: var(--admin-tooltip-border) !important;
   }
 
   .admin-ui-editor-root {
