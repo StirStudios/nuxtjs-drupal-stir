@@ -25,6 +25,7 @@ interface EditAction {
   ariaLabel: string
   icon: string
   variant: 'soft' | 'outline'
+  buttonClass: string
   disabled?: boolean
   to?: string
   target?: '_blank'
@@ -55,6 +56,7 @@ const actions = computed<EditAction[]>(() => {
       ariaLabel,
       icon: 'i-lucide-zap',
       variant: 'soft',
+      buttonClass: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft',
       disabled: props.quickEditDisabled === true,
       onClick: () => emit('quick-edit'),
     })
@@ -72,6 +74,7 @@ const actions = computed<EditAction[]>(() => {
       ariaLabel,
       icon: 'i-lucide-square-pen',
       variant: 'outline',
+      buttonClass: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-outline',
       to: fullEditLink.value,
       target: isExternalLink.value ? '_blank' : undefined,
       rel: isExternalLink.value ? 'noopener noreferrer' : undefined,
@@ -101,6 +104,7 @@ const hasActions = computed(() => actions.value.length > 0)
             :rel="action.rel"
             :target="action.target"
             :to="action.to"
+            :ui="{ base: action.buttonClass }"
             :variant="action.variant"
             @click="action.onClick?.()"
           >
