@@ -154,7 +154,7 @@ onMounted(async () => {
   <UTheme :ui="adminUiTheme">
     <div
       ref="editPanelRef"
-      :class="[classes, 'admin-ui admin-ui-scope admin-ui-panel']"
+      :class="[classes, 'admin-ui admin-ui-scope admin-ui-panel rounded-lg']"
     >
       <UEditor
         v-slot="{ editor }"
@@ -205,7 +205,7 @@ onMounted(async () => {
             color="neutral"
             icon="i-lucide-x"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base !rounded-md admin-ui-btn-neutral admin-ui-btn-soft' }"
+            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-soft' }"
             variant="soft"
             @click="cancelEditing"
           >
@@ -218,7 +218,7 @@ onMounted(async () => {
             icon="i-lucide-save"
             :loading="isSaving"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base !rounded-md admin-ui-btn-neutral admin-ui-btn-solid' }"
+            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-solid' }"
             variant="solid"
             @click="saveInline"
           >
