@@ -11,7 +11,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'cancel' | 'saved'): void
+  (e: 'cancel'): void
+  (e: 'saved', value: string): void
 }>()
 
 const isEditing = ref(true)
@@ -45,8 +46,15 @@ function resetEditMessages(): void {
   saveSuccess.value = ''
 }
 
-function closeEditor(event: 'cancel' | 'saved'): void {
+function closeEditor(event: 'cancel' | 'saved', value = ''): void {
   isEditing.value = false
+
+  if (event === 'saved') {
+    emit('saved', value)
+
+    return
+  }
+
   emit(event)
 }
 
@@ -119,7 +127,7 @@ async function closeEditing(): Promise<void> {
     await saveInline()
   }
 
-  closeEditor('saved')
+  closeEditor('saved', lastSavedValue.value || valueToSave)
 }
 
 function scrollEditorIntoViewIfNeeded(): void {

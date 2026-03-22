@@ -40,7 +40,6 @@ const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const singleActionLabel = computed(() => 'Edit')
-const isActive = ref(false)
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
@@ -82,23 +81,19 @@ const actions = computed<EditAction[]>(() => {
   return result
 })
 
-const shouldShowControls = computed(() => actions.value.length > 0 && isActive.value)
+const hasActions = computed(() => actions.value.length > 0)
 </script>
 
 <template>
-  <div
-    class="admin-ui-edit-shell relative"
-    @mouseenter="isActive = true"
-    @mouseleave="isActive = false"
-  >
+  <div class="admin-ui-edit-shell group relative">
     <slot />
     <div
-      v-if="shouldShowControls"
-      class="absolute right-2 top-2 z-100"
+      v-if="hasActions"
+      class="pointer-events-none absolute right-2 top-2 z-100 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
     >
       <UTheme :ui="adminUiTheme">
         <UFieldGroup
-          class="admin-ui admin-ui-scope admin-ui-controls rounded-md shadow-lg"
+          class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
           size="xs"
         >
           <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
