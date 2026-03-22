@@ -205,8 +205,8 @@ onMounted(async () => {
             color="neutral"
             icon="i-lucide-x"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-ghost' }"
-            variant="ghost"
+            :ui="{ base: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft' }"
+            variant="soft"
             @click="cancelEditing"
           >
             Cancel
@@ -218,8 +218,8 @@ onMounted(async () => {
             icon="i-lucide-save"
             :loading="isSaving"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft' }"
-            variant="soft"
+            :ui="{ base: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-solid' }"
+            variant="solid"
             @click="saveInline"
           >
             Save

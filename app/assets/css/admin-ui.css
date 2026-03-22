@@ -203,6 +203,18 @@
     color: var(--admin-text-strong) !important;
   }
 
+  .admin-ui-btn-solid {
+    background-color: var(--admin-text-strong) !important;
+    color: var(--admin-bg-surface) !important;
+    border-color: var(--admin-text-strong) !important;
+    --tw-ring-color: color-mix(in srgb, var(--admin-text-strong) 35%, transparent) !important;
+  }
+
+  .admin-ui-btn-solid:hover {
+    background-color: color-mix(in srgb, var(--admin-text-strong) 85%, white 15%) !important;
+    color: var(--admin-bg-surface) !important;
+  }
+
   .admin-ui-field-group {
     @apply rounded-md border shadow-lg;
     border-color: var(--admin-border) !important;
