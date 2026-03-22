@@ -88,6 +88,26 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     },
   })
 
+  const DivNode = Node.create({
+    name: 'div',
+    group: 'block',
+    content: 'block*',
+    parseHTML() {
+      return [{ tag: 'div' }]
+    },
+    addAttributes() {
+      return {
+        class: {
+          default: null,
+          parseHTML: (element: Element) => element.getAttribute('class'),
+        },
+      }
+    },
+    renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+      return ['div', mergeAttributes(HTMLAttributes), 0]
+    },
+  })
+
   const DrupalMediaNode = Node.create({
     name: 'drupalMedia',
     group: 'block',
@@ -121,6 +141,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     BulletListWithClass,
     OrderedListWithClass,
     ListItemWithAttributes,
+    DivNode,
     SectionNode,
     DrupalMediaNode,
   ]
