@@ -1,8 +1,62 @@
 import { ref, watch, type Ref } from 'vue'
 import { Node, mergeAttributes } from '@tiptap/core'
 import type { Editor } from '@tiptap/vue-3'
+import Heading from '@tiptap/extension-heading'
+import BulletList from '@tiptap/extension-bullet-list'
+import OrderedList from '@tiptap/extension-ordered-list'
+import ListItem from '@tiptap/extension-list-item'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
+  const HeadingWithClass = Heading.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        class: {
+          default: null,
+          parseHTML: element => element.getAttribute('class'),
+        },
+      }
+    },
+  })
+
+  const BulletListWithClass = BulletList.extend({
+    addAttributes() {
+      return {
+        class: {
+          default: null,
+          parseHTML: element => element.getAttribute('class'),
+        },
+      }
+    },
+  })
+
+  const OrderedListWithClass = OrderedList.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        class: {
+          default: null,
+          parseHTML: element => element.getAttribute('class'),
+        },
+      }
+    },
+  })
+
+  const ListItemWithAttributes = ListItem.extend({
+    addAttributes() {
+      return {
+        class: {
+          default: null,
+          parseHTML: element => element.getAttribute('class'),
+        },
+        'data-list-item-id': {
+          default: null,
+          parseHTML: element => element.getAttribute('data-list-item-id'),
+        },
+      }
+    },
+  })
+
   const SectionNode = Node.create({
     name: 'section',
     group: 'block',
@@ -50,7 +104,14 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
 
   const richTextClass = 'prose max-w-none'
   const editorUi = { base: richTextClass }
-  const extensions = [SectionNode, DrupalMediaNode]
+  const extensions = [
+    HeadingWithClass,
+    BulletListWithClass,
+    OrderedListWithClass,
+    ListItemWithAttributes,
+    SectionNode,
+    DrupalMediaNode,
+  ]
 
   const headingToolbarItems = [
     { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: { text: 'Heading 2' } },
