@@ -30,8 +30,10 @@ interface EditAction {
   onClick?: () => void
 }
 
+const controlsWrapClass =
+  'sticky top-[calc(var(--ui-header-height)+0.5rem)] z-100 h-0 overflow-visible pointer-events-none'
 const controlsClass =
-  'sticky top-[calc(var(--ui-header-height)+0.5rem)] z-100 flex ml-auto w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
+  'flex w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const hasLink = computed(() => typeof props.link === 'string' && props.link.length > 0)
@@ -88,27 +90,32 @@ const actions = computed<EditAction[]>(() => {
 </script>
 
 <template>
-  <div v-if="actions.length > 0" class="group/edit">
-    <UFieldGroup
-      :class="[controlsClass, 'rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm']"
-      size="xs"
-    >
-      <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
-        <UButton
-          :aria-label="action.ariaLabel"
-          color="neutral"
-          :disabled="action.disabled"
-          :icon="action.icon"
-          :rel="action.rel"
-          :target="action.target"
-          :to="action.to"
-          :variant="action.variant"
-          @click="action.onClick?.()"
-        >
-          <span class="sr-only">{{ action.ariaLabel }}</span>
-        </UButton>
-      </UTooltip>
-    </UFieldGroup>
+  <div
+    v-if="actions.length > 0"
+    class="group/edit relative"
+  >
+    <div :class="controlsWrapClass">
+      <UFieldGroup
+        :class="['ml-auto', controlsClass, 'rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm']"
+        size="xs"
+      >
+        <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
+          <UButton
+            :aria-label="action.ariaLabel"
+            color="neutral"
+            :disabled="action.disabled"
+            :icon="action.icon"
+            :rel="action.rel"
+            :target="action.target"
+            :to="action.to"
+            :variant="action.variant"
+            @click="action.onClick?.()"
+          >
+            <span class="sr-only">{{ action.ariaLabel }}</span>
+          </UButton>
+        </UTooltip>
+      </UFieldGroup>
+    </div>
 
     <slot />
   </div>
