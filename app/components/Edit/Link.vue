@@ -47,6 +47,7 @@ const isControlsHovered = ref(false)
 const controlsStyle = ref<Record<string, string>>({})
 const targetElement = ref<HTMLElement | null>(null)
 const stopTargetListeners = ref<Array<() => void>>([])
+const domObserver = ref<MutationObserver | null>(null)
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
@@ -134,6 +135,7 @@ function detachTargetListeners(): void {
     stop()
   }
   stopTargetListeners.value = []
+  targetElement.value = null
 }
 
 function attachTargetListeners(): void {
@@ -164,15 +166,44 @@ function attachTargetListeners(): void {
   ]
 }
 
+function refreshTargetBinding(): void {
+  if (import.meta.client === false) return
+
+  nextTick(() => {
+    attachTargetListeners()
+    updateControlsPosition()
+  })
+}
+
 onMounted(() => {
   if (import.meta.client === false) return
 
   attachTargetListeners()
   useEventListener(window, 'scroll', updateControlsPosition, { passive: true })
   useEventListener(window, 'resize', updateControlsPosition, { passive: true })
+
+  if (anchorRef.value?.parentElement) {
+    domObserver.value = new MutationObserver(() => {
+      refreshTargetBinding()
+    })
+
+    domObserver.value.observe(anchorRef.value.parentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+    })
+  }
+})
+
+onUpdated(() => {
+  refreshTargetBinding()
 })
 
 onBeforeUnmount(() => {
+  if (domObserver.value) {
+    domObserver.value.disconnect()
+    domObserver.value = null
+  }
   detachTargetListeners()
 })
 </script>

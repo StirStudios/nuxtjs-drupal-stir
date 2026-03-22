@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWindowScroll } from '@vueuse/core'
+import { useEventListener, useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '~/composables/useParagraphTextEditor'
 import { adminUiTheme } from '~/utils/adminUiTheme'
 import { normalizeEditorHtmlForSave } from '~/utils/normalizeEditorHtmlForSave'
@@ -48,12 +48,6 @@ function resetEditMessages(): void {
 function closeEditor(event: 'cancel' | 'saved'): void {
   isEditing.value = false
   emit(event)
-}
-
-function cancelEditing() {
-  syncEditorBuffers(sourceTextRef.value)
-  resetEditMessages()
-  closeEditor('cancel')
 }
 
 async function saveInline() {
@@ -115,6 +109,19 @@ function queueAutoSave(): void {
   }, 900)
 }
 
+async function closeEditing(): Promise<void> {
+  clearAutoSaveTimer()
+
+  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
+  const hasUnsavedChanges = valueToSave !== '' && valueToSave !== lastSavedValue.value
+
+  if (hasUnsavedChanges && isSaving.value === false) {
+    await saveInline()
+  }
+
+  closeEditor('saved')
+}
+
 function scrollEditorIntoViewIfNeeded(): void {
   if (import.meta.client === false || editPanelRef.value === null) return
 
@@ -145,6 +152,14 @@ onMounted(async () => {
   hasInitializedAutoSave.value = true
   await nextTick()
   scrollEditorIntoViewIfNeeded()
+
+  if (import.meta.client) {
+    useEventListener(window, 'keydown', (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      void closeEditing()
+    })
+  }
 })
 
 watch(editorValue, () => {
@@ -183,11 +198,22 @@ onBeforeUnmount(() => {
         :ui="editorUi"
       >
         <div :class="toolbarClass">
-          <UEditorToolbar
-            class="border-0 bg-transparent p-0"
-            :editor="editor"
-            :items="fixedToolbarItems"
-          />
+          <div class="flex items-center justify-between gap-2">
+            <UEditorToolbar
+              class="border-0 bg-transparent p-0"
+              :editor="editor"
+              :items="fixedToolbarItems"
+            />
+
+            <UButton
+              aria-label="Close editor"
+              color="neutral"
+              icon="i-lucide-x"
+              size="sm"
+              variant="outline"
+              @click="closeEditing"
+            />
+          </div>
         </div>
 
         <UEditorToolbar
@@ -205,15 +231,6 @@ onBeforeUnmount(() => {
         <span v-else-if="saveError" class="text-sm text-error">{{ saveError }}</span>
         <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
 
-        <UButton
-          color="neutral"
-          icon="i-lucide-x"
-          size="sm"
-          variant="outline"
-          @click="cancelEditing"
-        >
-          Cancel
-        </UButton>
       </div>
     </div>
   </UTheme>
