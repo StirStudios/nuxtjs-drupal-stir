@@ -39,7 +39,6 @@ const sourceText = computed(() => {
 
 const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
-const hasIframeEmbed = computed(() => sourceText.value.toLowerCase().includes('<iframe'))
 const richTextClass = 'prose max-w-none'
 
 async function startEditing() {
@@ -72,7 +71,6 @@ function stopEditing() {
       <div :class="[width, spacing]">
         <EditLink
           :link="editLink"
-          :quick-edit-disabled="hasIframeEmbed"
           :show-quick-edit="canInlineEdit && isEditing === false"
           @quick-edit="startEditing"
         >
