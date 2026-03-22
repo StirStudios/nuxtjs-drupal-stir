@@ -75,7 +75,7 @@
     @apply border;
     border-color: var(--admin-border);
     background-color: var(--admin-bg-surface);
-    color: var(--admin-text);
+    color: var(--admin-text) !important;
   }
 
   .admin-ui-toolbar {
@@ -190,7 +190,23 @@
     @apply border;
     border-color: var(--admin-border) !important;
     background-color: var(--admin-bg-surface);
-    color: var(--admin-text);
+    color: var(--admin-text) !important;
+  }
+
+  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base {
+    color: var(--admin-text-muted) !important;
+    background-color: transparent !important;
+  }
+
+  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base:hover {
+    color: var(--admin-text-strong) !important;
+    background-color: color-mix(in srgb, var(--admin-bg-strong) 70%, transparent) !important;
+  }
+
+  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[data-state='open'],
+  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[aria-pressed='true'] {
+    color: var(--admin-accent-text) !important;
+    background-color: var(--admin-accent-bg) !important;
   }
 
   .admin-editor-prose {
@@ -215,7 +231,7 @@
     }
 
     a {
-      color: var(--admin-text-muted);
+      color: var(--admin-text-muted) !important;
     }
 
     section,

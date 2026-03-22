@@ -127,7 +127,7 @@ onMounted(async () => {
   <UTheme :ui="adminUiTheme">
     <div
       ref="editPanelRef"
-      :class="['admin-ui admin-ui-scope admin-ui-panel rounded-md p-4', classes]"
+      :class="[classes, 'admin-ui admin-ui-scope admin-ui-panel rounded-md p-4']"
     >
       <UEditor
         v-slot="{ editor }"
