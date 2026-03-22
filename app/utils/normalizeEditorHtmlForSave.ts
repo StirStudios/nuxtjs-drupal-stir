@@ -18,9 +18,7 @@ function unwrapSimpleListItemParagraphs(value: string): string {
 
     if (elementChildren.length !== 1) continue
 
-    const [onlyChild] = elementChildren
-
-    if (onlyChild === undefined) continue
+    const onlyChild = elementChildren[0]!
 
     if (onlyChild.tagName !== 'P') continue
     if (onlyChild.attributes.length > 0) continue
