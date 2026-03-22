@@ -128,9 +128,17 @@ onMounted(async () => {
 
   if (import.meta.client) {
     useEventListener(window, 'keydown', (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      cancelEditing()
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        cancelEditing()
+
+        return
+      }
+
+      if (event.key === 'Enter' && event.metaKey) {
+        event.preventDefault()
+        void saveInline()
+      }
     })
   }
 })
