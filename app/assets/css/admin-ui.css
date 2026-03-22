@@ -94,6 +94,10 @@
     background-color: var(--admin-bg-muted);
   }
 
+  .admin-ui-edit-shell {
+    @apply relative;
+  }
+
   .admin-ui-nav-root {
     @apply border-b shadow-sm;
     border-color: var(--admin-border);
@@ -194,6 +198,11 @@
     @apply border;
     border-color: var(--admin-border) !important;
     background-color: var(--admin-bg-surface);
+    color: var(--admin-text) !important;
+  }
+
+  .admin-ui-editor-root .ProseMirror,
+  .admin-ui-editor-root .tiptap {
     color: var(--admin-text) !important;
   }
 

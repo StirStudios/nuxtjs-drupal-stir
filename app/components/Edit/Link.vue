@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useEventListener } from '@vueuse/core'
 import { adminUiTheme } from '~/utils/adminUiTheme'
 
 defineOptions({
@@ -41,13 +40,7 @@ const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const singleActionLabel = computed(() => 'Edit')
-const anchorRef = ref<HTMLElement | null>(null)
-const isTargetActive = ref(false)
-const isControlsHovered = ref(false)
-const controlsStyle = ref<Record<string, string>>({})
-const targetElement = ref<HTMLElement | null>(null)
-const stopTargetListeners = ref<Array<() => void>>([])
-const domObserver = ref<MutationObserver | null>(null)
+const isActive = ref(false)
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
@@ -89,140 +82,23 @@ const actions = computed<EditAction[]>(() => {
   return result
 })
 
-const shouldShowControls = computed(() =>
-  actions.value.length > 0 && (isTargetActive.value || isControlsHovered.value),
-)
-
-function getStickyTopOffset(): number {
-  if (import.meta.client === false) return 8
-
-  const raw = window.getComputedStyle(document.documentElement)
-    .getPropertyValue('--ui-header-height')
-    .trim()
-  let headerHeight = Number.parseFloat(raw) || 0
-
-  if (headerHeight <= 0) {
-    const headerEl = document.querySelector<HTMLElement>('header, .app-header, [data-slot="header"]')
-
-    if (headerEl) {
-      headerHeight = headerEl.getBoundingClientRect().height
-    }
-  }
-
-  return headerHeight + 8
-}
-
-function updateControlsPosition(): void {
-  if (import.meta.client === false || targetElement.value === null) return
-
-  const rect = targetElement.value.getBoundingClientRect()
-  const stickyTopOffset = getStickyTopOffset()
-  const viewportPadding = 8
-  const maxRight = Math.max(viewportPadding, window.innerWidth - viewportPadding)
-  const right = Math.max(viewportPadding, window.innerWidth - Math.min(maxRight, rect.right))
-  const top = Math.max(stickyTopOffset, rect.top)
-
-  controlsStyle.value = {
-    position: 'fixed',
-    top: `${top}px`,
-    right: `${right}px`,
-    zIndex: '100',
-  }
-}
-
-function detachTargetListeners(): void {
-  for (const stop of stopTargetListeners.value) {
-    stop()
-  }
-  stopTargetListeners.value = []
-  targetElement.value = null
-}
-
-function attachTargetListeners(): void {
-  if (import.meta.client === false || anchorRef.value === null) return
-
-  const siblingTarget = anchorRef.value.nextElementSibling
-  const target = siblingTarget instanceof HTMLElement
-    ? siblingTarget
-    : anchorRef.value.parentElement
-
-  if (target === null) return
-
-  if (targetElement.value === target && stopTargetListeners.value.length > 0) return
-
-  targetElement.value = target
-  detachTargetListeners()
-  stopTargetListeners.value = [
-    useEventListener(target, 'pointerenter', () => {
-      isTargetActive.value = true
-      updateControlsPosition()
-    }),
-    useEventListener(target, 'focusin', () => {
-      isTargetActive.value = true
-      updateControlsPosition()
-    }),
-    useEventListener(target, 'pointerleave', () => { isTargetActive.value = false }),
-    useEventListener(target, 'focusout', () => { isTargetActive.value = false }),
-  ]
-}
-
-function refreshTargetBinding(): void {
-  if (import.meta.client === false) return
-
-  nextTick(() => {
-    attachTargetListeners()
-    updateControlsPosition()
-  })
-}
-
-onMounted(() => {
-  if (import.meta.client === false) return
-
-  attachTargetListeners()
-  useEventListener(window, 'scroll', updateControlsPosition, { passive: true })
-  useEventListener(window, 'resize', updateControlsPosition, { passive: true })
-
-  if (anchorRef.value?.parentElement) {
-    domObserver.value = new MutationObserver(() => {
-      refreshTargetBinding()
-    })
-
-    domObserver.value.observe(anchorRef.value.parentElement, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-    })
-  }
-})
-
-onUpdated(() => {
-  refreshTargetBinding()
-})
-
-onBeforeUnmount(() => {
-  if (domObserver.value) {
-    domObserver.value.disconnect()
-    domObserver.value = null
-  }
-  detachTargetListeners()
-})
+const shouldShowControls = computed(() => actions.value.length > 0 && isActive.value)
 </script>
 
 <template>
-  <span ref="anchorRef" aria-hidden="true" class="hidden" />
-  <slot />
-
-  <Teleport to="body">
+  <div
+    class="admin-ui-edit-shell relative"
+    @mouseenter="isActive = true"
+    @mouseleave="isActive = false"
+  >
+    <slot />
     <div
       v-if="shouldShowControls"
-      class="pointer-events-none"
-      :style="controlsStyle"
-      @mouseenter="isControlsHovered = true"
-      @mouseleave="isControlsHovered = false"
+      class="absolute right-2 top-2 z-100"
     >
       <UTheme :ui="adminUiTheme">
         <UFieldGroup
-          class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
+          class="admin-ui admin-ui-scope admin-ui-controls rounded-md shadow-lg"
           size="xs"
         >
           <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
@@ -243,5 +119,5 @@ onBeforeUnmount(() => {
         </UFieldGroup>
       </UTheme>
     </div>
-  </Teleport>
+  </div>
 </template>
