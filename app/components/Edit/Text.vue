@@ -127,7 +127,7 @@ onMounted(async () => {
   scrollEditorIntoViewIfNeeded()
 
   if (import.meta.client) {
-    useEventListener(window, 'keydown', (event: KeyboardEvent) => {
+    const handleKeydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
         cancelEditing()
@@ -139,7 +139,13 @@ onMounted(async () => {
         event.preventDefault()
         void saveInline()
       }
-    })
+    }
+
+    if (editPanelRef.value) {
+      useEventListener(editPanelRef, 'keydown', handleKeydown, { capture: true })
+    }
+
+    useEventListener(window, 'keydown', handleKeydown, { capture: true })
   }
 })
 </script>
