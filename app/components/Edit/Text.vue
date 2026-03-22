@@ -141,7 +141,13 @@ onMounted(async () => {
       :handlers="customHandlers"
       :inject-css="false"
       placeholder="Type / for commands..."
-      :starter-kit="{ trailingNode: false }"
+      :starter-kit="{
+        trailingNode: false,
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+      }"
       :ui="editorUi"
     >
       <div :class="toolbarClass">
