@@ -36,12 +36,9 @@ const controlsClass =
   'flex w-fit pointer-events-auto opacity-100 md:pointer-events-none md:opacity-0 md:transition-opacity md:duration-200 md:group-focus-within/edit:pointer-events-auto md:group-focus-within/edit:opacity-100 md:group-hover/edit:pointer-events-auto md:group-hover/edit:opacity-100'
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
-const hasLink = computed(() => typeof props.link === 'string' && props.link.length > 0)
-const isExternalLink = computed(() => {
-  if (hasLink.value === false) return false
-
-  return /^https?:\/\//.test(props.link as string)
-})
+const fullEditLink = computed(() => (typeof props.link === 'string' ? props.link.trim() : ''))
+const hasLink = computed(() => fullEditLink.value.length > 0)
+const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
@@ -79,7 +76,7 @@ const actions = computed<EditAction[]>(() => {
       ariaLabel,
       icon: 'i-lucide-square-pen',
       variant: 'outline',
-      to: props.link,
+      to: fullEditLink.value,
       target: isExternalLink.value ? '_blank' : undefined,
       rel: isExternalLink.value ? 'noopener noreferrer' : undefined,
     })

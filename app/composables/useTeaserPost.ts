@@ -1,4 +1,5 @@
 import { unref } from 'vue'
+import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
 
 export function useTeaserPost(
   input: unknown,
@@ -10,8 +11,11 @@ export function useTeaserPost(
     orientation?: 'horizontal' | 'vertical'
   } = {},
 ) {
+  const config = useRuntimeConfig()
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null
+
+  const drupalOrigin = computed(() => getDrupalOrigin(config.public))
 
   const formatCreatedDate = (value: unknown) => {
     if (value === null || value === undefined || value === '') return ''
@@ -70,7 +74,7 @@ export function useTeaserPost(
     image: image.value,
     date: formatCreatedDate(extra.created),
     to: extra.url ?? '',
-    editLink: extra.nid ? `/node/${extra.nid}/edit` : undefined,
+    editLink: extra.nid ? toDrupalUrl(`/node/${extra.nid}/edit`, drupalOrigin.value) : undefined,
   }))
 
   return { teaser: teaserSource, image, post, orientation }
