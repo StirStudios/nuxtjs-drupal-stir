@@ -30,6 +30,8 @@
     --admin-bg-surface: var(--admin-z-50) !important;
     --admin-bg-muted: var(--admin-z-100) !important;
     --admin-bg-strong: var(--admin-z-200) !important;
+    --admin-toolbar-bg: #ffffff !important;
+    --admin-toolbar-border: var(--admin-z-200) !important;
     --admin-text: var(--admin-z-900) !important;
     --admin-text-muted: var(--admin-z-700) !important;
     --admin-text-strong: var(--admin-z-950) !important;
@@ -56,6 +58,8 @@
     --admin-bg-surface: var(--admin-z-950) !important;
     --admin-bg-muted: var(--admin-z-900) !important;
     --admin-bg-strong: var(--admin-z-800) !important;
+    --admin-toolbar-bg: #27272a !important;
+    --admin-toolbar-border: #3f3f46 !important;
     --admin-text: #f4f4f5 !important;
     --admin-text-muted: var(--admin-z-200) !important;
     --admin-text-strong: var(--admin-white) !important;
@@ -80,8 +84,8 @@
 
   .admin-ui-toolbar {
     @apply border-b;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-muted);
+    border-color: var(--admin-toolbar-border);
+    background-color: var(--admin-toolbar-bg);
   }
 
   .admin-ui-controls {

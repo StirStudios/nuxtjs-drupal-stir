@@ -19,6 +19,9 @@ const isSaving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
 const editPanelRef = ref<HTMLElement | null>(null)
+const autoSaveTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const lastSavedValue = ref('')
+const hasInitializedAutoSave = ref(false)
 const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
@@ -82,14 +85,34 @@ async function saveInline() {
       throw new Error(response?.message || 'Save failed.')
     }
 
+    lastSavedValue.value = valueToSave
     saveSuccess.value = 'Saved.'
-    await refreshNuxtData()
-    closeEditor('saved')
   } catch (error) {
     saveError.value = error instanceof Error ? error.message : 'Failed to save paragraph text.'
   } finally {
     isSaving.value = false
   }
+}
+
+function clearAutoSaveTimer(): void {
+  if (autoSaveTimer.value === null) return
+
+  clearTimeout(autoSaveTimer.value)
+  autoSaveTimer.value = null
+}
+
+function queueAutoSave(): void {
+  if (hasInitializedAutoSave.value === false) return
+
+  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
+
+  if (valueToSave === '' || valueToSave === lastSavedValue.value) return
+  if (isSaving.value) return
+
+  clearAutoSaveTimer()
+  autoSaveTimer.value = setTimeout(() => {
+    void saveInline()
+  }, 900)
 }
 
 function scrollEditorIntoViewIfNeeded(): void {
@@ -118,8 +141,18 @@ function scrollEditorIntoViewIfNeeded(): void {
 
 onMounted(async () => {
   syncEditorBuffers(sourceTextRef.value)
+  lastSavedValue.value = normalizeEditorHtmlForSave(sourceTextRef.value)
+  hasInitializedAutoSave.value = true
   await nextTick()
   scrollEditorIntoViewIfNeeded()
+})
+
+watch(editorValue, () => {
+  queueAutoSave()
+})
+
+onBeforeUnmount(() => {
+  clearAutoSaveTimer()
 })
 </script>
 
@@ -127,7 +160,7 @@ onMounted(async () => {
   <UTheme :ui="adminUiTheme">
     <div
       ref="editPanelRef"
-      :class="[classes, 'admin-ui admin-ui-scope admin-ui-panel rounded-md p-4']"
+      :class="[classes, 'admin-ui admin-ui-scope admin-ui-panel rounded-lg']"
     >
       <UEditor
         v-slot="{ editor }"
@@ -167,19 +200,13 @@ onMounted(async () => {
         <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
       </UEditor>
 
-      <div class="mt-3 flex items-center gap-2">
-        <UButton
-          :disabled="isSaving"
-          icon="i-lucide-save"
-          :loading="isSaving"
-          size="sm"
-          @click="saveInline"
-        >
-          Save
-        </UButton>
+      <div class="mt-3 flex items-center gap-3">
+        <span v-if="isSaving" class="text-sm text-muted">Saving...</span>
+        <span v-else-if="saveError" class="text-sm text-error">{{ saveError }}</span>
+        <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
+
         <UButton
           color="neutral"
-          :disabled="isSaving"
           icon="i-lucide-x"
           size="sm"
           variant="outline"
@@ -187,9 +214,6 @@ onMounted(async () => {
         >
           Cancel
         </UButton>
-
-        <span v-if="saveError" class="text-sm text-error">{{ saveError }}</span>
-        <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
       </div>
     </div>
   </UTheme>
