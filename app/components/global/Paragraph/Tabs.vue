@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
+import type { VNode } from 'vue'
 
 defineProps<{
   id?: number | string
@@ -13,14 +14,15 @@ defineProps<{
 const vueSlots = useSlots()
 const active = ref<string>('0')
 const contentRef = ref<HTMLElement | null>(null)
+const tabNodes = ref<VNode[]>([])
 
 type TabsItem = { label: string; value: string }
 
-const tabNodes = computed(() => {
+function syncTabNodes() {
   const nodes = vueSlots.tab?.()
 
-  return Array.isArray(nodes) ? nodes : []
-})
+  tabNodes.value = Array.isArray(nodes) ? nodes : []
+}
 
 const items = computed<TabsItem[]>(() =>
   tabNodes.value.map((tab, index) => ({
@@ -42,7 +44,12 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
 const ready = ref(false)
 
 onMounted(() => {
+  syncTabNodes()
   ready.value = true
+})
+
+onUpdated(() => {
+  syncTabNodes()
 })
 
 watch(active, async () => {
