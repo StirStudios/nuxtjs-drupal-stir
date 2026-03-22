@@ -20,9 +20,6 @@ const isSaving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
 const editPanelRef = ref<HTMLElement | null>(null)
-const autoSaveTimer = ref<ReturnType<typeof setTimeout> | null>(null)
-const lastSavedValue = ref('')
-const hasInitializedAutoSave = ref(false)
 const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
@@ -87,8 +84,8 @@ async function saveInline() {
       throw new Error(response?.message || 'Save failed.')
     }
 
-    lastSavedValue.value = valueToSave
     saveSuccess.value = 'Saved.'
+    closeEditor('saved', valueToSave)
   } catch (error) {
     saveError.value = error instanceof Error ? error.message : 'Failed to save paragraph text.'
   } finally {
@@ -96,38 +93,8 @@ async function saveInline() {
   }
 }
 
-function clearAutoSaveTimer(): void {
-  if (autoSaveTimer.value === null) return
-
-  clearTimeout(autoSaveTimer.value)
-  autoSaveTimer.value = null
-}
-
-function queueAutoSave(): void {
-  if (hasInitializedAutoSave.value === false) return
-
-  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
-
-  if (valueToSave === '' || valueToSave === lastSavedValue.value) return
-  if (isSaving.value) return
-
-  clearAutoSaveTimer()
-  autoSaveTimer.value = setTimeout(() => {
-    void saveInline()
-  }, 900)
-}
-
-async function closeEditing(): Promise<void> {
-  clearAutoSaveTimer()
-
-  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
-  const hasUnsavedChanges = valueToSave !== '' && valueToSave !== lastSavedValue.value
-
-  if (hasUnsavedChanges && isSaving.value === false) {
-    await saveInline()
-  }
-
-  closeEditor('saved', lastSavedValue.value || valueToSave)
+function cancelEditing(): void {
+  closeEditor('cancel')
 }
 
 function scrollEditorIntoViewIfNeeded(): void {
@@ -156,8 +123,6 @@ function scrollEditorIntoViewIfNeeded(): void {
 
 onMounted(async () => {
   syncEditorBuffers(sourceTextRef.value)
-  lastSavedValue.value = normalizeEditorHtmlForSave(sourceTextRef.value)
-  hasInitializedAutoSave.value = true
   await nextTick()
   scrollEditorIntoViewIfNeeded()
 
@@ -165,17 +130,9 @@ onMounted(async () => {
     useEventListener(window, 'keydown', (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       event.preventDefault()
-      void closeEditing()
+      cancelEditing()
     })
   }
-})
-
-watch(editorValue, () => {
-  queueAutoSave()
-})
-
-onBeforeUnmount(() => {
-  clearAutoSaveTimer()
 })
 </script>
 
@@ -192,7 +149,7 @@ onBeforeUnmount(() => {
         content-type="html"
         :extensions="extensions"
         :handlers="customHandlers"
-        :inject-css="false"
+        :inject-css="true"
         placeholder="Type / for commands..."
         :starter-kit="{
           trailingNode: false,
@@ -228,15 +185,30 @@ onBeforeUnmount(() => {
         <span v-else-if="saveError" class="admin-ui-status-error text-sm">{{ saveError }}</span>
         <span v-else-if="saveSuccess" class="admin-ui-status-success text-sm">{{ saveSuccess }}</span>
         <span v-else class="text-sm text-transparent">Status</span>
+        <div class="flex items-center gap-2">
+          <UButton
+            aria-label="Cancel"
+            color="neutral"
+            icon="i-lucide-x"
+            size="sm"
+            variant="ghost"
+            @click="cancelEditing"
+          >
+            Cancel
+          </UButton>
 
-        <UButton
-          aria-label="Close editor"
-          color="neutral"
-          icon="i-lucide-x"
-          size="sm"
-          variant="ghost"
-          @click="closeEditing"
-        />
+          <UButton
+            aria-label="Save"
+            color="neutral"
+            icon="i-lucide-save"
+            :loading="isSaving"
+            size="sm"
+            variant="soft"
+            @click="saveInline"
+          >
+            Save
+          </UButton>
+        </div>
       </div>
     </div>
   </UTheme>
