@@ -171,6 +171,7 @@
     @apply ring-1 ring-inset;
     background-color: var(--admin-bg-muted) !important;
     border-color: var(--admin-border) !important;
+    --tw-ring-color: var(--admin-border) !important;
     color: var(--admin-text-muted) !important;
   }
 
@@ -183,6 +184,7 @@
     @apply ring-1 ring-inset;
     background-color: transparent !important;
     border-color: var(--admin-border-strong) !important;
+    --tw-ring-color: var(--admin-border-strong) !important;
     color: var(--admin-text-muted) !important;
   }
 
@@ -252,6 +254,30 @@
   .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[aria-pressed='true'] {
     color: var(--admin-accent-text) !important;
     background-color: var(--admin-accent-bg) !important;
+  }
+
+  .admin-ui-controls [data-slot='base'].admin-ui-btn-soft {
+    background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text-muted) !important;
+    border-color: var(--admin-border) !important;
+    --tw-ring-color: var(--admin-border) !important;
+  }
+
+  .admin-ui-controls [data-slot='base'].admin-ui-btn-soft:hover {
+    background-color: var(--admin-bg-strong) !important;
+    color: var(--admin-text-strong) !important;
+  }
+
+  .admin-ui-controls [data-slot='base'].admin-ui-btn-outline {
+    background-color: transparent !important;
+    color: var(--admin-text-muted) !important;
+    border-color: var(--admin-border-strong) !important;
+    --tw-ring-color: var(--admin-border-strong) !important;
+  }
+
+  .admin-ui-controls [data-slot='base'].admin-ui-btn-outline:hover {
+    background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text-strong) !important;
   }
 
   .admin-editor-prose {
