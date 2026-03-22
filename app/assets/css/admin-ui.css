@@ -4,21 +4,21 @@
   }
 
   .admin-ui-scope {
-    --ui-bg: var(--ui-color-neutral-50);
-    --ui-text: var(--ui-color-neutral-900);
-    --ui-text-muted: var(--ui-color-neutral-600);
-    --ui-text-toned: var(--ui-color-neutral-700);
-    --ui-text-highlighted: var(--ui-color-neutral-900);
-    --ui-border: var(--ui-color-neutral-300);
+    --ui-bg: var(--ui-color-neutral-50) !important;
+    --ui-text: var(--ui-color-neutral-900) !important;
+    --ui-text-muted: var(--ui-color-neutral-600) !important;
+    --ui-text-toned: var(--ui-color-neutral-700) !important;
+    --ui-text-highlighted: var(--ui-color-neutral-900) !important;
+    --ui-border: var(--ui-color-neutral-300) !important;
   }
 
   .dark .admin-ui-scope {
-    --ui-bg: var(--ui-color-neutral-950);
-    --ui-text: var(--ui-color-neutral-100);
-    --ui-text-muted: var(--ui-color-neutral-400);
-    --ui-text-toned: var(--ui-color-neutral-300);
-    --ui-text-highlighted: var(--ui-color-neutral-100);
-    --ui-border: var(--ui-color-neutral-700);
+    --ui-bg: var(--ui-color-neutral-950) !important;
+    --ui-text: var(--ui-color-neutral-100) !important;
+    --ui-text-muted: var(--ui-color-neutral-400) !important;
+    --ui-text-toned: var(--ui-color-neutral-300) !important;
+    --ui-text-highlighted: var(--ui-color-neutral-100) !important;
+    --ui-border: var(--ui-color-neutral-700) !important;
   }
 
   .admin-ui-panel {
@@ -49,6 +49,14 @@
     @apply p-2 text-sm text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:bg-amber-50 aria-[current=page]:text-amber-700 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-amber-400/10 dark:aria-[current=page]:text-amber-300;
   }
 
+  .admin-ui-nav-root [class*='border-default'] {
+    border-color: var(--ui-color-neutral-300) !important;
+  }
+
+  .dark .admin-ui-nav-root [class*='border-default'] {
+    border-color: var(--ui-color-neutral-700) !important;
+  }
+
   .admin-ui-btn-base {
     @apply !font-medium;
   }
@@ -77,6 +85,24 @@
     @apply border !border-zinc-300 !bg-zinc-50 !text-zinc-900 dark:!border-zinc-700 dark:!bg-zinc-950 dark:!text-zinc-100;
   }
 
+  .admin-ui-panel a,
+  .admin-ui-controls a {
+    @apply text-zinc-700 dark:text-zinc-300;
+  }
+
+  .admin-ui-panel a:hover,
+  .admin-ui-controls a:hover {
+    @apply text-zinc-900 dark:text-zinc-100;
+  }
+
+  .admin-ui-controls .ui-button {
+    @apply !text-zinc-800 !bg-zinc-100 hover:!bg-zinc-200 dark:!text-zinc-100 dark:!bg-zinc-800 dark:hover:!bg-zinc-700;
+  }
+
+  .admin-ui-controls .ui-button[class*='outline'] {
+    @apply !bg-transparent !ring-zinc-400 hover:!bg-zinc-100 dark:!ring-zinc-600 dark:hover:!bg-zinc-800;
+  }
+
   .admin-editor-prose {
     p,
     ul,
@@ -90,8 +116,12 @@
       @apply leading-7;
     }
 
-    ul:not(.list-none) > li {
-      @apply ms-4 list-disc;
+    .list-none > li {
+      @apply ms-0 list-none;
+    }
+
+    li > p {
+      @apply p-0;
     }
 
     a {
