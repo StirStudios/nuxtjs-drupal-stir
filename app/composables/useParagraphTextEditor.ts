@@ -10,10 +10,13 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
   const HeadingWithClass = Heading.extend({
     addAttributes() {
       return {
-        ...this.parent?.(),
+        level: {
+          default: 1,
+          rendered: false,
+        },
         class: {
           default: null,
-          parseHTML: element => element.getAttribute('class'),
+          parseHTML: (element: Element) => element.getAttribute('class'),
         },
       }
     },
@@ -24,7 +27,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
       return {
         class: {
           default: null,
-          parseHTML: element => element.getAttribute('class'),
+          parseHTML: (element: Element) => element.getAttribute('class'),
         },
       }
     },
@@ -33,10 +36,19 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
   const OrderedListWithClass = OrderedList.extend({
     addAttributes() {
       return {
-        ...this.parent?.(),
+        start: {
+          default: 1,
+          parseHTML: (element: Element) => {
+            return element.hasAttribute('start') ? Number.parseInt(element.getAttribute('start') || '', 10) : 1
+          },
+        },
+        type: {
+          default: null,
+          parseHTML: (element: Element) => element.getAttribute('type'),
+        },
         class: {
           default: null,
-          parseHTML: element => element.getAttribute('class'),
+          parseHTML: (element: Element) => element.getAttribute('class'),
         },
       }
     },
@@ -47,11 +59,11 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
       return {
         class: {
           default: null,
-          parseHTML: element => element.getAttribute('class'),
+          parseHTML: (element: Element) => element.getAttribute('class'),
         },
         'data-list-item-id': {
           default: null,
-          parseHTML: element => element.getAttribute('data-list-item-id'),
+          parseHTML: (element: Element) => element.getAttribute('data-list-item-id'),
         },
       }
     },

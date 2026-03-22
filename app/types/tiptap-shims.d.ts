@@ -9,6 +9,34 @@ declare module '@tiptap/core' {
   ): Record<string, unknown>
 }
 
+declare module '@tiptap/extension-heading' {
+  const Heading: {
+    extend(config: unknown): unknown
+  }
+  export default Heading
+}
+
+declare module '@tiptap/extension-bullet-list' {
+  const BulletList: {
+    extend(config: unknown): unknown
+  }
+  export default BulletList
+}
+
+declare module '@tiptap/extension-ordered-list' {
+  const OrderedList: {
+    extend(config: unknown): unknown
+  }
+  export default OrderedList
+}
+
+declare module '@tiptap/extension-list-item' {
+  const ListItem: {
+    extend(config: unknown): unknown
+  }
+  export default ListItem
+}
+
 declare module '@tiptap/vue-3' {
   export interface EditorChain {
     focus(): EditorChain

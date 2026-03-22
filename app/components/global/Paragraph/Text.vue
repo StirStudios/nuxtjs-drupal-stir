@@ -25,6 +25,7 @@ const { isAdministrator } = usePageContext()
 
 const isEditing = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
+const editSourceText = ref<string | null>(null)
 
 const sourceText = computed(() => {
   const rawSnake = attrs.text_source ?? attrs['text-source']
@@ -41,12 +42,27 @@ const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value 
 const hasIframeEmbed = computed(() => sourceText.value.toLowerCase().includes('<iframe'))
 const richTextClass = 'prose max-w-none'
 
-function startEditing() {
+async function startEditing() {
+  editSourceText.value = sourceText.value
+
+  if (canInlineEdit.value && paragraphId.value > 0) {
+    try {
+      const response = await $fetch<{ ok: boolean; text?: string }>(`/api/paragraph/${paragraphId.value}/text`)
+
+      if (response?.ok === true && typeof response.text === 'string') {
+        editSourceText.value = response.text
+      }
+    } catch {
+      // Keep fallback source text if fetch fails.
+    }
+  }
+
   isEditing.value = true
 }
 
 function stopEditing() {
   isEditing.value = false
+  editSourceText.value = null
 }
 </script>
 
@@ -64,7 +80,7 @@ function stopEditing() {
             v-if="isEditing && canInlineEdit"
             :classes="classes"
             :paragraph-id="paragraphId"
-            :source-text="sourceText"
+            :source-text="editSourceText ?? sourceText"
             @cancel="stopEditing"
             @saved="stopEditing"
           />
