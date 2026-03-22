@@ -19,7 +19,6 @@ const props = defineProps<{
 
 const { post, orientation } = useTeaserPost(props.teaser, {
   title: props.title,
-  nid: props.nid,
   url: props.url,
   created: props.created,
   orientation: props.orientation,

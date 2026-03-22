@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '~/composables/useParagraphTextEditor'
+import { adminUiTheme } from '~/utils/adminUiTheme'
 import { normalizeEditorHtmlForSave } from '~/utils/normalizeEditorHtmlForSave'
 
 const props = defineProps<{
@@ -21,7 +22,7 @@ const editPanelRef = ref<HTMLElement | null>(null)
 const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
-const toolbarClass = 'sticky top-0 z-10 mb-2 border-b border-default bg-default px-2 py-2'
+const toolbarClass = 'admin-ui-toolbar sticky top-0 z-10 mb-2 px-2 py-2'
 const shouldShowBubbleToolbar = (payload: { view: { hasFocus: () => boolean }; state: { selection: { empty: boolean } } }) => {
   return payload.view.hasFocus() && payload.state.selection.empty === false
 }
@@ -123,71 +124,73 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    ref="editPanelRef"
-    :class="['rounded-md border border-default bg-default p-4', classes]"
-  >
-    <UEditor
-      v-slot="{ editor }"
-      v-model="editorValue"
-      class="w-full min-h-32 max-h-[60vh] overflow-y-auto"
-      content-type="html"
-      :extensions="extensions"
-      :handlers="customHandlers"
-      :inject-css="false"
-      placeholder="Type / for commands..."
-      :starter-kit="{
-        trailingNode: false,
-        heading: false,
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
-        taskList: false,
-        taskItem: false,
-      }"
-      :ui="editorUi"
+  <UTheme :ui="adminUiTheme">
+    <div
+      ref="editPanelRef"
+      :class="['admin-ui admin-ui-scope admin-ui-panel rounded-md p-4', classes]"
     >
-      <div :class="toolbarClass">
+      <UEditor
+        v-slot="{ editor }"
+        v-model="editorValue"
+        class="w-full min-h-32 max-h-[60vh] overflow-y-auto"
+        content-type="html"
+        :extensions="extensions"
+        :handlers="customHandlers"
+        :inject-css="false"
+        placeholder="Type / for commands..."
+        :starter-kit="{
+          trailingNode: false,
+          heading: false,
+          bulletList: false,
+          orderedList: false,
+          listItem: false,
+          taskList: false,
+          taskItem: false,
+        }"
+        :ui="editorUi"
+      >
+        <div :class="toolbarClass">
+          <UEditorToolbar
+            class="border-0 bg-transparent p-0"
+            :editor="editor"
+            :items="fixedToolbarItems"
+          />
+        </div>
+
         <UEditorToolbar
-          class="border-0 bg-transparent p-0"
           :editor="editor"
-          :items="fixedToolbarItems"
+          :items="bubbleToolbarItems"
+          layout="bubble"
+          :should-show="shouldShowBubbleToolbar"
         />
+
+        <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
+      </UEditor>
+
+      <div class="mt-3 flex items-center gap-2">
+        <UButton
+          :disabled="isSaving"
+          icon="i-lucide-save"
+          :loading="isSaving"
+          size="sm"
+          @click="saveInline"
+        >
+          Save
+        </UButton>
+        <UButton
+          color="neutral"
+          :disabled="isSaving"
+          icon="i-lucide-x"
+          size="sm"
+          variant="outline"
+          @click="cancelEditing"
+        >
+          Cancel
+        </UButton>
+
+        <span v-if="saveError" class="text-sm text-error">{{ saveError }}</span>
+        <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
       </div>
-
-      <UEditorToolbar
-        :editor="editor"
-        :items="bubbleToolbarItems"
-        layout="bubble"
-        :should-show="shouldShowBubbleToolbar"
-      />
-
-      <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
-    </UEditor>
-
-    <div class="mt-3 flex items-center gap-2">
-      <UButton
-        :disabled="isSaving"
-        icon="i-lucide-save"
-        :loading="isSaving"
-        size="sm"
-        @click="saveInline"
-      >
-        Save
-      </UButton>
-      <UButton
-        color="neutral"
-        :disabled="isSaving"
-        icon="i-lucide-x"
-        size="sm"
-        variant="outline"
-        @click="cancelEditing"
-      >
-        Cancel
-      </UButton>
-
-      <span v-if="saveError" class="text-sm text-error">{{ saveError }}</span>
-      <span v-else-if="saveSuccess" class="text-sm text-success">{{ saveSuccess }}</span>
     </div>
-  </div>
+  </UTheme>
 </template>

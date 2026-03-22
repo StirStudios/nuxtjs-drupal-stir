@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
+import { adminUiTheme } from '~/utils/adminUiTheme'
 
 const { getPage } = useDrupalCe()
 const page = getPage()
@@ -223,13 +224,13 @@ const links = computed(() => {
 })
 
 const adminTabsFontClass = 'app-admin-tabs-font'
-const adminTabsSurfaceClass = '!border !border-zinc-200 !ring-0 bg-zinc-100 dark:!border-zinc-800 dark:bg-zinc-900'
+const adminTabsSurfaceClass = 'admin-ui-nav-surface'
 
 const navigationUi = {
-  root: `${adminTabsFontClass} sticky top-0 z-60 h-[3.5rem] w-full border-b border-zinc-200 bg-zinc-100 p-4 text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100`,
+  root: `admin-ui admin-ui-scope admin-ui-nav-root ${adminTabsFontClass} sticky top-0 z-60 h-[3.5rem] w-full p-4`,
   list: 'isolate',
   item: 'relative',
-  link: `${adminTabsFontClass} before:bg-transparent text-sm font-medium text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:before:bg-transparent dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15`,
+  link: `${adminTabsFontClass} admin-ui-nav-link before:bg-transparent text-sm font-medium dark:before:bg-transparent`,
   linkLabel: 'sr-only md:not-sr-only md:block',
   linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
   linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
@@ -237,18 +238,20 @@ const navigationUi = {
   content: `${adminTabsFontClass} rounded-md ${adminTabsSurfaceClass} p-1`,
   childList: 'space-y-0.5 !ms-0 !border-0',
   childItem: '',
-  childLink: `${adminTabsFontClass} p-2 text-sm text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:text-amber-700 aria-[current=page]:bg-amber-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:bg-amber-400/10`,
+  childLink: `${adminTabsFontClass} admin-ui-nav-child-link`,
   childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
   childLinkLabel: 'truncate',
 }
 </script>
 
 <template>
-  <UNavigationMenu
-    color="neutral"
-    content-orientation="vertical"
-    :items="links"
-    :ui="navigationUi"
-    variant="link"
-  />
+  <UTheme :ui="adminUiTheme">
+    <UNavigationMenu
+      color="neutral"
+      content-orientation="vertical"
+      :items="links"
+      :ui="navigationUi"
+      variant="link"
+    />
+  </UTheme>
 </template>

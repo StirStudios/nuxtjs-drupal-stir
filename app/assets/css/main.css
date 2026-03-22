@@ -2,6 +2,7 @@
 @import '@nuxt/ui';
 
 @import './base';
+@import './admin-ui';
 @import './utilities';
 @import './safelist.inline';
 

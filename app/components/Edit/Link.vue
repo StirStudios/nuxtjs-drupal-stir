@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
+import { adminUiTheme } from '~/utils/adminUiTheme'
 
 defineOptions({
   inheritAttrs: false,
@@ -188,26 +189,28 @@ onBeforeUnmount(() => {
       @mouseenter="isControlsHovered = true"
       @mouseleave="isControlsHovered = false"
     >
-      <UFieldGroup
-        class="pointer-events-auto rounded-md bg-default/95 shadow-lg ring-1 ring-default backdrop-blur-sm"
-        size="xs"
-      >
-        <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
-          <UButton
-            :aria-label="action.ariaLabel"
-            color="neutral"
-            :disabled="action.disabled"
-            :icon="action.icon"
-            :rel="action.rel"
-            :target="action.target"
-            :to="action.to"
-            :variant="action.variant"
-            @click="action.onClick?.()"
-          >
-            <span class="sr-only">{{ action.ariaLabel }}</span>
-          </UButton>
-        </UTooltip>
-      </UFieldGroup>
+      <UTheme :ui="adminUiTheme">
+        <UFieldGroup
+          class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
+          size="xs"
+        >
+          <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
+            <UButton
+              :aria-label="action.ariaLabel"
+              color="neutral"
+              :disabled="action.disabled"
+              :icon="action.icon"
+              :rel="action.rel"
+              :target="action.target"
+              :to="action.to"
+              :variant="action.variant"
+              @click="action.onClick?.()"
+            >
+              <span class="sr-only">{{ action.ariaLabel }}</span>
+            </UButton>
+          </UTooltip>
+        </UFieldGroup>
+      </UTheme>
     </div>
   </Teleport>
 </template>
