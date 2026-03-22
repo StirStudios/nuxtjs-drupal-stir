@@ -171,20 +171,34 @@
     @apply ring-1 ring-inset;
     background-color: var(--admin-bg-muted) !important;
     border-color: var(--admin-border) !important;
+    color: var(--admin-text-muted) !important;
   }
 
   .admin-ui-btn-soft:hover {
     background-color: var(--admin-bg-strong) !important;
+    color: var(--admin-text-strong) !important;
   }
 
   .admin-ui-btn-outline {
     @apply ring-1 ring-inset;
     background-color: transparent !important;
     border-color: var(--admin-border-strong) !important;
+    color: var(--admin-text-muted) !important;
   }
 
   .admin-ui-btn-outline:hover {
     background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text-strong) !important;
+  }
+
+  .admin-ui-btn-ghost {
+    background-color: transparent !important;
+    color: var(--admin-text-muted) !important;
+  }
+
+  .admin-ui-btn-ghost:hover {
+    background-color: color-mix(in srgb, var(--admin-bg-strong) 70%, transparent) !important;
+    color: var(--admin-text-strong) !important;
   }
 
   .admin-ui-field-group {

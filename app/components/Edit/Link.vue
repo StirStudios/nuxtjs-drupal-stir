@@ -85,34 +85,33 @@ const hasActions = computed(() => actions.value.length > 0)
 </script>
 
 <template>
-  <div class="admin-ui-edit-shell group relative">
+  <div v-if="hasActions" class="admin-ui-edit-shell group relative">
     <slot />
-    <div
-      v-if="hasActions"
+    <UTheme
       class="pointer-events-none absolute right-2 top-2 z-100 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+      :ui="adminUiTheme"
     >
-      <UTheme :ui="adminUiTheme">
-        <UFieldGroup
-          class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
-          size="xs"
-        >
-          <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
-            <UButton
-              :aria-label="action.ariaLabel"
-              color="neutral"
-              :disabled="action.disabled"
-              :icon="action.icon"
-              :rel="action.rel"
-              :target="action.target"
-              :to="action.to"
-              :variant="action.variant"
-              @click="action.onClick?.()"
-            >
-              <span class="sr-only">{{ action.ariaLabel }}</span>
-            </UButton>
-          </UTooltip>
-        </UFieldGroup>
-      </UTheme>
-    </div>
+      <UFieldGroup
+        class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto rounded-md shadow-lg"
+        size="xs"
+      >
+        <UTooltip v-for="action in actions" :key="action.key" :text="action.tooltip">
+          <UButton
+            :aria-label="action.ariaLabel"
+            color="neutral"
+            :disabled="action.disabled"
+            :icon="action.icon"
+            :rel="action.rel"
+            :target="action.target"
+            :to="action.to"
+            :variant="action.variant"
+            @click="action.onClick?.()"
+          >
+            <span class="sr-only">{{ action.ariaLabel }}</span>
+          </UButton>
+        </UTooltip>
+      </UFieldGroup>
+    </UTheme>
   </div>
+  <slot v-else />
 </template>

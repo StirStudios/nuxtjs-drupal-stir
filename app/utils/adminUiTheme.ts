@@ -30,6 +30,7 @@ export const adminUiTheme = {
       variant: {
         soft: 'admin-ui-btn-soft',
         outline: 'admin-ui-btn-outline',
+        ghost: 'admin-ui-btn-ghost',
       },
     },
   },
