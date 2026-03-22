@@ -10,23 +10,6 @@
     --ui-text-toned: var(--ui-color-neutral-700);
     --ui-text-highlighted: var(--ui-color-neutral-900);
     --ui-border: var(--ui-color-neutral-300);
-
-    --admin-bg-surface: var(--ui-color-neutral-50);
-    --admin-bg-muted: var(--ui-color-neutral-100);
-    --admin-bg-strong: var(--ui-color-neutral-200);
-    --admin-text: var(--ui-color-neutral-900);
-    --admin-text-muted: var(--ui-color-neutral-700);
-    --admin-text-strong: var(--ui-color-neutral-950);
-    --admin-border: var(--ui-color-neutral-300);
-    --admin-border-strong: var(--ui-color-neutral-400);
-
-    --admin-accent-text: var(--ui-color-amber-700);
-    --admin-accent-bg: color-mix(in srgb, var(--ui-color-amber-100) 70%, transparent);
-    --admin-accent-bg-subtle: var(--ui-color-amber-50);
-
-    --admin-tooltip-bg: var(--ui-color-neutral-100);
-    --admin-tooltip-text: var(--ui-color-neutral-900);
-    --admin-tooltip-border: var(--ui-color-neutral-300);
   }
 
   .dark .admin-ui-scope {
@@ -36,93 +19,34 @@
     --ui-text-toned: var(--ui-color-neutral-300);
     --ui-text-highlighted: var(--ui-color-neutral-100);
     --ui-border: var(--ui-color-neutral-700);
-
-    --admin-bg-surface: var(--ui-color-neutral-950);
-    --admin-bg-muted: var(--ui-color-neutral-900);
-    --admin-bg-strong: var(--ui-color-neutral-800);
-    --admin-text: var(--ui-color-neutral-100);
-    --admin-text-muted: var(--ui-color-neutral-200);
-    --admin-text-strong: var(--ui-color-white);
-    --admin-border: var(--ui-color-neutral-700);
-    --admin-border-strong: var(--ui-color-neutral-600);
-
-    --admin-accent-text: var(--ui-color-amber-300);
-    --admin-accent-bg: color-mix(in srgb, var(--ui-color-amber-400) 15%, transparent);
-    --admin-accent-bg-subtle: color-mix(in srgb, var(--ui-color-amber-400) 10%, transparent);
-
-    --admin-tooltip-bg: var(--ui-color-neutral-900);
-    --admin-tooltip-text: var(--ui-color-neutral-50);
-    --admin-tooltip-border: var(--ui-color-neutral-700);
   }
 
   .admin-ui-panel {
-    @apply border;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-surface);
-    color: var(--admin-text);
+    @apply border border-zinc-300 bg-zinc-50 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100;
   }
 
   .admin-ui-toolbar {
-    @apply border-b;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-muted);
+    @apply border-b border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900;
   }
 
   .admin-ui-controls {
-    @apply border;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-muted);
+    @apply border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900;
   }
 
   .admin-ui-nav-root {
-    @apply border-b shadow-sm;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-surface);
-    color: var(--admin-text);
+    @apply border-b border-zinc-300 bg-zinc-50 text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100;
   }
 
   .admin-ui-nav-surface {
-    @apply !border !ring-0;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-surface);
+    @apply !border !border-zinc-300 !ring-0 bg-zinc-50 dark:!border-zinc-700 dark:bg-zinc-950;
   }
 
   .admin-ui-nav-link {
-    @apply !text-sm;
-    color: var(--admin-text-muted) !important;
-  }
-
-  .admin-ui-nav-link:hover {
-    color: var(--admin-text-strong) !important;
-  }
-
-  .admin-ui-nav-link:hover::before {
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent);
-  }
-
-  .admin-ui-nav-link[data-state='open'],
-  .admin-ui-nav-link[aria-current='page'] {
-    color: var(--admin-accent-text) !important;
-  }
-
-  .admin-ui-nav-link[data-state='open']::before,
-  .admin-ui-nav-link[aria-current='page']::before {
-    background-color: var(--admin-accent-bg);
+    @apply text-zinc-700 hover:text-zinc-900 hover:before:bg-zinc-200/80 data-[state=open]:!text-amber-700 data-[state=open]:before:!bg-amber-100/70 aria-[current=page]:text-amber-700 aria-[current=page]:before:bg-amber-100/70 dark:text-zinc-200 dark:hover:text-white dark:hover:before:bg-zinc-700/50 dark:data-[state=open]:!text-amber-300 dark:data-[state=open]:before:!bg-amber-400/15 dark:aria-[current=page]:text-amber-300 dark:aria-[current=page]:before:bg-amber-400/15;
   }
 
   .admin-ui-nav-child-link {
-    @apply p-2 text-sm;
-    color: var(--admin-text-muted) !important;
-  }
-
-  .admin-ui-nav-child-link:hover {
-    background-color: color-mix(in srgb, var(--admin-bg-strong) 80%, transparent);
-    color: var(--admin-text-strong) !important;
-  }
-
-  .admin-ui-nav-child-link[aria-current='page'] {
-    background-color: var(--admin-accent-bg-subtle);
-    color: var(--admin-accent-text) !important;
+    @apply p-2 text-sm text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 aria-[current=page]:bg-amber-50 aria-[current=page]:text-amber-700 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-amber-400/10 dark:aria-[current=page]:text-amber-300;
   }
 
   .admin-ui-btn-base {
@@ -130,52 +54,27 @@
   }
 
   .admin-ui-btn-neutral {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text-muted) !important;
-  }
-
-  .admin-ui-btn-neutral:hover {
-    background-color: var(--admin-bg-strong) !important;
+    @apply !bg-zinc-100 !text-zinc-800 hover:!bg-zinc-200 dark:!bg-zinc-800 dark:!text-zinc-100 dark:hover:!bg-zinc-700;
   }
 
   .admin-ui-btn-soft {
-    @apply ring-1 ring-inset;
-    background-color: var(--admin-bg-muted) !important;
-    border-color: var(--admin-border) !important;
-  }
-
-  .admin-ui-btn-soft:hover {
-    background-color: var(--admin-bg-strong) !important;
+    @apply !bg-zinc-100 ring-1 ring-inset !ring-zinc-300 hover:!bg-zinc-200 dark:!bg-zinc-800 dark:!ring-zinc-700 dark:hover:!bg-zinc-700;
   }
 
   .admin-ui-btn-outline {
-    @apply ring-1 ring-inset;
-    background-color: transparent !important;
-    border-color: var(--admin-border-strong) !important;
-  }
-
-  .admin-ui-btn-outline:hover {
-    background-color: var(--admin-bg-muted) !important;
+    @apply !bg-transparent ring-1 ring-inset !ring-zinc-400 hover:!bg-zinc-100 dark:!ring-zinc-600 dark:hover:!bg-zinc-800;
   }
 
   .admin-ui-field-group {
-    @apply rounded-md border shadow-lg;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-muted) !important;
+    @apply rounded-md border !border-zinc-300 !bg-zinc-50 shadow-lg dark:!border-zinc-700 dark:!bg-zinc-900;
   }
 
   .admin-ui-tooltip-content {
-    @apply border;
-    background-color: var(--admin-tooltip-bg) !important;
-    color: var(--admin-tooltip-text) !important;
-    border-color: var(--admin-tooltip-border) !important;
+    @apply !bg-zinc-900 !text-zinc-50 border !border-zinc-800 dark:!bg-zinc-100 dark:!text-zinc-900 dark:!border-zinc-200;
   }
 
   .admin-ui-editor-root {
-    @apply border;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-surface) !important;
-    color: var(--admin-text) !important;
+    @apply border !border-zinc-300 !bg-zinc-50 !text-zinc-900 dark:!border-zinc-700 dark:!bg-zinc-950 dark:!text-zinc-100;
   }
 
   .admin-editor-prose {
@@ -200,7 +99,7 @@
     }
 
     a {
-      color: var(--admin-text-muted);
+      @apply text-zinc-700 dark:text-zinc-300;
     }
 
     section,
