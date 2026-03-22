@@ -184,7 +184,6 @@ onBeforeUnmount(() => {
         content-type="html"
         :extensions="extensions"
         :handlers="customHandlers"
-        :inject-css="false"
         placeholder="Type / for commands..."
         :starter-kit="{
           trailingNode: false,
