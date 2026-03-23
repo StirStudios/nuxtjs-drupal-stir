@@ -27,6 +27,7 @@
     --admin-text-muted: var(--admin-z-700) !important;
     --admin-text-strong: var(--admin-z-950) !important;
     --admin-border: #d4d4d8 !important;
+    --admin-border-subtle: color-mix(in srgb, var(--admin-border) 55%, transparent) !important;
 
     --admin-accent-text: var(--admin-amber-700) !important;
     --admin-accent-bg: color-mix(
@@ -57,6 +58,7 @@
       --admin-text-muted: var(--admin-z-200) !important;
       --admin-text-strong: var(--admin-white) !important;
       --admin-border: #3f3f46 !important;
+      --admin-border-subtle: color-mix(in srgb, var(--admin-border) 45%, transparent) !important;
 
       --admin-accent-text: var(--admin-amber-300) !important;
       --admin-accent-bg: color-mix(
@@ -91,7 +93,7 @@
 
   .admin-ui-controls {
     @apply border;
-    border-color: var(--admin-border);
+    border-color: var(--admin-border-subtle);
     background-color: var(--admin-bg-muted);
   }
 
@@ -108,7 +110,7 @@
 
   .admin-ui-nav-surface {
     @apply !border !ring-0;
-    border-color: var(--admin-border) !important;
+    border-color: var(--admin-border-subtle) !important;
     background-color: var(--admin-bg);
   }
 
@@ -172,8 +174,8 @@
   .admin-ui-btn-soft {
     @apply ring-1 ring-inset;
     background-color: var(--admin-bg-muted) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
     color: var(--admin-text-muted) !important;
 
     &:hover {
@@ -185,8 +187,8 @@
   .admin-ui-btn-outline {
     @apply ring-1 ring-inset;
     background-color: transparent !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
     color: var(--admin-text-muted) !important;
 
     &:hover {
@@ -231,7 +233,7 @@
 
   .admin-ui-field-group {
     @apply rounded-md border shadow-lg;
-    border-color: var(--admin-border) !important;
+    border-color: var(--admin-border-subtle) !important;
     background-color: var(--admin-bg-muted);
   }
 
@@ -239,25 +241,25 @@
     @apply border ring ring-inset;
     background-color: #f4f4f5 !important;
     color: #18181b !important;
-    border-color: #d4d4d8 !important;
-    --tw-ring-color: #d4d4d8 !important;
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
   }
 
   .admin-ui-tooltip-arrow {
     fill: #f4f4f5 !important;
-    stroke: #d4d4d8 !important;
+    stroke: var(--admin-border-subtle) !important;
   }
 
   .dark .admin-ui-tooltip-content {
     background-color: #18181b !important;
     color: #fafafa !important;
-    border-color: #3f3f46 !important;
-    --tw-ring-color: #3f3f46 !important;
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
   }
 
   .dark .admin-ui-tooltip-arrow {
     fill: #18181b !important;
-    stroke: #3f3f46 !important;
+    stroke: var(--admin-border-subtle) !important;
   }
 
   .admin-ui-editor-root {
@@ -325,8 +327,8 @@
     [data-slot='base'].admin-ui-btn-soft {
       background-color: var(--admin-bg-muted) !important;
       color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
+      border-color: var(--admin-border-subtle) !important;
+      --tw-ring-color: var(--admin-border-subtle) !important;
 
       &:hover {
         background-color: var(--admin-bg-strong) !important;
@@ -337,8 +339,8 @@
     [data-slot='base'].admin-ui-btn-outline {
       background-color: transparent !important;
       color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
+      border-color: var(--admin-border-subtle) !important;
+      --tw-ring-color: var(--admin-border-subtle) !important;
 
       &:hover {
         background-color: var(--admin-bg-muted) !important;
@@ -351,8 +353,8 @@
     [data-slot='base'].admin-ui-btn-soft {
       background-color: var(--admin-bg-muted) !important;
       color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
+      border-color: var(--admin-border-subtle) !important;
+      --tw-ring-color: var(--admin-border-subtle) !important;
 
       &:hover,
       &:focus-visible,
@@ -365,8 +367,8 @@
     [data-slot='base'].admin-ui-btn-outline {
       background-color: transparent !important;
       color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
+      border-color: var(--admin-border-subtle) !important;
+      --tw-ring-color: var(--admin-border-subtle) !important;
 
       &:hover,
       &:focus-visible,

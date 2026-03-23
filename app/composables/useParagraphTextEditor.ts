@@ -7,6 +7,12 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
+  const adminTooltipUi = {
+    content: 'admin-ui-tooltip-content',
+    arrow: 'admin-ui-tooltip-arrow',
+  }
+  const withTooltip = (text: string) => ({ text, ui: adminTooltipUi })
+
   const HeadingWithClass = Heading.extend({
     addAttributes() {
       return {
@@ -147,31 +153,31 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
   ]
 
   const headingToolbarItems = [
-    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: { text: 'Heading 2' } },
-    { kind: 'heading', level: 3, icon: 'i-lucide-heading-3', tooltip: { text: 'Heading 3' } },
-    { kind: 'paragraph', icon: 'i-lucide-pilcrow', tooltip: { text: 'Paragraph' } },
+    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: withTooltip('Heading 2') },
+    { kind: 'heading', level: 3, icon: 'i-lucide-heading-3', tooltip: withTooltip('Heading 3') },
+    { kind: 'paragraph', icon: 'i-lucide-pilcrow', tooltip: withTooltip('Paragraph') },
   ]
 
   const markToolbarItems = [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Bold' } },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Italic' } },
-    { kind: 'mark', mark: 'underline', icon: 'i-lucide-underline', tooltip: { text: 'Underline' } },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: 'Strike' } },
-    { kind: 'linkEdit', icon: 'i-lucide-link', tooltip: { text: 'Link' } },
-    { kind: 'unlink', icon: 'i-lucide-link-2-off', tooltip: { text: 'Remove link' } },
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: withTooltip('Bold') },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: withTooltip('Italic') },
+    { kind: 'mark', mark: 'underline', icon: 'i-lucide-underline', tooltip: withTooltip('Underline') },
+    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: withTooltip('Strike') },
+    { kind: 'linkEdit', icon: 'i-lucide-link', tooltip: withTooltip('Link') },
+    { kind: 'unlink', icon: 'i-lucide-link-2-off', tooltip: withTooltip('Remove link') },
   ]
 
   const listToolbarItems = [
-    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: 'Bulleted list' } },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: 'Numbered list' } },
-    { kind: 'blockquote', icon: 'i-lucide-text-quote', tooltip: { text: 'Quote' } },
-    { kind: 'horizontalRule', icon: 'i-lucide-minus', tooltip: { text: 'Divider' } },
+    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: withTooltip('Bulleted list') },
+    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: withTooltip('Numbered list') },
+    { kind: 'blockquote', icon: 'i-lucide-text-quote', tooltip: withTooltip('Quote') },
+    { kind: 'horizontalRule', icon: 'i-lucide-minus', tooltip: withTooltip('Divider') },
   ]
 
   const fixedToolbarItems = [
     [
-      { kind: 'undo', icon: 'i-lucide-undo', tooltip: { text: 'Undo' } },
-      { kind: 'redo', icon: 'i-lucide-redo', tooltip: { text: 'Redo' } },
+      { kind: 'undo', icon: 'i-lucide-undo', tooltip: withTooltip('Undo') },
+      { kind: 'redo', icon: 'i-lucide-redo', tooltip: withTooltip('Redo') },
     ],
     headingToolbarItems,
     markToolbarItems,
