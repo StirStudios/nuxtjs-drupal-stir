@@ -131,47 +131,46 @@
 
   .admin-ui-nav-link {
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-nav-link:hover {
-    color: var(--admin-text-strong) !important;
-  }
+    &:hover {
+      color: var(--admin-text-strong) !important;
 
-  .admin-ui-nav-link:hover::before {
-    background-color: color-mix(
-      in srgb,
-      var(--admin-bg-strong) 80%,
-      transparent
-    ) !important;
-  }
+      &::before {
+        background-color: color-mix(
+          in srgb,
+          var(--admin-bg-strong) 80%,
+          transparent
+        ) !important;
+      }
+    }
 
-  .admin-ui-nav-link[data-state='open'],
-  .admin-ui-nav-link[aria-current='page'] {
-    color: var(--admin-accent-text) !important;
-  }
+    &[data-state='open'],
+    &[aria-current='page'] {
+      color: var(--admin-accent-text) !important;
 
-  .admin-ui-nav-link[data-state='open']::before,
-  .admin-ui-nav-link[aria-current='page']::before {
-    background-color: var(--admin-accent-bg) !important;
+      &::before {
+        background-color: var(--admin-accent-bg) !important;
+      }
+    }
   }
 
   .admin-ui-nav-child-link {
     @apply p-2 text-sm;
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-nav-child-link:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--admin-bg-strong) 80%,
-      transparent
-    ) !important;
-    color: var(--admin-text-strong) !important;
-  }
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--admin-bg-strong) 80%,
+        transparent
+      ) !important;
+      color: var(--admin-text-strong) !important;
+    }
 
-  .admin-ui-nav-child-link[aria-current='page'] {
-    background-color: var(--admin-accent-bg-subtle) !important;
-    color: var(--admin-accent-text) !important;
+    &[aria-current='page'] {
+      background-color: var(--admin-accent-bg-subtle) !important;
+      color: var(--admin-accent-text) !important;
+    }
   }
 
   .admin-ui-btn-base {
@@ -181,10 +180,10 @@
   .admin-ui-btn-neutral {
     background-color: var(--admin-bg-muted) !important;
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-btn-neutral:hover {
-    background-color: var(--admin-bg-strong) !important;
+    &:hover {
+      background-color: var(--admin-bg-strong) !important;
+    }
   }
 
   .admin-ui-btn-soft {
@@ -193,11 +192,11 @@
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-btn-soft:hover {
-    background-color: var(--admin-bg-strong) !important;
-    color: var(--admin-text-strong) !important;
+    &:hover {
+      background-color: var(--admin-bg-strong) !important;
+      color: var(--admin-text-strong) !important;
+    }
   }
 
   .admin-ui-btn-outline {
@@ -206,25 +205,25 @@
     border-color: var(--admin-border-strong) !important;
     --tw-ring-color: var(--admin-border-strong) !important;
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-btn-outline:hover {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text-strong) !important;
+    &:hover {
+      background-color: var(--admin-bg-muted) !important;
+      color: var(--admin-text-strong) !important;
+    }
   }
 
   .admin-ui-btn-ghost {
     background-color: transparent !important;
     color: var(--admin-text-muted) !important;
-  }
 
-  .admin-ui-btn-ghost:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--admin-bg-strong) 70%,
-      transparent
-    ) !important;
-    color: var(--admin-text-strong) !important;
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--admin-bg-strong) 70%,
+        transparent
+      ) !important;
+      color: var(--admin-text-strong) !important;
+    }
   }
 
   .admin-ui-btn-solid {
@@ -236,15 +235,15 @@
       var(--admin-text-strong) 35%,
       transparent
     ) !important;
-  }
 
-  .admin-ui-btn-solid:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--admin-text-strong) 85%,
-      white 15%
-    ) !important;
-    color: var(--admin-bg-surface) !important;
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--admin-text-strong) 85%,
+        white 15%
+      ) !important;
+      color: var(--admin-bg-surface) !important;
+    }
   }
 
   .admin-ui-field-group {
@@ -266,16 +265,18 @@
     stroke: #e4e4e7 !important;
   }
 
-  .dark .admin-ui-tooltip-content {
-    background-color: #18181b !important;
-    color: #fafafa !important;
-    border-color: #52525b !important;
-    --tw-ring-color: #52525b !important;
-  }
+  .dark {
+    .admin-ui-tooltip-content {
+      background-color: #18181b !important;
+      color: #fafafa !important;
+      border-color: #52525b !important;
+      --tw-ring-color: #52525b !important;
+    }
 
-  .dark .admin-ui-tooltip-arrow {
-    fill: #18181b !important;
-    stroke: #52525b !important;
+    .admin-ui-tooltip-arrow {
+      fill: #18181b !important;
+      stroke: #52525b !important;
+    }
   }
 
   .admin-ui-editor-root {
@@ -285,9 +286,11 @@
     color: var(--admin-text) !important;
   }
 
-  .admin-ui-editor-root .ProseMirror,
-  .admin-ui-editor-root .tiptap {
-    color: var(--admin-text) !important;
+  .admin-ui-editor-root {
+    .ProseMirror,
+    .tiptap {
+      color: var(--admin-text) !important;
+    }
   }
 
   .admin-ui-status-saving {
@@ -302,48 +305,52 @@
     color: var(--admin-status-success) !important;
   }
 
-  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base {
-    color: var(--admin-text-muted) !important;
-    background-color: transparent !important;
+  .admin-ui-toolbar {
+    [data-slot='base'].admin-ui-btn-base {
+      color: var(--admin-text-muted) !important;
+      background-color: transparent !important;
+
+      &:hover {
+        color: var(--admin-text-strong) !important;
+        background-color: color-mix(
+          in srgb,
+          var(--admin-bg-strong) 70%,
+          transparent
+        ) !important;
+      }
+
+      &[data-state='open'],
+      &[aria-pressed='true'] {
+        color: var(--admin-accent-text) !important;
+        background-color: var(--admin-accent-bg) !important;
+      }
+    }
   }
 
-  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base:hover {
-    color: var(--admin-text-strong) !important;
-    background-color: color-mix(
-      in srgb,
-      var(--admin-bg-strong) 70%,
-      transparent
-    ) !important;
-  }
+  .admin-ui-controls {
+    [data-slot='base'].admin-ui-btn-soft {
+      background-color: var(--admin-bg-muted) !important;
+      color: var(--admin-text-muted) !important;
+      border-color: var(--admin-border) !important;
+      --tw-ring-color: var(--admin-border) !important;
 
-  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[data-state='open'],
-  .admin-ui-toolbar [data-slot='base'].admin-ui-btn-base[aria-pressed='true'] {
-    color: var(--admin-accent-text) !important;
-    background-color: var(--admin-accent-bg) !important;
-  }
+      &:hover {
+        background-color: var(--admin-bg-strong) !important;
+        color: var(--admin-text-strong) !important;
+      }
+    }
 
-  .admin-ui-controls [data-slot='base'].admin-ui-btn-soft {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text-muted) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
-  }
+    [data-slot='base'].admin-ui-btn-outline {
+      background-color: transparent !important;
+      color: var(--admin-text-muted) !important;
+      border-color: var(--admin-border-strong) !important;
+      --tw-ring-color: var(--admin-border-strong) !important;
 
-  .admin-ui-controls [data-slot='base'].admin-ui-btn-soft:hover {
-    background-color: var(--admin-bg-strong) !important;
-    color: var(--admin-text-strong) !important;
-  }
-
-  .admin-ui-controls [data-slot='base'].admin-ui-btn-outline {
-    background-color: transparent !important;
-    color: var(--admin-text-muted) !important;
-    border-color: var(--admin-border-strong) !important;
-    --tw-ring-color: var(--admin-border-strong) !important;
-  }
-
-  .admin-ui-controls [data-slot='base'].admin-ui-btn-outline:hover {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text-strong) !important;
+      &:hover {
+        background-color: var(--admin-bg-muted) !important;
+        color: var(--admin-text-strong) !important;
+      }
+    }
   }
 
   .admin-editor-prose {

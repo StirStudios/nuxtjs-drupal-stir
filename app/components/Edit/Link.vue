@@ -41,6 +41,7 @@ const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const singleActionLabel = computed(() => 'Edit')
+const actionButtonClass = 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft'
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
@@ -56,7 +57,7 @@ const actions = computed<EditAction[]>(() => {
       ariaLabel,
       icon: 'i-lucide-zap',
       variant: 'soft',
-      buttonClass: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft',
+      buttonClass: actionButtonClass,
       disabled: props.quickEditDisabled === true,
       onClick: () => emit('quick-edit'),
     })
@@ -74,7 +75,7 @@ const actions = computed<EditAction[]>(() => {
       ariaLabel,
       icon: 'i-lucide-square-pen',
       variant: 'soft',
-      buttonClass: 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft',
+      buttonClass: actionButtonClass,
       to: fullEditLink.value,
       target: isExternalLink.value ? '_blank' : undefined,
       rel: isExternalLink.value ? 'noopener noreferrer' : undefined,

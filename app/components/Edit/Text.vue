@@ -18,7 +18,6 @@ const emit = defineEmits<{
 const isEditing = ref(true)
 const isSaving = ref(false)
 const saveError = ref('')
-const saveSuccess = ref('')
 const editPanelRef = ref<HTMLElement | null>(null)
 const { y } = useWindowScroll()
 
@@ -40,7 +39,6 @@ const {
 
 function resetEditMessages(): void {
   saveError.value = ''
-  saveSuccess.value = ''
 }
 
 function closeEditor(event: 'cancel' | 'saved', value = ''): void {
@@ -85,7 +83,6 @@ async function saveInline() {
       throw new Error(response?.message || 'Save failed.')
     }
 
-    saveSuccess.value = 'Saved.'
     closeEditor('saved', valueToSave)
   } catch (error) {
     saveError.value = error instanceof Error ? error.message : 'Failed to save paragraph text.'
@@ -203,7 +200,6 @@ onMounted(async () => {
       <div class="mt-4 p-4 flex items-center justify-between gap-3">
         <span v-if="isSaving" class="admin-ui-status-saving text-sm">Saving...</span>
         <span v-else-if="saveError" class="admin-ui-status-error text-sm">{{ saveError }}</span>
-        <span v-else-if="saveSuccess" class="admin-ui-status-success text-sm">{{ saveSuccess }}</span>
         <span v-else class="text-sm text-transparent">Status</span>
         <div class="flex items-center gap-2">
           <UButton
