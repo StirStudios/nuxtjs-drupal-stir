@@ -20,14 +20,7 @@
     --admin-amber-300: #fcd34d !important;
     --admin-amber-500: #f59e0b !important;
 
-    --ui-bg: #fafafa !important;
-    --ui-text: #18181b !important;
-    --ui-text-muted: #52525b !important;
-    --ui-text-toned: #3f3f46 !important;
-    --ui-text-highlighted: #18181b !important;
-    --ui-border: #d4d4d8 !important;
-
-    --admin-bg-surface: var(--admin-z-50) !important;
+    --admin-bg: var(--admin-z-50) !important;
     --admin-bg-muted: var(--admin-z-100) !important;
     --admin-bg-strong: var(--admin-z-200) !important;
     --admin-text: var(--admin-z-900) !important;
@@ -43,59 +36,50 @@
     ) !important;
     --admin-accent-bg-subtle: var(--admin-amber-50) !important;
 
-    --admin-tooltip-bg: var(--admin-z-100) !important;
-    --admin-tooltip-text: var(--admin-z-900) !important;
     --admin-status-saving: var(--admin-text-muted) !important;
     --admin-status-error: #b91c1c !important;
     --admin-status-success: #047857 !important;
   }
 
-  .dark .admin-ui-scope {
-    --ui-bg: #09090b !important;
-    --ui-text: #f4f4f5 !important;
-    --ui-text-muted: #a1a1aa !important;
-    --ui-text-toned: #d4d4d8 !important;
-    --ui-text-highlighted: #f4f4f5 !important;
-    --ui-border: #3f3f46 !important;
+  .dark {
+    .admin-ui-scope {
+      --admin-bg: var(--admin-z-950) !important;
+      --admin-bg-muted: var(--admin-z-900) !important;
+      --admin-bg-strong: var(--admin-z-800) !important;
+      --admin-text: #f4f4f5 !important;
+      --admin-text-muted: var(--admin-z-200) !important;
+      --admin-text-strong: var(--admin-white) !important;
+      --admin-border: #3f3f46 !important;
 
-    --admin-bg-surface: var(--admin-z-950) !important;
-    --admin-bg-muted: var(--admin-z-900) !important;
-    --admin-bg-strong: var(--admin-z-800) !important;
-    --admin-text: #f4f4f5 !important;
-    --admin-text-muted: var(--admin-z-200) !important;
-    --admin-text-strong: var(--admin-white) !important;
-    --admin-border: #3f3f46 !important;
+      --admin-accent-text: var(--admin-amber-300) !important;
+      --admin-accent-bg: color-mix(
+        in srgb,
+        var(--admin-amber-500) 15%,
+        transparent
+      ) !important;
+      --admin-accent-bg-subtle: color-mix(
+        in srgb,
+        var(--admin-amber-500) 10%,
+        transparent
+      ) !important;
 
-    --admin-accent-text: var(--admin-amber-300) !important;
-    --admin-accent-bg: color-mix(
-      in srgb,
-      var(--admin-amber-500) 15%,
-      transparent
-    ) !important;
-    --admin-accent-bg-subtle: color-mix(
-      in srgb,
-      var(--admin-amber-500) 10%,
-      transparent
-    ) !important;
-
-    --admin-tooltip-bg: var(--admin-z-900) !important;
-    --admin-tooltip-text: var(--admin-z-50) !important;
-    --admin-status-saving: var(--admin-text-muted) !important;
-    --admin-status-error: #f87171 !important;
-    --admin-status-success: #34d399 !important;
+      --admin-status-saving: var(--admin-text-muted) !important;
+      --admin-status-error: #f87171 !important;
+      --admin-status-success: #34d399 !important;
+    }
   }
 
   .admin-ui-panel {
     @apply border;
     border-color: var(--admin-border);
-    background-color: var(--admin-bg-surface);
+    background-color: var(--admin-bg);
     color: var(--admin-text) !important;
   }
 
   .admin-ui-toolbar {
     @apply border-b;
     border-color: var(--admin-border);
-    background-color: var(--admin-bg-surface);
+    background-color: var(--admin-bg);
   }
 
   .admin-ui-controls {
@@ -111,14 +95,14 @@
   .admin-ui-nav-root {
     @apply border-b shadow-sm;
     border-color: var(--admin-border);
-    background-color: var(--admin-bg-surface);
+    background-color: var(--admin-bg);
     color: var(--admin-text);
   }
 
   .admin-ui-nav-surface {
     @apply !border !ring-0;
     border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-surface);
+    background-color: var(--admin-bg);
   }
 
   .admin-ui-nav-link {
@@ -220,7 +204,7 @@
 
   .admin-ui-btn-solid {
     background-color: var(--admin-text-strong) !important;
-    color: var(--admin-bg-surface) !important;
+    color: var(--admin-bg) !important;
     border-color: var(--admin-text-strong) !important;
     --tw-ring-color: color-mix(
       in srgb,
@@ -234,7 +218,7 @@
         var(--admin-text-strong) 85%,
         white 15%
       ) !important;
-      color: var(--admin-bg-surface) !important;
+      color: var(--admin-bg) !important;
     }
   }
 
@@ -246,27 +230,27 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: var(--admin-bg-surface) !important;
+    background-color: var(--admin-bg) !important;
     color: var(--admin-text) !important;
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
   }
 
   .admin-ui-tooltip-arrow {
-    fill: var(--admin-bg-surface) !important;
+    fill: var(--admin-bg) !important;
     stroke: var(--admin-border) !important;
   }
 
   .dark {
     .admin-ui-tooltip-content {
-      background-color: var(--admin-bg-surface) !important;
+      background-color: var(--admin-bg) !important;
       color: var(--admin-text) !important;
       border-color: var(--admin-border) !important;
       --tw-ring-color: var(--admin-border) !important;
     }
 
     .admin-ui-tooltip-arrow {
-      fill: var(--admin-bg-surface) !important;
+      fill: var(--admin-bg) !important;
       stroke: var(--admin-border) !important;
     }
   }
@@ -274,7 +258,7 @@
   .admin-ui-editor-root {
     @apply border;
     border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-surface);
+    background-color: var(--admin-bg);
     color: var(--admin-text) !important;
   }
 

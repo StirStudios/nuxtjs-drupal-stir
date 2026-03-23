@@ -41,6 +41,11 @@ export const adminUiTheme = {
         variant: 'ghost',
         class: 'admin-ui-btn-neutral admin-ui-btn-ghost',
       },
+      {
+        color: 'neutral',
+        variant: 'solid',
+        class: 'admin-ui-btn-neutral admin-ui-btn-solid',
+      },
     ],
   },
   fieldGroup: {

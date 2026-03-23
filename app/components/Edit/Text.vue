@@ -204,10 +204,10 @@ onMounted(async () => {
         <div class="flex items-center gap-2">
           <UButton
             aria-label="Cancel"
+            class="rounded-sm"
             color="neutral"
             icon="i-lucide-x"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-soft' }"
             variant="soft"
             @click="cancelEditing"
           >
@@ -216,11 +216,11 @@ onMounted(async () => {
 
           <UButton
             aria-label="Save"
+            class="rounded-sm"
             color="neutral"
             icon="i-lucide-save"
             :loading="isSaving"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-solid' }"
             variant="solid"
             @click="saveInline"
           >
