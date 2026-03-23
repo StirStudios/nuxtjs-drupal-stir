@@ -26,6 +26,7 @@ const { isAdministrator } = usePageContext()
 const isEditing = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
 const editSourceText = ref<string | null>(null)
+const renderedText = ref(props.text ?? '')
 
 const sourceText = computed(() => {
   const rawSnake = attrs.text_source ?? attrs['text-source']
@@ -37,7 +38,7 @@ const sourceText = computed(() => {
   return normalizedTextSource ?? (snakeSource.trim() ? snakeSource : undefined) ?? props.text ?? ''
 })
 
-const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
+const safeTextHtml = computed(() => cleanHTML(renderedText.value))
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
 
@@ -63,6 +64,15 @@ function stopEditing() {
   isEditing.value = false
   editSourceText.value = null
 }
+
+function handleSaved(nextText: string) {
+  renderedText.value = nextText
+  stopEditing()
+}
+
+watch(() => props.text, (value) => {
+  renderedText.value = value ?? ''
+})
 </script>
 
 <template>
@@ -80,7 +90,7 @@ function stopEditing() {
             :paragraph-id="paragraphId"
             :source-text="editSourceText ?? sourceText"
             @cancel="stopEditing"
-            @saved="stopEditing"
+            @saved="handleSaved"
           />
 
           <div

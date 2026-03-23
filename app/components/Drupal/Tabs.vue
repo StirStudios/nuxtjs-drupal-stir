@@ -242,6 +242,7 @@ const navigationUi = {
   childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
   childLinkLabel: 'truncate',
 }
+
 </script>
 
 <template>
