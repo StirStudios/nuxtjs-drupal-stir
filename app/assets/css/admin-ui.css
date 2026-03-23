@@ -30,13 +30,10 @@
     --admin-bg-surface: var(--admin-z-50) !important;
     --admin-bg-muted: var(--admin-z-100) !important;
     --admin-bg-strong: var(--admin-z-200) !important;
-    --admin-toolbar-bg: #ffffff !important;
-    --admin-toolbar-border: var(--admin-z-200) !important;
     --admin-text: var(--admin-z-900) !important;
     --admin-text-muted: var(--admin-z-700) !important;
     --admin-text-strong: var(--admin-z-950) !important;
     --admin-border: #d4d4d8 !important;
-    --admin-border-strong: var(--admin-z-400) !important;
 
     --admin-accent-text: var(--admin-amber-700) !important;
     --admin-accent-bg: color-mix(
@@ -48,7 +45,6 @@
 
     --admin-tooltip-bg: var(--admin-z-100) !important;
     --admin-tooltip-text: var(--admin-z-900) !important;
-    --admin-tooltip-border: #d4d4d8 !important;
     --admin-status-saving: var(--admin-text-muted) !important;
     --admin-status-error: #b91c1c !important;
     --admin-status-success: #047857 !important;
@@ -65,13 +61,10 @@
     --admin-bg-surface: var(--admin-z-950) !important;
     --admin-bg-muted: var(--admin-z-900) !important;
     --admin-bg-strong: var(--admin-z-800) !important;
-    --admin-toolbar-bg: #27272a !important;
-    --admin-toolbar-border: #3f3f46 !important;
     --admin-text: #f4f4f5 !important;
     --admin-text-muted: var(--admin-z-200) !important;
     --admin-text-strong: var(--admin-white) !important;
     --admin-border: #3f3f46 !important;
-    --admin-border-strong: #52525b !important;
 
     --admin-accent-text: var(--admin-amber-300) !important;
     --admin-accent-bg: color-mix(
@@ -87,7 +80,6 @@
 
     --admin-tooltip-bg: var(--admin-z-900) !important;
     --admin-tooltip-text: var(--admin-z-50) !important;
-    --admin-tooltip-border: #3f3f46 !important;
     --admin-status-saving: var(--admin-text-muted) !important;
     --admin-status-error: #f87171 !important;
     --admin-status-success: #34d399 !important;
@@ -102,8 +94,8 @@
 
   .admin-ui-toolbar {
     @apply border-b;
-    border-color: var(--admin-toolbar-border);
-    background-color: var(--admin-toolbar-bg);
+    border-color: var(--admin-border);
+    background-color: var(--admin-bg-surface);
   }
 
   .admin-ui-controls {
@@ -202,8 +194,8 @@
   .admin-ui-btn-outline {
     @apply ring-1 ring-inset;
     background-color: transparent !important;
-    border-color: var(--admin-border-strong) !important;
-    --tw-ring-color: var(--admin-border-strong) !important;
+    border-color: var(--admin-border) !important;
+    --tw-ring-color: var(--admin-border) !important;
     color: var(--admin-text-muted) !important;
 
     &:hover {
@@ -254,28 +246,28 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: #f4f4f5 !important;
-    color: #18181b !important;
-    border-color: #e4e4e7 !important;
-    --tw-ring-color: #e4e4e7 !important;
+    background-color: var(--admin-bg-surface) !important;
+    color: var(--admin-text) !important;
+    border-color: var(--admin-border) !important;
+    --tw-ring-color: var(--admin-border) !important;
   }
 
   .admin-ui-tooltip-arrow {
-    fill: #f4f4f5 !important;
-    stroke: #e4e4e7 !important;
+    fill: var(--admin-bg-surface) !important;
+    stroke: var(--admin-border) !important;
   }
 
   .dark {
     .admin-ui-tooltip-content {
-      background-color: #18181b !important;
-      color: #fafafa !important;
-      border-color: #52525b !important;
-      --tw-ring-color: #52525b !important;
+      background-color: var(--admin-bg-surface) !important;
+      color: var(--admin-text) !important;
+      border-color: var(--admin-border) !important;
+      --tw-ring-color: var(--admin-border) !important;
     }
 
     .admin-ui-tooltip-arrow {
-      fill: #18181b !important;
-      stroke: #52525b !important;
+      fill: var(--admin-bg-surface) !important;
+      stroke: var(--admin-border) !important;
     }
   }
 
@@ -343,8 +335,8 @@
     [data-slot='base'].admin-ui-btn-outline {
       background-color: transparent !important;
       color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border-strong) !important;
-      --tw-ring-color: var(--admin-border-strong) !important;
+      border-color: var(--admin-border) !important;
+      --tw-ring-color: var(--admin-border) !important;
 
       &:hover {
         background-color: var(--admin-bg-muted) !important;
