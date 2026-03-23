@@ -237,28 +237,28 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: var(--admin-bg) !important;
-    color: var(--admin-text) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
+    background-color: #f4f4f5 !important;
+    color: #18181b !important;
+    border-color: #d4d4d8 !important;
+    --tw-ring-color: #d4d4d8 !important;
   }
 
   .admin-ui-tooltip-arrow {
-    fill: var(--admin-bg) !important;
-    stroke: var(--admin-border) !important;
+    fill: #f4f4f5 !important;
+    stroke: #d4d4d8 !important;
   }
 
   .dark {
     .admin-ui-tooltip-content {
-      background-color: var(--admin-bg) !important;
-      color: var(--admin-text) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
+      background-color: #18181b !important;
+      color: #fafafa !important;
+      border-color: #3f3f46 !important;
+      --tw-ring-color: #3f3f46 !important;
     }
 
     .admin-ui-tooltip-arrow {
-      fill: var(--admin-bg) !important;
-      stroke: var(--admin-border) !important;
+      fill: #18181b !important;
+      stroke: #3f3f46 !important;
     }
   }
 
@@ -311,6 +311,11 @@
   }
 
   .admin-ui-controls {
+    [data-slot='base'].admin-ui-btn-base [data-slot='leadingIcon'],
+    [data-slot='base'].admin-ui-btn-base [data-slot='trailingIcon'] {
+      color: currentColor !important;
+    }
+
     [data-slot='base'].admin-ui-btn-soft {
       background-color: var(--admin-bg-muted) !important;
       color: var(--admin-text-muted) !important;

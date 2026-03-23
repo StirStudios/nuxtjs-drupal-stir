@@ -100,7 +100,7 @@ const hasActions = computed(() => actions.value.length > 0)
           v-for="action in actions"
           :key="action.key"
           :text="action.tooltip"
-          :ui="{ content: 'admin-ui-tooltip-content' }"
+          :ui="{ content: 'admin-ui-tooltip-content', arrow: 'admin-ui-tooltip-arrow' }"
         >
           <UButton
             :aria-label="action.ariaLabel"
