@@ -1,4 +1,22 @@
 @layer base {
+  :root {
+    --admin-tooltip-bg-strength: 88%;
+    --admin-tooltip-bg-blend: var(--admin-bg-muted);
+    --admin-tooltip-text-strength: 90%;
+    --admin-tooltip-text-blend: var(--admin-text);
+    --admin-tooltip-border-strength: 48%;
+    --admin-tooltip-ring-strength: 38%;
+  }
+
+  .dark {
+    --admin-tooltip-bg-strength: 90%;
+    --admin-tooltip-bg-blend: var(--admin-bg);
+    --admin-tooltip-text-strength: 94%;
+    --admin-tooltip-text-blend: var(--admin-text-strong);
+    --admin-tooltip-border-strength: 42%;
+    --admin-tooltip-ring-strength: 30%;
+  }
+
   .admin-ui {
     color-scheme: light dark;
   }
@@ -237,29 +255,75 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: #f4f4f5 !important;
-    color: #18181b !important;
-    border-color: color-mix(in srgb, #e4e4e7 70%, transparent) !important;
-    --tw-ring-color: color-mix(in srgb, #e4e4e7 60%, transparent) !important;
+    background-color: color-mix(
+      in srgb,
+      var(--admin-tooltip-bg-blend) var(--admin-tooltip-bg-strength),
+      transparent
+    ) !important;
+    color: color-mix(
+      in srgb,
+      var(--admin-tooltip-text-blend) var(--admin-tooltip-text-strength),
+      transparent
+    ) !important;
+    border-color: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-border-strength),
+      transparent
+    ) !important;
+    --tw-ring-color: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-ring-strength),
+      transparent
+    ) !important;
   }
 
   .admin-ui-tooltip-arrow {
-    fill: #f4f4f5 !important;
-    stroke: color-mix(in srgb, #e4e4e7 70%, transparent) !important;
+    fill: color-mix(
+      in srgb,
+      var(--admin-tooltip-bg-blend) var(--admin-tooltip-bg-strength),
+      transparent
+    ) !important;
+    stroke: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-border-strength),
+      transparent
+    ) !important;
   }
 
-  .dark {
-    .admin-ui-tooltip-content {
-      background-color: #18181b !important;
-      color: #fafafa !important;
-      border-color: color-mix(in srgb, #52525b 72%, transparent) !important;
-      --tw-ring-color: color-mix(in srgb, #52525b 62%, transparent) !important;
-    }
+  [data-slot='content'].admin-ui-tooltip-content {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-tooltip-bg-blend) var(--admin-tooltip-bg-strength),
+      transparent
+    ) !important;
+    color: color-mix(
+      in srgb,
+      var(--admin-tooltip-text-blend) var(--admin-tooltip-text-strength),
+      transparent
+    ) !important;
+    border-color: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-border-strength),
+      transparent
+    ) !important;
+    --tw-ring-color: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-ring-strength),
+      transparent
+    ) !important;
+  }
 
-    .admin-ui-tooltip-arrow {
-      fill: #18181b !important;
-      stroke: color-mix(in srgb, #52525b 72%, transparent) !important;
-    }
+  [data-slot='arrow'].admin-ui-tooltip-arrow {
+    fill: color-mix(
+      in srgb,
+      var(--admin-tooltip-bg-blend) var(--admin-tooltip-bg-strength),
+      transparent
+    ) !important;
+    stroke: color-mix(
+      in srgb,
+      var(--admin-border) var(--admin-tooltip-border-strength),
+      transparent
+    ) !important;
   }
 
   .admin-ui-editor-root {
@@ -289,6 +353,22 @@
   }
 
   .admin-ui-toolbar {
+    [data-slot='base'] {
+      color: var(--admin-text-muted) !important;
+      background-color: transparent !important;
+
+      &:hover,
+      &:focus-visible,
+      &:active {
+        color: var(--admin-text-strong) !important;
+        background-color: color-mix(
+          in srgb,
+          var(--admin-bg-strong) 70%,
+          transparent
+        ) !important;
+      }
+    }
+
     [data-slot='base'].admin-ui-btn-base {
       color: var(--admin-text-muted) !important;
       background-color: transparent !important;
@@ -307,6 +387,11 @@
         color: var(--admin-accent-text) !important;
         background-color: var(--admin-accent-bg) !important;
       }
+    }
+
+    [data-slot='base'] [data-slot='leadingIcon'],
+    [data-slot='base'] [data-slot='trailingIcon'] {
+      color: currentColor !important;
     }
   }
 
