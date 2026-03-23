@@ -36,6 +36,13 @@
     ) !important;
     --admin-accent-bg-subtle: var(--admin-amber-50) !important;
 
+    --ui-bg: var(--admin-bg) !important;
+    --ui-text: var(--admin-text) !important;
+    --ui-text-muted: var(--admin-text-muted) !important;
+    --ui-text-toned: var(--admin-text-muted) !important;
+    --ui-text-highlighted: var(--admin-text-strong) !important;
+    --ui-border: var(--admin-border) !important;
+
     --admin-status-saving: var(--admin-text-muted) !important;
     --admin-status-error: #b91c1c !important;
     --admin-status-success: #047857 !important;
