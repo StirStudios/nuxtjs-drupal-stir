@@ -88,7 +88,7 @@
     @apply border;
     border-color: var(--admin-border);
     background-color: var(--admin-bg);
-    color: var(--admin-text) !important;
+    color: var(--admin-text);
   }
 
   .admin-ui-toolbar {
@@ -297,15 +297,15 @@
   }
 
   .admin-ui-status-saving {
-    color: var(--admin-status-saving) !important;
+    color: var(--admin-status-saving);
   }
 
   .admin-ui-status-error {
-    color: var(--admin-status-error) !important;
+    color: var(--admin-status-error);
   }
 
   .admin-ui-status-success {
-    color: var(--admin-status-success) !important;
+    color: var(--admin-status-success);
   }
 
   .admin-ui-toolbar {
