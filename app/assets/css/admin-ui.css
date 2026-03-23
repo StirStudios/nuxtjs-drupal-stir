@@ -1,4 +1,14 @@
 @layer base {
+  :root {
+    --admin-border: #d4d4d8;
+    --admin-border-subtle: color-mix(in srgb, var(--admin-border) 55%, transparent);
+  }
+
+  .dark {
+    --admin-border: #3f3f46;
+    --admin-border-subtle: color-mix(in srgb, var(--admin-border) 45%, transparent);
+  }
+
   .admin-ui {
     color-scheme: light dark;
   }
@@ -245,14 +255,28 @@
     --tw-ring-color: var(--admin-border-subtle) !important;
   }
 
+  [data-slot='content'].admin-ui-tooltip-content {
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
+  }
+
   .admin-ui-tooltip-arrow {
     fill: #f4f4f5 !important;
+    stroke: var(--admin-border-subtle) !important;
+  }
+
+  [data-slot='arrow'].admin-ui-tooltip-arrow {
     stroke: var(--admin-border-subtle) !important;
   }
 
   .dark .admin-ui-tooltip-content {
     background-color: #18181b !important;
     color: #fafafa !important;
+    border-color: var(--admin-border-subtle) !important;
+    --tw-ring-color: var(--admin-border-subtle) !important;
+  }
+
+  .dark [data-slot='content'].admin-ui-tooltip-content {
     border-color: var(--admin-border-subtle) !important;
     --tw-ring-color: var(--admin-border-subtle) !important;
   }
