@@ -20,6 +20,8 @@ export const adminUiTheme = {
   button: {
     slots: {
       base: 'admin-ui-btn-base',
+      leadingIcon: 'text-current',
+      trailingIcon: 'text-current',
     },
     defaultVariants: {
       color: 'neutral',
