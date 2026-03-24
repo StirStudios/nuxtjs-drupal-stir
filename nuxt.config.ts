@@ -6,7 +6,7 @@ const layerDir = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 
 export default defineNuxtConfig({
-  compatibilityDate: '2026-02-14',
+  compatibilityDate: '2026-03-23',
 
   css: ['~/assets/css/main.css'],
 
