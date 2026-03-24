@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
+import { useHeroSnapshot } from '~/composables/useHeroSnapshot'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useNavLock } from '~/composables/useNavLock'
@@ -40,29 +41,19 @@ if (props.mode !== 'simple') {
   provide('isHero', true)
 }
 
-// Snapshot anti-flicker system
-const snap = reactive({
-  isFront: isFront.value,
-  title: pageTitle.value,
+const {
+  isFrontEffective,
+  titleEffective: pageTitleEffective,
+  hideEffective: pageHideEffective,
+} = useHeroSnapshot({
+  locked,
+  isFront,
+  title: pageTitle,
+  hide: pageHide,
 })
-
-watch(locked, (l) => {
-  if (!l) {
-    snap.isFront = isFront.value
-    snap.title = pageTitle.value
-  }
-})
-
-const isFrontEffective = computed(() =>
-  locked.value ? snap.isFront : isFront.value,
-)
-
-const pageTitleEffective = computed(() =>
-  locked.value ? snap.title : pageTitle.value,
-)
 
 const hideHeroSection = computed(
-  () => props.mode !== 'simple' && pageHide.value && !isFrontEffective.value,
+  () => props.mode !== 'simple' && pageHideEffective.value && !isFrontEffective.value,
 )
 
 const slotMedia = computed(() => tk.slot('media'))
