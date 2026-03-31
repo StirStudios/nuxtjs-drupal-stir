@@ -54,12 +54,16 @@ const rootEl = ref<HTMLElement | null>(null)
 const REVEAL_START_INDEX = 6
 const shouldAnimateOnScroll = props.index >= REVEAL_START_INDEX
 const isRevealed = ref(!shouldAnimateOnScroll)
-const revealDurationMs = 550
+const revealDurationMs = theme.animations?.mediaReveal?.durationMs ?? 800
+const revealOffsetY = theme.animations?.mediaReveal?.offsetY || '4rem'
 const revealEasing = createSpringLinearEasing({
   duration: revealDurationMs / 1000,
   stiffness: 250,
   damping: 40,
 })
+const revealBaseStyle = computed(() => ({
+  '--media-reveal-offset-y': revealOffsetY,
+}))
 const revealStyle = computed(() =>
   shouldAnimateOnScroll && isRevealed.value
     ? {
@@ -105,7 +109,7 @@ onBeforeUnmount(() => {
       shouldAnimateOnScroll && 'media-reveal-animated',
       isRevealed && 'media-reveal-visible',
     ]"
-    :style="revealStyle"
+    :style="[revealBaseStyle, revealStyle]"
   >
     <component
       :is="componentMap[mediaProps.type]"
@@ -167,7 +171,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .media-reveal.media-reveal-animated {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(var(--media-reveal-offset-y, 4rem));
 }
 
 .media-reveal.media-reveal-animated.media-reveal-visible {
