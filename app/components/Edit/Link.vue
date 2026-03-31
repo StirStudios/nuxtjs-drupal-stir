@@ -89,11 +89,11 @@ const hasActions = computed(() => actions.value.length > 0)
 </script>
 
 <template>
-  <div v-if="hasActions" class="admin-ui-edit-shell group relative">
+  <div v-if="hasActions" class="admin-ui-edit-shell group/admin-ui relative">
     <slot />
     <UTheme :ui="adminUiTheme">
       <UFieldGroup
-        class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto absolute right-2 top-2 z-100 rounded-md shadow-lg opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+        class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto absolute right-2 top-2 z-100 rounded-md shadow-lg opacity-0 transition-opacity group-hover/admin-ui:opacity-100 group-focus-within/admin-ui:opacity-100"
         size="xs"
       >
         <UTooltip
