@@ -39,19 +39,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     )
 
-  // Configure and queue tracking immediately so first pageview is never missed
-  // even if script loading is deferred.
-  win.plausible.init?.({ autoCapturePageviews: false })
-  win.plausible('pageview')
-  let isFirstPageFinish = true
-  nuxtApp.hook('page:finish', () => {
-    if (isFirstPageFinish) {
-      isFirstPageFinish = false
-      return
-    }
-    win.plausible?.('pageview')
-  })
-
   const loadPlausible = () =>
     useScript({
       id: 'plausible-script',
@@ -61,13 +48,33 @@ export default defineNuxtPlugin((nuxtApp) => {
       ...(cfg.domain ? { 'data-domain': cfg.domain } : {}),
     })
 
+  const onScriptLoaded = ({ onLoaded }: ReturnType<typeof loadPlausible>) =>
+    onLoaded(() => {
+      const plausibleFn = win.plausible
+
+      // Keep explicit SPA tracking to avoid duplicate pageviews from auto capture.
+      plausibleFn?.init?.({ autoCapturePageviews: false })
+      plausibleFn?.('pageview')
+
+      let isFirstPageFinish = true
+
+      nuxtApp.hook('page:finish', () => {
+        if (isFirstPageFinish) {
+          isFirstPageFinish = false
+          return
+        }
+
+        plausibleFn?.('pageview')
+      })
+    })
+
   const idleApi = globalThis as typeof globalThis & {
     requestIdleCallback?: (callback: IdleRequestCallback) => number
   }
 
   if (typeof idleApi.requestIdleCallback === 'function') {
-    idleApi.requestIdleCallback(() => loadPlausible())
+    idleApi.requestIdleCallback(() => onScriptLoaded(loadPlausible()))
   } else {
-    setTimeout(() => loadPlausible(), 1)
+    setTimeout(() => onScriptLoaded(loadPlausible()), 1)
   }
 })
