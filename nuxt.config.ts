@@ -114,6 +114,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/scripts',
+    '@nuxtjs/plausible',
     [
       'nuxt-vitalizer',
       {
@@ -193,6 +194,14 @@ export default defineNuxtConfig({
     },
     public: {
       api: process.env.DRUPAL_URL,
+      plausible: {
+        enabled: true,
+        domain: '',
+        apiHost: 'https://analytics.stirstudiosdesign.com',
+        autoPageviews: true,
+        proxy: false,
+        proxyBaseEndpoint: '/_plausible',
+      },
     },
   },
 });

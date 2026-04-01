@@ -97,16 +97,17 @@ analytics: {
   plausible: {
     enabled: false,
     domain: 'domainname.com', // without https://www
-    // Optional: script filename id used by the loader
-    // Final URL: https://analytics.stirstudiosdesign.com/js/<scriptId>.js
-    scriptId: 'pa-Wq2Wz1lTBk8Y5zwVfu1bX',
+    apiHost: 'https://analytics.stirstudiosdesign.com',
+    autoPageviews: true,
+    proxy: false,
+    proxyBaseEndpoint: '/_plausible',
   },
 }
 ```
 
 Migration note:
-- `analytics.plausible.scriptUrl` is no longer honored by the client plugin.
-- Use `analytics.plausible.scriptId` for all sites.
+- `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
+- Plausible now uses `@nuxtjs/plausible` with `analytics.plausible` bridging to runtime options.
 
 ### 💬 `popup`
 

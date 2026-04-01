@@ -52,7 +52,10 @@ export default defineAppConfig({
     plausible: {
       enabled: false,
       domain: '',
-      scriptId: '',
+      apiHost: 'https://analytics.stirstudiosdesign.com',
+      autoPageviews: true,
+      proxy: false,
+      proxyBaseEndpoint: '/_plausible',
     },
   },
 

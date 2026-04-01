@@ -117,11 +117,10 @@ See `docs/dependency-update-policy.md` for the full policy.
 
 ## Plausible Migration Note (April 1, 2026)
 
-- `analytics.plausible.scriptUrl` is no longer used by the client plugin.
-- Configure `analytics.plausible.scriptId` instead.
-- Script source now resolves as:
-  - `https://analytics.stirstudiosdesign.com/js/<scriptId>.js` when `scriptId` is set
-  - `https://analytics.stirstudiosdesign.com/js/script.js` when `scriptId` is omitted
+- Plausible tracking now uses `@nuxtjs/plausible`.
+- Layer-level `analytics.plausible` settings are bridged to Nuxt runtime `public.plausible` options.
+- `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
+- Use `analytics.plausible.apiHost` (or `proxy: true`) with `domain` for endpoint/domain control.
 
 ## Release Checklist
 
