@@ -55,7 +55,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       // Keep explicit SPA tracking to avoid duplicate pageviews from auto capture.
       plausibleFn?.init?.({ autoCapturePageviews: false })
       plausibleFn?.('pageview')
+
+      let isFirstPageFinish = true
+
       nuxtApp.hook('page:finish', () => {
+        if (isFirstPageFinish) {
+          isFirstPageFinish = false
+          return
+        }
+
         plausibleFn?.('pageview')
       })
     })
