@@ -212,6 +212,10 @@ export default defineAppConfig({
 
     animations: {
       once: false,
+      mediaReveal: {
+        durationMs: 800,
+        offsetY: '4rem',
+      },
     },
 
     aspectRatios: {
