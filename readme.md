@@ -115,6 +115,14 @@ pnpm build
 Use `pnpm deps:update:safe` for routine updates.  
 See `docs/dependency-update-policy.md` for the full policy.
 
+## Plausible Migration Note (April 1, 2026)
+
+- `analytics.plausible.scriptUrl` is no longer used by the client plugin.
+- Configure `analytics.plausible.scriptId` instead.
+- Script source now resolves as:
+  - `https://analytics.stirstudiosdesign.com/js/<scriptId>.js` when `scriptId` is set
+  - `https://analytics.stirstudiosdesign.com/js/script.js` when `scriptId` is omitted
+
 ## Release Checklist
 
 Use `docs/release-checklist.md` as the standard pre-merge/pre-release checklist.
