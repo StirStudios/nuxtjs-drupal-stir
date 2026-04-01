@@ -14,6 +14,8 @@ const props = withDefaults(
     src?: string
     platform?: string
     mediaEmbed?: string
+    previewMode?: 'static' | 'animated'
+    animatedPreviewSrc?: string
 
     width?: number
     height?: number
@@ -28,6 +30,8 @@ const props = withDefaults(
     src: undefined,
     platform: undefined,
     mediaEmbed: undefined,
+    previewMode: undefined,
+    animatedPreviewSrc: undefined,
     width: undefined,
     height: undefined,
     noWrapper: false,
@@ -54,6 +58,13 @@ const shouldShowIframe = computed(
     !isProcessing.value &&
     (!props.deferEmbed || isEmbedActive.value),
 )
+const previewSrc = computed(() => {
+  if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
+    return props.animatedPreviewSrc
+  }
+
+  return props.src
+})
 
 function activateEmbed() {
   if (shouldShowIframe.value) return
@@ -119,10 +130,10 @@ onMounted(() => {
       @click="activateEmbed"
     >
       <img
-        v-if="src"
+        v-if="previewSrc"
         :alt="alt || title || 'Video thumbnail'"
         class="absolute inset-0 h-full w-full object-cover"
-        :src="src"
+        :src="previewSrc"
       />
       <div class="absolute inset-0 bg-black/40" />
       <UIcon class="relative z-10 size-16" name="i-lucide-play-circle" />
