@@ -9,7 +9,7 @@ type ProtectedRoutesConfig = {
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
-  scriptUrl?: string
+  scriptId?: string
 } & LooseRecord
 
 type AnalyticsConfig = {
