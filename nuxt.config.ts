@@ -197,7 +197,7 @@ export default defineNuxtConfig({
       plausible: {
         enabled: true,
         domain: '',
-        apiHost: 'https://plausible.io',
+        apiHost: 'https://analytics.stirstudiosdesign.com',
         autoPageviews: true,
         proxy: false,
         proxyBaseEndpoint: '/_plausible',

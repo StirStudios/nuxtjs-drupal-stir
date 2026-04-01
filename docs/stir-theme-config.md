@@ -97,7 +97,7 @@ analytics: {
   plausible: {
     enabled: false,
     domain: 'domainname.com', // without https://www
-    apiHost: 'https://plausible.io',
+    apiHost: 'https://analytics.stirstudiosdesign.com',
     autoPageviews: true,
     proxy: false,
     proxyBaseEndpoint: '/_plausible',

@@ -52,7 +52,7 @@ export default defineAppConfig({
     plausible: {
       enabled: false,
       domain: '',
-      apiHost: 'https://plausible.io',
+      apiHost: 'https://analytics.stirstudiosdesign.com',
       autoPageviews: true,
       proxy: false,
       proxyBaseEndpoint: '/_plausible',
