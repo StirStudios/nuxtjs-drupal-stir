@@ -97,11 +97,16 @@ analytics: {
   plausible: {
     enabled: false,
     domain: 'domainname.com', // without https://www
-    // Optional: overrides plugin default script URL
-    scriptUrl: 'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js',
+    // Optional: script filename id used by the loader
+    // Final URL: https://analytics.stirstudiosdesign.com/js/<scriptId>.js
+    scriptId: 'pa-Wq2Wz1lTBk8Y5zwVfu1bX',
   },
 }
 ```
+
+Migration note:
+- `analytics.plausible.scriptUrl` is no longer honored by the client plugin.
+- Use `analytics.plausible.scriptId` for all sites.
 
 ### 💬 `popup`
 

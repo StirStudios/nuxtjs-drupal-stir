@@ -52,7 +52,7 @@ export default defineAppConfig({
     plausible: {
       enabled: false,
       domain: '',
-      scriptUrl: '',
+      scriptId: '',
     },
   },
 

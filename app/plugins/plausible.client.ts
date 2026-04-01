@@ -7,9 +7,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   if (process.env.NODE_ENV !== 'production' || !cfg?.enabled || !cfg.domain)
     return
-  const scriptUrl =
-    cfg.scriptUrl ||
-    'https://analytics.stirstudiosdesign.com/js/pa-Wq2Wz1lTBk8Y5zwVfu1bX.js'
+  const scriptBaseUrl = 'https://analytics.stirstudiosdesign.com/js'
+  const scriptUrl = cfg.scriptId
+    ? `${scriptBaseUrl}/${cfg.scriptId}.js`
+    : `${scriptBaseUrl}/script.js`
 
   type PlausibleQueueFunction = ((
     event: string,
