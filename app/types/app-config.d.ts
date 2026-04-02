@@ -1,4 +1,5 @@
-type LooseRecord = Record<string, unknown>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LooseRecord = Record<string, any>
 
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
@@ -9,17 +10,6 @@ type ProtectedRoutesConfig = {
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
-  apiHost?: string
-  autoPageviews?: boolean
-  hashMode?: boolean
-  proxy?: boolean
-  proxyBaseEndpoint?: string
-  ignoredHostnames?: string[]
-  ignoreSubDomains?: boolean
-  autoOutboundTracking?: boolean
-  fileDownloads?: boolean | { fileExtensions: string[] }
-  formSubmissions?: boolean
-  logIgnoredEvents?: boolean
 } & LooseRecord
 
 type AnalyticsConfig = {
@@ -89,6 +79,7 @@ declare module 'nuxt/schema' {
     privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig
     colorMode: ColorModeConfig
+    stirTheme: StirThemeConfig
   }
 }
 

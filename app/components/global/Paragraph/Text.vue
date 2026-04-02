@@ -77,29 +77,27 @@ watch(() => props.text, (value) => {
 
 <template>
   <WrapAnimate :effect="direction">
-    <WrapAlign :align="align">
-      <div :class="[width, spacing]">
-        <EditLink
-          :link="editLink"
-          :show-quick-edit="canInlineEdit && isEditing === false"
-          @quick-edit="startEditing"
-        >
-          <EditText
-            v-if="isEditing && canInlineEdit"
-            :classes="classes"
-            :paragraph-id="paragraphId"
-            :source-text="editSourceText ?? sourceText"
-            @cancel="stopEditing"
-            @saved="handleSaved"
-          />
+    <WrapDiv :align="align" :styles="[width, spacing]">
+      <EditLink
+        :link="editLink"
+        :show-quick-edit="canInlineEdit && isEditing === false"
+        @quick-edit="startEditing"
+      >
+        <EditText
+          v-if="isEditing && canInlineEdit"
+          :classes="classes"
+          :paragraph-id="paragraphId"
+          :source-text="editSourceText ?? sourceText"
+          @cancel="stopEditing"
+          @saved="handleSaved"
+        />
 
-          <div
-            v-else-if="safeTextHtml"
-            :class="[classes, richTextClass].filter(Boolean).join(' ')"
-            v-html="safeTextHtml"
-          />
-        </EditLink>
-      </div>
-    </WrapAlign>
+        <div
+          v-else-if="safeTextHtml"
+          :class="[classes, richTextClass].filter(Boolean).join(' ')"
+          v-html="safeTextHtml"
+        />
+      </EditLink>
+    </WrapDiv>
   </WrapAnimate>
 </template>

@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 const layerDir = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
+const isTestEnv =
+  process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-23',
@@ -114,7 +116,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/scripts',
-    '@nuxtjs/plausible',
+    ...(!isTestEnv ? ['@nuxtjs/plausible'] : []),
     [
       'nuxt-vitalizer',
       {
@@ -195,13 +197,15 @@ export default defineNuxtConfig({
     public: {
       api: process.env.DRUPAL_URL,
       plausible: {
-        enabled: true,
+        enabled: false,
         domain: '',
-        apiHost: 'https://analytics.stirstudiosdesign.com',
+        apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
         proxy: false,
         proxyBaseEndpoint: '/_plausible',
+        ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
+        ignoreSubDomains: true,
       },
     },
   },
-});
+})
