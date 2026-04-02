@@ -1,4 +1,4 @@
-type LooseRecord = Record<string, unknown>
+type LooseRecord = Record<string, any>
 
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
@@ -78,6 +78,7 @@ declare module 'nuxt/schema' {
     privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig
     colorMode: ColorModeConfig
+    stirTheme: StirThemeConfig
   }
 }
 
