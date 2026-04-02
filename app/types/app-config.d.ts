@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LooseRecord = Record<string, any>
 
 type ProtectedRoutesConfig = {
