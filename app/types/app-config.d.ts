@@ -9,17 +9,6 @@ type ProtectedRoutesConfig = {
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
-  apiHost?: string
-  autoPageviews?: boolean
-  hashMode?: boolean
-  proxy?: boolean
-  proxyBaseEndpoint?: string
-  ignoredHostnames?: string[]
-  ignoreSubDomains?: boolean
-  autoOutboundTracking?: boolean
-  fileDownloads?: boolean | { fileExtensions: string[] }
-  formSubmissions?: boolean
-  logIgnoredEvents?: boolean
 } & LooseRecord
 
 type AnalyticsConfig = {
