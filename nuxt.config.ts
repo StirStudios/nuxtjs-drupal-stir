@@ -199,7 +199,7 @@ export default defineNuxtConfig({
       plausible: {
         enabled: false,
         domain: '',
-        apiHost: 'https://analytics.stirstudiosdesign.com',
+        apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
         proxy: false,
         proxyBaseEndpoint: '/_plausible',

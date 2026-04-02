@@ -97,19 +97,14 @@ analytics: {
   plausible: {
     enabled: false,
     domain: 'domainname.com', // without https://www
-    apiHost: 'https://analytics.stirstudiosdesign.com',
-    autoPageviews: true,
-    proxy: false,
-    proxyBaseEndpoint: '/_plausible',
-    ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
-    ignoreSubDomains: true,
   },
 }
 ```
 
 Migration note:
 - `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
-- Plausible now uses `@nuxtjs/plausible` with `analytics.plausible` bridging to runtime options.
+- Plausible now uses `@nuxtjs/plausible` with `analytics.plausible` only overriding `enabled` and `domain`.
+- Use `NUXT_PUBLIC_PLAUSIBLE_API_HOST` for API host overrides.
 
 ### 💬 `popup`
 

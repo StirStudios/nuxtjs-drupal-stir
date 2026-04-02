@@ -71,6 +71,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables sitemap/robots indexing behavior)
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
+- `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
 
@@ -118,9 +119,9 @@ See `docs/dependency-update-policy.md` for the full policy.
 ## Plausible Migration Note (April 1, 2026)
 
 - Plausible tracking now uses `@nuxtjs/plausible`.
-- Layer-level `analytics.plausible` settings are bridged to Nuxt runtime `public.plausible` options.
+- Layer-level `analytics.plausible` only overrides `enabled` and `domain`; runtime defaults live in `nuxt.config.ts`.
 - `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
-- Use `analytics.plausible.apiHost` (or `proxy: true`) with `domain` for endpoint/domain control.
+- Use `NUXT_PUBLIC_PLAUSIBLE_API_HOST` (or `proxy: true`) with `domain` for endpoint/domain control.
 
 ## Release Checklist
 
