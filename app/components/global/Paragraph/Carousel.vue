@@ -24,7 +24,6 @@ const props = defineProps<{
   editLink?: string
 }>()
 
-const carousel = useTemplateRef<'carousel'>('carousel')
 const theme = useAppConfig().stirTheme
 const slots = useSlots()
 const mounted = ref(false)
@@ -64,6 +63,7 @@ const autoScrollOptions = computed(() =>
   props.carouselAutoscroll
     ? {
         speed: autoScrollSpeed.value,
+        startDelay: 0,
         stopOnMouseEnter: true,
         stopOnInteraction: false,
       }
@@ -79,26 +79,12 @@ const autoplayOptions = computed(() =>
       }
     : false,
 )
-
-function handleSelect() {
-  const plugins = (
-    carousel.value as unknown as {
-      emblaApi?: { plugins?: () => Record<string, { reset: () => void }> }
-    } | null
-  )?.emblaApi?.plugins?.()
-
-  if (plugins?.autoplay && !props.carouselAutoscroll) plugins.autoplay.reset()
-
-  if (plugins?.autoScroll && props.carouselAutoscroll)
-    plugins.autoScroll.reset()
-}
 </script>
 
 <template>
   <div class="relative z-10" :class="[theme.carousel.padding, width, spacing]">
     <UCarousel
       v-if="slides.length"
-      ref="carousel"
       v-slot="{ item }"
       :arrows="mounted ? carouselArrows : false"
       :auto-height="carouselAutoheight"
@@ -117,7 +103,6 @@ function handleSelect() {
         container: 'items-center transition-[height]',
         item: gridItems,
       }"
-      @select="handleSelect"
     >
       <WrapDiv :styles="gridItems">
         <component :is="item.vnode" :key="item.key" />
