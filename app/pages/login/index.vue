@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const { heading, state, validate, onSubmit, onError, isLoading, showLogin } =
   usePasswordLogin()
+
+useSeoMeta({
+  robots: 'noindex, nofollow',
+})
 </script>
 
 <template>
