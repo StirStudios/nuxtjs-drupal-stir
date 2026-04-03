@@ -68,6 +68,10 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/login': {
+      robots: false,
+      sitemap: false,
+    },
     '/admincontrol': {
       redirect: {
         to: `${process.env.DRUPAL_URL}/admincontrol/login`,
@@ -83,12 +87,6 @@ export default defineNuxtConfig({
     '/admincontrol/password': {
       redirect: {
         to: `${process.env.DRUPAL_URL}/admincontrol/password`,
-        statusCode: 302,
-      },
-    },
-    '/front': {
-      redirect: {
-        to: '/',
         statusCode: 302,
       },
     },
@@ -151,6 +149,7 @@ export default defineNuxtConfig({
             '@nuxtjs/sitemap',
             {
               sources: [`${process.env.DRUPAL_URL}/api/sitemap`],
+              exclude: ['/login'],
               runtimeCacheStorage: { driver: 'memory' },
               cacheMaxAgeSeconds: 0,
               xslColumns: [

@@ -2,12 +2,13 @@ export function usePageContext() {
   const { getPage } = useDrupalCe()
   const page = getPage()
   const route = useRoute()
-
   const isFront = computed(() => {
-    const slug = route.params.slug
-    const slugValue = Array.isArray(slug) ? slug[0] : slug
+    const hasDrupalSlugParam = Object.hasOwn(route.params, 'slug')
+    const isDrupalRenderedRoute = route.path === '/' || hasDrupalSlugParam
 
-    return route.path === '/' || route.path === '/front' || slugValue === 'front'
+    if (!isDrupalRenderedRoute) return false
+
+    return page.value?.is_front_page === true
   })
   const isAdministrator = computed(
     () => page.value?.current_user?.roles?.includes('administrator') || false,

@@ -5,6 +5,7 @@ const stirTheme = useAppConfig()?.stirTheme ?? {}
 const navigation = stirTheme.navigation ?? { mode: 'default' }
 const errorConfig = stirTheme.error
 const { isAdministrator } = usePageContext()
+const route = useRoute()
 
 const props = defineProps<{ error: NuxtError }>()
 
@@ -33,6 +34,8 @@ const clearAction = computed(() => ({
   icon: errorConfig?.icon || 'i-lucide-arrow-left',
   variant: errorConfig?.variant || 'solid',
 }))
+
+const safeRedirect = computed(() => (route.path === '/' ? undefined : '/'))
 </script>
 
 <template>
@@ -43,7 +46,7 @@ const clearAction = computed(() => ({
   </template>
 
   <UMain id="main-content" as="main" role="main">
-    <UError :clear="clearAction" :error="displayError" redirect="/" />
+    <UError :clear="clearAction" :error="displayError" :redirect="safeRedirect" />
   </UMain>
 
   <template v-if="!isBackendError">

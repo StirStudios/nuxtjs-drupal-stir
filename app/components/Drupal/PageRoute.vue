@@ -4,7 +4,7 @@ const props = defineProps<{
 }>()
 
 const { fetchPage, renderCustomElements, usePageHead, getPage } = useDrupalCe()
-const { pageLayout, isAdministrator } = usePageContext()
+const { pageLayout, isAdministrator, isFront } = usePageContext()
 const pageState = getPage()
 const route = useRoute()
 const pageRequest = useResolvedPageRequest(route)
@@ -16,11 +16,14 @@ const page = await fetchPage(
   customPageError,
 )
 const layout = computed(() => props.forcedLayout || pageLayout.value)
+const routeSlugClass = computed(() => {
+  if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
+  return typeof route.params.slug === 'string' ? route.params.slug : ''
+})
 const bodyClasses = computed(() =>
   [
-    Array.isArray(route.params.slug)
-      ? route.params.slug[0]
-      : route.params.slug || 'front',
+    routeSlugClass.value,
+    isFront.value ? 'front' : '',
     isAdministrator.value ? 'logged-in' : '',
     pageState.value?.content?.element || '',
   ]
