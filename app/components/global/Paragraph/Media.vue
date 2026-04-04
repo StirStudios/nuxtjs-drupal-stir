@@ -61,8 +61,9 @@ const {
   activeItem,
   modalTitle,
   modalDescription,
-  modalA11yDescription,
   modalCredit,
+  modalAccessibleTitle,
+  modalAccessibleDescription,
   openModal,
   onSelect: onSelectModal,
 } = useMediaModal(slotMediaOrdered, tk)
@@ -139,17 +140,14 @@ onMounted(() => {
 
   <UModal
     v-model:open="open"
-    aria-modal="true"
     :close="false"
-    :description="modalA11yDescription"
+    :description="modalAccessibleDescription"
     fullscreen
     :portal="portal"
-    :title="modalTitle"
+    :title="modalAccessibleTitle"
     :ui="{
       content: 'bg-transparent divide-none p-0',
       header: 'hidden',
-      title: 'hidden',
-      description: 'hidden',
     }"
   >
     <template #body>
