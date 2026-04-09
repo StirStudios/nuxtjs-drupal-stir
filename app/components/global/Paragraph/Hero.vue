@@ -12,6 +12,7 @@ const props = defineProps<{
   editLink?: string
   direction?: string
   siteSlogan?: string
+  header?: string
   classes?: string
 }>()
 
@@ -80,6 +81,8 @@ const h1Classes = computed(() => {
   return [base].filter(Boolean)
 })
 
+const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
+
 const sectionClasses = computed(() => {
   if (props.mode === 'simple') {
     return props.classes || ''
@@ -131,7 +134,7 @@ const sectionClasses = computed(() => {
                 :hero-text="text"
                 :is-front="isFrontEffective"
                 :page-title="pageTitleEffective"
-                :site-slogan="siteSlogan"
+                :subtitle="heroSubtitle"
               />
 
               <h1 v-else v-bind="h1Classes.length ? { class: h1Classes } : {}">

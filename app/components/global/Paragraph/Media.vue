@@ -61,8 +61,9 @@ const {
   activeItem,
   modalTitle,
   modalDescription,
-  modalA11yDescription,
   modalCredit,
+  modalAccessibleTitle,
+  modalAccessibleDescription,
   openModal,
   onSelect: onSelectModal,
 } = useMediaModal(slotMediaOrdered, tk)
@@ -139,17 +140,14 @@ onMounted(() => {
 
   <UModal
     v-model:open="open"
-    aria-modal="true"
     :close="false"
-    :description="modalA11yDescription"
+    :description="modalAccessibleDescription"
     fullscreen
     :portal="portal"
-    :title="modalTitle"
+    :title="modalAccessibleTitle"
     :ui="{
       content: 'bg-transparent divide-none p-0',
       header: 'hidden',
-      title: 'hidden',
-      description: 'hidden',
     }"
   >
     <template #body>
@@ -222,7 +220,7 @@ onMounted(() => {
             (theme.modal.description?.media && modalDescription) ||
             modalCredit
           "
-          class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/60 px-4 py-3 text-center text-white backdrop-blur-sm"
+          class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/75 px-4 py-3 text-center text-white backdrop-blur-sm"
         >
           <div v-if="theme.modal.title && modalTitle" class="font-semibold">
             {{ modalTitle }}
@@ -230,12 +228,12 @@ onMounted(() => {
 
           <div
             v-if="theme.modal.description?.media && modalDescription"
-            class="text-sm opacity-80"
+            class="text-sm text-neutral-100"
           >
             {{ modalDescription }}
           </div>
 
-          <div v-if="modalCredit" class="text-xs italic opacity-80">
+          <div v-if="modalCredit" class="text-xs italic text-neutral-200">
             {{ modalCredit }}
           </div>
         </div>
