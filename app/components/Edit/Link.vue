@@ -164,6 +164,18 @@ const actions = computed<EditAction[]>(() => {
 })
 
 const hasActions = computed(() => actions.value.length > 0)
+const tooltipOpen = ref<Record<string, boolean>>({})
+
+const setTooltipOpen = (key: EditAction['key'], value: boolean) => {
+  tooltipOpen.value = {
+    ...tooltipOpen.value,
+    [key]: value,
+  }
+}
+
+const closeAllTooltips = () => {
+  tooltipOpen.value = {}
+}
 </script>
 
 <template>
@@ -177,8 +189,10 @@ const hasActions = computed(() => actions.value.length > 0)
         <UTooltip
           v-for="action in actions"
           :key="action.key"
+          :open="Boolean(tooltipOpen[action.key])"
           :text="action.tooltip"
           :ui="{ content: 'admin-ui-tooltip-content', arrow: 'admin-ui-tooltip-arrow' }"
+          @update:open="(value) => setTooltipOpen(action.key, value)"
         >
           <UButton
             :aria-label="action.ariaLabel"
@@ -190,7 +204,11 @@ const hasActions = computed(() => actions.value.length > 0)
             :to="action.to"
             :ui="{ base: action.buttonClass }"
             :variant="action.variant"
-            @click="action.onClick?.()"
+            @click="
+              closeAllTooltips()
+              action.onClick?.()
+            "
+            @pointerdown="closeAllTooltips()"
           >
             <span class="sr-only">{{ action.ariaLabel }}</span>
           </UButton>
