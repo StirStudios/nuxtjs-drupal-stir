@@ -176,6 +176,11 @@ const setTooltipOpen = (key: EditAction['key'], value: boolean) => {
 const closeAllTooltips = () => {
   tooltipOpen.value = {}
 }
+
+const handleActionClick = (action: EditAction) => {
+  closeAllTooltips()
+  action.onClick?.()
+}
 </script>
 
 <template>
@@ -204,10 +209,7 @@ const closeAllTooltips = () => {
             :to="action.to"
             :ui="{ base: action.buttonClass }"
             :variant="action.variant"
-            @click="
-              closeAllTooltips()
-              action.onClick?.()
-            "
+            @click="handleActionClick(action)"
             @pointerdown="closeAllTooltips()"
           >
             <span class="sr-only">{{ action.ariaLabel }}</span>
