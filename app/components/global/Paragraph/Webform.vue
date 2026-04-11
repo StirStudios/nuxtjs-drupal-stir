@@ -269,7 +269,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
 </script>
 
 <template>
-  <EditLink :link="webformSubmissions">
+  <EditLink :link="webformSubmissions" :parent-uuid="parentUuid">
     <WrapDiv :align="props.align" :styles="[props.width, props.spacing]">
       <WebformContent
         :key="formResetKey"

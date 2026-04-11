@@ -94,7 +94,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <WrapAlign :align="align">
       <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}

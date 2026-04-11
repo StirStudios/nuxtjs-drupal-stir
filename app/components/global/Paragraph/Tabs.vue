@@ -65,7 +65,7 @@ watch(active, async () => {
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <div v-if="items.length <= 1">
       <component :is="activeTabNode" v-if="activeTabNode" />
     </div>

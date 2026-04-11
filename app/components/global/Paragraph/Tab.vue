@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <slot name="tabContent" />
   </EditLink>
 </template>

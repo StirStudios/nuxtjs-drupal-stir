@@ -56,7 +56,7 @@ useCalendlyWidget(container, calendlyUrl.value)
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <div
       ref="container"
       :class="['m-auto w-full', props.calendlyScheme || 'scheme-normal']"

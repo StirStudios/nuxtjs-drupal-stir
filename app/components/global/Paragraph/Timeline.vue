@@ -50,7 +50,7 @@ const wrapperClasses = computed(() =>
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <WrapAnimate :effect="direction">
       <WrapAlign :align="align">
         <div :class="wrapperClasses">

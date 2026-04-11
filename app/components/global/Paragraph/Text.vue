@@ -80,6 +80,7 @@ watch(() => props.text, (value) => {
     <WrapDiv :align="align" :styles="[width, spacing]">
       <EditLink
         :link="editLink"
+        :parent-uuid="parentUuid"
         :show-quick-edit="canInlineEdit && isEditing === false"
         @quick-edit="startEditing"
       >
