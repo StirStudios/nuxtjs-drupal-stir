@@ -10,6 +10,12 @@ type RegionBlock = {
   [key: string]: unknown
 }
 
+const getBlockEditLink = (block: RegionBlock): string | undefined => {
+  const editLink = block.props?.editLink
+
+  return typeof editLink === 'string' && editLink.length > 0 ? editLink : undefined
+}
+
 const regionBlocks = computed<RegionBlock[]>(() => {
   const raw = page.value?.blocks?.[props.area]
 
@@ -22,5 +28,9 @@ const regionBlocks = computed<RegionBlock[]>(() => {
 </script>
 
 <template>
-  <component :is="renderCustomElements(regionBlocks)" v-if="regionBlocks.length" />
+  <template v-for="(block, index) in regionBlocks" :key="String(block.props?.uuid || index)">
+    <EditLink :link="getBlockEditLink(block)">
+      <component :is="renderCustomElements([block])" />
+    </EditLink>
+  </template>
 </template>
