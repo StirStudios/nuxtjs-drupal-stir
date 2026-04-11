@@ -4,9 +4,12 @@ const page = getPage()
 const props = defineProps<{ area: string }>()
 
 type RegionBlock = {
-  uuid?: string
+  element?: string
+  props?: Record<string, unknown>
+  slots?: Record<string, unknown>
   [key: string]: unknown
 }
+
 const regionBlocks = computed<RegionBlock[]>(() => {
   const raw = page.value?.blocks?.[props.area]
 
@@ -19,7 +22,5 @@ const regionBlocks = computed<RegionBlock[]>(() => {
 </script>
 
 <template>
-  <template v-for="(block, index) in regionBlocks" :key="block.uuid || index">
-    <component :is="renderCustomElements(block)" v-if="block" />
-  </template>
+  <component :is="renderCustomElements(regionBlocks)" v-if="regionBlocks.length" />
 </template>
