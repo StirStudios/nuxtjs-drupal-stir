@@ -18,7 +18,7 @@ defineSlots<{
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <WrapGrid :grid-items="gridItems">
       <slot name="media" />
     </WrapGrid>

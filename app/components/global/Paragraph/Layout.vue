@@ -13,7 +13,6 @@ const props = defineProps<{
   header?: string
   headerTag?: string
 
-  editLink?: string
   width?: string
   spacing?: string
   gridClass?: string
@@ -33,30 +32,28 @@ const sectionId = computed(() => {
 
 <template>
   <section :id="sectionId" :class="[classes || 'content', spacing]">
-    <EditLink :link="editLink">
-      <WrapGrid
-        :card="card"
-        :container="container"
-        :grid-items="gridClass"
-        :width="width"
-      >
-        <component :is="headerTag || 'h2'" v-if="header" class="col-span-full">
-          {{ props.header }}
-        </component>
+    <WrapGrid
+      :card="card"
+      :container="container"
+      :grid-items="gridClass"
+      :width="width"
+    >
+      <component :is="headerTag || 'h2'" v-if="header" class="col-span-full">
+        {{ props.header }}
+      </component>
 
-        <template v-for="[slotName] in orderedSlots" :key="slotName">
-          <div
-            :class="[
-              'region',
-              slotName,
-              props.regionAlign?.[slotName],
-              ['top', 'bottom'].includes(slotName) ? 'col-span-full' : '',
-            ]"
-          >
-            <slot :name="slotName" />
-          </div>
-        </template>
-      </WrapGrid>
-    </EditLink>
+      <template v-for="[slotName] in orderedSlots" :key="slotName">
+        <div
+          :class="[
+            'region',
+            slotName,
+            props.regionAlign?.[slotName],
+            ['top', 'bottom'].includes(slotName) ? 'col-span-full' : '',
+          ]"
+        >
+          <slot :name="slotName" />
+        </div>
+      </template>
+    </WrapGrid>
   </section>
 </template>

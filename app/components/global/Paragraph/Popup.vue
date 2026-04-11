@@ -21,7 +21,7 @@ const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
     <slot name="media" />
     <slot name="schedule" />
 
