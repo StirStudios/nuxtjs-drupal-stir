@@ -17,11 +17,8 @@ const slideoverMotionContent = computed(() => {
 
   if (!angleEnabled) return { 'aria-label': 'Site navigation menu' }
 
-  const sideToken = theme.navigation.toggleDirection === 'left' ? 'left' : 'right'
   const className = [
     'menu-panel-motion menu-panel-angle !bg-transparent !divide-y-0 !ring-0 !shadow-none sm:!ring-0 sm:!shadow-none',
-    `data-[state=open]:animate-[slide-in-from-${sideToken}_780ms_cubic-bezier(0.03,0.9,0.16,1)]`,
-    `data-[state=closed]:animate-[slide-out-to-${sideToken}_780ms_cubic-bezier(0.84,0,0.97,0.1)_120ms]`,
   ].join(' ')
 
   const degRaw = Number(theme.navigation.slideover?.angleDeg ?? 55)
