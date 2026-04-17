@@ -85,6 +85,9 @@ export default defineAppConfig({
       },
       slideover: {
         logo: true,
+        angle: false,
+        angleDeg: 35,
+        angleOffsetX: 175,
         link: 'text-xl text-center block my-3 uppercase',
         body: 'flex h-full flex-col justify-center text-center',
       },

@@ -12,6 +12,39 @@ const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
+const slideoverMotionContent = computed(() => {
+  const angleEnabled = Boolean(theme.navigation.slideover?.angle)
+
+  if (!angleEnabled) return { 'aria-label': 'Site navigation menu' }
+
+  const sideToken = theme.navigation.toggleDirection === 'left' ? 'left' : 'right'
+  const className = [
+    'menu-panel-motion menu-panel-angle !bg-transparent !divide-y-0 !ring-0 !shadow-none sm:!ring-0 sm:!shadow-none',
+    `data-[state=open]:animate-[slide-in-from-${sideToken}_780ms_cubic-bezier(0.03,0.9,0.16,1)]`,
+    `data-[state=closed]:animate-[slide-out-to-${sideToken}_780ms_cubic-bezier(0.84,0,0.97,0.1)_120ms]`,
+  ].join(' ')
+
+  const degRaw = Number(theme.navigation.slideover?.angleDeg ?? 55)
+  const offsetRaw = Number(theme.navigation.slideover?.angleOffsetX ?? 175)
+  const angleDeg = Number.isFinite(degRaw) ? degRaw : 55
+  const angleOffsetX = Number.isFinite(offsetRaw) ? offsetRaw : 175
+
+  if (angleDeg === 55 && angleOffsetX === 175) {
+    return {
+      'aria-label': 'Site navigation menu',
+      class: className,
+    }
+  }
+
+  return {
+    'aria-label': 'Site navigation menu',
+    class: className,
+    style: {
+      '--menu-angle-deg': `${angleDeg}deg`,
+      '--menu-angle-offset-x': `${angleOffsetX}%`,
+    },
+  }
+})
 
 // Fetch menu items
 const mainMenu = await fetchMenu('main')
@@ -96,9 +129,8 @@ const onOpen = (val: boolean) => {
   <LazyUHeader
     aria-label="Site header"
     :menu="{
-      content: {
-        'aria-label': 'Site navigation menu',
-      },
+      side: theme.navigation.toggleDirection,
+      content: slideoverMotionContent,
     }"
     :mode="theme.navigation.toggleType"
     :title="page?.site_info?.name ?? ''"

@@ -47,3 +47,126 @@
     @apply block w-full;
   }
 }
+
+/* Slideover animation system (single source of truth via CSS vars) */
+@keyframes menu-bg-angle-in {
+  from {
+    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
+      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
+      skew(0deg);
+    transform-style: preserve-3d;
+  }
+  to {
+    transform: translate3d(0%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg)
+      rotateY(0deg) rotateZ(0deg) skew(0deg);
+    transform-style: preserve-3d;
+  }
+}
+
+@keyframes menu-bg-angle-out {
+  from {
+    transform: translate3d(0%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg)
+      rotateY(0deg) rotateZ(0deg) skew(0deg);
+    transform-style: preserve-3d;
+  }
+  to {
+    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
+      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
+      skew(0deg);
+    transform-style: preserve-3d;
+  }
+}
+
+@keyframes menu-content-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes menu-content-fade-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+[data-slot='content'].menu-panel-motion {
+  @apply overflow-hidden isolate;
+
+  /* Motion defaults */
+  --menu-angle-offset-x: 175%;
+  --menu-angle-deg: 55deg;
+  --menu-from-x: var(--menu-angle-offset-x);
+  --menu-from-y: 0px;
+  --menu-from-rot: 0deg;
+  --menu-bg-duration: 780ms;
+  --menu-bg-ease-in: cubic-bezier(0.03, 0.9, 0.16, 1);
+  --menu-bg-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
+  --menu-content-duration: 620ms;
+  --menu-content-delay-in: 120ms;
+  --menu-content-delay-out: 0ms;
+
+  &::after {
+    content: '';
+    @apply absolute z-0 pointer-events-none -top-[24%] inset-x-0 bottom-0 shadow-[-8px_0_30px_#0000003b];
+    background: var(--ui-bg);
+    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
+      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg)
+      rotateZ(var(--menu-from-rot)) skew(0deg);
+    transform-style: preserve-3d;
+  }
+
+  > * {
+    @apply relative z-[1];
+  }
+
+  &[data-state='open'] {
+    &::after {
+      animation: menu-bg-angle-in var(--menu-bg-duration) var(--menu-bg-ease-in)
+        both;
+    }
+
+    .app-nav-mobile,
+    [data-slot='header'] {
+      animation: menu-content-fade-in var(--menu-content-duration)
+        var(--menu-bg-ease-in) var(--menu-content-delay-in) both;
+    }
+  }
+
+  &[data-state='closed'] {
+    &::after {
+      animation: menu-bg-angle-out var(--menu-bg-duration)
+        var(--menu-bg-ease-out) both;
+    }
+
+    .app-nav-mobile,
+    [data-slot='header'] {
+      animation: menu-content-fade-out var(--menu-content-duration)
+        var(--menu-bg-ease-out) var(--menu-content-delay-out) both;
+    }
+  }
+}
+
+/* Side selection */
+[data-slot='content'][data-side='left'].menu-panel-motion {
+  --menu-from-x: calc(var(--menu-angle-offset-x) * -1);
+  --menu-from-y: 0px;
+}
+
+/* Variant: angled background motion */
+[data-slot='content'].menu-panel-motion.menu-panel-angle {
+  --menu-from-rot: calc(var(--menu-angle-deg) * -1);
+}
+
+[data-slot='content'][data-side='left'].menu-panel-motion.menu-panel-angle {
+  --menu-from-rot: var(--menu-angle-deg);
+}
