@@ -136,7 +136,7 @@
 }
 
 [data-slot='content'].menu-panel-motion {
-  @apply overflow-hidden isolate;
+  @apply isolate;
 
   /* Motion defaults */
   --menu-angle-offset-x: 175%;
@@ -176,7 +176,7 @@
 [data-slot='content'].menu-panel-motion {
   &::after {
     content: '';
-    @apply absolute z-0 pointer-events-none -top-[24%] inset-x-0 bottom-0 shadow-[-8px_0_30px_#0000003b];
+    @apply absolute z-0 pointer-events-none -top-[24%] inset-x-0 bottom-0 shadow-lg;
     background: var(--ui-bg);
     transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
       scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg)
