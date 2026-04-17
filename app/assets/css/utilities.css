@@ -49,6 +49,42 @@
 }
 
 /* Slideover animation system (single source of truth via CSS vars) */
+@keyframes menu-panel-slide-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes menu-panel-slide-out-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes menu-panel-slide-in-left {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes menu-panel-slide-out-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
 @keyframes menu-bg-angle-in {
   from {
     transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
@@ -114,7 +150,30 @@
   --menu-content-duration: 620ms;
   --menu-content-delay-in: 120ms;
   --menu-content-delay-out: 0ms;
+  --menu-panel-delay-out: 120ms;
+}
 
+[data-slot='content'].menu-panel-motion[data-side='right'][data-state='open'] {
+  animation: menu-panel-slide-in-right var(--menu-bg-duration)
+    var(--menu-bg-ease-in) both !important;
+}
+
+[data-slot='content'].menu-panel-motion[data-side='right'][data-state='closed'] {
+  animation: menu-panel-slide-out-right var(--menu-bg-duration)
+    var(--menu-bg-ease-out) var(--menu-panel-delay-out) both !important;
+}
+
+[data-slot='content'].menu-panel-motion[data-side='left'][data-state='open'] {
+  animation: menu-panel-slide-in-left var(--menu-bg-duration)
+    var(--menu-bg-ease-in) both !important;
+}
+
+[data-slot='content'].menu-panel-motion[data-side='left'][data-state='closed'] {
+  animation: menu-panel-slide-out-left var(--menu-bg-duration)
+    var(--menu-bg-ease-out) var(--menu-panel-delay-out) both !important;
+}
+
+[data-slot='content'].menu-panel-motion {
   &::after {
     content: '';
     @apply absolute z-0 pointer-events-none -top-[24%] inset-x-0 bottom-0 shadow-[-8px_0_30px_#0000003b];
