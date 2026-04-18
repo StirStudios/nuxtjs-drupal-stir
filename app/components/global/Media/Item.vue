@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 import { createSpringLinearEasing } from '../../../utils/animations'
+import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 
 interface SlotNode {
   props?: Record<string, unknown>
@@ -124,6 +125,11 @@ onBeforeUnmount(() => {
       :class="[
         theme.media.rounded,
         isVideo || overlay ? 'cursor-pointer' : '',
+        isVideo &&
+          'grid place-items-center text-white',
+        isVideo && mediaPreviewClasses.overlayBase,
+        isVideo && mediaPreviewClasses.overlayTint30,
+        isVideo && mediaPreviewClasses.overlayInteractiveTint,
       ]"
       role="button"
       tabindex="0"
@@ -134,6 +140,7 @@ onBeforeUnmount(() => {
       <div
         :class="[
           'transition-transform',
+          isVideo && mediaPreviewClasses.zoomLayer,
           theme.media.effects.scale,
           theme.media.transitions.slow,
           'group-focus-within:scale-105',
@@ -153,17 +160,13 @@ onBeforeUnmount(() => {
         {{ mediaProps.credit }}
       </span>
 
-      <template v-if="isVideo">
-        <div
-          class="absolute inset-0 z-10 bg-black/30 transition-colors group-hover:bg-black/10 group-focus-within:bg-black/10"
-        />
-        <span
-          aria-hidden="true"
-          class="absolute inset-0 z-20 flex items-center justify-center text-white"
-        >
-          <UIcon name="i-lucide-play-circle" size="60" />
-        </span>
-      </template>
+      <span
+        v-if="isVideo"
+        aria-hidden="true"
+        :class="mediaPreviewClasses.iconLayer"
+      >
+        <UIcon name="i-lucide-play-circle" size="60" />
+      </span>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { aspectRatios } from '~/utils/aspectRatios'
+import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 
 defineOptions({
@@ -123,7 +124,9 @@ onMounted(() => {
       v-else-if="!isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
-        'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white after:pointer-events-none after:col-start-1 after:row-start-1 after:block after:h-full after:w-full after:bg-black/40 after:content-[\'\'] after:z-10',
+        'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',
+        mediaPreviewClasses.overlayBase,
+        mediaPreviewClasses.overlayTint40,
         theme.media.rounded,
       ]"
       type="button"
@@ -132,7 +135,7 @@ onMounted(() => {
       <div
         v-if="previewSrc"
         :class="[
-          'col-start-1 row-start-1 z-0 h-full w-full will-change-transform transition-transform',
+          mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,
           theme.media.effects.scale,
           'group-focus-within:scale-105',
@@ -144,7 +147,10 @@ onMounted(() => {
           :src="previewSrc"
         />
       </div>
-      <UIcon class="col-start-1 row-start-1 z-20 size-16" name="i-lucide-play-circle" />
+      <UIcon
+        :class="[mediaPreviewClasses.iconLayer, 'size-16']"
+        name="i-lucide-play-circle"
+      />
     </button>
   </div>
 </template>
