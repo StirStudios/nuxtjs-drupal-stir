@@ -65,7 +65,10 @@ export function useTeaserPost(
 
   const backendEditLink = computed(() => {
     const source = unref(input)
-    const editLink = isRecord(source) ? source.editLink : undefined
+    const sourceRecord = isRecord(source) ? source : {}
+    const sourceProps = isRecord(sourceRecord.props) ? sourceRecord.props : {}
+    const editLink =
+      sourceRecord.editLink ?? sourceProps.editLink
 
     return typeof editLink === 'string' && editLink !== '' ? editLink : undefined
   })
