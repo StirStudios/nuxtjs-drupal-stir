@@ -100,7 +100,7 @@ export default defineAppConfig({
       noMediaFallback:
         'bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
-        'relative min-h-[22rem] lg:min-h-[35rem] after:to-bg-black-10 after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
+        'relative after:to-bg-black-10 after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
       isFront: 'h-screen',
       image: {
         base: 'absolute min-h-full w-auto max-w-none min-w-full',

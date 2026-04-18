@@ -181,6 +181,10 @@ const handleActionClick = (action: EditAction) => {
   closeAllTooltips()
   action.onClick?.()
 }
+
+const handleTooltipOpenUpdate = (key: EditAction['key'], value: boolean) => {
+  setTooltipOpen(key, value)
+}
 </script>
 
 <template>
@@ -197,7 +201,7 @@ const handleActionClick = (action: EditAction) => {
           :open="Boolean(tooltipOpen[action.key])"
           :text="action.tooltip"
           :ui="{ content: 'admin-ui-tooltip-content', arrow: 'admin-ui-tooltip-arrow' }"
-          @update:open="(value) => setTooltipOpen(action.key, value)"
+          @update:open="(value: boolean) => handleTooltipOpenUpdate(action.key, value)"
         >
           <UButton
             :aria-label="action.ariaLabel"

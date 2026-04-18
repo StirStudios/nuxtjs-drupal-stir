@@ -1,4 +1,4 @@
-import { useEventListener, useScriptTag } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 
 declare global {
   interface Window {
@@ -52,17 +52,12 @@ export function useCalendlyWidget(
   onReady?: () => void,
 ) {
   const resolvedUrl = url.trim()
-  const { load } = useScriptTag(
-    'https://assets.calendly.com/assets/external/widget.js',
-    undefined,
-    {
-      manual: true,
-      attrs: {
-        async: 'true',
-        defer: 'true',
-      },
-    },
-  )
+  const { load } = useScript({
+    id: 'calendly-widget',
+    src: 'https://assets.calendly.com/assets/external/widget.js',
+  }, {
+    trigger: 'manual',
+  })
   let stopMessageListener: (() => void) | null = null
 
   onMounted(async () => {
