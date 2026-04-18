@@ -123,20 +123,28 @@ onMounted(() => {
       v-else-if="!isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
-        'absolute inset-0 z-10 flex h-full w-full items-center justify-center overflow-hidden bg-black text-white',
+        'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white after:pointer-events-none after:col-start-1 after:row-start-1 after:block after:h-full after:w-full after:bg-black/40 after:content-[\'\'] after:z-10',
         theme.media.rounded,
       ]"
       type="button"
       @click="activateEmbed"
     >
-      <img
+      <div
         v-if="previewSrc"
-        :alt="alt || title || 'Video thumbnail'"
-        class="absolute inset-0 h-full w-full object-cover"
-        :src="previewSrc"
-      />
-      <div class="absolute inset-0 bg-black/40" />
-      <UIcon class="relative z-10 size-16" name="i-lucide-play-circle" />
+        :class="[
+          'col-start-1 row-start-1 z-0 h-full w-full will-change-transform transition-transform',
+          theme.media.transitions.slow,
+          theme.media.effects.scale,
+          'group-focus-within:scale-105',
+        ]"
+      >
+        <img
+          :alt="alt || title || 'Video thumbnail'"
+          class="h-full w-full object-cover"
+          :src="previewSrc"
+        />
+      </div>
+      <UIcon class="col-start-1 row-start-1 z-20 size-16" name="i-lucide-play-circle" />
     </button>
   </div>
 </template>

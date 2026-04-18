@@ -80,6 +80,7 @@ const postUi = computed(() => {
       <template #header>
         <div
           :class="[
+            'app-node-teaser-media',
             theme.media.base,
             'transform transition-transform',
             theme.media.transitions.fast,
@@ -99,3 +100,13 @@ const postUi = computed(() => {
     </UBlogPost>
   </EditLink>
 </template>
+
+<style scoped>
+.app-node-teaser-media :deep(.media) {
+  @apply h-full w-full;
+}
+
+.app-node-teaser-media :deep(.media > img) {
+  @apply block h-full w-full object-cover;
+}
+</style>
