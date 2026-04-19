@@ -8,7 +8,7 @@ const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
 export default defineNuxtConfig({
-  compatibilityDate: '2026-03-23',
+  compatibilityDate: '2026-04-19',
 
   css: ['~/assets/css/main.css'],
 

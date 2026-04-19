@@ -59,6 +59,11 @@
     "vitest": "^4.1.4",
     "vue-tsc": "^2.2.12"
   },
+  "pnpm": {
+    "overrides": {
+      "unimport": "5.6.0"
+    }
+  },
   "release-it": {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
     "github": {
