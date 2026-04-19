@@ -1,52 +1,49 @@
 import { defineNuxtRouteMiddleware, useAppConfig } from '#app'
-
-function matchesRoute(path: string, rule: string): boolean {
-  const normalizedRule = rule.trim()
-
-  if (!normalizedRule) return false
-  if (normalizedRule === '/') return path === '/'
-  return path === normalizedRule || path.startsWith(`${normalizedRule}/`)
-}
+import {
+  getRouteColorModeOverride,
+  normalizeColorModePreference,
+  shouldLockGlobalColorMode,
+} from '~/utils/colorMode'
 
 export default defineNuxtRouteMiddleware((to) => {
   const colorMode = useColorMode()
   const {
     forced = false,
-    preference = 'dark',
+    preference,
     showToggle = true,
     lightRoutes = [],
     darkRoutes = [],
   } = useAppConfig().colorMode
+  const normalizedPreference = normalizeColorModePreference(preference)
 
+  // `forced` is a hard global lock. Route overrides apply only when not forced.
   if (forced) {
-    colorMode.preference = preference
-    to.meta.colorMode = preference
+    colorMode.preference = normalizedPreference
     return
   }
 
-  const isLight = lightRoutes.some((prefix: string) => matchesRoute(to.path, prefix))
-  const isDark = darkRoutes.some((prefix: string) => matchesRoute(to.path, prefix))
+  const routeOverride = getRouteColorModeOverride({
+    path: to.path,
+    lightRoutes,
+    darkRoutes,
+  })
 
   // If toggle is hidden, keep baseline mode deterministic across app reloads
   // regardless of any previously persisted user choice.
-  if (!showToggle) {
-    colorMode.preference = preference
+  if (routeOverride) {
+    colorMode.preference = routeOverride
+  } else if (shouldLockGlobalColorMode({ forced, showToggle })) {
+    colorMode.preference = normalizedPreference
   }
 
-  if (isLight) {
-    to.meta.colorMode = 'light'
+  if (routeOverride) {
+    to.meta.colorMode = routeOverride
     return
   }
 
-  if (isDark) {
-    to.meta.colorMode = 'dark'
-    return
-  }
-
-  if (!showToggle) {
-    to.meta.colorMode = preference
-    return
-  }
+  // Do not write route meta for global lock mode. Route meta forcing is
+  // reserved for explicit route overrides (lightRoutes/darkRoutes) only.
+  if (!showToggle) return
 
   delete to.meta.colorMode
 })
