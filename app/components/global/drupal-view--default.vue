@@ -6,6 +6,7 @@ import type {
   ExposedSort,
   ViewPager,
 } from '~/composables/useDrupalViewControls'
+import { useItemRevealConfig } from '~/composables/useItemRevealConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 
 interface CeElementNode {
@@ -31,6 +32,7 @@ const props = defineProps<{
   carouselFade?: boolean
   carouselIndicators?: boolean
   carouselInterval?: number
+  direction?: string
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
   noResults?: string
@@ -132,6 +134,7 @@ const hasRows = computed(() =>
     : staticTeaserRows.value.length > 0,
 )
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
+const { getStaggerDelayMs } = useItemRevealConfig()
 </script>
 
 <template>
@@ -216,14 +219,25 @@ const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
       :width="width"
     >
       <template v-if="hasDynamicRows">
-        <div v-for="row in dynamicRenderedRows" :key="row.key" class="item">
-          <component :is="renderCustomElements(row.node)" />
+        <div
+          v-for="(row, i) in dynamicRenderedRows"
+          :key="row.key"
+          class="item"
+        >
+          <WrapAnimate
+            :delay-ms="getStaggerDelayMs(i)"
+            :effect="direction"
+          >
+            <component :is="renderCustomElements(row.node)" />
+          </WrapAnimate>
         </div>
       </template>
 
       <template v-else>
         <div v-for="(node, i) in staticTeaserRows" :key="i" class="item">
-          <component :is="node" />
+          <WrapAnimate :delay-ms="getStaggerDelayMs(i)" :effect="direction">
+            <component :is="node" />
+          </WrapAnimate>
         </div>
       </template>
     </WrapGrid>

@@ -2,6 +2,8 @@
 import { useIntersectionObserver } from '@vueuse/core'
 import { createSpringLinearEasing } from '../../../utils/animations'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
+import { useItemRevealConfig } from '~/composables/useItemRevealConfig'
+import type { ItemRevealResolved } from '~/composables/useItemRevealConfig'
 
 interface SlotNode {
   props?: Record<string, unknown>
@@ -25,6 +27,7 @@ const props = defineProps<{
   index: number
   overlay?: boolean
   tk: SlotsToolkit
+  itemReveal?: ItemRevealResolved
 }>()
 
 const emit = defineEmits<{
@@ -52,27 +55,63 @@ const componentMap: Record<MediaType, string> = {
 }
 
 const rootEl = ref<HTMLElement | null>(null)
-const REVEAL_START_INDEX = 6
-const shouldAnimateOnScroll = props.index >= REVEAL_START_INDEX
+const { resolved: sharedItemReveal } = useItemRevealConfig()
+const reveal = computed(() => props.itemReveal ?? sharedItemReveal.value)
+const revealStartIndex = 0
+const revealOnce = false
+const shouldAnimateOnScroll = props.index >= revealStartIndex
 const isRevealed = ref(!shouldAnimateOnScroll)
-const revealDurationMs = theme.animations?.mediaReveal?.durationMs ?? 800
-const revealOffsetY = theme.animations?.mediaReveal?.offsetY || '4rem'
-const revealEasing = createSpringLinearEasing({
-  duration: revealDurationMs / 1000,
-  stiffness: 250,
-  damping: 40,
-})
-const revealBaseStyle = computed(() => ({
-  '--media-reveal-offset-y': revealOffsetY,
-}))
-const revealStyle = computed(() =>
-  shouldAnimateOnScroll && isRevealed.value
-    ? {
-        transition: `opacity ${revealDurationMs}ms ${revealEasing}, transform ${revealDurationMs}ms ${revealEasing}`,
-      }
-    : undefined,
+const revealEasing = computed(() =>
+  createSpringLinearEasing({
+    duration: reveal.value.durationMs / 1000,
+    stiffness: 250,
+    damping: 40,
+  }),
 )
+const revealBaseStyle = computed(() => ({
+  '--media-reveal-offset-y': reveal.value.offsetY,
+}))
+const revealStyle = computed(() => {
+  if (!shouldAnimateOnScroll) return undefined
+
+  return {
+    transition: `opacity ${reveal.value.durationMs}ms ${revealEasing.value}, transform ${reveal.value.durationMs}ms ${revealEasing.value}`,
+    transitionDelay: `${Math.max(0, props.index - revealStartIndex) * Math.max(0, reveal.value.staggerMs)}ms`,
+  }
+})
 let stopObserver: (() => void) | null = null
+let rafId: number | null = null
+
+function startRevealObserver() {
+  if (!rootEl.value) return
+
+  const { stop } = useIntersectionObserver(
+    rootEl,
+    (entries) => {
+      const isIntersecting = entries.some((entry) => entry.isIntersecting)
+
+      if (isIntersecting) {
+        isRevealed.value = true
+
+        if (revealOnce) {
+          stopObserver?.()
+          stopObserver = null
+        }
+        return
+      }
+
+      if (!revealOnce) {
+        isRevealed.value = false
+      }
+    },
+    {
+      threshold: reveal.value.threshold,
+      rootMargin: reveal.value.rootMargin,
+    },
+  )
+
+  stopObserver = stop
+}
 
 onMounted(() => {
   if (!shouldAnimateOnScroll || !rootEl.value) return
@@ -81,22 +120,20 @@ onMounted(() => {
     return
   }
 
-  const { stop } = useIntersectionObserver(
-    rootEl,
-    (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        isRevealed.value = true
-        stopObserver?.()
-        stopObserver = null
-      }
-    },
-    { rootMargin: '120px 0px' },
-  )
-
-  stopObserver = stop
+  // Let initial hidden styles paint first so staggered transitions are visible
+  // for media already in the first viewport.
+  rafId = requestAnimationFrame(() => {
+    startRevealObserver()
+    rafId = null
+  })
 })
 
 onBeforeUnmount(() => {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId)
+    rafId = null
+  }
+
   stopObserver?.()
   stopObserver = null
 })
