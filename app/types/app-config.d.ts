@@ -57,8 +57,30 @@ type StirThemeOverlayConfig = {
   portal?: boolean | string | HTMLElement
 } & LooseRecord
 
+type StirThemeInViewConfig = {
+  threshold?: number
+  rootMargin?: string
+} & LooseRecord
+
+type StirThemeItemRevealConfig = {
+  durationMs?: number
+  offsetY?: string
+  staggerMs?: number
+  threshold?: number
+  rootMargin?: string
+} & LooseRecord
+
+type StirThemeAnimationsConfig = {
+  once?: boolean
+  inView?: StirThemeInViewConfig
+  itemReveal?: StirThemeItemRevealConfig
+  // Backward compatibility for downstream projects still using the legacy key.
+  mediaReveal?: StirThemeItemRevealConfig
+} & LooseRecord
+
 type StirThemeConfig = {
   overlay?: StirThemeOverlayConfig
+  animations?: StirThemeAnimationsConfig
 } & LooseRecord
 
 declare module 'nuxt/schema' {

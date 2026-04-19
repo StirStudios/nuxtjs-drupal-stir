@@ -33,6 +33,11 @@ const hiddenTransforms: Record<string, string> = {
 const springEasing = createSpringLinearEasing(defaultTransitionConfig)
 const fallbackEasing = `cubic-bezier(${defaultTransitionConfig.ease.join(', ')})`
 const transitionTimingFunction = ref(fallbackEasing)
+const config = useAppConfig()
+const animateOnce = computed(() => config.stirTheme.animations?.once !== false)
+const inViewThreshold = Number(config.stirTheme.animations?.inView?.threshold ?? 0.12)
+const inViewRootMargin =
+  config.stirTheme.animations?.inView?.rootMargin || '0px 0px -8% 0px'
 
 const observerCallbacks = new WeakMap<HTMLElement, (visible: boolean) => void>()
 const observedElements = new Set<HTMLElement>()
@@ -51,8 +56,8 @@ function getSharedObserver(): IntersectionObserver | null {
       }
     },
     {
-      threshold: 0.1,
-      rootMargin: '0px 0px -10% 0px',
+      threshold: Number.isFinite(inViewThreshold) ? inViewThreshold : 0.12,
+      rootMargin: inViewRootMargin,
     },
   )
 
@@ -86,11 +91,10 @@ function observeInView(
   }
 }
 
-const config = useAppConfig()
-const animateOnce = computed(() => config.stirTheme.animations.once !== false)
 const props = defineProps<{
   effect?: string
   class?: string
+  delayMs?: number
 }>()
 
 const root = ref<HTMLElement | null>(null)
@@ -108,11 +112,13 @@ const animationStyle = computed(() => {
 
   const hiddenTransform =
     hiddenTransforms[props.effect] ?? hiddenTransforms['fade-in']
+  const extraDelaySeconds = Math.max(0, props.delayMs ?? 0) / 1000
+  const totalDelaySeconds = defaultTransitionConfig.delay + extraDelaySeconds
 
   return {
     opacity: shouldShow.value ? '1' : '0',
     transform: shouldShow.value ? 'none' : hiddenTransform,
-    transition: `opacity ${defaultTransitionConfig.duration}s ${transitionTimingFunction.value} ${defaultTransitionConfig.delay}s, transform ${defaultTransitionConfig.duration}s ${transitionTimingFunction.value} ${defaultTransitionConfig.delay}s`,
+    transition: `opacity ${defaultTransitionConfig.duration}s ${transitionTimingFunction.value} ${totalDelaySeconds}s, transform ${defaultTransitionConfig.duration}s ${transitionTimingFunction.value} ${totalDelaySeconds}s`,
     willChange: 'opacity, transform',
     transformStyle: props.effect?.startsWith('flip-')
       ? 'preserve-3d'

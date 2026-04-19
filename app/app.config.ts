@@ -214,9 +214,16 @@ export default defineAppConfig({
 
     animations: {
       once: false,
-      mediaReveal: {
+      inView: {
+        threshold: 0.12,
+        rootMargin: '0px 0px -8% 0px',
+      },
+      itemReveal: {
         durationMs: 800,
         offsetY: '4rem',
+        staggerMs: 250,
+        threshold: 0.05,
+        rootMargin: '0px 0px -5% 0px',
       },
     },
 
