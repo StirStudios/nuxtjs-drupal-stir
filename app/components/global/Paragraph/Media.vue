@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { useItemRevealConfig } from '~/composables/useItemRevealConfig'
+import { useRevealConfig } from '~/composables/useItemRevealConfig'
 import { useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -49,7 +49,7 @@ const componentMap: Record<string, string> = {
 }
 
 const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
-const { resolved: itemReveal } = useItemRevealConfig()
+const { resolved: reveal } = useRevealConfig()
 const slotMediaOrdered = computed(() =>
   orderedIndices.value
     .map((i) => slotMedia.value[i])
@@ -113,9 +113,9 @@ onMounted(() => {
         >
           <MediaItem
             :index="i"
-            :item-reveal="itemReveal"
             :node="node"
             :overlay="overlay"
+            :reveal="reveal"
             :tk="tk"
             @open="openModal"
           />
@@ -131,9 +131,9 @@ onMounted(() => {
             v-for="(node, i) in slotMediaOrdered"
             :key="i"
             :index="i"
-            :item-reveal="itemReveal"
             :node="node"
             :overlay="overlay"
+            :reveal="reveal"
             :tk="tk"
             @open="openModal"
           />

@@ -57,25 +57,17 @@ type StirThemeOverlayConfig = {
   portal?: boolean | string | HTMLElement
 } & LooseRecord
 
-type StirThemeInViewConfig = {
-  threshold?: number
-  rootMargin?: string
-} & LooseRecord
-
-type StirThemeItemRevealConfig = {
+type StirThemeRevealConfig = {
   durationMs?: number
-  offsetY?: string
-  staggerMs?: number
   threshold?: number
   rootMargin?: string
+  staggerMs?: number
+  ease?: [number, number, number, number]
 } & LooseRecord
 
 type StirThemeAnimationsConfig = {
   once?: boolean
-  inView?: StirThemeInViewConfig
-  itemReveal?: StirThemeItemRevealConfig
-  // Backward compatibility for downstream projects still using the legacy key.
-  mediaReveal?: StirThemeItemRevealConfig
+  reveal?: StirThemeRevealConfig
 } & LooseRecord
 
 type StirThemeConfig = {
