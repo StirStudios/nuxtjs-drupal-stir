@@ -214,16 +214,12 @@ export default defineAppConfig({
 
     animations: {
       once: false,
-      inView: {
-        threshold: 0.12,
-        rootMargin: '0px 0px -8% 0px',
-      },
-      itemReveal: {
-        durationMs: 800,
-        offsetY: '4rem',
-        staggerMs: 250,
-        threshold: 0.05,
+      reveal: {
+        durationMs: 1200,
+        threshold: 0.08,
         rootMargin: '0px 0px -5% 0px',
+        staggerMs: 250,
+        ease: [0.22, 1, 0.36, 1],
       },
     },
 

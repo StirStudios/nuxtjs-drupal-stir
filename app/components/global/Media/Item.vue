@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core'
-import { createSpringLinearEasing } from '../../../utils/animations'
+import { motion, useReducedMotion } from 'motion-v'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
-import { useItemRevealConfig } from '~/composables/useItemRevealConfig'
-import type { ItemRevealResolved } from '~/composables/useItemRevealConfig'
+import { useRevealConfig } from '~/composables/useItemRevealConfig'
+import type { RevealResolved } from '~/composables/useItemRevealConfig'
 
 interface SlotNode {
   props?: Record<string, unknown>
@@ -27,14 +26,15 @@ const props = defineProps<{
   index: number
   overlay?: boolean
   tk: SlotsToolkit
-  itemReveal?: ItemRevealResolved
+  reveal?: RevealResolved
 }>()
 
 const emit = defineEmits<{
   (e: 'open', index: number): void
 }>()
 
-const theme = useAppConfig().stirTheme
+const appConfig = useAppConfig()
+const theme = appConfig.stirTheme
 const mediaProps = computed(() => props.tk.propsOf(props.node))
 const isVideo = computed(() => mediaProps.value.type === 'video')
 const isDocument = computed(() => mediaProps.value.type === 'document')
@@ -54,100 +54,58 @@ const componentMap: Record<MediaType, string> = {
   link: 'MediaLink',
 }
 
-const rootEl = ref<HTMLElement | null>(null)
-const { resolved: sharedItemReveal } = useItemRevealConfig()
-const reveal = computed(() => props.itemReveal ?? sharedItemReveal.value)
+const { resolved: sharedReveal } = useRevealConfig()
+const reveal = computed(() => props.reveal ?? sharedReveal.value)
 const revealStartIndex = 0
-const revealOnce = false
+const revealOnce = computed(() => theme.animations?.once !== false)
 const shouldAnimateOnScroll = props.index >= revealStartIndex
-const isRevealed = ref(!shouldAnimateOnScroll)
-const revealEasing = computed(() =>
-  createSpringLinearEasing({
-    duration: reveal.value.durationMs / 1000,
-    stiffness: 250,
-    damping: 40,
-  }),
+const prefersReducedMotion = useReducedMotion()
+const revealDelayMs = computed(() =>
+  Math.max(0, props.index - revealStartIndex) * Math.max(0, reveal.value.staggerMs),
 )
-const revealBaseStyle = computed(() => ({
-  '--media-reveal-offset-y': reveal.value.offsetY,
-}))
-const revealStyle = computed(() => {
-  if (!shouldAnimateOnScroll) return undefined
+const revealTransition = computed(() => {
+  if (prefersReducedMotion.value || !shouldAnimateOnScroll) {
+    return { duration: 0 }
+  }
 
   return {
-    transition: `opacity ${reveal.value.durationMs}ms ${revealEasing.value}, transform ${reveal.value.durationMs}ms ${revealEasing.value}`,
-    transitionDelay: `${Math.max(0, props.index - revealStartIndex) * Math.max(0, reveal.value.staggerMs)}ms`,
+    type: 'tween',
+    duration: Math.max(0, reveal.value.durationMs) / 1000,
+    ease: reveal.value.ease,
+    delay: revealDelayMs.value / 1000,
   }
 })
-let stopObserver: (() => void) | null = null
-let rafId: number | null = null
+const revealInViewOptions = computed(() => ({
+  once: revealOnce.value,
+  amount: Math.min(1, Math.max(0, Number(reveal.value.threshold || 0))),
+  margin: reveal.value.rootMargin,
+}))
+const mediaRevealOffsetY = '4rem'
+const revealInitial = computed(() => {
+  if (prefersReducedMotion.value || !shouldAnimateOnScroll) return false
 
-function startRevealObserver() {
-  if (!rootEl.value) return
-
-  const { stop } = useIntersectionObserver(
-    rootEl,
-    (entries) => {
-      const isIntersecting = entries.some((entry) => entry.isIntersecting)
-
-      if (isIntersecting) {
-        isRevealed.value = true
-
-        if (revealOnce) {
-          stopObserver?.()
-          stopObserver = null
-        }
-        return
-      }
-
-      if (!revealOnce) {
-        isRevealed.value = false
-      }
-    },
-    {
-      threshold: reveal.value.threshold,
-      rootMargin: reveal.value.rootMargin,
-    },
-  )
-
-  stopObserver = stop
-}
-
-onMounted(() => {
-  if (!shouldAnimateOnScroll || !rootEl.value) return
-  if (!('IntersectionObserver' in window)) {
-    isRevealed.value = true
-    return
+  return {
+    opacity: 0,
+    y: mediaRevealOffsetY,
   }
-
-  // Let initial hidden styles paint first so staggered transitions are visible
-  // for media already in the first viewport.
-  rafId = requestAnimationFrame(() => {
-    startRevealObserver()
-    rafId = null
-  })
 })
+const revealWhileInView = computed(() => {
+  if (prefersReducedMotion.value || !shouldAnimateOnScroll) return undefined
 
-onBeforeUnmount(() => {
-  if (rafId !== null) {
-    cancelAnimationFrame(rafId)
-    rafId = null
+  return {
+    opacity: 1,
+    y: 0,
   }
-
-  stopObserver?.()
-  stopObserver = null
 })
 </script>
 
 <template>
-  <div
-    ref="rootEl"
-    :class="[
-      'media-reveal',
-      shouldAnimateOnScroll && 'media-reveal-animated',
-      isRevealed && 'media-reveal-visible',
-    ]"
-    :style="[revealBaseStyle, revealStyle]"
+  <motion.div
+    class="media-reveal"
+    :in-view-options="revealInViewOptions"
+    :initial="revealInitial"
+    :transition="revealTransition"
+    :while-in-view="revealWhileInView"
   >
     <component
       :is="componentMap[mediaProps.type]"
@@ -205,25 +163,5 @@ onBeforeUnmount(() => {
         <UIcon name="i-lucide-play-circle" size="60" />
       </span>
     </div>
-  </div>
+  </motion.div>
 </template>
-
-<style scoped>
-.media-reveal.media-reveal-animated {
-  opacity: 0;
-  transform: translateY(var(--media-reveal-offset-y, 4rem));
-}
-
-.media-reveal.media-reveal-animated.media-reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .media-reveal.media-reveal-animated {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-</style>
