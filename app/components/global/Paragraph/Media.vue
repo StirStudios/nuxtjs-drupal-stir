@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { Motion } from 'motion-v'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { useRevealConfig } from '~/composables/useItemRevealConfig'
+import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -49,7 +50,8 @@ const componentMap: Record<string, string> = {
 }
 
 const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
-const { resolved: reveal } = useRevealConfig()
+const { useRevealMotionProps } = useRevealMotionConfig()
+const motionProps = useRevealMotionProps(() => props.direction)
 const slotMediaOrdered = computed(() =>
   orderedIndices.value
     .map((i) => slotMedia.value[i])
@@ -102,7 +104,11 @@ onMounted(() => {
         {{ header }}
       </component>
 
-      <WrapAnimate class="relative" :effect="direction">
+      <Motion
+        as="div"
+        class="relative"
+        v-bind="motionProps"
+      >
         <UScrollArea
           v-if="useMasonryVirtualized"
           ref="scrollArea"
@@ -115,7 +121,6 @@ onMounted(() => {
             :index="i"
             :node="node"
             :overlay="overlay"
-            :reveal="reveal"
             :tk="tk"
             @open="openModal"
           />
@@ -133,12 +138,11 @@ onMounted(() => {
             :index="i"
             :node="node"
             :overlay="overlay"
-            :reveal="reveal"
             :tk="tk"
             @open="openModal"
           />
         </WrapGrid>
-      </WrapAnimate>
+      </Motion>
     </WrapAlign>
   </EditLink>
 

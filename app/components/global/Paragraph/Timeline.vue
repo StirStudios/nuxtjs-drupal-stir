@@ -51,21 +51,19 @@ const wrapperClasses = computed(() =>
 
 <template>
   <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <WrapAnimate :effect="direction">
-      <WrapAlign :align="align">
-        <div :class="wrapperClasses">
-          <UTimeline
-            class="max-w-3xl"
-            :color="color ?? 'primary'"
-            :default-value="timelineItems.length - 1"
-            :items="timelineItems"
-          >
-            <template #rich-description="{ item }">
-              <div class="prose max-w-none" v-html="item.description" />
-            </template>
-          </UTimeline>
-        </div>
-      </WrapAlign>
-    </WrapAnimate>
+    <WrapAlign :align="align">
+      <div :class="wrapperClasses">
+        <UTimeline
+          class="max-w-3xl"
+          :color="color ?? 'primary'"
+          :default-value="timelineItems.length - 1"
+          :items="timelineItems"
+        >
+          <template #rich-description="{ item }">
+            <div class="prose max-w-none" v-html="item.description" />
+          </template>
+        </UTimeline>
+      </div>
+    </WrapAlign>
   </EditLink>
 </template>
