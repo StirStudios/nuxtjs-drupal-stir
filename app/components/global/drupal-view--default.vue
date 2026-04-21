@@ -75,15 +75,22 @@ const randomizeEnabled = computed(() => {
 })
 
 const rawRows = computed(() => tk.slot('rows'))
-const slotRows = tk.hydrateOrder(
-  () => rawRows.value,
+const orderedRows = computed(() =>
+  rawRows.value.map((vnode, index) => ({
+    ...vnode,
+    key: vnode.key ?? `slide-${index}`,
+  })),
+)
+const randomizedRows = tk.hydrateOrder(
+  () => orderedRows.value,
   () =>
-    (randomizeEnabled.value ? tk.shuffle(rawRows.value) : rawRows.value).map(
-      (vnode, index) => ({
-        ...vnode,
-        key: vnode.key ?? `slide-${index}`,
-      }),
-    ),
+    tk.shuffle(rawRows.value).map((vnode, index) => ({
+      ...vnode,
+      key: vnode.key ?? `slide-${index}`,
+    })),
+)
+const slotRows = computed(() =>
+  randomizeEnabled.value ? randomizedRows.value : orderedRows.value,
 )
 
 const staticTeaserRows = computed(() =>
