@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { aspectRatios } from '~/utils/aspectRatios'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 
@@ -47,10 +46,24 @@ const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const isProcessing = computed(() => props.width === 180)
 const isEmbedActive = ref(false)
+const ratioConfig = {
+  portrait: 'aspect-[9/16]',
+  landscape: 'aspect-[16/9]',
+  square: 'aspect-square',
+  fourThree: 'aspect-[4/3]',
+} as const
 const aspectClass = computed(() => {
-  const ratio = aspectRatios(props.width ?? null, props.height ?? null)
+  const width = props.width
+  const height = props.height
 
-  return ratio || 'aspect-video'
+  if (!width || !height) return 'aspect-video'
+  if (height === 480) return ratioConfig.fourThree
+
+  const ratio = width / height
+
+  if (ratio > 1) return ratioConfig.landscape
+  if (ratio < 1) return ratioConfig.portrait
+  return ratioConfig.square
 })
 
 const shouldShowIframe = computed(

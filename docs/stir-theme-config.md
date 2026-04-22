@@ -182,7 +182,7 @@ Recommended key order in `stirTheme`:
 2. Content/component behavior:
    `media`, `carousel`, `modal`, `overlay`, `webform`, `turnstile`
 3. Visual/system tokens and utilities:
-   `card`, `gradients`, `animations`, `aspectRatios`, `scrollButton`, `error`
+   `card`, `gradients`, `animations`, `scrollButton`, `error`
 
 ### ✨ General
 
@@ -281,18 +281,12 @@ socials: [
 ]
 ```
 
-### 🖼️ `media` & aspect ratios
+### 🖼️ `media`
 
 ```ts
 media: {
   base: 'relative h-full w-full overflow-hidden object-cover',
   rounded: 'rounded-xl',
-},
-aspectRatios: {
-  portrait: 'aspect-[9/16]',
-  landscape: 'aspect-[16/9]',
-  square: 'aspect-square',
-  fourThree: 'aspect-[4/3]',
 },
 ```
 
