@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { slugify } from '~/utils/stringUtils'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{
   id?: number | string
   uuid?: string
+  parentUuid?: string
+  region?: string
 
   layout?: string
   container?: boolean
@@ -20,6 +26,7 @@ const props = defineProps<{
   regionAlign?: Record<string, string>
 
   randomize?: boolean
+  editLink?: string
 }>()
 
 const vueSlots = useSlots()
