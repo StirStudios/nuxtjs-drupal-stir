@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { Motion } from 'motion-v'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
@@ -23,6 +23,7 @@ interface SlotsToolkit {
 const props = defineProps<{
   node: SlotNode
   index: number
+  direction?: string
   overlay?: boolean
   tk: SlotsToolkit
 }>()
@@ -54,23 +55,21 @@ const componentMap: Record<MediaType, string> = {
 
 const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
 const revealMotionProps = computed(() =>
-  getRevealMotionProps('fade-up', getStaggerDelayMs(props.index)),
+  getRevealMotionProps(props.direction || 'fade-up', getStaggerDelayMs(props.index)),
 )
 </script>
 
 <template>
-  <motion.div
-    class="media-reveal"
+  <Motion
+    v-if="!overlay || isDocument || isAudio"
+    as-child
     v-bind="revealMotionProps"
   >
-    <component
-      :is="componentMap[mediaProps.type]"
-      v-if="!overlay || isDocument || isAudio"
-      v-bind="mediaProps"
-    />
+    <component :is="componentMap[mediaProps.type]" v-bind="mediaProps" />
+  </Motion>
 
+  <Motion v-else as-child v-bind="revealMotionProps">
     <div
-      v-else
       :aria-label="isVideo ? 'Open video modal' : 'Open media modal'"
       class="group relative overflow-hidden"
       :class="[
@@ -119,5 +118,5 @@ const revealMotionProps = computed(() =>
         <UIcon name="i-lucide-play-circle" size="60" />
       </span>
     </div>
-  </motion.div>
+  </Motion>
 </template>
