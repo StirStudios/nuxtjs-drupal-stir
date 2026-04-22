@@ -55,7 +55,7 @@ const componentMap: Record<MediaType, string> = {
 
 const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
 const revealMotionProps = computed(() =>
-  getRevealMotionProps(props.direction || 'fade-up', getStaggerDelayMs(props.index)),
+  getRevealMotionProps(props.direction, getStaggerDelayMs(props.index)),
 )
 </script>
 
