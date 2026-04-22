@@ -95,7 +95,7 @@ onMounted(() => {
 
 <template>
   <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <WrapAlign :align="align">
+    <WrapDiv :align="align">
       <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}
       </component>
@@ -135,7 +135,7 @@ onMounted(() => {
           @open="openModal"
         />
       </WrapGrid>
-    </WrapAlign>
+    </WrapDiv>
   </EditLink>
 
   <UModal

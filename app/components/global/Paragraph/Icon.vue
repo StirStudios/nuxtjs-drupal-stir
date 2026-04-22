@@ -15,12 +15,12 @@ defineProps<{
 
 <template>
   <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <WrapAlign :align="align">
+    <WrapDiv :align="align">
       <UIcon
         v-if="iconName"
         :class="['text-primary inline-block', iconSize ? `size-${iconSize}` : undefined]"
         :name="iconName"
       />
-    </WrapAlign>
+    </WrapDiv>
   </EditLink>
 </template>

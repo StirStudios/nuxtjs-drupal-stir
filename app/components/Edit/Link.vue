@@ -48,7 +48,8 @@ function findLayoutEditLinkByUuid(value: unknown, uuid: string): string {
   const nodeProps = (node.props ?? {}) as Record<string, unknown>
   const nodeUuid = typeof nodeProps.uuid === 'string' ? nodeProps.uuid : ''
   const nodeElement = typeof node.element === 'string' ? node.element : ''
-  const nodeEditLink = typeof nodeProps.editLink === 'string' ? nodeProps.editLink.trim() : ''
+  const nodeEditLink =
+    typeof nodeProps.editLink === 'string' ? nodeProps.editLink.trim() : ''
 
   if (nodeUuid === uuid && nodeElement === 'paragraph-layout') {
     return nodeEditLink
@@ -78,36 +79,53 @@ interface EditAction {
 }
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
-const fullEditLink = computed(() => (typeof props.link === 'string' ? props.link.trim() : ''))
+const fullEditLink = computed(() =>
+  typeof props.link === 'string' ? props.link.trim() : '',
+)
 const hasLink = computed(() => fullEditLink.value.length > 0)
 const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 
 const layoutEditLink = computed(() => {
-  const explicitLink = typeof props.layoutLink === 'string' ? props.layoutLink.trim() : ''
+  const explicitLink =
+    typeof props.layoutLink === 'string' ? props.layoutLink.trim() : ''
 
   if (explicitLink) return explicitLink
 
-  const parentUuid = typeof props.parentUuid === 'string' ? props.parentUuid.trim() : ''
+  const parentUuid =
+    typeof props.parentUuid === 'string' ? props.parentUuid.trim() : ''
 
   if (!parentUuid) return ''
 
   return findLayoutEditLinkByUuid(page.value, parentUuid)
 })
-const hasLayoutLink = computed(() => layoutEditLink.value.length > 0 && layoutEditLink.value !== fullEditLink.value)
-const isExternalLayoutLink = computed(() => /^https?:\/\//.test(layoutEditLink.value))
+const hasLayoutLink = computed(
+  () =>
+    layoutEditLink.value.length > 0 &&
+    layoutEditLink.value !== fullEditLink.value,
+)
+const isExternalLayoutLink = computed(() =>
+  /^https?:\/\//.test(layoutEditLink.value),
+)
 
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const layoutEditLabel = computed(() => 'Edit layout')
 const singleActionLabel = computed(() => 'Edit')
-const actionButtonClass = 'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft'
+const actionButtonClass =
+  'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft'
 
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
-  const hasSingleAction = Number(hasQuickEdit.value) + Number(hasLink.value) + Number(hasLayoutLink.value) === 1
+  const hasSingleAction =
+    Number(hasQuickEdit.value) +
+      Number(hasLink.value) +
+      Number(hasLayoutLink.value) ===
+    1
 
   if (hasQuickEdit.value) {
-    const tooltip = hasSingleAction ? singleActionLabel.value : quickEditLabel.value
+    const tooltip = hasSingleAction
+      ? singleActionLabel.value
+      : quickEditLabel.value
     const ariaLabel = `${tooltip} this section`
 
     result.push({
@@ -123,7 +141,9 @@ const actions = computed<EditAction[]>(() => {
   }
 
   if (hasLink.value) {
-    const tooltip = hasSingleAction ? singleActionLabel.value : fullEditLabel.value
+    const tooltip = hasSingleAction
+      ? singleActionLabel.value
+      : fullEditLabel.value
     const ariaLabel = isExternalLink.value
       ? `${tooltip} (opens in a new tab)`
       : `${tooltip} this section`
@@ -142,7 +162,9 @@ const actions = computed<EditAction[]>(() => {
   }
 
   if (hasLayoutLink.value) {
-    const tooltip = hasSingleAction ? singleActionLabel.value : layoutEditLabel.value
+    const tooltip = hasSingleAction
+      ? singleActionLabel.value
+      : layoutEditLabel.value
     const ariaLabel = isExternalLayoutLink.value
       ? `${tooltip} (opens in a new tab)`
       : `${tooltip} this layout`
@@ -188,39 +210,53 @@ const handleTooltipOpenUpdate = (key: EditAction['key'], value: boolean) => {
 </script>
 
 <template>
-  <div v-if="hasActions" class="admin-ui-edit-shell group/admin-ui relative">
-    <slot />
-    <UTheme :ui="adminUiTheme">
-      <UFieldGroup
-        class="admin-ui admin-ui-scope admin-ui-controls pointer-events-auto absolute right-2 top-2 z-100 rounded-md shadow-lg opacity-0 transition-opacity group-hover/admin-ui:opacity-100 group-focus-within/admin-ui:opacity-100"
-        size="xs"
+  <slot />
+  <UTheme v-if="hasActions" :ui="adminUiTheme">
+    <UFieldGroup
+      class="admin-ui admin-ui-scope admin-ui-controls pointer-events-none absolute top-2 right-2 z-100 rounded-md opacity-0 shadow-lg transition-opacity"
+      data-admin-ui-controls
+      size="xs"
+    >
+      <UTooltip
+        v-for="action in actions"
+        :key="action.key"
+        :open="Boolean(tooltipOpen[action.key])"
+        :text="action.tooltip"
+        :ui="{
+          content: 'admin-ui-tooltip-content',
+          arrow: 'admin-ui-tooltip-arrow',
+        }"
+        @update:open="
+          (value: boolean) => handleTooltipOpenUpdate(action.key, value)
+        "
       >
-        <UTooltip
-          v-for="action in actions"
-          :key="action.key"
-          :open="Boolean(tooltipOpen[action.key])"
-          :text="action.tooltip"
-          :ui="{ content: 'admin-ui-tooltip-content', arrow: 'admin-ui-tooltip-arrow' }"
-          @update:open="(value: boolean) => handleTooltipOpenUpdate(action.key, value)"
+        <UButton
+          :aria-label="action.ariaLabel"
+          color="neutral"
+          :disabled="action.disabled"
+          :icon="action.icon"
+          :rel="action.rel"
+          :target="action.target"
+          :to="action.to"
+          :ui="{ base: action.buttonClass }"
+          :variant="action.variant"
+          @click="handleActionClick(action)"
+          @pointerdown="closeAllTooltips()"
         >
-          <UButton
-            :aria-label="action.ariaLabel"
-            color="neutral"
-            :disabled="action.disabled"
-            :icon="action.icon"
-            :rel="action.rel"
-            :target="action.target"
-            :to="action.to"
-            :ui="{ base: action.buttonClass }"
-            :variant="action.variant"
-            @click="handleActionClick(action)"
-            @pointerdown="closeAllTooltips()"
-          >
-            <span class="sr-only">{{ action.ariaLabel }}</span>
-          </UButton>
-        </UTooltip>
-      </UFieldGroup>
-    </UTheme>
-  </div>
-  <slot v-else />
+          <span class="sr-only">{{ action.ariaLabel }}</span>
+        </UButton>
+      </UTooltip>
+    </UFieldGroup>
+  </UTheme>
 </template>
+
+<style>
+:where(*):has(> [data-admin-ui-controls]) {
+  @apply relative;
+
+  &:is(:hover, :focus-within) > [data-admin-ui-controls],
+  > [data-admin-ui-controls]:is(:hover, :focus-within) {
+    @apply opacity-100 pointer-events-auto;
+  }
+}
+</style>

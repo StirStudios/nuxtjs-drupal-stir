@@ -104,7 +104,7 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
       @update:model-value="emit('update:turnstileToken', $event)"
     />
 
-    <WrapAlign :align="themeWebform.submitAlign">
+    <WrapDiv :align="themeWebform.submitAlign">
       <UButton
         :disabled="!isSchemaReady || isLoading"
         :label="submitButtonLabel"
@@ -112,7 +112,7 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
         :size="themeWebform.buttonSize"
         type="submit"
       />
-    </WrapAlign>
+    </WrapDiv>
   </UForm>
 
   <div
