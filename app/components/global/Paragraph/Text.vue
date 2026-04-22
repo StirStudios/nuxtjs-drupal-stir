@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Motion } from 'motion-v'
+import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { cleanHTML } from '~/utils/cleanHTML'
 import EditText from '~/components/Edit/Text.vue'
 
@@ -41,6 +43,8 @@ const sourceText = computed(() => {
 const safeTextHtml = computed(() => cleanHTML(renderedText.value))
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
+const { useRevealMotionProps } = useRevealMotionConfig()
+const motionProps = useRevealMotionProps(() => props.direction)
 
 async function startEditing() {
   editSourceText.value = sourceText.value
@@ -76,29 +80,30 @@ watch(() => props.text, (value) => {
 </script>
 
 <template>
-  <WrapAnimate :effect="direction">
-    <WrapDiv :align="align" :styles="[width, spacing]">
-      <EditLink
-        :link="editLink"
-        :parent-uuid="parentUuid"
-        :show-quick-edit="canInlineEdit && isEditing === false"
-        @quick-edit="startEditing"
-      >
-        <EditText
-          v-if="isEditing && canInlineEdit"
-          :classes="classes"
-          :paragraph-id="paragraphId"
-          :source-text="editSourceText ?? sourceText"
-          @cancel="stopEditing"
-          @saved="handleSaved"
-        />
+  <WrapDiv :align="align" :styles="[width, spacing]">
+    <EditLink
+      :link="editLink"
+      :parent-uuid="parentUuid"
+      :show-quick-edit="canInlineEdit && isEditing === false"
+      @quick-edit="startEditing"
+    >
+      <EditText
+        v-if="isEditing && canInlineEdit"
+        :classes="classes"
+        :paragraph-id="paragraphId"
+        :source-text="editSourceText ?? sourceText"
+        @cancel="stopEditing"
+        @saved="handleSaved"
+      />
 
-        <div
-          v-else-if="safeTextHtml"
-          :class="[classes, richTextClass].filter(Boolean).join(' ')"
-          v-html="safeTextHtml"
-        />
-      </EditLink>
-    </WrapDiv>
-  </WrapAnimate>
+      <template v-else-if="safeTextHtml">
+        <Motion as-child v-bind="motionProps">
+          <div
+            :class="[classes, richTextClass].filter(Boolean).join(' ')"
+            v-html="safeTextHtml"
+          />
+        </Motion>
+      </template>
+    </EditLink>
+  </WrapDiv>
 </template>

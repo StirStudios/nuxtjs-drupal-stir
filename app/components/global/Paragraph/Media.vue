@@ -3,7 +3,6 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { useRevealConfig } from '~/composables/useItemRevealConfig'
 import { useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -49,7 +48,6 @@ const componentMap: Record<string, string> = {
 }
 
 const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
-const { resolved: reveal } = useRevealConfig()
 const slotMediaOrdered = computed(() =>
   orderedIndices.value
     .map((i) => slotMedia.value[i])
@@ -102,43 +100,41 @@ onMounted(() => {
         {{ header }}
       </component>
 
-      <WrapAnimate class="relative" :effect="direction">
-        <UScrollArea
-          v-if="useMasonryVirtualized"
-          ref="scrollArea"
-          v-slot="{ item: node, index: i }"
-          class="w-full overflow-hidden"
-          :items="slotMediaOrdered"
-          :virtualize="{ lanes, gap, estimateSize: 480 }"
-        >
-          <MediaItem
-            :index="i"
-            :node="node"
-            :overlay="overlay"
-            :reveal="reveal"
-            :tk="tk"
-            @open="openModal"
-          />
-        </UScrollArea>
+      <UScrollArea
+        v-if="useMasonryVirtualized"
+        ref="scrollArea"
+        v-slot="{ item: node, index: i }"
+        class="w-full overflow-hidden"
+        :items="slotMediaOrdered"
+        :virtualize="{ lanes, gap, estimateSize: 480 }"
+      >
+        <MediaItem
+          :direction="direction"
+          :index="i"
+          :node="node"
+          :overlay="overlay"
+          :tk="tk"
+          @open="openModal"
+        />
+      </UScrollArea>
 
-        <WrapGrid
-          v-else
-          :grid-items="gridItems"
-          :spacing="spacing"
-          :width="resolvedWidth"
-        >
-          <MediaItem
-            v-for="(node, i) in slotMediaOrdered"
-            :key="i"
-            :index="i"
-            :node="node"
-            :overlay="overlay"
-            :reveal="reveal"
-            :tk="tk"
-            @open="openModal"
-          />
-        </WrapGrid>
-      </WrapAnimate>
+      <WrapGrid
+        v-else
+        :grid-items="gridItems"
+        :spacing="spacing"
+        :width="resolvedWidth"
+      >
+        <MediaItem
+          v-for="(node, i) in slotMediaOrdered"
+          :key="i"
+          :direction="direction"
+          :index="i"
+          :node="node"
+          :overlay="overlay"
+          :tk="tk"
+          @open="openModal"
+        />
+      </WrapGrid>
     </WrapAlign>
   </EditLink>
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Motion } from 'motion-v'
 import type { VNode } from 'vue'
 import { cloneVNode } from 'vue'
 import type {
@@ -6,7 +7,7 @@ import type {
   ExposedSort,
   ViewPager,
 } from '~/composables/useDrupalViewControls'
-import { useItemRevealConfig } from '~/composables/useItemRevealConfig'
+import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 
 interface CeElementNode {
@@ -75,15 +76,22 @@ const randomizeEnabled = computed(() => {
 })
 
 const rawRows = computed(() => tk.slot('rows'))
-const slotRows = tk.hydrateOrder(
-  () => rawRows.value,
+const orderedRows = computed(() =>
+  rawRows.value.map((vnode, index) => ({
+    ...vnode,
+    key: vnode.key ?? `slide-${index}`,
+  })),
+)
+const randomizedRows = tk.hydrateOrder(
+  () => orderedRows.value,
   () =>
-    (randomizeEnabled.value ? tk.shuffle(rawRows.value) : rawRows.value).map(
-      (vnode, index) => ({
-        ...vnode,
-        key: vnode.key ?? `slide-${index}`,
-      }),
-    ),
+    tk.shuffle(rawRows.value).map((vnode, index) => ({
+      ...vnode,
+      key: vnode.key ?? `slide-${index}`,
+    })),
+)
+const slotRows = computed(() =>
+  randomizeEnabled.value ? randomizedRows.value : orderedRows.value,
 )
 
 const staticTeaserRows = computed(() =>
@@ -134,7 +142,10 @@ const hasRows = computed(() =>
     : staticTeaserRows.value.length > 0,
 )
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
-const { getStaggerDelayMs } = useItemRevealConfig()
+const { getStaggerDelayMs, getRevealMotionProps } = useRevealMotionConfig()
+
+const getRowMotionProps = (index: number) =>
+  getRevealMotionProps(props.direction, getStaggerDelayMs(index))
 </script>
 
 <template>
@@ -219,26 +230,27 @@ const { getStaggerDelayMs } = useItemRevealConfig()
       :width="width"
     >
       <template v-if="hasDynamicRows">
-        <div
+        <Motion
           v-for="(row, i) in dynamicRenderedRows"
           :key="row.key"
+          as="div"
           class="item"
+          v-bind="getRowMotionProps(i)"
         >
-          <WrapAnimate
-            :delay-ms="getStaggerDelayMs(i)"
-            :effect="direction"
-          >
-            <component :is="renderCustomElements(row.node)" />
-          </WrapAnimate>
-        </div>
+          <component :is="renderCustomElements(row.node)" />
+        </Motion>
       </template>
 
       <template v-else>
-        <div v-for="(node, i) in staticTeaserRows" :key="i" class="item">
-          <WrapAnimate :delay-ms="getStaggerDelayMs(i)" :effect="direction">
-            <component :is="node" />
-          </WrapAnimate>
-        </div>
+        <Motion
+          v-for="(node, i) in staticTeaserRows"
+          :key="i"
+          as="div"
+          class="item"
+          v-bind="getRowMotionProps(i)"
+        >
+          <component :is="node" />
+        </Motion>
       </template>
     </WrapGrid>
 

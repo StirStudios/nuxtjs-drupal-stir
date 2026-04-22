@@ -216,8 +216,6 @@ export default defineAppConfig({
       once: false,
       reveal: {
         durationMs: 1200,
-        threshold: 0.08,
-        rootMargin: '0px 0px -5% 0px',
         staggerMs: 250,
         ease: [0.22, 1, 0.36, 1],
       },

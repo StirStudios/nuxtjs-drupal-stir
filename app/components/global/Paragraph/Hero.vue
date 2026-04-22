@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { Motion } from 'motion-v'
 import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
 import { useHeroSnapshot } from '~/composables/useHeroSnapshot'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
+import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useNavLock } from '~/composables/useNavLock'
 
@@ -109,6 +111,8 @@ const sectionClasses = computed(() => {
     .flat()
     .filter(Boolean)
 })
+const { useRevealMotionProps } = useRevealMotionConfig()
+const heroMotionProps = useRevealMotionProps(() => props.direction)
 </script>
 
 <template>
@@ -121,13 +125,16 @@ const sectionClasses = computed(() => {
 
     <template v-else>
       <section :class="sectionClasses">
-        <div
-          :class="[
-            heroTheme.text.base,
-            isFrontEffective && heroTheme.text.isFront,
-          ]"
+        <Motion
+          as-child
+          v-bind="heroMotionProps"
         >
-          <WrapAnimate :effect="direction">
+          <div
+            :class="[
+              heroTheme.text.base,
+              isFrontEffective && heroTheme.text.isFront,
+            ]"
+          >
             <slot name="title">
               <HeroContent
                 v-if="text"
@@ -143,8 +150,8 @@ const sectionClasses = computed(() => {
             </slot>
 
             <slot name="button" />
-          </WrapAnimate>
-        </div>
+          </div>
+        </Motion>
 
         <component :is="heroMediaNode" />
       </section>

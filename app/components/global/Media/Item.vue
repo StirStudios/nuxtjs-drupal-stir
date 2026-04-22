@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { motion, useReducedMotion } from 'motion-v'
+import { Motion } from 'motion-v'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
-import { useRevealConfig } from '~/composables/useItemRevealConfig'
-import type { RevealResolved } from '~/composables/useItemRevealConfig'
+import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
 interface SlotNode {
   props?: Record<string, unknown>
@@ -24,9 +23,9 @@ interface SlotsToolkit {
 const props = defineProps<{
   node: SlotNode
   index: number
+  direction?: string
   overlay?: boolean
   tk: SlotsToolkit
-  reveal?: RevealResolved
 }>()
 
 const emit = defineEmits<{
@@ -54,67 +53,23 @@ const componentMap: Record<MediaType, string> = {
   link: 'MediaLink',
 }
 
-const { resolved: sharedReveal } = useRevealConfig()
-const reveal = computed(() => props.reveal ?? sharedReveal.value)
-const revealStartIndex = 0
-const revealOnce = computed(() => theme.animations?.once !== false)
-const shouldAnimateOnScroll = props.index >= revealStartIndex
-const prefersReducedMotion = useReducedMotion()
-const revealDelayMs = computed(() =>
-  Math.max(0, props.index - revealStartIndex) * Math.max(0, reveal.value.staggerMs),
+const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
+const revealMotionProps = computed(() =>
+  getRevealMotionProps(props.direction || 'fade-up', getStaggerDelayMs(props.index)),
 )
-const revealTransition = computed(() => {
-  if (prefersReducedMotion.value || !shouldAnimateOnScroll) {
-    return { duration: 0 }
-  }
-
-  return {
-    type: 'tween',
-    duration: Math.max(0, reveal.value.durationMs) / 1000,
-    ease: reveal.value.ease,
-    delay: revealDelayMs.value / 1000,
-  }
-})
-const revealInViewOptions = computed(() => ({
-  once: revealOnce.value,
-  amount: Math.min(1, Math.max(0, Number(reveal.value.threshold || 0))),
-  margin: reveal.value.rootMargin,
-}))
-const mediaRevealOffsetY = '4rem'
-const revealInitial = computed(() => {
-  if (prefersReducedMotion.value || !shouldAnimateOnScroll) return false
-
-  return {
-    opacity: 0,
-    y: mediaRevealOffsetY,
-  }
-})
-const revealWhileInView = computed(() => {
-  if (prefersReducedMotion.value || !shouldAnimateOnScroll) return undefined
-
-  return {
-    opacity: 1,
-    y: 0,
-  }
-})
 </script>
 
 <template>
-  <motion.div
-    class="media-reveal"
-    :in-view-options="revealInViewOptions"
-    :initial="revealInitial"
-    :transition="revealTransition"
-    :while-in-view="revealWhileInView"
+  <Motion
+    v-if="!overlay || isDocument || isAudio"
+    as-child
+    v-bind="revealMotionProps"
   >
-    <component
-      :is="componentMap[mediaProps.type]"
-      v-if="!overlay || isDocument || isAudio"
-      v-bind="mediaProps"
-    />
+    <component :is="componentMap[mediaProps.type]" v-bind="mediaProps" />
+  </Motion>
 
+  <Motion v-else as-child v-bind="revealMotionProps">
     <div
-      v-else
       :aria-label="isVideo ? 'Open video modal' : 'Open media modal'"
       class="group relative overflow-hidden"
       :class="[
@@ -163,5 +118,5 @@ const revealWhileInView = computed(() => {
         <UIcon name="i-lucide-play-circle" size="60" />
       </span>
     </div>
-  </motion.div>
+  </Motion>
 </template>
