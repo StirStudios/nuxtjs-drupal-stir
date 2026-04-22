@@ -113,6 +113,14 @@ export function useRevealMotionConfig() {
     effect?: string,
     delayMs: number = 0,
   ): Record<string, unknown> => {
+    const shouldReduceMotion =
+      import.meta.client &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (shouldReduceMotion) {
+      return { initial: false }
+    }
+
     const resolvedDelay = Math.max(0, Number(delayMs || 0)) / 1000
 
     if (!effect) {
