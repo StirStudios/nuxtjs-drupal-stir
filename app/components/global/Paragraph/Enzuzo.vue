@@ -6,6 +6,7 @@ const props = defineProps<{
   region?: string
 
   embedUrl?: string
+  editLink?: string
 }>()
 
 const normalizedEmbedUrl = computed(() => {
