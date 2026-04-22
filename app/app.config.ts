@@ -213,7 +213,7 @@ export default defineAppConfig({
     },
 
     animations: {
-      once: false,
+      once: true,
       reveal: {
         durationMs: 1200,
         staggerMs: 250,
