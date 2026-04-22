@@ -127,7 +127,11 @@ export function useRevealMotionConfig() {
       return { initial: false }
     }
 
-    const initial = REVEAL_HIDDEN_TARGETS[effect] ?? REVEAL_HIDDEN_TARGETS['fade-in']!
+    const initial = REVEAL_HIDDEN_TARGETS[effect]
+
+    if (!initial) {
+      return { initial: false }
+    }
 
     return {
       initial,
