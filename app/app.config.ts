@@ -108,7 +108,7 @@ export default defineAppConfig({
       },
       text: {
         h1: 'mb-0 text-white',
-        base: 'z-10 max-w-2xl relative p-5 text-center',
+        base: 'z-10 max-w-6xl relative p-5 text-center',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
       hide: 'pt-30',
@@ -219,13 +219,6 @@ export default defineAppConfig({
         staggerMs: 250,
         ease: [0.22, 1, 0.36, 1],
       },
-    },
-
-    aspectRatios: {
-      portrait: 'aspect-[9/16]',
-      landscape: 'aspect-[16/9]',
-      square: 'aspect-square',
-      fourThree: 'aspect-[4/3]',
     },
 
     scrollButton: {
