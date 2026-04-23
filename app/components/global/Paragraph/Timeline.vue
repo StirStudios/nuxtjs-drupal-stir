@@ -45,13 +45,13 @@ const timelineItems = computed<UITimelineItem[]>(() =>
 )
 
 const wrapperClasses = computed(() =>
-  [props.classes, props.width, props.spacing].filter(Boolean).join(' '),
+  ['w-full', props.classes, props.width, props.spacing].filter(Boolean).join(' '),
 )
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <WrapDiv :align="align" :styles="wrapperClasses">
+  <WrapDiv :align="align" :styles="wrapperClasses">
+    <EditLink :link="editLink" :parent-uuid="parentUuid">
       <UTimeline
         class="max-w-3xl"
         :color="color ?? 'primary'"
@@ -62,6 +62,6 @@ const wrapperClasses = computed(() =>
           <div class="prose max-w-none" v-html="item.description" />
         </template>
       </UTimeline>
-    </WrapDiv>
-  </EditLink>
+    </EditLink>
+  </WrapDiv>
 </template>

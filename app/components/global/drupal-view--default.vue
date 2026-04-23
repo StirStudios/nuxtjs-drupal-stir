@@ -149,157 +149,155 @@ const getRowMotionProps = (index: number) =>
 </script>
 
 <template>
-  <section class="drupal-view-default">
-    <h2 v-if="title" class="text-highlighted mb-4 text-2xl font-semibold">
-      {{ title }}
-    </h2>
+  <h2 v-if="title" class="text-highlighted mb-4 text-2xl font-semibold">
+    {{ title }}
+  </h2>
 
-    <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
-      <div class="flex flex-wrap items-end gap-3">
-        <div class="min-w-0 flex-1">
-          <DrupalViewsFilters
-            :filters="normalizedFilters"
-            :values="filterValues"
-            @change="onFilterChange"
-          />
-        </div>
-
-        <div class="flex items-end gap-3">
-          <DrupalViewsSort
-            :sort-by-key="primarySort?.queryParamSortBy"
-            :sort-by-label="primarySort?.label"
-            :sort-by-options="sortByOptions"
-            :sort-order-key="primarySort?.queryParamSortOrder"
-            sort-order-label="Sort order"
-            :sort-order-options="sortOrderOptions"
-            :values="sortValues"
-            @change="onSortChange"
-          />
-
-          <UButton
-            v-if="hasMultipleFilters"
-            class="h-10"
-            color="neutral"
-            icon="i-lucide-rotate-ccw"
-            size="md"
-            variant="outline"
-            @click="resetControls"
-          >
-            Reset filters
-          </UButton>
-        </div>
+  <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="min-w-0 flex-1">
+        <DrupalViewsFilters
+          :filters="normalizedFilters"
+          :values="filterValues"
+          @change="onFilterChange"
+        />
       </div>
-    </div>
 
-    <ParagraphCarousel
-      v-if="carousel"
-      :carousel-arrows="carouselArrows"
-      :carousel-autoheight="carouselAutoheight"
-      :carousel-autoscroll="carouselAutoscroll"
-      :carousel-fade="carouselFade"
-      :carousel-indicators="carouselIndicators"
-      :carousel-interval="carouselInterval"
-      :grid-items="gridItems"
-      :items="slotRows"
-      :randomize="randomizeEnabled"
-      :spacing="spacing"
-      :width="width"
-    />
+      <div class="flex items-end gap-3">
+        <DrupalViewsSort
+          :sort-by-key="primarySort?.queryParamSortBy"
+          :sort-by-label="primarySort?.label"
+          :sort-by-options="sortByOptions"
+          :sort-order-key="primarySort?.queryParamSortOrder"
+          sort-order-label="Sort order"
+          :sort-order-options="sortOrderOptions"
+          :values="sortValues"
+          @change="onSortChange"
+        />
 
-    <WrapGrid
-      v-else-if="isLoading"
-      :container="container"
-      :grid-items="gridItems"
-      :spacing="spacing"
-      :width="width"
-    >
-      <div v-for="index in 6" :key="`skeleton-${index}`" class="item">
-        <div class="space-y-4">
-          <USkeleton class="aspect-[16/9] w-full rounded-lg" />
-          <USkeleton class="h-5 w-10/12 rounded" />
-          <USkeleton class="h-4 w-8/12 rounded" />
-        </div>
-      </div>
-    </WrapGrid>
-
-    <WrapGrid
-      v-else-if="hasRows"
-      :container="container"
-      :grid-items="gridItems"
-      :spacing="spacing"
-      :width="width"
-    >
-      <template v-if="hasDynamicRows">
-        <Motion
-          v-for="(row, i) in dynamicRenderedRows"
-          :key="row.key"
-          as="div"
-          class="item"
-          v-bind="getRowMotionProps(i)"
-        >
-          <component :is="renderCustomElements(row.node)" />
-        </Motion>
-      </template>
-
-      <template v-else>
-        <Motion
-          v-for="(node, i) in staticTeaserRows"
-          :key="i"
-          as="div"
-          class="item"
-          v-bind="getRowMotionProps(i)"
-        >
-          <component :is="node" />
-        </Motion>
-      </template>
-    </WrapGrid>
-
-    <UEmpty
-      v-else-if="loadError"
-      description="Please try again."
-      icon="i-lucide-alert-triangle"
-      title="Unable to load results"
-      variant="subtle"
-    >
-      <template #actions>
-        <UButton color="neutral" variant="outline" @click="retryCurrentPage">
-          Try again
-        </UButton>
-      </template>
-    </UEmpty>
-
-    <UEmpty
-      v-else
-      icon="i-lucide-search-x"
-      title="No results found"
-      :ui="{
-        title: 'text-highlighted text-pretty font-medium mb-0',
-      }"
-      variant="subtle"
-    >
-      <template #description>
-        <span v-if="dynamicNoResults" v-html="dynamicNoResults" />
-        <span v-else>Try changing filters or reset to defaults.</span>
-      </template>
-
-      <template #actions>
         <UButton
           v-if="hasMultipleFilters"
+          class="h-10"
           color="neutral"
+          icon="i-lucide-rotate-ccw"
+          size="md"
           variant="outline"
           @click="resetControls"
         >
           Reset filters
         </UButton>
-      </template>
-    </UEmpty>
+      </div>
+    </div>
+  </div>
 
-    <DrupalViewsPagination
-      v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
-      class="mt-8"
-      :current="currentPage"
-      :total-pages="effectivePager.totalPages"
-      @update:current="onPageChange"
-    />
-  </section>
+  <ParagraphCarousel
+    v-if="carousel"
+    :carousel-arrows="carouselArrows"
+    :carousel-autoheight="carouselAutoheight"
+    :carousel-autoscroll="carouselAutoscroll"
+    :carousel-fade="carouselFade"
+    :carousel-indicators="carouselIndicators"
+    :carousel-interval="carouselInterval"
+    :grid-items="gridItems"
+    :items="slotRows"
+    :randomize="randomizeEnabled"
+    :spacing="spacing"
+    :width="width"
+  />
+
+  <WrapGrid
+    v-else-if="isLoading"
+    :container="container"
+    :grid-items="gridItems"
+    :spacing="spacing"
+    :width="width"
+  >
+    <div v-for="index in 6" :key="`skeleton-${index}`" class="item">
+      <div class="space-y-4">
+        <USkeleton class="aspect-[16/9] w-full rounded-lg" />
+        <USkeleton class="h-5 w-10/12 rounded" />
+        <USkeleton class="h-4 w-8/12 rounded" />
+      </div>
+    </div>
+  </WrapGrid>
+
+  <WrapGrid
+    v-else-if="hasRows"
+    :container="container"
+    :grid-items="gridItems"
+    :spacing="spacing"
+    :width="width"
+  >
+    <template v-if="hasDynamicRows">
+      <Motion
+        v-for="(row, i) in dynamicRenderedRows"
+        :key="row.key"
+        as="div"
+        class="item"
+        v-bind="getRowMotionProps(i)"
+      >
+        <component :is="renderCustomElements(row.node)" />
+      </Motion>
+    </template>
+
+    <template v-else>
+      <Motion
+        v-for="(node, i) in staticTeaserRows"
+        :key="i"
+        as="div"
+        class="item"
+        v-bind="getRowMotionProps(i)"
+      >
+        <component :is="node" />
+      </Motion>
+    </template>
+  </WrapGrid>
+
+  <UEmpty
+    v-else-if="loadError"
+    description="Please try again."
+    icon="i-lucide-alert-triangle"
+    title="Unable to load results"
+    variant="subtle"
+  >
+    <template #actions>
+      <UButton color="neutral" variant="outline" @click="retryCurrentPage">
+        Try again
+      </UButton>
+    </template>
+  </UEmpty>
+
+  <UEmpty
+    v-else
+    icon="i-lucide-search-x"
+    title="No results found"
+    :ui="{
+      title: 'text-highlighted text-pretty font-medium mb-0',
+    }"
+    variant="subtle"
+  >
+    <template #description>
+      <span v-if="dynamicNoResults" v-html="dynamicNoResults" />
+      <span v-else>Try changing filters or reset to defaults.</span>
+    </template>
+
+    <template #actions>
+      <UButton
+        v-if="hasMultipleFilters"
+        color="neutral"
+        variant="outline"
+        @click="resetControls"
+      >
+        Reset filters
+      </UButton>
+    </template>
+  </UEmpty>
+
+  <DrupalViewsPagination
+    v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
+    class="mt-8"
+    :current="currentPage"
+    :total-pages="effectivePager.totalPages"
+    @update:current="onPageChange"
+  />
 </template>

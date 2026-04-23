@@ -77,8 +77,8 @@ const pdfUrl = computed(() =>
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <div :class="['flex w-full', align, spacing, width]">
+  <div :class="['flex w-full', align, spacing, width]">
+    <EditLink :link="editLink" :parent-uuid="parentUuid">
       <UButton
         v-if="hasPdf"
         :block="btnBlock"
@@ -104,8 +104,8 @@ const pdfUrl = computed(() =>
         :to="linkData.url"
         :variant="btnVariant"
       />
-    </div>
-  </EditLink>
+    </EditLink>
+  </div>
 
   <UModal
     v-if="hasPdf && theme.pdf"

@@ -20,6 +20,8 @@ defineProps<{
   submitButtonLabel: string
   webformConfirmation: string
   turnstileToken: string
+  editLink?: string
+  parentUuid?: string
 }>()
 
 const emit = defineEmits<{
@@ -46,6 +48,8 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
     @error="emit('error', $event)"
     @submit="emit('submit', $event)"
   >
+    <EditLink :link="editLink" :parent-uuid="parentUuid" />
+
     <template v-for="fieldName in orderedFieldNames" :key="fieldName">
       <template
         v-if="
@@ -115,9 +119,8 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
     </WrapDiv>
   </UForm>
 
-  <div
-    v-else
-    :class="`${themeWebform.response} prose`"
-    v-html="safeHtml(webformConfirmation)"
-  />
+  <div v-else :class="themeWebform.response">
+    <div class="prose" v-html="safeHtml(webformConfirmation)" />
+    <EditLink :link="editLink" :parent-uuid="parentUuid" />
+  </div>
 </template>
