@@ -102,7 +102,9 @@ const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.v
 const usesMasonry = computed(() => Boolean(props.masonry))
 const fallbackGridItems = 'grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'
 const resolvedGridItems = computed(() =>
-  usesMasonry.value ? (gridItems || fallbackGridItems) : gridItems,
+  usesMasonry.value
+    ? (props.gridItems || fallbackGridItems)
+    : props.gridItems,
 )
 const isImageGallery = computed(() =>
   usesMasonry.value &&
