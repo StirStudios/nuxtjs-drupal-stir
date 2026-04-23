@@ -39,12 +39,29 @@ const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const theme = useAppConfig().stirTheme
 const slotMedia = computed(() => tk.mediaItems())
+
+type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
+
 const componentMap: Record<string, string> = {
   image: 'MediaImage',
   video: 'MediaVideo',
   document: 'MediaDocument',
   audio: 'MediaAudio',
   link: 'MediaLink',
+}
+
+const getMediaItemKey = (node: MediaNode, index: number) => {
+  const data = tk.propsOf(node) as Record<string, unknown>
+  const candidates = [data.uuid, data.id, data.mid, data.url, data.src]
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate) return candidate
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      return String(candidate)
+    }
+  }
+
+  return `media-${index}`
 }
 
 const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
@@ -82,6 +99,21 @@ const lanes = computed(() => {
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
 const hydrated = ref(false)
 const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
+const usesMasonry = computed(() => Boolean(props.masonry))
+const fallbackGridItems = 'grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'
+const resolvedGridItems = computed(() =>
+  usesMasonry.value
+    ? (props.gridItems || fallbackGridItems)
+    : props.gridItems,
+)
+const isImageGallery = computed(() =>
+  usesMasonry.value &&
+  slotMediaOrdered.value.length > 1 &&
+  slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
+)
+const revealMode = computed<'default' | 'gallery'>(() =>
+  isImageGallery.value ? 'gallery' : 'default',
+)
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
@@ -109,10 +141,12 @@ onMounted(() => {
         :virtualize="{ lanes, gap, estimateSize: 480 }"
       >
         <MediaItem
+          :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
           :node="node"
           :overlay="overlay"
+          :reveal-mode="revealMode"
           :tk="tk"
           @open="openModal"
         />
@@ -120,17 +154,18 @@ onMounted(() => {
 
       <WrapGrid
         v-else
-        :grid-items="gridItems"
+        :grid-items="resolvedGridItems"
         :spacing="spacing"
         :width="resolvedWidth"
       >
         <MediaItem
           v-for="(node, i) in slotMediaOrdered"
-          :key="i"
+          :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
           :node="node"
           :overlay="overlay"
+          :reveal-mode="revealMode"
           :tk="tk"
           @open="openModal"
         />

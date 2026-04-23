@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  inheritAttrs: false,
+})
+
 defineProps<{
   id?: number | string
   uuid?: string
@@ -6,13 +10,13 @@ defineProps<{
   region?: string
 
   title?: string
+  header?: string
+  headerTag?: string
 
   editLink?: string
 }>()
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <slot name="tabContent" />
-  </EditLink>
+  <slot name="tabContent" />
 </template>

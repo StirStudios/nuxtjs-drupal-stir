@@ -6,10 +6,17 @@ import { transformPayloadToSnakeCase } from '~/utils/transformUtils'
 import { getHiddenDefaults } from '~/utils/getHiddenDefaults'
 import { useValidation } from '~/composables/useValidation'
 import { useWindowScroll } from '@vueuse/core'
-import { createScrollToTopRunner, getWebformScrollConfig } from '~/utils/webformScrollToTop'
+import {
+  createScrollToTopRunner,
+  getWebformScrollConfig,
+} from '~/utils/webformScrollToTop'
 import { evaluateCondition } from '~/utils/evaluateUtils'
 import { buildYupSchema } from '~/utils/buildYupSchema'
-import type { WebformDefinition, WebformFieldProps, WebformState } from '../../../../types'
+import type {
+  WebformDefinition,
+  WebformFieldProps,
+  WebformState,
+} from '../../../../types'
 import type { ObjectSchema } from 'yup'
 
 const props = defineProps<{
@@ -38,7 +45,8 @@ const webformScrollConfig = computed(() => getWebformScrollConfig(themeWebform))
 const scrollToTopRunner = createScrollToTopRunner({
   y,
   getDelayMs: () => webformScrollConfig.value.scrollToTopDelayMs,
-  getFallbackDelayMs: () => webformScrollConfig.value.scrollToTopFallbackDelayMs,
+  getFallbackDelayMs: () =>
+    webformScrollConfig.value.scrollToTopFallbackDelayMs,
 })
 
 onUnmounted(() => {
@@ -63,7 +71,9 @@ const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
-const schema = shallowRef<ObjectSchema<Record<string, unknown>>>(buildYupSchema(fields, state))
+const schema = shallowRef<ObjectSchema<Record<string, unknown>>>(
+  buildYupSchema(fields, state),
+)
 const isSchemaReady = ref(true)
 const visibilitySignature = computed(() =>
   orderedFieldNames.value
@@ -75,9 +85,13 @@ const visibilitySignature = computed(() =>
     .join(''),
 )
 
-watch(visibilitySignature, () => {
-  schema.value = buildYupSchema(fields, state)
-}, { flush: 'post' })
+watch(
+  visibilitySignature,
+  () => {
+    schema.value = buildYupSchema(fields, state)
+  },
+  { flush: 'post' },
+)
 const submitButtonLabel = computed(
   () => actions[0]?.['#submit_Label'] || 'Submit',
 )
@@ -99,7 +113,9 @@ const groupedFields = computed(() => {
 
 const formResetKey = ref(0)
 const isRangeLikeField = (field: WebformFieldProps) => {
-  const type = String(field['#type'] ?? '').trim().toLowerCase()
+  const type = String(field['#type'] ?? '')
+    .trim()
+    .toLowerCase()
   const inputType = String(
     field['#input_type'] ??
       field['#inputType'] ??
@@ -117,7 +133,9 @@ const isRangeLikeField = (field: WebformFieldProps) => {
   )
 }
 
-const getFieldDefaultValue = (field: WebformFieldProps): WebformState[string] => {
+const getFieldDefaultValue = (
+  field: WebformFieldProps,
+): WebformState[string] => {
   const defaultValue =
     field['#default'] ?? field['#defaultValue'] ?? field['#default_value']
 
@@ -191,7 +209,9 @@ const getGroupFields = (parentName: string) =>
 
 const shouldRenderIndividualField = (fieldName: string) =>
   !fields[fieldName]?.parent &&
-  (fields[fieldName] ? !containerTypes.includes(fields[fieldName]['#type']) : false)
+  (fields[fieldName]
+    ? !containerTypes.includes(fields[fieldName]['#type'])
+    : false)
 
 const isContainerVisible = (containerName: string) =>
   evaluateContainerVisibility(containerName, state, fields, getGroupFields)
@@ -242,8 +262,9 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     isFormSubmitted.value = true
   } catch (error) {
     console.error('Submission Error:', error)
-    const errorData = (error as { response?: { _data?: Record<string, unknown> } })
-      ?.response?._data as
+    const errorData = (
+      error as { response?: { _data?: Record<string, unknown> } }
+    )?.response?._data as
       | {
           error?: { message?: string }
           message?: string
@@ -269,30 +290,30 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
 </script>
 
 <template>
-  <EditLink :link="webformSubmissions" :parent-uuid="parentUuid">
-    <WrapDiv :align="props.align" :styles="[props.width, props.spacing]">
-      <WebformContent
-        :key="formResetKey"
-        v-model:turnstile-token="turnstileToken"
-        :fields="fields"
-        :get-group-fields="getGroupFields"
-        :grouped-fields="groupedFields"
-        :is-container-visible="isContainerVisible"
-        :is-form-submitted="isFormSubmitted"
-        :is-loading="isLoading"
-        :is-schema-ready="isSchemaReady"
-        :ordered-field-names="orderedFieldNames"
-        :schema="schema"
-        :should-render-group-container="shouldRenderGroupContainer"
-        :should-render-individual-field="shouldRenderIndividualField"
-        :state="state"
-        :submit-button-label="submitButtonLabel"
-        :theme-webform="themeWebform"
-        :webform-confirmation="webformConfirmation"
-        @error="onError"
-        @reset-submission="handleResetSubmission"
-        @submit="onSubmit"
-      />
-    </WrapDiv>
-  </EditLink>
+  <WrapDiv :align="props.align" :styles="[props.width, props.spacing]">
+    <WebformContent
+      :key="formResetKey"
+      v-model:turnstile-token="turnstileToken"
+      :edit-link="webformSubmissions"
+      :fields="fields"
+      :get-group-fields="getGroupFields"
+      :grouped-fields="groupedFields"
+      :is-container-visible="isContainerVisible"
+      :is-form-submitted="isFormSubmitted"
+      :is-loading="isLoading"
+      :is-schema-ready="isSchemaReady"
+      :ordered-field-names="orderedFieldNames"
+      :parent-uuid="parentUuid"
+      :schema="schema"
+      :should-render-group-container="shouldRenderGroupContainer"
+      :should-render-individual-field="shouldRenderIndividualField"
+      :state="state"
+      :submit-button-label="submitButtonLabel"
+      :theme-webform="themeWebform"
+      :webform-confirmation="webformConfirmation"
+      @error="onError"
+      @reset-submission="handleResetSubmission"
+      @submit="onSubmit"
+    />
+  </WrapDiv>
 </template>
