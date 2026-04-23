@@ -1,20 +1,18 @@
 import { defineNuxtPlugin, useAppConfig } from '#app'
 import {
-  normalizeColorModePreference,
-  shouldLockGlobalColorMode,
+  resolveColorModeState,
 } from '~/utils/colorMode'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const colorMode = useColorMode()
   const appConfig = useAppConfig()
+  const route = useRoute()
 
   const applyLockedMode = () => {
-    const { preference } = appConfig.colorMode
+    const state = resolveColorModeState(appConfig.colorMode, route.path)
 
-    // Global lock policy only. Route-level overrides are handled in middleware.
-    if (!shouldLockGlobalColorMode(appConfig.colorMode)) return
-
-    colorMode.preference = normalizeColorModePreference(preference)
+    if (!state.effectivePreference) return
+    colorMode.preference = state.effectivePreference
   }
 
   applyLockedMode()

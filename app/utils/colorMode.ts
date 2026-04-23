@@ -1,9 +1,11 @@
 export type ColorModePreference = 'light' | 'dark' | 'system'
 
-type ColorModePolicyInput = {
+export type ColorModePolicyInput = {
   forced?: boolean
   preference?: string
   showToggle?: boolean
+  lightRoutes?: string[]
+  darkRoutes?: string[]
 }
 
 type RouteOverrideInput = {
@@ -48,4 +50,45 @@ export function getRouteColorModeOverride({
   if (isLight) return 'light'
   if (isDark) return 'dark'
   return undefined
+}
+
+export type ResolvedColorModeState = {
+  normalizedPreference: ColorModePreference
+  lockGlobal: boolean
+  routeOverride: Exclude<ColorModePreference, 'system'> | undefined
+  effectivePreference: Exclude<ColorModePreference, 'system'> | undefined
+  hideToggle: boolean
+}
+
+export function resolveColorModeState(
+  config: ColorModePolicyInput,
+  path: string,
+): ResolvedColorModeState {
+  const {
+    forced = false,
+    preference,
+    showToggle = true,
+    lightRoutes = [],
+    darkRoutes = [],
+  } = config
+
+  const normalizedPreference = normalizeColorModePreference(preference)
+  const lockGlobal = shouldLockGlobalColorMode({ forced, showToggle })
+  const matchedRouteOverride = getRouteColorModeOverride({
+    path,
+    lightRoutes,
+    darkRoutes,
+  })
+
+  // Forced mode is a hard global lock and disables route overrides.
+  const routeOverride = forced ? undefined : matchedRouteOverride
+  const effectivePreference = routeOverride || (lockGlobal ? normalizedPreference : undefined)
+
+  return {
+    normalizedPreference,
+    lockGlobal,
+    routeOverride,
+    effectivePreference,
+    hideToggle: lockGlobal || Boolean(routeOverride),
+  }
 }
