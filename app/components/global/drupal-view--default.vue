@@ -18,6 +18,7 @@ interface CeElementNode {
 const props = defineProps<{
   title?: string
   gridItems?: string
+  rowsWrapper?: string
   width?: string
   spacing?: string
   container?: boolean
@@ -207,6 +208,7 @@ const getRowMotionProps = (index: number) =>
 
   <WrapGrid
     v-else-if="isLoading"
+    :classes="rowsWrapper"
     :container="container"
     :grid-items="gridItems"
     :spacing="spacing"
@@ -223,6 +225,7 @@ const getRowMotionProps = (index: number) =>
 
   <WrapGrid
     v-else-if="hasRows"
+    :classes="rowsWrapper"
     :container="container"
     :grid-items="gridItems"
     :spacing="spacing"
