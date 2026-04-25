@@ -26,9 +26,9 @@
     "release": "release-it"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.102",
+    "@iconify-json/lucide": "^1.2.103",
     "@internationalized/date": "^3.12.1",
-    "@nuxt/ui": "^4.6.1",
+    "@nuxt/ui": "^4.7.0",
     "@nuxtjs/plausible": "^3.0.2",
     "@nuxtjs/robots": "^5.7.1",
     "@nuxtjs/sitemap": "^7.6.0",
@@ -43,10 +43,10 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
-    "@nuxt/scripts": "^1.0.1",
+    "@nuxt/scripts": "^1.0.2",
     "@nuxt/test-utils": "^4.0.2",
     "@types/node": "^25.6.0",
-    "@vue/test-utils": "^2.4.6",
+    "@vue/test-utils": "^2.4.8",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-nuxt": "^4.0.0",
@@ -54,16 +54,11 @@
     "globals": "^17.5.0",
     "happy-dom": "^20.9.0",
     "prettier": "^3.8.3",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prettier-plugin-tailwindcss": "^0.7.3",
     "release-it": "^19.2.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.5",
     "vue-tsc": "^2.2.12"
-  },
-  "pnpm": {
-    "overrides": {
-      "unimport": "5.6.0"
-    }
   },
   "release-it": {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
