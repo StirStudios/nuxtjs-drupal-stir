@@ -90,15 +90,17 @@ const portal = useOverlayPortal()
 const { width: viewportWidth } = useWindowSize()
 const masonryLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
 const gridLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
-const { width: mediaLayoutWidth } = useElementSize(
-  () => unrefElement(masonryLayoutRoot) ?? unrefElement(gridLayoutRoot),
-)
-const getClientLayoutWidth = () =>
-  mediaLayoutWidth.value > 0
-    ? mediaLayoutWidth.value
-    : viewportWidth.value > 0
-    ? viewportWidth.value
-    : window.innerWidth
+const { width: mediaLayoutWidth } = useElementSize(() => {
+  if (!import.meta.client) return null
+
+  const masonryElement = unrefElement(masonryLayoutRoot as never) as unknown
+  const gridElement = unrefElement(gridLayoutRoot as never) as unknown
+  const element = masonryElement ?? gridElement
+
+  return element instanceof HTMLElement || element instanceof SVGElement
+    ? element
+    : null
+})
 const resolveLaneCount = (width: number) => {
   const config = props.masonry?.lanes
 
@@ -154,6 +156,13 @@ const initialGallerySkipCount = useState<number>(
   `media-initial-skip-${props.uuid ?? props.id ?? 'default'}`,
   () => getInitialGallerySkipCount(0),
 )
+const updateInitialGallerySkipCount = () => {
+  if (!import.meta.client) return
+
+  initialGallerySkipCount.value = getInitialGallerySkipCount(
+    mediaLayoutWidth.value || viewportWidth.value || window.innerWidth,
+  )
+}
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
@@ -162,14 +171,14 @@ const { handleCarouselSelect } = useModalMediaPlayback({
 
 onMounted(() => {
   hydrated.value = true
-  initialGallerySkipCount.value = getInitialGallerySkipCount(getClientLayoutWidth())
+  updateInitialGallerySkipCount()
 })
 
 watch(
-  () => [viewportWidth.value, mediaLayoutWidth.value] as const,
+  [viewportWidth, mediaLayoutWidth],
   ([width, layoutWidth]) => {
     if (!import.meta.client || (width <= 0 && layoutWidth <= 0)) return
-    initialGallerySkipCount.value = getInitialGallerySkipCount(getClientLayoutWidth())
+    updateInitialGallerySkipCount()
   },
 )
 </script>
