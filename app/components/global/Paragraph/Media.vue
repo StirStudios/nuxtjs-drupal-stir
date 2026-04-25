@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { useElementSize } from '@vueuse/core'
+import { unrefElement, useElementSize } from '@vueuse/core'
 
 const props = defineProps<{
   id?: number | string
@@ -35,6 +35,7 @@ const props = defineProps<{
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
 
 const scrollArea = ref<{ $el?: HTMLElement } | null>(null)
+const firstMediaItem = ref<unknown>(null)
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const theme = useAppConfig().stirTheme
@@ -86,6 +87,11 @@ const {
 } = useMediaModal(slotMediaOrdered, tk)
 
 const portal = useOverlayPortal()
+const firstMediaElement = computed(() => {
+  const resolved = unrefElement(firstMediaItem.value as Parameters<typeof unrefElement>[0])
+
+  return resolved instanceof Element ? resolved : null
+})
 const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
 const lanes = computed(() => {
   const config = props.masonry?.lanes
@@ -99,29 +105,37 @@ const lanes = computed(() => {
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
 const hydrated = ref(false)
 const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
-const usesMasonry = computed(() => Boolean(props.masonry))
-const fallbackGridItems = 'grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3'
-const resolvedGridItems = computed(() =>
-  usesMasonry.value
-    ? (props.gridItems || fallbackGridItems)
-    : props.gridItems,
-)
 const isImageGallery = computed(() =>
-  usesMasonry.value &&
   slotMediaOrdered.value.length > 1 &&
   slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
 )
 const revealMode = computed<'default' | 'gallery'>(() =>
   isImageGallery.value ? 'gallery' : 'default',
 )
+const shouldSkipInitialGalleryReveal = ref(true)
+const setFirstMediaItem = (el: unknown) => {
+  firstMediaItem.value = el
+}
+const isElementInViewport = (el: Element) => {
+  const rect = el.getBoundingClientRect()
+
+  return rect.bottom > 0 && rect.top < window.innerHeight
+}
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
   onSelect: onSelectModal,
 })
 
-onMounted(() => {
+onMounted(async () => {
   hydrated.value = true
+  await nextTick()
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+
+  const root = firstMediaElement.value
+
+  shouldSkipInitialGalleryReveal.value =
+    Boolean(isImageGallery.value && root && isElementInViewport(root))
 })
 </script>
 
@@ -142,11 +156,13 @@ onMounted(() => {
       >
         <MediaItem
           :key="getMediaItemKey(node, i)"
+          :ref="i === 0 ? setFirstMediaItem : undefined"
           :direction="direction"
           :index="i"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
+          :skip-initial-gallery-reveal="shouldSkipInitialGalleryReveal"
           :tk="tk"
           @open="openModal"
         />
@@ -154,18 +170,20 @@ onMounted(() => {
 
       <WrapGrid
         v-else
-        :grid-items="resolvedGridItems"
+        :grid-items="gridItems"
         :spacing="spacing"
         :width="resolvedWidth"
       >
         <MediaItem
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
+          :ref="i === 0 ? setFirstMediaItem : undefined"
           :direction="direction"
           :index="i"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
+          :skip-initial-gallery-reveal="shouldSkipInitialGalleryReveal"
           :tk="tk"
           @open="openModal"
         />

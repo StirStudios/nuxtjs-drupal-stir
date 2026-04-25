@@ -14,6 +14,8 @@ interface MediaProps {
   type: MediaType
   credit?: string
   mediaEmbed?: unknown
+  loading?: 'lazy' | 'eager'
+  fetchpriority?: 'high' | 'auto'
   [key: string]: unknown
 }
 
@@ -26,6 +28,7 @@ const props = defineProps<{
   index: number
   direction?: string
   revealMode?: RevealMode
+  skipInitialGalleryReveal?: boolean
   overlay?: boolean
   tk: SlotsToolkit
 }>()
@@ -57,20 +60,12 @@ const componentMap: Record<MediaType, string> = {
 
 const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
 const isGalleryReveal = computed(() => props.revealMode === 'gallery')
-const galleryInitialVisibleCount = 6
+const galleryInitialVisibleCount = 4
 const skipInitialGalleryReveal = computed(() =>
+  props.skipInitialGalleryReveal !== false &&
   isGalleryReveal.value &&
   mediaProps.value.type === 'image' &&
   props.index < galleryInitialVisibleCount,
-)
-const mediaComponentProps = computed(() =>
-  skipInitialGalleryReveal.value
-    ? {
-        ...mediaProps.value,
-        loading: 'eager',
-        ...(props.index === 0 ? { fetchpriority: 'high' } : {}),
-      }
-    : mediaProps.value,
 )
 const rawDirection = computed(() =>
   typeof props.direction === 'string'
@@ -83,12 +78,11 @@ const usesExplicitDirection = computed(() =>
     !['none', 'off', 'unset', 'false', '0'].includes(rawDirection.value),
   ),
 )
-const effectDirection = computed(() => {
-  if (skipInitialGalleryReveal.value) return undefined
-  if (usesExplicitDirection.value) return rawDirection.value
-
-  return isGalleryReveal.value ? 'fade-in' : undefined
-})
+const effectDirection = computed(() =>
+  !skipInitialGalleryReveal.value && usesExplicitDirection.value
+    ? rawDirection.value
+    : undefined,
+)
 
 const galleryStaggerMs = 28
 const galleryStaggerGroup = 6
@@ -99,11 +93,20 @@ const resolvedDelayMs = computed(() =>
     : getStaggerDelayMs(props.index),
 )
 
-const revealMotionProps = computed(() => {
-  const base = getRevealMotionProps(effectDirection.value, resolvedDelayMs.value)
+const mediaRenderProps = computed(() => {
+  if (mediaProps.value.type !== 'image') return mediaProps.value
+  if (!skipInitialGalleryReveal.value) return mediaProps.value
 
-  return base
+  return {
+    ...mediaProps.value,
+    loading: 'eager',
+    fetchpriority: mediaProps.value.fetchpriority ?? (props.index === 0 ? 'high' : 'auto'),
+  }
 })
+
+const revealMotionProps = computed(() =>
+  getRevealMotionProps(effectDirection.value, resolvedDelayMs.value),
+)
 
 const shouldAnimate = computed(
   () =>
@@ -117,7 +120,7 @@ const shouldAnimate = computed(
   <component
     :is="componentMap[mediaProps.type]"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
-    v-bind="mediaComponentProps"
+    v-bind="mediaRenderProps"
   />
 
   <Motion
@@ -125,7 +128,7 @@ const shouldAnimate = computed(
     as-child
     v-bind="revealMotionProps"
   >
-    <component :is="componentMap[mediaProps.type]" v-bind="mediaComponentProps" />
+    <component :is="componentMap[mediaProps.type]" v-bind="mediaRenderProps" />
   </Motion>
 
   <Motion v-else as-child v-bind="revealMotionProps">
@@ -155,7 +158,7 @@ const shouldAnimate = computed(
           'group-focus-within:scale-105',
         ]"
       >
-        <MediaImage v-bind="{ ...mediaComponentProps, hideCredit: true }" />
+        <MediaImage v-bind="{ ...mediaRenderProps, hideCredit: true }" />
       </div>
 
       <span
