@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { useWindowSize } from '@vueuse/core'
+import { unrefElement, useElementSize, useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   id?: number | string
@@ -87,6 +87,17 @@ const {
 
 const portal = useOverlayPortal()
 const { width: viewportWidth } = useWindowSize()
+const masonryLayoutRoot = ref<unknown>(null)
+const gridLayoutRoot = ref<unknown>(null)
+const { width: mediaLayoutWidth } = useElementSize(
+  () => unrefElement(masonryLayoutRoot) ?? unrefElement(gridLayoutRoot),
+)
+const getClientLayoutWidth = () =>
+  mediaLayoutWidth.value > 0
+    ? mediaLayoutWidth.value
+    : viewportWidth.value > 0
+    ? viewportWidth.value
+    : window.innerWidth
 const resolveLaneCount = (width: number) => {
   const config = props.masonry?.lanes
 
@@ -130,7 +141,9 @@ const getInitialGallerySkipCount = (width: number) => {
 }
 const lanes = computed(() =>
   resolveLaneCount(
-    viewportWidth.value > 0
+    mediaLayoutWidth.value > 0
+      ? mediaLayoutWidth.value
+      : viewportWidth.value > 0
       ? viewportWidth.value
       : (import.meta.client ? window.innerWidth : getSsrEstimatedWidth()),
   ),
@@ -148,14 +161,14 @@ const { handleCarouselSelect } = useModalMediaPlayback({
 
 onMounted(() => {
   hydrated.value = true
-  initialGallerySkipCount.value = getInitialGallerySkipCount(window.innerWidth)
+  initialGallerySkipCount.value = getInitialGallerySkipCount(getClientLayoutWidth())
 })
 
 watch(
-  viewportWidth,
-  (width) => {
-    if (!import.meta.client || width <= 0) return
-    initialGallerySkipCount.value = getInitialGallerySkipCount(width)
+  () => [viewportWidth.value, mediaLayoutWidth.value] as const,
+  ([width, layoutWidth]) => {
+    if (!import.meta.client || (width <= 0 && layoutWidth <= 0)) return
+    initialGallerySkipCount.value = getInitialGallerySkipCount(getClientLayoutWidth())
   },
 )
 </script>
@@ -169,6 +182,7 @@ watch(
 
       <UScrollArea
         v-if="props.masonry && hydrated"
+        ref="masonryLayoutRoot"
         v-slot="{ item: node, index: i }"
         class="w-full overflow-hidden"
         :items="slotMediaOrdered"
@@ -189,6 +203,7 @@ watch(
 
       <WrapGrid
         v-else
+        ref="gridLayoutRoot"
         :grid-items="gridItems"
         :spacing="spacing"
         :width="resolvedWidth"
