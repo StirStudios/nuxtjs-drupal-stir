@@ -27,8 +27,8 @@ const props = defineProps<{
   node: SlotNode
   index: number
   direction?: string
+  initialSkipCount?: number
   revealMode?: RevealMode
-  skipInitialGalleryReveal?: boolean
   overlay?: boolean
   tk: SlotsToolkit
 }>()
@@ -37,16 +37,14 @@ const emit = defineEmits<{
   (e: 'open', index: number): void
 }>()
 
-const appConfig = useAppConfig()
-const theme = appConfig.stirTheme
+const theme = useAppConfig().stirTheme
 const mediaProps = computed(() => props.tk.propsOf(props.node))
 const isVideo = computed(() => mediaProps.value.type === 'video')
 const isDocument = computed(() => mediaProps.value.type === 'document')
 const isAudio = computed(() => mediaProps.value.type === 'audio')
 
-const canOpenOverlay = computed(() => !isDocument.value && !isAudio.value)
 const openOverlay = () => {
-  if (!canOpenOverlay.value) return
+  if (isDocument.value || isAudio.value) return
   emit('open', props.index)
 }
 
@@ -59,37 +57,29 @@ const componentMap: Record<MediaType, string> = {
 }
 
 const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
-const isGalleryReveal = computed(() => props.revealMode === 'gallery')
-const galleryInitialVisibleCount = 4
 const skipInitialGalleryReveal = computed(() =>
-  props.skipInitialGalleryReveal !== false &&
-  isGalleryReveal.value &&
+  props.revealMode === 'gallery' &&
   mediaProps.value.type === 'image' &&
-  props.index < galleryInitialVisibleCount,
+  props.index < Math.max(0, props.initialSkipCount ?? 4),
 )
-const rawDirection = computed(() =>
-  typeof props.direction === 'string'
-    ? props.direction.trim().toLowerCase()
-    : '',
-)
-const usesExplicitDirection = computed(() =>
-  Boolean(
-    rawDirection.value &&
-    !['none', 'off', 'unset', 'false', '0'].includes(rawDirection.value),
-  ),
-)
-const effectDirection = computed(() =>
-  !skipInitialGalleryReveal.value && usesExplicitDirection.value
-    ? rawDirection.value
-    : undefined,
-)
+const effectDirection = computed(() => {
+  if (skipInitialGalleryReveal.value) return undefined
 
-const galleryStaggerMs = 28
-const galleryStaggerGroup = 6
+  const direction =
+    typeof props.direction === 'string'
+      ? props.direction.trim().toLowerCase()
+      : ''
+
+  if (!direction || ['none', 'off', 'unset', 'false', '0'].includes(direction)) {
+    return undefined
+  }
+
+  return direction
+})
 
 const resolvedDelayMs = computed(() =>
-  isGalleryReveal.value && !skipInitialGalleryReveal.value
-    ? (props.index % galleryStaggerGroup) * galleryStaggerMs
+  props.revealMode === 'gallery' && !skipInitialGalleryReveal.value
+    ? (props.index % 6) * 28
     : getStaggerDelayMs(props.index),
 )
 
@@ -108,11 +98,8 @@ const revealMotionProps = computed(() =>
   getRevealMotionProps(effectDirection.value, resolvedDelayMs.value),
 )
 
-const shouldAnimate = computed(
-  () =>
-    typeof revealMotionProps.value === 'object' &&
-    revealMotionProps.value !== null &&
-    'whileInView' in revealMotionProps.value,
+const shouldAnimate = computed(() =>
+  Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
 )
 </script>
 

@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import { unrefElement, useElementSize } from '@vueuse/core'
+import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   id?: number | string
@@ -32,13 +32,12 @@ const props = defineProps<{
   editLink?: string
 }>()
 
+const theme = useAppConfig().stirTheme
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const requestHeaders = useRequestHeaders(['user-agent'])
 
-const scrollArea = ref<{ $el?: HTMLElement } | null>(null)
-const firstMediaItem = ref<unknown>(null)
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
-const theme = useAppConfig().stirTheme
 const slotMedia = computed(() => tk.mediaItems())
 
 type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
@@ -87,56 +86,78 @@ const {
 } = useMediaModal(slotMediaOrdered, tk)
 
 const portal = useOverlayPortal()
-const firstMediaElement = computed(() => {
-  const resolved = unrefElement(firstMediaItem.value as Parameters<typeof unrefElement>[0])
-
-  return resolved instanceof Element ? resolved : null
-})
-const { width: scrollWidth } = useElementSize(() => scrollArea.value?.$el)
-const lanes = computed(() => {
+const { width: viewportWidth } = useWindowSize()
+const resolveLaneCount = (width: number) => {
   const config = props.masonry?.lanes
 
   if (!config) return 1
-  if (scrollWidth.value >= 768 && config.md) return config.md
-  if (scrollWidth.value >= 640 && config.sm) return config.sm
+  if (width >= 768 && config.md) return config.md
+  if (width >= 640 && config.sm) return config.sm
   return config.default ?? 1
-})
+}
 
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
-const hydrated = ref(false)
-const useMasonryVirtualized = computed(() => Boolean(props.masonry && hydrated.value))
 const isImageGallery = computed(() =>
   slotMediaOrdered.value.length > 1 &&
   slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
 )
+const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isImageGallery.value ? 'gallery' : 'default',
 )
-const shouldSkipInitialGalleryReveal = ref(true)
-const setFirstMediaItem = (el: unknown) => {
-  firstMediaItem.value = el
-}
-const isElementInViewport = (el: Element) => {
-  const rect = el.getBoundingClientRect()
+const getSsrEstimatedWidth = (): number => {
+  if (!import.meta.server) return 0
 
-  return rect.bottom > 0 && rect.top < window.innerHeight
+  const userAgent = requestHeaders['user-agent'] || ''
+  const isLikelyMobile = /Mobile|Android|iPhone|iPod|Windows Phone/i.test(userAgent)
+
+  return isLikelyMobile ? 390 : 1280
 }
+const getInitialGallerySkipCount = (width: number) => {
+  const resolvedWidth = width > 0 ? width : getSsrEstimatedWidth()
+
+  const rows =
+    resolvedWidth >= 1024 ? 3
+    : resolvedWidth >= 768 ? 4
+    : resolvedWidth >= 640 ? 2
+    : 1
+
+  const galleryLanes = props.masonry
+    ? resolveLaneCount(resolvedWidth)
+    : (resolvedWidth >= 768 ? 4 : resolvedWidth >= 640 ? 3 : 1)
+
+  return Math.max(1, galleryLanes) * rows
+}
+const lanes = computed(() =>
+  resolveLaneCount(
+    viewportWidth.value > 0
+      ? viewportWidth.value
+      : (import.meta.client ? window.innerWidth : getSsrEstimatedWidth()),
+  ),
+)
+
+const initialGallerySkipCount = useState<number>(
+  `media-initial-skip-${props.uuid ?? props.id ?? 'default'}`,
+  () => getInitialGallerySkipCount(0),
+)
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
   onSelect: onSelectModal,
 })
 
-onMounted(async () => {
+onMounted(() => {
   hydrated.value = true
-  await nextTick()
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-
-  const root = firstMediaElement.value
-
-  shouldSkipInitialGalleryReveal.value =
-    Boolean(isImageGallery.value && root && isElementInViewport(root))
+  initialGallerySkipCount.value = getInitialGallerySkipCount(window.innerWidth)
 })
+
+watch(
+  viewportWidth,
+  (width) => {
+    if (!import.meta.client || width <= 0) return
+    initialGallerySkipCount.value = getInitialGallerySkipCount(width)
+  },
+)
 </script>
 
 <template>
@@ -147,22 +168,20 @@ onMounted(async () => {
       </component>
 
       <UScrollArea
-        v-if="useMasonryVirtualized"
-        ref="scrollArea"
+        v-if="props.masonry && hydrated"
         v-slot="{ item: node, index: i }"
         class="w-full overflow-hidden"
         :items="slotMediaOrdered"
-        :virtualize="{ lanes, gap, estimateSize: 480 }"
+        :virtualize="{ lanes, gap, estimateSize: isImageGallery ? 260 : 480, overscan: isImageGallery ? 24 : 8 }"
       >
         <MediaItem
           :key="getMediaItemKey(node, i)"
-          :ref="i === 0 ? setFirstMediaItem : undefined"
           :direction="direction"
           :index="i"
+          :initial-skip-count="initialGallerySkipCount"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :skip-initial-gallery-reveal="shouldSkipInitialGalleryReveal"
           :tk="tk"
           @open="openModal"
         />
@@ -177,13 +196,12 @@ onMounted(async () => {
         <MediaItem
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
-          :ref="i === 0 ? setFirstMediaItem : undefined"
           :direction="direction"
           :index="i"
+          :initial-skip-count="initialGallerySkipCount"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :skip-initial-gallery-reveal="shouldSkipInitialGalleryReveal"
           :tk="tk"
           @open="openModal"
         />
