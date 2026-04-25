@@ -82,7 +82,11 @@ export function resolveColorModeState(
 
   // Forced mode is a hard global lock and disables route overrides.
   const routeOverride = forced ? undefined : matchedRouteOverride
-  const effectivePreference = routeOverride || (lockGlobal ? normalizedPreference : undefined)
+  const effectivePreference = routeOverride || (
+    lockGlobal && normalizedPreference !== 'system'
+      ? normalizedPreference
+      : undefined
+  )
 
   return {
     normalizedPreference,
