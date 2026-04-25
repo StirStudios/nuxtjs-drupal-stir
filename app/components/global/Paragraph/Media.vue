@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
@@ -87,8 +88,8 @@ const {
 
 const portal = useOverlayPortal()
 const { width: viewportWidth } = useWindowSize()
-const masonryLayoutRoot = ref<unknown>(null)
-const gridLayoutRoot = ref<unknown>(null)
+const masonryLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
+const gridLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
 const { width: mediaLayoutWidth } = useElementSize(
   () => unrefElement(masonryLayoutRoot) ?? unrefElement(gridLayoutRoot),
 )
