@@ -99,6 +99,7 @@ export default defineNuxtConfig({
   icon: {
     clientBundle: {
       scan: true,
+      icons: ['lucide:chevron-left', 'lucide:chevron-right', 'lucide:arrow-up'],
       includeCustomCollections: true,
       sizeLimitKb: 256,
     },
@@ -124,7 +125,7 @@ export default defineNuxtConfig({
       {
         disableStylesheets: 'entry',
         disablePrefetchLinks: true,
-        disablePreloadLinks: true,
+        disablePreloadLinks: false,
         delayHydration: {
           hydrateOnEvents: ['mousemove', 'scroll', 'keydown', 'click'],
           idleCallbackTimeout: 8000,

@@ -107,7 +107,7 @@ const pdfUrl = computed(() =>
     </EditLink>
   </div>
 
-  <UModal
+  <LazyUModal
     v-if="hasPdf && theme.pdf"
     v-model:open="open"
     :description="pdfDescription"
@@ -121,5 +121,5 @@ const pdfUrl = computed(() =>
     <template #body>
       <LazyStirPdfViewer :src="pdfUrl" />
     </template>
-  </UModal>
+  </LazyUModal>
 </template>
