@@ -10,15 +10,21 @@ const props = defineProps<{
 
   srcset?: string
   sizes?: string
+  responsiveStyle?: string
+  modalSrc?: string
+  modalSrcset?: string
+  modalSizes?: string
+  modalResponsiveStyle?: string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
-  fetchpriority?: 'high' | 'auto'
+  fetchpriority?: 'high' | 'auto' | 'low'
   noWrapper?: boolean
 
   link?: string
   credit?: string
   hideCredit?: boolean
+  timestamp?: string
 
   isHero?: boolean
   wrapperClass?: unknown
