@@ -2,7 +2,6 @@
 import { Motion } from 'motion-v'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { cleanHTML } from '~/utils/cleanHTML'
-import EditText from '~/components/Edit/Text.vue'
 
 const props = defineProps<{
   id?: number | string
@@ -87,7 +86,7 @@ watch(() => props.text, (value) => {
       :show-quick-edit="canInlineEdit && isEditing === false"
       @quick-edit="startEditing"
     >
-      <EditText
+      <LazyEditText
         v-if="isEditing && canInlineEdit"
         :classes="classes"
         :paragraph-id="paragraphId"

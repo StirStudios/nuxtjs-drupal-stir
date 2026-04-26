@@ -243,7 +243,8 @@ watch(
     </WrapDiv>
   </EditLink>
 
-  <UModal
+  <LazyUModal
+    v-if="overlay && itemsOrdered.length > 0"
     v-model:open="open"
     :close="false"
     :description="modalAccessibleDescription"
@@ -342,7 +343,7 @@ watch(
         </div>
       </Transition>
     </template>
-  </UModal>
+  </LazyUModal>
 </template>
 
 <style>
