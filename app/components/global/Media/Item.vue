@@ -56,7 +56,7 @@ const componentMap: Record<MediaType, string> = {
   link: 'MediaLink',
 }
 
-const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
+const { getRevealMotionProps, getRevealDelayMs } = useRevealMotionConfig()
 const skipInitialGalleryReveal = computed(() =>
   props.revealMode === 'gallery' &&
   mediaProps.value.type === 'image' &&
@@ -79,8 +79,8 @@ const effectDirection = computed(() => {
 
 const resolvedDelayMs = computed(() =>
   props.revealMode === 'gallery' && !skipInitialGalleryReveal.value
-    ? (props.index % 6) * 28
-    : getStaggerDelayMs(props.index),
+    ? getRevealDelayMs(props.index, { mode: 'dense' })
+    : getRevealDelayMs(props.index),
 )
 
 const mediaRenderProps = computed(() => {
