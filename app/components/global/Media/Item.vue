@@ -15,7 +15,7 @@ interface MediaProps {
   credit?: string
   mediaEmbed?: unknown
   loading?: 'lazy' | 'eager'
-  fetchpriority?: 'high' | 'auto'
+  fetchpriority?: 'high' | 'auto' | 'low'
   [key: string]: unknown
 }
 
@@ -27,7 +27,6 @@ const props = defineProps<{
   node: SlotNode
   index: number
   direction?: string
-  initialSkipCount?: number
   revealMode?: RevealMode
   overlay?: boolean
   tk: SlotsToolkit
@@ -56,15 +55,8 @@ const componentMap: Record<MediaType, string> = {
   link: 'MediaLink',
 }
 
-const { getRevealMotionProps, getRevealDelayMs } = useRevealMotionConfig()
-const skipInitialGalleryReveal = computed(() =>
-  props.revealMode === 'gallery' &&
-  mediaProps.value.type === 'image' &&
-  props.index < Math.max(0, props.initialSkipCount ?? 4),
-)
+const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } = useRevealMotionConfig()
 const effectDirection = computed(() => {
-  if (skipInitialGalleryReveal.value) return undefined
-
   const direction =
     typeof props.direction === 'string'
       ? props.direction.trim().toLowerCase()
@@ -78,24 +70,15 @@ const effectDirection = computed(() => {
 })
 
 const resolvedDelayMs = computed(() =>
-  props.revealMode === 'gallery' && !skipInitialGalleryReveal.value
+  props.revealMode === 'gallery'
     ? getRevealDelayMs(props.index, { mode: 'dense' })
     : getRevealDelayMs(props.index),
 )
 
-const mediaRenderProps = computed(() => {
-  if (mediaProps.value.type !== 'image') return mediaProps.value
-  if (!skipInitialGalleryReveal.value) return mediaProps.value
-
-  return {
-    ...mediaProps.value,
-    loading: 'eager',
-    fetchpriority: mediaProps.value.fetchpriority ?? (props.index === 0 ? 'high' : 'auto'),
-  }
-})
-
 const revealMotionProps = computed(() =>
-  getRevealMotionProps(effectDirection.value, resolvedDelayMs.value),
+  getRevealMotionProps(effectDirection.value, resolvedDelayMs.value, {
+    ssrVisible: true,
+  }),
 )
 
 const shouldAnimate = computed(() =>
@@ -107,21 +90,27 @@ const shouldAnimate = computed(() =>
   <component
     :is="componentMap[mediaProps.type]"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
-    v-bind="mediaRenderProps"
+    v-bind="mediaProps"
   />
 
   <Motion
     v-else-if="!overlay || isDocument || isAudio"
+    :key="`media-${props.index}-${revealMotionKey}`"
     as-child
     v-bind="revealMotionProps"
   >
-    <component :is="componentMap[mediaProps.type]" v-bind="mediaRenderProps" />
+    <component :is="componentMap[mediaProps.type]" v-bind="mediaProps" />
   </Motion>
 
-  <Motion v-else as-child v-bind="revealMotionProps">
+  <Motion
+    v-else
+    :key="`media-overlay-${props.index}-${revealMotionKey}`"
+    as-child
+    v-bind="revealMotionProps"
+  >
     <MediaImage
       v-if="!isVideo"
-      v-bind="mediaRenderProps"
+      v-bind="mediaProps"
       :aria-label="'Open media modal'"
       class="cursor-pointer"
       :image-class="[
@@ -156,7 +145,7 @@ const shouldAnimate = computed(() =>
       @keydown.space.prevent="openOverlay"
     >
       <MediaImage
-        v-bind="{ ...mediaRenderProps, hideCredit: true }"
+        v-bind="{ ...mediaProps, hideCredit: true }"
         :wrapper-class="[
           mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,

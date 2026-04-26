@@ -1,5 +1,5 @@
 import type { ComputedRef, MaybeRefOrGetter } from 'vue'
-import { toValue } from 'vue'
+import { onMounted, toValue } from 'vue'
 
 type RevealLike = {
   durationMs?: unknown
@@ -14,6 +14,10 @@ export type RevealMotionResolved = {
 }
 
 export type RevealStaggerMode = 'default' | 'dense'
+
+type RevealMotionOptions = {
+  ssrVisible?: boolean
+}
 
 const REVEAL_DEFAULTS = {
   durationMs: 800,
@@ -109,6 +113,13 @@ export function useRevealMotionConfig() {
   const theme = useAppConfig().stirTheme
   const animateOnce = computed(() => theme.animations?.once !== false)
   const { resolved } = useRevealConfig()
+  const hasMounted = ref(false)
+  const revealMotionKey = ref(0)
+
+  onMounted(() => {
+    hasMounted.value = true
+    revealMotionKey.value = 1
+  })
 
   const getStaggerDelayMs = (index: number, startIndex: number = 0) => {
     return Math.max(0, index - startIndex) * Math.max(0, resolved.value.staggerMs)
@@ -134,6 +145,7 @@ export function useRevealMotionConfig() {
   const getRevealMotionProps = (
     effect?: string,
     delayMs: number = 0,
+    options: RevealMotionOptions = {},
   ): Record<string, unknown> => {
     const shouldReduceMotion =
       import.meta.client &&
@@ -156,7 +168,7 @@ export function useRevealMotionConfig() {
     }
 
     return {
-      initial,
+      initial: options.ssrVisible && !hasMounted.value ? false : initial,
       whileInView: REVEAL_VISIBLE_TARGET,
       transition: {
         type: 'tween',
@@ -176,14 +188,20 @@ export function useRevealMotionConfig() {
   const useRevealMotionProps = (
     effect: MaybeRefOrGetter<string | undefined>,
     delayMs: MaybeRefOrGetter<number | undefined> = 0,
+    options: MaybeRefOrGetter<RevealMotionOptions | undefined> = {},
   ): ComputedRef<Record<string, unknown>> => computed(() =>
-      getRevealMotionProps(toValue(effect), Number(toValue(delayMs) || 0)))
+      getRevealMotionProps(
+        toValue(effect),
+        Number(toValue(delayMs) || 0),
+        toValue(options) ?? {},
+      ))
 
   return {
     resolved,
     getStaggerDelayMs,
     getRevealDelayMs,
     getRevealMotionProps,
+    revealMotionKey,
     useRevealMotionProps,
   }
 }
