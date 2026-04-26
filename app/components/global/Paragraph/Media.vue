@@ -115,9 +115,18 @@ const isImageGallery = computed(() =>
   slotMediaOrdered.value.length > 1 &&
   slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
 )
+const isVisualGallery = computed(() =>
+  slotMediaOrdered.value.length > 1 &&
+  slotMediaOrdered.value.every((node) => {
+    const type = tk.propsOf(node).type
+
+    return type === 'image' || type === 'video'
+  }),
+)
+
 const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
-  isImageGallery.value ? 'gallery' : 'default',
+  isVisualGallery.value ? 'gallery' : 'default',
 )
 const getSsrEstimatedWidth = (): number => {
   if (!import.meta.server) return 0
@@ -258,18 +267,16 @@ watch(
 
       <div
         v-if="itemsOrdered.length === 1"
-        class="flex h-full items-center justify-center"
+        class="flex h-full w-full items-center justify-center"
       >
-        <div class="w-full">
-          <component
-            :is="componentMap[itemsOrdered[0].type]"
-            v-bind="{
-              ...itemsOrdered[0],
-              ...(itemsOrdered[0].type === 'video' ? { deferEmbed: false } : {}),
-              ...(itemsOrdered[0].type === 'image' ? { noWrapper: true } : {}),
-            }"
-          />
-        </div>
+        <component
+          :is="componentMap[itemsOrdered[0].type]"
+          v-bind="{
+            ...itemsOrdered[0],
+            ...(itemsOrdered[0].type === 'video' ? { deferEmbed: false } : {}),
+            ...(itemsOrdered[0].type === 'image' ? { noWrapper: true } : {}),
+          }"
+        />
       </div>
 
       <LazyUCarousel

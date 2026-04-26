@@ -24,7 +24,6 @@ const { post, orientation } = useTeaserPost(props.teaser, {
   orientation: props.orientation,
 })
 
-const theme = useAppConfig().stirTheme
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
 const titleOverlay = computed(() => props.titleOverlay ?? false)
@@ -78,20 +77,13 @@ const postUi = computed(() => {
       :ui="postUi"
     >
       <template #header>
-        <div
-          :class="[
-            'app-node-teaser-media',
-            theme.media.base,
-            'transform transition-transform',
-            theme.media.transitions.fast,
-            theme.media.effects.scale,
+        <MediaImage
+          v-if="teaserImage"
+          v-bind="teaserImage"
+          :wrapper-class="[
+            'h-full w-full transform transition-transform duration-300 group-hover:scale-105 group-hover/blog-post:scale-105',
           ]"
-        >
-          <MediaImage
-            v-if="teaserImage"
-            v-bind="teaserImage"
-          />
-        </div>
+        />
       </template>
 
       <template v-if="showDescription" #description>
@@ -100,13 +92,3 @@ const postUi = computed(() => {
     </UBlogPost>
   </EditLink>
 </template>
-
-<style scoped>
-.app-node-teaser-media :deep(.media) {
-  @apply h-full w-full;
-}
-
-.app-node-teaser-media :deep(.media > img) {
-  @apply block h-full w-full object-cover;
-}
-</style>

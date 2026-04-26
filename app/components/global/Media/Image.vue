@@ -21,9 +21,12 @@ const props = defineProps<{
   hideCredit?: boolean
 
   isHero?: boolean
+  wrapperClass?: unknown
+  imageClass?: unknown
 }>()
 
 const theme = useAppConfig().stirTheme
+const attrs = useAttrs()
 const { isFront } = usePageContext()
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
@@ -37,6 +40,17 @@ const isHero = computed(() =>
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
+)
+const rootAttrs = computed(() =>
+  props.link
+    ? {
+        ...attrs,
+        href: props.link,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        'aria-label': linkAriaLabel.value,
+      }
+    : attrs,
 )
 const hasImageSource = computed(() =>
   Boolean(props.src?.trim() || props.srcset?.trim()),
@@ -85,14 +99,16 @@ onMounted(() => {
   <img
     v-if="isBare"
     ref="imageElement"
+    v-bind="attrs"
     :alt="alt || ''"
     :class="
       isHero
         ? [
             theme.hero.image.base,
             isFront ? theme.hero.image.isFront : 'max-w-none',
+            imageClass,
           ]
-        : [theme.media.base, theme.media.rounded, 'm-auto !object-contain']
+        : [theme.media.base, theme.media.rounded, 'm-auto !object-contain', imageClass]
     "
     :fetchpriority="fetchpriority || undefined"
     :height="height"
@@ -108,19 +124,11 @@ onMounted(() => {
   <component
     :is="link ? 'a' : 'div'"
     v-else
-    v-bind="
-      link
-        ? {
-            href: link,
-            target: '_blank',
-            rel: 'noopener noreferrer',
-            'aria-label': linkAriaLabel,
-          }
-        : {}
-    "
+    v-bind="rootAttrs"
     :class="[
       'media group @container relative block overflow-hidden',
       theme.media.rounded,
+      wrapperClass,
     ]"
   >
     <USkeleton
@@ -136,6 +144,7 @@ onMounted(() => {
         theme.media.base,
         platform === 'instagram' ? 'aspect-3/4' : '',
         !isLoaded && 'opacity-0',
+        imageClass,
       ]"
       :height="height"
       :loading="normalizedLoading"
@@ -151,7 +160,7 @@ onMounted(() => {
       v-else
       ref="imageElement"
       :alt="alt || ''"
-      :class="[theme.media.base, !isLoaded && 'opacity-0']"
+      :class="[theme.media.base, !isLoaded && 'opacity-0', imageClass]"
       fetchpriority="high"
       :height="height"
       :loading="normalizedLoading"
