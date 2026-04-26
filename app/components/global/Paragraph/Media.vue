@@ -35,7 +35,6 @@ const props = defineProps<{
 
 const theme = useAppConfig().stirTheme
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
-const requestHeaders = useRequestHeaders(['user-agent'])
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
@@ -128,50 +127,16 @@ const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
-const getSsrEstimatedWidth = (): number => {
-  if (!import.meta.server) return 0
-
-  const userAgent = requestHeaders['user-agent'] || ''
-  const isLikelyMobile = /Mobile|Android|iPhone|iPod|Windows Phone/i.test(userAgent)
-
-  return isLikelyMobile ? 390 : 1280
-}
-const getInitialGallerySkipCount = (width: number) => {
-  const resolvedWidth = width > 0 ? width : getSsrEstimatedWidth()
-
-  const rows =
-    resolvedWidth >= 1024 ? 3
-    : resolvedWidth >= 768 ? 4
-    : resolvedWidth >= 640 ? 2
-    : 1
-
-  const galleryLanes = props.masonry
-    ? resolveLaneCount(resolvedWidth)
-    : (resolvedWidth >= 768 ? 4 : resolvedWidth >= 640 ? 3 : 1)
-
-  return Math.max(1, galleryLanes) * rows
-}
 const lanes = computed(() =>
   resolveLaneCount(
     mediaLayoutWidth.value > 0
       ? mediaLayoutWidth.value
       : viewportWidth.value > 0
       ? viewportWidth.value
-      : (import.meta.client ? window.innerWidth : getSsrEstimatedWidth()),
+      : (import.meta.client ? window.innerWidth : 0),
   ),
 )
 
-const initialGallerySkipCount = useState<number>(
-  `media-initial-skip-${props.uuid ?? props.id ?? 'default'}`,
-  () => getInitialGallerySkipCount(0),
-)
-const updateInitialGallerySkipCount = () => {
-  if (!import.meta.client) return
-
-  initialGallerySkipCount.value = getInitialGallerySkipCount(
-    mediaLayoutWidth.value || viewportWidth.value || window.innerWidth,
-  )
-}
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
@@ -180,16 +145,7 @@ const { handleCarouselSelect } = useModalMediaPlayback({
 
 onMounted(() => {
   hydrated.value = true
-  updateInitialGallerySkipCount()
 })
-
-watch(
-  [viewportWidth, mediaLayoutWidth],
-  ([width, layoutWidth]) => {
-    if (!import.meta.client || (width <= 0 && layoutWidth <= 0)) return
-    updateInitialGallerySkipCount()
-  },
-)
 </script>
 
 <template>
@@ -211,7 +167,6 @@ watch(
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
-          :initial-skip-count="initialGallerySkipCount"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
@@ -232,7 +187,6 @@ watch(
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
-          :initial-skip-count="initialGallerySkipCount"
           :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"

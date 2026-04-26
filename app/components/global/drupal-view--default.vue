@@ -15,6 +15,18 @@ interface CeElementNode {
   [key: string]: unknown
 }
 
+type RenderedViewRow =
+  | {
+      key: string
+      type: 'dynamic'
+      node: unknown
+    }
+  | {
+      key: string
+      type: 'static'
+      node: VNode
+    }
+
 const props = defineProps<{
   title?: string
   gridItems?: string
@@ -142,13 +154,29 @@ const hasRows = computed(() =>
     ? dynamicRenderedRows.value.length > 0
     : staticTeaserRows.value.length > 0,
 )
+const renderedRows = computed<RenderedViewRow[]>(() => {
+  if (hasDynamicRows.value) {
+    return dynamicRenderedRows.value.map((row) => ({
+      key: row.key,
+      type: 'dynamic',
+      node: row.node,
+    }))
+  }
+
+  return staticTeaserRows.value.map((node, index) => ({
+    key: String(node.key ?? index),
+    type: 'static',
+    node: node as VNode,
+  }))
+})
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
-const { getRevealDelayMs, getRevealMotionProps } = useRevealMotionConfig()
+const { getRevealDelayMs, getRevealMotionProps, revealMotionKey } = useRevealMotionConfig()
 
 const getRowMotionProps = (index: number) =>
   getRevealMotionProps(
     props.direction,
     props.direction ? getRevealDelayMs(index, { mode: 'dense' }) : getRevealDelayMs(index),
+    { ssrVisible: true },
   )
 </script>
 
@@ -234,29 +262,17 @@ const getRowMotionProps = (index: number) =>
     :spacing="spacing"
     :width="width"
   >
-    <template v-if="hasDynamicRows">
-      <Motion
-        v-for="(row, i) in dynamicRenderedRows"
-        :key="row.key"
-        as="div"
-        class="item"
-        v-bind="getRowMotionProps(i)"
-      >
-        <component :is="renderCustomElements(row.node)" />
-      </Motion>
-    </template>
-
-    <template v-else>
-      <Motion
-        v-for="(node, i) in staticTeaserRows"
-        :key="i"
-        as="div"
-        class="item"
-        v-bind="getRowMotionProps(i)"
-      >
-        <component :is="node" />
-      </Motion>
-    </template>
+    <Motion
+      v-for="(row, i) in renderedRows"
+      :key="`${row.key}-${revealMotionKey}`"
+      as="div"
+      class="item"
+      v-bind="getRowMotionProps(i)"
+    >
+      <component
+        :is="row.type === 'dynamic' ? renderCustomElements(row.node) : row.node"
+      />
+    </Motion>
   </WrapGrid>
 
   <UEmpty
