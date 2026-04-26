@@ -205,7 +205,7 @@ export default defineNuxtConfig({
         domain: '',
         apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
-        proxy: false,
+        proxy: true,
         proxyBaseEndpoint: '/_plausible',
         ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
         ignoreSubDomains: true,
