@@ -56,7 +56,7 @@ const componentMap: Record<MediaType, string> = {
   link: 'MediaLink',
 }
 
-const { getRevealMotionProps, getStaggerDelayMs } = useRevealMotionConfig()
+const { getRevealMotionProps, getRevealDelayMs } = useRevealMotionConfig()
 const skipInitialGalleryReveal = computed(() =>
   props.revealMode === 'gallery' &&
   mediaProps.value.type === 'image' &&
@@ -79,8 +79,8 @@ const effectDirection = computed(() => {
 
 const resolvedDelayMs = computed(() =>
   props.revealMode === 'gallery' && !skipInitialGalleryReveal.value
-    ? (props.index % 6) * 28
-    : getStaggerDelayMs(props.index),
+    ? getRevealDelayMs(props.index, { mode: 'dense' })
+    : getRevealDelayMs(props.index),
 )
 
 const mediaRenderProps = computed(() => {
@@ -119,16 +119,35 @@ const shouldAnimate = computed(() =>
   </Motion>
 
   <Motion v-else as-child v-bind="revealMotionProps">
+    <MediaImage
+      v-if="!isVideo"
+      v-bind="mediaRenderProps"
+      :aria-label="'Open media modal'"
+      class="cursor-pointer"
+      :image-class="[
+        'transition-transform',
+        theme.media.effects.scale,
+        theme.media.transitions.slow,
+        'group-focus-within:scale-105',
+      ]"
+      role="button"
+      tabindex="0"
+      @click="openOverlay"
+      @keydown.enter.prevent="openOverlay"
+      @keydown.space.prevent="openOverlay"
+    />
+
     <div
-      :aria-label="isVideo ? 'Open video modal' : 'Open media modal'"
+      v-else
+      aria-label="Open video modal"
       class="group relative overflow-hidden"
       :class="[
         theme.media.rounded,
-        isVideo || overlay ? 'cursor-pointer' : '',
-        isVideo && 'grid place-items-center text-white',
-        isVideo && mediaPreviewClasses.overlayBase,
-        isVideo && mediaPreviewClasses.overlayTint30,
-        isVideo && mediaPreviewClasses.overlayInteractiveTint,
+        'cursor-pointer',
+        'grid place-items-center text-white',
+        mediaPreviewClasses.overlayBase,
+        mediaPreviewClasses.overlayTint30,
+        mediaPreviewClasses.overlayInteractiveTint,
       ]"
       role="button"
       tabindex="0"
@@ -136,17 +155,15 @@ const shouldAnimate = computed(() =>
       @keydown.enter.prevent="openOverlay"
       @keydown.space.prevent="openOverlay"
     >
-      <div
-        :class="[
-          'transition-transform',
-          isVideo && mediaPreviewClasses.zoomLayer,
-          theme.media.effects.scale,
+      <MediaImage
+        v-bind="{ ...mediaRenderProps, hideCredit: true }"
+        :wrapper-class="[
+          mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,
+          theme.media.effects.scale,
           'group-focus-within:scale-105',
         ]"
-      >
-        <MediaImage v-bind="{ ...mediaRenderProps, hideCredit: true }" />
-      </div>
+      />
 
       <span
         v-if="mediaProps.credit"
@@ -159,11 +176,7 @@ const shouldAnimate = computed(() =>
         {{ mediaProps.credit }}
       </span>
 
-      <span
-        v-if="isVideo"
-        aria-hidden="true"
-        :class="mediaPreviewClasses.iconLayer"
-      >
+      <span aria-hidden="true" :class="mediaPreviewClasses.iconLayer">
         <UIcon name="i-lucide-play-circle" size="60" />
       </span>
     </div>

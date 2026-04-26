@@ -143,10 +143,13 @@ const hasRows = computed(() =>
     : staticTeaserRows.value.length > 0,
 )
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
-const { getStaggerDelayMs, getRevealMotionProps } = useRevealMotionConfig()
+const { getRevealDelayMs, getRevealMotionProps } = useRevealMotionConfig()
 
 const getRowMotionProps = (index: number) =>
-  getRevealMotionProps(props.direction, getStaggerDelayMs(index))
+  getRevealMotionProps(
+    props.direction,
+    props.direction ? getRevealDelayMs(index, { mode: 'dense' }) : getRevealDelayMs(index),
+  )
 </script>
 
 <template>

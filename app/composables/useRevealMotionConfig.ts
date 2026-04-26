@@ -13,11 +13,16 @@ export type RevealMotionResolved = {
   ease: [number, number, number, number]
 }
 
+export type RevealStaggerMode = 'default' | 'dense'
+
 const REVEAL_DEFAULTS = {
   durationMs: 800,
   staggerMs: 250,
   ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
 }
+
+const DENSE_REVEAL_STAGGER_GROUP = 6
+const DENSE_REVEAL_STAGGER_MS = 28
 
 type MotionEffectTarget = {
   opacity: number
@@ -109,6 +114,23 @@ export function useRevealMotionConfig() {
     return Math.max(0, index - startIndex) * Math.max(0, resolved.value.staggerMs)
   }
 
+  const getRevealDelayMs = (
+    index: number,
+    options?: {
+      mode?: RevealStaggerMode
+      startIndex?: number
+    },
+  ) => {
+    const mode = options?.mode ?? 'default'
+    const startIndex = options?.startIndex ?? 0
+
+    if (mode === 'dense') {
+      return (Math.max(0, index - startIndex) % DENSE_REVEAL_STAGGER_GROUP) * DENSE_REVEAL_STAGGER_MS
+    }
+
+    return getStaggerDelayMs(index, startIndex)
+  }
+
   const getRevealMotionProps = (
     effect?: string,
     delayMs: number = 0,
@@ -160,6 +182,7 @@ export function useRevealMotionConfig() {
   return {
     resolved,
     getStaggerDelayMs,
+    getRevealDelayMs,
     getRevealMotionProps,
     useRevealMotionProps,
   }
