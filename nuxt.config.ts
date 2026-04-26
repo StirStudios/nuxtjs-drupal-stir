@@ -99,6 +99,7 @@ export default defineNuxtConfig({
   icon: {
     clientBundle: {
       scan: true,
+      icons: ['lucide:chevron-left', 'lucide:chevron-right', 'lucide:arrow-up'],
       includeCustomCollections: true,
       sizeLimitKb: 256,
     },
@@ -124,7 +125,7 @@ export default defineNuxtConfig({
       {
         disableStylesheets: 'entry',
         disablePrefetchLinks: true,
-        disablePreloadLinks: true,
+        disablePreloadLinks: false,
         delayHydration: {
           hydrateOnEvents: ['mousemove', 'scroll', 'keydown', 'click'],
           idleCallbackTimeout: 8000,
@@ -204,7 +205,7 @@ export default defineNuxtConfig({
         domain: '',
         apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
-        proxy: false,
+        proxy: true,
         proxyBaseEndpoint: '/_plausible',
         ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
         ignoreSubDomains: true,

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { adminUiTheme } from '~/utils/adminUiTheme'
-
 defineOptions({
   inheritAttrs: false,
 })
@@ -75,7 +73,6 @@ interface EditAction {
   to?: string
   target?: '_blank'
   rel?: 'noopener noreferrer'
-  onClick?: () => void
 }
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
@@ -136,7 +133,6 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       disabled: props.quickEditDisabled === true,
-      onClick: () => emit('quick-edit'),
     })
   }
 
@@ -186,68 +182,19 @@ const actions = computed<EditAction[]>(() => {
 })
 
 const hasActions = computed(() => actions.value.length > 0)
-const tooltipOpen = ref<Record<string, boolean>>({})
 
-const setTooltipOpen = (key: EditAction['key'], value: boolean) => {
-  tooltipOpen.value = {
-    ...tooltipOpen.value,
-    [key]: value,
-  }
-}
-
-const closeAllTooltips = () => {
-  tooltipOpen.value = {}
-}
-
-const handleActionClick = (action: EditAction) => {
-  closeAllTooltips()
-  action.onClick?.()
-}
-
-const handleTooltipOpenUpdate = (key: EditAction['key'], value: boolean) => {
-  setTooltipOpen(key, value)
+const handleActionSelect = (key: EditAction['key']) => {
+  if (key === 'quick') emit('quick-edit')
 }
 </script>
 
 <template>
   <slot />
-  <UTheme v-if="hasActions" :ui="adminUiTheme">
-    <UFieldGroup
-      class="admin-ui admin-ui-scope admin-ui-controls pointer-events-none absolute top-2 right-2 z-100 rounded-md opacity-0 shadow-lg transition-opacity"
-      data-admin-ui-controls
-      size="xs"
-    >
-      <UTooltip
-        v-for="action in actions"
-        :key="action.key"
-        :open="Boolean(tooltipOpen[action.key])"
-        :text="action.tooltip"
-        :ui="{
-          content: 'admin-ui-tooltip-content',
-          arrow: 'admin-ui-tooltip-arrow',
-        }"
-        @update:open="
-          (value: boolean) => handleTooltipOpenUpdate(action.key, value)
-        "
-      >
-        <UButton
-          :aria-label="action.ariaLabel"
-          color="neutral"
-          :disabled="action.disabled"
-          :icon="action.icon"
-          :rel="action.rel"
-          :target="action.target"
-          :to="action.to"
-          :ui="{ base: action.buttonClass }"
-          :variant="action.variant"
-          @click="handleActionClick(action)"
-          @pointerdown="closeAllTooltips()"
-        >
-          <span class="sr-only">{{ action.ariaLabel }}</span>
-        </UButton>
-      </UTooltip>
-    </UFieldGroup>
-  </UTheme>
+  <LazyEditControls
+    v-if="hasActions"
+    :actions="actions"
+    @select="handleActionSelect"
+  />
 </template>
 
 <style>
