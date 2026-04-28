@@ -38,11 +38,6 @@ const activeTabNode = computed(() => {
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const isMobile = breakpoints.smaller('lg')
 const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
-const ready = ref(false)
-
-onMounted(() => {
-  ready.value = true
-})
 
 watch(active, async () => {
   if (!isMobile.value) return
@@ -59,13 +54,6 @@ watch(active, async () => {
 <template>
   <div v-if="items.length <= 1">
     <component :is="activeTabNode" v-if="activeTabNode" />
-  </div>
-
-  <div v-else-if="!ready" aria-hidden="true" class="m-auto w-full py-12">
-    <div class="flex flex-col items-center justify-center gap-2">
-      <UIcon class="size-8 animate-spin text-muted" name="i-lucide-loader-circle" />
-      <p class="text-sm text-muted">Loading tabs...</p>
-    </div>
   </div>
 
   <UTabs

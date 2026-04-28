@@ -71,7 +71,7 @@ function getErrorPayload(
       :render-custom-elements="renderCustomElements"
       :theme="theme"
     >
-      <LazySiteBreadcrumbs v-if="theme.crumbs" />
+      <SiteBreadcrumbs v-if="theme.crumbs" />
       <component :is="renderCustomElements(page.content)" v-if="page?.content" />
       <LazyRegionArea area="after_main" />
     </slot>
