@@ -1,7 +1,7 @@
 {
   "name": "nuxtjs-drupal-stir",
   "version": "4.3.2",
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@10.33.1",
   "scripts": {
     "build": "nuxi build",
     "dev": "nuxi dev",
