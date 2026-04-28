@@ -4,10 +4,10 @@ const { navigation } = useAppConfig().stirTheme
 
 <template>
   <div class="flex min-h-dvh flex-col">
-    <LazyAppHeader :mode="navigation.mode" />
+    <AppHeader :mode="navigation.mode" />
 
     <UMain id="main-content" class="flex-1" role="main">
-      <LazySiteMessages />
+      <SiteMessages />
       <slot />
     </UMain>
 

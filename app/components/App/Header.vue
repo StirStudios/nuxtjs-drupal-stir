@@ -120,10 +120,10 @@ const onOpen = (val: boolean) => {
 </script>
 
 <template>
-  <LazyRegionArea area="top" />
+  <RegionArea area="top" />
   <LazyDrupalTabs v-if="isAdministrator" />
 
-  <LazyUHeader
+  <UHeader
     aria-label="Site header"
     :menu="{
       side: theme.navigation.toggleDirection,
@@ -146,7 +146,7 @@ const onOpen = (val: boolean) => {
     @update:open="onOpen"
   >
     <template #title>
-      <LazyAppLogo
+      <AppLogo
         v-if="theme.navigation.logo"
         :add-classes="
           [
@@ -163,7 +163,7 @@ const onOpen = (val: boolean) => {
       </template>
     </template>
 
-    <LazyUNavigationMenu
+    <UNavigationMenu
       aria-label="Site Navigation"
       class="app-nav app-nav-desktop"
       :color="theme.navigation.color"
@@ -176,11 +176,11 @@ const onOpen = (val: boolean) => {
     />
 
     <template v-if="appConfig.colorMode?.showToggle !== false" #right>
-      <LazyIconsColorMode />
+      <IconsColorMode />
     </template>
 
     <template #body>
-      <LazyUNavigationMenu
+      <UNavigationMenu
         aria-label="Mobile Navigation"
         class="app-nav app-nav-mobile"
         :items="navLinks"
@@ -188,5 +188,5 @@ const onOpen = (val: boolean) => {
         :ui="{ link: theme.navigation.slideover.link }"
       />
     </template>
-  </LazyUHeader>
+  </UHeader>
 </template>
