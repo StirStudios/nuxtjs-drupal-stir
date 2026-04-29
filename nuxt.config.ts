@@ -98,7 +98,6 @@ export default defineNuxtConfig({
   routeRules: {
     '/login': {
       robots: false,
-      sitemap: false,
     },
     '/admincontrol': {
       redirect: {

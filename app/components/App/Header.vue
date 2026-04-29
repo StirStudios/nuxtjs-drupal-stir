@@ -176,7 +176,7 @@ const onOpen = (val: boolean) => {
     />
 
     <template v-if="appConfig.colorMode?.showToggle !== false" #right>
-      <IconsColorMode />
+      <LazyIconsColorMode />
     </template>
 
     <template #body>

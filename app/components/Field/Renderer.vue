@@ -5,18 +5,18 @@ import { useEvaluateState } from '~/composables/useEvaluateState'
 import { cleanHTML } from '~/utils/cleanHTML'
 
 import {
-  FieldInput,
-  FieldTextarea,
-  FieldSelect,
-  FieldRadio,
-  FieldCheckbox,
-  FieldCheckboxes,
-  FieldDate,
-  FieldDateTime,
-  FieldAddress,
-  FieldProcessedText,
-  FieldInputNumber,
-  FieldInputSlider,
+  LazyFieldInput,
+  LazyFieldTextarea,
+  LazyFieldSelect,
+  LazyFieldRadio,
+  LazyFieldCheckbox,
+  LazyFieldCheckboxes,
+  LazyFieldDate,
+  LazyFieldDateTime,
+  LazyFieldAddress,
+  LazyFieldProcessedText,
+  LazyFieldInputNumber,
+  LazyFieldInputSlider,
 } from '#components'
 
 const props = withDefaults(
@@ -36,20 +36,20 @@ const props = withDefaults(
 
 const { webform } = useAppConfig().stirTheme
 const componentMap: Record<string, Component> = {
-  textfield: FieldInput,
-  email: FieldInput,
-  number: FieldInputNumber,
-  range: FieldInputSlider,
-  tel: FieldInput,
-  textarea: FieldTextarea,
-  select: FieldSelect,
-  radio: FieldRadio,
-  checkbox: FieldCheckbox,
-  checkboxes: FieldCheckboxes,
-  datetime: FieldDateTime,
-  date: FieldDate,
-  address: FieldAddress,
-  processed_text: FieldProcessedText,
+  textfield: LazyFieldInput,
+  email: LazyFieldInput,
+  number: LazyFieldInputNumber,
+  range: LazyFieldInputSlider,
+  tel: LazyFieldInput,
+  textarea: LazyFieldTextarea,
+  select: LazyFieldSelect,
+  radio: LazyFieldRadio,
+  checkbox: LazyFieldCheckbox,
+  checkboxes: LazyFieldCheckboxes,
+  datetime: LazyFieldDateTime,
+  date: LazyFieldDate,
+  address: LazyFieldAddress,
+  processed_text: LazyFieldProcessedText,
 }
 
 const shouldRender = computed(() => {
@@ -141,7 +141,10 @@ const fieldUi = computed(() => {
     :required="!!field['#required']"
     :ui="fieldUi"
   >
-    <ButtonModal v-if="field['#modal'] === true" :modal-id="field['#name']" />
+    <LazyButtonModal
+      v-if="field['#modal'] === true"
+      :modal-id="field['#name']"
+    />
 
     <div
       v-if="descriptionContent && shouldShowDescription"

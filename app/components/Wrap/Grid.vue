@@ -33,6 +33,6 @@ const wrapperClasses = computed(() => {
     <WrapDiv :styles="gridStyles">
       <slot />
     </WrapDiv>
-    <CardGradient v-if="props.card" :layout="props" />
+    <LazyCardGradient v-if="props.card" :layout="props" />
   </WrapDiv>
 </template>

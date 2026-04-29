@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '../../../types'
+import { inputIdInjectionKey } from '@nuxt/ui/composables'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -10,11 +11,13 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
+const injectedInputId = inject(inputIdInjectionKey, undefined)
+const id = computed(() => injectedInputId?.value ?? props.fieldName)
 </script>
 
 <template>
   <UTextarea
-    :id="fieldName"
+    :id="id"
     v-model="props.state[props.fieldName]"
     autoresize
     class="w-full"
@@ -26,7 +29,7 @@ const isMaterial = computed(() => webform.variant === 'material')
     <label
       v-if="props.floatingLabel"
       :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
-      :for="props.fieldName"
+      :for="id"
     >
       <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
         {{ props.field['#title'] }}

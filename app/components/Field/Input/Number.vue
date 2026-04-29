@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
+import { inputIdInjectionKey } from '@nuxt/ui/composables'
 import { clampNumberToBounds } from '~/utils/formInputUtils'
 
 const props = defineProps<{
@@ -11,7 +12,9 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
-const id = useId()
+const injectedInputId = inject(inputIdInjectionKey, undefined)
+const fallbackId = useId()
+const id = computed(() => injectedInputId?.value ?? fallbackId)
 
 const minValue = computed(() => {
   const value = Number(props.field['#min'])
@@ -102,6 +105,7 @@ const modelValue = computed<number | undefined>({
     :increment="{ size: 'sm', color: 'neutral' }"
     :max="maxValue"
     :min="minValue"
+    name=""
     :placeholder="placeholder"
     :step="stepValue"
     :variant="webform.variant"
