@@ -64,7 +64,7 @@ onBeforeUnmount(() => {
         {{ themeTurnstile.label }}
       </p>
 
-      <NuxtTurnstile
+      <LazyNuxtTurnstile
         v-if="shouldRenderTurnstile"
         v-model="turnstileToken"
         class="max-w-xs overflow-x-hidden"

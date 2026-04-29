@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
+import { inputIdInjectionKey } from '@nuxt/ui/composables'
 import { clampNumberToBounds, normalizeNumberBounds } from '~/utils/formInputUtils'
 
 const props = defineProps<{
@@ -10,7 +11,9 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
-const id = useId()
+const injectedInputId = inject(inputIdInjectionKey, undefined)
+const fallbackId = useId()
+const id = computed(() => injectedInputId?.value ?? fallbackId)
 const minimumAllowedValue = 1
 
 const getDefaultValue = () => {

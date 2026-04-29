@@ -81,7 +81,7 @@ const footerMenuItems = computed(() =>
 
     <template #right>
       <div class="flex gap-1">
-        <IconsSocial
+        <LazyIconsSocial
           v-for="(icon, index) in iconsSocialConfig"
           :key="icon.url || icon.title || index"
           v-bind="icon"

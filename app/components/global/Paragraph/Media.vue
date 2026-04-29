@@ -155,7 +155,7 @@ onMounted(() => {
         {{ header }}
       </component>
 
-      <UScrollArea
+      <LazyUScrollArea
         v-if="props.masonry && hydrated"
         ref="masonryLayoutRoot"
         v-slot="{ item: node, index: i }"
@@ -173,7 +173,7 @@ onMounted(() => {
           :tk="tk"
           @open="openModal"
         />
-      </UScrollArea>
+      </LazyUScrollArea>
 
       <WrapGrid
         v-else

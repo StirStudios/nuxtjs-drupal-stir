@@ -52,7 +52,7 @@ const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
 
   <LazyRegionArea area="before_main" />
 
-  <NodeTeaser
+  <LazyNodeTeaser
     v-if="isTeaser"
     :created="props.created"
     orientation="vertical"
