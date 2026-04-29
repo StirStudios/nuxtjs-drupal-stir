@@ -1,6 +1,10 @@
 # Nuxt 4 Drupal Layer (Nuxt UI 4 + Tailwind 4)
 
-A production-ready Nuxt 4 layer/base theme for decoupled Drupal (Lupus Custom Elements) sites.  
+![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?logo=nuxt.js&logoColor=white)
+![Nuxt UI](https://img.shields.io/badge/Nuxt%20UI-4.x-00DC82?logo=nuxt.js&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38BDF8?logo=tailwindcss&logoColor=white)
+
+A production-ready Nuxt 4 layer/base theme for decoupled Drupal (Lupus Custom Elements) sites.
 Built with Nuxt UI 4 and Tailwind CSS 4 for SSR-friendly, SEO-aware, content-driven web apps.
 
 Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, content hubs, and custom page-builder experiences.
@@ -39,10 +43,11 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
-- **[Nuxt 4](https://nuxt.com/)**: `^4.3.1`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.5.0`
-- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.2.1`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.5.3`
+
+- **[Nuxt 4](https://nuxt.com/)**: `^4.4.2`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.7.1`
+- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.2.4`
+- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.6.1`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
 <!-- tech-stack:end -->
 
@@ -113,7 +118,7 @@ pnpm build
 
 ## Dependency Update Policy
 
-Use `pnpm deps:update:safe` for routine updates.  
+Use `pnpm deps:update:safe` for routine updates.
 See `docs/dependency-update-policy.md` for the full policy.
 
 ## Plausible Migration Note (April 1, 2026)
