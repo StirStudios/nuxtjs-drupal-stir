@@ -73,7 +73,7 @@ function getErrorPayload(
     >
       <LazySiteBreadcrumbs v-if="theme.crumbs" />
       <component :is="renderCustomElements(page.content)" v-if="page?.content" />
-      <LazyRegionArea area="after_main" />
+      <LazyRegionArea area="after_main" hydrate-on-visible />
     </slot>
   </NuxtLayout>
 </template>

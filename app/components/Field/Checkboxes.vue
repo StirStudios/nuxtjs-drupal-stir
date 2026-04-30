@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformOptionProperties, WebformState } from '../../../types'
 import { useEventBus } from '@vueuse/core'
-import { cleanHTML } from '~/utils/cleanHTML'
 import { enforceGroupLimit, enforceMaxSelected } from '~/utils/selectionUtils'
 import { normalizeValue } from '~/utils/stringUtils'
 import { handleTabChange } from '~/utils/visibilityUtils'
@@ -12,7 +11,6 @@ const props = defineProps<{
   state: WebformState
 }>()
 
-const descriptionContent = shallowRef<string>('')
 const tabBus = useEventBus<string>('tab-changed')
 let stopTabBus: (() => void) | null = null
 
@@ -20,7 +18,6 @@ onMounted(() => {
   if (!Array.isArray(props.state[props.fieldName])) {
     props.state[props.fieldName] = []
   }
-  descriptionContent.value = cleanHTML(props.field['#description'] || '')
 
   stopTabBus = tabBus.on((tabValue: string) => {
     handleTabChange(

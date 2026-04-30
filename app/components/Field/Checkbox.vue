@@ -9,7 +9,6 @@ const props = defineProps<{
   state: Record<string, boolean | string>
 }>()
 
-const descriptionContent = shallowRef('')
 const checkboxValue = ref<boolean>(false)
 const optionProps = props.field['#optionProperties'] || {}
 const checkboxId = computed(
@@ -18,14 +17,15 @@ const checkboxId = computed(
 const checkboxLabel = computed(() =>
   String(props.field['#title'] || props.fieldName),
 )
+const descriptionContent = computed(() =>
+  cleanHTML(String(props.field['#description'] ?? '')),
+)
 const { disabled, checked } = useEvaluateState(
   props.field['#states'] ?? {},
   props.state,
 )
 
 onMounted(() => {
-  descriptionContent.value = cleanHTML(props.field['#description'] || '')
-
   const initial = Object.prototype.hasOwnProperty.call(
     props.state,
     props.fieldName,
