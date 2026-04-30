@@ -35,7 +35,7 @@
     "@nuxtjs/turnstile": "^1.1.2",
     "@vueuse/core": "^14.2.1",
     "motion-v": "^2.2.1",
-    "nuxt": "^4.4.2",
+    "nuxt": "^4.4.4",
     "nuxt-vitalizer": "^2.0.0",
     "nuxtjs-drupal-ce": "^2.6.1",
     "tailwindcss": "^4.2.4",

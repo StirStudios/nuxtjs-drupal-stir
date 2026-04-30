@@ -149,11 +149,6 @@ export default defineNuxtConfig({
         disableStylesheets: 'entry',
         disablePrefetchLinks: true,
         disablePreloadLinks: false,
-        delayHydration: {
-          hydrateOnEvents: ['mousemove', 'scroll', 'keydown', 'click'],
-          idleCallbackTimeout: 8000,
-          postIdleTimeout: 4000,
-        },
       },
     ],
 

@@ -11,6 +11,6 @@ const { navigation } = useAppConfig().stirTheme
       <slot />
     </UMain>
 
-    <LazyAppFooter />
+    <LazyAppFooter hydrate-on-visible />
   </div>
 </template>

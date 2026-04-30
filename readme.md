@@ -20,7 +20,7 @@ Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, 
 - 📊 Built-in integrations for Turnstile CAPTCHA, Plausible analytics, Sitemap, and Robots
 - ♿ Accessibility-focused defaults (form labeling, semantics, keyboard-aware UI, contrast-friendly text tokens)
 - 🌀 Smooth scrolling and page transitions
-- ⚙️ Vitalizer: Delayed hydration for performance optimization
+- ⚙️ Vitalizer: LCP-focused prefetch and stylesheet optimization
 - 🔐 Environment-aware route rules, protected admin redirects
 - 🧪 ESLint, TypeScript checks, Vitest, and Release It pre-configured
 - 📁 Cloudflare-optimized asset compression via Nitro
@@ -44,7 +44,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 <!-- tech-stack:start -->
 
-- **[Nuxt 4](https://nuxt.com/)**: `^4.4.2`
+- **[Nuxt 4](https://nuxt.com/)**: `^4.4.4`
 - **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.7.1`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.2.4`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.6.1`
