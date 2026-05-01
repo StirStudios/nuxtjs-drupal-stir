@@ -1,4 +1,5 @@
 import { defineEventHandler, createError, getHeader } from 'h3'
+import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -21,10 +22,10 @@ export default defineEventHandler(async (event) => {
   try {
     const cookie = getHeader(event, 'cookie')
     const csrfToken = await $fetch<string>(`${drupalApi}/session/token`, {
-      headers: {
-        ...(cookie ? { cookie: String(cookie) } : {}),
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
-      },
+      headers: buildDrupalHeaders({
+        cookie: cookie ? String(cookie) : undefined,
+        apiKey,
+      }),
     })
 
     return { csrfToken }

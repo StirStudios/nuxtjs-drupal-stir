@@ -1,4 +1,5 @@
 import { defineEventHandler, getHeader } from 'h3'
+import { buildDrupalHeaders } from '../../../utils/drupalHeaders'
 import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
@@ -20,10 +21,10 @@ export default defineEventHandler(async (event) => {
   try {
     return await $fetch<{ ok: boolean; text?: string; format?: string; message?: string }>(readPath, {
       method: 'GET',
-      headers: {
-        ...(cookie ? { cookie: String(cookie) } : {}),
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
-      },
+      headers: buildDrupalHeaders({
+        cookie: cookie ? String(cookie) : undefined,
+        apiKey,
+      }),
     })
   } catch (error) {
     throw createUpstreamParagraphTextError(error, 'Failed to read paragraph text.')

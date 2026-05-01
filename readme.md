@@ -71,6 +71,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
 - `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
+- `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/login` gate
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
@@ -79,6 +80,10 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
+
+Notes:
+- `DRUPAL_API_KEY` is forwarded by server endpoints that call Drupal backend APIs (`x-api-key` header).
+- Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 
 ## 🎨 Styling Conventions
 
