@@ -68,6 +68,11 @@ Use these rules for all changes.
 
 ## Drupal CE integration guidance
 - Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
+- Preserve internal Nuxt CE proxy behavior (`/api/*`) when changing auth/header middleware.
+- API key responsibilities must stay explicit:
+  - Nuxt layer: forwards `x-api-key` on internal proxy/server calls to Drupal.
+  - Drupal/edge: enforces access policy for CE/data endpoints.
+- Do not narrow API-key middleware scope without verifying homepage, CE page fetch, and menu endpoint behavior.
 - Keep schema and mapping assumptions explicit with types or concise inline notes.
 - For custom elements, prefer 1:1 filename mapping in kebab-case
   (example: `node-article-teaser.vue`); fallback components may use `--default` suffix.
@@ -95,6 +100,21 @@ Run relevant checks after changes:
 - `pnpm build`
 - `pnpm generate` (when static output behavior is affected)
 - `pnpm dev` (for local/manual verification when needed)
+
+Validation policy:
+- Default for production-impacting changes: run `pnpm lint`, `pnpm test`, `pnpm test:nuxt`, and `pnpm build`.
+- For docs-only or clearly isolated non-runtime edits, targeted validation is acceptable, but state what was intentionally skipped.
+- Any change touching auth, headers, route middleware, CE fetch/proxy behavior, or runtime config must run the full validation set above.
+
+Security change smoke checklist (required when auth/header/routing behavior changes):
+- Homepage load (`/`) succeeds.
+- One inner CE route succeeds.
+- Menu fetch succeeds.
+- Webform submit proxy path behaves as expected.
+- Paragraph read/update endpoints behave as expected (if enabled).
+
+CI parity:
+- Keep CI tool versions aligned with repository declarations (for example `pnpm/action-setup` version must match `packageManager` in `package.json`).
 
 If checks are skipped, state exactly which were not run and why.
 
