@@ -21,23 +21,6 @@ type PopupBehaviorOptions = {
   cookieKey?: string
 }
 
-function normalizePath(path: string): string {
-  if (!path || path === '/') return '/'
-  return path.endsWith('/') ? path.slice(0, -1) : path
-}
-
-function matchesPopupPath(routePath: string, rule: string): boolean {
-  const normalizedRule = normalizePath(rule.trim())
-  const normalizedRoute = normalizePath(routePath)
-
-  if (!normalizedRule) return false
-  if (normalizedRule === '/') return normalizedRoute === '/'
-  return (
-    normalizedRoute === normalizedRule ||
-    normalizedRoute.startsWith(`${normalizedRule}/`)
-  )
-}
-
 export const usePopupBehavior = ({
   popup,
   config,
@@ -46,7 +29,6 @@ export const usePopupBehavior = ({
   cookieKey = 'marketing_popup',
 }: PopupBehaviorOptions) => {
   const route = useRoute()
-  const appConfig = useAppConfig()
   const { y } = useWindowScroll()
 
   const open = ref(false)
@@ -57,30 +39,6 @@ export const usePopupBehavior = ({
   const hasTriggered = ref(false)
   const readyForPopupTriggers = ref(!import.meta.client)
   const isSuppressed = computed(() => suppress?.value === true)
-
-  const includePaths = computed(() =>
-    (appConfig.popup?.includePaths ?? []).filter(
-      (path): path is string =>
-        typeof path === 'string' && path.trim().length > 0,
-    ),
-  )
-  const excludePaths = computed(() =>
-    (appConfig.popup?.excludePaths ?? []).filter(
-      (path): path is string =>
-        typeof path === 'string' && path.trim().length > 0,
-    ),
-  )
-  const isPopupRouteAllowed = computed(() => {
-    const routePath = route.path
-    const includeMatch =
-      includePaths.value.length === 0 ||
-      includePaths.value.some((path) => matchesPopupPath(routePath, path))
-    const excludeMatch = excludePaths.value.some((path) =>
-      matchesPopupPath(routePath, path),
-    )
-
-    return includeMatch && !excludeMatch
-  })
   const shouldRenderPopupContent = computed(() => open.value)
 
   let delayTimer: ReturnType<typeof setTimeout> | null = null
@@ -168,7 +126,6 @@ export const usePopupBehavior = ({
 
   const showModalOnce = () => {
     if (isSuppressed.value) return
-    if (!isPopupRouteAllowed.value) return
     if (open.value || (config.value.showOnce && seen.value === true)) return
 
     open.value = true
@@ -182,7 +139,6 @@ export const usePopupBehavior = ({
     if (!import.meta.client) return
     if (isSuppressed.value) return
     if (!popup.value) return
-    if (!isPopupRouteAllowed.value) return
     if (hasTriggered.value) return
 
     hasTriggered.value = true
@@ -233,11 +189,28 @@ export const usePopupBehavior = ({
     },
   )
 
+  // Re-arm popup triggers when popup content/config changes without UUID changes
+  // (e.g. schedule edits on nested items in the same popup paragraph).
   watch(
-    [popup, readyForPopupTriggers, isPopupRouteAllowed, isSuppressed],
-    ([popupNode, isReady, isRouteAllowed, suppressed]) => {
+    () => ({
+      popup: popup.value,
+      config: config.value,
+    }),
+    () => {
       cleanupTriggerHandlers()
-      if (popupNode && isReady && isRouteAllowed && !suppressed) {
+      hasTriggered.value = false
+      if (isSuppressed.value) {
+        open.value = false
+      }
+    },
+    { deep: true },
+  )
+
+  watch(
+    [popup, readyForPopupTriggers, isSuppressed],
+    ([popupNode, isReady, suppressed]) => {
+      cleanupTriggerHandlers()
+      if (popupNode && isReady && !suppressed) {
         handleTrigger()
       }
     },
@@ -249,9 +222,6 @@ export const usePopupBehavior = ({
     () => {
       hasTriggered.value = false
       cleanupTriggerHandlers()
-      if (!isPopupRouteAllowed.value) {
-        open.value = false
-      }
     },
   )
 
@@ -274,6 +244,5 @@ export const usePopupBehavior = ({
   return {
     open,
     shouldRenderPopupContent,
-    isPopupRouteAllowed,
   }
 }

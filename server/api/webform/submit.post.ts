@@ -1,4 +1,5 @@
 import { defineEventHandler, readBody, createError, getHeader } from 'h3'
+import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 function normalizeErrorStatus(error: unknown): number {
   if (!error || typeof error !== 'object') return 500
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Validate Turnstile CAPTCHA
+    // Require a Turnstile token; Drupal stir_webform_rest performs verification.
     if (!body.turnstile_response) {
       throw createError({
         statusCode: 400,
@@ -69,13 +70,12 @@ export default defineEventHandler(async (event) => {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-CSRF-Token': csrfToken,
+        ...buildDrupalHeaders({ apiKey, csrfToken }),
         ...(origin ? { Origin: origin } : {}),
         ...(referer ? { Referer: referer } : {}),
         ...(forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {}),
         ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
         ...(userAgent ? { 'User-Agent': userAgent } : {}),
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
       },
       body,
     })

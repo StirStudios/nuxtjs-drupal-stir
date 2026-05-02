@@ -1,4 +1,5 @@
 import { createError, defineEventHandler, getHeader, readBody } from 'h3'
+import { buildDrupalHeaders } from '../../../utils/drupalHeaders'
 import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
@@ -34,19 +35,19 @@ export default defineEventHandler(async (event) => {
 
   try {
     const csrfToken = await $fetch<string>(`${drupalBaseUrl}/session/token`, {
-      headers: {
-        ...(cookie ? { cookie: String(cookie) } : {}),
-        ...(apiKey ? { 'x-api-key': apiKey } : {}),
-      },
+      headers: buildDrupalHeaders({
+        cookie: cookie ? String(cookie) : undefined,
+        apiKey,
+      }),
     })
 
     return await $fetch<{ ok: boolean; message?: string }>(savePath, {
       method: 'POST',
       body: { text },
-      headers: {
-        ...(cookie ? { cookie: String(cookie) } : {}),
-        ...(csrfToken ? { 'x-csrf-token': String(csrfToken) } : {}),
-      },
+      headers: buildDrupalHeaders({
+        cookie: cookie ? String(cookie) : undefined,
+        csrfToken: csrfToken ? String(csrfToken) : undefined,
+      }),
     })
   } catch (error) {
     throw createUpstreamParagraphTextError(error, 'Failed to save paragraph text.')

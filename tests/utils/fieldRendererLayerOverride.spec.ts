@@ -12,9 +12,9 @@ describe('FieldRenderer layer override wiring', () => {
     const source = readFileSync(rendererPath, 'utf8')
 
     expect(source).toContain('from \'#components\'')
-    expect(source).toContain('textfield: FieldInput')
-    expect(source).toContain('number: FieldInputNumber')
-    expect(source).toContain('range: FieldInputSlider')
+    expect(source).toContain('textfield: LazyFieldInput')
+    expect(source).toContain('number: LazyFieldInputNumber')
+    expect(source).toContain('range: LazyFieldInputSlider')
 
     expect(source).not.toContain('import(\'~/components/Field/Input.vue\')')
     expect(source).not.toContain(

@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const password =
     typeof body?.password === 'string' ? body.password : undefined
-  const expectedPassword = config.public.protectedPassword
+  const expectedPassword = config.protectedPassword
 
   if (!password || !expectedPassword || password !== expectedPassword) {
     throw createError({
