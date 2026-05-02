@@ -4,10 +4,9 @@ export default defineNitroPlugin((nitroApp) => {
     const apiKey = config.apiKey
 
     const path = event.node.req.url || ''
-    const requiresDrupalApiKey =
-      path.startsWith('/api/menu/') || path.startsWith('/api/drupal-ce/')
+    const isInternalApiRoute = path.startsWith('/api/')
 
-    if (requiresDrupalApiKey && typeof apiKey === 'string' && apiKey.trim().length > 0) {
+    if (isInternalApiRoute && typeof apiKey === 'string' && apiKey.trim().length > 0) {
       event.node.req.headers['x-api-key'] = apiKey
     }
   })
