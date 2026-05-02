@@ -17,7 +17,6 @@ export function buildDrupalHeaders(options: DrupalHeaderOptions = {}): Record<st
 
   if (typeof options.csrfToken === 'string' && options.csrfToken.trim()) {
     headers['x-csrf-token'] = options.csrfToken
-    headers['X-CSRF-Token'] = options.csrfToken
   }
 
   return headers

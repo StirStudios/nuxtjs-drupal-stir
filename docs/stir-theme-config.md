@@ -111,15 +111,11 @@ Migration note:
 ```ts
 popup: {
   enabled: false, // global mount switch for <LazyAppPopup />
-  includePaths: [], // optional allowlist; empty = all routes
-  excludePaths: [], // optional blocklist; takes precedence over includePaths
 }
 ```
 
-Popup path matching rules:
-
-- `'/'` matches only homepage.
-- Non-root entries use exact-or-prefix matching (for example `'/pricing'` matches `/pricing` and `/pricing/team`).
+Popup visibility should be controlled in Drupal block visibility settings
+(Show/Hide for listed pages). Nuxt no longer applies route allow/block lists.
 
 ### 🍪 `privacyNotice`
 

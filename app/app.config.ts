@@ -44,8 +44,6 @@ export default defineAppConfig({
 
   popup: {
     enabled: false,
-    includePaths: [],
-    excludePaths: [],
   },
 
   analytics: {

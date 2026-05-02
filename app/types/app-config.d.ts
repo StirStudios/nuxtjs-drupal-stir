@@ -41,8 +41,6 @@ type PrivacyNoticeConfig = {
 
 type PopupConfig = {
   enabled?: boolean
-  includePaths?: string[]
-  excludePaths?: string[]
 } & LooseRecord
 
 type ColorModeConfig = {
