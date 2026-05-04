@@ -13,7 +13,8 @@ export function useAuthSession() {
   )
 
   const fetchSession = async () => {
-    const session = await $fetch<AuthSessionResponse>('/api/auth/session')
+    const requestFetch = useRequestFetch()
+    const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
 
     loggedIn.value = Boolean(session?.authenticated)
     protectedLoggedIn.value = Boolean(session?.protectedAuthenticated)
