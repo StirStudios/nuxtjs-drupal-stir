@@ -31,6 +31,7 @@ export default defineAppConfig({
     requireLoginPaths: [],
     loginPath: '/auth/protected',
     redirectOnLogin: '/',
+    allowAuthenticatedUserBypass: true,
   },
 
   userway: {

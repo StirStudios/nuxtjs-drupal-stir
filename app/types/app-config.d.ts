@@ -5,6 +5,7 @@ type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
   loginPath?: string
     redirectOnLogin?: string
+  allowAuthenticatedUserBypass?: boolean
 } & LooseRecord
 
 type PlausibleConfig = {

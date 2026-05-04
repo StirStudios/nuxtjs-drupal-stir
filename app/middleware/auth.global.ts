@@ -21,14 +21,22 @@ export default defineNuxtRouteMiddleware(async (to) => {
   )
   const protectedLoginPath = config.loginPath || '/auth/protected'
   const redirectOnLogin = config.redirectOnLogin || '/'
+  const allowAuthenticatedUserBypass =
+    config.allowAuthenticatedUserBypass !== false
   const session = useAuthSession()
 
-  if (to.path === protectedLoginPath) {
-    if (!session.ready.value) {
-      await session.fetchSession()
+  const hasProtectedAccess = () => {
+    if (allowAuthenticatedUserBypass) {
+      return session.loggedIn.value || session.protectedLoggedIn.value
     }
 
-    if (session.protectedLoggedIn.value) {
+    return session.protectedLoggedIn.value
+  }
+
+  if (to.path === protectedLoginPath) {
+    await session.fetchSession()
+
+    if (hasProtectedAccess()) {
       return navigateTo(redirectOnLogin)
     }
   }
@@ -41,11 +49,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!isProtected) return
 
-  if (!session.ready.value) {
-    await session.fetchSession()
-  }
+  // Always re-check on protected route navigation so manual cookie changes are respected.
+  await session.fetchSession()
 
-  if (!session.loggedIn.value && !session.protectedLoggedIn.value) {
+  if (!hasProtectedAccess()) {
     return navigateTo({
       path: protectedLoginPath,
       query: {
