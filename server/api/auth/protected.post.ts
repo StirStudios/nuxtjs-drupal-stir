@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     typeof body?.action === 'string' ? body.action.toLowerCase().trim() : ''
 
   if (action === 'logout') {
-    setCookie(event, 'stir_protected', '', {
+    setCookie(event, 'protected_access', '', {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
@@ -39,15 +39,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  setCookie(event, 'stir_protected', '1', {
+  setCookie(event, 'protected_access', '1', {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 12,
+    maxAge: 60 * 60 * 24 * 7,
   })
 
-  const protectedCookie = getCookie(event, 'stir_protected')
+  const protectedCookie = getCookie(event, 'protected_access')
 
   return {
     protectedAuthenticated: protectedCookie === '1',

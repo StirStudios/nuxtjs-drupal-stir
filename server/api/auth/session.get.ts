@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const drupalApi = String(
     drupalCeConfig.drupalBaseUrl || config.public.api || '',
   ).replace(/\/+$/, '')
-  const protectedAuthenticated = getCookie(event, 'stir_protected') === '1'
+  const protectedAuthenticated = getCookie(event, 'protected_access') === '1'
 
   if (!drupalApi) {
     return {
