@@ -1,9 +1,30 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
 
+type ScrollButtonTheme = {
+  showAtScrollY?: number
+  base?: string
+  variant?: string
+  icon?: string
+}
+
 const { y } = useWindowScroll()
-const theme = useAppConfig().stirTheme.scrollButton
-const showButton = computed(() => y.value > (theme.showAtScrollY ?? 200))
+const appConfig = useAppConfig()
+
+const theme = computed<Required<ScrollButtonTheme>>(() => {
+  const configured = (appConfig.stirTheme?.scrollButton || {}) as ScrollButtonTheme
+
+  return {
+    showAtScrollY: Number(configured.showAtScrollY ?? 200),
+    base:
+      configured.base ||
+      'fixed right-6 bottom-6 z-40 rounded-full transition-opacity duration-300',
+    variant: configured.variant || 'soft',
+    icon: configured.icon || 'i-lucide-chevron-up',
+  }
+})
+
+const showButton = computed(() => y.value > theme.value.showAtScrollY)
 
 const scrollToTop = () => {
   if (!import.meta.client) return

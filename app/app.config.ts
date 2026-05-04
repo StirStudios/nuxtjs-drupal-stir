@@ -29,7 +29,7 @@ export default defineAppConfig({
 
   protectedRoutes: {
     requireLoginPaths: [],
-    loginPath: '/login',
+    loginPath: '/auth/protected',
     redirectOnLogin: '/',
   },
 
@@ -217,131 +217,56 @@ export default defineAppConfig({
         staggerMs: 250,
         ease: [0.22, 1, 0.36, 1],
       },
+      parallax: {
+        speed: 0.2,
+      },
     },
 
-    scrollButton: {
-      enabled: true,
-      base: 'fixed bottom-4 left-4 z-50 rounded-full p-2 shadow-md transition-opacity duration-300',
-      icon: 'i-lucide-arrow-up',
-      variant: 'solid',
-      showAtScrollY: 200,
-    },
+    paragraph: {
+      text: {
+        wrapper: 'my-8',
+      },
 
-    error: {
-      label: 'Back to home',
-      color: 'primary',
-      size: 'xl',
-      icon: 'i-lucide-arrow-left',
-      variant: 'solid',
-    },
-  },
+      card: {
+        base: 'mx-auto max-w-6xl grid lg:grid-cols-2 gap-8 items-center my-16',
+        media: {
+          wrapper: 'relative h-80 overflow-hidden rounded-xl shadow-lg',
+          image: 'h-full w-full object-cover transition-transform duration-500 hover:scale-105',
+        },
+        body: {
+          wrapper: 'space-y-4',
+        },
+      },
 
-  ui: {
-    colors: {
-      primary: 'lime',
-      neutral: 'zinc',
+      split: {
+        base: 'my-16 grid gap-8 lg:grid-cols-2 items-start',
+        body: {
+          wrapper: 'space-y-4',
+        },
+      },
+
+      gallery: {
+        grid: 'grid grid-cols-2 md:grid-cols-3 gap-4 my-10',
+        item: 'overflow-hidden rounded-lg',
+        image: 'h-48 w-full object-cover transition-transform duration-500 hover:scale-105',
+      },
+
+      quote: {
+        wrapper:
+          'my-12 border-l-4 border-primary/70 pl-6 italic text-xl text-muted',
+      },
+
+      hero: {
+        wrapper: 'relative isolate overflow-hidden rounded-2xl py-20 px-8 text-center my-14',
+        title: 'text-4xl md:text-5xl mb-4',
+        body: 'mx-auto max-w-3xl text-lg text-muted',
+      },
     },
 
     button: {
-      slots: {
-        base: 'transition-all duration-300',
-      },
-      variants: {
-        size: {
-          '2xl': {
-            base: 'px-10 py-3 text-md gap-2',
-          },
-        },
-        variant: {
-          material: materialVariantMuted,
-        },
-      },
-    },
-
-    modal: {
-      slots: {
-        title: 'mb-0',
-      },
-    },
-
-    carousel: {
-      slots: {
-        root: 'group relative focus:outline-none',
-      },
-      variants: {
-        orientation: {
-          horizontal: {
-            container: 'flex-row -ms-0',
-            item: 'ps-0',
-            prev: 'start-5 sm:start-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-            next: 'end-5 sm:end-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-          },
-        },
-      },
-    },
-
-    formField: {
-      slots: {
-        label: 'block font-medium text-default/80',
-        container: 'mt-1',
-        error: 'mt-1 text-error',
-      },
-    },
-
-    input: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    select: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    selectMenu: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    inputNumber: {
-      variants: {
-        size: {
-          md: 'px-2.5 py-1.5 text-base gap-1.5',
-        },
-        variant: {
-          material: materialVariant,
-        },
-      },
-    },
-
-    textarea: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-        variant: 'material',
-      },
+      materialVariant,
+      materialVariantWithPB,
+      materialVariantMuted,
     },
   },
 })

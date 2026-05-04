@@ -4,7 +4,7 @@ type LooseRecord = Record<string, any>
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
   loginPath?: string
-  redirectOnLogin?: string
+    redirectOnLogin?: string
 } & LooseRecord
 
 type PlausibleConfig = {

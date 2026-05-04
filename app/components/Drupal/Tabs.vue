@@ -98,6 +98,10 @@ const drupalCeConfig = computed<DrupalCeConfig>(() => {
 const drupalOrigin = computed(() => getDrupalOrigin(config.public))
 
 const normalizeAdminUrl = (value: string): string => {
+  if (value === '/user/logout' || value.endsWith('/user/logout')) {
+    return '/auth/logout'
+  }
+
   return toDrupalUrl(value, drupalOrigin.value)
 }
 

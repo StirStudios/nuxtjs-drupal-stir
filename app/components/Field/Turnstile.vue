@@ -52,24 +52,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="container">
-    <UFormField>
-      <p
-        v-if="hasLabel"
-        :id="labelId"
-        :class="
-          themeTurnstile.appearance !== 'interaction-only' ? '' : 'sr-only'
-        "
-      >
-        {{ themeTurnstile.label }}
-      </p>
+  <div ref="container" class="text-sm">
+    <p
+      v-if="hasLabel"
+      :id="labelId"
+      :class="themeTurnstile.appearance !== 'interaction-only' ? '' : 'sr-only'"
+    >
+      {{ themeTurnstile.label }}
+    </p>
 
-      <LazyNuxtTurnstile
-        v-if="shouldRenderTurnstile"
-        v-model="turnstileToken"
-        class="max-w-xs overflow-x-hidden"
-        :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
-      />
-    </UFormField>
+    <LazyNuxtTurnstile
+      v-if="shouldRenderTurnstile"
+      v-model="turnstileToken"
+      class="max-w-xs overflow-x-hidden"
+      :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
+    />
   </div>
 </template>

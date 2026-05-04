@@ -1,4 +1,5 @@
 import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
+import { useAuthSession } from '~/composables/auth/useAuthSession'
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {
   const normalizedRule = rule.trim()
@@ -18,17 +19,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
     (path): path is string =>
       typeof path === 'string' && path.trim().length > 0,
   )
-  const loginPath = config.loginPath || '/login'
+  const protectedLoginPath = config.loginPath || '/auth/protected'
   const redirectOnLogin = config.redirectOnLogin || '/'
-  const session =
-    typeof useUserSession === 'function' ? useUserSession() : undefined
+  const session = useAuthSession()
 
-  if (to.path === loginPath && session) {
+  if (to.path === protectedLoginPath) {
     if (!session.ready.value) {
-      await session.fetch()
+      await session.fetchSession()
     }
 
-    if (session.loggedIn.value) {
+    if (session.protectedLoggedIn.value) {
       return navigateTo(redirectOnLogin)
     }
   }
@@ -41,21 +41,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!isProtected) return
 
-  if (!session) {
-    return navigateTo({
-      path: loginPath,
-      query: to.query,
-    })
-  }
-
   if (!session.ready.value) {
-    await session.fetch()
+    await session.fetchSession()
   }
 
-  if (!session.loggedIn.value) {
+  if (!session.loggedIn.value && !session.protectedLoggedIn.value) {
     return navigateTo({
-      path: loginPath,
-      query: to.query,
+      path: protectedLoginPath,
+      query: {
+        ...to.query,
+        redirect: to.fullPath,
+      },
     })
   }
 })

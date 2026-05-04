@@ -3,25 +3,11 @@ import {
   createError,
   defineEventHandler,
   getHeader,
-  readBody,
 } from 'h3'
 import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{
-    identifier?: unknown
-    password?: unknown
-    turnstile_response?: unknown
-  }>(event)
   const config = useRuntimeConfig()
-  const identifier =
-    typeof body?.identifier === 'string' ? body.identifier.trim() : ''
-  const password =
-    typeof body?.password === 'string' ? body.password.trim() : ''
-  const turnstileResponse =
-    typeof body?.turnstile_response === 'string'
-      ? body.turnstile_response.trim()
-      : ''
   const drupalCeConfig =
     config.public.drupalCe && typeof config.public.drupalCe === 'object'
       ? (config.public.drupalCe as Record<string, unknown>)
@@ -29,13 +15,6 @@ export default defineEventHandler(async (event) => {
   const drupalApi = String(
     drupalCeConfig.drupalBaseUrl || config.public.api || '',
   ).replace(/\/+$/, '')
-
-  if (!identifier || !password) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Identifier and password are required',
-    })
-  }
 
   if (!drupalApi) {
     throw createError({
@@ -46,14 +25,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     const cookie = getHeader(event, 'cookie')
-
-    const response = await $fetch.raw(`${drupalApi}/api/auth/login`, {
+    const response = await $fetch.raw(`${drupalApi}/api/auth/logout`, {
       method: 'POST',
-      body: {
-        identifier,
-        password,
-        turnstile_response: turnstileResponse,
-      },
       headers: buildDrupalHeaders({
         cookie: cookie ? String(cookie) : undefined,
         apiKey: String(config.apiKey || ''),
@@ -74,22 +47,15 @@ export default defineEventHandler(async (event) => {
       'statusCode' in error &&
       typeof (error as { statusCode?: unknown }).statusCode === 'number'
         ? (error as { statusCode: number }).statusCode
-        : 401
+        : 500
     const statusMessage =
       typeof error === 'object' &&
       error !== null &&
       'statusMessage' in error &&
       typeof (error as { statusMessage?: unknown }).statusMessage === 'string'
         ? (error as { statusMessage: string }).statusMessage
-        : 'Invalid credentials'
+        : 'Logout failed'
 
-    const isUpstreamNotFound = statusCode === 404
-
-    throw createError({
-      statusCode,
-      statusMessage: isUpstreamNotFound
-        ? `Drupal auth endpoint not found at ${drupalApi}/api/auth/login`
-        : statusMessage,
-    })
+    throw createError({ statusCode, statusMessage })
   }
 })
