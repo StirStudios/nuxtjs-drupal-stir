@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useAuthLogin } from '~/composables/auth/useAuthLogin'
+import { useAuthRegister } from '~/composables/auth/useAuthRegister'
 import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 
-const { fields, turnstileToken, validate, onSubmit, onError, isLoading } =
-  useAuthLogin()
+const { fields, turnstileToken, validate, onSubmit, isLoading } =
+  useAuthRegister()
 const { auth } = useAuthConfig()
 
-const title = computed(() => auth.value.login?.title || 'Login')
+const title = computed(() => auth.value.register?.title || 'Create Account')
 const description = computed(
-  () => auth.value.login?.description || 'Sign in to continue.',
+  () => auth.value.register?.description || 'Create your account to continue.',
 )
 
 useSeoMeta({
@@ -21,16 +21,19 @@ useSeoMeta({
     <AuthCard
       :description="description"
       :fields="fields"
-      icon="i-lucide-lock"
+      icon="i-lucide-user-plus"
       :loading="isLoading"
-      :submit="{ label: 'Continue' }"
+      :submit="{ label: 'Create Account' }"
       :title="title"
       :validate="validate"
-      @error="onError"
       @submit="onSubmit"
     >
       <template #validation>
         <AuthTurnstile v-model="turnstileToken" />
+      </template>
+      <template #footer>
+        Already have an account?
+        <ULink class="text-primary" to="/auth/login">Sign in</ULink>
       </template>
     </AuthCard>
   </AuthPage>

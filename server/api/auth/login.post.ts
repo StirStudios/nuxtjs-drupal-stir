@@ -1,11 +1,9 @@
+import { createError, defineEventHandler, readBody } from 'h3'
 import {
-  appendResponseHeader,
-  createError,
-  defineEventHandler,
-  getHeader,
-  readBody,
-} from 'h3'
-import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+  drupalApiRequest,
+  getDrupalApiConfig,
+  throwDrupalApiError,
+} from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -13,22 +11,14 @@ export default defineEventHandler(async (event) => {
     password?: unknown
     turnstile_response?: unknown
   }>(event)
-  const config = useRuntimeConfig()
+
   const identifier =
     typeof body?.identifier === 'string' ? body.identifier.trim() : ''
-  const password =
-    typeof body?.password === 'string' ? body.password.trim() : ''
+  const password = typeof body?.password === 'string' ? body.password.trim() : ''
   const turnstileResponse =
     typeof body?.turnstile_response === 'string'
       ? body.turnstile_response.trim()
       : ''
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
-  const drupalApi = String(
-    drupalCeConfig.drupalBaseUrl || config.public.api || '',
-  ).replace(/\/+$/, '')
 
   if (!identifier || !password) {
     throw createError({
@@ -37,59 +27,32 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (!drupalApi) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Drupal API base URL is not configured',
-    })
-  }
-
   try {
-    const cookie = getHeader(event, 'cookie')
-
-    const response = await $fetch.raw(`${drupalApi}/api/auth/login`, {
+    return await drupalApiRequest(event, '/api/auth/login', {
       method: 'POST',
       body: {
         identifier,
         password,
         turnstile_response: turnstileResponse,
       },
-      headers: buildDrupalHeaders({
-        cookie: cookie ? String(cookie) : undefined,
-        apiKey: String(config.apiKey || ''),
-      }),
+      forwardCookies: true,
+      forwardSetCookies: true,
     })
-
-    const setCookies = response.headers.getSetCookie?.() ?? []
-
-    for (const setCookie of setCookies) {
-      appendResponseHeader(event, 'set-cookie', setCookie)
-    }
-
-    return response._data
   } catch (error: unknown) {
-    const statusCode =
+    const { baseUrl } = getDrupalApiConfig()
+
+    if (
       typeof error === 'object' &&
       error !== null &&
       'statusCode' in error &&
-      typeof (error as { statusCode?: unknown }).statusCode === 'number'
-        ? (error as { statusCode: number }).statusCode
-        : 401
-    const statusMessage =
-      typeof error === 'object' &&
-      error !== null &&
-      'statusMessage' in error &&
-      typeof (error as { statusMessage?: unknown }).statusMessage === 'string'
-        ? (error as { statusMessage: string }).statusMessage
-        : 'Invalid credentials'
+      (error as { statusCode?: unknown }).statusCode === 404
+    ) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Drupal auth endpoint not found at ${baseUrl}/api/auth/login`,
+      })
+    }
 
-    const isUpstreamNotFound = statusCode === 404
-
-    throw createError({
-      statusCode,
-      statusMessage: isUpstreamNotFound
-        ? `Drupal auth endpoint not found at ${drupalApi}/api/auth/login`
-        : statusMessage,
-    })
+    throwDrupalApiError(error, 'Invalid credentials', 401)
   }
 })

@@ -1,17 +1,17 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import type { LoginResponse } from '~/types/auth'
+import { useAuthActions } from '~/composables/auth/useAuthActions'
+import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 import { useAuthSession } from '~/composables/auth/useAuthSession'
 
 export function useAuthLogin() {
-  const config = useAppConfig().protectedRoutes
-  const heading = computed(() => config?.loginHeading || 'Login')
   const toast = useToast()
   const isLoading = ref(false)
-  const state = reactive({
-    identifier: '' as string,
-    password: '' as string,
-  })
   const turnstileToken = ref('')
+  const { login, getFetchErrorMessage } = useAuthActions()
+  const { loginRedirectPath } = useAuthConfig()
+  const session = useAuthSession()
+  const { onError } = useValidation()
+
   const fields: AuthFormField[] = [
     {
       name: 'identifier',
@@ -28,6 +28,7 @@ export function useAuthLogin() {
       required: true,
     },
   ]
+
   const validate = (formState: { identifier?: string; password?: string }) => {
     const errors: Array<{ name: string; message: string }> = []
 
@@ -47,34 +48,29 @@ export function useAuthLogin() {
 
     return errors
   }
-  const session = useAuthSession()
-  const { onError } = useValidation()
+
   const onSubmit = async (
     event: FormSubmitEvent<{ identifier: string; password: string }>,
   ) => {
     isLoading.value = true
+
     try {
-      const loginResponse = await $fetch<LoginResponse>('/api/auth/login', {
-        method: 'POST',
-        body: {
-          identifier: event.data.identifier?.trim(),
-          password: event.data.password?.trim(),
-          turnstile_response: turnstileToken.value,
-        },
+      const loginResult = await login({
+        identifier: event.data.identifier?.trim(),
+        password: event.data.password?.trim(),
+        turnstile_response: turnstileToken.value,
       })
 
-      await session.fetchSession()
-
-      if (session.loggedIn.value) {
+      if (loginResult.loggedIn) {
         toast.add({
           title: 'Success',
           description: 'Signed in successfully.',
           color: 'success',
         })
-        navigateTo(config?.redirectOnLogin || '/')
+        await navigateTo(loginRedirectPath.value)
       } else {
         const backendAuthenticated = Boolean(
-          loginResponse?.session?.authenticated,
+          loginResult.response?.session?.authenticated,
         )
 
         toast.add({
@@ -88,36 +84,18 @@ export function useAuthLogin() {
         })
       }
     } catch (error: unknown) {
-      const statusMessage =
-        typeof error === 'object' &&
-        error !== null &&
-        'statusMessage' in error &&
-        typeof (error as { statusMessage?: unknown }).statusMessage === 'string'
-          ? (error as { statusMessage: string }).statusMessage
-          : ''
-      const dataError =
-        typeof error === 'object' &&
-        error !== null &&
-        'data' in error &&
-        typeof (error as { data?: { error?: unknown } }).data?.error === 'string'
-          ? (error as { data: { error: string } }).data.error
-          : ''
-
-      const message = dataError || statusMessage || 'Sign-in failed.'
-
       toast.add({
         title: 'Sign-in failed',
-        description: message,
+        description: getFetchErrorMessage(error, 'Sign-in failed.'),
         color: 'error',
       })
+      session.clearSession()
     } finally {
       isLoading.value = false
     }
   }
 
   return {
-    heading,
-    state,
     fields,
     turnstileToken,
     validate,

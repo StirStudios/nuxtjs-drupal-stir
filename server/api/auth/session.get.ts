@@ -1,5 +1,12 @@
-import { defineEventHandler, getCookie, getHeader } from 'h3'
-import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+import { defineEventHandler } from 'h3'
+import {
+  drupalApiRequest,
+  throwDrupalApiError,
+} from '../../utils/drupalApi'
+import {
+  getProtectedAccessSecret,
+  isProtectedAccessAuthenticated,
+} from '../../utils/protectedAccess'
 
 type AuthSessionResponse = {
   authenticated?: boolean
@@ -11,33 +18,18 @@ type AuthSessionResponse = {
 }
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
-  const drupalApi = String(
-    drupalCeConfig.drupalBaseUrl || config.public.api || '',
-  ).replace(/\/+$/, '')
-  const protectedAuthenticated = getCookie(event, 'protected_access') === '1'
-
-  if (!drupalApi) {
-    return {
-      authenticated: false,
-      protectedAuthenticated,
-      user: null,
-    }
-  }
+  const secret = getProtectedAccessSecret()
+  const protectedAuthenticated = secret
+    ? isProtectedAccessAuthenticated(event, secret)
+    : false
 
   try {
-    const cookie = getHeader(event, 'cookie')
-    const response = await $fetch<AuthSessionResponse>(
-      `${drupalApi}/api/auth/session`,
+    const response = await drupalApiRequest<AuthSessionResponse>(
+      event,
+      '/api/auth/session',
       {
-        headers: buildDrupalHeaders({
-          cookie: cookie ? String(cookie) : undefined,
-          apiKey: String(config.apiKey || ''),
-        }),
+        method: 'GET',
+        forwardCookies: true,
       },
     )
 
@@ -51,12 +43,23 @@ export default defineEventHandler(async (event) => {
         roles: response?.roles ?? [],
       },
     }
-  } catch {
-    // Keep auth checks non-fatal so login page can still render.
-    return {
-      authenticated: false,
-      protectedAuthenticated,
-      user: null,
+  } catch (error: unknown) {
+    const statusCode =
+      typeof error === 'object' &&
+      error !== null &&
+      'statusCode' in error &&
+      typeof (error as { statusCode?: unknown }).statusCode === 'number'
+        ? (error as { statusCode: number }).statusCode
+        : 500
+
+    if (statusCode === 500) {
+      return {
+        authenticated: false,
+        protectedAuthenticated,
+        user: null,
+      }
     }
+
+    throwDrupalApiError(error, 'Session fetch failed')
   }
 })

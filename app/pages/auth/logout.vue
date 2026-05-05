@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAuthAccount } from '~/composables/auth/useAuthAccount'
-import { useProtectedSession } from '~/composables/auth/useProtectedSession'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { useAuthActions } from '~/composables/auth/useAuthActions'
+import { useProtectedActions } from '~/composables/auth/useProtectedActions'
+import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 
-const { logout } = useAuthAccount()
-const session = useAuthSession()
-const protectedSession = useProtectedSession()
+const { logout } = useAuthActions()
+const { logout: logoutProtected } = useProtectedActions()
+const { logoutRedirectPath } = useAuthConfig()
 const toast = useToast()
 
 useSeoMeta({
@@ -20,19 +20,9 @@ onMounted(async () => {
   }
 
   try {
-    await $fetch('/api/auth/protected', {
-      method: 'POST',
-      body: { action: 'logout' },
-    })
-    protectedSession.clearSession()
+    await logoutProtected()
   } catch {
     // Best-effort cleanup for optional protected gate session.
-  }
-
-  try {
-    await session.fetchSession()
-  } catch {
-    session.clearSession()
   }
 
   toast.add({
@@ -41,7 +31,7 @@ onMounted(async () => {
     color: 'success',
   })
 
-  await navigateTo('/auth/login')
+  await navigateTo(logoutRedirectPath.value)
 })
 </script>
 

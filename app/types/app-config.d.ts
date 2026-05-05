@@ -4,8 +4,23 @@ type LooseRecord = Record<string, any>
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
   loginPath?: string
-    redirectOnLogin?: string
   allowAuthenticatedUserBypass?: boolean
+} & LooseRecord
+
+type AuthPageCopyConfig = {
+  title?: string
+  description?: string
+} & LooseRecord
+
+type AuthConfig = {
+  loginRedirectPath?: string
+  logoutRedirectPath?: string
+  protectedFallbackRedirectPath?: string
+  login?: AuthPageCopyConfig
+  protectedPage?: AuthPageCopyConfig
+  register?: AuthPageCopyConfig
+  passwordRequest?: AuthPageCopyConfig
+  passwordReset?: AuthPageCopyConfig
 } & LooseRecord
 
 type PlausibleConfig = {
@@ -77,6 +92,7 @@ type StirThemeConfig = {
 declare module 'nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
+    auth?: AuthConfig
     analytics?: AnalyticsConfig
     userway?: UserwayConfig
     privacyNotice?: PrivacyNoticeConfig
@@ -87,6 +103,7 @@ declare module 'nuxt/schema' {
 
   interface AppConfig {
     protectedRoutes: ProtectedRoutesConfig
+    auth: AuthConfig
     analytics: AnalyticsConfig
     userway: UserwayConfig
     privacyNotice: PrivacyNoticeConfig

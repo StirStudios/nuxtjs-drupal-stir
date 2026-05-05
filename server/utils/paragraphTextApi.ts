@@ -1,4 +1,5 @@
 import { createError } from 'h3'
+import { getDrupalApiConfig } from './drupalApi'
 
 function normalizeEndpoint(value: unknown): string {
   const raw = typeof value === 'string' ? value.trim() : ''
@@ -34,18 +35,10 @@ export function resolveParagraphTextApiConfig(config: ReturnType<typeof useRunti
     config.public.drupalCe && typeof config.public.drupalCe === 'object'
       ? (config.public.drupalCe as Record<string, unknown>)
       : {}
-  const drupalBaseUrl = normalizeBaseUrl(drupalCeConfig.drupalBaseUrl || config.public.api)
+  const drupalApi = getDrupalApiConfig()
+  const drupalBaseUrl = normalizeBaseUrl(drupalApi.baseUrl)
   const ceApiEndpoint = normalizeEndpoint(drupalCeConfig.ceApiEndpoint)
-  const apiKey = typeof config.apiKey === 'string' && config.apiKey.trim()
-    ? config.apiKey
-    : ''
-
-  if (!drupalBaseUrl) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Drupal API base URL is not configured',
-    })
-  }
+  const apiKey = drupalApi.apiKey
 
   return {
     apiKey,

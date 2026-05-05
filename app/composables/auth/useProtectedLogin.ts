@@ -1,12 +1,13 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import { useProtectedSession } from '~/composables/auth/useProtectedSession'
+import { useProtectedActions } from '~/composables/auth/useProtectedActions'
+import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 
 export function useProtectedLogin() {
-  const config = useAppConfig().protectedRoutes
   const toast = useToast()
   const isLoading = ref(false)
   const route = useRoute()
-  const protectedSession = useProtectedSession()
+  const { login } = useProtectedActions()
+  const { protectedFallbackRedirectPath } = useAuthConfig()
 
   const fields: AuthFormField[] = [
     {
@@ -31,19 +32,14 @@ export function useProtectedLogin() {
   ) => {
     isLoading.value = true
     try {
-      await $fetch('/api/auth/protected', {
-        method: 'POST',
-        body: {
-          password: event.data.password?.trim(),
-        },
-      })
-      await protectedSession.fetchSession()
+      const hasAccess = await login(event.data.password?.trim())
 
-      if (protectedSession.loggedIn.value) {
+      if (hasAccess) {
         const redirectTarget =
-          typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+          typeof route.query.redirect === 'string' &&
+          route.query.redirect.startsWith('/')
             ? route.query.redirect
-            : config?.redirectOnLogin || '/'
+            : protectedFallbackRedirectPath.value
 
         await navigateTo(redirectTarget)
       }

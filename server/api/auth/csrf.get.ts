@@ -1,29 +1,17 @@
-import { defineEventHandler, createError, getHeader } from 'h3'
+import { createError, defineEventHandler } from 'h3'
+import {
+  getForwardedCookie,
+  getDrupalApiConfig,
+} from '../../utils/drupalApi'
 import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
-  const drupalApi = String(drupalCeConfig.drupalBaseUrl || config.public.api || '').replace(/\/+$/, '')
-  const apiKey = typeof config.apiKey === 'string' && config.apiKey.trim()
-    ? config.apiKey
-    : ''
-
-  if (typeof drupalApi !== 'string' || !drupalApi.trim()) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Drupal API base URL is not configured',
-    })
-  }
+  const { baseUrl, apiKey } = getDrupalApiConfig()
 
   try {
-    const cookie = getHeader(event, 'cookie')
-    const csrfToken = await $fetch<string>(`${drupalApi}/session/token`, {
+    const csrfToken = await $fetch<string>(`${baseUrl}/session/token`, {
       headers: buildDrupalHeaders({
-        cookie: cookie ? String(cookie) : undefined,
+        cookie: getForwardedCookie(event),
         apiKey,
       }),
     })

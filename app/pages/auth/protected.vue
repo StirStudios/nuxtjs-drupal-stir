@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { useProtectedLogin } from '~/composables/auth/useProtectedLogin'
+import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 
 const { fields, validate, onSubmit, isLoading } = useProtectedLogin()
+const { auth } = useAuthConfig()
+
+const title = computed(
+  () => auth.value.protectedPage?.title || 'Protected Access',
+)
+const description = computed(
+  () =>
+    auth.value.protectedPage?.description ||
+    'Enter the page password to continue.',
+)
 
 useSeoMeta({
   robots: 'noindex, nofollow',
@@ -9,23 +20,16 @@ useSeoMeta({
 </script>
 
 <template>
-  <div
-    class="relative flex h-screen w-screen flex-col items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-4 text-center"
-    role="presentation"
-  >
-    <main class="w-full max-w-md" role="main">
-      <UPageCard class="bg-default/90 w-full rounded-lg shadow-lg">
-        <UAuthForm
-          description="Enter the page password to continue."
-          :fields="fields"
-          icon="i-lucide-shield-check"
-          :loading="isLoading"
-          :submit="{ label: 'Continue' }"
-          title="Protected Access"
-          :validate="validate"
-          @submit="onSubmit"
-        />
-      </UPageCard>
-    </main>
-  </div>
+  <AuthPage>
+    <AuthCard
+      :description="description"
+      :fields="fields"
+      icon="i-lucide-shield-check"
+      :loading="isLoading"
+      :submit="{ label: 'Continue' }"
+      :title="title"
+      :validate="validate"
+      @submit="onSubmit"
+    />
+  </AuthPage>
 </template>

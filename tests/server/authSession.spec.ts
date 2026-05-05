@@ -19,13 +19,17 @@ describe('/api/auth/session', () => {
       apiKey: 'api-key',
       public: { api: 'https://cms.example.test' },
     }))
-    vi.stubGlobal('$fetch', vi.fn().mockResolvedValue({
-      authenticated: true,
-      uid: 10,
-      name: 'Demo',
-      mail: 'demo@example.test',
-      roles: ['authenticated'],
-    }))
+    vi.stubGlobal('$fetch', {
+      raw: vi.fn().mockResolvedValue({
+        _data: {
+          authenticated: true,
+          uid: 10,
+          name: 'Demo',
+          mail: 'demo@example.test',
+          roles: ['authenticated'],
+        },
+      }),
+    })
 
     const response = await sessionHandler(mockEvent)
 
