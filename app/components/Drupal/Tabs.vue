@@ -98,8 +98,28 @@ const drupalCeConfig = computed<DrupalCeConfig>(() => {
 const drupalOrigin = computed(() => getDrupalOrigin(config.public))
 
 const normalizeAdminUrl = (value: string): string => {
-  if (value === '/user/logout' || value.endsWith('/user/logout')) {
+  const trimmed = value.trim()
+  const normalizedPath = (() => {
+    if (trimmed.startsWith('/')) {
+      return trimmed.split('?')[0]
+    }
+
+    try {
+      const url = new URL(trimmed)
+      return url.pathname
+    } catch {
+      return trimmed
+    }
+  })()
+
+  if (normalizedPath === '/user/logout' || normalizedPath.endsWith('/user/logout')) {
     return '/auth/logout'
+  }
+  if (normalizedPath === '/user/login' || normalizedPath.endsWith('/user/login')) {
+    return '/auth/login'
+  }
+  if (normalizedPath === '/user/password' || normalizedPath.endsWith('/user/password')) {
+    return '/auth/password'
   }
 
   return toDrupalUrl(value, drupalOrigin.value)

@@ -99,24 +99,6 @@ export default defineNuxtConfig({
     '/login': {
       robots: false,
     },
-    '/admincontrol': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/login`,
-        statusCode: 302,
-      },
-    },
-    '/admincontrol/login': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/login`,
-        statusCode: 302,
-      },
-    },
-    '/admincontrol/password': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/password`,
-        statusCode: 302,
-      },
-    },
   },
 
   icon: {
