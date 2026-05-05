@@ -31,7 +31,7 @@ useSeoMeta({
       @submit="onSubmit"
     >
       <template #validation>
-        <AuthTurnstile v-model="turnstileToken" />
+        <FieldTurnstile v-model="turnstileToken" />
       </template>
       <template #footer>
         <ULink class="text-primary" to="/auth/login">Back to login</ULink>

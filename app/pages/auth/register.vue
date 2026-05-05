@@ -29,7 +29,7 @@ useSeoMeta({
       @submit="onSubmit"
     >
       <template #validation>
-        <AuthTurnstile v-model="turnstileToken" />
+        <FieldTurnstile v-model="turnstileToken" />
       </template>
       <template #footer>
         Already have an account?

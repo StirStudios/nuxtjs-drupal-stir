@@ -30,7 +30,7 @@ useSeoMeta({
       @submit="onSubmit"
     >
       <template #validation>
-        <AuthTurnstile v-model="turnstileToken" />
+        <FieldTurnstile v-model="turnstileToken" />
       </template>
     </AuthCard>
   </AuthPage>
