@@ -129,15 +129,10 @@ const normalizeAdminUrl = (value: string): string => {
 }
 
 const getAccountMenuUrl = (): string => {
-  const menuBaseUrl = String(drupalCeConfig.value.menuBaseUrl || '').replace(/\/$/, '')
-  const drupalBaseUrl = String(drupalCeConfig.value.drupalBaseUrl || '').replace(/\/$/, '')
-  const ceApiEndpoint = String(drupalCeConfig.value.ceApiEndpoint || '/ce-api')
-  const normalizedCeApiEndpoint = ceApiEndpoint.startsWith('/') ? ceApiEndpoint : `/${ceApiEndpoint}`
   const menuEndpoint = String(drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$')
   const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
-  const baseUrl = menuBaseUrl || `${drupalBaseUrl}${normalizedCeApiEndpoint}`
 
-  return `${baseUrl}/${menuPath}`
+  return `/api/menu/${menuPath}`
 }
 
 const loadAccountMenu = async () => {
