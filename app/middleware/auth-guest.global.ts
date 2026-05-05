@@ -20,4 +20,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (session.loggedIn.value) {
     return navigateTo(redirectPath)
   }
+
+  if (to.path === '/auth/register') {
+    const requestFetch = useRequestFetch()
+    const policy = await requestFetch<{ allowed?: boolean }>(
+      '/api/auth/register-policy',
+    )
+
+    if (!policy?.allowed) {
+      return navigateTo('/auth/login')
+    }
+  }
 })

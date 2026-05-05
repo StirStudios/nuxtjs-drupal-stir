@@ -106,6 +106,7 @@ const normalizeAdminUrl = (value: string): string => {
 
     try {
       const url = new URL(trimmed)
+
       return url.pathname
     } catch {
       return trimmed
@@ -115,9 +116,11 @@ const normalizeAdminUrl = (value: string): string => {
   if (normalizedPath === '/user/logout' || normalizedPath.endsWith('/user/logout')) {
     return '/auth/logout'
   }
+
   if (normalizedPath === '/user/login' || normalizedPath.endsWith('/user/login')) {
     return '/auth/login'
   }
+
   if (normalizedPath === '/user/password' || normalizedPath.endsWith('/user/password')) {
     return '/auth/password'
   }
