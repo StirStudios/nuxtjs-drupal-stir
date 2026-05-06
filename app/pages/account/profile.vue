@@ -21,24 +21,7 @@ const profileTabs = [
   { label: 'Profile', icon: 'i-lucide-user-round', slot: 'profile' },
   { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
 ]
-const emailFieldName = computed(() => {
-  const preferred = ['mail', 'account_email', 'email']
-
-  for (const key of preferred) {
-    if (fields.value.some((field) => field.name === key)) {
-      return key
-    }
-  }
-
-  const inferred = fields.value.find((field) => /mail|email/i.test(field.name))
-
-  return inferred?.name || null
-})
-const hasProfileSave = computed(
-  () => editableFields.value.length > 0 || emailFieldName.value !== null,
-)
-const isFieldEditable = (field: { name: string; editable: boolean }): boolean =>
-  field.name === emailFieldName.value || field.editable
+const hasProfileSave = computed(() => editableFields.value.length > 0)
 
 const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
   if (type === 'text_long' || type === 'string_long') {
@@ -76,27 +59,11 @@ onMounted(async () => {
   }
 
   await load()
-  if (emailFieldName.value && typeof values.value[emailFieldName.value] !== 'string') {
-    values.value[emailFieldName.value] =
-      (session.user.value?.mail as string | undefined) || ''
-  }
   isReady.value = true
 })
 
 const onSubmit = async () => {
   try {
-    const currentEmail =
-      emailFieldName.value && typeof values.value[emailFieldName.value] === 'string'
-        ? values.value[emailFieldName.value].trim()
-        : ''
-
-    if (currentEmail.length > 0) {
-      await $fetch('/api/account/email', {
-        method: 'PATCH',
-        body: { mail: currentEmail },
-      })
-    }
-
     const response = await save()
 
     if (response?.updated) {
@@ -210,26 +177,26 @@ const onCancelAccount = async () => {
                 <UCheckbox
                   v-if="getFieldType(field.type) === 'checkbox'"
                   v-model="values[field.name]"
-                  :disabled="!isFieldEditable(field)"
+                  :disabled="!field.editable"
                 />
 
                 <UTextarea
                   v-else-if="getFieldType(field.type) === 'textarea'"
                   v-model="values[field.name]"
-                  :disabled="!isFieldEditable(field)"
+                  :disabled="!field.editable"
                   :rows="4"
                 />
 
                 <USelect
                   v-else-if="getFieldType(field.type) === 'select'"
                   v-model="values[field.name]"
-                  :disabled="!isFieldEditable(field)"
+                  :disabled="!field.editable"
                   :items="toSelectItems(field)"
                   label-key="label"
                   value-key="value"
                 />
 
-                <UInput v-else v-model="values[field.name]" :disabled="!isFieldEditable(field)" type="text" />
+                <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
               </UFormField>
             </div>
 
