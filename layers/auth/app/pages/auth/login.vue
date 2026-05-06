@@ -29,6 +29,11 @@ useSeoMeta({
       @error="onError"
       @submit="onSubmit"
     >
+      <template #password-hint>
+        <ULink class="text-primary font-medium" to="/auth/password/request">
+          Forgot password?
+        </ULink>
+      </template>
       <template #validation>
         <FieldTurnstile v-model="turnstileToken" />
       </template>

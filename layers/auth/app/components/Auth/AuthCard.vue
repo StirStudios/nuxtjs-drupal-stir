@@ -28,6 +28,9 @@ defineEmits<{
       @error="$emit('error', $event)"
       @submit="$emit('submit', $event)"
     >
+      <template #password-hint>
+        <slot name="password-hint" />
+      </template>
       <template #validation>
         <slot name="validation" />
       </template>
