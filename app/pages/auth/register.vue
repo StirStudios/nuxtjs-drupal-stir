@@ -2,7 +2,16 @@
 import { useAuthRegister } from '~/composables/auth/useAuthRegister'
 import { useAuthConfig } from '~/composables/auth/useAuthConfig'
 
-const { fields, turnstileToken, validate, onSubmit, isLoading } =
+const {
+  fields,
+  turnstileToken,
+  validate,
+  onSubmit,
+  isLoading,
+  registrationComplete,
+  registrationMessage,
+  requiresVerification,
+} =
   useAuthRegister()
 const { auth } = useAuthConfig()
 
@@ -18,7 +27,25 @@ useSeoMeta({
 
 <template>
   <AuthPage>
+    <UPageCard
+      v-if="registrationComplete"
+      class="bg-default/90 w-full rounded-lg shadow-lg"
+    >
+      <UAlert
+        :color="requiresVerification ? 'warning' : 'success'"
+        :description="registrationMessage"
+        icon="i-lucide-mail-check"
+        :title="requiresVerification ? 'Verify your email' : 'Account created'"
+        variant="soft"
+      />
+      <template #footer>
+        <div class="text-sm text-center">
+          <ULink class="text-primary" to="/auth/login">Back to login</ULink>
+        </div>
+      </template>
+    </UPageCard>
     <AuthCard
+      v-else
       :description="description"
       :fields="fields"
       icon="i-lucide-user-plus"

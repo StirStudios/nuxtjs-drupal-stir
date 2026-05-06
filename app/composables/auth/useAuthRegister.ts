@@ -4,6 +4,9 @@ import { useAuthActions } from '~/composables/auth/useAuthActions'
 export function useAuthRegister() {
   const toast = useToast()
   const isLoading = ref(false)
+  const registrationComplete = ref(false)
+  const registrationMessage = ref('')
+  const requiresVerification = ref(false)
   const turnstileToken = ref('')
   const { register, getFetchErrorMessage } = useAuthActions()
 
@@ -69,17 +72,23 @@ export function useAuthRegister() {
       const verificationSent = Boolean(response?.verification_sent)
 
       if (requiresVerification) {
+        registrationComplete.value = true
+        requiresVerification.value = true
+        registrationMessage.value = verificationSent
+          ? 'Check your inbox to verify your account before signing in.'
+          : 'Your account was created and requires email verification before sign-in.'
         toast.add({
           title: verificationSent ? 'Verify your email' : 'Account created',
-          description: verificationSent
-            ? 'Check your inbox to verify your account before signing in.'
-            : 'Your account was created and requires email verification before sign-in.',
+          description: registrationMessage.value,
           color: verificationSent ? 'success' : 'warning',
         })
       } else {
+        registrationComplete.value = true
+        requiresVerification.value = false
+        registrationMessage.value = 'Your account has been created. You can now sign in.'
         toast.add({
           title: 'Account created',
-          description: 'Your account has been created. You can now sign in.',
+          description: registrationMessage.value,
           color: 'success',
         })
       }
@@ -101,6 +110,9 @@ export function useAuthRegister() {
     validate,
     onSubmit,
     isLoading,
+    registrationComplete,
+    registrationMessage,
+    requiresVerification,
     turnstileToken,
   }
 }
