@@ -4,10 +4,13 @@ import { useAuthSession } from '~/composables/auth/useAuthSession'
 
 const toast = useToast()
 const session = useAuthSession()
-const { values, editableFields, loading, saving, load, save } =
+const { fields, values, editableFields, loading, saving, load, save } =
   useAccountProfile()
 
 const isReady = ref(false)
+const currentPassword = ref('')
+const newPassword = ref('')
+const changingPassword = ref(false)
 
 const title = 'Profile'
 const description = 'Update your account profile details.'
@@ -75,6 +78,40 @@ const onSubmit = async () => {
     })
   }
 }
+
+const onChangePassword = async () => {
+  changingPassword.value = true
+  try {
+    await $fetch('/api/account/password', {
+      method: 'PATCH',
+      body: {
+        current_password: currentPassword.value,
+        new_password: newPassword.value,
+      },
+    })
+
+    currentPassword.value = ''
+    newPassword.value = ''
+    toast.add({
+      title: 'Password updated',
+      description: 'Your password was changed successfully.',
+      color: 'success',
+    })
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'statusMessage' in error
+        ? String((error as { statusMessage?: unknown }).statusMessage)
+        : 'Unable to update password.'
+
+    toast.add({
+      title: 'Password update failed',
+      description: message,
+      color: 'error',
+    })
+  } finally {
+    changingPassword.value = false
+  }
+}
 </script>
 
 <template>
@@ -95,7 +132,7 @@ const onSubmit = async () => {
 
       <UForm v-else class="space-y-5" :state="values" @submit="onSubmit">
         <div
-          v-for="field in editableFields"
+          v-for="field in fields"
           :key="field.name"
           class="space-y-2"
         >
@@ -103,23 +140,26 @@ const onSubmit = async () => {
             <UCheckbox
               v-if="getFieldType(field.type) === 'checkbox'"
               v-model="values[field.name]"
+              :disabled="!field.editable"
             />
 
             <UTextarea
               v-else-if="getFieldType(field.type) === 'textarea'"
               v-model="values[field.name]"
+              :disabled="!field.editable"
               :rows="4"
             />
 
             <USelect
               v-else-if="getFieldType(field.type) === 'select'"
               v-model="values[field.name]"
+              :disabled="!field.editable"
               :items="toSelectItems(field)"
               label-key="label"
               value-key="value"
             />
 
-            <UInput v-else v-model="values[field.name]" type="text" />
+            <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
           </UFormField>
         </div>
 
@@ -129,6 +169,21 @@ const onSubmit = async () => {
 
         <UButton :disabled="saving || editableFields.length === 0" :loading="saving" type="submit">
           Save Changes
+        </UButton>
+      </UForm>
+
+      <USeparator class="my-6" />
+
+      <UForm class="space-y-4" @submit="onChangePassword">
+        <h2 class="text-base font-semibold text-highlighted">Change Password</h2>
+        <UFormField label="Current password" name="current_password" required>
+          <UInput v-model="currentPassword" type="password" />
+        </UFormField>
+        <UFormField label="New password" name="new_password" required>
+          <UInput v-model="newPassword" type="password" />
+        </UFormField>
+        <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
+          Update Password
         </UButton>
       </UForm>
     </UPageCard>
