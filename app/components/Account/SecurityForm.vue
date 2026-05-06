@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { FormError } from '@nuxt/ui'
+import { accountPasswordChangeValidationSchema } from '~/utils/authValidation'
+import { mapYupValidationErrors } from '~/utils/yupValidation'
+
 const props = defineProps<{
   currentPassword: string
   newPassword: string
@@ -24,6 +28,20 @@ const onSubmitPassword = () => {
   emit('change-password')
 }
 
+const validate = (state: {
+  currentPassword?: string
+  newPassword?: string
+}): FormError[] => {
+  try {
+    accountPasswordChangeValidationSchema.validateSync(state, {
+      abortEarly: false,
+    })
+    return []
+  } catch (error: unknown) {
+    return mapYupValidationErrors(error)
+  }
+}
+
 const openCancelModal = () => {
   emit('update:cancelModalOpen', true)
 }
@@ -44,8 +62,13 @@ const confirmCancel = () => {
       <p class="text-muted text-sm">Manage your password and account status.</p>
     </div>
 
-    <UForm class="space-y-4" @submit="onSubmitPassword">
-      <UFormField label="Current password" name="current_password" required>
+    <UForm
+      class="space-y-4"
+      :state="{ currentPassword: props.currentPassword, newPassword: props.newPassword }"
+      :validate="validate"
+      @submit="onSubmitPassword"
+    >
+      <UFormField label="Current password" name="currentPassword" required>
         <UInput
           :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.currentPassword"
@@ -64,7 +87,7 @@ const confirmCancel = () => {
           </template>
         </UInput>
       </UFormField>
-      <UFormField label="New password" name="new_password" required>
+      <UFormField label="New password" name="newPassword" required>
         <UInput
           :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.newPassword"

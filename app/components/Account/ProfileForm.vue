@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { FormError } from '@nuxt/ui'
+import { validateProfileValues } from '~/utils/profileValidation'
+
 type ProfileField = {
   name: string
   label: string
@@ -56,6 +59,10 @@ const toSelectItems = (field: {
 const onSubmit = () => {
   emit('submit')
 }
+
+const validate = (state: Record<string, unknown>): FormError[] => {
+  return validateProfileValues(props.fields, state)
+}
 </script>
 
 <template>
@@ -65,7 +72,12 @@ const onSubmit = () => {
       <p class="text-muted text-sm">Update your basic account information.</p>
     </div>
 
-    <UForm class="space-y-5" :state="props.values" @submit="onSubmit">
+    <UForm
+      class="space-y-5"
+      :state="props.values"
+      :validate="validate"
+      @submit="onSubmit"
+    >
       <UFormField
         v-for="field in props.fields"
         :key="field.name"
