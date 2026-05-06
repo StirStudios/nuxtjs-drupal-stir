@@ -58,18 +58,31 @@ export function useAuthRegister() {
     isLoading.value = true
 
     try {
-      await register({
+      const response = await register({
         display_name: event.data.display_name?.trim(),
         email: event.data.email.trim(),
         password: event.data.password.trim(),
         turnstile_response: turnstileToken.value,
       })
 
-      toast.add({
-        title: 'Account created',
-        description: 'Your account has been created. You can now sign in.',
-        color: 'success',
-      })
+      const requiresVerification = Boolean(response?.verification_required)
+      const verificationSent = Boolean(response?.verification_sent)
+
+      if (requiresVerification) {
+        toast.add({
+          title: verificationSent ? 'Verify your email' : 'Account created',
+          description: verificationSent
+            ? 'Check your inbox to verify your account before signing in.'
+            : 'Your account was created and requires email verification before sign-in.',
+          color: verificationSent ? 'success' : 'warning',
+        })
+      } else {
+        toast.add({
+          title: 'Account created',
+          description: 'Your account has been created. You can now sign in.',
+          color: 'success',
+        })
+      }
 
       await navigateTo('/auth/login')
     } catch (error: unknown) {

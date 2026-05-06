@@ -3,6 +3,7 @@ import type {
   PasswordRequestPayload,
   PasswordResetPayload,
   RegisterPayload,
+  RegisterResponse,
 } from '~/types/auth'
 
 export function useAuthApi() {
@@ -22,7 +23,7 @@ export function useAuthApi() {
     })
 
   const register = (payload: RegisterPayload) =>
-    $fetch('/api/auth/register', {
+    $fetch<RegisterResponse>('/api/auth/register', {
       method: 'POST',
       body: payload,
     })

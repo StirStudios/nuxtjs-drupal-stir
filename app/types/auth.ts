@@ -28,6 +28,15 @@ export type RegisterPayload = {
   turnstile_response?: string
 }
 
+export type RegisterResponse = {
+  created?: boolean
+  uid?: number
+  name?: string
+  mail?: string
+  verification_required?: boolean
+  verification_sent?: boolean
+}
+
 export type PasswordRequestPayload = {
   identifier: string
   turnstile_response?: string
