@@ -11,8 +11,6 @@ const isReady = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const changingPassword = ref(false)
-const emailValue = ref('')
-const updatingEmail = ref(false)
 const confirmCancel = ref('')
 const cancelingAccount = ref(false)
 
@@ -22,6 +20,9 @@ const profileTabs = [
   { label: 'Profile', icon: 'i-lucide-user-round', slot: 'profile' },
   { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
 ]
+const hasProfileSave = computed(
+  () => editableFields.value.length > 0 || fields.value.some((field) => field.name === 'mail'),
+)
 
 const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
   if (type === 'text_long' || type === 'string_long') {
@@ -59,15 +60,23 @@ onMounted(async () => {
   }
 
   await load()
-  emailValue.value =
-    typeof values.value.mail === 'string'
-      ? values.value.mail
-      : (session.user.value?.mail as string | undefined) || ''
+  if (typeof values.value.mail !== 'string') {
+    values.value.mail = (session.user.value?.mail as string | undefined) || ''
+  }
   isReady.value = true
 })
 
 const onSubmit = async () => {
   try {
+    const currentEmail = typeof values.value.mail === 'string' ? values.value.mail.trim() : ''
+
+    if (currentEmail.length > 0) {
+      await $fetch('/api/account/email', {
+        method: 'PATCH',
+        body: { mail: currentEmail },
+      })
+    }
+
     const response = await save()
 
     if (response?.updated) {
@@ -88,35 +97,6 @@ const onSubmit = async () => {
       description: message,
       color: 'error',
     })
-  }
-}
-
-const onUpdateEmail = async () => {
-  updatingEmail.value = true
-  try {
-    await $fetch('/api/account/email', {
-      method: 'PATCH',
-      body: { mail: emailValue.value },
-    })
-    values.value.mail = emailValue.value
-    toast.add({
-      title: 'Email updated',
-      description: 'Your email address was updated successfully.',
-      color: 'success',
-    })
-  } catch (error: unknown) {
-    const message =
-      error && typeof error === 'object' && 'statusMessage' in error
-        ? String((error as { statusMessage?: unknown }).statusMessage)
-        : 'Unable to update email.'
-
-    toast.add({
-      title: 'Email update failed',
-      description: message,
-      color: 'error',
-    })
-  } finally {
-    updatingEmail.value = false
   }
 }
 
@@ -245,19 +225,8 @@ const onCancelAccount = async () => {
               No editable profile fields are currently available.
             </div>
 
-            <UButton :disabled="saving || editableFields.length === 0" :loading="saving" type="submit">
+            <UButton :disabled="saving || !hasProfileSave" :loading="saving" type="submit">
               Save Changes
-            </UButton>
-          </UForm>
-
-          <USeparator class="my-6" />
-
-          <UForm class="space-y-4" @submit="onUpdateEmail">
-            <UFormField label="Email address" name="mail" required>
-              <UInput v-model="emailValue" type="email" />
-            </UFormField>
-            <UButton :disabled="updatingEmail" :loading="updatingEmail" type="submit" variant="soft">
-              Update Email
             </UButton>
           </UForm>
         </template>
