@@ -1,11 +1,12 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
     uid?: unknown
     timestamp?: unknown
     hash?: unknown
+    password?: unknown
   }>(event)
 
   const uid =
@@ -17,17 +18,19 @@ export default defineEventHandler(async (event) => {
       ? body.timestamp
       : Number.parseInt(String(body?.timestamp ?? '0'), 10)
   const hash = typeof body?.hash === 'string' ? body.hash.trim() : ''
+  const password = typeof body?.password === 'string' ? body.password.trim() : ''
 
   try {
-    return await drupalApiRequest(event, '/api/auth/password/validate', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/password/reset', {
       method: 'POST',
       body: {
         uid,
         timestamp,
         hash,
+        password,
       },
     })
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Password reset link is invalid or expired', 400)
+    layerAuthThrowDrupalApiError(error, 'Password reset failed')
   }
 })

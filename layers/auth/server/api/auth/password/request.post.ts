@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       : ''
 
   try {
-    return await drupalApiRequest(event, '/api/auth/password/request', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/password/request', {
       method: 'POST',
       body: {
         identifier,
@@ -23,6 +23,6 @@ export default defineEventHandler(async (event) => {
       },
     })
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Password reset request failed')
+    layerAuthThrowDrupalApiError(error, 'Password reset request failed')
   }
 })
