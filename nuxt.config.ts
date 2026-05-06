@@ -1,8 +1,5 @@
 import { createRequire } from 'node:module'
-import { dirname, resolve as resolvePath } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-const layerDir = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
@@ -10,7 +7,6 @@ const isTestEnv =
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-29',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
-  css: [resolvePath(layerDir, 'layers/theme/app/assets/css/main.css')],
 
   features: {
     inlineStyles: true,
@@ -111,7 +107,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'social',
-        dir: resolvePath(layerDir, 'layers/theme/app/assets/icons'),
+        dir: './layers/theme/app/assets/icons',
       },
     ],
   },
