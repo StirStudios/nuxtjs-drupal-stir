@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
-import { type PopupNode, usePopupData } from '~/composables/usePopupData'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
@@ -8,6 +7,11 @@ const { open, shouldRenderPopupContent } = usePopupBehavior({ popup, config })
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),
 )
+
+type PopupNode = {
+  props?: Record<string, unknown>
+  slots?: Record<string, unknown>
+}
 
 type PopupWebform = {
   webformTitle?: string
