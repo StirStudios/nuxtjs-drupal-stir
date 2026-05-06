@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAccountProfile } from '~/composables/account/useAccountProfile'
 import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { accountPasswordChangeValidationSchema } from '~/utils/authValidation'
+import { mapYupValidationErrors } from '~/utils/yupValidation'
 
 const toast = useToast()
 const session = useAuthSession()
@@ -69,6 +71,30 @@ const onSubmit = async () => {
 }
 
 const onChangePassword = async () => {
+  const validationErrors = (() => {
+    try {
+      accountPasswordChangeValidationSchema.validateSync(
+        {
+          currentPassword: currentPassword.value,
+          newPassword: newPassword.value,
+        },
+        { abortEarly: false },
+      )
+      return []
+    } catch (error: unknown) {
+      return mapYupValidationErrors(error)
+    }
+  })()
+
+  if (validationErrors.length > 0) {
+    toast.add({
+      title: 'Password update failed',
+      description: validationErrors[0]?.message || 'Please review your input.',
+      color: 'error',
+    })
+    return
+  }
+
   changingPassword.value = true
   try {
     await $fetch('/api/account/password', {

@@ -1,5 +1,7 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from '~/composables/auth/useAuthActions'
+import { registerValidationSchema } from '~/utils/authValidation'
+import { mapYupValidationErrors } from '~/utils/yupValidation'
 
 export function useAuthRegister() {
   const toast = useToast()
@@ -35,20 +37,16 @@ export function useAuthRegister() {
   ]
 
   const validate = (formState: {
+    display_name?: string
     email?: string
     password?: string
   }) => {
-    const errors: Array<{ name: string; message: string }> = []
-
-    if (!formState.email?.trim()) {
-      errors.push({ name: 'email', message: 'Email is required' })
+    try {
+      registerValidationSchema.validateSync(formState, { abortEarly: false })
+      return []
+    } catch (error: unknown) {
+      return mapYupValidationErrors(error)
     }
-
-    if (!formState.password?.trim()) {
-      errors.push({ name: 'password', message: 'Password is required' })
-    }
-
-    return errors
   }
 
   const onSubmit = async (

@@ -106,6 +106,7 @@ Behavior notes:
 - Turnstile tokens are required in auth form submissions when enabled by backend policy.
 
 See [Auth Integration Guide](./docs/auth-integration.md) for endpoint contracts, deployment notes, and rate-limit recommendations.
+See [Validation Architecture](./docs/validation.md) for Yup validation flow across webforms and auth/account forms.
 
 ## 🎨 Styling Conventions
 
