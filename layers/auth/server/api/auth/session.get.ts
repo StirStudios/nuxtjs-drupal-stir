@@ -2,11 +2,11 @@ import { defineEventHandler } from 'h3'
 import {
   drupalApiRequest,
   throwDrupalApiError,
-} from '~~/server/utils/drupalApi'
+} from '../../utils/drupalApi'
 import {
   getProtectedAccessSecret,
   isProtectedAccessAuthenticated,
-} from '~~/server/utils/protectedAccess'
+} from '../../utils/protectedAccess'
 
 type AuthSessionResponse = {
   authenticated?: boolean

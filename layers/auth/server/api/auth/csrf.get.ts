@@ -2,8 +2,8 @@ import { createError, defineEventHandler } from 'h3'
 import {
   getForwardedCookie,
   getDrupalApiConfig,
-} from '~~/server/utils/drupalApi'
-import { buildDrupalHeaders } from '~~/server/utils/drupalHeaders'
+} from '../../utils/drupalApi'
+import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 export default defineEventHandler(async (event) => {
   const { baseUrl, apiKey } = getDrupalApiConfig()
