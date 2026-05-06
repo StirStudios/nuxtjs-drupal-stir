@@ -19,6 +19,10 @@ const props = defineProps<{
 const emit = defineEmits<{
   submit: []
 }>()
+const themeWebform = (
+  (useAppConfig().stirTheme as { webform?: { variant?: string; fieldInput?: string } })
+    .webform || {}
+)
 
 const getFieldType = (
   type: string,
@@ -78,25 +82,30 @@ const onSubmit = () => {
         <UTextarea
           v-else-if="getFieldType(field.type) === 'textarea'"
           v-model="props.values[field.name]"
+          :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
           :rows="4"
+          :variant="themeWebform.variant"
         />
 
         <USelect
           v-else-if="getFieldType(field.type) === 'select'"
           v-model="props.values[field.name]"
+          :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
           :items="toSelectItems(field)"
           label-key="label"
           value-key="value"
+          :variant="themeWebform.variant"
         />
 
         <UInput
           v-else
           v-model="props.values[field.name]"
-          class="w-full"
+          :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
           type="text"
+          :variant="themeWebform.variant"
         />
       </UFormField>
 

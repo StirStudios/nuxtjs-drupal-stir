@@ -13,6 +13,10 @@ const emit = defineEmits<{
   (e: 'update:cancelModalOpen', value: boolean): void
   (e: 'change-password' | 'cancel-account'): void
 }>()
+const themeWebform = (
+  (useAppConfig().stirTheme as { webform?: { variant?: string; fieldInput?: string } })
+    .webform || {}
+)
 
 const onSubmitPassword = () => {
   emit('change-password')
@@ -41,17 +45,19 @@ const confirmCancel = () => {
     <UForm class="space-y-4" @submit="onSubmitPassword">
       <UFormField label="Current password" name="current_password" required>
         <UInput
-          class="w-full"
+          :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.currentPassword"
           type="password"
+          :variant="themeWebform.variant"
           @update:model-value="emit('update:currentPassword', String($event ?? ''))"
         />
       </UFormField>
       <UFormField label="New password" name="new_password" required>
         <UInput
-          class="w-full"
+          :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.newPassword"
           type="password"
+          :variant="themeWebform.variant"
           @update:model-value="emit('update:newPassword', String($event ?? ''))"
         />
       </UFormField>
