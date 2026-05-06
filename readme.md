@@ -21,7 +21,7 @@ Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, 
 - ♿ Accessibility-focused defaults (form labeling, semantics, keyboard-aware UI, contrast-friendly text tokens)
 - 🌀 Smooth scrolling and page transitions
 - ⚙️ Vitalizer: LCP-focused prefetch and stylesheet optimization
-- 🔐 Environment-aware route rules, protected admin redirects
+- 🔐 Unified Drupal auth UI/routes (`/auth/*`) and optional password-protected route gate
 - 🧪 ESLint, TypeScript checks, Vitest, and Release It pre-configured
 - 📁 Cloudflare-optimized asset compression via Nitro
 
@@ -71,7 +71,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
 - `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
-- `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/login` gate
+- `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
@@ -84,6 +84,28 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 Notes:
 - `DRUPAL_API_KEY` is forwarded by server endpoints that call Drupal backend APIs (`x-api-key` header).
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
+- Auth/session source of truth is server endpoint `/api/auth/session`.
+
+## Auth + Account Integration (stir_account)
+
+This layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
+
+- `/auth/login`
+- `/auth/logout`
+- `/auth/register`
+- `/auth/password/request`
+- `/auth/password/reset`
+- `/auth/verify`
+- `/auth/protected` (optional password-only page gate)
+
+Behavior notes:
+
+- Client auth state comes from `/api/auth/session` only.
+- Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
+- Password reset and verification links are backend-signed and validated before submit.
+- Turnstile tokens are required in auth form submissions when enabled by backend policy.
+
+See [Auth Integration Guide](./docs/auth-integration.md) for endpoint contracts, deployment notes, and rate-limit recommendations.
 
 ## 🎨 Styling Conventions
 
