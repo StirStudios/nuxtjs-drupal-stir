@@ -105,10 +105,10 @@ const suggestedComponentPath = computed(() => {
   if (element.startsWith('paragraph-')) {
     const paragraphName = toPascalCase(element.replace(/^paragraph-/, ''))
 
-    return `app/components/global/Paragraph/${paragraphName}.vue`
+    return `layers/theme/app/components/global/Paragraph/${paragraphName}.vue`
   }
 
-  return `app/components/global/${element}.vue`
+  return `layers/theme/app/components/global/${element}.vue`
 })
 </script>
 

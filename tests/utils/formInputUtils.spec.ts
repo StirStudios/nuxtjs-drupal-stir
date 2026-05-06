@@ -7,7 +7,7 @@ import {
   sanitizeTelValue,
   shouldPreventTelBeforeInput,
   shouldPreventTelKeydown,
-} from '../../app/utils/formInputUtils'
+} from '../../layers/theme/app/utils/formInputUtils'
 
 describe('formInputUtils', () => {
   describe('sanitizeTelValue', () => {

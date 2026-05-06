@@ -10,7 +10,7 @@ const isTestEnv =
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-29',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
-  css: ['~/assets/css/main.css'],
+  css: [resolvePath(layerDir, 'layers/theme/app/assets/css/main.css')],
 
   features: {
     inlineStyles: true,
@@ -111,7 +111,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'social',
-        dir: resolvePath(layerDir, 'app/assets/icons'),
+        dir: resolvePath(layerDir, 'layers/theme/app/assets/icons'),
       },
     ],
   },

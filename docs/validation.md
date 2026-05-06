@@ -5,8 +5,8 @@ This layer uses Yup for client-side validation with two intentionally different 
 ## 1) Dynamic Drupal Webforms
 
 - Entry points:
-  - `app/components/global/Paragraph/Webform.vue`
-  - `app/utils/buildYupSchema.ts`
+  - `layers/theme/app/components/global/Paragraph/Webform.vue`
+  - `layers/theme/app/utils/buildYupSchema.ts`
 - Purpose:
   - Build Yup schemas at runtime from Drupal webform metadata and field states.
 - Notes:
@@ -16,9 +16,9 @@ This layer uses Yup for client-side validation with two intentionally different 
 ## 2) Explicit Auth and Account Forms
 
 - Entry points:
-  - `app/utils/authValidation.ts`
-  - `app/composables/auth/*`
-  - `app/pages/account/profile.vue`
+  - `layers/auth/app/utils/authValidation.ts`
+  - `layers/auth/app/composables/auth/*`
+  - `layers/auth/app/pages/account/profile.vue`
 - Purpose:
   - Use explicit, stable Yup schemas for login, register, password reset, and account password change.
 - Notes:
@@ -27,7 +27,7 @@ This layer uses Yup for client-side validation with two intentionally different 
 
 ## Shared Yup Error Mapping
 
-- Utility: `app/utils/yupValidation.ts`
+- Utility: `layers/auth/app/utils/yupValidation.ts`
 - Purpose:
   - Normalize `ValidationError` objects into Nuxt UI field errors (`{ name, message }[]`).
   - Reused by auth and account flows to keep error behavior consistent.

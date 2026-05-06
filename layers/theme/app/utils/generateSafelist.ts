@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-// Run with: node ./app/utils/generateSafelist.ts
+// Run with: node ./layers/theme/app/utils/generateSafelist.ts
 const breakpoints = ['', 'sm:', 'md:', 'lg:', 'xl:']
 const columns = Array.from({ length: 6 }, (_, i) => `grid-cols-${i + 1}`)
 const spans = Array.from({ length: 3 }, (_, i) => `col-span-${i + 1}`)
@@ -87,7 +87,7 @@ function generateInlineSources(classes: Set<string>): string {
   return lines.join('\n')
 }
 
-const safelistPath = path.resolve('app/assets/css/safelist.inline.css')
+const safelistPath = path.resolve('layers/theme/app/assets/css/safelist.inline.css')
 const inlineCSS = generateInlineSources(safelist)
 
 fs.writeFileSync(safelistPath, inlineCSS)

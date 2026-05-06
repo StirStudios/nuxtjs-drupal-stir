@@ -9,6 +9,8 @@ Included in this layer:
 - Presentation components (`Drupal/*`, `Edit/*`, `Field/*`, `StirPdfViewer.client.vue`)
 - Default app rendering shell (`app/layouts/*`, `app/pages/[...slug].vue`, `app/error.vue`)
 - Reusable visual CE components (`global/*`, `global/Media/*`, most `global/Paragraph/*`)
+- Theme assets and client plugins (`app/assets/*`, `app/plugins/*`, `app/middleware/colorMode.global.ts`)
+- UI composables, UI utilities, and app-local type shims (`app/composables/*`, `app/utils/*`, `app/types/*`)
 
 The base repository enables this layer from root `nuxt.config.ts`:
 
