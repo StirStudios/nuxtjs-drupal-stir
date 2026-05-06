@@ -93,9 +93,9 @@ const confirmCancel = () => {
       </UButton>
     </UForm>
 
-    <div class="border-error/30 bg-error/5 space-y-4 rounded-lg border p-4">
+    <div class="border-error/30 bg-error/5 mt-5 space-y-4 rounded-lg border p-4">
       <div class="space-y-1">
-        <h3 class="text-highlighted text-sm font-semibold">Cancel Account</h3>
+        <h3 class="text-highlighted text-base font-semibold">Cancel Account</h3>
         <p class="text-muted text-sm">
           Cancellation method: disable your account and keep existing content.
         </p>
