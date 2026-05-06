@@ -48,12 +48,19 @@ export function useAuthActions() {
     password: string
   }) => authApi.resetPassword(payload)
 
+  const validatePasswordReset = (payload: {
+    uid: number
+    timestamp: number
+    hash: string
+  }) => authApi.validatePasswordReset(payload)
+
   return {
     login,
     logout,
     register,
     requestPasswordReset,
     resetPassword,
+    validatePasswordReset,
     getFetchErrorMessage,
   }
 }

@@ -48,3 +48,9 @@ export type PasswordResetPayload = {
   hash: string
   password: string
 }
+
+export type PasswordResetValidatePayload = {
+  uid: number
+  timestamp: number
+  hash: string
+}

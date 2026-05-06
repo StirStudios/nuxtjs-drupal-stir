@@ -5,7 +5,11 @@ export function usePasswordReset() {
   const route = useRoute()
   const toast = useToast()
   const isLoading = ref(false)
-  const { resetPassword, getFetchErrorMessage } = useAuthActions()
+  const isCheckingLink = ref(true)
+  const linkValid = ref(false)
+  const linkMessage = ref('Validating reset link...')
+  const { resetPassword, validatePasswordReset, getFetchErrorMessage } =
+    useAuthActions()
 
   const fields: AuthFormField[] = [
     {
@@ -77,9 +81,14 @@ export function usePasswordReset() {
 
       await navigateTo('/auth/login')
     } catch (error: unknown) {
+      linkValid.value = false
+      linkMessage.value = getFetchErrorMessage(
+        error,
+        'Reset link is invalid or expired.',
+      )
       toast.add({
         title: 'Reset failed',
-        description: getFetchErrorMessage(error, 'Password reset failed.'),
+        description: linkMessage.value,
         color: 'error',
       })
     } finally {
@@ -87,10 +96,40 @@ export function usePasswordReset() {
     }
   }
 
+  onMounted(async () => {
+    if (
+      !Number.isInteger(uid.value) ||
+      !Number.isInteger(timestamp.value) ||
+      !hash.value
+    ) {
+      isCheckingLink.value = false
+      linkValid.value = false
+      linkMessage.value = 'Reset link is invalid or incomplete.'
+      return
+    }
+
+    try {
+      await validatePasswordReset({
+        uid: uid.value,
+        timestamp: timestamp.value,
+        hash: hash.value,
+      })
+      linkValid.value = true
+    } catch {
+      linkValid.value = false
+      linkMessage.value = 'This reset link is invalid, expired, or already used.'
+    } finally {
+      isCheckingLink.value = false
+    }
+  })
+
   return {
     fields,
     validate,
     onSubmit,
     isLoading,
+    isCheckingLink,
+    linkValid,
+    linkMessage,
   }
 }

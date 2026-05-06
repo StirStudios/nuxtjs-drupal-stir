@@ -2,6 +2,7 @@ import type {
   LoginResponse,
   PasswordRequestPayload,
   PasswordResetPayload,
+  PasswordResetValidatePayload,
   RegisterPayload,
   RegisterResponse,
 } from '~/types/auth'
@@ -40,6 +41,12 @@ export function useAuthApi() {
       body: payload,
     })
 
+  const validatePasswordReset = (payload: PasswordResetValidatePayload) =>
+    $fetch('/api/auth/password/validate', {
+      method: 'POST',
+      body: payload,
+    })
+
   const loginProtected = (password: string) =>
     $fetch('/api/auth/protected', {
       method: 'POST',
@@ -58,6 +65,7 @@ export function useAuthApi() {
     register,
     requestPasswordReset,
     resetPassword,
+    validatePasswordReset,
     loginProtected,
     logoutProtected,
   }
