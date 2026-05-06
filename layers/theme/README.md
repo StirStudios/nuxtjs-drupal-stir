@@ -6,6 +6,8 @@ Included in this layer:
 - Nuxt app theme config (`app/app.config.ts`)
 - UI variant helpers (`app/utils/uiVariants.ts`)
 - Theme/shell components (`App/*`, `Site/*`, `Icons/*`, `Wrap/*`)
+- Presentation components (`Drupal/*`, `Edit/*`, `Field/*`, `StirPdfViewer.client.vue`)
+- Default app rendering shell (`app/layouts/*`, `app/pages/[...slug].vue`, `app/error.vue`)
 - Reusable visual CE components (`global/*`, `global/Media/*`, most `global/Paragraph/*`)
 
 The base repository enables this layer from root `nuxt.config.ts`:

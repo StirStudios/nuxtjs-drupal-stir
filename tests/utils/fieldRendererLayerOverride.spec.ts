@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 const rendererPath = resolve(
   process.cwd(),
-  'app/components/Field/Renderer.vue',
+  'layers/theme/app/components/Field/Renderer.vue',
 )
 
 describe('FieldRenderer layer override wiring', () => {

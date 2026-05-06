@@ -38,13 +38,13 @@ export default withNuxt(
     },
   },
   {
-    files: ['app/components/global/node--default.vue'],
+    files: ['layers/theme/app/components/global/node--default.vue'],
     rules: {
       'vue/prop-name-casing': 'off',
     },
   },
   {
-    files: ['app/layouts/clear.vue', 'app/layouts/default.vue'],
+    files: ['layers/theme/app/layouts/clear.vue', 'layers/theme/app/layouts/default.vue'],
     rules: {
       'vue/no-multiple-template-root': 'off',
     },
