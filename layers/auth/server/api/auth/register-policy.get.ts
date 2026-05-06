@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../utils/drupalApi'
 
 type RegisterPolicyResponse = {
   allowed: boolean
@@ -8,7 +8,7 @@ type RegisterPolicyResponse = {
 
 export default defineEventHandler(async (event): Promise<RegisterPolicyResponse> => {
   try {
-    return await drupalApiRequest<RegisterPolicyResponse>(
+    return await layerAuthDrupalApiRequest<RegisterPolicyResponse>(
       event,
       '/api/auth/register-policy',
       {

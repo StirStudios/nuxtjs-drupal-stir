@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 type ProfileValuesResponse = {
   values?: Record<string, unknown>
@@ -7,7 +7,7 @@ type ProfileValuesResponse = {
 
 export default defineEventHandler(async (event) => {
   try {
-    return await drupalApiRequest<ProfileValuesResponse>(
+    return await layerAuthDrupalApiRequest<ProfileValuesResponse>(
       event,
       '/api/account/profile/values',
       {
@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Failed to load profile values')
+    layerAuthThrowDrupalApiError(error, 'Failed to load profile values')
   }
 })

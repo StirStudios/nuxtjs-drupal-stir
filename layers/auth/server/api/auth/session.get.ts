@@ -1,11 +1,11 @@
 import { defineEventHandler } from 'h3'
 import {
-  drupalApiRequest,
-  throwDrupalApiError,
+  layerAuthDrupalApiRequest,
+  layerAuthThrowDrupalApiError,
 } from '../../utils/drupalApi'
 import {
-  getProtectedAccessSecret,
-  isProtectedAccessAuthenticated,
+  layerAuthGetProtectedAccessSecret,
+  layerAuthIsProtectedAccessAuthenticated,
 } from '../../utils/protectedAccess'
 
 type AuthSessionResponse = {
@@ -18,13 +18,13 @@ type AuthSessionResponse = {
 }
 
 export default defineEventHandler(async (event) => {
-  const secret = getProtectedAccessSecret()
+  const secret = layerAuthGetProtectedAccessSecret()
   const protectedAuthenticated = secret
-    ? isProtectedAccessAuthenticated(event, secret)
+    ? layerAuthIsProtectedAccessAuthenticated(event, secret)
     : false
 
   try {
-    const response = await drupalApiRequest<AuthSessionResponse>(
+    const response = await layerAuthDrupalApiRequest<AuthSessionResponse>(
       event,
       '/api/auth/session',
       {
@@ -60,6 +60,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    throwDrupalApiError(error, 'Session fetch failed')
+    layerAuthThrowDrupalApiError(error, 'Session fetch failed')
   }
 })

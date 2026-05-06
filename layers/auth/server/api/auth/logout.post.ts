@@ -1,14 +1,14 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   try {
-    return await drupalApiRequest(event, '/api/auth/logout', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/logout', {
       method: 'POST',
       forwardCookies: true,
       forwardSetCookies: true,
     })
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Logout failed')
+    layerAuthThrowDrupalApiError(error, 'Logout failed')
   }
 })

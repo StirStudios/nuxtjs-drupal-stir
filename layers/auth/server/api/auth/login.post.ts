@@ -1,8 +1,8 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import {
-  drupalApiRequest,
-  getDrupalApiConfig,
-  throwDrupalApiError,
+  layerAuthDrupalApiRequest,
+  layerAuthGetDrupalApiConfig,
+  layerAuthThrowDrupalApiError,
 } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await drupalApiRequest(event, '/api/auth/login', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/login', {
       method: 'POST',
       body: {
         identifier,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       forwardSetCookies: true,
     })
   } catch (error: unknown) {
-    const { baseUrl } = getDrupalApiConfig()
+    const { baseUrl } = layerAuthGetDrupalApiConfig()
 
     if (
       typeof error === 'object' &&
@@ -53,6 +53,6 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    throwDrupalApiError(error, 'Invalid credentials', 401)
+    layerAuthThrowDrupalApiError(error, 'Invalid credentials', 401)
   }
 })

@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const token = typeof body?.token === 'string' ? body.token.trim() : ''
 
   try {
-    return await drupalApiRequest(event, '/api/auth/verify', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/verify', {
       method: 'POST',
       body: {
         uid,
@@ -28,6 +28,6 @@ export default defineEventHandler(async (event) => {
       },
     })
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Account verification failed')
+    layerAuthThrowDrupalApiError(error, 'Account verification failed')
   }
 })

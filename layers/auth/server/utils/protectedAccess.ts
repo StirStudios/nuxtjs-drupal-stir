@@ -1,13 +1,13 @@
 import { getCookie, setCookie, type H3Event } from 'h3'
 import {
-  createProtectedAccessToken,
-  verifyProtectedAccessToken,
+  layerAuthCreateProtectedAccessToken,
+  layerAuthVerifyProtectedAccessToken,
 } from './protectedAccessToken'
 
-export const PROTECTED_ACCESS_COOKIE_NAME = 'protected_access'
-export const PROTECTED_ACCESS_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
+export const LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME = 'protected_access'
+export const LAYER_AUTH_PROTECTED_ACCESS_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 
-export const getProtectedAccessSecret = (): string => {
+export const layerAuthGetProtectedAccessSecret = (): string => {
   const config = useRuntimeConfig()
   const explicitSecret = String(config.protectedCookieSecret || '').trim()
 
@@ -16,8 +16,8 @@ export const getProtectedAccessSecret = (): string => {
   return String(config.protectedPassword || '').trim()
 }
 
-export const clearProtectedAccessCookie = (event: H3Event) => {
-  setCookie(event, PROTECTED_ACCESS_COOKIE_NAME, '', {
+export const layerAuthClearProtectedAccessCookie = (event: H3Event) => {
+  setCookie(event, LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME, '', {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
@@ -26,23 +26,23 @@ export const clearProtectedAccessCookie = (event: H3Event) => {
   })
 }
 
-export const setProtectedAccessCookie = (event: H3Event, secret: string) => {
-  const token = createProtectedAccessToken(secret, PROTECTED_ACCESS_MAX_AGE_SECONDS)
+export const layerAuthSetProtectedAccessCookie = (event: H3Event, secret: string) => {
+  const token = layerAuthCreateProtectedAccessToken(secret, LAYER_AUTH_PROTECTED_ACCESS_MAX_AGE_SECONDS)
 
-  setCookie(event, PROTECTED_ACCESS_COOKIE_NAME, token, {
+  setCookie(event, LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: PROTECTED_ACCESS_MAX_AGE_SECONDS,
+    maxAge: LAYER_AUTH_PROTECTED_ACCESS_MAX_AGE_SECONDS,
   })
 }
 
-export const isProtectedAccessAuthenticated = (
+export const layerAuthIsProtectedAccessAuthenticated = (
   event: H3Event,
   secret: string,
 ): boolean => {
-  const token = getCookie(event, PROTECTED_ACCESS_COOKIE_NAME)
+  const token = getCookie(event, LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME)
 
-  return Boolean(token) && verifyProtectedAccessToken(token, secret)
+  return Boolean(token) && layerAuthVerifyProtectedAccessToken(token, secret)
 }

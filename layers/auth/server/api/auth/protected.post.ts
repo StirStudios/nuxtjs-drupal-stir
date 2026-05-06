@@ -1,9 +1,9 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import {
-  clearProtectedAccessCookie,
-  getProtectedAccessSecret,
-  isProtectedAccessAuthenticated,
-  setProtectedAccessCookie,
+  layerAuthClearProtectedAccessCookie,
+  layerAuthGetProtectedAccessSecret,
+  layerAuthIsProtectedAccessAuthenticated,
+  layerAuthSetProtectedAccessCookie,
 } from '../../utils/protectedAccess'
 
 type ProtectedBody = {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     typeof body?.action === 'string' ? body.action.toLowerCase().trim() : ''
 
   if (action === 'logout') {
-    clearProtectedAccessCookie(event)
+    layerAuthClearProtectedAccessCookie(event)
 
     return { protectedAuthenticated: false }
   }
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const secret = getProtectedAccessSecret()
+  const secret = layerAuthGetProtectedAccessSecret()
 
   if (!secret) {
     throw createError({
@@ -46,9 +46,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  setProtectedAccessCookie(event, secret)
+  layerAuthSetProtectedAccessCookie(event, secret)
 
   return {
-    protectedAuthenticated: isProtectedAccessAuthenticated(event, secret),
+    protectedAuthenticated: layerAuthIsProtectedAccessAuthenticated(event, secret),
   }
 })

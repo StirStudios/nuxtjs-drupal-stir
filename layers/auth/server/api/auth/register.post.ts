@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
       : ''
 
   try {
-    return await drupalApiRequest(event, '/api/auth/register', {
+    return await layerAuthDrupalApiRequest(event, '/api/auth/register', {
       method: 'POST',
       body: {
         email,
@@ -29,6 +29,6 @@ export default defineEventHandler(async (event) => {
       },
     })
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Registration failed')
+    layerAuthThrowDrupalApiError(error, 'Registration failed')
   }
 })

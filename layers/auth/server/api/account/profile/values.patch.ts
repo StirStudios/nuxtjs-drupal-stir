@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 type ProfileValuesPayload = {
   values?: Record<string, unknown>
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       : {}
 
   try {
-    return await drupalApiRequest<Record<string, unknown>>(
+    return await layerAuthDrupalApiRequest<Record<string, unknown>>(
       event,
       '/api/account/profile/values',
       {
@@ -23,6 +23,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Failed to update profile values')
+    layerAuthThrowDrupalApiError(error, 'Failed to update profile values')
   }
 })

@@ -4,7 +4,7 @@ interface DrupalHeaderOptions {
   csrfToken?: string
 }
 
-export function buildDrupalHeaders(options: DrupalHeaderOptions = {}): Record<string, string> {
+export function layerAuthBuildDrupalHeaders(options: DrupalHeaderOptions = {}): Record<string, string> {
   const headers: Record<string, string> = {}
 
   if (typeof options.cookie === 'string' && options.cookie.trim()) {

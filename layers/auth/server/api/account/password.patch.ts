@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
 
 type PasswordPayload = {
   current_password?: unknown
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     typeof body?.new_password === 'string' ? body.new_password : ''
 
   try {
-    return await drupalApiRequest<Record<string, unknown>>(
+    return await layerAuthDrupalApiRequest<Record<string, unknown>>(
       event,
       '/api/account/password',
       {
@@ -29,6 +29,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Failed to update password')
+    layerAuthThrowDrupalApiError(error, 'Failed to update password')
   }
 })

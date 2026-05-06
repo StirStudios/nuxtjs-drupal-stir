@@ -31,7 +31,7 @@ const equalsSafe = (a: string, b: string): boolean => {
   return timingSafeEqual(left, right)
 }
 
-export const createProtectedAccessToken = (
+export const layerAuthCreateProtectedAccessToken = (
   secret: string,
   maxAgeSeconds: number,
 ): string => {
@@ -45,7 +45,7 @@ export const createProtectedAccessToken = (
   return `${encodedPayload}.${signature}`
 }
 
-export const verifyProtectedAccessToken = (
+export const layerAuthVerifyProtectedAccessToken = (
   token: string | undefined,
   secret: string,
 ): boolean => {

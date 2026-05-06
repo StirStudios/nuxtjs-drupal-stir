@@ -1,17 +1,17 @@
 import { createError, defineEventHandler } from 'h3'
 import {
-  getForwardedCookie,
-  getDrupalApiConfig,
+  layerAuthGetForwardedCookie,
+  layerAuthGetDrupalApiConfig,
 } from '../../utils/drupalApi'
-import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+import { layerAuthBuildDrupalHeaders } from '../../utils/drupalHeaders'
 
 export default defineEventHandler(async (event) => {
-  const { baseUrl, apiKey } = getDrupalApiConfig()
+  const { baseUrl, apiKey } = layerAuthGetDrupalApiConfig()
 
   try {
     const csrfToken = await $fetch<string>(`${baseUrl}/session/token`, {
-      headers: buildDrupalHeaders({
-        cookie: getForwardedCookie(event),
+      headers: layerAuthBuildDrupalHeaders({
+        cookie: layerAuthGetForwardedCookie(event),
         apiKey,
       }),
     })

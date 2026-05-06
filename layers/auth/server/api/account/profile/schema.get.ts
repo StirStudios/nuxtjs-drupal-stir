@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 type ProfileSchemaResponse = {
   fields?: Array<Record<string, unknown>>
@@ -7,7 +7,7 @@ type ProfileSchemaResponse = {
 
 export default defineEventHandler(async (event) => {
   try {
-    return await drupalApiRequest<ProfileSchemaResponse>(
+    return await layerAuthDrupalApiRequest<ProfileSchemaResponse>(
       event,
       '/api/account/profile/schema',
       {
@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    throwDrupalApiError(error, 'Failed to load profile schema')
+    layerAuthThrowDrupalApiError(error, 'Failed to load profile schema')
   }
 })

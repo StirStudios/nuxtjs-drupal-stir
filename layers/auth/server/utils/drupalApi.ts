@@ -4,9 +4,9 @@ import {
   getHeader,
   type H3Event,
 } from 'h3'
-import { buildDrupalHeaders } from './drupalHeaders'
+import { layerAuthBuildDrupalHeaders } from './drupalHeaders'
 
-export function getDrupalApiConfig() {
+export function layerAuthGetDrupalApiConfig() {
   const config = useRuntimeConfig()
   const drupalCeConfig =
     config.public.drupalCe && typeof config.public.drupalCe === 'object'
@@ -31,13 +31,13 @@ export function getDrupalApiConfig() {
   }
 }
 
-export const getForwardedCookie = (event: H3Event): string | undefined => {
+export const layerAuthGetForwardedCookie = (event: H3Event): string | undefined => {
   const cookie = getHeader(event, 'cookie')
 
   return cookie ? String(cookie) : undefined
 }
 
-export const appendDrupalSetCookies = (
+export const layerAuthAppendDrupalSetCookies = (
   event: H3Event,
   response: { headers: { getSetCookie?: () => string[] } },
 ) => {
@@ -48,7 +48,7 @@ export const appendDrupalSetCookies = (
   }
 }
 
-export const throwDrupalApiError = (
+export const layerAuthThrowDrupalApiError = (
   error: unknown,
   fallbackMessage = 'Request failed',
   fallbackStatusCode = 500,
@@ -121,23 +121,23 @@ type DrupalRequestOptions = {
   forwardSetCookies?: boolean
 }
 
-export async function drupalApiRequest<T>(
+export async function layerAuthDrupalApiRequest<T>(
   event: H3Event,
   path: string,
   options: DrupalRequestOptions = {},
 ): Promise<T> {
-  const { baseUrl, apiKey } = getDrupalApiConfig()
+  const { baseUrl, apiKey } = layerAuthGetDrupalApiConfig()
   const response = await $fetch.raw<T>(`${baseUrl}${path}`, {
     method: options.method || 'POST',
     body: options.body,
-    headers: buildDrupalHeaders({
+    headers: layerAuthBuildDrupalHeaders({
       apiKey,
-      cookie: options.forwardCookies ? getForwardedCookie(event) : undefined,
+      cookie: options.forwardCookies ? layerAuthGetForwardedCookie(event) : undefined,
     }),
   })
 
   if (options.forwardSetCookies) {
-    appendDrupalSetCookies(event, response)
+    layerAuthAppendDrupalSetCookies(event, response)
   }
 
   return response._data as T
