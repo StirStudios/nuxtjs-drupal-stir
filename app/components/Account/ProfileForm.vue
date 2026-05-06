@@ -114,6 +114,7 @@ const onSubmit = () => {
       </div>
 
       <UButton
+        class="mt-5"
         :disabled="props.saving || !props.hasProfileSave"
         :loading="props.saving"
         type="submit"

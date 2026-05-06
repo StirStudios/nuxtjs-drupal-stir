@@ -84,6 +84,7 @@ const confirmCancel = () => {
         </UInput>
       </UFormField>
       <UButton
+        class="mt-5"
         :disabled="props.changingPassword"
         :loading="props.changingPassword"
         type="submit"

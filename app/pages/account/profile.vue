@@ -122,12 +122,10 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="w-full px-4 py-8 md:px-6 lg:px-8">
-    <div class="mx-auto w-full max-w-5xl space-y-6">
-      <div class="flex items-start justify-between gap-3">
-        <div class="space-y-1">
-          <h1 class="text-highlighted text-xl font-semibold">{{ title }}</h1>
-        </div>
+  <div class="w-full px-4 py-8">
+    <div class="mx-auto w-full max-w-3xl space-y-6">
+      <div class="flex items-center justify-between gap-3">
+        <h1 class="text-highlighted text-xl font-semibold">{{ title }}</h1>
         <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
           Back to site
         </UButton>
