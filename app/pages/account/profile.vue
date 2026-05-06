@@ -123,7 +123,7 @@ const onCancelAccount = async () => {
 
 <template>
   <div class="w-full px-4 py-8">
-    <div class="mx-auto w-full max-w-3xl space-y-6">
+    <div class="mx-auto w-full max-w-lg space-y-6">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-highlighted text-xl font-semibold">{{ title }}</h1>
         <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
@@ -133,7 +133,7 @@ const onCancelAccount = async () => {
 
       <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
         <div v-if="loading || !isReady" class="space-y-6">
-          <div class="flex items-center gap-4 border-b border-accented pb-3">
+          <div class="border-accented flex items-center gap-4 border-b pb-3">
             <USkeleton class="h-5 w-20" />
             <USkeleton class="h-5 w-20" />
           </div>
