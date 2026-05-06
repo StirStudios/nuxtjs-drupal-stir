@@ -16,7 +16,7 @@ export default defineEventHandler(async (event): Promise<RegisterPolicyResponse>
         forwardCookies: true,
       },
     )
-  } catch (error: unknown) {
+  } catch {
     // Fail closed if policy endpoint is unavailable.
     return { allowed: false }
   }
