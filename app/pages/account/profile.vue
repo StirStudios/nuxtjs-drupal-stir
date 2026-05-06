@@ -132,10 +132,17 @@ const onCancelAccount = async () => {
       </div>
 
       <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-        <div v-if="loading || !isReady" class="space-y-4">
-          <USkeleton class="h-10 w-full" />
-          <USkeleton class="h-10 w-full" />
-          <USkeleton class="h-10 w-1/2" />
+        <div v-if="loading || !isReady" class="space-y-6">
+          <div class="flex items-center gap-4 border-b border-accented pb-3">
+            <USkeleton class="h-5 w-20" />
+            <USkeleton class="h-5 w-20" />
+          </div>
+          <div class="space-y-4">
+            <USkeleton class="h-5 w-28" />
+            <USkeleton class="h-10 w-full" />
+            <USkeleton class="h-10 w-full" />
+            <USkeleton class="h-10 w-1/2" />
+          </div>
         </div>
 
         <UTabs v-else class="w-full" :items="profileTabs" variant="link">
