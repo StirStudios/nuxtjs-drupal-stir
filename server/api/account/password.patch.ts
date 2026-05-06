@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
           new_password: newPassword,
         },
         forwardCookies: true,
+        forwardSetCookies: true,
       },
     )
   } catch (error: unknown) {
