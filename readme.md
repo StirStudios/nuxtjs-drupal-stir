@@ -88,7 +88,18 @@ Notes:
 
 ## Auth + Account Integration (stir_account)
 
-This layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
+Auth/account features now live in the optional sub-layer: `layers/auth`.
+
+In this repository, auth is enabled by default through:
+
+```ts
+// nuxt.config.ts
+extends: ['./layers/auth']
+```
+
+If a downstream project does not need auth/account UI or APIs, remove that `extends` entry.
+
+When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 
 - `/auth/login`
 - `/auth/logout`

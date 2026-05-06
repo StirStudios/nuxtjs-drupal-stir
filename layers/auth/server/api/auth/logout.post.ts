@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../utils/drupalApi'
+import { drupalApiRequest, throwDrupalApiError } from '~~/server/utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   try {

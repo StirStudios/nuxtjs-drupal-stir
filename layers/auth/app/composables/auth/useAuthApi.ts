@@ -5,7 +5,7 @@ import type {
   PasswordResetValidatePayload,
   RegisterPayload,
   RegisterResponse,
-} from '~/types/auth'
+} from '../../types/auth'
 
 export function useAuthApi() {
   const login = (payload: {

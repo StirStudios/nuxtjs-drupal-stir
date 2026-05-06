@@ -1,4 +1,4 @@
-import type { AuthSessionResponse, AuthSessionUser } from '~/types/auth'
+import type { AuthSessionResponse, AuthSessionUser } from '../../types/auth'
 
 export function useAuthSession() {
   const ready = useState<boolean>('auth-session-ready', () => false)

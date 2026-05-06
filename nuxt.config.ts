@@ -9,6 +9,7 @@ const isTestEnv =
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-29',
+  extends: ['./layers/auth'],
 
   css: ['~/assets/css/main.css'],
 

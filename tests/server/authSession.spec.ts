@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
-import sessionHandler from '../../server/api/auth/session.get'
+import sessionHandler from '../../layers/auth/server/api/auth/session.get'
 
 describe('/api/auth/session', () => {
   const mockEvent = {

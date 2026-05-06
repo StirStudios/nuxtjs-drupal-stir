@@ -3,7 +3,7 @@ import {
   drupalApiRequest,
   getDrupalApiConfig,
   throwDrupalApiError,
-} from '../../utils/drupalApi'
+} from '~~/server/utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{

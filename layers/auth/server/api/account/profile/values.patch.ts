@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { drupalApiRequest, throwDrupalApiError } from '../../../utils/drupalApi'
+import { drupalApiRequest, throwDrupalApiError } from '~~/server/utils/drupalApi'
 
 type ProfileValuesPayload = {
   values?: Record<string, unknown>

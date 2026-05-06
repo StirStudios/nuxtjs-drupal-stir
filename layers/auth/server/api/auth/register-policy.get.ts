@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest } from '../../utils/drupalApi'
+import { drupalApiRequest } from '~~/server/utils/drupalApi'
 
 type RegisterPolicyResponse = {
   allowed: boolean

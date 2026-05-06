@@ -4,7 +4,7 @@ import {
   getProtectedAccessSecret,
   isProtectedAccessAuthenticated,
   setProtectedAccessCookie,
-} from '../../utils/protectedAccess'
+} from '~~/server/utils/protectedAccess'
 
 type ProtectedBody = {
   action?: unknown
