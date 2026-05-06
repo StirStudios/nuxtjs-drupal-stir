@@ -24,6 +24,8 @@ const profileTabs = [
 const hasProfileSave = computed(
   () => editableFields.value.length > 0 || fields.value.some((field) => field.name === 'mail'),
 )
+const isFieldEditable = (field: { name: string; editable: boolean }): boolean =>
+  field.name === 'mail' || field.editable
 
 const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
   if (type === 'text_long' || type === 'string_long') {
@@ -191,26 +193,26 @@ const onCancelAccount = async () => {
                 <UCheckbox
                   v-if="getFieldType(field.type) === 'checkbox'"
                   v-model="values[field.name]"
-                  :disabled="!field.editable"
+                  :disabled="!isFieldEditable(field)"
                 />
 
                 <UTextarea
                   v-else-if="getFieldType(field.type) === 'textarea'"
                   v-model="values[field.name]"
-                  :disabled="!field.editable"
+                  :disabled="!isFieldEditable(field)"
                   :rows="4"
                 />
 
                 <USelect
                   v-else-if="getFieldType(field.type) === 'select'"
                   v-model="values[field.name]"
-                  :disabled="!field.editable"
+                  :disabled="!isFieldEditable(field)"
                   :items="toSelectItems(field)"
                   label-key="label"
                   value-key="value"
                 />
 
-                <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
+                <UInput v-else v-model="values[field.name]" :disabled="!isFieldEditable(field)" type="text" />
               </UFormField>
             </div>
 
