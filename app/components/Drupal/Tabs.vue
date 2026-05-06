@@ -125,6 +125,10 @@ const normalizeAdminUrl = (value: string): string => {
     return '/auth/password'
   }
 
+  if (normalizedPath === '/user' || normalizedPath.endsWith('/user')) {
+    return '/account/profile'
+  }
+
   return toDrupalUrl(value, drupalOrigin.value)
 }
 

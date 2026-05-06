@@ -153,9 +153,19 @@ const onCancelAccount = async () => {
   <div class="mx-auto w-full max-w-2xl px-4 py-8">
     <UPageCard>
       <template #header>
-        <div class="space-y-1">
-          <h1 class="text-xl font-semibold text-highlighted">{{ title }}</h1>
-          <p class="text-sm text-muted">{{ description }}</p>
+        <div class="flex items-start justify-between gap-3">
+          <div class="space-y-1">
+            <h1 class="text-xl font-semibold text-highlighted">{{ title }}</h1>
+            <p class="text-sm text-muted">{{ description }}</p>
+          </div>
+          <UButton
+            icon="i-lucide-arrow-left"
+            size="sm"
+            to="/"
+            variant="ghost"
+          >
+            Back to site
+          </UButton>
         </div>
       </template>
 
