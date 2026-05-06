@@ -19,6 +19,7 @@ type ProfileValuesResponse = {
 type ProfileUpdateResponse = {
   updated?: boolean
   updated_fields?: string[]
+  no_changes?: boolean
 }
 
 const MULTI_VALUE_TYPES = new Set(['list_string', 'list_integer'])
@@ -72,10 +73,23 @@ function normalizeValueForSubmit(field: ProfileField, value: unknown): unknown {
 export function useAccountProfile() {
   const fields = ref<ProfileField[]>([])
   const values = ref<Record<string, unknown>>({})
+  const baselineValues = ref<Record<string, unknown>>({})
   const loading = ref(false)
   const saving = ref(false)
 
   const editableFields = computed(() => fields.value.filter((field) => field.editable))
+  const hasChanges = computed(() => {
+    for (const field of editableFields.value) {
+      const current = normalizeValueForSubmit(field, values.value[field.name])
+      const baseline = normalizeValueForSubmit(field, baselineValues.value[field.name])
+
+      if (JSON.stringify(current) !== JSON.stringify(baseline)) {
+        return true
+      }
+    }
+
+    return false
+  })
 
   const load = async () => {
     loading.value = true
@@ -102,12 +116,21 @@ export function useAccountProfile() {
       }
 
       values.value = nextValues
+      baselineValues.value = { ...nextValues }
     } finally {
       loading.value = false
     }
   }
 
   const save = async () => {
+    if (!hasChanges.value) {
+      return {
+        updated: false,
+        updated_fields: [],
+        no_changes: true,
+      }
+    }
+
     saving.value = true
     try {
       const payloadValues: Record<string, unknown> = {}
@@ -119,12 +142,16 @@ export function useAccountProfile() {
         )
       }
 
-      return await $fetch<ProfileUpdateResponse>('/api/account/profile/values', {
+      const response = await $fetch<ProfileUpdateResponse>('/api/account/profile/values', {
         method: 'PATCH',
         body: {
           values: payloadValues,
         },
       })
+
+      baselineValues.value = { ...values.value }
+
+      return response
     } finally {
       saving.value = false
     }
@@ -134,6 +161,7 @@ export function useAccountProfile() {
     fields,
     values,
     editableFields,
+    hasChanges,
     loading,
     saving,
     load,

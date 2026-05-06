@@ -4,7 +4,7 @@ import { useAuthSession } from '~/composables/auth/useAuthSession'
 
 const toast = useToast()
 const session = useAuthSession()
-const { fields, values, editableFields, loading, saving, load, save } =
+const { fields, values, editableFields, hasChanges, loading, saving, load, save } =
   useAccountProfile()
 
 const isReady = ref(false)
@@ -20,7 +20,7 @@ const profileTabs = [
   { label: 'Profile', icon: 'i-lucide-user-round', slot: 'profile' },
   { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
 ]
-const hasProfileSave = computed(() => editableFields.value.length > 0)
+const hasProfileSave = computed(() => editableFields.value.length > 0 && hasChanges.value)
 
 onMounted(async () => {
   await session.fetchSession()
@@ -37,6 +37,15 @@ onMounted(async () => {
 const onSubmit = async () => {
   try {
     const response = await save()
+
+    if (response?.no_changes) {
+      toast.add({
+        title: 'No changes',
+        description: 'There is nothing new to save.',
+        color: 'neutral',
+      })
+      return
+    }
 
     if (response?.updated) {
       toast.add({
