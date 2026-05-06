@@ -15,15 +15,16 @@ const cancelingAccount = ref(false)
 const cancelModalOpen = ref(false)
 const portal = useOverlayPortal()
 
-const title = 'Profile'
-const description = 'Update your account profile details.'
+const title = 'Account Settings'
 const profileTabs = [
   { label: 'Profile', icon: 'i-lucide-user-round', slot: 'profile' },
   { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
 ]
 const hasProfileSave = computed(() => editableFields.value.length > 0)
 
-const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
+const getFieldType = (
+  type: string,
+): 'text' | 'textarea' | 'select' | 'checkbox' => {
   if (type === 'text_long' || type === 'string_long') {
     return 'textarea'
   }
@@ -154,20 +155,14 @@ const onCancelAccount = async () => {
     <div class="mx-auto w-full max-w-5xl space-y-6">
       <div class="flex items-start justify-between gap-3">
         <div class="space-y-1">
-          <h1 class="text-xl font-semibold text-highlighted">{{ title }}</h1>
-          <p class="text-sm text-muted">{{ description }}</p>
+          <h1 class="text-highlighted text-xl font-semibold">{{ title }}</h1>
         </div>
-        <UButton
-          icon="i-lucide-arrow-left"
-          size="sm"
-          to="/"
-          variant="ghost"
-        >
+        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
           Back to site
         </UButton>
       </div>
 
-      <div class="rounded-xl border border-accented bg-elevated/30 p-4 md:p-6">
+      <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
         <div v-if="loading || !isReady" class="space-y-4">
           <USkeleton class="h-10 w-full" />
           <USkeleton class="h-10 w-full" />
@@ -176,10 +171,12 @@ const onCancelAccount = async () => {
 
         <UTabs v-else class="w-full" :items="profileTabs" variant="link">
           <template #profile>
-            <div class="space-y-4 pt-4">
+            <div class="space-y-6 pt-4">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-highlighted">Profile</h2>
-                <p class="text-sm text-muted">
+                <h2 class="text-highlighted text-base font-semibold">
+                  Profile
+                </h2>
+                <p class="text-muted text-sm">
                   Update your basic account information.
                 </p>
               </div>
@@ -189,7 +186,11 @@ const onCancelAccount = async () => {
                   :key="field.name"
                   class="space-y-2"
                 >
-                  <UFormField :label="field.label" :name="field.name" :required="field.required">
+                  <UFormField
+                    :label="field.label"
+                    :name="field.name"
+                    :required="field.required"
+                  >
                     <UCheckbox
                       v-if="getFieldType(field.type) === 'checkbox'"
                       v-model="values[field.name]"
@@ -212,15 +213,29 @@ const onCancelAccount = async () => {
                       value-key="value"
                     />
 
-                    <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
+                    <UInput
+                      v-else
+                      v-model="values[field.name]"
+                      class="w-full"
+                      :disabled="!field.editable"
+                      type="text"
+                      variant="outline"
+                    />
                   </UFormField>
                 </div>
 
-                <div v-if="editableFields.length === 0" class="text-sm text-muted">
+                <div
+                  v-if="editableFields.length === 0"
+                  class="text-muted text-sm"
+                >
                   No editable profile fields are currently available.
                 </div>
 
-                <UButton :disabled="saving || !hasProfileSave" :loading="saving" type="submit">
+                <UButton
+                  :disabled="saving || !hasProfileSave"
+                  :loading="saving"
+                  type="submit"
+                >
                   Save Changes
                 </UButton>
               </UForm>
@@ -230,30 +245,53 @@ const onCancelAccount = async () => {
           <template #security>
             <div class="space-y-6 pt-4">
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-highlighted">Security</h2>
-                <p class="text-sm text-muted">
+                <h2 class="text-highlighted text-base font-semibold">
+                  Security
+                </h2>
+                <p class="text-muted text-sm">
                   Manage your password and account status.
                 </p>
               </div>
               <UForm class="space-y-4" @submit="onChangePassword">
-                <UFormField label="Current password" name="current_password" required>
-                  <UInput v-model="currentPassword" type="password" />
+                <UFormField
+                  label="Current password"
+                  name="current_password"
+                  required
+                >
+                  <UInput
+                    v-model="currentPassword"
+                    class="w-full"
+                    type="password"
+                    variant="outline"
+                  />
                 </UFormField>
                 <UFormField label="New password" name="new_password" required>
-                  <UInput v-model="newPassword" type="password" />
+                  <UInput
+                    v-model="newPassword"
+                    class="w-full"
+                    type="password"
+                    variant="outline"
+                  />
                 </UFormField>
-                <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
+                <UButton
+                  :disabled="changingPassword"
+                  :loading="changingPassword"
+                  type="submit"
+                >
                   Update Password
                 </UButton>
               </UForm>
 
-              <USeparator />
-
-              <div class="space-y-4 rounded-lg border border-error/30 bg-error/5 p-4">
+              <div
+                class="border-error/30 bg-error/5 space-y-4 rounded-lg border p-4"
+              >
                 <div class="space-y-1">
-                  <h3 class="text-sm font-semibold text-highlighted">Cancel Account</h3>
-                  <p class="text-sm text-muted">
-                    Cancellation method: disable your account and keep existing content.
+                  <h3 class="text-highlighted text-sm font-semibold">
+                    Cancel Account
+                  </h3>
+                  <p class="text-muted text-sm">
+                    Cancellation method: disable your account and keep existing
+                    content.
                   </p>
                 </div>
                 <UButton
@@ -281,8 +319,9 @@ const onCancelAccount = async () => {
       >
         <template #body>
           <div class="space-y-3 p-4">
-            <p class="text-sm text-muted">
-              You will be logged out after cancellation. You can contact support to reactivate if needed.
+            <p class="text-muted text-sm">
+              You will be logged out after cancellation. You can contact support
+              to reactivate if needed.
             </p>
             <div class="flex items-center gap-3">
               <UButton
