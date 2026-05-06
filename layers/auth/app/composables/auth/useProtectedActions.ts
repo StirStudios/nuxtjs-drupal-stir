@@ -1,5 +1,5 @@
-import { useAuthApi } from '~/composables/auth/useAuthApi'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { useAuthApi } from './useAuthApi'
+import { useAuthSession } from './useAuthSession'
 
 export function useProtectedActions() {
   const authApi = useAuthApi()

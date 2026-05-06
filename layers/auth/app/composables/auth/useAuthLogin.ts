@@ -1,9 +1,9 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import { useAuthActions } from '~/composables/auth/useAuthActions'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
-import { loginValidationSchema } from '~/utils/authValidation'
-import { mapYupValidationErrors } from '~/utils/yupValidation'
+import { useAuthActions } from './useAuthActions'
+import { useAuthConfig } from './useAuthConfig'
+import { useAuthSession } from './useAuthSession'
+import { loginValidationSchema } from '../../utils/authValidation'
+import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 export function useAuthLogin() {
   const toast = useToast()

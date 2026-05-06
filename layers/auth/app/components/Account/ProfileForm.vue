@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui'
-import { validateProfileValues } from '~/utils/profileValidation'
+import { validateProfileValues } from '../../utils/profileValidation'
 
 type ProfileField = {
   name: string

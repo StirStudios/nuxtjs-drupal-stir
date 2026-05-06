@@ -1,6 +1,6 @@
-import { getFetchErrorMessage } from '~/utils/fetchError'
-import { useAuthApi } from '~/composables/auth/useAuthApi'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { getFetchErrorMessage } from '../../utils/fetchError'
+import { useAuthApi } from './useAuthApi'
+import { useAuthSession } from './useAuthSession'
 
 export function useAuthActions() {
   const authApi = useAuthApi()

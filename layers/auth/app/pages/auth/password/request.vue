@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { usePasswordRequest } from '~/composables/auth/usePasswordRequest'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { usePasswordRequest } from '../../../composables/auth/usePasswordRequest'
+import { useAuthConfig } from '../../../composables/auth/useAuthConfig'
 
 const { fields, turnstileToken, validate, onSubmit, isLoading } =
   usePasswordRequest()

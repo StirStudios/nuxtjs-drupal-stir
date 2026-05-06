@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui'
-import { accountPasswordChangeValidationSchema } from '~/utils/authValidation'
-import { mapYupValidationErrors } from '~/utils/yupValidation'
+import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
+import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 const props = defineProps<{
   currentPassword: string

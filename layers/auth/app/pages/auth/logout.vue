@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuthActions } from '~/composables/auth/useAuthActions'
-import { useProtectedActions } from '~/composables/auth/useProtectedActions'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { useAuthActions } from '../../composables/auth/useAuthActions'
+import { useProtectedActions } from '../../composables/auth/useProtectedActions'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
 const { logout } = useAuthActions()
 const { logout: logoutProtected } = useProtectedActions()

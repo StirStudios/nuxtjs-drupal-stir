@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { usePasswordReset } from '~/composables/auth/usePasswordReset'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { usePasswordReset } from '../../../composables/auth/usePasswordReset'
+import { useAuthConfig } from '../../../composables/auth/useAuthConfig'
 
 const { fields, validate, onSubmit, isLoading, isCheckingLink, linkValid, linkMessage } =
   usePasswordReset()

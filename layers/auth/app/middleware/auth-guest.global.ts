@@ -1,5 +1,5 @@
 import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { useAuthSession } from '../composables/auth/useAuthSession'
 
 const GUEST_ONLY_AUTH_ROUTES = new Set([
   '/auth/login',

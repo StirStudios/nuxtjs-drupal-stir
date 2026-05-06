@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useProtectedLogin } from '~/composables/auth/useProtectedLogin'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { useProtectedLogin } from '../../composables/auth/useProtectedLogin'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
 const { fields, validate, onSubmit, isLoading } = useProtectedLogin()
 const { auth } = useAuthConfig()

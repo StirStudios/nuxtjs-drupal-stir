@@ -1,4 +1,4 @@
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { useAuthSession } from './useAuthSession'
 
 export function useProtectedSession() {
   const authSession = useAuthSession()

@@ -1,6 +1,6 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import { useProtectedActions } from '~/composables/auth/useProtectedActions'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { useProtectedActions } from './useProtectedActions'
+import { useAuthConfig } from './useAuthConfig'
 
 export function useProtectedLogin() {
   const toast = useToast()

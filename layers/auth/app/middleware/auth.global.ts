@@ -1,5 +1,5 @@
 import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
+import { useAuthSession } from '../composables/auth/useAuthSession'
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {
   const normalizedRule = rule.trim()

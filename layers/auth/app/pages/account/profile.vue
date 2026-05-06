@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useAccountProfile } from '~/composables/account/useAccountProfile'
-import { useAuthSession } from '~/composables/auth/useAuthSession'
-import { accountPasswordChangeValidationSchema } from '~/utils/authValidation'
-import { mapYupValidationErrors } from '~/utils/yupValidation'
+import { useAccountProfile } from '../../composables/account/useAccountProfile'
+import { useAuthSession } from '../../composables/auth/useAuthSession'
+import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
+import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 const toast = useToast()
 const session = useAuthSession()

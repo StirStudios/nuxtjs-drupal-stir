@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthLogin } from '~/composables/auth/useAuthLogin'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { useAuthLogin } from '../../composables/auth/useAuthLogin'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
 const { fields, turnstileToken, validate, onSubmit, onError, isLoading } =
   useAuthLogin()

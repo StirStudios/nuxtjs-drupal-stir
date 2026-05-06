@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthRegister } from '~/composables/auth/useAuthRegister'
-import { useAuthConfig } from '~/composables/auth/useAuthConfig'
+import { useAuthRegister } from '../../composables/auth/useAuthRegister'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
 const {
   fields,

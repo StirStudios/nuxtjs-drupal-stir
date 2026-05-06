@@ -1,4 +1,4 @@
-import { useAuthApi } from '~/composables/auth/useAuthApi'
+import { useAuthApi } from './useAuthApi'
 
 export function useAuthAccount() {
   const api = useAuthApi()

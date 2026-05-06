@@ -1,7 +1,7 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
-import { useAuthActions } from '~/composables/auth/useAuthActions'
-import { passwordRequestValidationSchema } from '~/utils/authValidation'
-import { mapYupValidationErrors } from '~/utils/yupValidation'
+import { useAuthActions } from './useAuthActions'
+import { passwordRequestValidationSchema } from '../../utils/authValidation'
+import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 export function usePasswordRequest() {
   const toast = useToast()
