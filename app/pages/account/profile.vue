@@ -11,8 +11,9 @@ const isReady = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const changingPassword = ref(false)
-const confirmCancel = ref('')
 const cancelingAccount = ref(false)
+const cancelModalOpen = ref(false)
+const portal = useOverlayPortal()
 
 const title = 'Profile'
 const description = 'Update your account profile details.'
@@ -135,18 +136,10 @@ const onChangePassword = async () => {
 }
 
 const onCancelAccount = async () => {
-  if (confirmCancel.value.trim().toUpperCase() !== 'CANCEL') {
-    toast.add({
-      title: 'Confirmation required',
-      description: 'Type CANCEL to confirm account cancellation.',
-      color: 'warning',
-    })
-    return
-  }
-
   cancelingAccount.value = true
   try {
     await $fetch('/api/account/cancel', { method: 'POST' })
+    cancelModalOpen.value = false
     toast.add({
       title: 'Account canceled',
       description: 'Your account has been disabled.',
@@ -256,27 +249,52 @@ const onCancelAccount = async () => {
                 Cancellation method: disable your account and keep existing content.
               </p>
             </div>
-            <UForm @submit="onCancelAccount">
-              <UFormField
-                label='Type CANCEL to confirm'
-                name='confirm_cancel'
-                required
-              >
-                <UInput v-model="confirmCancel" type="text" />
-              </UFormField>
-              <UButton
-                class="mt-3"
-                color="error"
-                :disabled="cancelingAccount"
-                :loading="cancelingAccount"
-                type="submit"
-              >
-                Cancel Account
-              </UButton>
-            </UForm>
+            <UButton
+              class="mt-2"
+              color="error"
+              :disabled="cancelingAccount"
+              variant="soft"
+              @click="cancelModalOpen = true"
+            >
+              Cancel Account
+            </UButton>
           </div>
         </template>
       </UTabs>
     </UPageCard>
+
+    <ClientOnly>
+      <UModal
+        v-model:open="cancelModalOpen"
+        description="This will disable your account and keep existing content."
+        :portal="portal"
+        title="Cancel Account?"
+      >
+        <template #body>
+          <div class="space-y-3 p-4">
+            <p class="text-sm text-muted">
+              You will be logged out after cancellation. You can contact support to reactivate if needed.
+            </p>
+            <div class="flex items-center gap-3">
+              <UButton
+                color="error"
+                :disabled="cancelingAccount"
+                :loading="cancelingAccount"
+                @click="onCancelAccount"
+              >
+                Yes, cancel account
+              </UButton>
+              <UButton
+                :disabled="cancelingAccount"
+                variant="ghost"
+                @click="cancelModalOpen = false"
+              >
+                Keep account
+              </UButton>
+            </div>
+          </div>
+        </template>
+      </UModal>
+    </ClientOnly>
   </div>
 </template>
