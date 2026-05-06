@@ -61,13 +61,55 @@ export const throwDrupalApiError = (
       ? (error as { statusCode: number }).statusCode
       : fallbackStatusCode
 
+  const payloadMessage = (() => {
+    if (typeof error !== 'object' || error === null || !('data' in error)) {
+      return ''
+    }
+
+    const data = (error as { data?: unknown }).data
+
+    if (typeof data !== 'object' || data === null) {
+      return ''
+    }
+
+    const dataRecord = data as Record<string, unknown>
+    const primary =
+      typeof dataRecord.error === 'string'
+        ? dataRecord.error
+        : typeof dataRecord.message === 'string'
+          ? dataRecord.message
+          : ''
+
+    const fieldErrors =
+      typeof dataRecord.errors === 'object' && dataRecord.errors !== null
+        ? Object.entries(dataRecord.errors as Record<string, unknown>)
+            .map(([key, value]) =>
+              typeof value === 'string' && value.trim().length > 0
+                ? `${key}: ${value}`
+                : '',
+            )
+            .filter((entry) => entry.length > 0)
+        : []
+
+    if (primary && fieldErrors.length > 0) {
+      return `${primary} ${fieldErrors.join(' | ')}`
+    }
+
+    if (fieldErrors.length > 0) {
+      return fieldErrors.join(' | ')
+    }
+
+    return primary
+  })()
+
   const statusMessage =
-    typeof error === 'object' &&
+    payloadMessage ||
+    (typeof error === 'object' &&
     error !== null &&
     'statusMessage' in error &&
     typeof (error as { statusMessage?: unknown }).statusMessage === 'string'
       ? (error as { statusMessage: string }).statusMessage
-      : fallbackMessage
+      : fallbackMessage)
 
   throw createError({ statusCode, statusMessage })
 }
