@@ -125,7 +125,7 @@ const onCancelAccount = async () => {
   <div class="w-full px-4 py-8">
     <div class="mx-auto w-full max-w-lg space-y-6">
       <div class="flex items-center justify-between gap-3">
-        <h1 class="text-highlighted text-xl font-semibold">{{ title }}</h1>
+        <h1 class="text-highlighted mb-0 text-xl font-semibold">{{ title }}</h1>
         <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
           Back to site
         </UButton>
