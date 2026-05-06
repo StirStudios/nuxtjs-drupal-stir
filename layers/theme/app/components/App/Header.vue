@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import { useScrollNav } from '~/composables/useScrollNav'
-import { usePageContext } from '~/composables/usePageContext'
-
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
 const { fetchMenu, getPage } = useDrupalCe()

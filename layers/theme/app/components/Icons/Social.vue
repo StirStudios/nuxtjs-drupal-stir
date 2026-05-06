@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { SocialIcon } from '../../../types/Social'
+type SocialIcon = {
+  icon?: string
+  title?: string
+  url?: string
+  iconSize?: string
+}
 
 const props = defineProps<SocialIcon>()
 const iconSize = props.iconSize || 'size-10'

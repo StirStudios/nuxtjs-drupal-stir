@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useAppLogo } from '~/composables/useAppLogo'
-
 const props = defineProps<{
   addClasses?: string
 }>()
