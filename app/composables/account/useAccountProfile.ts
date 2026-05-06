@@ -40,6 +40,10 @@ function normalizeValueForForm(field: ProfileField, value: unknown): unknown {
     return Boolean(value)
   }
 
+  if (typeof value === 'object') {
+    return ''
+  }
+
   return value
 }
 

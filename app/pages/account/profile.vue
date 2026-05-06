@@ -14,6 +14,10 @@ const changingPassword = ref(false)
 
 const title = 'Profile'
 const description = 'Update your account profile details.'
+const profileTabs = [
+  { label: 'Profile Details', icon: 'i-lucide-user-round', slot: 'profile' },
+  { label: 'Password', icon: 'i-lucide-key-round', slot: 'password' },
+]
 
 const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
   if (type === 'text_long' || type === 'string_long') {
@@ -130,62 +134,68 @@ const onChangePassword = async () => {
         <USkeleton class="h-10 w-1/2" />
       </div>
 
-      <UForm v-else class="space-y-5" :state="values" @submit="onSubmit">
-        <div
-          v-for="field in fields"
-          :key="field.name"
-          class="space-y-2"
-        >
-          <UFormField :label="field.label" :name="field.name" :required="field.required">
-            <UCheckbox
-              v-if="getFieldType(field.type) === 'checkbox'"
-              v-model="values[field.name]"
-              :disabled="!field.editable"
-            />
+      <UTabs v-else class="w-full" :items="profileTabs" variant="link">
+        <template #profile>
+          <UForm class="space-y-5 pt-4" :state="values" @submit="onSubmit">
+            <div
+              v-for="field in fields"
+              :key="field.name"
+              class="space-y-2"
+            >
+              <UFormField :label="field.label" :name="field.name" :required="field.required">
+                <UCheckbox
+                  v-if="getFieldType(field.type) === 'checkbox'"
+                  v-model="values[field.name]"
+                  :disabled="!field.editable"
+                />
 
-            <UTextarea
-              v-else-if="getFieldType(field.type) === 'textarea'"
-              v-model="values[field.name]"
-              :disabled="!field.editable"
-              :rows="4"
-            />
+                <UTextarea
+                  v-else-if="getFieldType(field.type) === 'textarea'"
+                  v-model="values[field.name]"
+                  :disabled="!field.editable"
+                  :rows="4"
+                />
 
-            <USelect
-              v-else-if="getFieldType(field.type) === 'select'"
-              v-model="values[field.name]"
-              :disabled="!field.editable"
-              :items="toSelectItems(field)"
-              label-key="label"
-              value-key="value"
-            />
+                <USelect
+                  v-else-if="getFieldType(field.type) === 'select'"
+                  v-model="values[field.name]"
+                  :disabled="!field.editable"
+                  :items="toSelectItems(field)"
+                  label-key="label"
+                  value-key="value"
+                />
 
-            <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
-          </UFormField>
-        </div>
+                <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
+              </UFormField>
+            </div>
 
-        <div v-if="editableFields.length === 0" class="text-sm text-muted">
-          No editable profile fields are currently available.
-        </div>
+            <div v-if="editableFields.length === 0" class="text-sm text-muted">
+              No editable profile fields are currently available.
+            </div>
 
-        <UButton :disabled="saving || editableFields.length === 0" :loading="saving" type="submit">
-          Save Changes
-        </UButton>
-      </UForm>
+            <UButton :disabled="saving || editableFields.length === 0" :loading="saving" type="submit">
+              Save Changes
+            </UButton>
+          </UForm>
+        </template>
 
-      <USeparator class="my-6" />
-
-      <UForm class="space-y-4" @submit="onChangePassword">
-        <h2 class="text-base font-semibold text-highlighted">Change Password</h2>
-        <UFormField label="Current password" name="current_password" required>
-          <UInput v-model="currentPassword" type="password" />
-        </UFormField>
-        <UFormField label="New password" name="new_password" required>
-          <UInput v-model="newPassword" type="password" />
-        </UFormField>
-        <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
-          Update Password
-        </UButton>
-      </UForm>
+        <template #password>
+          <UForm class="space-y-4 pt-4" @submit="onChangePassword">
+            <p class="text-sm text-muted">
+              Update your account password using your current credentials.
+            </p>
+            <UFormField label="Current password" name="current_password" required>
+              <UInput v-model="currentPassword" type="password" />
+            </UFormField>
+            <UFormField label="New password" name="new_password" required>
+              <UInput v-model="newPassword" type="password" />
+            </UFormField>
+            <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
+              Update Password
+            </UButton>
+          </UForm>
+        </template>
+      </UTabs>
     </UPageCard>
   </div>
 </template>
