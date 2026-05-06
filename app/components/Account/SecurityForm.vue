@@ -17,6 +17,8 @@ const themeWebform = (
   (useAppConfig().stirTheme as { webform?: { variant?: string; fieldInput?: string } })
     .webform || {}
 )
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
 
 const onSubmitPassword = () => {
   emit('change-password')
@@ -47,19 +49,39 @@ const confirmCancel = () => {
         <UInput
           :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.currentPassword"
-          type="password"
+          :type="showCurrentPassword ? 'text' : 'password'"
           :variant="themeWebform.variant"
           @update:model-value="emit('update:currentPassword', String($event ?? ''))"
-        />
+        >
+          <template #trailing>
+            <UButton
+              color="neutral"
+              :icon="showCurrentPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+              size="xs"
+              variant="ghost"
+              @click="showCurrentPassword = !showCurrentPassword"
+            />
+          </template>
+        </UInput>
       </UFormField>
       <UFormField label="New password" name="new_password" required>
         <UInput
           :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.newPassword"
-          type="password"
+          :type="showNewPassword ? 'text' : 'password'"
           :variant="themeWebform.variant"
           @update:model-value="emit('update:newPassword', String($event ?? ''))"
-        />
+        >
+          <template #trailing>
+            <UButton
+              color="neutral"
+              :icon="showNewPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+              size="xs"
+              variant="ghost"
+              @click="showNewPassword = !showNewPassword"
+            />
+          </template>
+        </UInput>
       </UFormField>
       <UButton
         :disabled="props.changingPassword"
