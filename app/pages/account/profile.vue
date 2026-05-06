@@ -150,114 +150,127 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-2xl px-4 py-8">
-    <UPageCard>
-      <template #header>
-        <div class="flex items-start justify-between gap-3">
-          <div class="space-y-1">
-            <h1 class="text-xl font-semibold text-highlighted">{{ title }}</h1>
-            <p class="text-sm text-muted">{{ description }}</p>
-          </div>
-          <UButton
-            icon="i-lucide-arrow-left"
-            size="sm"
-            to="/"
-            variant="ghost"
-          >
-            Back to site
-          </UButton>
+  <div class="w-full px-4 py-8 md:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-5xl space-y-6">
+      <div class="flex items-start justify-between gap-3">
+        <div class="space-y-1">
+          <h1 class="text-xl font-semibold text-highlighted">{{ title }}</h1>
+          <p class="text-sm text-muted">{{ description }}</p>
         </div>
-      </template>
-
-      <div v-if="loading || !isReady" class="space-y-4">
-        <USkeleton class="h-10 w-full" />
-        <USkeleton class="h-10 w-full" />
-        <USkeleton class="h-10 w-1/2" />
+        <UButton
+          icon="i-lucide-arrow-left"
+          size="sm"
+          to="/"
+          variant="ghost"
+        >
+          Back to site
+        </UButton>
       </div>
 
-      <UTabs v-else class="w-full" :items="profileTabs" variant="link">
-        <template #profile>
-          <UForm class="space-y-5 pt-4" :state="values" @submit="onSubmit">
-            <div
-              v-for="field in fields"
-              :key="field.name"
-              class="space-y-2"
-            >
-              <UFormField :label="field.label" :name="field.name" :required="field.required">
-                <UCheckbox
-                  v-if="getFieldType(field.type) === 'checkbox'"
-                  v-model="values[field.name]"
-                  :disabled="!field.editable"
-                />
+      <div class="rounded-xl border border-accented bg-elevated/30 p-4 md:p-6">
+        <div v-if="loading || !isReady" class="space-y-4">
+          <USkeleton class="h-10 w-full" />
+          <USkeleton class="h-10 w-full" />
+          <USkeleton class="h-10 w-1/2" />
+        </div>
 
-                <UTextarea
-                  v-else-if="getFieldType(field.type) === 'textarea'"
-                  v-model="values[field.name]"
-                  :disabled="!field.editable"
-                  :rows="4"
-                />
+        <UTabs v-else class="w-full" :items="profileTabs" variant="link">
+          <template #profile>
+            <div class="space-y-4 pt-4">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-highlighted">Profile</h2>
+                <p class="text-sm text-muted">
+                  Update your basic account information.
+                </p>
+              </div>
+              <UForm class="space-y-5" :state="values" @submit="onSubmit">
+                <div
+                  v-for="field in fields"
+                  :key="field.name"
+                  class="space-y-2"
+                >
+                  <UFormField :label="field.label" :name="field.name" :required="field.required">
+                    <UCheckbox
+                      v-if="getFieldType(field.type) === 'checkbox'"
+                      v-model="values[field.name]"
+                      :disabled="!field.editable"
+                    />
 
-                <USelect
-                  v-else-if="getFieldType(field.type) === 'select'"
-                  v-model="values[field.name]"
-                  :disabled="!field.editable"
-                  :items="toSelectItems(field)"
-                  label-key="label"
-                  value-key="value"
-                />
+                    <UTextarea
+                      v-else-if="getFieldType(field.type) === 'textarea'"
+                      v-model="values[field.name]"
+                      :disabled="!field.editable"
+                      :rows="4"
+                    />
 
-                <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
-              </UFormField>
+                    <USelect
+                      v-else-if="getFieldType(field.type) === 'select'"
+                      v-model="values[field.name]"
+                      :disabled="!field.editable"
+                      :items="toSelectItems(field)"
+                      label-key="label"
+                      value-key="value"
+                    />
+
+                    <UInput v-else v-model="values[field.name]" :disabled="!field.editable" type="text" />
+                  </UFormField>
+                </div>
+
+                <div v-if="editableFields.length === 0" class="text-sm text-muted">
+                  No editable profile fields are currently available.
+                </div>
+
+                <UButton :disabled="saving || !hasProfileSave" :loading="saving" type="submit">
+                  Save Changes
+                </UButton>
+              </UForm>
             </div>
+          </template>
 
-            <div v-if="editableFields.length === 0" class="text-sm text-muted">
-              No editable profile fields are currently available.
+          <template #security>
+            <div class="space-y-6 pt-4">
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-highlighted">Security</h2>
+                <p class="text-sm text-muted">
+                  Manage your password and account status.
+                </p>
+              </div>
+              <UForm class="space-y-4" @submit="onChangePassword">
+                <UFormField label="Current password" name="current_password" required>
+                  <UInput v-model="currentPassword" type="password" />
+                </UFormField>
+                <UFormField label="New password" name="new_password" required>
+                  <UInput v-model="newPassword" type="password" />
+                </UFormField>
+                <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
+                  Update Password
+                </UButton>
+              </UForm>
+
+              <USeparator />
+
+              <div class="space-y-4 rounded-lg border border-error/30 bg-error/5 p-4">
+                <div class="space-y-1">
+                  <h3 class="text-sm font-semibold text-highlighted">Cancel Account</h3>
+                  <p class="text-sm text-muted">
+                    Cancellation method: disable your account and keep existing content.
+                  </p>
+                </div>
+                <UButton
+                  class="mt-2"
+                  color="error"
+                  :disabled="cancelingAccount"
+                  variant="soft"
+                  @click="cancelModalOpen = true"
+                >
+                  Cancel Account
+                </UButton>
+              </div>
             </div>
-
-            <UButton :disabled="saving || !hasProfileSave" :loading="saving" type="submit">
-              Save Changes
-            </UButton>
-          </UForm>
-        </template>
-
-        <template #security>
-          <UForm class="space-y-4 pt-4" @submit="onChangePassword">
-            <p class="text-sm text-muted">
-              Update your account password using your current credentials.
-            </p>
-            <UFormField label="Current password" name="current_password" required>
-              <UInput v-model="currentPassword" type="password" />
-            </UFormField>
-            <UFormField label="New password" name="new_password" required>
-              <UInput v-model="newPassword" type="password" />
-            </UFormField>
-            <UButton :disabled="changingPassword" :loading="changingPassword" type="submit">
-              Update Password
-            </UButton>
-          </UForm>
-
-          <USeparator class="my-6" />
-
-          <div class="space-y-4 rounded-lg border border-error/30 bg-error/5 p-4">
-            <div class="space-y-1">
-              <h2 class="text-base font-semibold text-highlighted">Cancel Account</h2>
-              <p class="text-sm text-muted">
-                Cancellation method: disable your account and keep existing content.
-              </p>
-            </div>
-            <UButton
-              class="mt-2"
-              color="error"
-              :disabled="cancelingAccount"
-              variant="soft"
-              @click="cancelModalOpen = true"
-            >
-              Cancel Account
-            </UButton>
-          </div>
-        </template>
-      </UTabs>
-    </UPageCard>
+          </template>
+        </UTabs>
+      </div>
+    </div>
 
     <ClientOnly>
       <UModal
