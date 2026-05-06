@@ -1,4 +1,4 @@
-import type { SocialIcon } from '../../types/Social'
+import type { SocialIcon } from '../types/Social'
 
 export function useSocialIcons() {
   const theme = useAppConfig().stirTheme as { socials?: unknown }
