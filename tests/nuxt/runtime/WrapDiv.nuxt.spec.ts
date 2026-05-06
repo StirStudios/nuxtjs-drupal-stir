@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import WrapDiv from '../../../app/components/Wrap/Div.vue'
+import WrapDiv from '../../../layers/theme/app/components/Wrap/Div.vue'
 
 describe('WrapDiv (Nuxt runtime)', () => {
   it('renders slot content without extra wrapper when styles is blank', async () => {
