@@ -44,7 +44,6 @@ const confirmCancel = () => {
           class="w-full"
           :model-value="props.currentPassword"
           type="password"
-          variant="outline"
           @update:model-value="emit('update:currentPassword', String($event ?? ''))"
         />
       </UFormField>
@@ -53,7 +52,6 @@ const confirmCancel = () => {
           class="w-full"
           :model-value="props.newPassword"
           type="password"
-          variant="outline"
           @update:model-value="emit('update:newPassword', String($event ?? ''))"
         />
       </UFormField>

@@ -62,48 +62,43 @@ const onSubmit = () => {
     </div>
 
     <UForm class="space-y-5" :state="props.values" @submit="onSubmit">
-      <div
+      <UFormField
         v-for="field in props.fields"
         :key="field.name"
-        class="space-y-2"
+        :label="field.label"
+        :name="field.name"
+        :required="field.required"
       >
-        <UFormField
-          :label="field.label"
-          :name="field.name"
-          :required="field.required"
-        >
-          <UCheckbox
-            v-if="getFieldType(field.type) === 'checkbox'"
-            v-model="props.values[field.name]"
-            :disabled="!field.editable"
-          />
+        <UCheckbox
+          v-if="getFieldType(field.type) === 'checkbox'"
+          v-model="props.values[field.name]"
+          :disabled="!field.editable"
+        />
 
-          <UTextarea
-            v-else-if="getFieldType(field.type) === 'textarea'"
-            v-model="props.values[field.name]"
-            :disabled="!field.editable"
-            :rows="4"
-          />
+        <UTextarea
+          v-else-if="getFieldType(field.type) === 'textarea'"
+          v-model="props.values[field.name]"
+          :disabled="!field.editable"
+          :rows="4"
+        />
 
-          <USelect
-            v-else-if="getFieldType(field.type) === 'select'"
-            v-model="props.values[field.name]"
-            :disabled="!field.editable"
-            :items="toSelectItems(field)"
-            label-key="label"
-            value-key="value"
-          />
+        <USelect
+          v-else-if="getFieldType(field.type) === 'select'"
+          v-model="props.values[field.name]"
+          :disabled="!field.editable"
+          :items="toSelectItems(field)"
+          label-key="label"
+          value-key="value"
+        />
 
-          <UInput
-            v-else
-            v-model="props.values[field.name]"
-            class="w-full"
-            :disabled="!field.editable"
-            type="text"
-            variant="outline"
-          />
-        </UFormField>
-      </div>
+        <UInput
+          v-else
+          v-model="props.values[field.name]"
+          class="w-full"
+          :disabled="!field.editable"
+          type="text"
+        />
+      </UFormField>
 
       <div v-if="props.editableFieldsCount === 0" class="text-muted text-sm">
         No editable profile fields are currently available.
@@ -119,4 +114,3 @@ const onSubmit = () => {
     </UForm>
   </div>
 </template>
-
