@@ -11,12 +11,16 @@ const isReady = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const changingPassword = ref(false)
+const emailValue = ref('')
+const updatingEmail = ref(false)
+const confirmCancel = ref('')
+const cancelingAccount = ref(false)
 
 const title = 'Profile'
 const description = 'Update your account profile details.'
 const profileTabs = [
-  { label: 'Profile Details', icon: 'i-lucide-user-round', slot: 'profile' },
-  { label: 'Password', icon: 'i-lucide-key-round', slot: 'password' },
+  { label: 'Profile', icon: 'i-lucide-user-round', slot: 'profile' },
+  { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
 ]
 
 const getFieldType = (type: string): 'text' | 'textarea' | 'select' | 'checkbox' => {
@@ -55,6 +59,10 @@ onMounted(async () => {
   }
 
   await load()
+  emailValue.value =
+    typeof values.value.mail === 'string'
+      ? values.value.mail
+      : (session.user.value?.mail as string | undefined) || ''
   isReady.value = true
 })
 
@@ -80,6 +88,35 @@ const onSubmit = async () => {
       description: message,
       color: 'error',
     })
+  }
+}
+
+const onUpdateEmail = async () => {
+  updatingEmail.value = true
+  try {
+    await $fetch('/api/account/email', {
+      method: 'PATCH',
+      body: { mail: emailValue.value },
+    })
+    values.value.mail = emailValue.value
+    toast.add({
+      title: 'Email updated',
+      description: 'Your email address was updated successfully.',
+      color: 'success',
+    })
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'statusMessage' in error
+        ? String((error as { statusMessage?: unknown }).statusMessage)
+        : 'Unable to update email.'
+
+    toast.add({
+      title: 'Email update failed',
+      description: message,
+      color: 'error',
+    })
+  } finally {
+    updatingEmail.value = false
   }
 }
 
@@ -114,6 +151,41 @@ const onChangePassword = async () => {
     })
   } finally {
     changingPassword.value = false
+  }
+}
+
+const onCancelAccount = async () => {
+  if (confirmCancel.value.trim().toUpperCase() !== 'CANCEL') {
+    toast.add({
+      title: 'Confirmation required',
+      description: 'Type CANCEL to confirm account cancellation.',
+      color: 'warning',
+    })
+    return
+  }
+
+  cancelingAccount.value = true
+  try {
+    await $fetch('/api/account/cancel', { method: 'POST' })
+    toast.add({
+      title: 'Account canceled',
+      description: 'Your account has been disabled.',
+      color: 'success',
+    })
+    await navigateTo('/auth/logout')
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'statusMessage' in error
+        ? String((error as { statusMessage?: unknown }).statusMessage)
+        : 'Unable to cancel account.'
+
+    toast.add({
+      title: 'Cancellation failed',
+      description: message,
+      color: 'error',
+    })
+  } finally {
+    cancelingAccount.value = false
   }
 }
 </script>
@@ -177,9 +249,20 @@ const onChangePassword = async () => {
               Save Changes
             </UButton>
           </UForm>
+
+          <USeparator class="my-6" />
+
+          <UForm class="space-y-4" @submit="onUpdateEmail">
+            <UFormField label="Email address" name="mail" required>
+              <UInput v-model="emailValue" type="email" />
+            </UFormField>
+            <UButton :disabled="updatingEmail" :loading="updatingEmail" type="submit" variant="soft">
+              Update Email
+            </UButton>
+          </UForm>
         </template>
 
-        <template #password>
+        <template #security>
           <UForm class="space-y-4 pt-4" @submit="onChangePassword">
             <p class="text-sm text-muted">
               Update your account password using your current credentials.
@@ -194,6 +277,35 @@ const onChangePassword = async () => {
               Update Password
             </UButton>
           </UForm>
+
+          <USeparator class="my-6" />
+
+          <div class="space-y-4 rounded-lg border border-error/30 bg-error/5 p-4">
+            <div class="space-y-1">
+              <h2 class="text-base font-semibold text-highlighted">Cancel Account</h2>
+              <p class="text-sm text-muted">
+                Cancellation method: disable your account and keep existing content.
+              </p>
+            </div>
+            <UForm @submit="onCancelAccount">
+              <UFormField
+                label='Type CANCEL to confirm'
+                name='confirm_cancel'
+                required
+              >
+                <UInput v-model="confirmCancel" type="text" />
+              </UFormField>
+              <UButton
+                class="mt-3"
+                color="error"
+                :disabled="cancelingAccount"
+                :loading="cancelingAccount"
+                type="submit"
+              >
+                Cancel Account
+              </UButton>
+            </UForm>
+          </div>
         </template>
       </UTabs>
     </UPageCard>
