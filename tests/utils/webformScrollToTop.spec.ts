@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '../../app/utils/webformScrollToTop'
+} from '../../layers/theme/app/utils/webformScrollToTop'
 
 describe('webformScrollToTop', () => {
   it('normalizes config defaults and overrides', () => {
