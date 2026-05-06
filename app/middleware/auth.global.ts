@@ -16,6 +16,7 @@ function isAuthSystemRoute(path: string, protectedLoginPath: string): boolean {
   return (
     path === '/auth/login' ||
     path === '/auth/logout' ||
+    path === '/auth/verify' ||
     path === '/auth/register' ||
     path === '/auth/password/request' ||
     path === '/auth/password/reset'
