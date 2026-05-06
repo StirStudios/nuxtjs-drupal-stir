@@ -35,6 +35,8 @@ onMounted(async () => {
 
     verified.value = true
     message.value = 'Your account has been verified. You can now sign in.'
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    await navigateTo('/auth/login')
   } catch (error: unknown) {
     verified.value = false
     message.value =
