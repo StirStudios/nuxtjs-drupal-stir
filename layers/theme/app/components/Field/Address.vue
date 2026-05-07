@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '../../../types'
+import type { WebformFieldProps } from '~/types'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -70,7 +70,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       <UInput
         v-if="key !== 'country'"
         :id="getFieldId(String(key))"
-        v-model="state[fieldName][key]"
+        v-model="state[fieldName]![String(key)]"
         class="w-full"
         :placeholder="useFloatingLabels ? ' ' : ''"
         :ui="useFloatingLabels ? { base: 'peer' } : {}"
@@ -90,7 +90,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       <USelectMenu
         v-else
         :id="getFieldId(String(key))"
-        v-model="state[fieldName].country"
+        v-model="state[fieldName]!.country"
         class="w-full"
         :items="countryOptions"
         label-key="label"

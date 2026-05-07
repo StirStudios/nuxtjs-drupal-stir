@@ -58,7 +58,7 @@ const wrapperClasses = computed(() =>
         :default-value="timelineItems.length - 1"
         :items="timelineItems"
       >
-        <template #rich-description="{ item }">
+        <template #rich-description="{ item }: { item: UITimelineItem }">
           <div class="prose max-w-none" v-html="item.description" />
         </template>
       </UTimeline>

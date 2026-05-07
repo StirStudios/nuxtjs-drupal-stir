@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '../../../types'
+import type { WebformFieldProps } from '~/types'
 import { cleanHTML } from '~/utils/cleanHTML'
 
 const props = defineProps<{

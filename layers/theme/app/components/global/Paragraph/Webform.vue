@@ -16,7 +16,7 @@ import type {
   WebformDefinition,
   WebformFieldProps,
   WebformState,
-} from '../../../../types'
+} from '~/types'
 import type { ObjectSchema } from 'yup'
 
 const props = defineProps<{
@@ -200,9 +200,11 @@ resetFormState({ bumpKey: false })
 
 const containerTypes = ['section', 'fieldset', 'details', 'webform_section']
 const shouldRenderGroupContainer = (fieldName: string) =>
-  fields[fieldName]?.parent &&
-  groupedFields.value[fields[fieldName]?.parent]?.[0] === fieldName &&
-  !containerTypes.includes(fields[fieldName]['#type'])
+  !!(
+    fields[fieldName]?.parent &&
+    groupedFields.value[fields[fieldName]?.parent]?.[0] === fieldName &&
+    !containerTypes.includes(fields[fieldName]['#type'])
+  )
 
 const getGroupFields = (parentName: string) =>
   groupedFields.value[parentName] || []
@@ -215,6 +217,8 @@ const shouldRenderIndividualField = (fieldName: string) =>
 
 const isContainerVisible = (containerName: string) =>
   evaluateContainerVisibility(containerName, state, fields, getGroupFields)
+
+const wrapStyles = computed(() => [props.width, props.spacing].filter((value): value is string => typeof value === 'string' && value.length > 0))
 
 const handleResetSubmission = async () => {
   isFormSubmitted.value = false
@@ -290,7 +294,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
 </script>
 
 <template>
-  <WrapDiv :align="props.align" :styles="[props.width, props.spacing]">
+  <WrapDiv :align="props.align" :styles="wrapStyles">
     <WebformContent
       :key="formResetKey"
       v-model:turnstile-token="turnstileToken"
@@ -311,7 +315,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       :submit-button-label="submitButtonLabel"
       :theme-webform="themeWebform"
       :webform-confirmation="webformConfirmation"
-      @error="onError"
+      @error="onError($event as never)"
       @reset-submission="handleResetSubmission"
       @submit="onSubmit"
     />

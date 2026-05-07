@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '../../../types'
+import type { WebformFieldProps, WebformState } from '~/types'
 import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'

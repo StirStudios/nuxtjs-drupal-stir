@@ -101,7 +101,9 @@ const normalizeAdminUrl = (value: string): string => {
   const trimmed = value.trim()
   const normalizedPath = (() => {
     if (trimmed.startsWith('/')) {
-      return trimmed.split('?')[0]
+      const [path = ''] = trimmed.split('?')
+
+      return path
     }
 
     try {
@@ -109,7 +111,7 @@ const normalizeAdminUrl = (value: string): string => {
 
       return url.pathname
     } catch {
-      return trimmed
+      return trimmed || '/'
     }
   })()
 

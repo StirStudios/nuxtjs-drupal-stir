@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import type { AuthFormField, FormError } from '@nuxt/ui'
+
 defineProps<{
   title: string
   description: string
   icon?: string
-  fields: unknown[]
+  fields: AuthFormField[]
   submit?: Record<string, unknown>
   loading?: boolean
-  validate?: ((state: Record<string, unknown>) => unknown[])
+  validate?: (
+    state: Record<string, unknown>,
+  ) => FormError<string>[] | Promise<FormError<string>[]>
 }>()
 
 defineEmits<{

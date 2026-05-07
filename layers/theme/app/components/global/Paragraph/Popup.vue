@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cleanHTML } from '~/utils/cleanHTML'
+import type { WebformDefinition } from '~/types'
 
 const props = defineProps<{
   id: number | string
@@ -9,7 +10,7 @@ const props = defineProps<{
 
   text?: string
   alert?: string
-  webform?: unknown
+  webform?: WebformDefinition
 
   direction?: string
   onClose?: () => void

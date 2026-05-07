@@ -174,8 +174,6 @@ onMounted(async () => {
           bulletList: false,
           orderedList: false,
           listItem: false,
-          taskList: false,
-          taskItem: false,
         }"
         :ui="editorUi"
       >
@@ -194,7 +192,7 @@ onMounted(async () => {
           :should-show="shouldShowBubbleToolbar"
         />
 
-        <UEditorSuggestionMenu :editor="editor" :items="suggestionItems" />
+        <UEditorSuggestionMenu :editor="editor" :items="suggestionItems as never" />
       </UEditor>
 
       <div class="mt-4 p-4 flex items-center justify-between gap-3">

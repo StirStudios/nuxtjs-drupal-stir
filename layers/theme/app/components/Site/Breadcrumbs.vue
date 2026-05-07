@@ -21,7 +21,7 @@ const breadcrumbs = computed<CrumbItem[]>(() => {
 const breadcrumbLinks = computed(() =>
   breadcrumbs.value.map((crumb) => ({
     label: crumb.label,
-    to: crumb.url || null,
+    to: crumb.url || undefined,
   })),
 )
 </script>

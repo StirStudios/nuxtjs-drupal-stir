@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import type { WebformFieldProps, WebformState } from '../../../types'
+import type { WebformFieldProps, WebformState } from '~/types'
 import { useEvaluateState } from '~/composables/useEvaluateState'
 import { cleanHTML } from '~/utils/cleanHTML'
 
@@ -109,7 +109,7 @@ const descriptionContent = computed(() =>
   cleanHTML(String(props.field['#description'] ?? '')),
 )
 const helpContent = computed(() => cleanHTML(String(props.field['#help'] ?? '')))
-const labelClass = computed(() => props.field['#class'] || '')
+const labelClass = computed(() => String(props.field['#class'] ?? ''))
 const fieldUi = computed(() => {
   if (
     resolvedFieldType.value === 'checkbox' ||

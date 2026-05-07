@@ -29,7 +29,7 @@ useSeoMeta({
       :submit="{ label: 'Continue' }"
       :title="title"
       :validate="validate"
-      @submit="onSubmit"
+      @submit="onSubmit($event as never)"
     />
   </AuthPage>
 </template>

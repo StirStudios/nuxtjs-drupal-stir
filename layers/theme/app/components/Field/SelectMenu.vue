@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '../../../types'
+import type { WebformFieldProps } from '~/types'
 import { transformOptions } from '~/utils/transformUtils'
 
 const props = defineProps<{
@@ -10,7 +10,12 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
-const selectItems = computed(() => transformOptions(props.field['#options'] || {}))
+const selectItems = computed(() => transformOptions(props.field['#options'] || {}) as Array<Record<string, unknown>>)
+const handleSelectUpdate = (value: unknown) => {
+  props.state[props.fieldName] = String(
+    (value as { value?: string })?.value ?? value ?? '',
+  )
+}
 
 onMounted(() => {
   if (props.state[props.fieldName] === undefined) {
@@ -21,11 +26,12 @@ onMounted(() => {
 
 <template>
   <USelectMenu
-    v-model="state[fieldName]"
     class="w-full"
     :items="selectItems"
+    :model-value="state[fieldName] as never"
     placeholder="Select"
     :portal="portal"
     :variant="webform.variant"
+    @update:model-value="handleSelectUpdate"
   />
 </template>

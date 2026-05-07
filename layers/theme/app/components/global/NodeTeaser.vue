@@ -38,13 +38,21 @@ const teaserImage = computed(() => {
     }
   }
 
+  const media = image as Record<string, unknown>
+  const mediaAlt = typeof media.alt === 'string' ? media.alt : ''
+
   return {
-    ...image,
+    ...media,
     alt:
-      (typeof image.alt === 'string' && image.alt.length > 0
-        ? image.alt
+      (mediaAlt.length > 0
+        ? mediaAlt
         : post.value.title || props.title || ''),
   }
+})
+const teaserImageProps = computed<Record<string, unknown>>(() => {
+  const image = teaserImage.value
+
+  return image && typeof image === 'object' ? image : {}
 })
 
 const postUi = computed(() => {
@@ -79,7 +87,7 @@ const postUi = computed(() => {
       <template #header>
         <MediaImage
           v-if="teaserImage"
-          v-bind="teaserImage"
+          v-bind="teaserImageProps"
           :wrapper-class="[
             'h-full w-full transform transition-transform duration-300 group-hover:scale-105 group-hover/blog-post:scale-105',
           ]"

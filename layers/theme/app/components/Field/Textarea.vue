@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '../../../types'
+import type { WebformFieldProps } from '~/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables'
 
 const props = defineProps<{

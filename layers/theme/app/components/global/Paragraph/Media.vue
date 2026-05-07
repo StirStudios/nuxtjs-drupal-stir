@@ -142,6 +142,7 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   getActiveMid: (index) => String(itemsOrdered.value[index]?.mid ?? ''),
   onSelect: onSelectModal,
 })
+const firstItem = computed(() => itemsOrdered.value[0] ?? null)
 
 onMounted(() => {
   hydrated.value = true
@@ -167,10 +168,10 @@ onMounted(() => {
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
-          :node="node"
+          :node="node as never"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk"
+          :tk="tk as never"
           @open="openModal"
         />
       </LazyUScrollArea>
@@ -187,10 +188,10 @@ onMounted(() => {
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :index="i"
-          :node="node"
+          :node="node as never"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk"
+          :tk="tk as never"
           @open="openModal"
         />
       </WrapGrid>
@@ -221,15 +222,15 @@ onMounted(() => {
       />
 
       <div
-        v-if="itemsOrdered.length === 1"
+        v-if="itemsOrdered.length === 1 && firstItem"
         class="flex h-full w-full items-center justify-center"
       >
         <component
-          :is="componentMap[itemsOrdered[0].type]"
+          :is="componentMap[firstItem.type]"
           v-bind="{
-            ...itemsOrdered[0],
-            ...(itemsOrdered[0].type === 'video' ? { deferEmbed: false } : {}),
-            ...(itemsOrdered[0].type === 'image' ? { noWrapper: true } : {}),
+            ...firstItem,
+            ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
+            ...(firstItem.type === 'image' ? { noWrapper: true } : {}),
           }"
         />
       </div>

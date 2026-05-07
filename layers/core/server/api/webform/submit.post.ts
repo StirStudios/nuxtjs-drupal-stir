@@ -37,6 +37,10 @@ export default defineEventHandler(async (event) => {
       : ''
 
   try {
+    const fetchJson = $fetch as <T>(
+      request: string,
+      options?: Record<string, unknown>,
+    ) => Promise<T>
     const body = await readBody<Record<string, unknown>>(event)
 
     if (!body?.webform_id) {
@@ -54,9 +58,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const { csrfToken } = await $fetch<{ csrfToken: string }>(
-      '/api/auth/csrf',
-    )
+    const { csrfToken } = await fetchJson<{ csrfToken: string }>('/api/auth/csrf')
 
     const drupalApiUrl = `${config.public.api}/api/stir_webform_rest/submit`
     const origin = getHeader(event, 'origin')
@@ -65,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const forwardedProto = getHeader(event, 'x-forwarded-proto')
     const userAgent = getHeader(event, 'user-agent')
 
-    return await $fetch(drupalApiUrl, {
+    return await fetchJson<Record<string, unknown>>(drupalApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

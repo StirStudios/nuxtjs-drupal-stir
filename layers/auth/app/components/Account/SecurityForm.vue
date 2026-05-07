@@ -9,7 +9,7 @@ const props = defineProps<{
   changingPassword: boolean
   cancelingAccount: boolean
   cancelModalOpen: boolean
-  portal: unknown
+  portal: string | boolean | HTMLElement | undefined
 }>()
 
 const emit = defineEmits<{
@@ -18,8 +18,11 @@ const emit = defineEmits<{
   (e: 'change-password' | 'cancel-account'): void
 }>()
 const themeWebform = (
-  (useAppConfig().stirTheme as { webform?: { variant?: string; fieldInput?: string } })
-    .webform || {}
+  (
+    useAppConfig().stirTheme as {
+      webform?: { variant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
+    }
+  ).webform || {}
 )
 const showCurrentPassword = ref(false)
 const showNewPassword = ref(false)

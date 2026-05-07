@@ -23,8 +23,11 @@ const emit = defineEmits<{
   submit: []
 }>()
 const themeWebform = (
-  (useAppConfig().stirTheme as { webform?: { variant?: string; fieldInput?: string } })
-    .webform || {}
+  (
+    useAppConfig().stirTheme as {
+      webform?: { variant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
+    }
+  ).webform || {}
 )
 
 const getFieldType = (
@@ -60,6 +63,9 @@ const onSubmit = () => {
   emit('submit')
 }
 
+const getStringValue = (value: unknown): string => (typeof value === 'string' ? value : '')
+const getCheckboxValue = (value: unknown): boolean => value === true
+
 const validate = (state: Record<string, unknown>): FormError[] => {
   return validateProfileValues(props.fields, state)
 }
@@ -87,37 +93,41 @@ const validate = (state: Record<string, unknown>): FormError[] => {
       >
         <UCheckbox
           v-if="getFieldType(field.type) === 'checkbox'"
-          v-model="props.values[field.name]"
           :disabled="!field.editable"
+          :model-value="getCheckboxValue(props.values[field.name])"
+          @update:model-value="props.values[field.name] = $event === true"
         />
 
         <UTextarea
           v-else-if="getFieldType(field.type) === 'textarea'"
-          v-model="props.values[field.name]"
           :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
+          :model-value="getStringValue(props.values[field.name])"
           :rows="4"
           :variant="themeWebform.variant"
+          @update:model-value="props.values[field.name] = String($event ?? '')"
         />
 
         <USelect
           v-else-if="getFieldType(field.type) === 'select'"
-          v-model="props.values[field.name]"
           :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
           :items="toSelectItems(field)"
           label-key="label"
+          :model-value="getStringValue(props.values[field.name])"
           value-key="value"
           :variant="themeWebform.variant"
+          @update:model-value="props.values[field.name] = String($event ?? '')"
         />
 
         <UInput
           v-else
-          v-model="props.values[field.name]"
           :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
+          :model-value="getStringValue(props.values[field.name])"
           type="text"
           :variant="themeWebform.variant"
+          @update:model-value="props.values[field.name] = String($event ?? '')"
         />
       </UFormField>
 

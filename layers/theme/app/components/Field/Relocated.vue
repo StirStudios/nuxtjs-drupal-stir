@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '../../../types'
+import type { WebformFieldProps, WebformState } from '~/types'
 
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>
@@ -19,7 +19,7 @@ const movedFields = computed(() =>
     v-for="fieldName in movedFields"
     :key="fieldName"
     :bypass-relocated-filter="true"
-    :field="fields[fieldName]"
+    :field="fields[fieldName]!"
     :field-name="fieldName"
     :fields="fields"
     :ordered-field-names="orderedFieldNames"

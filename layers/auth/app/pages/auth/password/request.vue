@@ -28,7 +28,7 @@ useSeoMeta({
       :submit="{ label: 'Send Reset Instructions' }"
       :title="title"
       :validate="validate"
-      @submit="onSubmit"
+      @submit="onSubmit($event as never)"
     >
       <template #validation>
         <FieldTurnstile v-model="turnstileToken" />

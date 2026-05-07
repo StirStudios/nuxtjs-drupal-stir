@@ -114,10 +114,10 @@ export default defineNuxtConfig({
 
   alias: {
     yup: require.resolve('yup'),
-    '~/utils': './layers/theme/app/utils',
-    '~/composables': './layers/theme/app/composables',
-    '~/components': './layers/theme/app/components',
-    '~/types': './layers/theme/app/types',
+    '~/utils': 'layers/theme/app/utils',
+    '~/composables': 'layers/theme/app/composables',
+    '~/components': 'layers/theme/app/components',
+    '~/types': 'types',
   },
 
   modules: [

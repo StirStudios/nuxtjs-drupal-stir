@@ -44,6 +44,11 @@ const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value 
 const richTextClass = 'prose max-w-none'
 const { useRevealMotionProps } = useRevealMotionConfig()
 const motionProps = useRevealMotionProps(() => props.direction)
+const wrapStyles = computed(() =>
+  [props.width, props.spacing].filter(
+    (value): value is string => typeof value === 'string' && value.length > 0,
+  ),
+)
 
 async function startEditing() {
   editSourceText.value = sourceText.value
@@ -79,7 +84,7 @@ watch(() => props.text, (value) => {
 </script>
 
 <template>
-  <WrapDiv :align="align" :styles="[width, spacing]">
+  <WrapDiv :align="align" :styles="wrapStyles">
     <EditLink
       :link="editLink"
       :parent-uuid="parentUuid"

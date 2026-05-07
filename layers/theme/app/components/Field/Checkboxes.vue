@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformOptionProperties, WebformState } from '../../../types'
+import type { WebformFieldProps, WebformOptionProperties, WebformState } from '~/types'
 import { useEventBus } from '@vueuse/core'
 import { enforceGroupLimit, enforceMaxSelected } from '~/utils/selectionUtils'
 import { normalizeValue } from '~/utils/stringUtils'
@@ -138,7 +138,7 @@ const handleModelUpdate = (val: unknown) => {
   <UCheckboxGroup
     class="form-input w-full"
     :items="items"
-    :model-value="props.state[props.fieldName]"
+    :model-value="toStringArray(props.state[props.fieldName])"
     @update:model-value="handleModelUpdate"
   >
     <template #label="{ item }">

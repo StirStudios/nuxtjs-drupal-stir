@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '../../types'
+import type { WebformFieldProps, WebformState } from '~/types'
 import type { ObjectSchema } from 'yup'
 import { cleanHTML } from '~/utils/cleanHTML'
 
-defineProps<{
+const props = defineProps<{
   fields: Record<string, WebformFieldProps>
   state: WebformState
   schema: ObjectSchema<Record<string, unknown>>
@@ -30,17 +30,26 @@ const emit = defineEmits<{
   (e: 'update:turnstileToken', value: string): void
 }>()
 
-const validateOn = ['blur', 'change', 'input'] as const
+const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const safeHtml = (value?: string) => cleanHTML(value ?? '')
+const buttonSize = computed<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined>(
+  () => {
+    const size = props.themeWebform.buttonSize
+
+    return typeof size === 'string' && ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].includes(size)
+      ? (size as 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl')
+      : undefined
+  },
+)
 </script>
 
 <template>
   <UForm
     v-if="!isFormSubmitted"
     :class="
-      themeWebform.variant === 'material'
-        ? themeWebform.spacingLarge
-        : themeWebform.spacing
+      props.themeWebform.variant === 'material'
+        ? props.themeWebform.spacingLarge
+        : props.themeWebform.spacing
     "
     :schema="schema"
     :state="state"
@@ -54,34 +63,34 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
       <template
         v-if="
           shouldRenderGroupContainer(fieldName) &&
-          isContainerVisible(fields[fieldName]?.parent || '')
+          isContainerVisible(String(fields[fieldName]?.parent ?? ''))
         "
       >
-        <h2 :class="themeWebform.fieldGroupHeader">
+        <h2 :class="props.themeWebform.fieldGroupHeader">
           {{ fields[fieldName]?.parentTitle }}
         </h2>
         <div
           v-if="fields[fieldName]?.parentDescription"
           class="section-desc"
-          v-html="safeHtml(fields[fieldName]?.parentDescription)"
+          v-html="safeHtml(String(fields[fieldName]?.parentDescription ?? ''))"
         />
-        <div :class="themeWebform.fieldGroup">
+        <div :class="props.themeWebform.fieldGroup">
           <template
             v-for="groupedFieldName in getGroupFields(
-              fields[fieldName]?.parent || '',
+              String(fields[fieldName]?.parent ?? ''),
             )"
             :key="groupedFieldName"
           >
             <FieldRenderer
               v-if="
                 !fields[groupedFieldName]?.['#tabGroup'] ||
-                groupedFields[fields[fieldName]?.parent || '']?.find(
+                groupedFields[String(fields[fieldName]?.parent ?? '')]?.find(
                   (name: string) =>
                     fields[name]?.['#tabGroup'] ===
                     fields[groupedFieldName]?.['#tabGroup'],
                 ) === groupedFieldName
               "
-              :field="fields[groupedFieldName]"
+              :field="fields[groupedFieldName]!"
               :field-name="groupedFieldName"
               :fields="fields"
               :ordered-field-names="orderedFieldNames"
@@ -94,7 +103,7 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
       <template v-else-if="shouldRenderIndividualField(fieldName)">
         <FieldRenderer
           v-if="!fields[fieldName]?.['#tabGroup']"
-          :field="fields[fieldName]"
+          :field="fields[fieldName]!"
           :field-name="fieldName"
           :fields="fields"
           :ordered-field-names="orderedFieldNames"
@@ -105,15 +114,15 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
 
     <FieldTurnstile
       :model-value="turnstileToken"
-      @update:model-value="emit('update:turnstileToken', $event)"
+      @update:model-value="emit('update:turnstileToken', String($event ?? ''))"
     />
 
-    <WrapDiv :align="themeWebform.submitAlign">
+    <WrapDiv :align="props.themeWebform.submitAlign">
       <UButton
         :disabled="!isSchemaReady || isLoading"
         :label="submitButtonLabel"
         :loading="isLoading"
-        :size="themeWebform.buttonSize"
+        :size="buttonSize"
         type="submit"
       />
     </WrapDiv>

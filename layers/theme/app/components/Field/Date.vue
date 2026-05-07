@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '../../../types'
+import type { WebformFieldProps, WebformState } from '~/types'
 import {
   CalendarDate,
   DateFormatter,
@@ -78,6 +78,12 @@ const selectedDatesLabel = computed(() =>
         .join(', ')
     : 'Select Date(s)',
 )
+const calendarModel = computed({
+  get: () => models.value as never,
+  set: (value: unknown) => {
+    models.value = (Array.isArray(value) ? value : []) as CalendarDate[]
+  },
+})
 </script>
 
 <template>
@@ -91,7 +97,7 @@ const selectedDatesLabel = computed(() =>
       {{ selectedDatesLabel }}
     </UButton>
     <template #content>
-      <UCalendar v-model="models" class="p-2" multiple />
+      <UCalendar v-model="calendarModel" class="p-2" multiple />
     </template>
   </UPopover>
 </template>

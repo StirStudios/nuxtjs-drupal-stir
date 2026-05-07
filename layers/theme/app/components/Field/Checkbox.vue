@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '../../../types'
+import type { WebformFieldProps } from '~/types'
 import { cleanHTML } from '~/utils/cleanHTML'
 import { useEvaluateState } from '~/composables/useEvaluateState'
 
@@ -12,7 +12,7 @@ const props = defineProps<{
 const checkboxValue = ref<boolean>(false)
 const optionProps = props.field['#optionProperties'] || {}
 const checkboxId = computed(
-  () => props.field['#id'] || `checkbox-${props.fieldName}`,
+  () => String(props.field['#id'] ?? `checkbox-${props.fieldName}`),
 )
 const checkboxLabel = computed(() =>
   String(props.field['#title'] || props.fieldName),
@@ -50,9 +50,11 @@ if (props.field['#states']?.checked) {
   })
 }
 
-const handleModelUpdate = (val: boolean) => {
-  checkboxValue.value = !!val
-  props.state[props.fieldName] = !!val
+const handleModelUpdate = (val: boolean | 'indeterminate') => {
+  const safe = val === true
+
+  checkboxValue.value = safe
+  props.state[props.fieldName] = safe
 }
 </script>
 

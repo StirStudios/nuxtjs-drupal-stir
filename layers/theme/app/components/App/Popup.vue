@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
+import type { WebformDefinition } from '~/types'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
@@ -13,17 +14,13 @@ type PopupNode = {
   slots?: Record<string, unknown>
 }
 
-type PopupWebform = {
-  webformTitle?: string
-}
-
 type PopupProps = {
   id?: string | number
   uuid?: string
   parentUuid?: string
   region?: string
   text?: string
-  webform?: PopupWebform
+  webform?: WebformDefinition
   editLink?: string
   direction?: string
 }
@@ -42,6 +39,10 @@ const description = computed(() => popupProps.value.text ?? '')
 const popupRenderProps = computed(() => {
   const { id, uuid, parentUuid, region, text, webform, editLink, direction } =
     popupProps.value
+
+  if (id === undefined || uuid === undefined) {
+    return null
+  }
 
   return {
     id,
@@ -119,6 +120,7 @@ watch(open, (isOpen) => {
           />
 
           <LazyParagraphPopup
+            v-if="popupRenderProps"
             v-bind="popupRenderProps"
             :on-close="closeModal"
           >

@@ -14,7 +14,9 @@ defineSlots<{ default(): unknown }>()
 const { container: themeContainer, card: themeCard } = useAppConfig().stirTheme
 const gridClasses = computed(() => props.gridItems || props.gridClasses)
 const gridStyles = computed(() => {
-  return [gridClasses.value, props.card ? 'relative z-10' : null].filter(Boolean)
+  return [gridClasses.value, props.card ? 'relative z-10' : null].filter(
+    (value): value is string => typeof value === 'string' && value.length > 0,
+  )
 })
 
 const wrapperClasses = computed(() => {
@@ -24,7 +26,7 @@ const wrapperClasses = computed(() => {
     props.classes || null,
     props.width || null,
     props.spacing || null,
-  ].filter(Boolean)
+  ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
 </script>
 

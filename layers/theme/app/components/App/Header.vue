@@ -124,7 +124,7 @@ const onOpen = (val: boolean) => {
     aria-label="Site header"
     :menu="{
       side: theme.navigation.toggleDirection,
-      content: slideoverMotionContent,
+      content: slideoverMotionContent as never,
     }"
     :mode="theme.navigation.toggleType"
     :title="page?.site_info?.name ?? ''"

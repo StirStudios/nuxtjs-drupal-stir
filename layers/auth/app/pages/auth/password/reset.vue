@@ -46,7 +46,7 @@ useSeoMeta({
       :submit="{ label: 'Update Password' }"
       :title="title"
       :validate="validate"
-      @submit="onSubmit"
+      @submit="onSubmit($event as never)"
     >
       <template #footer>
         <ULink class="text-primary" to="/auth/login">Back to login</ULink>
