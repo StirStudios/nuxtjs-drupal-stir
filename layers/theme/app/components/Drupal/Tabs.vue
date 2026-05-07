@@ -95,7 +95,9 @@ const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
 const drupalCeConfig = computed<DrupalCeConfig>(() => {
   return (config.public.drupalCe || {}) as DrupalCeConfig
 })
-const drupalOrigin = computed(() => getDrupalOrigin(config.public))
+const drupalOrigin = computed(() =>
+  getDrupalOrigin(config.public as Record<string, unknown>),
+)
 
 const normalizeAdminUrl = (value: string): string => {
   const trimmed = value.trim()

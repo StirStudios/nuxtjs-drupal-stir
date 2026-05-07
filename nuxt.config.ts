@@ -95,7 +95,7 @@ export default defineNuxtConfig({
     '/login': {
       robots: false,
     },
-  },
+  } as Record<string, Record<string, unknown>>,
 
   icon: {
     clientBundle: {
