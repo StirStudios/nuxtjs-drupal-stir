@@ -66,19 +66,19 @@ export function useAuthRegister() {
         turnstile_response: turnstileToken.value,
       })
 
-      const requiresVerification = Boolean(response?.verification_required)
-      const verificationSent = Boolean(response?.verification_sent)
+      const isVerificationRequired = Boolean(response?.verification_required)
+      const isVerificationSent = Boolean(response?.verification_sent)
 
-      if (requiresVerification) {
+      if (isVerificationRequired) {
         registrationComplete.value = true
         requiresVerification.value = true
-        registrationMessage.value = verificationSent
+        registrationMessage.value = isVerificationSent
           ? 'Check your inbox to verify your account before signing in.'
           : 'Your account was created and requires email verification before sign-in.'
         toast.add({
-          title: verificationSent ? 'Verify your email' : 'Account created',
+          title: isVerificationSent ? 'Verify your email' : 'Account created',
           description: registrationMessage.value,
-          color: verificationSent ? 'success' : 'warning',
+          color: isVerificationSent ? 'success' : 'warning',
         })
       } else {
         registrationComplete.value = true
