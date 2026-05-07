@@ -38,6 +38,22 @@ export default withNuxt(
     },
   },
   {
+    files: ['layers/theme/**/*.{js,ts,vue}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../../types', '../../../types', '../../../../types'],
+              message: 'Use `~/types` for shared form types in layers/theme.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['layers/theme/app/components/global/node--default.vue'],
     rules: {
       'vue/prop-name-casing': 'off',
