@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { handleValidationError } from '../../app/composables/useValidation'
+import { handleValidationError } from '../../layers/theme/app/composables/useValidation'
 
 describe('handleValidationError', () => {
   it('focuses and scrolls the first errored field and emits a toast', () => {

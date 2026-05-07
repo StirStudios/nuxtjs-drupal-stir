@@ -1,8 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import type { Ref } from 'vue'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '../../app/utils/webformScrollToTop'
+} from '../../layers/theme/app/utils/webformScrollToTop'
 
 describe('webformScrollToTop', () => {
   it('normalizes config defaults and overrides', () => {
@@ -39,7 +40,7 @@ describe('webformScrollToTop', () => {
     })
 
     it('applies primary scroll immediately and fallback after configured delay', () => {
-      const y = { value: 999 }
+      const y = { value: 999 } as Ref<number>
       const scrollToSpy = vi.fn()
       const testWindow = { scrollTo: scrollToSpy }
 
@@ -61,7 +62,7 @@ describe('webformScrollToTop', () => {
     })
 
     it('cancels pending timers on cleanup to avoid late scroll jumps', () => {
-      const y = { value: 999 }
+      const y = { value: 999 } as Ref<number>
       const scrollToSpy = vi.fn()
       const testWindow = { scrollTo: scrollToSpy }
 

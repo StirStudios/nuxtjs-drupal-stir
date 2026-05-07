@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildYupSchema } from '../../app/utils/buildYupSchema'
+import { buildYupSchema } from '../../layers/theme/app/utils/buildYupSchema'
 import type { WebformFieldProps, WebformState } from '../../types'
 
 function createDateTimeField(

@@ -1,16 +1,12 @@
 import { createRequire } from 'node:module'
-import { dirname, resolve as resolvePath } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-const layerDir = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(import.meta.url)
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-29',
-
-  css: ['~/assets/css/main.css'],
+  extends: ['./layers/core', './layers/theme', './layers/auth'],
 
   features: {
     inlineStyles: true,
@@ -99,25 +95,7 @@ export default defineNuxtConfig({
     '/login': {
       robots: false,
     },
-    '/admincontrol': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/login`,
-        statusCode: 302,
-      },
-    },
-    '/admincontrol/login': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/login`,
-        statusCode: 302,
-      },
-    },
-    '/admincontrol/password': {
-      redirect: {
-        to: `${process.env.DRUPAL_URL}/admincontrol/password`,
-        statusCode: 302,
-      },
-    },
-  },
+  } as Record<string, Record<string, unknown>>,
 
   icon: {
     clientBundle: {
@@ -129,13 +107,17 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'social',
-        dir: resolvePath(layerDir, 'app/assets/icons'),
+        dir: './layers/theme/app/assets/icons',
       },
     ],
   },
 
   alias: {
     yup: require.resolve('yup'),
+    '~/utils': 'layers/theme/app/utils',
+    '~/composables': 'layers/theme/app/composables',
+    '~/components': 'layers/theme/app/components',
+    '~/types': 'types',
   },
 
   modules: [

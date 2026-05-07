@@ -1,0 +1,90 @@
+import { defineEventHandler, readBody, createError, getHeader } from 'h3'
+import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+
+function normalizeErrorStatus(error: unknown): number {
+  if (!error || typeof error !== 'object') return 500
+  const statusCode =
+    (error as { statusCode?: unknown; status?: unknown }).statusCode ??
+    (error as { status?: unknown }).status
+
+  return typeof statusCode === 'number' ? statusCode : 500
+}
+
+function normalizeErrorMessage(error: unknown): string {
+  if (!error || typeof error !== 'object')
+    return 'Form submission failed. Please try again later.'
+
+  const statusMessage = (error as { statusMessage?: unknown }).statusMessage
+
+  if (typeof statusMessage === 'string' && statusMessage.trim()) {
+    return statusMessage
+  }
+
+  const message = (error as { message?: unknown }).message
+
+  if (typeof message === 'string' && message.trim()) {
+    return message
+  }
+
+  return 'Form submission failed. Please try again later.'
+}
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  const apiKey =
+    typeof config.apiKey === 'string' && config.apiKey.trim()
+      ? config.apiKey
+      : ''
+
+  try {
+    const fetchJson = $fetch as <T>(
+      request: string,
+      options?: Record<string, unknown>,
+    ) => Promise<T>
+    const body = await readBody<Record<string, unknown>>(event)
+
+    if (!body?.webform_id) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Missing required fields',
+      })
+    }
+
+    // Require a Turnstile token; Drupal stir_webform_rest performs verification.
+    if (!body.turnstile_response) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'CAPTCHA validation failed',
+      })
+    }
+
+    const { csrfToken } = await fetchJson<{ csrfToken: string }>('/api/auth/csrf')
+
+    const drupalApiUrl = `${config.public.api}/api/stir_webform_rest/submit`
+    const origin = getHeader(event, 'origin')
+    const referer = getHeader(event, 'referer')
+    const forwardedFor = getHeader(event, 'x-forwarded-for')
+    const forwardedProto = getHeader(event, 'x-forwarded-proto')
+    const userAgent = getHeader(event, 'user-agent')
+
+    return await fetchJson<Record<string, unknown>>(drupalApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...buildDrupalHeaders({ apiKey, csrfToken }),
+        ...(origin ? { Origin: origin } : {}),
+        ...(referer ? { Referer: referer } : {}),
+        ...(forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {}),
+        ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
+        ...(userAgent ? { 'User-Agent': userAgent } : {}),
+      },
+      body,
+    })
+  } catch (error) {
+    throw createError({
+      statusCode: normalizeErrorStatus(error),
+      statusMessage: normalizeErrorMessage(error),
+    })
+  }
+})
