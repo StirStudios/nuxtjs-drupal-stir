@@ -10,6 +10,7 @@ const { fields, values, editableFields, hasChanges, loading, saving, load, save 
 const isReady = ref(false)
 const uploading = ref(false)
 const selectedFiles = ref<File[]>([])
+const uploadSlot = ref<'avatar' | 'cover' | 'gallery'>('gallery')
 const uploadedItems = ref<Array<{ mid: number; name: string; url: string }>>([])
 
 onMounted(async () => {
@@ -46,11 +47,6 @@ const onSubmit = async () => {
   }
 }
 
-const onFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  selectedFiles.value = target.files ? Array.from(target.files) : []
-}
-
 const onUploadPhotos = async () => {
   if (selectedFiles.value.length === 0) {
     toast.add({ title: 'No files selected', description: 'Choose one or more photos first.', color: 'neutral' })
@@ -60,6 +56,7 @@ const onUploadPhotos = async () => {
   uploading.value = true
   try {
     const formData = new FormData()
+    formData.append('slot', uploadSlot.value)
     for (const file of selectedFiles.value) {
       formData.append('files[]', file)
     }
@@ -135,7 +132,29 @@ const onUploadPhotos = async () => {
           <div class="mt-8 space-y-3 border-t pt-6">
             <h2 class="text-highlighted text-base font-semibold">Profile Photos</h2>
             <p class="text-muted text-sm">Upload one or more profile photos (images only).</p>
-            <input accept="image/*" multiple type="file" @change="onFileChange">
+            <UFormField label="Upload To">
+              <USelect
+                v-model="uploadSlot"
+                :items="[
+                  { label: 'Avatar', value: 'avatar' },
+                  { label: 'Cover', value: 'cover' },
+                  { label: 'Gallery', value: 'gallery' },
+                ]"
+                label-key="label"
+                value-key="value"
+                class="w-52"
+              />
+            </UFormField>
+            <UFileUpload
+              v-model="selectedFiles"
+              accept="image/*"
+              description="PNG, JPG, WebP or GIF (max. 10MB each)"
+              icon="i-lucide-image"
+              label="Drop your profile photos here"
+              layout="list"
+              multiple
+              class="min-h-40"
+            />
             <UButton :disabled="uploading || selectedFiles.length === 0" :loading="uploading" @click="onUploadPhotos">
               Upload Photos
             </UButton>

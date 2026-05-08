@@ -14,7 +14,13 @@ export default defineEventHandler(async (event) => {
   const formData = new FormData()
 
   for (const part of parts) {
-    if (!part.filename || !(part.data instanceof Uint8Array)) {
+    if (!part.filename) {
+      if (part.name === 'slot') {
+        const slotValue = new TextDecoder().decode(part.data).trim()
+        if (slotValue) {
+          formData.append('slot', slotValue)
+        }
+      }
       continue
     }
 
