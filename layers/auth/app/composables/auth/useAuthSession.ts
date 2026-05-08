@@ -11,15 +11,30 @@ export function useAuthSession() {
     'auth-session-user',
     () => null,
   )
+  let pendingSessionFetch: Promise<void> | null = null
 
   const fetchSession = async () => {
-    const requestFetch = useRequestFetch()
-    const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
+    if (pendingSessionFetch) {
+      await pendingSessionFetch
+      return
+    }
 
-    loggedIn.value = Boolean(session?.authenticated)
-    protectedLoggedIn.value = Boolean(session?.protectedAuthenticated)
-    user.value = session?.user ?? null
-    ready.value = true
+    const requestFetch = useRequestFetch()
+
+    pendingSessionFetch = (async () => {
+      const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
+
+      loggedIn.value = Boolean(session?.authenticated)
+      protectedLoggedIn.value = Boolean(session?.protectedAuthenticated)
+      user.value = session?.user ?? null
+      ready.value = true
+    })()
+
+    try {
+      await pendingSessionFetch
+    } finally {
+      pendingSessionFetch = null
+    }
   }
 
   const clearSession = () => {

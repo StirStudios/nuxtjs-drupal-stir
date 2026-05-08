@@ -9,6 +9,7 @@ export default defineAppConfig({
     loginRedirectPath: '/',
     logoutRedirectPath: '/auth/login',
     protectedFallbackRedirectPath: '/',
+    backgroundImage: '',
     login: {
       title: 'Login',
       description: 'Sign in to continue.',
@@ -31,4 +32,3 @@ export default defineAppConfig({
     },
   },
 })
-

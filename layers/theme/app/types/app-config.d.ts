@@ -10,12 +10,14 @@ type ProtectedRoutesConfig = {
 type AuthPageCopyConfig = {
   title?: string
   description?: string
+  backgroundImage?: string
 } & LooseRecord
 
 type AuthConfig = {
   loginRedirectPath?: string
   logoutRedirectPath?: string
   protectedFallbackRedirectPath?: string
+  backgroundImage?: string
   login?: AuthPageCopyConfig
   protectedPage?: AuthPageCopyConfig
   register?: AuthPageCopyConfig
