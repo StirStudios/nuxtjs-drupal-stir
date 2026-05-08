@@ -379,32 +379,26 @@ const onGalleryDrop = async (targetMid: number) => {
 
 <template>
   <NuxtLayout name="account">
-    <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-      <div v-if="loading || !isReady" class="text-muted text-sm">
-        Loading profile...
-      </div>
+    <AccountProfileForm
+      v-if="!loading && isReady && displayFields.length > 0"
+      :editable-fields-count="displayEditableFieldsCount"
+      :fields="displayFields"
+      :has-profile-save="hasChanges"
+      heading="Profile"
+      :saving="saving"
+      subheading="Update your Drupal profile fields."
+      :values="values"
+      @submit="onSubmit"
+    />
 
-      <template v-else>
-        <AccountProfileForm
-          v-if="displayFields.length > 0"
-          :editable-fields-count="displayEditableFieldsCount"
-          :fields="displayFields"
-          :has-profile-save="hasChanges"
-          heading="Profile"
-          :saving="saving"
-          subheading="Update your Drupal profile fields."
-          :values="values"
-          @submit="onSubmit"
-        />
+    <div v-if="!loading && isReady" class="space-y-3">
+      <h2 class="text-highlighted text-base font-semibold">
+        Profile Photos
+      </h2>
 
-        <div class="space-y-3">
-          <h2 class="text-highlighted text-base font-semibold">
-            Profile Photos
-          </h2>
-
-          <p class="text-muted text-sm">
-            Drag and drop to upload. In gallery, drag tiles to reorder.
-          </p>
+      <p class="text-muted text-sm">
+        Drag and drop to upload. In gallery, drag tiles to reorder.
+      </p>
 
           <div class="space-y-4">
             <div
@@ -505,8 +499,6 @@ const onGalleryDrop = async (targetMid: number) => {
               </div>
             </div>
           </div>
-        </div>
-      </template>
     </div>
   </NuxtLayout>
 </template>

@@ -31,7 +31,7 @@ const pageTitle = computed(() =>
       />
 
       <template #footer>
-        <UButton icon="i-lucide-arrow-left" to="/" variant="ghost">
+        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
           Back to site
         </UButton>
       </template>
