@@ -18,12 +18,23 @@ const pageTitle = computed(() =>
       v-model:open="sidebarOpen"
       collapsible="icon"
       rail
-      title="Account"
       :ui="{
         container: 'h-full',
         inner: 'bg-default',
       }"
     >
+      <template #header>
+        <UButton
+          class="w-full justify-start overflow-hidden"
+          color="neutral"
+          icon="i-lucide-user-round"
+          :label="sidebarOpen ? 'Account' : undefined"
+          :square="!sidebarOpen"
+          to="/account/settings"
+          variant="ghost"
+        />
+      </template>
+
       <UNavigationMenu
         :items="items"
         orientation="vertical"
@@ -31,9 +42,16 @@ const pageTitle = computed(() =>
       />
 
       <template #footer>
-        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
-          Back to site
-        </UButton>
+        <UButton
+          class="w-full justify-start overflow-hidden"
+          color="neutral"
+          icon="i-lucide-arrow-left"
+          :label="sidebarOpen ? 'Back to site' : undefined"
+          size="sm"
+          :square="!sidebarOpen"
+          to="/"
+          variant="ghost"
+        />
       </template>
     </USidebar>
 
