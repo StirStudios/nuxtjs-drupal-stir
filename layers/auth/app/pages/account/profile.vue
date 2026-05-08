@@ -380,7 +380,8 @@ const onGalleryDrop = async (targetMid: number) => {
                     <div class="aspect-square w-full overflow-hidden rounded-md">
                       <MediaImage
                         :alt="String(item.alt || item.title || 'Profile media')"
-                        image-class="h-full w-full !object-cover"
+                        :draggable="false"
+                        :image-class="section.key === 'gallery' ? 'pointer-events-none select-none h-full w-full !object-cover' : 'h-full w-full !object-cover'"
                         no-wrapper
                         :src="String(item.src || '')"
                       />
