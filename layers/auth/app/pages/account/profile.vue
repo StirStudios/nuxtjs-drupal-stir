@@ -3,7 +3,7 @@ import { useAccountProfile } from '../../composables/account/useAccountProfile'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
 
 definePageMeta({
-  layout: 'account',
+  layout: false,
   accountTitle: 'Profile',
   accountSubtitle: 'Manage your profile details and photos.',
 })
@@ -377,136 +377,138 @@ const onGalleryDrop = async (targetMid: number) => {
 </script>
 
 <template>
-  <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-    <div v-if="loading || !isReady" class="space-y-4">
-      <USkeleton class="h-5 w-28" />
-      <USkeleton class="h-10 w-full" />
-      <USkeleton class="h-10 w-full" />
-      <USkeleton class="h-10 w-1/2" />
-    </div>
+  <NuxtLayout name="account">
+    <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
+      <div v-if="loading || !isReady" class="space-y-4">
+        <USkeleton class="h-5 w-28" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-1/2" />
+      </div>
 
-    <template v-else>
-      <AccountProfileForm
-        v-if="displayFields.length > 0"
-        :editable-fields-count="displayEditableFieldsCount"
-        :fields="displayFields"
-        :has-profile-save="hasChanges"
-        heading="Profile"
-        :saving="saving"
-        subheading="Update your Drupal profile fields."
-        :values="values"
-        @submit="onSubmit"
-      />
+      <template v-else>
+        <AccountProfileForm
+          v-if="displayFields.length > 0"
+          :editable-fields-count="displayEditableFieldsCount"
+          :fields="displayFields"
+          :has-profile-save="hasChanges"
+          heading="Profile"
+          :saving="saving"
+          subheading="Update your Drupal profile fields."
+          :values="values"
+          @submit="onSubmit"
+        />
 
-      <div class="space-y-3">
-        <h2 class="text-highlighted text-base font-semibold">
-          Profile Photos
-        </h2>
+        <div class="space-y-3">
+          <h2 class="text-highlighted text-base font-semibold">
+            Profile Photos
+          </h2>
 
-        <p class="text-muted text-sm">
-          Drag and drop to upload. In gallery, drag tiles to reorder.
-        </p>
+          <p class="text-muted text-sm">
+            Drag and drop to upload. In gallery, drag tiles to reorder.
+          </p>
 
-        <div class="space-y-4">
-          <div
-            v-for="section in mediaSections"
-            :key="section.key"
-            class="space-y-2"
-          >
-            <h3 class="text-sm font-medium">{{ section.label }}</h3>
-
+          <div class="space-y-4">
             <div
-              v-if="uploadingSlot === section.key"
-              class="text-muted text-sm"
+              v-for="section in mediaSections"
+              :key="section.key"
+              class="space-y-2"
             >
-              Uploading...
-            </div>
+              <h3 class="text-sm font-medium">{{ section.label }}</h3>
 
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
               <div
-                v-for="item in section.items"
-                :key="item.mid"
-                class="bg-elevated group relative rounded-md p-2"
-                :class="
-                  section.key === 'gallery'
-                    ? 'cursor-grab active:cursor-grabbing'
-                    : ''
-                "
-                :draggable="section.key === 'gallery'"
-                @dragover.prevent="section.key === 'gallery'"
-                @dragstart="
-                  section.key === 'gallery' &&
-                  onGalleryDragStart(item.mid)
-                "
-                @drop.prevent="
-                  section.key === 'gallery' && onGalleryDrop(item.mid)
-                "
+                v-if="uploadingSlot === section.key"
+                class="text-muted text-sm"
               >
-                <UButton
-                  class="absolute top-3 right-3 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
-                  color="neutral"
-                  icon="i-lucide-x"
-                  :loading="
-                    deletingMediaKey === `${section.key}-${item.mid}`
-                  "
-                  size="xs"
-                  variant="soft"
-                  @click="
-                    onRemoveProfileMediaItem(
-                      section.key as 'avatar' | 'cover' | 'gallery',
-                      item,
-                    )
-                  "
-                />
-
-                <div
-                  class="aspect-square w-full overflow-hidden rounded-md"
-                >
-                  <MediaImage
-                    :alt="
-                      String(item.alt || item.title || 'Profile media')
-                    "
-                    :draggable="false"
-                    :image-class="
-                      section.key === 'gallery'
-                        ? 'pointer-events-none select-none h-full w-full !object-cover'
-                        : 'h-full w-full !object-cover'
-                    "
-                    no-wrapper
-                    :src="String(item.src || '')"
-                  />
-                </div>
-
-                <p class="text-muted mt-2 truncate text-xs">
-                  {{ item.title || `Media #${item.mid}` }}
-                </p>
+                Uploading...
               </div>
 
-              <UFileUpload
-                v-if="canShowUploader(section)"
-                v-model="uploadFiles[section.key]"
-                accept="image/*"
-                :class="
-                  section.multiple ? 'h-full min-h-0' : 'col-span-full'
-                "
-                description="PNG, JPG, WebP or GIF"
-                icon="i-lucide-image-plus"
-                :label="section.multiple ? 'Add photos' : 'Add photo'"
-                :multiple="section.multiple"
-                :ui="{
-                  root: section.multiple ? 'h-full' : 'w-full',
-                  base: section.multiple
-                    ? 'h-full min-h-36'
-                    : 'w-full min-h-36',
-                }"
-                @update:model-value="
-                  onFilesSelected(section.key, $event)
-                "
-              />
+              <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
+                <div
+                  v-for="item in section.items"
+                  :key="item.mid"
+                  class="bg-elevated group relative rounded-md p-2"
+                  :class="
+                    section.key === 'gallery'
+                      ? 'cursor-grab active:cursor-grabbing'
+                      : ''
+                  "
+                  :draggable="section.key === 'gallery'"
+                  @dragover.prevent="section.key === 'gallery'"
+                  @dragstart="
+                    section.key === 'gallery' &&
+                    onGalleryDragStart(item.mid)
+                  "
+                  @drop.prevent="
+                    section.key === 'gallery' && onGalleryDrop(item.mid)
+                  "
+                >
+                  <UButton
+                    class="absolute top-3 right-3 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+                    color="neutral"
+                    icon="i-lucide-x"
+                    :loading="
+                      deletingMediaKey === `${section.key}-${item.mid}`
+                    "
+                    size="xs"
+                    variant="soft"
+                    @click="
+                      onRemoveProfileMediaItem(
+                        section.key as 'avatar' | 'cover' | 'gallery',
+                        item,
+                      )
+                    "
+                  />
+
+                  <div
+                    class="aspect-square w-full overflow-hidden rounded-md"
+                  >
+                    <MediaImage
+                      :alt="
+                        String(item.alt || item.title || 'Profile media')
+                      "
+                      :draggable="false"
+                      :image-class="
+                        section.key === 'gallery'
+                          ? 'pointer-events-none select-none h-full w-full !object-cover'
+                          : 'h-full w-full !object-cover'
+                      "
+                      no-wrapper
+                      :src="String(item.src || '')"
+                    />
+                  </div>
+
+                  <p class="text-muted mt-2 truncate text-xs">
+                    {{ item.title || `Media #${item.mid}` }}
+                  </p>
+                </div>
+
+                <UFileUpload
+                  v-if="canShowUploader(section)"
+                  v-model="uploadFiles[section.key]"
+                  accept="image/*"
+                  :class="
+                    section.multiple ? 'h-full min-h-0' : 'col-span-full'
+                  "
+                  description="PNG, JPG, WebP or GIF"
+                  icon="i-lucide-image-plus"
+                  :label="section.multiple ? 'Add photos' : 'Add photo'"
+                  :multiple="section.multiple"
+                  :ui="{
+                    root: section.multiple ? 'h-full' : 'w-full',
+                    base: section.multiple
+                      ? 'h-full min-h-36'
+                      : 'w-full min-h-36',
+                  }"
+                  @update:model-value="
+                    onFilesSelected(section.key, $event)
+                  "
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </template>
-  </div>
+      </template>
+    </div>
+  </NuxtLayout>
 </template>

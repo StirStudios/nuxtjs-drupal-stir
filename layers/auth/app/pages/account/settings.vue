@@ -5,7 +5,7 @@ import { accountPasswordChangeValidationSchema } from '../../utils/authValidatio
 import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 definePageMeta({
-  layout: 'account',
+  layout: false,
   accountTitle: 'Account Settings',
   accountSubtitle: 'Manage your login details and account security.',
 })
@@ -172,42 +172,44 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-    <div v-if="loading || !isReady" class="space-y-4">
-      <USkeleton class="h-5 w-28" />
-      <USkeleton class="h-10 w-full" />
-      <USkeleton class="h-10 w-full" />
-      <USkeleton class="h-10 w-1/2" />
+  <NuxtLayout name="account">
+    <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
+      <div v-if="loading || !isReady" class="space-y-4">
+        <USkeleton class="h-5 w-28" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-1/2" />
+      </div>
+
+      <template v-else>
+        <UTabs class="w-full" :items="settingsTabs" variant="link">
+          <template #settings>
+            <AccountProfileForm
+              :editable-fields-count="2"
+              :fields="settingsFields"
+              :has-profile-save="hasChanges"
+              heading="Settings"
+              :saving="saving"
+              subheading="Update your account login details."
+              :values="values"
+              @submit="onSubmitSettings"
+            />
+          </template>
+
+          <template #security>
+            <AccountSecurityForm
+              v-model:cancel-modal-open="cancelModalOpen"
+              v-model:current-password="currentPassword"
+              v-model:new-password="newPassword"
+              :canceling-account="cancelingAccount"
+              :changing-password="changingPassword"
+              :portal="portal"
+              @cancel-account="onCancelAccount"
+              @change-password="onChangePassword"
+            />
+          </template>
+        </UTabs>
+      </template>
     </div>
-
-    <template v-else>
-      <UTabs class="w-full" :items="settingsTabs" variant="link">
-        <template #settings>
-          <AccountProfileForm
-            :editable-fields-count="2"
-            :fields="settingsFields"
-            :has-profile-save="hasChanges"
-            heading="Settings"
-            :saving="saving"
-            subheading="Update your account login details."
-            :values="values"
-            @submit="onSubmitSettings"
-          />
-        </template>
-
-        <template #security>
-          <AccountSecurityForm
-            v-model:cancel-modal-open="cancelModalOpen"
-            v-model:current-password="currentPassword"
-            v-model:new-password="newPassword"
-            :canceling-account="cancelingAccount"
-            :changing-password="changingPassword"
-            :portal="portal"
-            @cancel-account="onCancelAccount"
-            @change-password="onChangePassword"
-          />
-        </template>
-      </UTabs>
-    </template>
-  </div>
+  </NuxtLayout>
 </template>
