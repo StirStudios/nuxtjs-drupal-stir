@@ -22,6 +22,7 @@ const {
   save,
 } = useAccountProfile()
 
+const isReady = ref(false)
 const uploadingSlot = ref<'avatar' | 'cover' | 'gallery' | null>(null)
 const deletingMediaKey = ref<string | null>(null)
 const uploadFiles = reactive<Record<'avatar' | 'cover' | 'gallery', File[]>>({
@@ -122,7 +123,9 @@ onMounted(async () => {
     return
   }
 
+  isReady.value = false
   await load()
+  isReady.value = true
 })
 
 const onSubmit = async () => {
@@ -377,7 +380,7 @@ const onGalleryDrop = async (targetMid: number) => {
 <template>
   <NuxtLayout name="account">
     <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-      <div v-if="loading" class="text-muted text-sm">
+      <div v-if="loading || !isReady" class="text-muted text-sm">
         Loading profile...
       </div>
 

@@ -6,7 +6,7 @@ import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 definePageMeta({
   layout: false,
-  accountTitle: 'Account Settings',
+  accountTitle: 'Settings',
   accountSubtitle: 'Manage your login details and account security.',
 })
 
@@ -14,6 +14,7 @@ const toast = useToast()
 const session = useAuthSession()
 const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
 
+const isReady = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const changingPassword = ref(false)
@@ -50,7 +51,9 @@ onMounted(async () => {
     return
   }
 
+  isReady.value = false
   await load()
+  isReady.value = true
 })
 
 const onSubmitSettings = async () => {
@@ -172,7 +175,7 @@ const onCancelAccount = async () => {
 <template>
   <NuxtLayout name="account">
     <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-      <div v-if="loading" class="text-muted text-sm">
+      <div v-if="loading || !isReady" class="text-muted text-sm">
         Loading settings...
       </div>
 
