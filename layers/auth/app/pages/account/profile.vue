@@ -4,8 +4,17 @@ import { useAuthSession } from '../../composables/auth/useAuthSession'
 
 const toast = useToast()
 const session = useAuthSession()
-const { fields, values, editableFields, profileMedia, hasChanges, loading, saving, load, save } =
-  useAccountProfile()
+const {
+  fields,
+  values,
+  editableFields,
+  profileMedia,
+  hasChanges,
+  loading,
+  saving,
+  load,
+  save,
+} = useAccountProfile()
 
 const isReady = ref(false)
 const uploadingSlot = ref<'avatar' | 'cover' | 'gallery' | null>(null)
@@ -15,7 +24,9 @@ const uploadFiles = reactive<Record<'avatar' | 'cover' | 'gallery', File[]>>({
   cover: [],
   gallery: [],
 })
-const uploadTimers: Partial<Record<'avatar' | 'cover' | 'gallery', ReturnType<typeof setTimeout>>> = {}
+const uploadTimers: Partial<
+  Record<'avatar' | 'cover' | 'gallery', ReturnType<typeof setTimeout>>
+> = {}
 const localGalleryItems = ref<ProfileMediaItem[]>([])
 const dragGalleryMid = ref<number | null>(null)
 
@@ -36,11 +47,14 @@ const hiddenProfileFieldNames = new Set([
 ])
 
 const displayFields = computed(() =>
-  fields.value.filter(field => !hiddenProfileFieldNames.has(field.name)),
+  fields.value.filter((field) => !hiddenProfileFieldNames.has(field.name)),
 )
 
-const displayEditableFieldsCount = computed(() =>
-  editableFields.value.filter(field => !hiddenProfileFieldNames.has(field.name)).length,
+const displayEditableFieldsCount = computed(
+  () =>
+    editableFields.value.filter(
+      (field) => !hiddenProfileFieldNames.has(field.name),
+    ).length,
 )
 
 const mediaSections = computed(() => {
@@ -53,9 +67,24 @@ const mediaSections = computed(() => {
   const gallery = localGalleryItems.value
 
   return [
-    { key: 'avatar' as const, label: 'Profile avatar', items: avatar, multiple: false },
-    { key: 'cover' as const, label: 'Profile cover', items: cover, multiple: false },
-    { key: 'gallery' as const, label: 'Profile gallery', items: gallery, multiple: true },
+    {
+      key: 'avatar' as const,
+      label: 'Profile avatar',
+      items: avatar,
+      multiple: false,
+    },
+    {
+      key: 'cover' as const,
+      label: 'Profile cover',
+      items: cover,
+      multiple: false,
+    },
+    {
+      key: 'gallery' as const,
+      label: 'Profile gallery',
+      items: gallery,
+      multiple: true,
+    },
   ]
 })
 
@@ -69,7 +98,10 @@ watch(
   { immediate: true },
 )
 
-const canShowUploader = (section: { key: 'avatar' | 'cover' | 'gallery'; items: ProfileMediaItem[] }): boolean => {
+const canShowUploader = (section: {
+  key: 'avatar' | 'cover' | 'gallery'
+  items: ProfileMediaItem[]
+}): boolean => {
   if (section.key === 'gallery') {
     return true
   }
@@ -94,12 +126,20 @@ const onSubmit = async () => {
     const response = await save()
 
     if (response?.no_changes) {
-      toast.add({ title: 'No changes', description: 'There is nothing new to save.', color: 'neutral' })
+      toast.add({
+        title: 'No changes',
+        description: 'There is nothing new to save.',
+        color: 'neutral',
+      })
       return
     }
 
     if (response?.updated) {
-      toast.add({ title: 'Profile updated', description: 'Your changes were saved.', color: 'success' })
+      toast.add({
+        title: 'Profile updated',
+        description: 'Your changes were saved.',
+        color: 'success',
+      })
     }
   } catch (error: unknown) {
     const message =
@@ -113,7 +153,11 @@ const onSubmit = async () => {
 
 const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
   if (uploadFiles[slot].length === 0) {
-    toast.add({ title: 'No files selected', description: 'Choose one or more photos first.', color: 'neutral' })
+    toast.add({
+      title: 'No files selected',
+      description: 'Choose one or more photos first.',
+      color: 'neutral',
+    })
     return
   }
 
@@ -131,31 +175,39 @@ const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
       error?: string
       items?: Array<{ mid: number; name: string; url: string }>
       errors?: Array<{ file: string; error: string }>
-    }>(
-      '/api/account/profile/media/upload',
-      {
-        method: 'POST',
-        body: formData,
-      },
-    )
+    }>('/api/account/profile/media/upload', {
+      method: 'POST',
+      body: formData,
+    })
 
     if (Array.isArray(response.items) && response.items.length > 0) {
-      toast.add({ title: 'Photos uploaded', description: `${response.items.length} photo(s) uploaded.`, color: 'success' })
+      toast.add({
+        title: 'Photos uploaded',
+        description: `${response.items.length} photo(s) uploaded.`,
+        color: 'success',
+      })
       await load({ silent: true })
     }
 
     if (Array.isArray(response.errors) && response.errors.length > 0) {
       toast.add({
         title: 'Some uploads failed',
-        description: response.errors[0]?.error || 'One or more files could not be uploaded.',
+        description:
+          response.errors[0]?.error ||
+          'One or more files could not be uploaded.',
         color: 'warning',
       })
     }
 
-    if (!response.uploaded && (!Array.isArray(response.items) || response.items.length === 0)) {
+    if (
+      !response.uploaded &&
+      (!Array.isArray(response.items) || response.items.length === 0)
+    ) {
       toast.add({
         title: 'Upload failed',
-        description: response.error || 'No files were uploaded. Check profile media field setup in Drupal.',
+        description:
+          response.error ||
+          'No files were uploaded. Check profile media field setup in Drupal.',
         color: 'error',
       })
     }
@@ -177,23 +229,26 @@ const onFilesSelected = async (
   slot: 'avatar' | 'cover' | 'gallery',
   value: File | File[] | FileList | null | undefined,
 ) => {
-  const files = value instanceof FileList
-    ? Array.from(value)
-    : Array.isArray(value)
-    ? value
-    : value instanceof File
-      ? [value]
-      : []
+  const files =
+    value instanceof FileList
+      ? Array.from(value)
+      : Array.isArray(value)
+        ? value
+        : value instanceof File
+          ? [value]
+          : []
 
   if (slot === 'gallery') {
     const existing = uploadFiles.gallery
     const merged = [...existing, ...files]
-    const deduped = merged.filter((file, index, all) =>
-      all.findIndex(candidate =>
-        candidate.name === file.name
-        && candidate.size === file.size
-        && candidate.lastModified === file.lastModified,
-      ) === index,
+    const deduped = merged.filter(
+      (file, index, all) =>
+        all.findIndex(
+          (candidate) =>
+            candidate.name === file.name &&
+            candidate.size === file.size &&
+            candidate.lastModified === file.lastModified,
+        ) === index,
     )
 
     uploadFiles.gallery = deduped
@@ -222,13 +277,16 @@ const onRemoveProfileMediaItem = async (
   deletingMediaKey.value = key
 
   try {
-    const response = await $fetch<{ removed?: boolean; error?: string }>('/api/account/profile/media/delete', {
-      method: 'POST',
-      body: {
-        slot,
-        mid: item.mid,
+    const response = await $fetch<{ removed?: boolean; error?: string }>(
+      '/api/account/profile/media/delete',
+      {
+        method: 'POST',
+        body: {
+          slot,
+          mid: item.mid,
+        },
       },
-    })
+    )
 
     if (response.removed) {
       toast.add({
@@ -270,8 +328,8 @@ const onGalleryDrop = async (targetMid: number) => {
   }
 
   const current = [...localGalleryItems.value]
-  const fromIndex = current.findIndex(item => item.mid === sourceMid)
-  const toIndex = current.findIndex(item => item.mid === targetMid)
+  const fromIndex = current.findIndex((item) => item.mid === sourceMid)
+  const toIndex = current.findIndex((item) => item.mid === targetMid)
 
   if (fromIndex < 0 || toIndex < 0) {
     return
@@ -291,10 +349,14 @@ const onGalleryDrop = async (targetMid: number) => {
       method: 'POST',
       body: {
         slot: 'gallery',
-        ordered_mids: next.map(item => item.mid),
+        ordered_mids: next.map((item) => item.mid),
       },
     })
-    toast.add({ title: 'Order updated', description: 'Gallery order saved.', color: 'success' })
+    toast.add({
+      title: 'Order updated',
+      description: 'Gallery order saved.',
+      color: 'success',
+    })
     await load({ silent: true })
   } catch (error: unknown) {
     localGalleryItems.value = current
@@ -309,103 +371,203 @@ const onGalleryDrop = async (targetMid: number) => {
 </script>
 
 <template>
-  <div class="w-full px-4 py-8">
-    <div class="mx-auto w-full max-w-lg space-y-6">
-      <div class="flex items-center justify-between gap-3">
-        <h1 class="text-highlighted mb-0 text-xl font-semibold">Profile</h1>
-        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">Back to site</UButton>
-      </div>
+  <div class="bg-muted min-h-screen">
+    <div class="border-default bg-default border-b px-6 py-4 text-center">
+      <span class="text-muted text-sm">StirStudios • Profile</span>
+    </div>
 
-      <div class="flex items-center gap-2">
-        <UButton color="neutral" to="/account/settings" variant="ghost">Settings</UButton>
-        <UButton color="neutral" to="/account/profile" variant="soft">Profile</UButton>
-      </div>
+    <div
+      class="grid min-h-[calc(100vh-57px)] grid-cols-1 md:grid-cols-[260px_1fr]"
+    >
+      <!-- Left sidebar -->
+      <aside class="border-default bg-default border-r p-4">
+        <nav class="space-y-6">
+          <div>
+            <p class="text-muted mb-2 text-sm">Account</p>
 
-      <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-        <div v-if="loading || !isReady" class="space-y-4">
-          <USkeleton class="h-5 w-28" />
-          <USkeleton class="h-10 w-full" />
-          <USkeleton class="h-10 w-full" />
-          <USkeleton class="h-10 w-1/2" />
-        </div>
+            <div class="space-y-1">
+              <UButton
+                block
+                class="justify-start"
+                color="neutral"
+                icon="i-lucide-settings"
+                to="/account/settings"
+                variant="ghost"
+              >
+                Settings
+              </UButton>
 
-        <template v-else>
-          <AccountProfileForm
-            v-if="displayFields.length > 0"
-            :editable-fields-count="displayEditableFieldsCount"
-            :fields="displayFields"
-            :has-profile-save="hasChanges"
-            heading="Profile"
-            :saving="saving"
-            subheading="Update your Drupal profile fields."
-            :values="values"
-            @submit="onSubmit"
-          />
-
-          <div class="space-y-3">
-            <h2 class="text-highlighted text-base font-semibold">Profile Photos</h2>
-            <p class="text-muted text-sm">Select images below to upload instantly.</p>
-
-            <div class="space-y-4">
-              <div v-for="section in mediaSections" :key="section.key" class="space-y-2">
-                <h3 class="text-sm font-medium">{{ section.label }}</h3>
-                <div
-                  v-if="uploadingSlot === section.key"
-                  class="text-muted text-sm"
-                >
-                  Uploading...
-                </div>
-                <div
-                  class="grid grid-cols-2 gap-3 md:grid-cols-3"
-                >
-                  <div
-                    v-for="item in section.items"
-                    :key="item.mid"
-                    class="bg-elevated group relative rounded-md p-2"
-                    :class="section.key === 'gallery' ? 'cursor-grab active:cursor-grabbing' : ''"
-                    :draggable="section.key === 'gallery'"
-                    @dragover.prevent="section.key === 'gallery'"
-                    @dragstart="section.key === 'gallery' && onGalleryDragStart(item.mid)"
-                    @drop.prevent="section.key === 'gallery' && onGalleryDrop(item.mid)"
-                  >
-                    <UButton
-                      class="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-                      color="neutral"
-                      icon="i-lucide-x"
-                      :loading="deletingMediaKey === `${section.key}-${item.mid}`"
-                      size="xs"
-                      variant="soft"
-                      @click="onRemoveProfileMediaItem(section.key as 'avatar' | 'cover' | 'gallery', item)"
-                    />
-                    <div class="aspect-square w-full overflow-hidden rounded-md">
-                      <MediaImage
-                        :alt="String(item.alt || item.title || 'Profile media')"
-                        :draggable="false"
-                        :image-class="section.key === 'gallery' ? 'pointer-events-none select-none h-full w-full !object-cover' : 'h-full w-full !object-cover'"
-                        no-wrapper
-                        :src="String(item.src || '')"
-                      />
-                    </div>
-                    <p class="text-muted mt-2 truncate text-xs">{{ item.title || `Media #${item.mid}` }}</p>
-                  </div>
-                  <UFileUpload
-                    v-if="canShowUploader(section)"
-                    v-model="uploadFiles[section.key]"
-                    accept="image/*"
-                    :class="section.multiple ? 'h-full min-h-0' : 'col-span-full'"
-                    description="PNG, JPG, WebP or GIF"
-                    icon="i-lucide-image-plus"
-                    :label="section.multiple ? 'Add photos' : 'Add photo'"
-                    :multiple="section.multiple"
-                    :ui="{ root: section.multiple ? 'h-full' : 'w-full', base: section.multiple ? 'h-full min-h-36' : 'w-full min-h-36' }"
-                    @update:model-value="onFilesSelected(section.key, $event)"
-                  />
-                </div>
-              </div>
+              <UButton
+                block
+                class="justify-start"
+                color="neutral"
+                icon="i-lucide-user-round"
+                to="/account/profile"
+                variant="soft"
+              >
+                Profile
+              </UButton>
             </div>
           </div>
-        </template>
-      </div>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="w-full px-4 py-8 md:px-8">
+        <div class="mx-auto w-full max-w-4xl space-y-6">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h1 class="text-highlighted mb-1 text-xl font-semibold">
+                Profile
+              </h1>
+              <p class="text-muted text-sm">
+                Manage your profile details and photos.
+              </p>
+            </div>
+
+            <UButton
+              icon="i-lucide-arrow-left"
+              size="sm"
+              to="/"
+              variant="ghost"
+            >
+              Back to site
+            </UButton>
+          </div>
+
+          <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
+            <div v-if="loading || !isReady" class="space-y-4">
+              <USkeleton class="h-5 w-28" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-full" />
+              <USkeleton class="h-10 w-1/2" />
+            </div>
+
+            <template v-else>
+              <AccountProfileForm
+                v-if="displayFields.length > 0"
+                :editable-fields-count="displayEditableFieldsCount"
+                :fields="displayFields"
+                :has-profile-save="hasChanges"
+                heading="Profile"
+                :saving="saving"
+                subheading="Update your Drupal profile fields."
+                :values="values"
+                @submit="onSubmit"
+              />
+
+              <div class="space-y-3">
+                <h2 class="text-highlighted text-base font-semibold">
+                  Profile Photos
+                </h2>
+                <p class="text-muted text-sm">
+                  Select images below to upload instantly.
+                </p>
+
+                <div class="space-y-4">
+                  <div
+                    v-for="section in mediaSections"
+                    :key="section.key"
+                    class="space-y-2"
+                  >
+                    <h3 class="text-sm font-medium">{{ section.label }}</h3>
+
+                    <div
+                      v-if="uploadingSlot === section.key"
+                      class="text-muted text-sm"
+                    >
+                      Uploading...
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
+                      <div
+                        v-for="item in section.items"
+                        :key="item.mid"
+                        class="bg-elevated group relative rounded-md p-2"
+                        :class="
+                          section.key === 'gallery'
+                            ? 'cursor-grab active:cursor-grabbing'
+                            : ''
+                        "
+                        :draggable="section.key === 'gallery'"
+                        @dragover.prevent="section.key === 'gallery'"
+                        @dragstart="
+                          section.key === 'gallery' &&
+                          onGalleryDragStart(item.mid)
+                        "
+                        @drop.prevent="
+                          section.key === 'gallery' && onGalleryDrop(item.mid)
+                        "
+                      >
+                        <UButton
+                          class="absolute top-3 right-3 z-10 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+                          color="neutral"
+                          icon="i-lucide-x"
+                          :loading="
+                            deletingMediaKey === `${section.key}-${item.mid}`
+                          "
+                          size="xs"
+                          variant="soft"
+                          @click="
+                            onRemoveProfileMediaItem(
+                              section.key as 'avatar' | 'cover' | 'gallery',
+                              item,
+                            )
+                          "
+                        />
+
+                        <div
+                          class="aspect-square w-full overflow-hidden rounded-md"
+                        >
+                          <MediaImage
+                            :alt="
+                              String(item.alt || item.title || 'Profile media')
+                            "
+                            :draggable="false"
+                            :image-class="
+                              section.key === 'gallery'
+                                ? 'pointer-events-none select-none h-full w-full !object-cover'
+                                : 'h-full w-full !object-cover'
+                            "
+                            no-wrapper
+                            :src="String(item.src || '')"
+                          />
+                        </div>
+
+                        <p class="text-muted mt-2 truncate text-xs">
+                          {{ item.title || `Media #${item.mid}` }}
+                        </p>
+                      </div>
+
+                      <UFileUpload
+                        v-if="canShowUploader(section)"
+                        v-model="uploadFiles[section.key]"
+                        accept="image/*"
+                        :class="
+                          section.multiple ? 'h-full min-h-0' : 'col-span-full'
+                        "
+                        description="PNG, JPG, WebP or GIF"
+                        icon="i-lucide-image-plus"
+                        :label="section.multiple ? 'Add photos' : 'Add photo'"
+                        :multiple="section.multiple"
+                        :ui="{
+                          root: section.multiple ? 'h-full' : 'w-full',
+                          base: section.multiple
+                            ? 'h-full min-h-36'
+                            : 'w-full min-h-36',
+                        }"
+                        @update:model-value="
+                          onFilesSelected(section.key, $event)
+                        "
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </main>
     </div>
   </div>
 </template>
