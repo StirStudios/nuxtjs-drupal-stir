@@ -9,6 +9,7 @@ const { fields, values, editableFields, hasChanges, loading, saving, load, save 
 
 const isReady = ref(false)
 const uploading = ref(false)
+const deletingMid = ref<number | null>(null)
 const selectedFiles = ref<File[]>([])
 const uploadSlot = ref<'avatar' | 'cover' | 'gallery'>('gallery')
 const uploadedItems = ref<Array<{ mid: number; name: string; url: string }>>([])
@@ -107,6 +108,40 @@ const onUploadPhotos = async () => {
     uploading.value = false
   }
 }
+
+const onRemoveUploadedItem = async (item: { mid: number; name: string }) => {
+  deletingMid.value = item.mid
+  try {
+    const response = await $fetch<{ removed?: boolean; error?: string }>('/api/account/profile/media/delete', {
+      method: 'POST',
+      body: {
+        slot: uploadSlot.value,
+        mid: item.mid,
+      },
+    })
+
+    if (response.removed) {
+      uploadedItems.value = uploadedItems.value.filter(entry => entry.mid !== item.mid)
+      toast.add({ title: 'Photo removed', description: `${item.name} was removed.`, color: 'success' })
+      return
+    }
+
+    toast.add({
+      title: 'Remove failed',
+      description: response.error || 'Unable to remove this media item.',
+      color: 'error',
+    })
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'statusMessage' in error
+        ? String((error as { statusMessage?: unknown }).statusMessage)
+        : 'Unable to remove this media item.'
+
+    toast.add({ title: 'Remove failed', description: message, color: 'error' })
+  } finally {
+    deletingMid.value = null
+  }
+}
 </script>
 
 <template>
@@ -172,9 +207,18 @@ const onUploadPhotos = async () => {
               Upload Photos
             </UButton>
 
-            <ul v-if="uploadedItems.length > 0" class="space-y-1 text-sm">
-              <li v-for="item in uploadedItems" :key="item.mid">
+            <ul v-if="uploadedItems.length > 0" class="space-y-2 text-sm">
+              <li v-for="item in uploadedItems" :key="item.mid" class="flex items-center justify-between gap-3">
                 <a :href="item.url" class="underline" target="_blank">{{ item.name }}</a>
+                <UButton
+                  color="error"
+                  size="xs"
+                  variant="soft"
+                  :loading="deletingMid === item.mid"
+                  @click="onRemoveUploadedItem(item)"
+                >
+                  Remove
+                </UButton>
               </li>
             </ul>
           </div>

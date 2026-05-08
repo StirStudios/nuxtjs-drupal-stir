@@ -2,6 +2,28 @@ import { defineEventHandler, readMultipartFormData, createError } from 'h3'
 import { layerAuthBuildDrupalHeaders } from '../../../../utils/drupalHeaders'
 import { layerAuthGetDrupalApiConfig, layerAuthGetForwardedCookie, layerAuthThrowDrupalApiError } from '../../../../utils/drupalApi'
 
+const IMAGE_MIME_BY_EXTENSION: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  avif: 'image/avif',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  svg: 'image/svg+xml',
+}
+
+const resolveUploadMimeType = (filename: string, rawType: string): string => {
+  const type = rawType.trim().toLowerCase()
+  if (type && type !== 'application/octet-stream') {
+    return type
+  }
+
+  const extension = filename.split('.').pop()?.toLowerCase() || ''
+  return IMAGE_MIME_BY_EXTENSION[extension] || 'application/octet-stream'
+}
+
 export default defineEventHandler(async (event) => {
   const parts = await readMultipartFormData(event)
   if (!parts || parts.length === 0) {
@@ -34,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
     const fieldName = part.name === 'photos' || part.name === 'file' || part.name === 'files[]' || part.name === 'files' ? 'files' : (part.name || 'files')
     const blob = new Blob([new Uint8Array(part.data)], {
-      type: part.type || 'application/octet-stream',
+      type: resolveUploadMimeType(part.filename, String(part.type || '')),
     })
     formData.append(fieldName, blob, part.filename)
     appendedFileCount += 1
