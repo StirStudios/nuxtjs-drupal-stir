@@ -12,8 +12,16 @@ export default defineEventHandler(async (event) => {
   const cookie = layerAuthGetForwardedCookie(event)
 
   const formData = new FormData()
+  let appendedFileCount = 0
+  const partMeta: Array<{ name: string; filename: string; type: string }> = []
 
   for (const part of parts) {
+    partMeta.push({
+      name: String(part.name || ''),
+      filename: String(part.filename || ''),
+      type: String(part.type || ''),
+    })
+
     if (!part.filename) {
       if (part.name === 'slot') {
         const slotValue = new TextDecoder().decode(part.data).trim()
@@ -29,6 +37,18 @@ export default defineEventHandler(async (event) => {
       type: part.type || 'application/octet-stream',
     })
     formData.append(fieldName, blob, part.filename)
+    appendedFileCount += 1
+  }
+
+  if (appendedFileCount === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Upload payload contained no file parts.',
+      data: {
+        error: 'Upload payload contained no file parts.',
+        parts: partMeta,
+      },
+    })
   }
 
   try {
