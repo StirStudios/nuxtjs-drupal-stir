@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
 import { useAccountNav } from '../composables/account/useAccountNav'
 
 const sidebarOpen = ref(true)
 const route = useRoute()
 const { items } = useAccountNav()
-const accountHeaderItem: NavigationMenuItem[] = [
-  {
-    label: 'Account',
-    icon: 'i-lucide-user-round',
-  },
-]
 
 const pageTitle = computed(() =>
   typeof route.meta.accountTitle === 'string'
@@ -25,19 +18,12 @@ const pageTitle = computed(() =>
       v-model:open="sidebarOpen"
       collapsible="icon"
       rail
+      title="Account"
       :ui="{
         container: 'h-full',
         inner: 'bg-default',
       }"
     >
-      <template #header>
-        <UNavigationMenu
-          :items="accountHeaderItem"
-          orientation="vertical"
-          :ui="{ link: 'p-1.5 overflow-hidden' }"
-        />
-      </template>
-
       <UNavigationMenu
         :items="items"
         orientation="vertical"
