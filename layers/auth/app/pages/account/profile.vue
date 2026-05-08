@@ -370,11 +370,11 @@ const onGalleryDrop = async (targetMid: number) => {
                   >
                     <UButton
                       class="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-                      color="error"
+                      color="neutral"
                       icon="i-lucide-x"
                       :loading="deletingMediaKey === `${section.key}-${item.mid}`"
                       size="xs"
-                      variant="solid"
+                      variant="soft"
                       @click="onRemoveProfileMediaItem(section.key as 'avatar' | 'cover' | 'gallery', item)"
                     />
                     <div class="aspect-square w-full overflow-hidden rounded-md">
