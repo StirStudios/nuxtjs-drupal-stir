@@ -390,6 +390,7 @@ const onGalleryDrop = async (targetMid: number) => {
                   </div>
                   <UFileUpload
                     v-if="canShowUploader(section)"
+                    v-model="uploadFiles[section.key]"
                     accept="image/*"
                     :class="section.multiple ? 'h-full min-h-0' : 'col-span-full'"
                     description="PNG, JPG, WebP or GIF"
