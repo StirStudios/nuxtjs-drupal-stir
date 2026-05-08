@@ -61,15 +61,23 @@ export function useAccountSettings() {
 
     saving.value = true
     try {
+      const changedValues = SETTINGS_FIELDS.reduce<Record<string, string>>((acc, field) => {
+        const current = String(values.value[field] ?? '').trim()
+        const baseline = String(baselineValues.value[field] ?? '').trim()
+
+        if (current !== baseline) {
+          acc[field] = current
+        }
+
+        return acc
+      }, {})
+
       const response = await $fetch<SettingsUpdateResponse>(
         '/api/account/settings/values',
         {
           method: 'PATCH',
           body: {
-            values: {
-              account_name: String(values.value.account_name ?? '').trim(),
-              account_email: String(values.value.account_email ?? '').trim(),
-            },
+            values: changedValues,
           },
         },
       )
