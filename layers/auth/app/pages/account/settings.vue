@@ -3,12 +3,16 @@ import { useAccountSettings } from '../../composables/account/useAccountSettings
 import { useAuthSession } from '../../composables/auth/useAuthSession'
 import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
-import type { NavigationMenuItem } from '@nuxt/ui'
+
+definePageMeta({
+  layout: 'account',
+  accountTitle: 'Account Settings',
+  accountSubtitle: 'Manage your login details and account security.',
+})
 
 const toast = useToast()
 const session = useAuthSession()
 const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
-const sidebarOpen = ref(true)
 
 const isReady = ref(false)
 const currentPassword = ref('')
@@ -17,21 +21,6 @@ const changingPassword = ref(false)
 const cancelingAccount = ref(false)
 const cancelModalOpen = ref(false)
 const portal = useOverlayPortal()
-
-const accountNavigationItems: NavigationMenuItem[] = [
-  {
-    label: 'Settings',
-    icon: 'i-lucide-settings',
-    to: '/account/settings',
-    active: true,
-  },
-
-  {
-    label: 'Profile',
-    icon: 'i-lucide-user-round',
-    to: '/account/profile',
-  },
-]
 
 const settingsFields = [
   {
@@ -183,94 +172,42 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen">
-    <USidebar
-      v-model:open="sidebarOpen"
-      collapsible="icon"
-      rail
-      title="Account"
-      :ui="{
-        container: 'h-full',
-        inner: 'bg-default',
-      }"
-    >
-      <UNavigationMenu
-        :items="accountNavigationItems"
-        orientation="vertical"
-        :ui="{ link: 'p-1.5 overflow-hidden' }"
-      />
-    </USidebar>
-
-    <div class="flex min-w-0 flex-1 flex-col">
-      <div
-        class="border-default bg-default flex h-(--ui-header-height) shrink-0 items-center justify-between border-b px-4"
-      >
-        <UButton
-          aria-label="Toggle sidebar"
-          color="neutral"
-          icon="i-lucide-panel-left"
-          variant="ghost"
-          @click="sidebarOpen = !sidebarOpen"
-        />
-
-        <span class="text-muted text-sm">Account Settings</span>
-
-        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
-          Back to site
-        </UButton>
-      </div>
-
-      <main class="w-full px-4 py-8 md:px-8">
-        <div class="mx-auto w-full max-w-4xl space-y-6">
-          <div>
-            <h1 class="text-highlighted mb-1 text-xl font-semibold">
-              Account Settings
-            </h1>
-            <p class="text-muted text-sm">
-              Manage your login details and account security.
-            </p>
-          </div>
-
-          <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-            <div v-if="loading || !isReady" class="space-y-4">
-              <USkeleton class="h-5 w-28" />
-              <USkeleton class="h-10 w-full" />
-              <USkeleton class="h-10 w-full" />
-              <USkeleton class="h-10 w-1/2" />
-            </div>
-
-            <template v-else>
-              <UTabs class="w-full" :items="settingsTabs" variant="link">
-                <template #settings>
-                  <AccountProfileForm
-                    :editable-fields-count="2"
-                    :fields="settingsFields"
-                    :has-profile-save="hasChanges"
-                    heading="Settings"
-                    :saving="saving"
-                    subheading="Update your account login details."
-                    :values="values"
-                    @submit="onSubmitSettings"
-                  />
-                </template>
-
-                <template #security>
-                  <AccountSecurityForm
-                    v-model:cancel-modal-open="cancelModalOpen"
-                    v-model:current-password="currentPassword"
-                    v-model:new-password="newPassword"
-                    :canceling-account="cancelingAccount"
-                    :changing-password="changingPassword"
-                    :portal="portal"
-                    @cancel-account="onCancelAccount"
-                    @change-password="onChangePassword"
-                  />
-                </template>
-              </UTabs>
-            </template>
-          </div>
-        </div>
-      </main>
+  <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
+    <div v-if="loading || !isReady" class="space-y-4">
+      <USkeleton class="h-5 w-28" />
+      <USkeleton class="h-10 w-full" />
+      <USkeleton class="h-10 w-full" />
+      <USkeleton class="h-10 w-1/2" />
     </div>
+
+    <template v-else>
+      <UTabs class="w-full" :items="settingsTabs" variant="link">
+        <template #settings>
+          <AccountProfileForm
+            :editable-fields-count="2"
+            :fields="settingsFields"
+            :has-profile-save="hasChanges"
+            heading="Settings"
+            :saving="saving"
+            subheading="Update your account login details."
+            :values="values"
+            @submit="onSubmitSettings"
+          />
+        </template>
+
+        <template #security>
+          <AccountSecurityForm
+            v-model:cancel-modal-open="cancelModalOpen"
+            v-model:current-password="currentPassword"
+            v-model:new-password="newPassword"
+            :canceling-account="cancelingAccount"
+            :changing-password="changingPassword"
+            :portal="portal"
+            @cancel-account="onCancelAccount"
+            @change-password="onChangePassword"
+          />
+        </template>
+      </UTabs>
+    </template>
   </div>
 </template>
