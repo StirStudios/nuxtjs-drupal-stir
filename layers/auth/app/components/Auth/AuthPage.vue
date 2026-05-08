@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const appConfig = useAppConfig()
+const runtimeConfig = useRuntimeConfig()
 
 const pageBackgroundImage = computed(() => {
   const auth = appConfig.auth || {}
@@ -32,9 +33,28 @@ const pageBackgroundImage = computed(() => {
     : ''
 })
 
+const resolvedBackgroundImage = computed(() => {
+  const image = pageBackgroundImage.value
+
+  if (!image) {
+    return ''
+  }
+
+  if (!image.startsWith('/')) {
+    return image
+  }
+
+  const apiBase =
+    typeof runtimeConfig.public?.api === 'string'
+      ? runtimeConfig.public.api.trim().replace(/\/$/, '')
+      : ''
+
+  return apiBase ? `${apiBase}${image}` : image
+})
+
 const pageStyle = computed(() =>
-  pageBackgroundImage.value
-    ? ({ backgroundImage: `url('${pageBackgroundImage.value}')` } as const)
+  resolvedBackgroundImage.value
+    ? ({ backgroundImage: `url('${resolvedBackgroundImage.value}')` } as const)
     : undefined,
 )
 </script>
