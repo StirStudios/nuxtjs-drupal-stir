@@ -16,6 +16,8 @@ const uploadFiles = reactive<Record<'avatar' | 'cover' | 'gallery', File[]>>({
   gallery: [],
 })
 const uploadTimers: Partial<Record<'avatar' | 'cover' | 'gallery', ReturnType<typeof setTimeout>>> = {}
+const localGalleryItems = ref<ProfileMediaItem[]>([])
+const dragGalleryMid = ref<number | null>(null)
 
 type ProfileMediaItem = {
   mid: number
@@ -48,7 +50,7 @@ const mediaSections = computed(() => {
   const cover = profileMedia.value.cover
     ? [profileMedia.value.cover as ProfileMediaItem]
     : []
-  const gallery = (profileMedia.value.gallery || []) as ProfileMediaItem[]
+  const gallery = localGalleryItems.value
 
   return [
     { key: 'avatar' as const, label: 'Profile avatar', items: avatar, multiple: false },
@@ -56,6 +58,16 @@ const mediaSections = computed(() => {
     { key: 'gallery' as const, label: 'Profile gallery', items: gallery, multiple: true },
   ]
 })
+
+watch(
+  () => profileMedia.value.gallery,
+  (gallery) => {
+    localGalleryItems.value = Array.isArray(gallery)
+      ? [...(gallery as ProfileMediaItem[])]
+      : []
+  },
+  { immediate: true },
+)
 
 const canShowUploader = (section: { key: 'avatar' | 'cover' | 'gallery'; items: ProfileMediaItem[] }): boolean => {
   if (section.key === 'gallery') {
@@ -244,6 +256,56 @@ const onRemoveProfileMediaItem = async (
     deletingMediaKey.value = null
   }
 }
+
+const onGalleryDragStart = (mid: number) => {
+  dragGalleryMid.value = mid
+}
+
+const onGalleryDrop = async (targetMid: number) => {
+  const sourceMid = dragGalleryMid.value
+
+  dragGalleryMid.value = null
+  if (!sourceMid || sourceMid === targetMid) {
+    return
+  }
+
+  const current = [...localGalleryItems.value]
+  const fromIndex = current.findIndex(item => item.mid === sourceMid)
+  const toIndex = current.findIndex(item => item.mid === targetMid)
+
+  if (fromIndex < 0 || toIndex < 0) {
+    return
+  }
+
+  const next = [...current]
+  const [moved] = next.splice(fromIndex, 1)
+
+  if (!moved) {
+    return
+  }
+  next.splice(toIndex, 0, moved)
+  localGalleryItems.value = next
+
+  try {
+    await $fetch('/api/account/profile/media/reorder', {
+      method: 'POST',
+      body: {
+        slot: 'gallery',
+        ordered_mids: next.map(item => item.mid),
+      },
+    })
+    toast.add({ title: 'Order updated', description: 'Gallery order saved.', color: 'success' })
+    await load({ silent: true })
+  } catch (error: unknown) {
+    localGalleryItems.value = current
+    const message =
+      error && typeof error === 'object' && 'statusMessage' in error
+        ? String((error as { statusMessage?: unknown }).statusMessage)
+        : 'Unable to save gallery order.'
+
+    toast.add({ title: 'Reorder failed', description: message, color: 'error' })
+  }
+}
 </script>
 
 <template>
@@ -300,6 +362,10 @@ const onRemoveProfileMediaItem = async (
                     v-for="item in section.items"
                     :key="item.mid"
                     class="bg-elevated group relative rounded-md p-2"
+                    :draggable="section.key === 'gallery'"
+                    @dragover.prevent="section.key === 'gallery'"
+                    @dragstart="section.key === 'gallery' && onGalleryDragStart(item.mid)"
+                    @drop.prevent="section.key === 'gallery' && onGalleryDrop(item.mid)"
                   >
                     <UButton
                       class="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
