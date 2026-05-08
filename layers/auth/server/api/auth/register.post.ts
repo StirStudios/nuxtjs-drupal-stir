@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody } from 'h3'
+import { createError, defineEventHandler, readBody } from 'h3'
 import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
@@ -17,6 +17,13 @@ export default defineEventHandler(async (event) => {
     typeof body?.turnstile_response === 'string'
       ? body.turnstile_response.trim()
       : ''
+
+  if (!email || !password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Email and password are required',
+    })
+  }
 
   try {
     return await layerAuthDrupalApiRequest(event, '/api/auth/register', {

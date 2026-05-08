@@ -3,21 +3,52 @@ const route = useRoute()
 const appConfig = useAppConfig()
 const runtimeConfig = useRuntimeConfig()
 
+type AuthPageConfigKey =
+  | 'login'
+  | 'protectedPage'
+  | 'register'
+  | 'passwordRequest'
+  | 'passwordReset'
+
+const resolveAuthPageKey = (): AuthPageConfigKey | null => {
+  const explicitKey = route.meta.authPageKey
+
+  if (typeof explicitKey === 'string' && explicitKey.trim()) {
+    switch (explicitKey) {
+      case 'login':
+      case 'protectedPage':
+      case 'register':
+      case 'passwordRequest':
+      case 'passwordReset':
+        return explicitKey
+      default:
+        break
+    }
+  }
+
+  const routeName = typeof route.name === 'string' ? route.name : ''
+
+  if (routeName.includes('auth-login')) return 'login'
+  if (routeName.includes('auth-protected')) return 'protectedPage'
+  if (routeName.includes('auth-register')) return 'register'
+  if (routeName.includes('auth-password-request')) return 'passwordRequest'
+  if (routeName.includes('auth-password-reset')) return 'passwordReset'
+
+  const path = route.path
+
+  if (path.endsWith('/auth/login')) return 'login'
+  if (path.endsWith('/auth/protected')) return 'protectedPage'
+  if (path.endsWith('/auth/register')) return 'register'
+  if (path.endsWith('/auth/password/request')) return 'passwordRequest'
+  if (path.endsWith('/auth/password/reset')) return 'passwordReset'
+
+  return null
+}
+
 const pageBackgroundImage = computed(() => {
   const auth = appConfig.auth || {}
-  const path = route.path
-  const pageConfig =
-    path === '/auth/login'
-      ? auth.login
-      : path === '/auth/protected'
-        ? auth.protectedPage
-        : path === '/auth/register'
-          ? auth.register
-          : path === '/auth/password/request'
-            ? auth.passwordRequest
-            : path === '/auth/password/reset'
-              ? auth.passwordReset
-              : undefined
+  const pageKey = resolveAuthPageKey()
+  const pageConfig = pageKey ? auth[pageKey] : undefined
 
   const pageImage =
     typeof pageConfig?.backgroundImage === 'string'

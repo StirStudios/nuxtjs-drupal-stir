@@ -114,6 +114,30 @@ export const layerAuthThrowDrupalApiError = (
   throw createError({ statusCode, statusMessage })
 }
 
+export const layerAuthExtractDrupalErrorDetail = (error: unknown): string => {
+  if (!error || typeof error !== 'object' || !('data' in error)) {
+    return ''
+  }
+
+  const data = (error as { data?: unknown }).data
+
+  if (!data || typeof data !== 'object') {
+    return ''
+  }
+
+  const record = data as Record<string, unknown>
+
+  if (typeof record.error === 'string' && record.error.trim()) {
+    return record.error
+  }
+
+  if (typeof record.message === 'string' && record.message.trim()) {
+    return record.message
+  }
+
+  return ''
+}
+
 type DrupalRequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>
