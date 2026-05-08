@@ -4,7 +4,7 @@ import { useAuthSession } from '../../composables/auth/useAuthSession'
 
 const toast = useToast()
 const session = useAuthSession()
-const { fields, values, editableFields, hasChanges, loading, saving, load, save } =
+const { fields, values, editableFields, profileMedia, hasChanges, loading, saving, load, save } =
   useAccountProfile()
 
 const isReady = ref(false)
@@ -13,6 +13,23 @@ const deletingMid = ref<number | null>(null)
 const selectedFiles = ref<File[]>([])
 const uploadSlot = ref<'avatar' | 'cover' | 'gallery'>('gallery')
 const uploadedItems = ref<Array<{ mid: number; name: string; url: string }>>([])
+
+type ProfileMediaItem = {
+  mid: number
+  title?: string
+  src?: string
+  alt?: string
+}
+
+const selectedMediaItems = computed<ProfileMediaItem[]>(() => {
+  if (uploadSlot.value === 'avatar') {
+    return profileMedia.value.avatar ? [profileMedia.value.avatar as ProfileMediaItem] : []
+  }
+  if (uploadSlot.value === 'cover') {
+    return profileMedia.value.cover ? [profileMedia.value.cover as ProfileMediaItem] : []
+  }
+  return (profileMedia.value.gallery || []) as ProfileMediaItem[]
+})
 
 onMounted(async () => {
   await session.fetchSession()
@@ -57,6 +74,7 @@ const onUploadPhotos = async () => {
   uploading.value = true
   try {
     const formData = new FormData()
+
     formData.append('slot', uploadSlot.value)
     for (const file of selectedFiles.value) {
       formData.append('files', file)
@@ -78,6 +96,7 @@ const onUploadPhotos = async () => {
     if (Array.isArray(response.items) && response.items.length > 0) {
       uploadedItems.value = response.items
       toast.add({ title: 'Photos uploaded', description: `${response.items.length} photo(s) uploaded.`, color: 'success' })
+      await load()
     }
 
     if (Array.isArray(response.errors) && response.errors.length > 0) {
@@ -170,10 +189,10 @@ const onRemoveUploadedItem = async (item: { mid: number; name: string }) => {
             :editable-fields-count="editableFields.length"
             :fields="fields"
             :has-profile-save="hasChanges"
-            :saving="saving"
-            :values="values"
             heading="Profile"
+            :saving="saving"
             subheading="Update your Drupal profile fields."
+            :values="values"
             @submit="onSubmit"
           />
 
@@ -183,6 +202,7 @@ const onRemoveUploadedItem = async (item: { mid: number; name: string }) => {
             <UFormField label="Upload To">
               <USelect
                 v-model="uploadSlot"
+                class="w-52"
                 :items="[
                   { label: 'Avatar', value: 'avatar' },
                   { label: 'Cover', value: 'cover' },
@@ -190,31 +210,52 @@ const onRemoveUploadedItem = async (item: { mid: number; name: string }) => {
                 ]"
                 label-key="label"
                 value-key="value"
-                class="w-52"
               />
             </UFormField>
             <UFileUpload
               v-model="selectedFiles"
               accept="image/*"
+              class="min-h-40"
               description="PNG, JPG, WebP or GIF (max. 10MB each)"
               icon="i-lucide-image"
               label="Drop your profile photos here"
               layout="list"
               multiple
-              class="min-h-40"
             />
             <UButton :disabled="uploading || selectedFiles.length === 0" :loading="uploading" @click="onUploadPhotos">
               Upload Photos
             </UButton>
 
+            <div class="space-y-2">
+              <h3 class="text-sm font-medium">Current {{ uploadSlot }} media</h3>
+              <UScrollArea
+                v-if="selectedMediaItems.length > 0"
+                v-slot="{ item }"
+                class="h-72 rounded-md border"
+                :items="selectedMediaItems"
+                :ui="{ viewport: 'gap-3 p-2' }"
+              >
+                <div class="bg-elevated rounded-md p-2">
+                  <MediaImage
+                    :alt="String(item.alt || item.title || 'Profile media')"
+                    image-class="h-40 w-full object-cover"
+                    no-wrapper
+                    :src="String(item.src || '')"
+                  />
+                  <p class="text-muted mt-2 truncate text-xs">{{ item.title || `Media #${item.mid}` }}</p>
+                </div>
+              </UScrollArea>
+              <p v-else class="text-muted text-sm">No media uploaded for this slot yet.</p>
+            </div>
+
             <ul v-if="uploadedItems.length > 0" class="space-y-2 text-sm">
               <li v-for="item in uploadedItems" :key="item.mid" class="flex items-center justify-between gap-3">
-                <a :href="item.url" class="underline" target="_blank">{{ item.name }}</a>
+                <a class="underline" :href="item.url" target="_blank">{{ item.name }}</a>
                 <UButton
                   color="error"
+                  :loading="deletingMid === item.mid"
                   size="xs"
                   variant="soft"
-                  :loading="deletingMid === item.mid"
                   @click="onRemoveUploadedItem(item)"
                 >
                   Remove

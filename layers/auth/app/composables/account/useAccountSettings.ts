@@ -26,6 +26,7 @@ export function useAccountSettings() {
     return SETTINGS_FIELDS.some((field) => {
       const current = String(values.value[field] ?? '').trim()
       const baseline = String(baselineValues.value[field] ?? '').trim()
+
       return current !== baseline
     })
   })

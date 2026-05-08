@@ -148,16 +148,16 @@ const onCancelAccount = async () => {
         </div>
 
         <template v-else>
-          <UTabs :items="settingsTabs" class="w-full" variant="link">
+          <UTabs class="w-full" :items="settingsTabs" variant="link">
             <template #settings>
               <AccountProfileForm
                 :editable-fields-count="2"
                 :fields="settingsFields"
                 :has-profile-save="hasChanges"
-                :saving="saving"
-                :values="values"
                 heading="Settings"
+                :saving="saving"
                 subheading="Update your account login details."
+                :values="values"
                 @submit="onSubmitSettings"
               />
             </template>

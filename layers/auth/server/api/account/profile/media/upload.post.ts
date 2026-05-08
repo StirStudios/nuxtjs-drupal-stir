@@ -16,16 +16,19 @@ const IMAGE_MIME_BY_EXTENSION: Record<string, string> = {
 
 const resolveUploadMimeType = (filename: string, rawType: string): string => {
   const type = rawType.trim().toLowerCase()
+
   if (type && type !== 'application/octet-stream') {
     return type
   }
 
   const extension = filename.split('.').pop()?.toLowerCase() || ''
+
   return IMAGE_MIME_BY_EXTENSION[extension] || 'application/octet-stream'
 }
 
 export default defineEventHandler(async (event) => {
   const parts = await readMultipartFormData(event)
+
   if (!parts || parts.length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'No files were uploaded.' })
   }
@@ -47,6 +50,7 @@ export default defineEventHandler(async (event) => {
     if (!part.filename) {
       if (part.name === 'slot') {
         const slotValue = new TextDecoder().decode(part.data).trim()
+
         if (slotValue) {
           formData.append('slot', slotValue)
         }
@@ -58,6 +62,7 @@ export default defineEventHandler(async (event) => {
     const blob = new Blob([new Uint8Array(part.data)], {
       type: resolveUploadMimeType(part.filename, String(part.type || '')),
     })
+
     formData.append(fieldName, blob, part.filename)
     appendedFileCount += 1
   }
@@ -93,10 +98,12 @@ export default defineEventHandler(async (event) => {
         return ''
       }
       const data = (error as { data?: unknown }).data
+
       if (!data || typeof data !== 'object') {
         return ''
       }
       const record = data as Record<string, unknown>
+
       if (typeof record.error === 'string' && record.error.trim()) {
         return record.error
       }

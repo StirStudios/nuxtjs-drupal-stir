@@ -43,10 +43,12 @@ export default defineEventHandler(async (event) => {
         return ''
       }
       const data = (error as { data?: unknown }).data
+
       if (!data || typeof data !== 'object') {
         return ''
       }
       const record = data as Record<string, unknown>
+
       if (typeof record.error === 'string' && record.error.trim()) {
         return record.error
       }

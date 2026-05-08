@@ -14,6 +14,11 @@ type ProfileSchemaResponse = {
 
 type ProfileValuesResponse = {
   values?: Record<string, unknown>
+  media?: {
+    avatar?: Record<string, unknown> | null
+    cover?: Record<string, unknown> | null
+    gallery?: Array<Record<string, unknown>>
+  }
 }
 
 type ProfileUpdateResponse = {
@@ -74,6 +79,15 @@ export function useAccountProfile() {
   const fields = ref<ProfileField[]>([])
   const values = ref<Record<string, unknown>>({})
   const baselineValues = ref<Record<string, unknown>>({})
+  const profileMedia = ref<{
+    avatar: Record<string, unknown> | null
+    cover: Record<string, unknown> | null
+    gallery: Array<Record<string, unknown>>
+  }>({
+    avatar: null,
+    cover: null,
+    gallery: [],
+  })
   const loading = ref(false)
   const saving = ref(false)
 
@@ -117,6 +131,15 @@ export function useAccountProfile() {
 
       values.value = nextValues
       baselineValues.value = { ...nextValues }
+      profileMedia.value = {
+        avatar: (profileValues?.media?.avatar && typeof profileValues.media.avatar === 'object')
+          ? profileValues.media.avatar
+          : null,
+        cover: (profileValues?.media?.cover && typeof profileValues.media.cover === 'object')
+          ? profileValues.media.cover
+          : null,
+        gallery: Array.isArray(profileValues?.media?.gallery) ? profileValues.media.gallery : [],
+      }
     } finally {
       loading.value = false
     }
@@ -161,6 +184,7 @@ export function useAccountProfile() {
     fields,
     values,
     editableFields,
+    profileMedia,
     hasChanges,
     loading,
     saving,
