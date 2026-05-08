@@ -259,7 +259,7 @@ const onRemoveProfileMediaItem = async (
         <UButton color="neutral" to="/account/profile" variant="soft">Profile</UButton>
       </div>
 
-      <div>
+      <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
         <div v-if="loading || !isReady" class="space-y-4">
           <USkeleton class="h-5 w-28" />
           <USkeleton class="h-10 w-full" />
@@ -310,23 +310,25 @@ const onRemoveProfileMediaItem = async (
                       variant="solid"
                       @click="onRemoveProfileMediaItem(section.key as 'avatar' | 'cover' | 'gallery', item)"
                     />
-                    <MediaImage
-                      :alt="String(item.alt || item.title || 'Profile media')"
-                      image-class="h-36 w-full rounded-md object-cover"
-                      no-wrapper
-                      :src="String(item.src || '')"
-                    />
+                    <div class="aspect-square w-full overflow-hidden rounded-md">
+                      <MediaImage
+                        :alt="String(item.alt || item.title || 'Profile media')"
+                        image-class="h-full w-full !object-cover"
+                        no-wrapper
+                        :src="String(item.src || '')"
+                      />
+                    </div>
                     <p class="text-muted mt-2 truncate text-xs">{{ item.title || `Media #${item.mid}` }}</p>
                   </div>
                   <UFileUpload
                     v-if="canShowUploader(section)"
                     accept="image/*"
-                    class="h-full min-h-0"
+                    :class="section.multiple ? 'h-full min-h-0' : 'col-span-full'"
                     description="PNG, JPG, WebP or GIF"
                     icon="i-lucide-image-plus"
                     :label="section.multiple ? 'Add photos' : 'Add photo'"
                     :multiple="section.multiple"
-                    :ui="{ root: 'h-full', base: 'h-full min-h-36' }"
+                    :ui="{ root: section.multiple ? 'h-full' : 'w-full', base: section.multiple ? 'h-full min-h-36' : 'w-full min-h-36' }"
                     @update:model-value="onFilesSelected(section.key, $event)"
                   />
                 </div>
