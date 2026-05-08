@@ -46,6 +46,28 @@ export default defineEventHandler(async (event) => {
 
     return response._data
   } catch (error: unknown) {
+    const detail = (() => {
+      if (!error || typeof error !== 'object' || !('data' in error)) {
+        return ''
+      }
+      const data = (error as { data?: unknown }).data
+      if (!data || typeof data !== 'object') {
+        return ''
+      }
+      const record = data as Record<string, unknown>
+      if (typeof record.error === 'string' && record.error.trim()) {
+        return record.error
+      }
+      if (typeof record.message === 'string' && record.message.trim()) {
+        return record.message
+      }
+      return ''
+    })()
+
+    if (detail) {
+      layerAuthThrowDrupalApiError(error, detail)
+    }
+
     layerAuthThrowDrupalApiError(error, 'Failed to upload profile photos')
   }
 })
