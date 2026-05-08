@@ -14,7 +14,6 @@ const toast = useToast()
 const session = useAuthSession()
 const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
 
-const isReady = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const changingPassword = ref(false)
@@ -52,7 +51,6 @@ onMounted(async () => {
   }
 
   await load()
-  isReady.value = true
 })
 
 const onSubmitSettings = async () => {
@@ -174,11 +172,8 @@ const onCancelAccount = async () => {
 <template>
   <NuxtLayout name="account">
     <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
-      <div v-if="loading || !isReady" class="space-y-4">
-        <USkeleton class="h-5 w-28" />
-        <USkeleton class="h-10 w-full" />
-        <USkeleton class="h-10 w-full" />
-        <USkeleton class="h-10 w-1/2" />
+      <div v-if="loading" class="text-muted text-sm">
+        Loading settings...
       </div>
 
       <template v-else>

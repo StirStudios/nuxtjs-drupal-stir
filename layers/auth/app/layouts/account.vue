@@ -8,23 +8,26 @@ const { items } = useAccountNav()
 const pageTitle = computed(() =>
   typeof route.meta.accountTitle === 'string' ? route.meta.accountTitle : 'Account',
 )
-const pageSubtitle = computed(() =>
-  typeof route.meta.accountSubtitle === 'string' ? route.meta.accountSubtitle : '',
-)
 </script>
 
 <template>
-  <div class="flex min-h-screen">
+  <div class="flex">
     <USidebar
       v-model:open="sidebarOpen"
       collapsible="icon"
       rail
-      title="Account"
+      title="Back to site"
       :ui="{
         container: 'h-full',
         inner: 'bg-default',
       }"
     >
+      <div class="mb-3">
+        <UButton icon="i-lucide-arrow-left" to="/" variant="ghost">
+          Back to site
+        </UButton>
+      </div>
+
       <UNavigationMenu
         :items="items"
         orientation="vertical"
@@ -43,19 +46,11 @@ const pageSubtitle = computed(() =>
         />
 
         <span class="text-muted text-sm">{{ pageTitle }}</span>
-
-        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
-          Back to site
-        </UButton>
+        <div />
       </div>
 
       <main class="w-full px-4 py-8 md:px-8">
-        <div class="mx-auto w-full max-w-4xl space-y-6">
-          <div>
-            <h1 class="text-highlighted mb-1 text-xl font-semibold">{{ pageTitle }}</h1>
-            <p v-if="pageSubtitle" class="text-muted text-sm">{{ pageSubtitle }}</p>
-          </div>
-
+        <div class="mx-auto w-full max-w-4xl">
           <slot />
         </div>
       </main>
