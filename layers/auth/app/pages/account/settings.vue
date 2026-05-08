@@ -20,6 +20,10 @@ const settingsFields = [
   { name: 'account_name', label: 'Username', type: 'string', required: true, editable: true },
   { name: 'account_email', label: 'Email', type: 'email', required: true, editable: true },
 ]
+const settingsTabs = [
+  { label: 'Settings', icon: 'i-lucide-user-round', slot: 'settings' },
+  { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
+]
 
 onMounted(async () => {
   await session.fetchSession()
@@ -144,27 +148,33 @@ const onCancelAccount = async () => {
         </div>
 
         <template v-else>
-          <AccountProfileForm
-            :editable-fields-count="2"
-            :fields="settingsFields"
-            :has-profile-save="hasChanges"
-            :saving="saving"
-            :values="values"
-            heading="Settings"
-            subheading="Update your account login details."
-            @submit="onSubmitSettings"
-          />
+          <UTabs :items="settingsTabs" class="w-full" variant="link">
+            <template #settings>
+              <AccountProfileForm
+                :editable-fields-count="2"
+                :fields="settingsFields"
+                :has-profile-save="hasChanges"
+                :saving="saving"
+                :values="values"
+                heading="Settings"
+                subheading="Update your account login details."
+                @submit="onSubmitSettings"
+              />
+            </template>
 
-          <AccountSecurityForm
-            v-model:cancel-modal-open="cancelModalOpen"
-            v-model:current-password="currentPassword"
-            v-model:new-password="newPassword"
-            :canceling-account="cancelingAccount"
-            :changing-password="changingPassword"
-            :portal="portal"
-            @cancel-account="onCancelAccount"
-            @change-password="onChangePassword"
-          />
+            <template #security>
+              <AccountSecurityForm
+                v-model:cancel-modal-open="cancelModalOpen"
+                v-model:current-password="currentPassword"
+                v-model:new-password="newPassword"
+                :canceling-account="cancelingAccount"
+                :changing-password="changingPassword"
+                :portal="portal"
+                @cancel-account="onCancelAccount"
+                @change-password="onChangePassword"
+              />
+            </template>
+          </UTabs>
         </template>
       </div>
     </div>
