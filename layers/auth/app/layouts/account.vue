@@ -18,21 +18,17 @@ const pageTitle = computed(() =>
       v-model:open="sidebarOpen"
       collapsible="icon"
       rail
+      title="Account"
       :ui="{
         container: 'h-full',
         inner: 'bg-default',
       }"
     >
-      <template #header>
-        <UButton
-          class="w-full justify-start overflow-hidden"
-          color="neutral"
-          icon="i-lucide-user-round"
-          :label="sidebarOpen ? 'Account' : undefined"
-          :square="!sidebarOpen"
-          to="/account/settings"
-          variant="ghost"
-        />
+      <template #title>
+        <span class="inline-flex items-center gap-2">
+          <UIcon class="size-4" name="i-lucide-user-round" />
+          <span>Account</span>
+        </span>
       </template>
 
       <UNavigationMenu
