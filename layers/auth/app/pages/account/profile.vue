@@ -152,6 +152,20 @@ const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
   }
 }
 
+const onFilesSelected = async (
+  slot: 'avatar' | 'cover' | 'gallery',
+  value: File | File[] | null | undefined,
+) => {
+  const files = Array.isArray(value)
+    ? value
+    : value instanceof File
+      ? [value]
+      : []
+
+  uploadFiles[slot] = files
+  await onUploadPhotos(slot)
+}
+
 const onRemoveProfileMediaItem = async (
   slot: 'avatar' | 'cover' | 'gallery',
   item: { mid: number; title?: string },
@@ -233,13 +247,12 @@ const onRemoveProfileMediaItem = async (
 
           <div class="mt-8 space-y-3 border-t pt-6">
             <h2 class="text-highlighted text-base font-semibold">Profile Photos</h2>
-            <p class="text-muted text-sm">Upload images directly to avatar, cover, or gallery.</p>
+            <p class="text-muted text-sm">Select images below to upload instantly.</p>
 
             <div class="space-y-4">
               <div v-for="section in mediaSections" :key="section.key" class="space-y-2">
                 <h3 class="text-sm font-medium">{{ section.label }}</h3>
                 <UFileUpload
-                  v-model="uploadFiles[section.key]"
                   accept="image/*"
                   class="min-h-28"
                   description="PNG, JPG, WebP or GIF (max. 10MB each)"
@@ -247,22 +260,23 @@ const onRemoveProfileMediaItem = async (
                   :label="`Drop ${section.label.toLowerCase()} image${section.multiple ? 's' : ''} here`"
                   layout="list"
                   :multiple="section.multiple"
+                  @update:model-value="onFilesSelected(section.key, $event)"
                 />
-                <UButton
-                  :disabled="uploadingSlot !== null || uploadFiles[section.key].length === 0"
-                  :loading="uploadingSlot === section.key"
-                  @click="onUploadPhotos(section.key)"
+                <div
+                  v-if="uploadingSlot === section.key"
+                  class="text-muted text-sm"
                 >
-                  Upload to {{ section.label }}
-                </UButton>
-                <UScrollArea
+                  Uploading...
+                </div>
+                <div
                   v-if="section.items.length > 0"
-                  v-slot="{ item }"
-                  class="h-72 rounded-md border"
-                  :items="section.items"
-                  :ui="{ viewport: 'grid grid-cols-2 gap-3 p-2' }"
+                  class="grid grid-cols-2 gap-3 md:grid-cols-3"
                 >
-                  <div class="bg-elevated group relative rounded-md p-2">
+                  <div
+                    v-for="item in section.items"
+                    :key="item.mid"
+                    class="bg-elevated group relative rounded-md p-2"
+                  >
                     <UButton
                       class="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
                       color="error"
@@ -280,7 +294,7 @@ const onRemoveProfileMediaItem = async (
                     />
                     <p class="text-muted mt-2 truncate text-xs">{{ item.title || `Media #${item.mid}` }}</p>
                   </div>
-                </UScrollArea>
+                </div>
                 <p v-else class="text-muted text-sm">No media uploaded yet.</p>
               </div>
             </div>
