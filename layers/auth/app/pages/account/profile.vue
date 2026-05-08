@@ -342,7 +342,7 @@ const onGalleryDrop = async (targetMid: number) => {
             @submit="onSubmit"
           />
 
-          <div class="mt-8 space-y-3 pt-2">
+          <div class="space-y-3">
             <h2 class="text-highlighted text-base font-semibold">Profile Photos</h2>
             <p class="text-muted text-sm">Select images below to upload instantly.</p>
 
@@ -362,6 +362,7 @@ const onGalleryDrop = async (targetMid: number) => {
                     v-for="item in section.items"
                     :key="item.mid"
                     class="bg-elevated group relative rounded-md p-2"
+                    :class="section.key === 'gallery' ? 'cursor-grab active:cursor-grabbing' : ''"
                     :draggable="section.key === 'gallery'"
                     @dragover.prevent="section.key === 'gallery'"
                     @dragstart="section.key === 'gallery' && onGalleryDragStart(item.mid)"
