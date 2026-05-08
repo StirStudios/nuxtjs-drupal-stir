@@ -461,7 +461,7 @@ const onGalleryDrop = async (targetMid: number) => {
                 </h2>
 
                 <p class="text-muted text-sm">
-                  Select images below to upload instantly.
+                  Drag and drop to upload. In gallery, drag tiles to reorder.
                 </p>
 
                 <div class="space-y-4">
