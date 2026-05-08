@@ -38,7 +38,9 @@ type MenuLink = {
   tooltip: boolean
 }
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
-type AccountMenuFetchOptions = NonNullable<Parameters<typeof $fetch<AccountMenuItem[]>>[1]>
+type AccountMenuFetchOptions = NonNullable<
+  Parameters<typeof $fetch<AccountMenuItem[]>>[1]
+>
 type DrupalCeConfig = {
   drupalBaseUrl?: string
   ceApiEndpoint?: string
@@ -89,8 +91,14 @@ const localTaskLinks = computed(() =>
 )
 
 const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
-const isAccountMenuLoaded = useState<boolean>('drupal-tabs-account-menu-loaded', () => false)
-const accountMenuUserId = useState<string>('drupal-tabs-account-menu-user-id', () => '')
+const isAccountMenuLoaded = useState<boolean>(
+  'drupal-tabs-account-menu-loaded',
+  () => false,
+)
+const accountMenuUserId = useState<string>(
+  'drupal-tabs-account-menu-user-id',
+  () => '',
+)
 const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
 const drupalCeConfig = computed<DrupalCeConfig>(() => {
   return (config.public.drupalCe || {}) as DrupalCeConfig
@@ -117,28 +125,41 @@ const normalizeAdminUrl = (value: string): string => {
     }
   })()
 
-  if (normalizedPath === '/user/logout' || normalizedPath.endsWith('/user/logout')) {
+  if (
+    normalizedPath === '/user/logout' ||
+    normalizedPath.endsWith('/user/logout')
+  ) {
     return '/auth/logout'
   }
 
-  if (normalizedPath === '/user/login' || normalizedPath.endsWith('/user/login')) {
+  if (
+    normalizedPath === '/user/login' ||
+    normalizedPath.endsWith('/user/login')
+  ) {
     return '/auth/login'
   }
 
-  if (normalizedPath === '/user/password' || normalizedPath.endsWith('/user/password')) {
+  if (
+    normalizedPath === '/user/password' ||
+    normalizedPath.endsWith('/user/password')
+  ) {
     return '/auth/password'
   }
 
   if (normalizedPath === '/user' || normalizedPath.endsWith('/user')) {
-    return '/account/profile'
+    return '/account/settings'
   }
 
   return toDrupalUrl(value, drupalOrigin.value)
 }
 
 const getAccountMenuUrl = (): string => {
-  const menuEndpoint = String(drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$')
-  const menuPath = menuEndpoint.replace('$$$NAME$$$', 'account').replace(/^\/+/, '')
+  const menuEndpoint = String(
+    drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$',
+  )
+  const menuPath = menuEndpoint
+    .replace('$$$NAME$$$', 'account')
+    .replace(/^\/+/, '')
 
   return `/api/menu/${menuPath}`
 }
@@ -156,8 +177,10 @@ const loadAccountMenu = async () => {
 
   try {
     const accountMenuUrl = getAccountMenuUrl()
-    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions || {}) as AccountMenuFetchOptions
-    const credentials = drupalCeConfig.value.fetchOptions?.credentials || 'include'
+    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions ||
+      {}) as AccountMenuFetchOptions
+    const credentials =
+      drupalCeConfig.value.fetchOptions?.credentials || 'include'
     const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
       ...configuredFetchOptions,
       credentials,
@@ -217,11 +240,14 @@ watch(isAdministrator, (isAdmin) => {
   }
 })
 
-watch(() => route.fullPath, () => {
-  if (isAdministrator.value && !isAccountMenuLoaded.value) {
-    void loadAccountMenu()
-  }
-})
+watch(
+  () => route.fullPath,
+  () => {
+    if (isAdministrator.value && !isAccountMenuLoaded.value) {
+      void loadAccountMenu()
+    }
+  },
+)
 
 const links = computed(() => {
   const baseLinks = [
@@ -262,17 +288,19 @@ const navigationUi = {
   item: 'relative',
   link: `${adminTabsFontClass} admin-ui-nav-link before:bg-transparent text-sm font-medium dark:before:bg-transparent`,
   linkLabel: 'sr-only md:not-sr-only md:block',
-  linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
-  linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
+  linkLeadingIcon:
+    'text-current group-hover:!text-current group-data-[state=open]:!text-current',
+  linkTrailingIcon:
+    'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
   viewport: `${adminTabsFontClass} relative overflow-hidden rounded-md ${adminTabsSurfaceClass} shadow-md`,
   content: `${adminTabsFontClass} rounded-md ${adminTabsSurfaceClass} p-1`,
   childList: 'space-y-0.5 !ms-0 !border-0',
   childItem: '',
   childLink: `${adminTabsFontClass} admin-ui-nav-child-link`,
-  childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
+  childLinkIcon:
+    'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
   childLinkLabel: 'truncate',
 }
-
 </script>
 
 <template>
