@@ -68,7 +68,9 @@ const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
 const slotMediaOrdered = computed(() =>
   orderedIndices.value
     .map((i) => slotMedia.value[i])
-    .filter((item): item is NonNullable<(typeof slotMedia.value)[number]> => !!item),
+    .filter(
+      (item): item is NonNullable<(typeof slotMedia.value)[number]> => !!item,
+    ),
 )
 
 const {
@@ -87,7 +89,9 @@ const {
 
 const portal = useOverlayPortal()
 const { width: viewportWidth } = useWindowSize()
-const masonryLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
+const masonryLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(
+  null,
+)
 const gridLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
 const { width: mediaLayoutWidth } = useElementSize(() => {
   if (!import.meta.client) return null
@@ -110,17 +114,19 @@ const resolveLaneCount = (width: number) => {
 }
 
 const gap = computed(() => props.masonry?.gap?.default ?? 16)
-const isImageGallery = computed(() =>
-  slotMediaOrdered.value.length > 1 &&
-  slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
+const isImageGallery = computed(
+  () =>
+    slotMediaOrdered.value.length > 1 &&
+    slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
 )
-const isVisualGallery = computed(() =>
-  slotMediaOrdered.value.length > 1 &&
-  slotMediaOrdered.value.every((node) => {
-    const type = tk.propsOf(node).type
+const isVisualGallery = computed(
+  () =>
+    slotMediaOrdered.value.length > 1 &&
+    slotMediaOrdered.value.every((node) => {
+      const type = tk.propsOf(node).type
 
-    return type === 'image' || type === 'video'
-  }),
+      return type === 'image' || type === 'video'
+    }),
 )
 
 const hydrated = ref(false)
@@ -132,8 +138,10 @@ const lanes = computed(() =>
     mediaLayoutWidth.value > 0
       ? mediaLayoutWidth.value
       : viewportWidth.value > 0
-      ? viewportWidth.value
-      : (import.meta.client ? window.innerWidth : 0),
+        ? viewportWidth.value
+        : import.meta.client
+          ? window.innerWidth
+          : 0,
   ),
 )
 
@@ -162,7 +170,12 @@ onMounted(() => {
         v-slot="{ item: node, index: i }"
         class="w-full overflow-hidden"
         :items="slotMediaOrdered"
-        :virtualize="{ lanes, gap, estimateSize: isImageGallery ? 260 : 480, overscan: isImageGallery ? 24 : 8 }"
+        :virtualize="{
+          lanes,
+          gap,
+          estimateSize: isImageGallery ? 260 : 480,
+          overscan: isImageGallery ? 24 : 8,
+        }"
       >
         <MediaItem
           :key="getMediaItemKey(node, i)"
@@ -201,6 +214,7 @@ onMounted(() => {
   <LazyUModal
     v-if="overlay && itemsOrdered.length > 0"
     v-model:open="open"
+    class="media-modal"
     :close="false"
     :description="modalAccessibleDescription"
     fullscreen
@@ -292,7 +306,7 @@ onMounted(() => {
             {{ modalDescription }}
           </div>
 
-          <div v-if="modalCredit" class="text-xs italic text-neutral-200">
+          <div v-if="modalCredit" class="text-xs text-neutral-200 italic">
             {{ modalCredit }}
           </div>
         </div>
@@ -303,11 +317,15 @@ onMounted(() => {
 
 <style>
 @layer components {
-  [role='dialog'] [aria-roledescription='carousel'],
-  [role='dialog'] .overflow-hidden {
+  .media-modal [aria-roledescription='carousel'] {
     @apply h-full;
+
+    .overflow-hidden {
+      @apply h-full;
+    }
   }
-  [role='dialog'] img {
+
+  .media-modal img {
     @apply max-h-[80vh] object-contain;
   }
 }
