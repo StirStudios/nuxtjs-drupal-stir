@@ -61,7 +61,12 @@ const onUploadPhotos = async () => {
       formData.append('files[]', file)
     }
 
-    const response = await $fetch<{ items?: Array<{ mid: number; name: string; url: string }>; errors?: Array<{ file: string; error: string }> }>(
+    const response = await $fetch<{
+      uploaded?: boolean
+      error?: string
+      items?: Array<{ mid: number; name: string; url: string }>
+      errors?: Array<{ file: string; error: string }>
+    }>(
       '/api/account/profile/media/upload',
       {
         method: 'POST',
@@ -79,6 +84,14 @@ const onUploadPhotos = async () => {
         title: 'Some uploads failed',
         description: response.errors[0]?.error || 'One or more files could not be uploaded.',
         color: 'warning',
+      })
+    }
+
+    if (!response.uploaded && (!Array.isArray(response.items) || response.items.length === 0)) {
+      toast.add({
+        title: 'Upload failed',
+        description: response.error || 'No files were uploaded. Check profile media field setup in Drupal.',
+        color: 'error',
       })
     }
 
