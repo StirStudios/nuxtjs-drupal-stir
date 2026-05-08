@@ -17,6 +17,8 @@ const props = defineProps<{
   editableFieldsCount: number
   hasProfileSave: boolean
   saving: boolean
+  heading?: string
+  subheading?: string
 }>()
 
 const emit = defineEmits<{
@@ -74,8 +76,8 @@ const validate = (state: Record<string, unknown>): FormError[] => {
 <template>
   <div class="space-y-6 pt-4">
     <div class="space-y-1">
-      <h2 class="text-highlighted text-base font-semibold">Profile</h2>
-      <p class="text-muted text-sm">Update your basic account information.</p>
+      <h2 class="text-highlighted text-base font-semibold">{{ props.heading || 'Settings' }}</h2>
+      <p class="text-muted text-sm">{{ props.subheading || 'Update your account settings.' }}</p>
     </div>
 
     <UForm
