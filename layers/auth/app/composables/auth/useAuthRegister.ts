@@ -90,8 +90,6 @@ export function useAuthRegister() {
           color: 'success',
         })
       }
-
-      await navigateTo('/auth/login')
     } catch (error: unknown) {
       toast.add({
         title: 'Registration failed',
