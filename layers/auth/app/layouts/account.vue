@@ -25,9 +25,11 @@ const pageTitle = computed(() =>
       }"
     >
       <template #title>
-        <span class="inline-flex items-center gap-2">
-          <UIcon class="size-4" name="i-lucide-user-round" />
-          <span>Account</span>
+        <span class="inline-flex items-center gap-2 overflow-hidden">
+          <UIcon class="size-4 shrink-0" name="i-lucide-user-round" />
+          <span class="truncate group-data-[state=collapsed]/sidebar:hidden">
+            Account
+          </span>
         </span>
       </template>
 
