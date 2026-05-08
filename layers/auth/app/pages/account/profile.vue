@@ -58,7 +58,7 @@ const onUploadPhotos = async () => {
     const formData = new FormData()
     formData.append('slot', uploadSlot.value)
     for (const file of selectedFiles.value) {
-      formData.append('files[]', file)
+      formData.append('files', file)
     }
 
     const response = await $fetch<{
