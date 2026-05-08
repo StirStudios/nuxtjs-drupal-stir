@@ -166,7 +166,7 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="bg-muted min-h-screen">
+  <div class="min-h-screen">
     <div class="border-default bg-default border-b px-6 py-4 text-center">
       <span class="text-muted text-sm">StirStudios • Account Settings</span>
     </div>
