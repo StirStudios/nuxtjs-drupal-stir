@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
   try {

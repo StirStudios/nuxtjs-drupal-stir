@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
 
 type PasswordPayload = {
   current_password?: unknown

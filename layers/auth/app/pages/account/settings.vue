@@ -79,7 +79,7 @@ const onChangePassword = async () => {
 
   changingPassword.value = true
   try {
-    await $fetch('/api/account/password', {
+    await $fetch('/api/account/settings/password', {
       method: 'PATCH',
       body: {
         current_password: currentPassword.value,
@@ -105,7 +105,7 @@ const onChangePassword = async () => {
 const onCancelAccount = async () => {
   cancelingAccount.value = true
   try {
-    await $fetch('/api/account/cancel', { method: 'POST' })
+    await $fetch('/api/account/settings/cancel', { method: 'POST' })
     cancelModalOpen.value = false
     toast.add({ title: 'Account canceled', description: 'Your account has been disabled.', color: 'success' })
     await navigateTo('/auth/logout')
