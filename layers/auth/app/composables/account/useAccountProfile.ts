@@ -105,8 +105,12 @@ export function useAccountProfile() {
     return false
   })
 
-  const load = async () => {
-    loading.value = true
+  const load = async (options?: { silent?: boolean }) => {
+    const silent = options?.silent === true
+
+    if (!silent) {
+      loading.value = true
+    }
     try {
       const [schema, profileValues] = await Promise.all([
         $fetch<ProfileSchemaResponse>('/api/account/profile/schema'),
@@ -141,7 +145,9 @@ export function useAccountProfile() {
         gallery: Array.isArray(profileValues?.media?.gallery) ? profileValues.media.gallery : [],
       }
     } finally {
-      loading.value = false
+      if (!silent) {
+        loading.value = false
+      }
     }
   }
 

@@ -129,7 +129,7 @@ const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
 
     if (Array.isArray(response.items) && response.items.length > 0) {
       toast.add({ title: 'Photos uploaded', description: `${response.items.length} photo(s) uploaded.`, color: 'success' })
-      await load()
+      await load({ silent: true })
     }
 
     if (Array.isArray(response.errors) && response.errors.length > 0) {
@@ -224,7 +224,7 @@ const onRemoveProfileMediaItem = async (
         description: `${item.title || `Media #${item.mid}`} was removed.`,
         color: 'success',
       })
-      await load()
+      await load({ silent: true })
       return
     }
 
@@ -259,7 +259,7 @@ const onRemoveProfileMediaItem = async (
         <UButton color="neutral" to="/account/profile" variant="soft">Profile</UButton>
       </div>
 
-      <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
+      <div>
         <div v-if="loading || !isReady" class="space-y-4">
           <USkeleton class="h-5 w-28" />
           <USkeleton class="h-10 w-full" />
@@ -280,24 +280,13 @@ const onRemoveProfileMediaItem = async (
             @submit="onSubmit"
           />
 
-          <div class="mt-8 space-y-3 border-t pt-6">
+          <div class="mt-8 space-y-3 pt-2">
             <h2 class="text-highlighted text-base font-semibold">Profile Photos</h2>
             <p class="text-muted text-sm">Select images below to upload instantly.</p>
 
             <div class="space-y-4">
               <div v-for="section in mediaSections" :key="section.key" class="space-y-2">
                 <h3 class="text-sm font-medium">{{ section.label }}</h3>
-                <UFileUpload
-                  v-if="canShowUploader(section)"
-                  accept="image/*"
-                  class="min-h-28"
-                  description="PNG, JPG, WebP or GIF (max. 10MB each)"
-                  icon="i-lucide-image"
-                  :label="`Drop ${section.label.toLowerCase()} image${section.multiple ? 's' : ''} here`"
-                  layout="list"
-                  :multiple="section.multiple"
-                  @update:model-value="onFilesSelected(section.key, $event)"
-                />
                 <div
                   v-if="uploadingSlot === section.key"
                   class="text-muted text-sm"
@@ -305,7 +294,6 @@ const onRemoveProfileMediaItem = async (
                   Uploading...
                 </div>
                 <div
-                  v-if="section.items.length > 0"
                   class="grid grid-cols-2 gap-3 md:grid-cols-3"
                 >
                   <div
@@ -324,14 +312,24 @@ const onRemoveProfileMediaItem = async (
                     />
                     <MediaImage
                       :alt="String(item.alt || item.title || 'Profile media')"
-                      image-class="h-32 w-full object-cover"
+                      image-class="h-36 w-full rounded-md object-cover"
                       no-wrapper
                       :src="String(item.src || '')"
                     />
                     <p class="text-muted mt-2 truncate text-xs">{{ item.title || `Media #${item.mid}` }}</p>
                   </div>
+                  <UFileUpload
+                    v-if="canShowUploader(section)"
+                    accept="image/*"
+                    class="h-full min-h-0"
+                    description="PNG, JPG, WebP or GIF"
+                    icon="i-lucide-image-plus"
+                    :label="section.multiple ? 'Add photos' : 'Add photo'"
+                    :multiple="section.multiple"
+                    :ui="{ root: 'h-full', base: 'h-full min-h-36' }"
+                    @update:model-value="onFilesSelected(section.key, $event)"
+                  />
                 </div>
-                <p v-else class="text-muted text-sm">No media uploaded yet.</p>
               </div>
             </div>
           </div>
