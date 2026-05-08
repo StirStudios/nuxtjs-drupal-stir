@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAccountProfile } from '../../composables/account/useAccountProfile'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const toast = useToast()
 const session = useAuthSession()
@@ -16,6 +17,7 @@ const {
   save,
 } = useAccountProfile()
 
+const sidebarOpen = ref(true)
 const isReady = ref(false)
 const uploadingSlot = ref<'avatar' | 'cover' | 'gallery' | null>(null)
 const deletingMediaKey = ref<string | null>(null)
@@ -36,6 +38,21 @@ type ProfileMediaItem = {
   src?: string
   alt?: string
 }
+
+const accountNavigationItems: NavigationMenuItem[] = [
+  {
+    label: 'Settings',
+    icon: 'i-lucide-settings',
+    to: '/account/settings',
+    active: true,
+  },
+
+  {
+    label: 'Profile',
+    icon: 'i-lucide-user-round',
+    to: '/account/profile',
+  },
+]
 
 const hiddenProfileFieldNames = new Set([
   'field_profile_avatar',
@@ -371,68 +388,50 @@ const onGalleryDrop = async (targetMid: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div class="border-default bg-default border-b px-6 py-4 text-center">
-      <span class="text-muted text-sm">StirStudios • Profile</span>
-    </div>
-
-    <div
-      class="grid min-h-[calc(100vh-57px)] grid-cols-1 md:grid-cols-[260px_1fr]"
+  <div class="flex min-h-screen">
+    <USidebar
+      v-model:open="sidebarOpen"
+      collapsible="icon"
+      rail
+      title="Account"
+      :ui="{
+        container: 'h-full',
+        inner: 'bg-default',
+      }"
     >
-      <!-- Left sidebar -->
-      <aside class="border-default bg-default border-r p-4">
-        <nav class="space-y-6">
-          <div>
-            <p class="text-muted mb-2 text-sm">Account</p>
+      <UNavigationMenu
+        :items="accountNavigationItems"
+        orientation="vertical"
+        :ui="{ link: 'p-1.5 overflow-hidden' }"
+      />
+    </USidebar>
 
-            <div class="space-y-1">
-              <UButton
-                block
-                class="justify-start"
-                color="neutral"
-                icon="i-lucide-settings"
-                to="/account/settings"
-                variant="ghost"
-              >
-                Settings
-              </UButton>
+    <div class="flex min-w-0 flex-1 flex-col">
+      <div
+        class="border-default bg-default flex h-(--ui-header-height) shrink-0 items-center justify-between border-b px-4"
+      >
+        <UButton
+          aria-label="Toggle sidebar"
+          color="neutral"
+          icon="i-lucide-panel-left"
+          variant="ghost"
+          @click="sidebarOpen = !sidebarOpen"
+        />
 
-              <UButton
-                block
-                class="justify-start"
-                color="neutral"
-                icon="i-lucide-user-round"
-                to="/account/profile"
-                variant="soft"
-              >
-                Profile
-              </UButton>
-            </div>
-          </div>
-        </nav>
-      </aside>
+        <span class="text-muted text-sm">Account Profile</span>
 
-      <!-- Main content -->
+        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
+          Back to site
+        </UButton>
+      </div>
+
       <main class="w-full px-4 py-8 md:px-8">
         <div class="mx-auto w-full max-w-4xl space-y-6">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <h1 class="text-highlighted mb-1 text-xl font-semibold">
-                Profile
-              </h1>
-              <p class="text-muted text-sm">
-                Manage your profile details and photos.
-              </p>
-            </div>
-
-            <UButton
-              icon="i-lucide-arrow-left"
-              size="sm"
-              to="/"
-              variant="ghost"
-            >
-              Back to site
-            </UButton>
+          <div>
+            <h1 class="text-highlighted mb-1 text-xl font-semibold">Profile</h1>
+            <p class="text-muted text-sm">
+              Manage your profile details and photos.
+            </p>
           </div>
 
           <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
@@ -460,6 +459,7 @@ const onGalleryDrop = async (targetMid: number) => {
                 <h2 class="text-highlighted text-base font-semibold">
                   Profile Photos
                 </h2>
+
                 <p class="text-muted text-sm">
                   Select images below to upload instantly.
                 </p>

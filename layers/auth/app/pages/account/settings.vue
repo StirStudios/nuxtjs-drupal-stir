@@ -3,10 +3,12 @@ import { useAccountSettings } from '../../composables/account/useAccountSettings
 import { useAuthSession } from '../../composables/auth/useAuthSession'
 import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const toast = useToast()
 const session = useAuthSession()
 const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
+const sidebarOpen = ref(true)
 
 const isReady = ref(false)
 const currentPassword = ref('')
@@ -15,6 +17,21 @@ const changingPassword = ref(false)
 const cancelingAccount = ref(false)
 const cancelModalOpen = ref(false)
 const portal = useOverlayPortal()
+
+const accountNavigationItems: NavigationMenuItem[] = [
+  {
+    label: 'Settings',
+    icon: 'i-lucide-settings',
+    to: '/account/settings',
+    active: true,
+  },
+
+  {
+    label: 'Profile',
+    icon: 'i-lucide-user-round',
+    to: '/account/profile',
+  },
+]
 
 const settingsFields = [
   {
@@ -166,68 +183,52 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div class="border-default bg-default border-b px-6 py-4 text-center">
-      <span class="text-muted text-sm">StirStudios • Account Settings</span>
-    </div>
-
-    <div
-      class="grid min-h-[calc(100vh-57px)] grid-cols-1 md:grid-cols-[260px_1fr]"
+  <div class="flex min-h-screen">
+    <USidebar
+      v-model:open="sidebarOpen"
+      collapsible="icon"
+      rail
+      title="Account"
+      :ui="{
+        container: 'h-full',
+        inner: 'bg-default',
+      }"
     >
-      <!-- Left sidebar -->
-      <aside class="border-default bg-default border-r p-4">
-        <nav class="space-y-6">
-          <div>
-            <p class="text-muted mb-2 text-sm">Account</p>
+      <UNavigationMenu
+        :items="accountNavigationItems"
+        orientation="vertical"
+        :ui="{ link: 'p-1.5 overflow-hidden' }"
+      />
+    </USidebar>
 
-            <div class="space-y-1">
-              <UButton
-                block
-                class="justify-start"
-                color="neutral"
-                icon="i-lucide-settings"
-                to="/account/settings"
-                variant="soft"
-              >
-                Settings
-              </UButton>
+    <div class="flex min-w-0 flex-1 flex-col">
+      <div
+        class="border-default bg-default flex h-(--ui-header-height) shrink-0 items-center justify-between border-b px-4"
+      >
+        <UButton
+          aria-label="Toggle sidebar"
+          color="neutral"
+          icon="i-lucide-panel-left"
+          variant="ghost"
+          @click="sidebarOpen = !sidebarOpen"
+        />
 
-              <UButton
-                block
-                class="justify-start"
-                color="neutral"
-                icon="i-lucide-user-round"
-                to="/account/profile"
-                variant="ghost"
-              >
-                Profile
-              </UButton>
-            </div>
-          </div>
-        </nav>
-      </aside>
+        <span class="text-muted text-sm">Account Settings</span>
 
-      <!-- Main content -->
+        <UButton icon="i-lucide-arrow-left" size="sm" to="/" variant="ghost">
+          Back to site
+        </UButton>
+      </div>
+
       <main class="w-full px-4 py-8 md:px-8">
         <div class="mx-auto w-full max-w-4xl space-y-6">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <h1 class="text-highlighted mb-1 text-xl font-semibold">
-                Account Settings
-              </h1>
-              <p class="text-muted text-sm">
-                Manage your login details and account security.
-              </p>
-            </div>
-
-            <UButton
-              icon="i-lucide-arrow-left"
-              size="sm"
-              to="/"
-              variant="ghost"
-            >
-              Back to site
-            </UButton>
+          <div>
+            <h1 class="text-highlighted mb-1 text-xl font-semibold">
+              Account Settings
+            </h1>
+            <p class="text-muted text-sm">
+              Manage your login details and account security.
+            </p>
           </div>
 
           <div class="border-accented bg-default rounded-xl border p-4 md:p-6">
