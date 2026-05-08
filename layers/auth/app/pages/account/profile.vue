@@ -15,6 +15,7 @@ const uploadFiles = reactive<Record<'avatar' | 'cover' | 'gallery', File[]>>({
   cover: [],
   gallery: [],
 })
+const uploadTimers: Partial<Record<'avatar' | 'cover' | 'gallery', ReturnType<typeof setTimeout>>> = {}
 
 type ProfileMediaItem = {
   mid: number
@@ -55,6 +56,14 @@ const mediaSections = computed(() => {
     { key: 'gallery' as const, label: 'Profile gallery', items: gallery, multiple: true },
   ]
 })
+
+const canShowUploader = (section: { key: 'avatar' | 'cover' | 'gallery'; items: ProfileMediaItem[] }): boolean => {
+  if (section.key === 'gallery') {
+    return true
+  }
+
+  return section.items.length === 0
+}
 
 onMounted(async () => {
   await session.fetchSession()
@@ -154,15 +163,41 @@ const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
 
 const onFilesSelected = async (
   slot: 'avatar' | 'cover' | 'gallery',
-  value: File | File[] | null | undefined,
+  value: File | File[] | FileList | null | undefined,
 ) => {
-  const files = Array.isArray(value)
+  const files = value instanceof FileList
+    ? Array.from(value)
+    : Array.isArray(value)
     ? value
     : value instanceof File
       ? [value]
       : []
 
-  uploadFiles[slot] = files
+  if (slot === 'gallery') {
+    const existing = uploadFiles.gallery
+    const merged = [...existing, ...files]
+    const deduped = merged.filter((file, index, all) =>
+      all.findIndex(candidate =>
+        candidate.name === file.name
+        && candidate.size === file.size
+        && candidate.lastModified === file.lastModified,
+      ) === index,
+    )
+
+    uploadFiles.gallery = deduped
+
+    if (uploadTimers.gallery) {
+      clearTimeout(uploadTimers.gallery)
+    }
+    uploadTimers.gallery = setTimeout(async () => {
+      if (uploadingSlot.value === null && uploadFiles.gallery.length > 0) {
+        await onUploadPhotos('gallery')
+      }
+    }, 250)
+    return
+  }
+
+  uploadFiles[slot] = files.slice(0, 1)
   await onUploadPhotos(slot)
 }
 
@@ -253,6 +288,7 @@ const onRemoveProfileMediaItem = async (
               <div v-for="section in mediaSections" :key="section.key" class="space-y-2">
                 <h3 class="text-sm font-medium">{{ section.label }}</h3>
                 <UFileUpload
+                  v-if="canShowUploader(section)"
                   accept="image/*"
                   class="min-h-28"
                   description="PNG, JPG, WebP or GIF (max. 10MB each)"
