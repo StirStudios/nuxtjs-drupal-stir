@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDrupalHeaders } from '../../server/utils/drupalHeaders'
+import { buildDrupalHeaders } from '../../layers/core/server/utils/drupalHeaders'
 
 describe('buildDrupalHeaders', () => {
   it('builds only the requested headers', () => {

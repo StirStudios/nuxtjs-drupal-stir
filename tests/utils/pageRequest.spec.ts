@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolvePageRequest } from '../../app/utils/pageRequest'
+import { resolvePageRequest } from '../../layers/theme/app/utils/pageRequest'
 
 describe('resolvePageRequest', () => {
   it('returns the current route path and a hash-free cache key by default', () => {

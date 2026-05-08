@@ -5,18 +5,21 @@ This repository is a **Nuxt 4 layer/base theme** using **Nuxt UI 4 + Tailwind 4*
 Use these rules for all changes.
 
 ## Primary goals
+
 - Keep the layer production-safe for SSR and reusable across downstream projects.
 - Preserve Drupal CE compatibility and predictable custom-element rendering.
 - Favor explicit, typed, and documented configuration over implicit behavior.
 
 ## Project overview
+
 - **Framework:** Nuxt 4 (SSR by default, Nitro runtime)
 - **UI:** Nuxt UI 4 + Tailwind CSS 4
 - **CMS integration:** `nuxtjs-drupal-ce` (Lupus Decoupled Custom Elements)
 - **Performance modules:** `nuxt-vitalizer`
-- **Aux modules:** robots, sitemap, turnstile, scripts, eslint
+- **Additional modules:** robots, sitemap, turnstile, scripts, eslint
 
 ## Repository structure (high level)
+
 - `app/` - Nuxt app code (pages, components, composables, plugins)
 - `server/` - Nitro server routes/middleware/utilities
 - `assets/` - global CSS and static assets
@@ -26,6 +29,7 @@ Use these rules for all changes.
 - `app.config.ts` - Nuxt UI/theme-level app configuration
 
 ## Environment and configuration rules
+
 - Keep `.env`-driven config aligned with `nuxt.config.ts`; avoid hardcoded URLs/secrets.
 - If adding/renaming env vars, update `readme.md` and mention in your summary.
 - When changed, explicitly document purpose and expected values for:
@@ -42,6 +46,7 @@ Use these rules for all changes.
 - If route rules/redirects change (for example `/admincontrol` or `/front`), document user-facing impact.
 
 ## Coding conventions
+
 - TypeScript-first: prefer typed params, return types, and narrow interfaces near usage.
 - Use Nuxt/Vue idioms: composables for shared logic, focused components, minimal cross-layer coupling.
 - Prefer Nuxt UI tokens/variants and Tailwind utilities before writing custom CSS.
@@ -60,6 +65,7 @@ Use these rules for all changes.
   - Server utilities/routes: clear, purpose-driven names that match Nitro conventions.
 
 ## Nuxt UI reference priority
+
 - For Nuxt UI component/composable APIs, props, slots, events, theming, and patterns, prefer official sources in this order:
   - Nuxt UI MCP server: `https://ui.nuxt.com/mcp`
   - Nuxt UI LLM index: `https://ui.nuxt.com/llms.txt`
@@ -67,7 +73,13 @@ Use these rules for all changes.
 - This is recommended guidance, not a hard requirement; do not block work if MCP is unavailable.
 
 ## Drupal CE integration guidance
+
 - Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
+- Preserve internal Nuxt CE proxy behavior (`/api/*`) when changing auth/header middleware.
+- API key responsibilities must stay explicit:
+  - Nuxt layer: forwards `x-api-key` on internal proxy/server calls to Drupal.
+  - Drupal/edge: enforces access policy for CE/data endpoints.
+- Do not narrow API-key middleware scope without verifying homepage, CE page fetch, and menu endpoint behavior.
 - Keep schema and mapping assumptions explicit with types or concise inline notes.
 - For custom elements, prefer 1:1 filename mapping in kebab-case
   (example: `node-article-teaser.vue`); fallback components may use `--default` suffix.
@@ -82,7 +94,32 @@ Use these rules for all changes.
 - Any change affecting Drupal-driven layout/block/custom-element rendering must be clearly called out in summaries.
 - If a feature requires new Drupal fields, CE config, or JSON:API include changes, document in `docs/` or `readme.md`.
 
+## Auth, protected routes, and Drupal API proxy guidance
+
+- Keep Drupal user authentication separate from simple password-protected page access.
+- Drupal auth routes (`/api/auth/login`, `/api/auth/logout`, `/api/auth/session`, password reset, registration) should use shared Nitro server utilities for:
+  - Drupal base URL resolution
+  - API key forwarding
+  - request cookie forwarding
+  - `set-cookie` response forwarding
+  - upstream error normalization
+- Prefer aligning custom auth proxy behavior with `nuxtjs-drupal-ce` proxy/header conventions before adding custom behavior.
+- Do not route custom auth endpoints through CE page-fetch helpers unless explicitly supported.
+- Protected page access should remain lightweight and local to Nuxt unless Drupal auth is intentionally required.
+- Global route middleware should only gate configured protected routes.
+- Auth system routes must remain public unless explicitly configured otherwise:
+  - `/auth/login`
+  - `/auth/logout`
+  - `/auth/register`
+  - `/auth/password/request`
+  - `/auth/password/reset`
+  - `/auth/protected`
+- Do not couple protected route middleware to Drupal user login redirects.
+- Use explicit redirect config for Drupal auth login/logout behavior.
+- Use `?redirect=/path` for protected page return paths when possible.
+
 ## SSR, runtime, and performance safeguards
+
 - No browser-only APIs at module top-level.
 - Use `import.meta.client`/`import.meta.server` (or Nuxt-safe guards) where runtime-specific logic is required.
 - Keep server/client behavior consistent when touching hydration-sensitive UI.
@@ -90,19 +127,47 @@ Use these rules for all changes.
 - Avoid breaking public interfaces/config defaults unless explicitly requested.
 
 ## Validation checklist
+
 Run relevant checks after changes:
+
 - `pnpm lint`
 - `pnpm build`
 - `pnpm generate` (when static output behavior is affected)
 - `pnpm dev` (for local/manual verification when needed)
 
+Validation policy:
+
+- Default for production-impacting changes: run `pnpm verify:ci`.
+- If debugging failures, run the individual commands:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm test:nuxt`
+  - `pnpm build`
+- For docs-only or clearly isolated non-runtime edits, targeted validation is acceptable, but state what was intentionally skipped.
+- Any change touching auth, headers, route middleware, CE fetch/proxy behavior, or runtime config must run the full validation set above.
+
+Security change smoke checklist (required when auth/header/routing behavior changes):
+
+- Homepage load (`/`) succeeds.
+- One inner CE route succeeds.
+- Menu fetch succeeds.
+- Webform submit proxy path behaves as expected.
+- Paragraph read/update endpoints behave as expected (if enabled).
+
+CI parity:
+
+- Keep CI tool versions aligned with repository declarations (for example `pnpm/action-setup` version must match `packageManager` in `package.json`).
+
 If checks are skipped, state exactly which were not run and why.
 
 ## Release and safety rules
+
 - Do **not** run `pnpm release` unless explicitly requested.
 - Do not introduce breaking changes to shared layer contracts without approval.
 
 ## PR / handoff expectations
+
 - Summaries must include:
   - user-facing changes
   - Drupal integration impact (if any)

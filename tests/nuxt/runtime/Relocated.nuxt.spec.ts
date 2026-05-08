@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { WebformFieldProps, WebformState } from '../../../types'
-import FieldRelocated from '../../../app/components/Field/Relocated.vue'
+import FieldRelocated from '../../../layers/theme/app/components/Field/Relocated.vue'
 
 describe('FieldRelocated (Nuxt runtime)', () => {
   it('renders only relocated hidden fields via FieldRenderer', async () => {
