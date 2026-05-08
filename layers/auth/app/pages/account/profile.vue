@@ -111,7 +111,7 @@ const onUploadPhotos = async (slot: 'avatar' | 'cover' | 'gallery') => {
 
     formData.append('slot', slot)
     for (const file of uploadFiles[slot]) {
-      formData.append('files', file)
+      formData.append('files[]', file)
     }
 
     const response = await $fetch<{

@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
       continue
     }
 
-    const fieldName = part.name === 'photos' || part.name === 'file' || part.name === 'files[]' || part.name === 'files' ? 'files' : (part.name || 'files')
+    const fieldName = part.name === 'photos' || part.name === 'file' || part.name === 'files[]' || part.name === 'files' ? 'files[]' : (part.name || 'files[]')
     const blob = new Blob([new Uint8Array(part.data)], {
       type: resolveUploadMimeType(part.filename, String(part.type || '')),
     })
