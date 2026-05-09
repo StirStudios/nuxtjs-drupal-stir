@@ -14,13 +14,6 @@ export function useAuthRegister() {
 
   const fields: AuthFormField[] = [
     {
-      name: 'display_name',
-      type: 'text',
-      label: 'Display name',
-      placeholder: 'Enter your display name',
-      required: false,
-    },
-    {
       name: 'email',
       type: 'email',
       label: 'Email',
@@ -37,7 +30,6 @@ export function useAuthRegister() {
   ]
 
   const validate = (formState: {
-    display_name?: string
     email?: string
     password?: string
   }) => {
@@ -51,7 +43,6 @@ export function useAuthRegister() {
 
   const onSubmit = async (
     event: FormSubmitEvent<{
-      display_name?: string
       email: string
       password: string
     }>,
@@ -60,7 +51,6 @@ export function useAuthRegister() {
 
     try {
       const response = await register({
-        display_name: event.data.display_name?.trim(),
         email: event.data.email.trim(),
         password: event.data.password.trim(),
         turnstile_response: turnstileToken.value,

@@ -9,21 +9,18 @@ type SettingsUpdateResponse = {
   no_changes?: boolean
 }
 
-const SETTINGS_FIELDS = ['account_name', 'account_email'] as const
+const SETTINGS_FIELDS = ['account_email'] as const
 
 export function useAccountSettings() {
   const values = ref<Record<string, unknown>>({
-    account_name: '',
     account_email: '',
   })
   const baselineValues = ref<Record<string, unknown>>({
-    account_name: '',
     account_email: '',
   })
   const loading = ref(false)
   const saving = ref(false)
   const fieldEditability = ref<Record<string, boolean>>({
-    account_name: true,
     account_email: true,
   })
 
@@ -46,7 +43,6 @@ export function useAccountSettings() {
           : {}
 
       values.value = {
-        account_name: String(sourceValues.account_name ?? ''),
         account_email: String(sourceValues.account_email ?? ''),
       }
 
@@ -56,10 +52,6 @@ export function useAccountSettings() {
           : {}
 
       fieldEditability.value = {
-        account_name:
-          typeof sourceFields.account_name?.editable === 'boolean'
-            ? sourceFields.account_name.editable
-            : false,
         account_email:
           typeof sourceFields.account_email?.editable === 'boolean'
             ? sourceFields.account_email.editable

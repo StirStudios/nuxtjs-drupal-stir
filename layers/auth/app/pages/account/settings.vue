@@ -24,13 +24,6 @@ const portal = useOverlayPortal()
 
 const settingsFields = [
   {
-    name: 'account_name',
-    label: 'Username',
-    type: 'string',
-    required: true,
-    editable: true,
-  },
-  {
     name: 'account_email',
     label: 'Email',
     type: 'email',
