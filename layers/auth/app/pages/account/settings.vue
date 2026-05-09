@@ -13,6 +13,8 @@ definePageMeta({
 const toast = useToast()
 const session = useAuthSession()
 const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
+const appConfig = useAppConfig()
+const allowUsernameChange = Boolean(appConfig.auth?.settings?.allowUsernameChange)
 
 const isReady = ref(false)
 const currentPassword = ref('')
@@ -28,7 +30,7 @@ const settingsFields = [
     label: 'Username',
     type: 'string',
     required: true,
-    editable: true,
+    editable: allowUsernameChange,
   },
   {
     name: 'account_email',
@@ -38,6 +40,9 @@ const settingsFields = [
     editable: true,
   },
 ]
+const editableSettingsFieldsCount = computed(
+  () => settingsFields.filter((field) => field.editable).length,
+)
 const settingsTabs = [
   { label: 'Settings', icon: 'i-lucide-user-round', slot: 'settings' },
   { label: 'Security', icon: 'i-lucide-shield-check', slot: 'security' },
@@ -177,7 +182,7 @@ const onCancelAccount = async () => {
     <UTabs v-if="!loading && isReady" class="w-full" :items="settingsTabs" variant="link">
       <template #settings>
         <AccountProfileForm
-          :editable-fields-count="2"
+          :editable-fields-count="editableSettingsFieldsCount"
           :fields="settingsFields"
           :has-profile-save="hasChanges"
           heading="Settings"
