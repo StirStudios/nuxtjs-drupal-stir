@@ -1,4 +1,5 @@
 type SettingsValuesResponse = {
+  fields?: Record<string, { editable?: boolean }>
   values?: Record<string, unknown>
 }
 
@@ -21,6 +22,10 @@ export function useAccountSettings() {
   })
   const loading = ref(false)
   const saving = ref(false)
+  const fieldEditability = ref<Record<string, boolean>>({
+    account_name: true,
+    account_email: true,
+  })
 
   const hasChanges = computed(() => {
     return SETTINGS_FIELDS.some((field) => {
@@ -44,6 +49,23 @@ export function useAccountSettings() {
         account_name: String(sourceValues.account_name ?? ''),
         account_email: String(sourceValues.account_email ?? ''),
       }
+
+      const sourceFields =
+        response && typeof response.fields === 'object' && response.fields !== null
+          ? response.fields
+          : {}
+
+      fieldEditability.value = {
+        account_name:
+          typeof sourceFields.account_name?.editable === 'boolean'
+            ? sourceFields.account_name.editable
+            : true,
+        account_email:
+          typeof sourceFields.account_email?.editable === 'boolean'
+            ? sourceFields.account_email.editable
+            : true,
+      }
+
       baselineValues.value = { ...values.value }
     } finally {
       loading.value = false
@@ -91,6 +113,7 @@ export function useAccountSettings() {
 
   return {
     values,
+    fieldEditability,
     hasChanges,
     loading,
     saving,
