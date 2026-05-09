@@ -59,7 +59,7 @@ export function useAccountSettings() {
         account_name:
           typeof sourceFields.account_name?.editable === 'boolean'
             ? sourceFields.account_name.editable
-            : true,
+            : false,
         account_email:
           typeof sourceFields.account_email?.editable === 'boolean'
             ? sourceFields.account_email.editable
