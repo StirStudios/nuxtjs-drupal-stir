@@ -10,9 +10,6 @@ export default defineAppConfig({
     logoutRedirectPath: '/auth/login',
     protectedFallbackRedirectPath: '/',
     backgroundImage: '',
-    settings: {
-      allowUsernameChange: false,
-    },
     login: {
       title: 'Login',
       description: 'Sign in to continue.',

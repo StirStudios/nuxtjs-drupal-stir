@@ -12,9 +12,7 @@ definePageMeta({
 
 const toast = useToast()
 const session = useAuthSession()
-const { values, hasChanges, loading, saving, load, save } = useAccountSettings()
-const appConfig = useAppConfig()
-const allowUsernameChange = Boolean(appConfig.auth?.settings?.allowUsernameChange)
+const { values, fieldEditability, hasChanges, loading, saving, load, save } = useAccountSettings()
 
 const isReady = ref(false)
 const currentPassword = ref('')
@@ -30,7 +28,7 @@ const settingsFields = [
     label: 'Username',
     type: 'string',
     required: true,
-    editable: allowUsernameChange,
+    editable: true,
   },
   {
     name: 'account_email',
@@ -40,8 +38,19 @@ const settingsFields = [
     editable: true,
   },
 ]
+
+const displaySettingsFields = computed(() => {
+  return settingsFields.map((field) => ({
+    ...field,
+    editable:
+      fieldEditability.value[field.name] !== undefined
+        ? fieldEditability.value[field.name]
+        : field.editable,
+  }))
+})
+
 const editableSettingsFieldsCount = computed(
-  () => settingsFields.filter((field) => field.editable).length,
+  () => displaySettingsFields.value.filter((field) => field.editable).length,
 )
 const settingsTabs = [
   { label: 'Settings', icon: 'i-lucide-user-round', slot: 'settings' },
@@ -183,7 +192,7 @@ const onCancelAccount = async () => {
       <template #settings>
         <AccountProfileForm
           :editable-fields-count="editableSettingsFieldsCount"
-          :fields="settingsFields"
+          :fields="displaySettingsFields"
           :has-profile-save="hasChanges"
           heading="Settings"
           :saving="saving"
