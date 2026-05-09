@@ -478,11 +478,11 @@ const onGalleryDrop = async (targetMid: number) => {
                 <UFileUpload
                   v-if="canShowUploader(section)"
                   v-model="uploadFiles[section.key]"
-                  accept="image/*"
+                  accept="image/png,image/gif,image/jpeg,image/webp,.png,.gif,.jpg,.jpeg,.webp"
                   :class="
                     section.multiple ? 'h-full min-h-0' : 'col-span-full'
                   "
-                  description="PNG, JPG, WebP or GIF"
+                  description="PNG, JPG, JPEG, WebP or GIF"
                   icon="i-lucide-image-plus"
                   :label="section.multiple ? 'Add photos' : 'Add photo'"
                   :multiple="section.multiple"
