@@ -51,9 +51,9 @@ export default defineAppConfig({
     pdf: false,
     crumbs: false,
 
-    h1: 'mb-20 text-center text-6xl',
+    h1: 'mb-12 text-center text-6xl lg:mb-20',
     container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
-    header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
+    header: 'fixed top-0 z-30 w-full !p-0 md:px-auto',
 
     navigation: {
       mode: 'fixed',
@@ -80,15 +80,15 @@ export default defineAppConfig({
         angle: false,
         angleDeg: 35,
         angleOffsetX: 175,
-        link: 'text-xl text-center block my-3 uppercase',
+        link: 'block my-3 text-center text-xl uppercase',
         body: 'flex h-full flex-col justify-center text-center',
       },
     },
 
     hero: {
       base: 'hero flex items-center justify-center overflow-hidden',
-      mediaSpacing: 'min-h-[22rem] lg:min-h-[35rem] mb-20',
-      noMediaSpacing: 'pt-30 lg:pt-54',
+      mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
+      noMediaSpacing: 'pt-20 lg:pt-54',
       noMediaFallback:
         'bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
@@ -100,17 +100,17 @@ export default defineAppConfig({
       },
       text: {
         h1: 'mb-0 text-white',
-        base: 'z-10 max-w-6xl relative p-5 text-center',
+        base: 'relative z-10 max-w-6xl p-5 text-center',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
-      hide: 'pt-30',
+      hide: 'pt-15 lg:pt-30',
     },
 
     footer: {
       hideEmail: false,
-      base: 'mt-20 bg-accented dark:bg-muted/50 py-10 text-default text-sm',
-      left: 'text-sm leading-relaxed lg:text-left mt-8 lg:mt-0',
-      right: 'lg:items-end flex flex-col items-center gap-2 lg:text-right',
+      base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
+      left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
+      right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
       footerLinks: 'transition-colors text-primary hover:text-primary/90',
       poweredby: true,
     },
@@ -171,7 +171,7 @@ export default defineAppConfig({
       fieldGroupHeader: 'mb-6 text-xl font-semibold',
       fieldGroup: 'space-y-10',
       fieldInput: 'w-full',
-      response: 'px-6 py-3 bg-muted rounded-lg italic',
+      response: 'rounded-lg bg-muted px-6 py-3 italic',
       description: 'desc mb-3 text-muted',
       help: 'desc my-3 text-muted',
       submitAlign: '',
