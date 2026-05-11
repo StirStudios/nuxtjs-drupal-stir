@@ -35,10 +35,7 @@ const settingsFields = [
 const displaySettingsFields = computed(() => {
   return settingsFields.map((field) => ({
     ...field,
-    editable:
-      fieldEditability.value[field.name] !== undefined
-        ? fieldEditability.value[field.name]
-        : field.editable,
+    editable: fieldEditability.value[field.name] ?? field.editable,
   }))
 })
 
