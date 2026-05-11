@@ -18,7 +18,7 @@ This layer uses Yup for client-side validation with two intentionally different 
 - Entry points:
   - `layers/auth/app/utils/authValidation.ts`
   - `layers/auth/app/composables/auth/*`
-  - `layers/auth/app/pages/account/profile.vue`
+  - `layers/auth/app/pages/account/settings.vue`
 - Purpose:
   - Use explicit, stable Yup schemas for login, register, password reset, and account password change.
 - Notes:
