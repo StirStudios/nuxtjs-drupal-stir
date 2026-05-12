@@ -1,6 +1,8 @@
 import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
+const resolveLayerPath = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
@@ -107,17 +109,17 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'social',
-        dir: './layers/theme/app/assets/icons',
+        dir: resolveLayerPath('./layers/theme/app/assets/icons'),
       },
     ],
   },
 
   alias: {
     yup: require.resolve('yup'),
-    '~/utils': 'layers/theme/app/utils',
-    '~/composables': 'layers/theme/app/composables',
-    '~/components': 'layers/theme/app/components',
-    '~/types': 'types',
+    '~/utils': resolveLayerPath('./layers/theme/app/utils'),
+    '~/composables': resolveLayerPath('./layers/theme/app/composables'),
+    '~/components': resolveLayerPath('./layers/theme/app/components'),
+    '~/types': resolveLayerPath('./types'),
   },
 
   modules: [

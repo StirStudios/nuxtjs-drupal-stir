@@ -14,10 +14,10 @@ describe('layer contract', () => {
   it('keeps required aliases for layer imports', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
 
-    expect(nuxtConfig).toContain('\'~/utils\': \'layers/theme/app/utils\'')
-    expect(nuxtConfig).toContain('\'~/composables\': \'layers/theme/app/composables\'')
-    expect(nuxtConfig).toContain('\'~/components\': \'layers/theme/app/components\'')
-    expect(nuxtConfig).toContain('\'~/types\': \'types\'')
+    expect(nuxtConfig).toContain('\'~/utils\': resolveLayerPath(\'./layers/theme/app/utils\')')
+    expect(nuxtConfig).toContain('\'~/composables\': resolveLayerPath(\'./layers/theme/app/composables\')')
+    expect(nuxtConfig).toContain('\'~/components\': resolveLayerPath(\'./layers/theme/app/components\')')
+    expect(nuxtConfig).toContain('\'~/types\': resolveLayerPath(\'./types\')')
   })
 
   it('has consumer fixture for smoke testing the layer from a root app', () => {
