@@ -25,7 +25,6 @@ const themeWebform = (
   ).webform || {}
 )
 const showCurrentPassword = ref(false)
-const showNewPassword = ref(false)
 
 const onSubmitPassword = () => {
   emit('change-password')
@@ -91,23 +90,10 @@ const confirmCancel = () => {
         </UInput>
       </UFormField>
       <UFormField label="New password" name="newPassword" required>
-        <UInput
-          :class="themeWebform.fieldInput || 'w-full'"
+        <AuthPasswordField
           :model-value="props.newPassword"
-          :type="showNewPassword ? 'text' : 'password'"
-          :variant="themeWebform.variant"
           @update:model-value="emit('update:newPassword', String($event ?? ''))"
-        >
-          <template #trailing>
-            <UButton
-              color="neutral"
-              :icon="showNewPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-              size="xs"
-              variant="ghost"
-              @click="showNewPassword = !showNewPassword"
-            />
-          </template>
-        </UInput>
+        />
       </UFormField>
       <UButton
         class="mt-5"

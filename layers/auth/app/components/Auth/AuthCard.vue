@@ -17,6 +17,14 @@ defineEmits<{
   submit: [event: unknown]
   error: [event: unknown]
 }>()
+
+defineSlots<{
+  'password-field'?: (props: { field: AuthFormField; state: Record<string, string | undefined> }) => unknown
+  'confirmPassword-field'?: (props: { field: AuthFormField; state: Record<string, string | undefined> }) => unknown
+  'password-hint'?: () => unknown
+  validation?: () => unknown
+  footer?: () => unknown
+}>()
 </script>
 
 <template>
@@ -32,6 +40,14 @@ defineEmits<{
       @error="$emit('error', $event)"
       @submit="$emit('submit', $event)"
     >
+      <!-- @vue-ignore UAuthForm exposes scoped field slots that are not typed upstream. -->
+      <template #password-field="{ state, field }">
+        <slot :field="field" name="password-field" :state="state" />
+      </template>
+      <!-- @vue-ignore UAuthForm exposes scoped field slots that are not typed upstream. -->
+      <template #confirmPassword-field="{ state, field }">
+        <slot :field="field" name="confirmPassword-field" :state="state" />
+      </template>
       <template #password-hint>
         <slot name="password-hint" />
       </template>
