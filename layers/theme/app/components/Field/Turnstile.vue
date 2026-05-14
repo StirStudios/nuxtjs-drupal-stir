@@ -3,14 +3,11 @@ import { useIntersectionObserver } from '@vueuse/core'
 
 type TurnstileTheme = {
   appearance?: 'always' | 'execute' | 'interaction-only'
-  label?: string
 }
 
 const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
-const hasLabel = computed(() => Boolean(themeTurnstile.label))
-const labelId = useId()
 const container = ref<HTMLElement | null>(null)
 const shouldRenderTurnstile = ref(false)
 let stopObserver: (() => void) | null = null
@@ -53,14 +50,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="container" class="text-sm">
-    <p
-      v-if="hasLabel"
-      :id="labelId"
-      :class="themeTurnstile.appearance !== 'interaction-only' ? '' : 'sr-only'"
-    >
-      {{ themeTurnstile.label }}
-    </p>
-
     <LazyNuxtTurnstile
       v-if="shouldRenderTurnstile"
       v-model="turnstileToken"

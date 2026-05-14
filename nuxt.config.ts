@@ -186,6 +186,7 @@ export default defineNuxtConfig({
       'nuxtjs-drupal-ce',
       {
         drupalBaseUrl: process.env.DRUPAL_URL,
+        menuBaseUrl: process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || process.env.DRUPAL_URL,
         exposeAPIRouteRules: true,
         disableFormHandler: true,
         enableComponentPreview: false,

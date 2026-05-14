@@ -181,7 +181,6 @@ export default defineAppConfig({
 
     turnstile: {
       appearance: 'always',
-      label: 'Let us know you’re human',
     },
 
     card: {
