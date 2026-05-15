@@ -683,9 +683,15 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       const message = String(
         (error as { message?: string })?.message || error || '',
       )
+      const causeMessage = String(
+        (error as { cause?: { message?: string } })?.cause?.message || '',
+      )
+      const abortMessage = `${message} ${causeMessage}`.toLowerCase()
       const isAbortError =
         (error instanceof DOMException && error.name === 'AbortError') ||
-        message.includes('AbortError')
+        message.includes('AbortError') ||
+        abortMessage.includes('operation was aborted') ||
+        abortMessage.includes('request aborted')
 
       if (isAbortError) return
 
