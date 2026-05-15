@@ -49,12 +49,18 @@ const props = defineProps<{
   direction?: string
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
+  restoreScrollLinkPattern?: string
   noResults?: string
 }>()
 
 const { renderCustomElements } = useDrupalCe()
+const route = useRoute()
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
+const viewRoot = useTemplateRef<HTMLElement>('viewRoot')
+const restoredScrollPosition = ref(false)
+const isHistoryNavigation = ref(false)
+const restoreTargetKey = 'stir:view-scroll-restore-target'
 
 const {
   isLoading,
@@ -178,46 +184,204 @@ const getRowMotionProps = (index: number) =>
     props.direction ? getRevealDelayMs(index, { mode: 'dense' }) : getRevealDelayMs(index),
     { ssrVisible: true },
   )
+
+function scrollStorageKeyFor(fullPath = route.fullPath) {
+  return [
+    'stir:view-scroll',
+    fullPath,
+    props.viewId || '',
+    props.displayId || '',
+    props.parentUuid || '',
+  ].join(':')
+}
+
+function saveScrollPosition(key = scrollStorageKeyFor()) {
+  if (!import.meta.client) return
+
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({
+      top: window.scrollY,
+      savedAt: Date.now(),
+    }),
+  )
+}
+
+function restoreScrollPosition() {
+  if (
+    !import.meta.client ||
+    restoredScrollPosition.value
+  ) {
+    return
+  }
+
+  const shouldRestore =
+    isHistoryNavigation.value ||
+    sessionStorage.getItem(restoreTargetKey) === route.fullPath
+
+  if (!shouldRestore) return
+
+  const stored = sessionStorage.getItem(scrollStorageKeyFor())
+
+  if (!stored) return
+
+  try {
+    const data = JSON.parse(stored) as { top?: unknown, savedAt?: unknown }
+    const top = typeof data.top === 'number' ? data.top : null
+    const savedAt = typeof data.savedAt === 'number' ? data.savedAt : 0
+
+    if (top === null || Date.now() - savedAt > 30 * 60 * 1000) {
+      sessionStorage.removeItem(scrollStorageKeyFor())
+      return
+    }
+
+    restoredScrollPosition.value = true
+    isHistoryNavigation.value = false
+    sessionStorage.removeItem(restoreTargetKey)
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top,
+          behavior: 'instant',
+        })
+      })
+    })
+  }
+  catch {
+    sessionStorage.removeItem(scrollStorageKeyFor())
+  }
+}
+
+function shouldRestoreScrollForHref(href: string): boolean {
+  if (!href.startsWith('/') || href === route.path) return false
+  if (!props.restoreScrollLinkPattern) return true
+
+  try {
+    return new RegExp(props.restoreScrollLinkPattern).test(href)
+  }
+  catch {
+    return false
+  }
+}
+
+function handleViewClick(event: MouseEvent) {
+  if (!import.meta.client) return
+
+  const target = event.target instanceof Element ? event.target : null
+  const link = target?.closest('a[href]')
+  const href = link?.getAttribute('href') || ''
+
+  if (!shouldRestoreScrollForHref(href)) return
+
+  saveScrollPosition()
+  sessionStorage.setItem(restoreTargetKey, route.fullPath)
+}
+
+function scrollToViewTop() {
+  if (!import.meta.client) return
+
+  nextTick(() => {
+    viewRoot.value?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  })
+}
+
+watch(currentPage, (value, oldValue) => {
+  if (oldValue === undefined || value === oldValue) return
+
+  scrollToViewTop()
+})
+
+watch(hasRows, (value) => {
+  if (!value) return
+
+  restoreScrollPosition()
+})
+
+watch(
+  () => [route.path, route.fullPath] as const,
+  ([path], [oldPath, oldFullPath]) => {
+    if (!oldPath || path === oldPath) return
+
+    saveScrollPosition(scrollStorageKeyFor(oldFullPath))
+    restoredScrollPosition.value = false
+
+    if (
+      isHistoryNavigation.value ||
+      sessionStorage.getItem(restoreTargetKey) === route.fullPath
+    ) {
+      nextTick(restoreScrollPosition)
+      return
+    }
+
+    scrollToViewTop()
+  },
+)
+
+function markHistoryNavigation() {
+  isHistoryNavigation.value = true
+}
+
+function handlePageHide() {
+  saveScrollPosition()
+}
+
+onMounted(() => {
+  restoreScrollPosition()
+  window.addEventListener('popstate', markHistoryNavigation)
+  window.addEventListener('pagehide', handlePageHide)
+})
+
+onBeforeUnmount(() => {
+  saveScrollPosition()
+  window.removeEventListener('popstate', markHistoryNavigation)
+  window.removeEventListener('pagehide', handlePageHide)
+})
 </script>
 
 <template>
-  <h2 v-if="title" class="text-highlighted mb-4 text-2xl font-semibold">
-    {{ title }}
-  </h2>
+  <div ref="viewRoot" class="scroll-mt-24">
+    <h2 v-if="title" class="text-highlighted mb-4 text-2xl font-semibold">
+      {{ title }}
+    </h2>
 
-  <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
-    <div class="flex flex-wrap items-end gap-3">
-      <div class="min-w-0 flex-1">
-        <DrupalViewsFilters
-          :filters="normalizedFilters"
-          :values="filterValues"
-          @change="onFilterChange"
-        />
-      </div>
+    <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="min-w-0 flex-1">
+          <DrupalViewsFilters
+            :filters="normalizedFilters"
+            :values="filterValues"
+            @change="onFilterChange"
+          />
+        </div>
 
-      <div class="flex items-end gap-3">
-        <DrupalViewsSort
-          :sort-by-key="primarySort?.queryParamSortBy"
-          :sort-by-label="primarySort?.label"
-          :sort-by-options="sortByOptions"
-          :sort-order-key="primarySort?.queryParamSortOrder"
-          sort-order-label="Sort order"
-          :sort-order-options="sortOrderOptions"
-          :values="sortValues"
-          @change="onSortChange"
-        />
+        <div class="flex items-end gap-3">
+          <DrupalViewsSort
+            :sort-by-key="primarySort?.queryParamSortBy"
+            :sort-by-label="primarySort?.label"
+            :sort-by-options="sortByOptions"
+            :sort-order-key="primarySort?.queryParamSortOrder"
+            sort-order-label="Sort order"
+            :sort-order-options="sortOrderOptions"
+            :values="sortValues"
+            @change="onSortChange"
+          />
 
-        <UButton
-          v-if="hasMultipleFilters"
-          class="h-10"
-          color="neutral"
-          icon="i-lucide-rotate-ccw"
-          size="md"
-          variant="outline"
-          @click="resetControls"
-        >
-          Reset filters
-        </UButton>
+          <UButton
+            v-if="hasMultipleFilters"
+            class="h-10"
+            color="neutral"
+            icon="i-lucide-rotate-ccw"
+            size="md"
+            variant="outline"
+            @click="resetControls"
+          >
+            Reset filters
+          </UButton>
+        </div>
       </div>
     </div>
   </div>
@@ -261,6 +425,7 @@ const getRowMotionProps = (index: number) =>
     :grid-items="gridItems"
     :spacing="spacing"
     :width="width"
+    @click.capture="handleViewClick"
   >
     <Motion
       v-for="(row, i) in renderedRows"

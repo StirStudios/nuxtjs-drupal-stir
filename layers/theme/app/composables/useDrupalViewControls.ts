@@ -9,6 +9,7 @@ export interface ExposedFilter {
   label: string
   queryParamName: string
   multiple?: boolean
+  disabled?: boolean
   options?: Record<string, string> | string[]
   submittedValues?: unknown[]
 }
@@ -32,6 +33,8 @@ interface CeElementNode {
 interface ViewStateSnapshot {
   filters: Record<string, string | string[]>
   sorts: Record<string, string | string[]>
+  page?: number
+  savedAt?: number
 }
 
 interface UseDrupalViewControlsProps {
@@ -128,6 +131,7 @@ function getNodeRows(node: CeElementNode): unknown[] {
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   const { $ceApi } = useDrupalCe()
   const route = useRoute()
+  const router = useRouter()
 
   const isLoading = ref(false)
   const loadError = ref('')
@@ -145,6 +149,27 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   let refreshTimer: ReturnType<typeof setTimeout> | null = null
   let activeRequestId = 0
   let activeAbortController: AbortController | null = null
+  let suppressNextRouteRefresh = false
+
+  function viewStateStorageKeyFor(path = route.path): string {
+    return [
+      'stir:view-controls',
+      path,
+      props.viewId || '',
+      props.displayId || '',
+      props.parentUuid || '',
+    ].join(':')
+  }
+
+  function routeQueryValue(key: string): string | string[] | undefined {
+    const value = route.query[key] ?? route.query[`${key}[]`]
+
+    if (Array.isArray(value)) {
+      return value.filter((item): item is string => typeof item === 'string')
+    }
+
+    return typeof value === 'string' ? value : undefined
+  }
 
   const defaultNoResultsMessage = computed(
     () =>
@@ -191,6 +216,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         label: filter.label,
         queryParamName: filter.queryParamName,
         multiple: filter.multiple,
+        disabled: filter.disabled,
         options: mapFilterOptions(filter.options),
       })),
   )
@@ -233,13 +259,18 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         (item) => item.queryParamName === filter.queryParamName,
       )
       const submitted = source?.submittedValues ?? []
+      const routeValue = routeQueryValue(filter.queryParamName)
 
       if (filter.multiple) {
-        filterValues.value[filter.queryParamName] = submitted.map((value) =>
-          String(value),
-        )
+        filterValues.value[filter.queryParamName] = Array.isArray(routeValue)
+          ? routeValue
+          : routeValue
+            ? [routeValue]
+            : submitted.map((value) => String(value))
       } else {
-        filterValues.value[filter.queryParamName] = String(submitted[0] ?? '')
+        filterValues.value[filter.queryParamName] = Array.isArray(routeValue)
+          ? String(routeValue[0] ?? '')
+          : String(routeValue ?? submitted[0] ?? '')
       }
     }
   })
@@ -250,14 +281,20 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     if (!sort) return
 
     if (sort.queryParamSortBy && !(sort.queryParamSortBy in sortValues.value)) {
-      sortValues.value[sort.queryParamSortBy] = sort.sortByValue || ''
+      sortValues.value[sort.queryParamSortBy] =
+        routeQueryValue(sort.queryParamSortBy) ||
+        sort.sortByValue ||
+        ''
     }
 
     if (
       sort.queryParamSortOrder &&
       !(sort.queryParamSortOrder in sortValues.value)
     ) {
-      sortValues.value[sort.queryParamSortOrder] = sort.submittedOrder || ''
+      sortValues.value[sort.queryParamSortOrder] =
+        routeQueryValue(sort.queryParamSortOrder) ||
+        sort.submittedOrder ||
+        ''
     }
   })
 
@@ -265,11 +302,209 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     () => effectivePager.value?.current,
     (value) => {
       if (typeof value === 'number') {
-        currentPage.value = value
+        currentPage.value = routePageValue() ?? value
       }
     },
     { immediate: true },
   )
+
+  function routePageValue(): number | null {
+    const routePage = routeQueryValue('page')
+    const pageValue = Array.isArray(routePage) ? routePage[0] : routePage
+
+    if (!pageValue || !/^\d+$/.test(pageValue)) return null
+
+    return Number(pageValue)
+  }
+
+  function snapshotCurrentViewState(page = currentPage.value): ViewStateSnapshot {
+    const filtersSnapshot: Record<string, string | string[]> = {}
+
+    for (const [key, value] of Object.entries(filterValues.value)) {
+      filtersSnapshot[key] = Array.isArray(value) ? [...value] : value
+    }
+
+    const sortsSnapshot: Record<string, string | string[]> = {}
+
+    for (const [key, value] of Object.entries(sortValues.value)) {
+      sortsSnapshot[key] = Array.isArray(value) ? [...value] : value
+    }
+
+    return {
+      filters: filtersSnapshot,
+      sorts: sortsSnapshot,
+      page,
+      savedAt: Date.now(),
+    }
+  }
+
+  function saveViewState(page = currentPage.value): void {
+    if (!import.meta.client) return
+
+    sessionStorage.setItem(
+      viewStateStorageKeyFor(),
+      JSON.stringify(snapshotCurrentViewState(page)),
+    )
+  }
+
+  function storedViewState(): ViewStateSnapshot | null {
+    if (!import.meta.client) return null
+
+    const stored = sessionStorage.getItem(viewStateStorageKeyFor())
+
+    if (!stored) return null
+
+    try {
+      const data = JSON.parse(stored) as ViewStateSnapshot
+      const savedAt = typeof data.savedAt === 'number' ? data.savedAt : 0
+
+      if (Date.now() - savedAt > 30 * 60 * 1000) {
+        sessionStorage.removeItem(viewStateStorageKeyFor())
+        return null
+      }
+
+      return data
+    }
+    catch {
+      sessionStorage.removeItem(viewStateStorageKeyFor())
+      return null
+    }
+  }
+
+  function applyStoredStateToControls(): number | null {
+    const stored = storedViewState()
+
+    if (!stored) return null
+
+    filterValues.value = {
+      ...filterValues.value,
+      ...stored.filters,
+    }
+    sortValues.value = {
+      ...sortValues.value,
+      ...stored.sorts,
+    }
+
+    const page = typeof stored.page === 'number' && stored.page > 0
+      ? stored.page
+      : 0
+
+    currentPage.value = page
+
+    return page
+  }
+
+  function managedQueryKeys(): string[] {
+    const keys = ['page']
+
+    for (const filter of normalizedFilters.value) {
+      keys.push(filter.queryParamName, `${filter.queryParamName}[]`)
+    }
+
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      keys.push(sort.queryParamSortBy, `${sort.queryParamSortBy}[]`)
+    }
+
+    if (sort?.queryParamSortOrder) {
+      keys.push(sort.queryParamSortOrder, `${sort.queryParamSortOrder}[]`)
+    }
+
+    return keys
+  }
+
+  function syncUrlQuery(page: number): void {
+    if (!import.meta.client) return
+
+    suppressNextRouteRefresh = true
+
+    const nextQuery: Record<string, string | string[]> = {}
+
+    for (const [key, value] of Object.entries(route.query)) {
+      if (managedQueryKeys().includes(key)) continue
+      if (Array.isArray(value)) {
+        const values = value.filter((item): item is string => typeof item === 'string')
+
+        if (values.length > 0) {
+          nextQuery[key] = values
+        }
+
+        continue
+      }
+
+      if (typeof value === 'string') {
+        nextQuery[key] = value
+      }
+    }
+
+    Object.assign(nextQuery, buildQueryParams(page))
+    saveViewState(page)
+
+    void router.replace({
+      path: route.path,
+      query: nextQuery,
+    }).finally(() => {
+      suppressNextRouteRefresh = false
+    })
+  }
+
+  function routeHasManagedQuery(fullPath = route.fullPath): boolean {
+    const queryString = fullPath.split('?')[1]?.split('#')[0] || ''
+
+    if (queryString === '') return false
+
+    const params = new URLSearchParams(queryString)
+
+    return managedQueryKeys().some((key) => params.has(key))
+  }
+
+  function routeValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
+    const routeValue = routeQueryValue(filter.queryParamName)
+
+    if (filter.multiple) {
+      if (Array.isArray(routeValue)) return routeValue
+      if (routeValue) return [routeValue]
+
+      return (source?.submittedValues ?? []).map((value) => String(value))
+    }
+
+    if (Array.isArray(routeValue)) return String(routeValue[0] ?? '')
+
+    return String(routeValue ?? source?.submittedValues?.[0] ?? '')
+  }
+
+  function applyRouteStateToControls(): number {
+    for (const filter of normalizedFilters.value) {
+      const source = effectiveFilters.value.find(
+        (item) => item.queryParamName === filter.queryParamName,
+      )
+
+      filterValues.value[filter.queryParamName] = routeValueForFilter(filter, source)
+    }
+
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      sortValues.value[sort.queryParamSortBy] =
+        routeQueryValue(sort.queryParamSortBy) ||
+        sort.sortByValue ||
+        ''
+    }
+
+    if (sort?.queryParamSortOrder) {
+      sortValues.value[sort.queryParamSortOrder] =
+        routeQueryValue(sort.queryParamSortOrder) ||
+        sort.submittedOrder ||
+        ''
+    }
+
+    const page = routePageValue() ?? 0
+
+    currentPage.value = page
+
+    return page
+  }
 
   function buildQueryParams(page: number): Record<string, string | string[]> {
     const query: Record<string, string | string[]> = {}
@@ -492,39 +727,30 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function onFilterChange(payload: { key: string; value: string | string[] }) {
     filterValues.value[payload.key] = payload.value
     currentPage.value = 0
+    saveViewState(0)
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
   function onSortChange(payload: { key: string; value: string }) {
     sortValues.value[payload.key] = payload.value
     currentPage.value = 0
+    saveViewState(0)
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
   function onPageChange(value: number) {
     currentPage.value = value
+    saveViewState(value)
+    syncUrlQuery(value)
     void refreshView(value)
   }
 
   function captureDefaultViewState() {
     if (defaultViewState.value) return
 
-    const filtersSnapshot: Record<string, string | string[]> = {}
-
-    for (const [key, value] of Object.entries(filterValues.value)) {
-      filtersSnapshot[key] = Array.isArray(value) ? [...value] : value
-    }
-
-    const sortsSnapshot: Record<string, string | string[]> = {}
-
-    for (const [key, value] of Object.entries(sortValues.value)) {
-      sortsSnapshot[key] = Array.isArray(value) ? [...value] : value
-    }
-
-    defaultViewState.value = {
-      filters: filtersSnapshot,
-      sorts: sortsSnapshot,
-    }
+    defaultViewState.value = snapshotCurrentViewState(0)
   }
 
   function resetControls() {
@@ -539,14 +765,48 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       ...defaults.sorts,
     }
     currentPage.value = 0
+    saveViewState(0)
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
+  watch(
+    () => route.fullPath,
+    (fullPath, oldFullPath) => {
+      if (!import.meta.client || !oldFullPath || fullPath === oldFullPath) return
+
+      if (suppressNextRouteRefresh) {
+        suppressNextRouteRefresh = false
+        return
+      }
+
+      if (!routeHasManagedQuery(fullPath) && !routeHasManagedQuery(oldFullPath)) return
+
+      const page = applyRouteStateToControls()
+
+      void refreshView(page)
+    },
+  )
+
   onMounted(() => {
     captureDefaultViewState()
+
+    if (routeHasManagedQuery()) {
+      const page = applyRouteStateToControls()
+
+      void refreshView(page)
+      return
+    }
+
+    const storedPage = applyStoredStateToControls()
+
+    if (storedPage !== null && storedPage > 0) {
+      void refreshView(storedPage)
+    }
   })
 
   onBeforeUnmount(() => {
+    saveViewState()
     activeAbortController?.abort()
 
     if (refreshTimer) {
