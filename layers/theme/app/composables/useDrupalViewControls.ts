@@ -147,6 +147,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   let refreshTimer: ReturnType<typeof setTimeout> | null = null
   let activeRequestId = 0
   let activeAbortController: AbortController | null = null
+  let suppressNextRouteRefresh = false
 
   function routeQueryValue(key: string): string | string[] | undefined {
     const value = route.query[key] ?? route.query[`${key}[]`]
@@ -289,16 +290,20 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     () => effectivePager.value?.current,
     (value) => {
       if (typeof value === 'number') {
-        const routePage = routeQueryValue('page')
-        const pageValue = Array.isArray(routePage) ? routePage[0] : routePage
-
-        currentPage.value = pageValue && /^\d+$/.test(pageValue)
-          ? Number(pageValue)
-          : value
+        currentPage.value = routePageValue() ?? value
       }
     },
     { immediate: true },
   )
+
+  function routePageValue(): number | null {
+    const routePage = routeQueryValue('page')
+    const pageValue = Array.isArray(routePage) ? routePage[0] : routePage
+
+    if (!pageValue || !/^\d+$/.test(pageValue)) return null
+
+    return Number(pageValue)
+  }
 
   function managedQueryKeys(): string[] {
     const keys = ['page']
@@ -322,6 +327,8 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
   function syncUrlQuery(page: number): void {
     if (!import.meta.client) return
+
+    suppressNextRouteRefresh = true
 
     const nextQuery: Record<string, string | string[]> = {}
 
@@ -347,7 +354,66 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     void router.replace({
       path: route.path,
       query: nextQuery,
+    }).finally(() => {
+      suppressNextRouteRefresh = false
     })
+  }
+
+  function routeHasManagedQuery(fullPath = route.fullPath): boolean {
+    const queryString = fullPath.split('?')[1]?.split('#')[0] || ''
+
+    if (queryString === '') return false
+
+    const params = new URLSearchParams(queryString)
+
+    return managedQueryKeys().some((key) => params.has(key))
+  }
+
+  function routeValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
+    const routeValue = routeQueryValue(filter.queryParamName)
+
+    if (filter.multiple) {
+      if (Array.isArray(routeValue)) return routeValue
+      if (routeValue) return [routeValue]
+
+      return (source?.submittedValues ?? []).map((value) => String(value))
+    }
+
+    if (Array.isArray(routeValue)) return String(routeValue[0] ?? '')
+
+    return String(routeValue ?? source?.submittedValues?.[0] ?? '')
+  }
+
+  function applyRouteStateToControls(): number {
+    for (const filter of normalizedFilters.value) {
+      const source = effectiveFilters.value.find(
+        (item) => item.queryParamName === filter.queryParamName,
+      )
+
+      filterValues.value[filter.queryParamName] = routeValueForFilter(filter, source)
+    }
+
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      sortValues.value[sort.queryParamSortBy] =
+        routeQueryValue(sort.queryParamSortBy) ||
+        sort.sortByValue ||
+        ''
+    }
+
+    if (sort?.queryParamSortOrder) {
+      sortValues.value[sort.queryParamSortOrder] =
+        routeQueryValue(sort.queryParamSortOrder) ||
+        sort.submittedOrder ||
+        ''
+    }
+
+    const page = routePageValue() ?? 0
+
+    currentPage.value = page
+
+    return page
   }
 
   function buildQueryParams(page: number): Record<string, string | string[]> {
@@ -625,8 +691,32 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     scheduleRefresh(0)
   }
 
+  watch(
+    () => route.fullPath,
+    (fullPath, oldFullPath) => {
+      if (!import.meta.client || !oldFullPath || fullPath === oldFullPath) return
+
+      if (suppressNextRouteRefresh) {
+        suppressNextRouteRefresh = false
+        return
+      }
+
+      if (!routeHasManagedQuery(fullPath) && !routeHasManagedQuery(oldFullPath)) return
+
+      const page = applyRouteStateToControls()
+
+      void refreshView(page)
+    },
+  )
+
   onMounted(() => {
     captureDefaultViewState()
+
+    if (routeHasManagedQuery()) {
+      const page = applyRouteStateToControls()
+
+      void refreshView(page)
+    }
   })
 
   onBeforeUnmount(() => {
