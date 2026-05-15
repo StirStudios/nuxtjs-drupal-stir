@@ -16,6 +16,8 @@ const props = withDefaults(
     mediaEmbed?: string
     previewMode?: 'static' | 'animated'
     animatedPreviewSrc?: string
+    thumbnailStatus?: 'ready' | 'processing' | 'missing'
+    thumbnailIsDefault?: boolean
 
     width?: number
     height?: number
@@ -32,6 +34,8 @@ const props = withDefaults(
     mediaEmbed: undefined,
     previewMode: undefined,
     animatedPreviewSrc: undefined,
+    thumbnailStatus: undefined,
+    thumbnailIsDefault: false,
     width: undefined,
     height: undefined,
     noWrapper: false,
@@ -44,7 +48,13 @@ const { media: mediaTheme } = theme
 const { initializePlayers } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
-const isProcessing = computed(() => props.width === 180)
+const isProcessing = computed(() => {
+  if (props.thumbnailStatus) {
+    return props.thumbnailStatus === 'processing'
+  }
+
+  return props.width === 180
+})
 const isEmbedActive = ref(false)
 const ratioConfig = {
   portrait: 'aspect-[9/16]',
