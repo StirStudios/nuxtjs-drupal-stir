@@ -80,6 +80,7 @@ function getItems(filter: ExposedFilter): SelectItem[] {
         "
         :multiple="filter.multiple"
         :placeholder="filter.label"
+        :searchable="filter.options.length > 10"
         @update:model-value="onChange(filter.queryParamName, $event)"
       />
 

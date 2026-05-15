@@ -12,28 +12,46 @@ const props = defineProps<{
   placeholder?: string
   multiple?: boolean
   disabled?: boolean
+  searchable?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
 
-function onUpdate(value: unknown) {
+function normalizeValue(value: unknown): string | string[] {
   if (Array.isArray(value)) {
-    emit(
-      'update:modelValue',
-      value.map((item) => String(item)),
-    )
-    return
+    return value.map((item) => String(item))
   }
 
-  emit('update:modelValue', String(value ?? ''))
+  return String(value ?? '')
+}
+
+function onUpdate(value: unknown) {
+  emit('update:modelValue', normalizeValue(value))
 }
 </script>
 
 <template>
   <UFormField :label="label" :ui="{ label: 'sr-only' }">
+    <USelectMenu
+      v-if="searchable"
+      :aria-label="label"
+      :disabled="props.disabled"
+      :items="items"
+      :model-value="modelValue"
+      :multiple="multiple"
+      :placeholder="placeholder || label"
+      :search-input="{ placeholder: `Search ${label.toLowerCase()}...` }"
+      :ui="{
+        base: ['min-w-35'],
+      }"
+      value-key="value"
+      @update:model-value="onUpdate"
+    />
+
     <USelect
+      v-else
       :aria-label="label"
       :disabled="props.disabled"
       :items="items"
