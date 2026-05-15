@@ -338,6 +338,32 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     }
   }
 
+  function defaultViewStateSnapshot(): ViewStateSnapshot {
+    const filtersSnapshot: Record<string, string | string[]> = {}
+
+    for (const filter of normalizedFilters.value) {
+      filtersSnapshot[filter.queryParamName] = filter.multiple ? [] : ''
+    }
+
+    const sortsSnapshot: Record<string, string | string[]> = {}
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      sortsSnapshot[sort.queryParamSortBy] = sort.sortByValue || ''
+    }
+
+    if (sort?.queryParamSortOrder) {
+      sortsSnapshot[sort.queryParamSortOrder] = sort.submittedOrder || ''
+    }
+
+    return {
+      filters: filtersSnapshot,
+      sorts: sortsSnapshot,
+      page: 0,
+      savedAt: Date.now(),
+    }
+  }
+
   function saveViewState(page = currentPage.value): void {
     if (!import.meta.client) return
 
@@ -756,7 +782,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function captureDefaultViewState() {
     if (defaultViewState.value) return
 
-    defaultViewState.value = snapshotCurrentViewState(0)
+    defaultViewState.value = defaultViewStateSnapshot()
   }
 
   function resetControls() {
