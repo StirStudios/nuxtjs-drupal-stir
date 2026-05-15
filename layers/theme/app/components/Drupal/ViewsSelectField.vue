@@ -5,12 +5,13 @@ interface SelectOption {
   disabled?: boolean
 }
 
-defineProps<{
+const props = defineProps<{
   label: string
   items: SelectOption[]
   modelValue: string | string[]
   placeholder?: string
   multiple?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -34,6 +35,7 @@ function onUpdate(value: unknown) {
   <UFormField :label="label" :ui="{ label: 'sr-only' }">
     <USelect
       :aria-label="label"
+      :disabled="props.disabled"
       :items="items"
       :model-value="modelValue"
       :multiple="multiple"

@@ -9,6 +9,7 @@ export interface ExposedFilter {
   label: string
   queryParamName: string
   multiple?: boolean
+  disabled?: boolean
   options?: Record<string, string> | string[]
   submittedValues?: unknown[]
 }
@@ -128,6 +129,7 @@ function getNodeRows(node: CeElementNode): unknown[] {
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   const { $ceApi } = useDrupalCe()
   const route = useRoute()
+  const router = useRouter()
 
   const isLoading = ref(false)
   const loadError = ref('')
@@ -145,6 +147,16 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   let refreshTimer: ReturnType<typeof setTimeout> | null = null
   let activeRequestId = 0
   let activeAbortController: AbortController | null = null
+
+  function routeQueryValue(key: string): string | string[] | undefined {
+    const value = route.query[key] ?? route.query[`${key}[]`]
+
+    if (Array.isArray(value)) {
+      return value.filter((item): item is string => typeof item === 'string')
+    }
+
+    return typeof value === 'string' ? value : undefined
+  }
 
   const defaultNoResultsMessage = computed(
     () =>
@@ -191,6 +203,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         label: filter.label,
         queryParamName: filter.queryParamName,
         multiple: filter.multiple,
+        disabled: filter.disabled,
         options: mapFilterOptions(filter.options),
       })),
   )
@@ -233,13 +246,18 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         (item) => item.queryParamName === filter.queryParamName,
       )
       const submitted = source?.submittedValues ?? []
+      const routeValue = routeQueryValue(filter.queryParamName)
 
       if (filter.multiple) {
-        filterValues.value[filter.queryParamName] = submitted.map((value) =>
-          String(value),
-        )
+        filterValues.value[filter.queryParamName] = Array.isArray(routeValue)
+          ? routeValue
+          : routeValue
+            ? [routeValue]
+            : submitted.map((value) => String(value))
       } else {
-        filterValues.value[filter.queryParamName] = String(submitted[0] ?? '')
+        filterValues.value[filter.queryParamName] = Array.isArray(routeValue)
+          ? String(routeValue[0] ?? '')
+          : String(routeValue ?? submitted[0] ?? '')
       }
     }
   })
@@ -250,14 +268,20 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     if (!sort) return
 
     if (sort.queryParamSortBy && !(sort.queryParamSortBy in sortValues.value)) {
-      sortValues.value[sort.queryParamSortBy] = sort.sortByValue || ''
+      sortValues.value[sort.queryParamSortBy] =
+        routeQueryValue(sort.queryParamSortBy) ||
+        sort.sortByValue ||
+        ''
     }
 
     if (
       sort.queryParamSortOrder &&
       !(sort.queryParamSortOrder in sortValues.value)
     ) {
-      sortValues.value[sort.queryParamSortOrder] = sort.submittedOrder || ''
+      sortValues.value[sort.queryParamSortOrder] =
+        routeQueryValue(sort.queryParamSortOrder) ||
+        sort.submittedOrder ||
+        ''
     }
   })
 
@@ -265,11 +289,66 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     () => effectivePager.value?.current,
     (value) => {
       if (typeof value === 'number') {
-        currentPage.value = value
+        const routePage = routeQueryValue('page')
+        const pageValue = Array.isArray(routePage) ? routePage[0] : routePage
+
+        currentPage.value = pageValue && /^\d+$/.test(pageValue)
+          ? Number(pageValue)
+          : value
       }
     },
     { immediate: true },
   )
+
+  function managedQueryKeys(): string[] {
+    const keys = ['page']
+
+    for (const filter of normalizedFilters.value) {
+      keys.push(filter.queryParamName, `${filter.queryParamName}[]`)
+    }
+
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      keys.push(sort.queryParamSortBy, `${sort.queryParamSortBy}[]`)
+    }
+
+    if (sort?.queryParamSortOrder) {
+      keys.push(sort.queryParamSortOrder, `${sort.queryParamSortOrder}[]`)
+    }
+
+    return keys
+  }
+
+  function syncUrlQuery(page: number): void {
+    if (!import.meta.client) return
+
+    const nextQuery: Record<string, string | string[]> = {}
+
+    for (const [key, value] of Object.entries(route.query)) {
+      if (managedQueryKeys().includes(key)) continue
+      if (Array.isArray(value)) {
+        const values = value.filter((item): item is string => typeof item === 'string')
+
+        if (values.length > 0) {
+          nextQuery[key] = values
+        }
+
+        continue
+      }
+
+      if (typeof value === 'string') {
+        nextQuery[key] = value
+      }
+    }
+
+    Object.assign(nextQuery, buildQueryParams(page))
+
+    void router.replace({
+      path: route.path,
+      query: nextQuery,
+    })
+  }
 
   function buildQueryParams(page: number): Record<string, string | string[]> {
     const query: Record<string, string | string[]> = {}
@@ -492,17 +571,20 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function onFilterChange(payload: { key: string; value: string | string[] }) {
     filterValues.value[payload.key] = payload.value
     currentPage.value = 0
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
   function onSortChange(payload: { key: string; value: string }) {
     sortValues.value[payload.key] = payload.value
     currentPage.value = 0
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
   function onPageChange(value: number) {
     currentPage.value = value
+    syncUrlQuery(value)
     void refreshView(value)
   }
 
@@ -539,6 +621,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       ...defaults.sorts,
     }
     currentPage.value = 0
+    syncUrlQuery(0)
     scheduleRefresh(0)
   }
 
