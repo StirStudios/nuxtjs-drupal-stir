@@ -98,11 +98,22 @@ watch(
   () => props.values,
   () => {
     for (const filter of props.filters) {
-      if (hasOptions(filter) || textDebounceTimers.has(filter.queryParamName)) {
+      if (hasOptions(filter)) {
         continue
       }
 
-      textValues.value[filter.queryParamName] = getValueAsText(filter.queryParamName)
+      const key = filter.queryParamName
+      const externalValue = getValueAsText(key)
+      const timer = textDebounceTimers.get(key)
+
+      if (timer && textValues.value[key] !== externalValue) {
+        clearTimeout(timer)
+        textDebounceTimers.delete(key)
+      }
+
+      if (!textDebounceTimers.has(key)) {
+        textValues.value[key] = externalValue
+      }
     }
   },
   { deep: true, immediate: true },

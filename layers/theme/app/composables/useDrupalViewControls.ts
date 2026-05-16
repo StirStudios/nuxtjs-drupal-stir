@@ -342,7 +342,11 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     const filtersSnapshot: Record<string, string | string[]> = {}
 
     for (const filter of normalizedFilters.value) {
-      filtersSnapshot[filter.queryParamName] = filter.multiple ? [] : ''
+      const source = effectiveFilters.value.find(
+        (item) => item.queryParamName === filter.queryParamName,
+      )
+
+      filtersSnapshot[filter.queryParamName] = defaultValueForFilter(filter, source)
     }
 
     const sortsSnapshot: Record<string, string | string[]> = {}
@@ -362,6 +366,16 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       page: 0,
       savedAt: Date.now(),
     }
+  }
+
+  function defaultValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
+    const submitted = source?.submittedValues ?? []
+
+    if (filter.multiple) {
+      return submitted.map((value) => String(value))
+    }
+
+    return String(submitted[0] ?? '')
   }
 
   function saveViewState(page = currentPage.value): void {
