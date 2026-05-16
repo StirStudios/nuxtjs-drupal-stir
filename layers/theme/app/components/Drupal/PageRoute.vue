@@ -20,6 +20,9 @@ const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
   return typeof route.params.slug === 'string' ? route.params.slug : ''
 })
+
+type DrupalMetaTag = { name?: string; content?: string }
+
 const bodyClasses = computed(() =>
   [
     routeSlugClass.value,
@@ -31,13 +34,24 @@ const bodyClasses = computed(() =>
     .join(' '),
 )
 
-usePageHead(page)
+const seoTitle = computed(() => {
+  const meta = page.value?.metatags?.meta
 
-useHead({
-  bodyAttrs: {
-    class: bodyClasses,
-  },
+  if (!Array.isArray(meta)) return ''
+
+  const titleTag = meta.find((tag: DrupalMetaTag) => tag.name === 'title')
+
+  return typeof titleTag?.content === 'string' ? titleTag.content : ''
 })
+
+usePageHead(page, ['meta', 'link', 'jsonld'])
+
+useHead(() => ({
+  title: seoTitle.value || page.value?.title || '',
+  bodyAttrs: {
+    class: bodyClasses.value,
+  },
+}))
 
 function customPageError(error: unknown) {
   const payload = getErrorPayload(error)
