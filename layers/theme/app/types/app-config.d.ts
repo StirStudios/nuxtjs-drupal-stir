@@ -61,6 +61,13 @@ type PopupConfig = {
   enabled?: boolean
 } & LooseRecord
 
+type CmsGlobalSeoConfig = {
+  enabled?: boolean
+  ignoredPathPrefixes?: string[]
+  ignoredPaths?: string[]
+  drupalRouteNames?: string[]
+} & LooseRecord
+
 type ColorModeConfig = {
   forced?: boolean
   preference?: 'light' | 'dark' | 'system'
@@ -99,6 +106,7 @@ declare module 'nuxt/schema' {
     userway?: UserwayConfig
     privacyNotice?: PrivacyNoticeConfig
     popup?: PopupConfig
+    cmsGlobalSeo?: CmsGlobalSeoConfig
     colorMode?: ColorModeConfig
     stirTheme?: StirThemeConfig
   }
@@ -110,6 +118,7 @@ declare module 'nuxt/schema' {
     userway: UserwayConfig
     privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig
+    cmsGlobalSeo: CmsGlobalSeoConfig
     colorMode: ColorModeConfig
     stirTheme: StirThemeConfig
   }
