@@ -5,6 +5,13 @@ import {
 } from './utils/uiVariants'
 
 export default defineAppConfig({
+  cmsGlobalSeo: {
+    enabled: true,
+    ignoredPathPrefixes: ['/account', '/auth'],
+    ignoredPaths: [],
+    drupalRouteNames: ['slug'],
+  },
+
   colorMode: {
     forced: false,
     preference: 'dark',
