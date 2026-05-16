@@ -338,6 +338,46 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     }
   }
 
+  function defaultViewStateSnapshot(): ViewStateSnapshot {
+    const filtersSnapshot: Record<string, string | string[]> = {}
+
+    for (const filter of normalizedFilters.value) {
+      const source = effectiveFilters.value.find(
+        (item) => item.queryParamName === filter.queryParamName,
+      )
+
+      filtersSnapshot[filter.queryParamName] = defaultValueForFilter(filter, source)
+    }
+
+    const sortsSnapshot: Record<string, string | string[]> = {}
+    const sort = primarySort.value
+
+    if (sort?.queryParamSortBy) {
+      sortsSnapshot[sort.queryParamSortBy] = sort.sortByValue || ''
+    }
+
+    if (sort?.queryParamSortOrder) {
+      sortsSnapshot[sort.queryParamSortOrder] = sort.submittedOrder || ''
+    }
+
+    return {
+      filters: filtersSnapshot,
+      sorts: sortsSnapshot,
+      page: 0,
+      savedAt: Date.now(),
+    }
+  }
+
+  function defaultValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
+    const submitted = source?.submittedValues ?? []
+
+    if (filter.multiple) {
+      return submitted.map((value) => String(value))
+    }
+
+    return String(submitted[0] ?? '')
+  }
+
   function saveViewState(page = currentPage.value): void {
     if (!import.meta.client) return
 
@@ -683,9 +723,15 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       const message = String(
         (error as { message?: string })?.message || error || '',
       )
+      const causeMessage = String(
+        (error as { cause?: { message?: string } })?.cause?.message || '',
+      )
+      const abortMessage = `${message} ${causeMessage}`.toLowerCase()
       const isAbortError =
         (error instanceof DOMException && error.name === 'AbortError') ||
-        message.includes('AbortError')
+        message.includes('AbortError') ||
+        abortMessage.includes('operation was aborted') ||
+        abortMessage.includes('request aborted')
 
       if (isAbortError) return
 
@@ -750,7 +796,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function captureDefaultViewState() {
     if (defaultViewState.value) return
 
-    defaultViewState.value = snapshotCurrentViewState(0)
+    defaultViewState.value = defaultViewStateSnapshot()
   }
 
   function resetControls() {

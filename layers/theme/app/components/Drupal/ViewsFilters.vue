@@ -25,21 +25,52 @@ const emit = defineEmits<{
   change: [payload: { key: string; value: string | string[] }]
 }>()
 
+const textValues = ref<Record<string, string>>({})
+const textDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
+const textDebounceMs = 350
+
 function onChange(key: string, value: unknown) {
   emit('change', { key, value: value as string | string[] })
 }
 
-function onTextChange(key: string, value: unknown) {
+function normalizeTextValue(value: unknown): string {
   if (value && typeof value === 'object' && 'label' in value) {
-    emit('change', { key, value: String(value.label ?? '') })
-    return
+    return String(value.label ?? '')
   }
 
-  emit('change', { key, value: String(value ?? '') })
+  return String(value ?? '')
+}
+
+function onTextChange(key: string, value: unknown) {
+  const normalized = normalizeTextValue(value)
+
+  textValues.value[key] = normalized
+
+  const existingTimer = textDebounceTimers.get(key)
+
+  if (existingTimer) {
+    clearTimeout(existingTimer)
+  }
+
+  textDebounceTimers.set(
+    key,
+    setTimeout(() => {
+      textDebounceTimers.delete(key)
+      emit('change', { key, value: normalized })
+    }, textDebounceMs),
+  )
 }
 
 function getTextValue(filter: ExposedFilter): string {
-  const value = props.values[filter.queryParamName]
+  if (filter.queryParamName in textValues.value) {
+    return textValues.value[filter.queryParamName] ?? ''
+  }
+
+  return getValueAsText(filter.queryParamName)
+}
+
+function getValueAsText(key: string): string {
+  const value = props.values[key]
 
   if (Array.isArray(value)) return String(value[0] ?? '')
 
@@ -62,6 +93,39 @@ function getItems(filter: ExposedFilter): SelectItem[] {
     ...filter.options,
   ]
 }
+
+watch(
+  () => props.values,
+  () => {
+    for (const filter of props.filters) {
+      if (hasOptions(filter)) {
+        continue
+      }
+
+      const key = filter.queryParamName
+      const externalValue = getValueAsText(key)
+      const timer = textDebounceTimers.get(key)
+
+      if (timer && textValues.value[key] !== externalValue) {
+        clearTimeout(timer)
+        textDebounceTimers.delete(key)
+      }
+
+      if (!textDebounceTimers.has(key)) {
+        textValues.value[key] = externalValue
+      }
+    }
+  },
+  { deep: true, immediate: true },
+)
+
+onBeforeUnmount(() => {
+  for (const timer of textDebounceTimers.values()) {
+    clearTimeout(timer)
+  }
+
+  textDebounceTimers.clear()
+})
 </script>
 
 <template>
