@@ -11,10 +11,7 @@ type CmsGlobalSeoConfig = {
   drupalRouteNames?: string[]
 }
 
-function getCmsGlobalSeoConfig(): Required<CmsGlobalSeoConfig> {
-  const appConfig = useAppConfig()
-  const config = (appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig
-
+function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
     enabled: config.enabled !== false,
     ignoredPathPrefixes: Array.isArray(config.ignoredPathPrefixes)
@@ -74,6 +71,8 @@ function withLinkKeys(tags: Array<Record<string, string>> = []) {
 
 export default defineNuxtPlugin(async () => {
   const route = useRoute()
+  const appConfig = useAppConfig()
+  const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   const defaults = useState<CmsGlobalSeo | null>('cms-global-seo', () => null)
 
   if (defaults.value === null) {
@@ -85,8 +84,6 @@ export default defineNuxtPlugin(async () => {
 
   useHead(
     () => {
-      const config = getCmsGlobalSeoConfig()
-
       if (
         !config.enabled ||
         defaults.value === null ||
