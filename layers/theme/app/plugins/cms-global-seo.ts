@@ -75,13 +75,7 @@ export default defineNuxtPlugin(async () => {
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   const defaults = useState<CmsGlobalSeo | null>('cms-global-seo', () => null)
 
-  if (defaults.value === null) {
-    defaults.value = await $fetch<CmsGlobalSeo>('/api/seo/global').catch(() => ({
-      meta: [],
-      link: [],
-    }))
-  }
-
+  // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
     () => {
       if (
@@ -103,4 +97,11 @@ export default defineNuxtPlugin(async () => {
       tagPriority: 'low',
     },
   )
+
+  if (defaults.value === null) {
+    defaults.value = await $fetch<CmsGlobalSeo>('/api/seo/global').catch(() => ({
+      meta: [],
+      link: [],
+    }))
+  }
 })
