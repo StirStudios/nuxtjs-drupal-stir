@@ -13,6 +13,17 @@ describe('schedule utils', () => {
     ).toBe('Tue, May 19, 8:30 - 10:30 PM')
   })
 
+  it('compares range dates in the explicit timezone', () => {
+    const start = new Date('2026-05-20T06:30:00Z')
+    const end = new Date('2026-05-20T08:30:00Z')
+
+    expect(
+      formatScheduleRange(start, end, false, {
+        timeZone: 'America/Los_Angeles',
+      }),
+    ).toBe('Tue, May 19, 11:30 PM - Wed, May 20, 1:30 AM')
+  })
+
   it('uses the process runtime timezone when timezone is omitted', () => {
     const start = new Date('2026-05-20T03:30:00Z')
     const end = new Date('2026-05-20T05:30:00Z')
