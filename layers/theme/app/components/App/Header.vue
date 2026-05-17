@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { NavigationMenuItem } from '@nuxt/ui'
+
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
 const { fetchMenu, getPage } = useDrupalCe()
@@ -48,17 +50,67 @@ type MainMenuItem = {
   external?: boolean
   absolute?: string
   alias?: string
+  relative?: string
+  url?: string
+  uri?: string
+  children?: MainMenuItem[]
+  below?: MainMenuItem[]
+  items?: MainMenuItem[]
   options?: {
     fragment?: string
+    attributes?: {
+      target?: string
+    }
   }
 }
-const navLinks = computed(() =>
-  mainMenu.value.map((item: MainMenuItem) => ({
+
+function menuChildren(item: MainMenuItem): MainMenuItem[] {
+  if (Array.isArray(item.children)) return item.children
+  if (Array.isArray(item.below)) return item.below
+  if (Array.isArray(item.items)) return item.items
+
+  return []
+}
+
+function normalizeInternalPath(value: string) {
+  const path = value.replace(/^internal:/, '').replace(/^base:/, '')
+
+  if (!path || path === '<front>') return '/'
+  if (path.startsWith('/')) return path
+
+  return `/${path}`
+}
+
+function menuItemTo(item: MainMenuItem) {
+  if (item.external) {
+    return String(item.absolute || item.url || item.uri || '')
+  }
+
+  const value = String(item.relative || item.alias || item.uri || item.url || '')
+
+  if (/^https?:\/\//.test(value) || value.startsWith('mailto:') || value.startsWith('tel:')) {
+    return value
+  }
+
+  const path = normalizeInternalPath(value)
+
+  return `${path}${item.options?.fragment ? `#${item.options.fragment}` : ''}`
+}
+
+function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
+  const children = menuChildren(item).map(mapMenuItem)
+  const to = menuItemTo(item)
+
+  return {
     label: item.title ?? '',
-    to: item.external
-      ? (item.absolute ?? '')
-      : `/${item.alias ?? ''}${item.options?.fragment ? `#${item.options.fragment}` : ''}`,
-  })),
+    to,
+    target: item.external ? item.options?.attributes?.target || '_blank' : undefined,
+    children: children.length > 0 ? children : undefined,
+  }
+}
+
+const navLinks = computed<NavigationMenuItem[]>(() =>
+  mainMenu.value.map((item: MainMenuItem) => mapMenuItem(item)),
 )
 
 const finalIsScrolled = computed(() => {
