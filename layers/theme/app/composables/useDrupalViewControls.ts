@@ -129,7 +129,7 @@ function getNodeRows(node: CeElementNode): unknown[] {
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   const { $ceApi } = useDrupalCe()
   const route = useRoute()
-  const router = useRouter()
+  const routeControls = useRouteListControls()
 
   const isLoading = ref(false)
   const loadError = ref('')
@@ -160,13 +160,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function routeQueryValue(key: string): string | string[] | undefined {
-    const value = route.query[key] ?? route.query[`${key}[]`]
-
-    if (Array.isArray(value)) {
-      return value.filter((item): item is string => typeof item === 'string')
-    }
-
-    return typeof value === 'string' ? value : undefined
+    return routeControls.routeQueryValue(key)
   }
 
   const defaultNoResultsMessage = computed(
@@ -307,12 +301,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   )
 
   function routePageValue(): number | null {
-    const routePage = routeQueryValue('page')
-    const pageValue = Array.isArray(routePage) ? routePage[0] : routePage
-
-    if (!pageValue || !/^\d+$/.test(pageValue)) return null
-
-    return Number(pageValue)
+    return routeControls.routePageValue()
   }
 
   function snapshotCurrentViewState(page = currentPage.value): ViewStateSnapshot {
@@ -457,44 +446,20 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     suppressNextRouteRefresh = true
 
-    const nextQuery: Record<string, string | string[]> = {}
-
-    for (const [key, value] of Object.entries(route.query)) {
-      if (managedQueryKeys().includes(key)) continue
-      if (Array.isArray(value)) {
-        const values = value.filter((item): item is string => typeof item === 'string')
-
-        if (values.length > 0) {
-          nextQuery[key] = values
-        }
-
-        continue
-      }
-
-      if (typeof value === 'string') {
-        nextQuery[key] = value
-      }
+    const nextQuery = {
+      ...routeControls.routeQueryExcluding(managedQueryKeys()),
+      ...buildQueryParams(page),
     }
 
-    Object.assign(nextQuery, buildQueryParams(page))
     saveViewState(page)
 
-    void router.replace({
-      path: route.path,
-      query: nextQuery,
-    }).finally(() => {
+    void routeControls.replaceRoute(nextQuery).finally(() => {
       suppressNextRouteRefresh = false
     })
   }
 
   function routeHasManagedQuery(fullPath = route.fullPath): boolean {
-    const queryString = fullPath.split('?')[1]?.split('#')[0] || ''
-
-    if (queryString === '') return false
-
-    const params = new URLSearchParams(queryString)
-
-    return managedQueryKeys().some((key) => params.has(key))
+    return routeControls.routeHasQuery(managedQueryKeys(), fullPath)
   }
 
   function routeValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
