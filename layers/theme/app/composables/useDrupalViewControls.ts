@@ -78,10 +78,8 @@ function buildSearchParams(
 
   for (const [key, value] of Object.entries(query)) {
     if (Array.isArray(value)) {
-      const paramKey = key.endsWith('[]') ? key : `${key}[]`
-
       for (const item of value) {
-        params.append(paramKey, item)
+        params.append(key, item)
       }
 
       continue
@@ -554,7 +552,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          query[filter.queryParamName] = value
+          query[`${filter.queryParamName}[]`] = value
         }
 
         continue
