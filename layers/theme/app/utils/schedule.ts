@@ -55,12 +55,29 @@ function getDateFormatter(timeZone?: string): Intl.DateTimeFormat {
   })
 }
 
+function getDateKeyFormatter(timeZone?: string): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...(timeZone ? { timeZone } : {}),
+  })
+}
+
 function getTimeFormatter(timeZone?: string): Intl.DateTimeFormat {
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     ...(timeZone ? { timeZone } : {}),
   })
+}
+
+function getDateKey(date: Date, formatter: Intl.DateTimeFormat): string {
+  return formatter
+    .formatToParts(date)
+    .filter(({ type }) => type === 'year' || type === 'month' || type === 'day')
+    .map(({ type, value }) => `${type}:${value}`)
+    .join('|')
 }
 
 export function formatScheduleRange(
@@ -71,6 +88,7 @@ export function formatScheduleRange(
 ): string | null {
   if (!start) return null
   const dateFormatter = getDateFormatter(options.timeZone)
+  const dateKeyFormatter = getDateKeyFormatter(options.timeZone)
   const timeFormatter = getTimeFormatter(options.timeZone)
 
   if (!end || timeTbd) {
@@ -79,7 +97,8 @@ export function formatScheduleRange(
 
   const dateLabel = dateFormatter.format(start)
   const startTime = timeFormatter.format(start)
-  const sameLocalDay = start.toDateString() === end.toDateString()
+  const sameLocalDay =
+    getDateKey(start, dateKeyFormatter) === getDateKey(end, dateKeyFormatter)
   const endTime = timeFormatter.format(end)
 
   const startDayPeriod = timeFormatter
