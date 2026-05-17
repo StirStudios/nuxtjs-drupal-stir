@@ -42,7 +42,7 @@ const safeRedirect = computed(() => (route.path === '/' ? undefined : '/'))
   <template v-if="!isBackendError">
     <LazyRegionArea area="top" />
     <LazyDrupalTabs v-if="isAdministrator" />
-    <LazyAppHeader :mode="navigation.mode" />
+    <AppHeader :mode="navigation.mode" />
   </template>
 
   <UMain id="main-content" as="main" role="main">
