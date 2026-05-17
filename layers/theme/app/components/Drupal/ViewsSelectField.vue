@@ -19,6 +19,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
 
+const open = ref(false)
+
 function normalizeValue(value: unknown): string | string[] {
   if (Array.isArray(value)) {
     return value.map((item) => String(item))
@@ -29,6 +31,10 @@ function normalizeValue(value: unknown): string | string[] {
 
 function onUpdate(value: unknown) {
   emit('update:modelValue', normalizeValue(value))
+
+  nextTick(() => {
+    open.value = false
+  })
 }
 </script>
 
@@ -36,6 +42,7 @@ function onUpdate(value: unknown) {
   <UFormField :label="label" :ui="{ label: 'sr-only' }">
     <USelectMenu
       v-if="searchable"
+      v-model:open="open"
       :aria-label="label"
       :disabled="props.disabled"
       :items="items"
@@ -52,6 +59,7 @@ function onUpdate(value: unknown) {
 
     <USelect
       v-else
+      v-model:open="open"
       :aria-label="label"
       :disabled="props.disabled"
       :items="items"
@@ -61,6 +69,7 @@ function onUpdate(value: unknown) {
       :ui="{
         base: ['min-w-35'],
       }"
+      value-key="value"
       @update:model-value="onUpdate"
     />
   </UFormField>
