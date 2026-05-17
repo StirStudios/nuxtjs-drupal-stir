@@ -4,7 +4,6 @@ import type { WebformDefinition } from '~/types'
 
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
-const { open, shouldRenderPopupContent } = usePopupBehavior({ popup, config })
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),
 )
@@ -34,6 +33,36 @@ function getPopupProps(node: PopupNode | null): PopupProps {
 
 const hasPopup = computed(() => !!popup.value)
 const popupProps = computed(() => getPopupProps(popup.value))
+const dismissedPopups = useState<Record<string, boolean>>(
+  'marketing_popup_dismissed',
+  () => ({}),
+)
+const popupDismissKey = computed(() => {
+  const popupUuid = popupProps.value?.uuid
+
+  if (typeof popupUuid === 'string' && popupUuid.trim()) {
+    return popupUuid.trim()
+  }
+
+  const fallbackId = popupProps.value?.id
+
+  if (typeof fallbackId === 'number' || typeof fallbackId === 'string') {
+    return String(fallbackId)
+  }
+
+  return null
+})
+const isPopupDismissed = computed(() => {
+  if (!popupDismissKey.value) return false
+
+  return Boolean(dismissedPopups.value[popupDismissKey.value])
+})
+
+const { open, shouldRenderPopupContent } = usePopupBehavior({
+  popup,
+  config,
+  suppress: computed(() => isPopupDismissed.value),
+})
 const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
 const popupRenderProps = computed(() => {
@@ -63,6 +92,11 @@ const closeModal = () => {
   open.value = false
 }
 
+function markPopupDismissed() {
+  if (!popupDismissKey.value) return
+  dismissedPopups.value[popupDismissKey.value] = true
+}
+
 watch(
   () => popup.value?.props?.uuid,
   () => {
@@ -85,6 +119,15 @@ watch(open, (isOpen) => {
       ? media[0]
       : media[Math.floor(Math.random() * media.length)]
 })
+
+watch(
+  open,
+  (value, oldValue) => {
+    if (oldValue && !value) {
+      markPopupDismissed()
+    }
+  },
+)
 </script>
 
 <template>
