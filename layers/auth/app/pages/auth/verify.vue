@@ -54,7 +54,7 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <UPageCard class="bg-default/90 w-full rounded-lg shadow-lg">
+    <UPageCard class="bg-default w-full rounded-lg shadow-lg">
       <UAlert
         :color="isLoading ? 'neutral' : verified ? 'success' : 'error'"
         :description="message"
