@@ -48,6 +48,12 @@ export function useVideoPlayers() {
     if (!import.meta.client) return
     await nextTick()
 
+    const Player = window.playerjs?.Player
+
+    if (typeof Player !== 'function') {
+      return
+    }
+
     const iframes = document.querySelectorAll<HTMLIFrameElement>(
       'iframe[data-mid]',
     )
@@ -60,29 +66,14 @@ export function useVideoPlayers() {
 
       pendingIframes.add(iframeKey)
 
-      const attachPlayer = () => {
-        try {
-          if (typeof window.playerjs?.Player === 'function') {
-            const player = new window.playerjs.Player(iframe)
+      try {
+        const player = new Player(iframe)
 
-            playersReady(iframeKey, player)
-            return
-          }
-        } catch (err) {
-          console.error(`PlayerJS init failed for ${iframeKey}:`, err)
-        } finally {
-          pendingIframes.delete(iframeKey)
-        }
-      }
-
-      const iframeReady =
-        iframe.contentDocument?.readyState === 'complete' &&
-        typeof window.playerjs?.Player === 'function'
-
-      if (iframeReady) {
-        attachPlayer()
-      } else {
-        iframe.addEventListener('load', attachPlayer, { once: true })
+        playersReady(iframeKey, player)
+      } catch (err) {
+        console.error(`PlayerJS init failed for ${iframeKey}:`, err)
+      } finally {
+        pendingIframes.delete(iframeKey)
       }
     })
   }

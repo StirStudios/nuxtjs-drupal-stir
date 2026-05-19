@@ -33,29 +33,52 @@
   }
 
   .prose {
-    p,
-    ul,
-    ol {
-      @apply py-3 leading-7;
-    }
-
-    p,
-    ul > li,
-    ol > li {
+    :where(p, ul, ol, blockquote) {
       @apply leading-7;
     }
 
-    ul:not(.list-none) > li {
-      @apply ms-4 list-disc;
+    :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote) {
+      @apply mt-4;
     }
 
-    a {
-      @apply text-primary;
+    :where(p, ul, ol, blockquote) + :where(h2) {
+      @apply mt-12;
     }
 
-    section,
-    header {
-      @apply mb-15;
+    :where(p, ul, ol, blockquote) + :where(h3) {
+      @apply mt-10;
+    }
+
+    :where(p, ul, ol, blockquote) + :where(h4) {
+      @apply mt-8;
+    }
+
+    :where(h2, h3, h4) {
+      @apply mb-3 leading-tight;
+    }
+
+    :where(h2, h3, h4) + :where(p, ul, ol, blockquote) {
+      @apply mt-0;
+    }
+
+    :where(ul:not(.list-none), ol:not(.list-none)) {
+      @apply ps-6;
+    }
+
+    :where(ul:not(.list-none) > li) {
+      @apply list-disc;
+    }
+
+    :where(ol:not(.list-none) > li) {
+      @apply list-decimal;
+    }
+
+    :where(li + li) {
+      @apply mt-2;
+    }
+
+    :where(a) {
+      @apply text-primary underline underline-offset-4 hover:text-primary/80;
     }
   }
 
