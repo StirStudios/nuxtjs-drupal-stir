@@ -33,29 +33,46 @@
   }
 
   .prose {
-    p,
-    ul,
-    ol {
-      @apply py-3 leading-7;
+    > * + * {
+      @apply mt-4;
     }
 
     p,
-    ul > li,
-    ol > li {
+    ul,
+    ol,
+    li {
       @apply leading-7;
     }
 
+    ul:not(.list-none),
+    ol:not(.list-none) {
+      @apply ps-6;
+    }
+
     ul:not(.list-none) > li {
-      @apply ms-4 list-disc;
+      @apply list-disc;
+    }
+
+    ol:not(.list-none) > li {
+      @apply list-decimal;
+    }
+
+    li + li {
+      @apply mt-2;
     }
 
     a {
-      @apply text-primary;
+      @apply text-primary underline underline-offset-4 hover:text-primary/80;
     }
 
     section,
     header {
-      @apply mb-15;
+      @apply mb-12;
+    }
+
+    section > :last-child,
+    header > :last-child {
+      @apply mb-0;
     }
   }
 
