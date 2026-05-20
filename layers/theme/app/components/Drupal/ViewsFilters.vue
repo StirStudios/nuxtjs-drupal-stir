@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DrupalViewsSelectField from './ViewsSelectField.vue'
+
 interface ExposedFilterOption {
   label: string
   value: string

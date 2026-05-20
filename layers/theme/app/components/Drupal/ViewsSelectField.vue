@@ -20,6 +20,11 @@ const emit = defineEmits<{
 }>()
 
 const open = ref(false)
+const selectUi = {
+  base: 'min-w-35',
+  content: 'w-max min-w-[var(--reka-select-trigger-width,var(--reka-combobox-trigger-width))] max-w-[calc(100vw-2rem)]',
+  itemLabel: 'overflow-visible whitespace-nowrap text-clip',
+} as const
 
 function normalizeValue(value: unknown): string | string[] {
   if (Array.isArray(value)) {
@@ -32,9 +37,11 @@ function normalizeValue(value: unknown): string | string[] {
 function onUpdate(value: unknown) {
   emit('update:modelValue', normalizeValue(value))
 
-  nextTick(() => {
-    open.value = false
-  })
+  if (!props.multiple) {
+    nextTick(() => {
+      open.value = false
+    })
+  }
 }
 </script>
 
@@ -50,9 +57,7 @@ function onUpdate(value: unknown) {
       :multiple="multiple"
       :placeholder="placeholder || label"
       :search-input="{ placeholder: `Search ${label.toLowerCase()}...` }"
-      :ui="{
-        base: ['min-w-35'],
-      }"
+      :ui="selectUi"
       value-key="value"
       @update:model-value="onUpdate"
     />
@@ -66,9 +71,7 @@ function onUpdate(value: unknown) {
       :model-value="modelValue"
       :multiple="multiple"
       :placeholder="placeholder || label"
-      :ui="{
-        base: ['min-w-35'],
-      }"
+      :ui="selectUi"
       value-key="value"
       @update:model-value="onUpdate"
     />
