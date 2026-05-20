@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DrupalViewsSelectField from './ViewsSelectField.vue'
+
 interface SortOption {
   label: string
   value: string

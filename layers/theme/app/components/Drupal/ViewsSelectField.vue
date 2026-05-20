@@ -20,6 +20,10 @@ const emit = defineEmits<{
 }>()
 
 const open = ref(false)
+const selectUi = {
+  base: 'min-w-35',
+  itemLabel: 'overflow-visible whitespace-normal text-clip',
+} as const
 
 function normalizeValue(value: unknown): string | string[] {
   if (Array.isArray(value)) {
@@ -32,9 +36,11 @@ function normalizeValue(value: unknown): string | string[] {
 function onUpdate(value: unknown) {
   emit('update:modelValue', normalizeValue(value))
 
-  nextTick(() => {
-    open.value = false
-  })
+  if (!props.multiple) {
+    nextTick(() => {
+      open.value = false
+    })
+  }
 }
 </script>
 
@@ -50,9 +56,7 @@ function onUpdate(value: unknown) {
       :multiple="multiple"
       :placeholder="placeholder || label"
       :search-input="{ placeholder: `Search ${label.toLowerCase()}...` }"
-      :ui="{
-        base: ['min-w-35'],
-      }"
+      :ui="selectUi"
       value-key="value"
       @update:model-value="onUpdate"
     />
@@ -66,9 +70,7 @@ function onUpdate(value: unknown) {
       :model-value="modelValue"
       :multiple="multiple"
       :placeholder="placeholder || label"
-      :ui="{
-        base: ['min-w-35'],
-      }"
+      :ui="selectUi"
       value-key="value"
       @update:model-value="onUpdate"
     />
