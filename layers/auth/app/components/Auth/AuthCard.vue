@@ -28,7 +28,7 @@ defineSlots<{
 </script>
 
 <template>
-  <UPageCard class="bg-default/90 w-full rounded-lg shadow-lg">
+  <UPageCard class="bg-default w-full rounded-lg shadow-lg">
     <UAuthForm
       :description="description"
       :fields="fields"

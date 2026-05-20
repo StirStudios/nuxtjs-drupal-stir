@@ -20,7 +20,7 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="isCheckingLink || !linkValid"
-      class="bg-default/90 w-full rounded-lg shadow-lg"
+      class="bg-default w-full rounded-lg shadow-lg"
     >
       <UAlert
         :color="isCheckingLink ? 'neutral' : 'warning'"
