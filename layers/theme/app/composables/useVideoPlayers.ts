@@ -1,6 +1,7 @@
 import { watchOnce } from '@vueuse/core'
 
 export interface VideoPlayer {
+  elem?: HTMLIFrameElement
   isReady: boolean
   supports: (method: string, value: string) => boolean
   pause: () => void
@@ -15,11 +16,16 @@ export interface VideoPlayer {
   off: (event: string, callback?: () => void) => void
 }
 
+type PlayerConstructor = new (iframe: HTMLIFrameElement) => VideoPlayer
+
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())
 const isScriptLoaded = ref(false)
 let scriptInjected = false
+const PLAYER_ORIGIN = 'https://player.mediadelivery.net'
 const pendingIframes = new Set<string>()
 const endedBoundPlayers = new Set<string>()
+const loadedIframes = new WeakSet<HTMLIFrameElement>()
+const playerIframes = new WeakMap<VideoPlayer, HTMLIFrameElement>()
 
 export function useVideoPlayers() {
   if (import.meta.client && !scriptInjected) {
@@ -61,26 +67,103 @@ export function useVideoPlayers() {
     iframes.forEach((iframe) => {
       const iframeKey = iframe.getAttribute('data-mid')
 
-      if (!iframeKey || videoPlayers.value.has(iframeKey)) return
+      if (!iframeKey || !isBunnyIframe(iframe)) return
+
+      const existingPlayer = videoPlayers.value.get(iframeKey)
+
+      if (existingPlayer) {
+        if (isLivePlayer(iframeKey, existingPlayer)) return
+
+        forgetPlayer(iframeKey)
+      }
+
       if (pendingIframes.has(iframeKey)) return
 
-      pendingIframes.add(iframeKey)
-
-      try {
-        const player = new Player(iframe)
-
-        playersReady(iframeKey, player)
-      } catch (err) {
-        console.error(`PlayerJS init failed for ${iframeKey}:`, err)
-      } finally {
-        pendingIframes.delete(iframeKey)
-      }
+      queuePlayerInitialization(iframeKey, iframe, Player)
     })
+  }
+
+  function isBunnyIframe(iframe: HTMLIFrameElement): boolean {
+    try {
+      return new URL(iframe.src).origin === PLAYER_ORIGIN
+    }
+    catch {
+      return false
+    }
+  }
+
+  function currentIframe(iframeKey: string): HTMLIFrameElement | null {
+    return document.querySelector<HTMLIFrameElement>(
+      `iframe[data-mid="${CSS.escape(iframeKey)}"]`,
+    )
+  }
+
+  function isLivePlayer(iframeKey: string, player: VideoPlayer): boolean {
+    const iframe = currentIframe(iframeKey)
+    const playerIframe = player.elem ?? playerIframes.get(player)
+
+    return Boolean(iframe && iframe.contentWindow && playerIframe === iframe)
+  }
+
+  function forgetPlayer(iframeKey: string): void {
+    videoPlayers.value.delete(iframeKey)
+    endedBoundPlayers.delete(iframeKey)
+  }
+
+  function queuePlayerInitialization(
+    iframeKey: string,
+    iframe: HTMLIFrameElement,
+    Player: PlayerConstructor,
+  ): void {
+    if (loadedIframes.has(iframe)) {
+      initializeIframePlayer(iframeKey, iframe, Player)
+      return
+    }
+
+    pendingIframes.add(iframeKey)
+    let initialized = false
+
+    const initialize = () => {
+      if (initialized) return
+      initialized = true
+      loadedIframes.add(iframe)
+      pendingIframes.delete(iframeKey)
+      initializeIframePlayer(iframeKey, iframe, Player)
+    }
+
+    iframe.addEventListener('load', initialize, { once: true })
+
+    window.setTimeout(() => {
+      if (!pendingIframes.has(iframeKey)) return
+
+      initialize()
+    }, 500)
+  }
+
+  function initializeIframePlayer(
+    iframeKey: string,
+    iframe: HTMLIFrameElement,
+    Player: PlayerConstructor,
+  ): void {
+    if (videoPlayers.value.has(iframeKey)) return
+
+    try {
+      const player = new Player(iframe)
+
+      playerIframes.set(player, iframe)
+
+      playersReady(iframeKey, player)
+    } catch (err) {
+      console.error(`PlayerJS init failed for ${iframeKey}:`, err)
+    }
   }
 
   function playersReady(iframeKey: string, player: VideoPlayer): void {
     if (videoPlayers.value.has(iframeKey)) return
+
     player.on('ready', () => {
+      if (!isLivePlayer(iframeKey, player)) return
+
       videoPlayers.value.set(iframeKey, player)
       resetOnEnd(iframeKey, player)
     })
@@ -91,6 +174,8 @@ export function useVideoPlayers() {
     endedBoundPlayers.add(iframeKey)
 
     const onEnded = () => {
+      if (!isLivePlayer(iframeKey, player)) return
+
       player.setCurrentTime(0)
       player.pause()
 
@@ -104,8 +189,19 @@ export function useVideoPlayers() {
     player.on('ended', onEnded)
   }
 
+  function forEachLivePlayer(callback: (player: VideoPlayer) => void): void {
+    videoPlayers.value.forEach((player, iframeKey) => {
+      if (!isLivePlayer(iframeKey, player)) {
+        forgetPlayer(iframeKey)
+        return
+      }
+
+      callback(player)
+    })
+  }
+
   function addEventToAllPlayers(event: string, callback: () => void): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('event', event)) {
         player.on(event, callback)
       }
@@ -113,7 +209,7 @@ export function useVideoPlayers() {
   }
 
   function playAllPlayers(): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'play')) {
         player.play()
       }
@@ -121,7 +217,7 @@ export function useVideoPlayers() {
   }
 
   function pauseAllPlayers(): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'pause')) {
         player.pause()
       }
@@ -139,7 +235,7 @@ export function useVideoPlayers() {
   }
 
   function muteAllPlayers(): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'mute')) {
         player.mute()
       }
@@ -147,7 +243,7 @@ export function useVideoPlayers() {
   }
 
   function unmuteAllPlayers(): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'unmute')) {
         player.unmute()
       }
@@ -155,7 +251,7 @@ export function useVideoPlayers() {
   }
 
   function setVolumeForAll(value: number): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'setVolume')) {
         player.setVolume(value)
       }
@@ -163,7 +259,7 @@ export function useVideoPlayers() {
   }
 
   function seekAllPlayers(timeInSeconds: number): void {
-    videoPlayers.value.forEach((player) => {
+    forEachLivePlayer((player) => {
       if (player.isReady && player.supports('method', 'setCurrentTime')) {
         player.setCurrentTime(timeInSeconds)
       }
