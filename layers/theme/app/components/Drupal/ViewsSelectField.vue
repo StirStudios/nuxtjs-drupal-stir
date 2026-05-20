@@ -22,7 +22,8 @@ const emit = defineEmits<{
 const open = ref(false)
 const selectUi = {
   base: 'min-w-35',
-  itemLabel: 'overflow-visible whitespace-normal text-clip',
+  content: 'w-max min-w-[var(--reka-select-trigger-width,var(--reka-combobox-trigger-width))] max-w-[calc(100vw-2rem)]',
+  itemLabel: 'overflow-visible whitespace-nowrap text-clip',
 } as const
 
 function normalizeValue(value: unknown): string | string[] {
