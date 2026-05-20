@@ -19,6 +19,15 @@
   }
 }
 
+figure {
+  > img {
+    @apply !mb-4;
+  }
+  figcaption {
+    @apply text-center italic;
+  }
+}
+
 .align-left {
   @apply mx-auto max-w-sm sm:float-left sm:me-5 sm:mb-5;
 }
@@ -176,11 +185,11 @@
 [data-slot='content'].menu-panel-motion {
   &::after {
     content: '';
-    @apply absolute z-0 pointer-events-none -top-[24%] inset-x-0 bottom-0 shadow-lg;
+    @apply pointer-events-none absolute inset-x-0 -top-[24%] bottom-0 z-0 shadow-lg;
     background: var(--ui-bg);
     transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
-      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg)
-      rotateZ(var(--menu-from-rot)) skew(0deg);
+      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
+      skew(0deg);
     transform-style: preserve-3d;
   }
 
