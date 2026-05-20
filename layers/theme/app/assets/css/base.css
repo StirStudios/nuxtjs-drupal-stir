@@ -41,15 +41,18 @@
       @apply mt-4;
     }
 
-    :where(p, ul, ol, blockquote) + :where(h2) {
+    :where(p, ul, ol, blockquote) + :where(h2),
+    > :where(div) + :where(h2) {
       @apply mt-12;
     }
 
-    :where(p, ul, ol, blockquote) + :where(h3) {
+    :where(p, ul, ol, blockquote) + :where(h3),
+    > :where(div) + :where(h3) {
       @apply mt-10;
     }
 
-    :where(p, ul, ol, blockquote) + :where(h4) {
+    :where(p, ul, ol, blockquote) + :where(h4),
+    > :where(div) + :where(h4) {
       @apply mt-8;
     }
 
@@ -57,7 +60,8 @@
       @apply mb-3 leading-tight;
     }
 
-    :where(h2, h3, h4) + :where(p, ul, ol, blockquote) {
+    :where(h2, h3, h4) + :where(p, ul, ol, blockquote),
+    > :where(h2, h3, h4) + :where(div) > :where(p, ul, ol, blockquote):first-child {
       @apply mt-0;
     }
 
