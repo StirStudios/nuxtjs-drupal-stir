@@ -80,7 +80,7 @@ const shouldShowIframe = computed(
   () =>
     !!props.mediaEmbed &&
     !isProcessing.value &&
-    (!props.deferEmbed || isEmbedActive.value),
+    isEmbedActive.value,
 )
 const previewSrc = computed(() => {
   if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
@@ -102,6 +102,10 @@ function activateEmbed() {
 }
 
 onMounted(() => {
+  if (!isBare.value && !props.deferEmbed) {
+    isEmbedActive.value = true
+  }
+
   if (!isBare.value && shouldShowIframe.value) {
     void scheduleInitializePlayers()
   }
