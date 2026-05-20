@@ -34,15 +34,15 @@ const NETWORK_META: Record<ShareNetwork, Omit<ShareLinkItem, 'network' | 'href'>
   },
   x: {
     label: 'Share on X',
-    icon: 'i-lucide-message-circle',
+    icon: 'i-social-x',
   },
   facebook: {
     label: 'Share on Facebook',
-    icon: 'i-lucide-share',
+    icon: 'i-social-facebook',
   },
   linkedin: {
     label: 'Share on LinkedIn',
-    icon: 'i-lucide-briefcase-business',
+    icon: 'i-social-linkedin',
   },
   email: {
     label: 'Share by email',
