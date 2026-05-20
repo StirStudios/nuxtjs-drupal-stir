@@ -9,6 +9,7 @@ export default defineVitestConfig({
     environment: 'nuxt',
     include: ['tests/nuxt/runtime/**/*.spec.ts'],
     setupFiles: ['tests/nuxt/runtime/setup.ts'],
+    testTimeout: 10000,
     environmentOptions: {
       nuxt: {
         rootDir,

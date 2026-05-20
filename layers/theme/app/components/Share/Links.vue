@@ -9,9 +9,11 @@ const props = withDefaults(defineProps<{
   description?: string
   networks?: ShareNetwork[]
   label?: string
+  compact?: boolean
   variant?: ShareLinksVariant
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }>(), {
+  compact: false,
   description: '',
   label: 'Share',
   networks: () => ['native', 'x', 'facebook', 'linkedin', 'email', 'copy'],
@@ -34,6 +36,7 @@ const {
 })
 
 const visibleItems = computed(() => items.value.filter(item => item.network !== 'native' || isNativeShareSupported.value))
+const showMenuLabel = computed(() => props.variant !== 'menu' || !props.compact)
 const menuItems = computed(() => visibleItems.value.map(item => ({
   label: item.network === 'copy' && copied.value ? 'Copied' : item.label,
   icon: item.network === 'copy' && copied.value ? 'i-lucide-check' : item.icon,
@@ -52,10 +55,12 @@ function itemIcon(network: ShareNetwork, icon: string) {
 <template>
   <UDropdownMenu v-if="variant === 'menu'" :items="menuItems">
     <UButton
+      :aria-label="showMenuLabel ? undefined : label"
       color="neutral"
       :icon="copied ? 'i-lucide-check' : 'i-lucide-share-2'"
-      :label="label"
+      :label="showMenuLabel ? label : undefined"
       :size="size"
+      :square="!showMenuLabel"
       variant="outline"
     />
   </UDropdownMenu>
