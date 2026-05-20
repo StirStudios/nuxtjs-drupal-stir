@@ -90,17 +90,32 @@ const previewSrc = computed(() => {
   return props.src
 })
 
+async function scheduleInitializePlayers(): Promise<void> {
+  await nextTick()
+  await initializePlayers()
+}
+
 function activateEmbed() {
   if (shouldShowIframe.value) return
   isEmbedActive.value = true
-  initializePlayers()
+  void scheduleInitializePlayers()
 }
 
 onMounted(() => {
   if (!isBare.value && shouldShowIframe.value) {
-    initializePlayers()
+    void scheduleInitializePlayers()
   }
 })
+
+watch(
+  shouldShowIframe,
+  (showIframe) => {
+    if (!showIframe || isBare.value) return
+
+    void scheduleInitializePlayers()
+  },
+  { flush: 'post' },
+)
 </script>
 
 <template>
@@ -141,6 +156,7 @@ onMounted(() => {
       loading="lazy"
       :src="mediaEmbed"
       :title="title"
+      @load="scheduleInitializePlayers()"
     />
 
     <button
