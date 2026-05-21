@@ -41,6 +41,10 @@ const endedBoundPlayers = new Set<string>()
 const loadedIframes = new WeakSet<HTMLIFrameElement>()
 const playerIframes = new WeakMap<VideoPlayer, HTMLIFrameElement>()
 
+function normalizePlayerKey(playerKey: number | string | null | undefined): string {
+  return typeof playerKey === 'number' || typeof playerKey === 'string' ? String(playerKey) : ''
+}
+
 function videoPlayerDebug(): boolean {
   if (!import.meta.dev || !import.meta.client) return false
 
@@ -182,7 +186,11 @@ export function useVideoPlayers() {
     return currentIframe(iframeKey) === iframe && Boolean(iframe.contentWindow)
   }
 
-  function forgetPlayer(iframeKey: string): void {
+  function forgetPlayer(playerKey: number | string | null | undefined): void {
+    const iframeKey = normalizePlayerKey(playerKey)
+
+    if (!iframeKey) return
+
     videoPlayers.value.delete(iframeKey)
     pendingIframes.delete(iframeKey)
     initializingIframes.delete(iframeKey)
@@ -419,9 +427,7 @@ export function useVideoPlayers() {
     )
 
     const normalizedPlayerKey = computed(() => {
-      const key = toValue(playerKey)
-
-      return typeof key === 'number' || typeof key === 'string' ? String(key) : ''
+      return normalizePlayerKey(toValue(playerKey))
     })
     const isEnabled = computed(() => Boolean(toValue(enabled)))
 
@@ -507,6 +513,7 @@ export function useVideoPlayers() {
   return {
     initializePlayers,
     playersReady,
+    forgetPlayer,
     onPlayerEvent,
     addEventToAllPlayers,
     playAllPlayers,
