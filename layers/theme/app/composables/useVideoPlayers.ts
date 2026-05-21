@@ -1,4 +1,5 @@
 import { watchOnce } from '@vueuse/core'
+import type { MaybeRefOrGetter } from 'vue'
 
 export interface VideoPlayer {
   elem?: HTMLIFrameElement
@@ -12,21 +13,37 @@ export interface VideoPlayer {
   getVolume: (callback: (value: number) => void) => void
   getCurrentTime: (callback: (value: number) => void) => void
   setCurrentTime: (value: number) => void
-  on: (event: string, callback: () => void) => void
-  off: (event: string, callback?: () => void) => void
+  on: (event: string, callback: (payload?: unknown) => void) => void
+  off: (event: string, callback?: (payload?: unknown) => void) => void
 }
 
 type PlayerConstructor = new (iframe: HTMLIFrameElement) => VideoPlayer
+type PlayerEventOptions = {
+  enabled?: MaybeRefOrGetter<boolean>
+  event: string
+  handler: (payload?: unknown, player?: VideoPlayer) => void
+  pollIntervalMs?: number
+  playerKey: MaybeRefOrGetter<number | string | null | undefined>
+}
 
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())
 const isScriptLoaded = ref(false)
 let scriptInjected = false
-const PLAYER_ORIGIN = 'https://player.mediadelivery.net'
+const DEFAULT_EVENT_POLL_INTERVAL_MS = 1000
+const MIN_EVENT_POLL_INTERVAL_MS = 250
+const PLAYER_ORIGINS = new Set([
+  'https://player.mediadelivery.net',
+  'https://iframe.mediadelivery.net',
+])
 const pendingIframes = new Map<string, HTMLIFrameElement>()
 const initializingIframes = new Map<string, HTMLIFrameElement>()
 const endedBoundPlayers = new Set<string>()
 const loadedIframes = new WeakSet<HTMLIFrameElement>()
 const playerIframes = new WeakMap<VideoPlayer, HTMLIFrameElement>()
+
+function normalizePlayerKey(playerKey: number | string | null | undefined): string {
+  return typeof playerKey === 'number' || typeof playerKey === 'string' ? String(playerKey) : ''
+}
 
 function videoPlayerDebug(): boolean {
   if (!import.meta.dev || !import.meta.client) return false
@@ -142,7 +159,7 @@ export function useVideoPlayers() {
 
   function isBunnyIframe(iframe: HTMLIFrameElement): boolean {
     try {
-      return new URL(iframe.src).origin === PLAYER_ORIGIN
+      return PLAYER_ORIGINS.has(new URL(iframe.src).origin)
     }
     catch {
       return false
@@ -169,8 +186,14 @@ export function useVideoPlayers() {
     return currentIframe(iframeKey) === iframe && Boolean(iframe.contentWindow)
   }
 
-  function forgetPlayer(iframeKey: string): void {
+  function forgetPlayer(playerKey: number | string | null | undefined): void {
+    const iframeKey = normalizePlayerKey(playerKey)
+
+    if (!iframeKey) return
+
     videoPlayers.value.delete(iframeKey)
+    pendingIframes.delete(iframeKey)
+    initializingIframes.delete(iframeKey)
     endedBoundPlayers.delete(iframeKey)
   }
 
@@ -387,9 +410,111 @@ export function useVideoPlayers() {
     })
   }
 
+  function onPlayerEvent({
+    enabled = true,
+    event,
+    handler,
+    pollIntervalMs = 1000,
+    playerKey,
+  }: PlayerEventOptions): void {
+    let activePlayer: VideoPlayer | null = null
+    let activePlayerKey = ''
+    let activeCallback: ((payload?: unknown) => void) | null = null
+    let poll: ReturnType<typeof setInterval> | null = null
+    const safePollIntervalMs = Math.max(
+      MIN_EVENT_POLL_INTERVAL_MS,
+      Number.isFinite(pollIntervalMs) ? pollIntervalMs : DEFAULT_EVENT_POLL_INTERVAL_MS,
+    )
+
+    const normalizedPlayerKey = computed(() => {
+      return normalizePlayerKey(toValue(playerKey))
+    })
+    const isEnabled = computed(() => Boolean(toValue(enabled)))
+
+    function unbind(): void {
+      if (activePlayer && activeCallback) {
+        activePlayer.off(event, activeCallback)
+        debugVideoPlayer('unbound player event', {
+          event,
+          iframeKey: activePlayerKey,
+        })
+      }
+
+      activePlayer = null
+      activePlayerKey = ''
+      activeCallback = null
+    }
+
+    function bind(): void {
+      if (!isEnabled.value || !normalizedPlayerKey.value) {
+        unbind()
+        return
+      }
+
+      const player = videoPlayers.value.get(normalizedPlayerKey.value)
+
+      if (!player) {
+        initializePlayers()
+        return
+      }
+
+      if (!isLivePlayer(normalizedPlayerKey.value, player)) {
+        forgetPlayer(normalizedPlayerKey.value)
+        initializePlayers()
+        return
+      }
+
+      if (activePlayer === player) return
+
+      unbind()
+      activePlayer = player
+      activePlayerKey = normalizedPlayerKey.value
+      activeCallback = (payload?: unknown) => handler(payload, player)
+      activePlayer.on(event, activeCallback)
+      debugVideoPlayer('bound player event', {
+        event,
+        iframeKey: activePlayerKey,
+      })
+    }
+
+    function startPolling(): void {
+      if (poll || !isEnabled.value) return
+
+      poll = setInterval(bind, safePollIntervalMs)
+      bind()
+    }
+
+    function stopPolling(): void {
+      if (!poll) return
+
+      clearInterval(poll)
+      poll = null
+    }
+
+    onMounted(startPolling)
+
+    watch([isEnabled, normalizedPlayerKey], () => {
+      if (isEnabled.value) {
+        startPolling()
+        bind()
+        return
+      }
+
+      stopPolling()
+      unbind()
+    })
+
+    onBeforeUnmount(() => {
+      stopPolling()
+      unbind()
+    })
+  }
+
   return {
     initializePlayers,
     playersReady,
+    forgetPlayer,
+    onPlayerEvent,
     addEventToAllPlayers,
     playAllPlayers,
     pauseAllPlayers,

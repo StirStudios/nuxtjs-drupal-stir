@@ -151,6 +151,20 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   onSelect: onSelectModal,
 })
 const firstItem = computed(() => itemsOrdered.value[0] ?? null)
+const singleVideoFrameStyle = computed(() => {
+  if (firstItem.value?.type !== 'video') return undefined
+
+  const width = Number(firstItem.value?.width)
+  const height = Number(firstItem.value?.height)
+  const aspectRatio =
+    Number.isFinite(width) && Number.isFinite(height) && height > 0
+      ? width / height
+      : 16 / 9
+
+  return {
+    maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
+  }
+})
 
 onMounted(() => {
   hydrated.value = true
@@ -237,16 +251,25 @@ onMounted(() => {
 
       <div
         v-if="itemsOrdered.length === 1 && firstItem"
-        class="flex h-full w-full items-center justify-center"
+        class="flex h-full w-full items-center justify-center p-4"
       >
-        <component
-          :is="componentMap[firstItem.type]"
-          v-bind="{
-            ...firstItem,
-            ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
-            ...(firstItem.type === 'image' ? { noWrapper: true } : {}),
-          }"
-        />
+        <div
+          :class="
+            firstItem.type === 'video'
+              ? ['w-full overflow-hidden', theme.media.rounded]
+              : 'contents'
+          "
+          :style="singleVideoFrameStyle"
+        >
+          <component
+            :is="componentMap[firstItem.type]"
+            v-bind="{
+              ...firstItem,
+              ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
+              ...(firstItem.type === 'image' ? { noWrapper: true } : {}),
+            }"
+          />
+        </div>
       </div>
 
       <LazyUCarousel
