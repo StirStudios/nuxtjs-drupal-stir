@@ -2,7 +2,7 @@
 import { usePasswordRequest } from '../../../composables/auth/usePasswordRequest'
 import { useAuthConfig } from '../../../composables/auth/useAuthConfig'
 
-const { fields, turnstileToken, validate, onSubmit, isLoading } =
+const { fields, turnstileToken, validate, onSubmit, isLoading, requestSent } =
   usePasswordRequest()
 const { auth } = useAuthConfig()
 
@@ -20,7 +20,25 @@ useSeoMeta({
 
 <template>
   <AuthPage>
+    <UPageCard
+      v-if="requestSent"
+      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
+    >
+      <AuthStatusPanel
+        description="If an account exists for that email or username, reset instructions have been sent."
+        icon="i-lucide-mail-check"
+        title="Check your inbox"
+        tone="success"
+      />
+      <template #footer>
+        <div class="text-center text-sm text-muted">
+          <ULink class="text-primary" to="/auth/login">Back to login</ULink>
+        </div>
+      </template>
+    </UPageCard>
+
     <AuthCard
+      v-else
       :description="description"
       :fields="fields"
       icon="i-lucide-key-round"
