@@ -100,12 +100,13 @@ function menuItemTo(item: MainMenuItem) {
 function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
   const children = menuChildren(item).map(mapMenuItem)
   const to = menuItemTo(item)
+  const hasChildren = children.length > 0
 
   return {
     label: item.title ?? '',
-    to,
-    target: item.external ? item.options?.attributes?.target || '_blank' : undefined,
-    children: children.length > 0 ? children : undefined,
+    to: hasChildren ? undefined : to,
+    target: !hasChildren && item.external ? item.options?.attributes?.target || '_blank' : undefined,
+    children: hasChildren ? children : undefined,
   }
 }
 
