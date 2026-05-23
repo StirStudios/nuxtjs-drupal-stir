@@ -6,6 +6,49 @@ const resolveLayerPath = (path: string) => fileURLToPath(new URL(path, import.me
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
+type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
+
+type SitemapInputContext = {
+  urls: SitemapInputEntry[]
+}
+
+function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
+  const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
+
+  if (!loc) {
+    return null
+  }
+
+  try {
+    const url = new URL(String(loc), 'https://example.com')
+    const pathname = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
+
+    return url.search ? pathname + url.search : pathname
+  } catch {
+    return null
+  }
+}
+
+function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
+  const seen = new Set<string>()
+
+  return urls.filter((entry) => {
+    const key = sitemapDedupeKey(entry)
+
+    if (key === null) {
+      return true
+    }
+
+    if (seen.has(key)) {
+      return false
+    }
+
+    seen.add(key)
+    return true
+  })
+}
+
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-29',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
@@ -92,6 +135,13 @@ export default defineNuxtConfig({
   experimental: {
     appManifest: false,
   },
+
+  hooks: {
+    'sitemap:input'(ctx: SitemapInputContext) {
+      ctx.urls = dedupeSitemapUrls(ctx.urls)
+    },
+  } as Record<string, (ctx: SitemapInputContext) => void>,
+
 
   routeRules: {
     '/login': {
