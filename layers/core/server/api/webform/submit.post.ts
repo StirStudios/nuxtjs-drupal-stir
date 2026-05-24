@@ -1,5 +1,19 @@
-import { defineEventHandler, readBody, createError, getHeader } from 'h3'
+import {
+  defineEventHandler,
+  readBody,
+  readMultipartFormData,
+  createError,
+  getHeader,
+  type H3Event,
+} from 'h3'
 import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+
+type SubmissionBody = Record<string, unknown>
+type ParsedSubmission = {
+  body: SubmissionBody
+  forwardBody: SubmissionBody | FormData
+  contentType?: string
+}
 
 function normalizeErrorStatus(error: unknown): number {
   if (!error || typeof error !== 'object') return 500
@@ -29,6 +43,67 @@ function normalizeErrorMessage(error: unknown): string {
   return 'Form submission failed. Please try again later.'
 }
 
+function setBodyValue(
+  body: SubmissionBody,
+  key: string,
+  value: unknown,
+): void {
+  const normalizedKey = key.endsWith('[]') ? key.slice(0, -2) : key
+  const existing = body[normalizedKey]
+
+  if (existing === undefined) {
+    body[normalizedKey] = key.endsWith('[]') ? [value] : value
+    return
+  }
+
+  body[normalizedKey] = Array.isArray(existing)
+    ? [...existing, value]
+    : [existing, value]
+}
+
+async function parseSubmission(event: H3Event): Promise<ParsedSubmission> {
+  const contentType = getHeader(event, 'content-type') ?? ''
+
+  if (!contentType.toLowerCase().includes('multipart/form-data')) {
+    const body = await readBody<SubmissionBody>(event)
+
+    return {
+      body,
+      forwardBody: body,
+      contentType: 'application/json',
+    }
+  }
+
+  const parts = await readMultipartFormData(event)
+  const body: SubmissionBody = {}
+  const formData = new FormData()
+
+  for (const part of parts ?? []) {
+    if (!part.name) continue
+
+    if (part.filename) {
+      const data = new Uint8Array(part.data)
+      const blob = new Blob([data], {
+        type: part.type || 'application/octet-stream',
+      })
+
+      formData.append(part.name, blob, part.filename)
+      setBodyValue(body, part.name, part.filename)
+      continue
+    }
+
+    const value = part.data.toString('utf8')
+
+    formData.append(part.name, value)
+    setBodyValue(body, part.name, value)
+  }
+
+  return {
+    body,
+    forwardBody: formData,
+  }
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const apiKey =
@@ -41,7 +116,8 @@ export default defineEventHandler(async (event) => {
       request: string,
       options?: Record<string, unknown>,
     ) => Promise<T>
-    const body = await readBody<Record<string, unknown>>(event)
+    const submission = await parseSubmission(event)
+    const body = submission.body
 
     if (!body?.webform_id) {
       throw createError({
@@ -70,7 +146,9 @@ export default defineEventHandler(async (event) => {
     return await fetchJson<Record<string, unknown>>(drupalApiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...(submission.contentType
+          ? { 'Content-Type': submission.contentType }
+          : {}),
         Accept: 'application/json',
         ...buildDrupalHeaders({ apiKey, csrfToken }),
         ...(origin ? { Origin: origin } : {}),
@@ -79,7 +157,7 @@ export default defineEventHandler(async (event) => {
         ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
         ...(userAgent ? { 'User-Agent': userAgent } : {}),
       },
-      body,
+      body: submission.forwardBody,
     })
   } catch (error) {
     throw createError({

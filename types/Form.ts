@@ -22,6 +22,12 @@ export type InputType =
   | 'processed_text'
   | 'datetime'
   | 'section'
+  | 'file'
+  | 'managed_file'
+  | 'webform_document_file'
+  | 'webform_image_file'
+  | 'webform_audio_file'
+  | 'webform_video_file'
 
 export interface DrupalFormProps {
   formId: string
@@ -90,6 +96,9 @@ export interface WebformFieldProps {
   '#min'?: number
   '#max'?: number
   '#step'?: number
+  '#accept'?: string
+  '#file_extensions'?: string
+  '#upload_validators'?: Record<string, unknown>
   '#multiple'?: number | boolean
   '#states'?: States
   '#group'?: string
@@ -117,7 +126,14 @@ export interface WebformActionProps {
 
 export type WebformState = Record<
   string,
-  string | number | boolean | string[] | Record<string, unknown> | undefined
+  | string
+  | number
+  | boolean
+  | string[]
+  | File
+  | File[]
+  | Record<string, unknown>
+  | undefined
 >
 
 export type WebformFields = Record<string, WebformFieldProps>

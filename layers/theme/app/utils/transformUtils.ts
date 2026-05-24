@@ -1,4 +1,5 @@
 import { toSnakeCase } from './stringUtils'
+import { hasFileValue, isFileValue } from './webformFileUtils'
 
 type OptionObject = { label: string; description?: string }
 type OptionValue = string | OptionObject
@@ -53,6 +54,11 @@ export function transformPayloadToSnakeCase<T extends Record<string, unknown>>(
         postal_code: value.postalCode ?? '',
         country: value.country ?? '',
       }
+      return
+    }
+
+    if (isFileValue(value) || (Array.isArray(value) && hasFileValue(value))) {
+      result[snakeKey] = value
       return
     }
 
