@@ -1,18 +1,38 @@
-import { useAuthSession } from './useAuthSession'
-
 export function useProtectedSession() {
-  const authSession = useAuthSession()
-
-  const ready = computed(() => authSession.ready.value)
-  const loggedIn = computed(() => authSession.protectedLoggedIn.value)
+  const ready = useState<boolean>('auth-protected-session-ready', () => false)
+  const loggedIn = useState<boolean>(
+    'auth-session-protected-logged-in',
+    () => false,
+  )
+  let pendingSessionFetch: Promise<void> | null = null
 
   const fetchSession = async () => {
-    await authSession.fetchSession()
+    if (pendingSessionFetch) {
+      await pendingSessionFetch
+      return
+    }
+
+    const requestFetch = useRequestFetch()
+
+    pendingSessionFetch = (async () => {
+      const session = await requestFetch<{ protectedAuthenticated?: boolean }>(
+        '/api/auth/protected',
+      )
+
+      loggedIn.value = Boolean(session?.protectedAuthenticated)
+      ready.value = true
+    })()
+
+    try {
+      await pendingSessionFetch
+    } finally {
+      pendingSessionFetch = null
+    }
   }
 
   const clearSession = () => {
-    authSession.protectedLoggedIn.value = false
-    authSession.ready.value = true
+    loggedIn.value = false
+    ready.value = true
   }
 
   return {
