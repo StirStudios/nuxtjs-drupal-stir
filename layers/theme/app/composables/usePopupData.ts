@@ -8,8 +8,7 @@ type UnknownRecord = Record<string, unknown>
 
 type VisibilityMode = 'show' | 'hide'
 
-type PopupPagePayload = {
-  content?: unknown
+type LayoutBlocksPayload = {
   blocks?: {
     decoupled?: unknown
   }
@@ -180,12 +179,6 @@ function findPopupInSources(content: unknown, decoupled: unknown, routePath: str
   return findPopupInDecoupledBlocks(decoupled, routePath) || findPopupInContent(content)
 }
 
-function normalizePopupRoutePath(path: string): string {
-  if (!path || path === '/') return ''
-
-  return path.replace(/^\/+/, '').replace(/\/+$/, '')
-}
-
 function stringSetting(...values: unknown[]): string | undefined {
   return values.find((value): value is string => typeof value === 'string')
 }
@@ -203,8 +196,8 @@ export const usePopupData = () => {
   const page = getPage()
   const route = useRoute()
   const popup = ref<PopupNode | null>(null)
-  const fallbackPopup = ref<PopupNode | null>(null)
-  const fallbackPath = ref<string | null>(null)
+  const fallbackDecoupledSource = ref<unknown>(null)
+  const fallbackLoaded = ref(false)
   let fallbackRequestId = 0
 
   const contentSource = computed(() => page.value?.content)
@@ -216,40 +209,32 @@ export const usePopupData = () => {
     decoupledSource.value,
     routePath.value,
   ))
+  const fallbackPopup = computed(() => {
+    if (hasPageDecoupledBlocks.value) return null
 
-  async function loadFallbackPopup(path: string) {
+    return findPopupInSources(
+      undefined,
+      fallbackDecoupledSource.value,
+      routePath.value,
+    )
+  })
+
+  async function loadFallbackPopup() {
     if (!import.meta.client) return
+    if (fallbackLoaded.value) return
 
-    const normalizedPath = normalizePopupRoutePath(path)
-
-    if (fallbackPath.value === normalizedPath) return
-
-    fallbackPath.value = normalizedPath
-    fallbackPopup.value = null
-
+    fallbackLoaded.value = true
     const requestId = ++fallbackRequestId
 
     try {
-      const fallbackPage = await $fetch<PopupPagePayload>(
-        normalizedPath ? `/api/drupal-ce/${normalizedPath}` : '/api/drupal-ce',
-        {
-          ignoreResponseError: true,
-          query: {
-            _content_format: 'json',
-          },
-        },
-      )
+      const fallbackPage = await $fetch<LayoutBlocksPayload>('/api/layout-blocks')
 
       if (requestId !== fallbackRequestId) return
 
-      fallbackPopup.value = findPopupInSources(
-        fallbackPage?.content,
-        fallbackPage?.blocks?.decoupled,
-        path,
-      )
+      fallbackDecoupledSource.value = fallbackPage?.blocks?.decoupled ?? null
     } catch {
       if (requestId === fallbackRequestId) {
-        fallbackPopup.value = null
+        fallbackDecoupledSource.value = null
       }
     }
   }
@@ -263,16 +248,13 @@ export const usePopupData = () => {
   )
 
   watch(
-    [pagePopup, routePath, hasPageDecoupledBlocks],
-    ([currentPagePopup, path, currentHasPageDecoupledBlocks]) => {
+    [pagePopup, hasPageDecoupledBlocks],
+    ([currentPagePopup, currentHasPageDecoupledBlocks]) => {
       if (currentPagePopup || currentHasPageDecoupledBlocks) {
-        fallbackPopup.value = null
-        fallbackPath.value = null
-        fallbackRequestId++
         return
       }
 
-      void loadFallbackPopup(path)
+      void loadFallbackPopup()
     },
     { immediate: true },
   )
