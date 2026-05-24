@@ -43,6 +43,15 @@ type UserwayConfig = {
   type?: string
 } & LooseRecord
 
+type PrivacyNoticeLink = {
+  label?: string
+  title?: string
+  text?: string
+  url?: string
+  href?: string
+  to?: string
+} & LooseRecord
+
 type PrivacyNoticeConfig = {
   enabled?: boolean
   mode?: 'consent' | 'notice'
@@ -55,10 +64,15 @@ type PrivacyNoticeConfig = {
   declineButtonLabel?: string
   termsUrl?: string
   privacyUrl?: string
+  cookieConsentUrl?: string
+  cookiePolicyUrl?: string
+  links?: PrivacyNoticeLink[]
+  legalLinks?: PrivacyNoticeLink[]
 } & LooseRecord
 
 type PopupConfig = {
   enabled?: boolean
+  component?: string
 } & LooseRecord
 
 type CmsGlobalSeoConfig = {

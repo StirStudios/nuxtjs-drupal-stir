@@ -54,16 +54,16 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <UPageCard class="bg-default w-full rounded-lg shadow-lg">
-      <UAlert
-        :color="isLoading ? 'neutral' : verified ? 'success' : 'error'"
+    <UPageCard class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full">
+      <AuthStatusPanel
         :description="message"
         :icon="isLoading ? 'i-lucide-loader-circle' : verified ? 'i-lucide-check-circle' : 'i-lucide-alert-circle'"
+        :loading="isLoading"
         :title="isLoading ? 'Verifying account' : verified ? 'Account verified' : 'Verification failed'"
-        variant="soft"
+        :tone="isLoading ? 'neutral' : verified ? 'success' : 'error'"
       />
       <template #footer>
-        <div class="text-sm text-center">
+        <div class="text-center text-sm text-muted">
           <ULink class="text-primary" to="/auth/login">Back to login</ULink>
         </div>
       </template>

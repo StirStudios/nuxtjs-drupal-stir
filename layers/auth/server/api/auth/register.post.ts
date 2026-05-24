@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
     password?: unknown
     display_name?: unknown
     turnstile_response?: unknown
+    fields?: unknown
   }>(event)
 
   const email = typeof body?.email === 'string' ? body.email.trim() : ''
@@ -17,6 +18,9 @@ export default defineEventHandler(async (event) => {
     typeof body?.turnstile_response === 'string'
       ? body.turnstile_response.trim()
       : ''
+  const fields = body?.fields && typeof body.fields === 'object'
+    ? body.fields
+    : {}
 
   if (!email || !password) {
     throw createError({
@@ -33,6 +37,7 @@ export default defineEventHandler(async (event) => {
         password,
         display_name: displayName,
         turnstile_response: turnstileResponse,
+        fields,
       },
     })
   } catch (error: unknown) {

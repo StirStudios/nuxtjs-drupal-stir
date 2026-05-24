@@ -17,6 +17,7 @@ import {
   LazyFieldProcessedText,
   LazyFieldInputNumber,
   LazyFieldInputSlider,
+  LazyFieldFile,
 } from '#components'
 
 const props = withDefaults(
@@ -50,6 +51,12 @@ const componentMap: Record<string, Component> = {
   date: LazyFieldDate,
   address: LazyFieldAddress,
   processed_text: LazyFieldProcessedText,
+  file: LazyFieldFile,
+  managed_file: LazyFieldFile,
+  webform_document_file: LazyFieldFile,
+  webform_image_file: LazyFieldFile,
+  webform_audio_file: LazyFieldFile,
+  webform_video_file: LazyFieldFile,
 }
 
 const shouldRender = computed(() => {

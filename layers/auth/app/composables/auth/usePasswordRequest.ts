@@ -6,6 +6,7 @@ import { mapYupValidationErrors } from '../../utils/yupValidation'
 export function usePasswordRequest() {
   const toast = useToast()
   const isLoading = ref(false)
+  const requestSent = ref(false)
   const turnstileToken = ref('')
   const { requestPasswordReset, getFetchErrorMessage } = useAuthActions()
 
@@ -41,6 +42,7 @@ export function usePasswordRequest() {
         turnstile_response: turnstileToken.value,
       })
 
+      requestSent.value = true
       toast.add({
         title: 'Request sent',
         description:
@@ -66,6 +68,7 @@ export function usePasswordRequest() {
     validate,
     onSubmit,
     isLoading,
+    requestSent,
     turnstileToken,
   }
 }

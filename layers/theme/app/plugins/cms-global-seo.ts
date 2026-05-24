@@ -9,6 +9,7 @@ type CmsGlobalSeoConfig = {
   ignoredPathPrefixes?: string[]
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
+  lang?: string
 }
 
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
@@ -21,6 +22,9 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
     drupalRouteNames: Array.isArray(config.drupalRouteNames)
       ? config.drupalRouteNames
       : ['slug'],
+    lang: typeof config.lang === 'string' && config.lang.trim() !== ''
+      ? config.lang.trim()
+      : 'en',
   }
 }
 
@@ -74,21 +78,26 @@ export default defineNuxtPlugin(async () => {
   const appConfig = useAppConfig()
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   const defaults = useState<CmsGlobalSeo | null>('cms-global-seo', () => null)
+  const lang = computed(() => defaults.value?.lang || config.lang)
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
     () => {
+      const head = {
+        htmlAttrs: { lang: lang.value },
+      }
+
       if (
         !config.enabled ||
         defaults.value === null ||
         isIgnoredPath(route.path, config) ||
         isDrupalRoute(route, config)
       ) {
-        return {}
+        return head
       }
 
       return {
-        htmlAttrs: defaults.value.lang ? { lang: defaults.value.lang } : undefined,
+        ...head,
         link: withLinkKeys(defaults.value.link),
         meta: withMetaKeys(defaults.value.meta),
       }

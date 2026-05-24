@@ -12,6 +12,11 @@ import {
 } from '~/utils/webformScrollToTop'
 import { evaluateCondition } from '~/utils/evaluateUtils'
 import { buildYupSchema } from '~/utils/buildYupSchema'
+import {
+  buildWebformFormData,
+  hasFileValue,
+  isWebformFileField,
+} from '~/utils/webformFileUtils'
 import type {
   WebformDefinition,
   WebformFieldProps,
@@ -161,6 +166,7 @@ const getFieldDefaultValue = (
     (Number.isFinite(multipleCount) && multipleCount > 1) ||
     (typeof field['#cardinality'] === 'number' && field['#cardinality'] !== 1)
 
+  if (isWebformFileField(field)) return multiple ? [] : undefined
   if (type === 'checkboxes' || multiple) return []
   if (type === 'checkbox') return false
   if (isRangeLikeField(field)) {
@@ -242,10 +248,13 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       ...transformPayloadToSnakeCase(hiddenDefaults),
       turnstile_response: turnstileToken.value,
     }
+    const body = hasFileValue(payload)
+      ? buildWebformFormData(payload)
+      : JSON.stringify(payload)
 
     await $fetch('/api/webform/submit', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body,
     })
 
     if (webformScrollConfig.value.scrollToTopOnSuccess) {

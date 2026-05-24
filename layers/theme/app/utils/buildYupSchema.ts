@@ -5,11 +5,19 @@ import {
   number,
   array,
   boolean,
+  mixed,
   type ObjectSchema,
   type AnySchema,
   type NumberSchema,
 } from 'yup'
 import { evaluateCondition } from './evaluateUtils'
+import {
+  allowsMultipleFiles,
+  getFileExtensions,
+  getFileMaxSize,
+  isFileValue,
+  isWebformFileField,
+} from './webformFileUtils'
 
 const SCHEMA_CACHE_LIMIT = 100
 const schemaCache = new WeakMap<
@@ -100,6 +108,7 @@ export function buildYupSchema(
     const isCheckboxes = field['#type'] === 'checkboxes'
     const isCheckbox = field['#type'] === 'checkbox'
     const isDateLike = field['#type'] === 'date' || field['#type'] === 'datetime'
+    const isFile = isWebformFileField(field)
     const isMultiple = '#multiple' in field && !!field['#multiple']
     const multipleCountRaw = Number(field['#multiple'])
     const requiredMultipleCount =
@@ -121,6 +130,37 @@ export function buildYupSchema(
           })
       }
       shape[key] = object().shape(subShape)
+      continue
+    }
+
+    if (isFile) {
+      const multipleFiles = allowsMultipleFiles(field)
+      const maxSize = getFileMaxSize(field)
+      const extensions = getFileExtensions(field)
+      const fileValidator = mixed<File>()
+        .test('file-size', 'File is too large', (value) => {
+          if (!maxSize || !isFileValue(value)) return true
+
+          return value.size <= maxSize
+        })
+        .test('file-extension', 'File type is not allowed', (value) => {
+          if (!extensions.length || !isFileValue(value)) return true
+          const extension = value.name.split('.').pop()?.toLowerCase() ?? ''
+
+          return extensions.includes(extension)
+        })
+
+      shape[key] = multipleFiles
+        ? array()
+            .of(fileValidator)
+            .when([], {
+              is: () => isRequired,
+              then: (schema) => schema.min(1, requiredError),
+            })
+        : fileValidator.when([], {
+            is: () => isRequired,
+            then: (schema) => schema.required(requiredError),
+          })
       continue
     }
 

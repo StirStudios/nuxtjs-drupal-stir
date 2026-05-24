@@ -20,17 +20,17 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="isCheckingLink || !linkValid"
-      class="bg-default w-full rounded-lg shadow-lg"
+      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
     >
-      <UAlert
-        :color="isCheckingLink ? 'neutral' : 'warning'"
+      <AuthStatusPanel
         :description="linkMessage"
         :icon="isCheckingLink ? 'i-lucide-loader-circle' : 'i-lucide-triangle-alert'"
+        :loading="isCheckingLink"
         :title="isCheckingLink ? 'Checking reset link' : 'Reset link unavailable'"
-        variant="soft"
+        :tone="isCheckingLink ? 'neutral' : 'warning'"
       />
       <template #footer>
-        <div class="text-sm text-center">
+        <div class="text-center text-sm text-muted">
           <ULink class="text-primary" to="/auth/password/request"
             >Request a new reset link</ULink
           >

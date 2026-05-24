@@ -44,6 +44,8 @@ export const usePopupBehavior = ({
   let delayTimer: ReturnType<typeof setTimeout> | null = null
   let stopScrollWatch: (() => void) | null = null
   let onExitIntent: ((event: MouseEvent) => void) | null = null
+  let onPointerEnteredDocument: (() => void) | null = null
+  let hasPointerEnteredDocument = false
   let idleTimer: ReturnType<typeof setTimeout> | null = null
   let removeReadyListeners: (() => void) | null = null
 
@@ -62,6 +64,13 @@ export const usePopupBehavior = ({
       document.removeEventListener('mouseout', onExitIntent)
       onExitIntent = null
     }
+
+    if (onPointerEnteredDocument && import.meta.client) {
+      document.removeEventListener('mousemove', onPointerEnteredDocument)
+      onPointerEnteredDocument = null
+    }
+
+    hasPointerEnteredDocument = false
   }
 
   const cleanupReadyHandlers = () => {
@@ -170,13 +179,18 @@ export const usePopupBehavior = ({
     }
 
     if (config.value.trigger === 'exit') {
+      onPointerEnteredDocument = () => {
+        hasPointerEnteredDocument = true
+      }
+
       onExitIntent = (e: MouseEvent) => {
-        if (e.clientY <= 0 && !e.relatedTarget) {
+        if (hasPointerEnteredDocument && e.clientY <= 0 && !e.relatedTarget) {
           showModalOnce()
           cleanupTriggerHandlers()
         }
       }
 
+      document.addEventListener('mousemove', onPointerEnteredDocument, { once: true, passive: true })
       document.addEventListener('mouseout', onExitIntent)
     }
   }
