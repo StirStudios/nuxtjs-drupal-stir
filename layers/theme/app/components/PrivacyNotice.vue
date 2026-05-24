@@ -1,4 +1,13 @@
 <script setup lang="ts">
+type PrivacyNoticeLink = {
+  label?: string
+  title?: string
+  text?: string
+  url?: string
+  href?: string
+  to?: string
+}
+
 const appConfig = useAppConfig()
 const route = useRoute()
 const open = ref(false)
@@ -11,12 +20,20 @@ const consent = useCookie<boolean | string>('cookie_consent', {
 const isConsentMode = computed(() => config.value?.mode === 'consent')
 const isDismissible = computed(() => config.value?.dismissible !== false)
 const primaryButtonLabel = computed(() =>
-  config.value?.buttonLabel || (isConsentMode.value ? 'Accept' : 'Got it'),
+  config.value?.buttonLabel || (isConsentMode.value ? 'Accept all' : 'Got it'),
 )
-const declineButtonLabel = computed(() => config.value?.declineButtonLabel || 'Decline')
+const declineButtonLabel = computed(() =>
+  config.value?.declineButtonLabel || (isConsentMode.value ? 'Reject all' : 'Decline'),
+)
 const hasDecision = computed(() =>
   consent.value === true ||
   (typeof consent.value === 'string' && consent.value.length > 0),
+)
+const noticeTermsUrl = computed(() =>
+  config.value?.cookiePolicyUrl ? '' : config.value?.termsUrl,
+)
+const hasPolicyLinks = computed(() =>
+  Boolean(noticeTermsUrl.value || config.value?.privacyUrl || config.value?.cookiePolicyUrl),
 )
 
 const isConfigured = computed(() => {
@@ -51,10 +68,29 @@ function dismiss() {
   setDecision(isConsentMode.value ? 'declined' : 'dismissed')
 }
 
+function toRoutePath(url: string) {
+  try {
+    return new URL(url, 'https://example.com').pathname
+  } catch {
+    return url
+  }
+}
+
 const ignorePaths = computed(() =>
-  [config.value?.termsUrl, config.value?.privacyUrl].filter(
-    (path): path is string => typeof path === 'string' && path.length > 0,
-  ),
+  [
+    config.value?.termsUrl,
+    config.value?.privacyUrl,
+    config.value?.cookieConsentUrl,
+    config.value?.cookiePolicyUrl,
+    ...(config.value?.links || []).map((link: PrivacyNoticeLink) =>
+      link.url || link.href || link.to,
+    ),
+    ...(config.value?.legalLinks || []).map((link: PrivacyNoticeLink) =>
+      link.url || link.href || link.to,
+    ),
+  ]
+    .filter((url): url is string => typeof url === 'string' && url.length > 0)
+    .map((url) => toRoutePath(url)),
 )
 
 const positionClass = computed(() => {
@@ -146,18 +182,20 @@ watchEffect(() => {
 
       <p class="text-default">{{ noticeMessage }}</p>
 
-      <p v-if="isConfigured && (config.termsUrl || config.privacyUrl)" class="text-default">
+      <p v-if="isConfigured && hasPolicyLinks" class="text-default">
         {{ config.messageLinks }}
         <ULink
-          v-if="config.termsUrl"
+          v-if="noticeTermsUrl"
           class="text-primary underline"
           rel="noopener noreferrer"
           target="_blank"
-          :to="config.termsUrl"
+          :to="noticeTermsUrl"
         >
           Terms of Service
         </ULink>
-        <span v-if="config.termsUrl && config.privacyUrl" class="mx-1">and</span>
+        <span v-if="noticeTermsUrl && (config.privacyUrl || config.cookiePolicyUrl)">
+          and
+        </span>
         <ULink
           v-if="config.privacyUrl"
           class="text-primary underline"
@@ -167,10 +205,19 @@ watchEffect(() => {
         >
           Privacy Policy
         </ULink>
-        .
+        <span v-if="config.privacyUrl && config.cookiePolicyUrl"> and </span>
+        <ULink
+          v-if="config.cookiePolicyUrl"
+          class="text-primary underline"
+          rel="noopener noreferrer"
+          target="_blank"
+          :to="config.cookiePolicyUrl"
+        >
+          Cookie Policy
+        </ULink>
       </p>
 
-      <div v-if="isConfigured" class="flex justify-end gap-2">
+      <div v-if="isConfigured" class="flex justify-end gap-2 pt-2">
         <UButton
           v-if="isConsentMode"
           color="neutral"
