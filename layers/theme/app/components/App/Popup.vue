@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineAsyncComponent, resolveComponent } from 'vue'
+import * as componentRegistry from '#components'
+import { defineAsyncComponent } from 'vue'
+import type { Component } from 'vue'
 import type { WebformDefinition } from '~/types'
 
 const appConfig = useAppConfig()
@@ -26,6 +28,7 @@ type PopupProps = {
 }
 
 type PopupMedia = Record<string, unknown>
+const popupComponents = componentRegistry as unknown as Record<string, Component | undefined>
 
 function getPopupProps(node: PopupNode | null): PopupProps {
   if (!node?.props || typeof node.props !== 'object') return {}
@@ -75,11 +78,7 @@ const popupComponent = computed(() => {
     return LazyParagraphPopup
   }
 
-  const resolvedComponent = resolveComponent(componentName)
-
-  return typeof resolvedComponent === 'string'
-    ? LazyParagraphPopup
-    : resolvedComponent
+  return popupComponents[componentName] ?? LazyParagraphPopup
 })
 const popupRenderProps = computed(() => {
   const { id, uuid, parentUuid, region, text, webform, editLink, direction } =
