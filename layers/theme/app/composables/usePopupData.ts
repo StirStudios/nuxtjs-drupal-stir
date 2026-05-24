@@ -154,26 +154,26 @@ function findPopupInDecoupledBlocks(decoupled: unknown, routePath: string): Popu
   return null
 }
 
-function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
-  if (content) {
-    if (Array.isArray(content) && content.length) {
-      for (const entry of content) {
-        const found = findPopup(entry)
+function findPopupInContent(content: unknown): PopupNode | null {
+  if (!content) return null
 
-        if (found) {
-          return found
-        }
-      }
-    } else {
-      const found = findPopup(content)
+  if (Array.isArray(content) && content.length) {
+    for (const entry of content) {
+      const found = findPopup(entry)
 
       if (found) {
         return found
       }
     }
+
+    return null
   }
 
-  return findPopupInDecoupledBlocks(decoupled, routePath)
+  return findPopup(content)
+}
+
+function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
+  return findPopupInDecoupledBlocks(decoupled, routePath) || findPopupInContent(content)
 }
 
 function normalizePopupRoutePath(path: string): string {
