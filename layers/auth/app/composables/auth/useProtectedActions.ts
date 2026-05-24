@@ -1,15 +1,15 @@
 import { useAuthApi } from './useAuthApi'
-import { useAuthSession } from './useAuthSession'
+import { useProtectedSession } from './useProtectedSession'
 
 export function useProtectedActions() {
   const authApi = useAuthApi()
-  const session = useAuthSession()
+  const session = useProtectedSession()
 
   const login = async (password: string) => {
     await authApi.loginProtected(password)
     await session.fetchSession()
 
-    return session.protectedLoggedIn.value
+    return session.loggedIn.value
   }
 
   const logout = async () => {
