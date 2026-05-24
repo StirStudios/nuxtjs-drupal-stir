@@ -6,6 +6,8 @@ export type PopupNode = {
 
 type UnknownRecord = Record<string, unknown>
 
+type VisibilityMode = 'show' | 'hide'
+
 type PopupPagePayload = {
   content?: unknown
   blocks?: {
@@ -49,30 +51,110 @@ function findPopup(node: unknown): PopupNode | null {
   return null
 }
 
-function findPopupInDecoupledBlocks(decoupled: unknown): PopupNode | null {
-  if (!isRecord(decoupled)) return null
+function normalizeVisibilityRoutePath(path: string): string {
+  if (!path || path === '/') return '/'
 
-  for (const block of Object.values(decoupled)) {
-    if (!isRecord(block)) continue
+  return `/${path.replace(/^\/+/, '').replace(/\/+$/, '')}`
+}
 
-    const paragraphBlocks = (block.slots as Record<string, unknown> | undefined)
-      ?.paragraphBlock
+function normalizeVisibilityPattern(pattern: string): string {
+  const trimmed = pattern.trim()
 
-    if (!Array.isArray(paragraphBlocks)) continue
+  if (!trimmed || trimmed === '<front>') return trimmed
 
-    for (const entry of paragraphBlocks) {
-      const found = findPopup(entry)
+  return `/${trimmed.replace(/^\/+/, '').replace(/\/+$/, '')}`
+}
 
-      if (found) {
-        return found
+function visibilityPatternMatches(pattern: string, routePath: string): boolean {
+  const normalizedPattern = normalizeVisibilityPattern(pattern)
+
+  if (normalizedPattern === '<front>') {
+    return routePath === '/'
+  }
+
+  if (!normalizedPattern) return false
+
+  const expression = normalizedPattern
+    .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*/g, '.*')
+
+  return new RegExp(`^${expression}$`).test(routePath)
+}
+
+function getRequestPathVisibility(block: UnknownRecord): { mode: VisibilityMode, paths: string[] } | null {
+  const props = block.props
+
+  if (!isRecord(props) || !isRecord(props.visibility)) return null
+
+  const requestPath = props.visibility.requestPath
+
+  if (!isRecord(requestPath)) return null
+
+  const mode = requestPath.mode === 'hide' ? 'hide' : 'show'
+  const paths = Array.isArray(requestPath.paths)
+    ? requestPath.paths.filter((path): path is string => typeof path === 'string' && path.trim() !== '')
+    : []
+
+  if (!paths.length) return null
+
+  return { mode, paths }
+}
+
+function blockAllowsRoute(block: UnknownRecord, routePath: string): boolean {
+  const visibility = getRequestPathVisibility(block)
+
+  if (!visibility) return true
+
+  const normalizedRoutePath = normalizeVisibilityRoutePath(routePath)
+  const matches = visibility.paths.some(path => visibilityPatternMatches(path, normalizedRoutePath))
+
+  return visibility.mode === 'hide' ? !matches : matches
+}
+
+function findPopupInDecoupledBlocks(decoupled: unknown, routePath: string): PopupNode | null {
+  const stack: unknown[] = [decoupled]
+
+  while (stack.length) {
+    const current = stack.pop()
+
+    if (Array.isArray(current)) {
+      for (let i = current.length - 1; i >= 0; i--) {
+        stack.push(current[i])
       }
+      continue
+    }
+
+    if (!isRecord(current)) continue
+
+    const slots = current.slots
+
+    if (isRecord(slots)) {
+      if (!blockAllowsRoute(current, routePath)) {
+        continue
+      }
+
+      const paragraphBlocks = slots.paragraphBlock
+
+      if (Array.isArray(paragraphBlocks)) {
+        for (const entry of paragraphBlocks) {
+          const found = findPopup(entry)
+
+          if (found) {
+            return found
+          }
+        }
+      }
+    }
+
+    for (const value of Object.values(current)) {
+      stack.push(value)
     }
   }
 
   return null
 }
 
-function findPopupInSources(content: unknown, decoupled: unknown): PopupNode | null {
+function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
   if (content) {
     if (Array.isArray(content) && content.length) {
       for (const entry of content) {
@@ -91,7 +173,7 @@ function findPopupInSources(content: unknown, decoupled: unknown): PopupNode | n
     }
   }
 
-  return findPopupInDecoupledBlocks(decoupled)
+  return findPopupInDecoupledBlocks(decoupled, routePath)
 }
 
 function normalizePopupRoutePath(path: string): string {
@@ -111,11 +193,12 @@ export const usePopupData = () => {
 
   const contentSource = computed(() => page.value?.content)
   const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+  const routePath = computed(() => route.path || '/')
   const pagePopup = computed(() => findPopupInSources(
     contentSource.value,
     decoupledSource.value,
+    routePath.value,
   ))
-  const routePath = computed(() => route.path || '/')
 
   async function loadFallbackPopup(path: string) {
     if (!import.meta.client) return
@@ -145,6 +228,7 @@ export const usePopupData = () => {
       fallbackPopup.value = findPopupInSources(
         fallbackPage?.content,
         fallbackPage?.blocks?.decoupled,
+        path,
       )
     } catch {
       if (requestId === fallbackRequestId) {
