@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { drupalApiRequest } from '../../utils/drupalApi'
+import { drupalApiRequest } from '../utils/drupalApi'
 
 type LayoutBlocksResponse = {
   blocks?: Record<string, unknown>
