@@ -172,6 +172,10 @@ function findPopupInContent(content: unknown): PopupNode | null {
   return findPopup(content)
 }
 
+function hasDecoupledBlocks(decoupled: unknown): boolean {
+  return isRecord(decoupled) && Object.keys(decoupled).length > 0
+}
+
 function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
   return findPopupInDecoupledBlocks(decoupled, routePath) || findPopupInContent(content)
 }
@@ -193,6 +197,7 @@ export const usePopupData = () => {
 
   const contentSource = computed(() => page.value?.content)
   const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+  const hasPageDecoupledBlocks = computed(() => hasDecoupledBlocks(decoupledSource.value))
   const routePath = computed(() => route.path || '/')
   const pagePopup = computed(() => findPopupInSources(
     contentSource.value,
@@ -246,9 +251,9 @@ export const usePopupData = () => {
   )
 
   watch(
-    [pagePopup, routePath],
-    ([currentPagePopup, path]) => {
-      if (currentPagePopup) {
+    [pagePopup, routePath, hasPageDecoupledBlocks],
+    ([currentPagePopup, path, currentHasPageDecoupledBlocks]) => {
+      if (currentPagePopup || currentHasPageDecoupledBlocks) {
         fallbackPopup.value = null
         fallbackPath.value = null
         fallbackRequestId++
