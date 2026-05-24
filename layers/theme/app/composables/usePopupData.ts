@@ -186,6 +186,18 @@ function normalizePopupRoutePath(path: string): string {
   return path.replace(/^\/+/, '').replace(/\/+$/, '')
 }
 
+function stringSetting(...values: unknown[]): string | undefined {
+  return values.find((value): value is string => typeof value === 'string')
+}
+
+function numberSetting(...values: unknown[]): number | undefined {
+  return values.find((value): value is number => typeof value === 'number' && Number.isFinite(value))
+}
+
+function booleanSetting(...values: unknown[]): boolean | undefined {
+  return values.find((value): value is boolean => typeof value === 'boolean')
+}
+
 export const usePopupData = () => {
   const { getPage } = useDrupalCe()
   const page = getPage()
@@ -267,20 +279,26 @@ export const usePopupData = () => {
 
   const config = computed(() => {
     const p = popup.value?.props ?? {}
+    const trigger = stringSetting(p.popupTrigger, p.popup_trigger)
+    const delay = numberSetting(p.popupDelay, p.popup_delay)
+    const showOnce = booleanSetting(p.popupOnce, p.popup_once)
+    const scrollThreshold = numberSetting(
+      p.popupThreshold,
+      p.popupScrollThreshold,
+      p.popup_threshold,
+      p.popup_scroll_threshold,
+    )
 
     return {
       trigger:
-        p.popupTrigger === 'delay' ||
-        p.popupTrigger === 'scroll' ||
-        p.popupTrigger === 'exit'
-          ? p.popupTrigger
+        trigger === 'delay' ||
+        trigger === 'scroll' ||
+        trigger === 'exit'
+          ? trigger
           : 'delay',
-      delay: typeof p.popupDelay === 'number' ? p.popupDelay : 100,
-      showOnce: p.popupOnce === true,
-      scrollThreshold:
-        typeof p.popupScrollThreshold === 'number'
-          ? p.popupScrollThreshold
-          : 0.25,
+      delay: delay ?? 100,
+      showOnce: showOnce === true,
+      scrollThreshold: scrollThreshold ?? 0.25,
     }
   })
 
