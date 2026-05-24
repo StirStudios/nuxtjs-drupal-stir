@@ -6,6 +6,13 @@ export type PopupNode = {
 
 type UnknownRecord = Record<string, unknown>
 
+type PopupPagePayload = {
+  content?: unknown
+  blocks?: {
+    decoupled?: unknown
+  }
+}
+
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null
 }
@@ -42,53 +49,132 @@ function findPopup(node: unknown): PopupNode | null {
   return null
 }
 
-export const usePopupData = () => {
-  const { getPage } = useDrupalCe()
-  const page = getPage()
-  const popup = ref<PopupNode | null>(null)
+function findPopupInDecoupledBlocks(decoupled: unknown): PopupNode | null {
+  if (!isRecord(decoupled)) return null
 
-  const contentSource = computed(() => page.value?.content)
-  const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+  for (const block of Object.values(decoupled)) {
+    if (!isRecord(block)) continue
 
-  watch([contentSource, decoupledSource], ([content, decoupled]) => {
-    popup.value = null
+    const paragraphBlocks = (block.slots as Record<string, unknown> | undefined)
+      ?.paragraphBlock
 
-    if (content) {
-      if (Array.isArray(content) && content.length) {
-        for (const entry of content) {
-          const found = findPopup(entry)
+    if (!Array.isArray(paragraphBlocks)) continue
 
-          if (found) {
-            popup.value = found
-            break
-          }
-        }
-      } else {
-        popup.value = findPopup(content)
+    for (const entry of paragraphBlocks) {
+      const found = findPopup(entry)
+
+      if (found) {
+        return found
       }
     }
+  }
 
-    if (popup.value) return
-    if (!isRecord(decoupled)) return
+  return null
+}
 
-    Object.values(decoupled).forEach((block) => {
-      if (popup.value) return
-      if (!isRecord(block)) return
-      const paragraphBlocks = (block.slots as Record<string, unknown>)
-        ?.paragraphBlock
-
-      if (!Array.isArray(paragraphBlocks)) return
-
-      for (const entry of paragraphBlocks) {
+function findPopupInSources(content: unknown, decoupled: unknown): PopupNode | null {
+  if (content) {
+    if (Array.isArray(content) && content.length) {
+      for (const entry of content) {
         const found = findPopup(entry)
 
         if (found) {
-          popup.value = found
-          break
+          return found
         }
       }
-    })
-  }, { immediate: true })
+    } else {
+      const found = findPopup(content)
+
+      if (found) {
+        return found
+      }
+    }
+  }
+
+  return findPopupInDecoupledBlocks(decoupled)
+}
+
+function normalizePopupRoutePath(path: string): string {
+  if (!path || path === '/') return ''
+
+  return path.replace(/^\/+/, '').replace(/\/+$/, '')
+}
+
+export const usePopupData = () => {
+  const { getPage } = useDrupalCe()
+  const page = getPage()
+  const route = useRoute()
+  const popup = ref<PopupNode | null>(null)
+  const fallbackPopup = ref<PopupNode | null>(null)
+  const fallbackPath = ref<string | null>(null)
+  let fallbackRequestId = 0
+
+  const contentSource = computed(() => page.value?.content)
+  const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+  const pagePopup = computed(() => findPopupInSources(
+    contentSource.value,
+    decoupledSource.value,
+  ))
+  const routePath = computed(() => route.path || '/')
+
+  async function loadFallbackPopup(path: string) {
+    if (!import.meta.client) return
+
+    const normalizedPath = normalizePopupRoutePath(path)
+
+    if (fallbackPath.value === normalizedPath) return
+
+    fallbackPath.value = normalizedPath
+    fallbackPopup.value = null
+
+    const requestId = ++fallbackRequestId
+
+    try {
+      const fallbackPage = await $fetch<PopupPagePayload>(
+        normalizedPath ? `/api/drupal-ce/${normalizedPath}` : '/api/drupal-ce',
+        {
+          ignoreResponseError: true,
+          query: {
+            _content_format: 'json',
+          },
+        },
+      )
+
+      if (requestId !== fallbackRequestId) return
+
+      fallbackPopup.value = findPopupInSources(
+        fallbackPage?.content,
+        fallbackPage?.blocks?.decoupled,
+      )
+    } catch {
+      if (requestId === fallbackRequestId) {
+        fallbackPopup.value = null
+      }
+    }
+  }
+
+  watch(
+    [pagePopup, fallbackPopup],
+    ([currentPagePopup, currentFallbackPopup]) => {
+      popup.value = currentPagePopup || currentFallbackPopup || null
+    },
+    { immediate: true },
+  )
+
+  watch(
+    [pagePopup, routePath],
+    ([currentPagePopup, path]) => {
+      if (currentPagePopup) {
+        fallbackPopup.value = null
+        fallbackPath.value = null
+        fallbackRequestId++
+        return
+      }
+
+      void loadFallbackPopup(path)
+    },
+    { immediate: true },
+  )
 
   const config = computed(() => {
     const p = popup.value?.props ?? {}

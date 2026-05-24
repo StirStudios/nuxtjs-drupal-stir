@@ -72,6 +72,7 @@ type PrivacyNoticeConfig = {
 
 type PopupConfig = {
   enabled?: boolean
+  component?: string
 } & LooseRecord
 
 type CmsGlobalSeoConfig = {

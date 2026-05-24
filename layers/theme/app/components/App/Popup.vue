@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, resolveComponent } from 'vue'
 import type { WebformDefinition } from '~/types'
 
+const appConfig = useAppConfig()
 const { renderCustomElements } = useDrupalCe()
 const { popup, config } = usePopupData()
 const LazyParagraphPopup = defineAsyncComponent(
@@ -65,6 +66,21 @@ const { open, shouldRenderPopupContent } = usePopupBehavior({
 })
 const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
+const popupComponent = computed(() => {
+  const componentName = typeof appConfig.popup?.component === 'string'
+    ? appConfig.popup.component.trim()
+    : ''
+
+  if (!componentName) {
+    return LazyParagraphPopup
+  }
+
+  const resolvedComponent = resolveComponent(componentName)
+
+  return typeof resolvedComponent === 'string'
+    ? LazyParagraphPopup
+    : resolvedComponent
+})
 const popupRenderProps = computed(() => {
   const { id, uuid, parentUuid, region, text, webform, editLink, direction } =
     popupProps.value
@@ -162,7 +178,8 @@ watch(
             @click="open = false"
           />
 
-          <LazyParagraphPopup
+          <component
+            :is="popupComponent"
             v-if="popupRenderProps"
             v-bind="popupRenderProps"
             :on-close="closeModal"
@@ -173,7 +190,7 @@ watch(
                 v-if="selectedMedia"
               />
             </template>
-          </LazyParagraphPopup>
+          </component>
         </template>
       </template>
     </UModal>
