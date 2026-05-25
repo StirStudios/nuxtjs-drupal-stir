@@ -1,4 +1,43 @@
-import type { ThemeUI } from '@nuxt/ui/composables/useComponentUI'
+type AdminThemeSlots<T extends string> = {
+  slots: Record<T, string>
+}
+
+type AdminUiTheme = {
+  navigationMenu: AdminThemeSlots<
+    | 'root'
+    | 'list'
+    | 'item'
+    | 'link'
+    | 'linkLabel'
+    | 'linkLeadingIcon'
+    | 'linkTrailingIcon'
+    | 'viewport'
+    | 'content'
+    | 'childList'
+    | 'childItem'
+    | 'childLink'
+    | 'childLinkIcon'
+    | 'childLinkLabel'
+  >
+  button: {
+    base: string
+    leadingIcon: string
+    trailingIcon: string
+  }
+  fieldGroup: {
+    base: string
+  }
+  tooltip: AdminThemeSlots<'content' | 'arrow'>
+  editor: {
+    root: string
+    content?: string
+    base?: string
+  }
+  editorToolbar: AdminThemeSlots<'separator'>
+  separator: {
+    base: string
+  }
+}
 
 export const adminUiTheme = {
   navigationMenu: {
@@ -44,4 +83,4 @@ export const adminUiTheme = {
   separator: {
     base: '!bg-[var(--admin-border)]',
   },
-} as const satisfies ThemeUI
+} as const satisfies AdminUiTheme
