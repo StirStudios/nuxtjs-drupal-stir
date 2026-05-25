@@ -39,7 +39,13 @@ type AdminUiTheme = {
     separator: string
   }
   separator: {
-    base: string
+    root?: string
+    border: string
+    container?: string
+    icon?: string
+    avatar?: string
+    avatarSize?: string
+    label?: string
   }
 }
 
@@ -79,6 +85,6 @@ export const adminUiTheme = {
     separator: '!bg-[var(--admin-border)]',
   },
   separator: {
-    base: '!bg-[var(--admin-border)]',
+    border: '!bg-[var(--admin-border)]',
   },
 } as const satisfies AdminUiTheme
