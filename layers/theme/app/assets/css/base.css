@@ -61,8 +61,15 @@
     }
 
     :where(h2, h3, h4) + :where(p, ul, ol, blockquote),
-    > :where(h2, h3, h4) + :where(div) > :where(p, ul, ol, blockquote):first-child {
+    > :where(h2, h3, h4)
+      + :where(div)
+      > :where(p, ul, ol, blockquote):first-child {
       @apply mt-0;
+    }
+
+    :where(ul.list-none),
+    :where(ol.list-none) {
+      @apply m-0;
     }
 
     :where(ul:not(.list-none), ol:not(.list-none)) {
@@ -82,7 +89,7 @@
     }
 
     :where(a) {
-      @apply text-primary underline underline-offset-4 hover:text-primary/80;
+      @apply text-primary hover:text-primary/80 underline underline-offset-4;
     }
   }
 
