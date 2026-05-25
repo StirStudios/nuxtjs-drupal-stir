@@ -18,12 +18,21 @@ export interface VideoPlayer {
 }
 
 type PlayerConstructor = new (iframe: HTMLIFrameElement) => VideoPlayer
+type PlayerJsGlobal = {
+  Player?: PlayerConstructor
+}
 type PlayerEventOptions = {
   enabled?: MaybeRefOrGetter<boolean>
   event: string
   handler: (payload?: unknown, player?: VideoPlayer) => void
   pollIntervalMs?: number
   playerKey: MaybeRefOrGetter<number | string | null | undefined>
+}
+
+declare global {
+  interface Window {
+    playerjs?: PlayerJsGlobal
+  }
 }
 
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())

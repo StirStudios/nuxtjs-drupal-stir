@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -11,6 +12,7 @@ const props = defineProps<{
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 
 const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
   typeof props.field['#composite'] === 'object' &&
@@ -74,7 +76,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         class="w-full"
         :placeholder="useFloatingLabels ? ' ' : ''"
         :ui="useFloatingLabels ? { base: 'peer' } : {}"
-        :variant="webform.variant"
+        :variant="fieldVariant"
       >
         <label
           v-if="useFloatingLabels"
@@ -97,7 +99,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         placeholder="Select Country"
         :portal="portal"
         value-key="value"
-        :variant="webform.variant"
+        :variant="fieldVariant"
       />
     </UFormField>
   </div>

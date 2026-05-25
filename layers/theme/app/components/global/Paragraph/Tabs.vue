@@ -66,7 +66,7 @@ watch(active, async () => {
       list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
       content: 'flex-1 min-w-0',
       trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
-      marker: 'bg-primary',
+      indicator: 'bg-primary',
     }"
     variant="link"
   >

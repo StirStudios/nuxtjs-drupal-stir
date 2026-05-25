@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inputIdInjectionKey } from '@nuxt/ui/composables'
+import type { UiFieldVariant } from '~/utils/nuxtUiProps'
 
 type SelectItem = {
   label: string
@@ -9,7 +10,7 @@ type SelectItem = {
 defineProps<{
   items: SelectItem[]
   placeholder?: string
-  variant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none'
+  variant?: UiFieldVariant
 }>()
 
 const model = defineModel<string>({ required: true })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { cleanHTML } from '~/utils/cleanHTML'
+import { resolveUiColor } from '~/utils/nuxtUiProps'
 
 type UITimelineItem = {
   date?: string
@@ -47,6 +48,7 @@ const timelineItems = computed<UITimelineItem[]>(() =>
 const wrapperClasses = computed(() =>
   ['w-full', props.classes, props.width, props.spacing].filter(Boolean).join(' '),
 )
+const timelineColor = computed(() => resolveUiColor(props.color))
 </script>
 
 <template>
@@ -54,7 +56,7 @@ const wrapperClasses = computed(() =>
     <EditLink :link="editLink" :parent-uuid="parentUuid">
       <UTimeline
         class="max-w-3xl"
-        :color="color ?? 'primary'"
+        :color="timelineColor"
         :default-value="timelineItems.length - 1"
         :items="timelineItems"
       >

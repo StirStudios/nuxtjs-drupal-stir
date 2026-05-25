@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
+import {
+  resolveUiButtonVariant,
+  type UiButtonVariant,
+} from '~/utils/nuxtUiProps'
 
 type ScrollButtonTheme = {
   showAtScrollY?: number
   base?: string
-  variant?: string
+  variant?: UiButtonVariant
   icon?: string
 }
 
@@ -19,7 +23,7 @@ const theme = computed<Required<ScrollButtonTheme>>(() => {
     base:
       configured.base ||
       'fixed right-6 bottom-6 z-40 rounded-full transition-opacity duration-300',
-    variant: configured.variant || 'soft',
+    variant: resolveUiButtonVariant(configured.variant, 'soft'),
     icon: configured.icon || 'i-lucide-chevron-up',
   }
 })

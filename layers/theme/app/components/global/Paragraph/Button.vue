@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import {
+  resolveUiButtonVariant,
+  resolveUiColor,
+  resolveUiSize,
+} from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   id?: number | string
@@ -35,9 +40,9 @@ const theme = useAppConfig().stirTheme
 const linkData = computed(() => props.link || {})
 const isExternal = computed(() => !!linkData.value.external)
 const btnLabel = computed(() => linkData.value.title || 'View link')
-const btnColor = computed(() => props.color || 'primary')
-const btnVariant = computed(() => props.variant || 'solid')
-const btnSize = computed(() => props.size || 'xl')
+const btnColor = computed(() => resolveUiColor(props.color))
+const btnVariant = computed(() => resolveUiButtonVariant(props.variant))
+const btnSize = computed(() => resolveUiSize(props.size, 'xl'))
 const btnBlock = computed(() => props.block ?? false)
 const iconName = computed(() => props.icon || null)
 const slotMedia = computed(() => tk.mediaItems())

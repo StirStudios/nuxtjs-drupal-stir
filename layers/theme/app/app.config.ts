@@ -33,6 +33,7 @@ export default defineAppConfig({
     cookiePolicyUrl: '',
     cookieConsentUrl: '',
     links: [],
+    legalLinks: [],
     buttonLabel: 'Got it',
     declineButtonLabel: 'Decline',
   },

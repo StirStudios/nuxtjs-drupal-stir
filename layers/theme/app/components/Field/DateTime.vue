@@ -4,6 +4,7 @@ import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
 import { generateTimeOptions, getOffsetString } from '~/utils/dateUtils'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -13,6 +14,7 @@ const props = defineProps<{
 
 const { emitFormInput, emitFormChange } = useFormField()
 const { webform } = useAppConfig().stirTheme
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 const multiple = Number(props.field['#multiple']) || 1
 const minTime = String(props.field['#dateTimeMin'] ?? '10:00:00')
 const maxTime = String(props.field['#dateTimeMax'] ?? '22:00:00')
@@ -120,7 +122,7 @@ watch(
             v-model="block.date"
             :label="dateFieldLabel(i)"
             :timezone="siteTimezone"
-            :variant="webform.variant"
+            :variant="fieldVariant"
           />
         </UFormField>
 
@@ -129,7 +131,7 @@ watch(
             v-model="block.start"
             :items="timeOptions"
             placeholder="Select time"
-            :variant="webform.variant"
+            :variant="fieldVariant"
           />
         </UFormField>
       </template>
