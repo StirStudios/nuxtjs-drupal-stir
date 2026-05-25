@@ -58,183 +58,59 @@ figure {
 }
 
 /* Slideover animation system (single source of truth via CSS vars) */
-@keyframes menu-panel-slide-in-right {
+@keyframes stir-menu-panel-in {
   from {
-    transform: translate3d(100%, 0, 0);
+    clip-path: var(--stir-menu-clip-from);
+    transform: translate3d(var(--stir-menu-content-x), 0, 0);
   }
+
   to {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes menu-panel-slide-out-right {
+@keyframes stir-menu-panel-out {
   from {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transform: translate3d(0, 0, 0);
   }
+
   to {
-    transform: translate3d(100%, 0, 0);
+    clip-path: var(--stir-menu-clip-from);
+    transform: translate3d(var(--stir-menu-content-x), 0, 0);
   }
 }
 
-@keyframes menu-panel-slide-in-left {
-  from {
-    transform: translate3d(-100%, 0, 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+[data-slot='content'].stir-menu-panel {
+  --stir-menu-duration: 980ms;
+  --stir-menu-ease-in: cubic-bezier(0.16, 0.72, 0.28, 1);
+  --stir-menu-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
+
+  background: var(--stir-menu-panel-bg, var(--ui-bg));
 }
 
-@keyframes menu-panel-slide-out-left {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-100%, 0, 0);
-  }
+[data-slot='content'].stir-menu-panel[data-state='open'] {
+  animation: stir-menu-panel-in var(--stir-menu-duration)
+    var(--stir-menu-ease-in) both !important;
 }
 
-@keyframes menu-bg-angle-in {
-  from {
-    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
-      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
-      skew(0deg);
-    transform-style: preserve-3d;
-  }
-  to {
-    transform: translate3d(0%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg)
-      rotateY(0deg) rotateZ(0deg) skew(0deg);
-    transform-style: preserve-3d;
-  }
+[data-slot='content'].stir-menu-panel[data-state='closed'] {
+  animation: stir-menu-panel-out var(--stir-menu-duration)
+    var(--stir-menu-ease-out) both !important;
 }
 
-@keyframes menu-bg-angle-out {
-  from {
-    transform: translate3d(0%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg)
-      rotateY(0deg) rotateZ(0deg) skew(0deg);
-    transform-style: preserve-3d;
-  }
-  to {
-    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
-      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
-      skew(0deg);
-    transform-style: preserve-3d;
-  }
+[data-slot='content'].stir-menu-panel [data-slot='header'],
+[data-slot='content'].stir-menu-panel [data-slot='body'] {
+  background: transparent;
 }
 
-@keyframes menu-content-fade-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 8px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+[data-slot='content'].stir-menu-panel[data-side='left'] {
+  --stir-menu-clip-from: polygon(0 0, var(--stir-menu-angle-edge) 0, 0 100%, 0 100%);
+  --stir-menu-content-x: -1.5rem;
 }
 
-@keyframes menu-content-fade-out {
-  from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    opacity: 0;
-    transform: translate3d(0, 6px, 0);
-  }
-}
-
-[data-slot='content'].menu-panel-motion {
-  @apply isolate;
-
-  /* Motion defaults */
-  --menu-angle-offset-x: 175%;
-  --menu-angle-deg: 55deg;
-  --menu-from-x: var(--menu-angle-offset-x);
-  --menu-from-y: 0px;
-  --menu-from-rot: 0deg;
-  --menu-bg-duration: 780ms;
-  --menu-bg-ease-in: cubic-bezier(0.03, 0.9, 0.16, 1);
-  --menu-bg-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
-  --menu-content-duration: 620ms;
-  --menu-content-delay-in: 120ms;
-  --menu-content-delay-out: 0ms;
-  --menu-panel-delay-out: 120ms;
-}
-
-[data-slot='content'].menu-panel-motion[data-side='right'][data-state='open'] {
-  animation: menu-panel-slide-in-right var(--menu-bg-duration)
-    var(--menu-bg-ease-in) both !important;
-}
-
-[data-slot='content'].menu-panel-motion[data-side='right'][data-state='closed'] {
-  animation: menu-panel-slide-out-right var(--menu-bg-duration)
-    var(--menu-bg-ease-out) var(--menu-panel-delay-out) both !important;
-}
-
-[data-slot='content'].menu-panel-motion[data-side='left'][data-state='open'] {
-  animation: menu-panel-slide-in-left var(--menu-bg-duration)
-    var(--menu-bg-ease-in) both !important;
-}
-
-[data-slot='content'].menu-panel-motion[data-side='left'][data-state='closed'] {
-  animation: menu-panel-slide-out-left var(--menu-bg-duration)
-    var(--menu-bg-ease-out) var(--menu-panel-delay-out) both !important;
-}
-
-[data-slot='content'].menu-panel-motion {
-  &::after {
-    content: '';
-    @apply pointer-events-none absolute inset-x-0 -top-[24%] bottom-0 z-0 shadow-lg;
-    background: var(--ui-bg);
-    transform: translate3d(var(--menu-from-x), var(--menu-from-y), 0)
-      scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(var(--menu-from-rot))
-      skew(0deg);
-    transform-style: preserve-3d;
-  }
-
-  > * {
-    @apply relative z-[1];
-  }
-
-  &[data-state='open'] {
-    &::after {
-      animation: menu-bg-angle-in var(--menu-bg-duration) var(--menu-bg-ease-in)
-        both;
-    }
-
-    .app-nav-mobile,
-    [data-slot='header'] {
-      animation: menu-content-fade-in var(--menu-content-duration)
-        var(--menu-bg-ease-in) var(--menu-content-delay-in) both;
-    }
-  }
-
-  &[data-state='closed'] {
-    &::after {
-      animation: menu-bg-angle-out var(--menu-bg-duration)
-        var(--menu-bg-ease-out) both;
-    }
-
-    .app-nav-mobile,
-    [data-slot='header'] {
-      animation: menu-content-fade-out var(--menu-content-duration)
-        var(--menu-bg-ease-out) var(--menu-content-delay-out) both;
-    }
-  }
-}
-
-/* Side selection */
-[data-slot='content'][data-side='left'].menu-panel-motion {
-  --menu-from-x: calc(var(--menu-angle-offset-x) * -1);
-  --menu-from-y: 0px;
-}
-
-/* Variant: angled background motion */
-[data-slot='content'].menu-panel-motion.menu-panel-angle {
-  --menu-from-rot: calc(var(--menu-angle-deg) * -1);
-}
-
-[data-slot='content'][data-side='left'].menu-panel-motion.menu-panel-angle {
-  --menu-from-rot: var(--menu-angle-deg);
+[data-slot='content'].stir-menu-panel[data-side='right'] {
+  --stir-menu-clip-from: polygon(calc(100% - var(--stir-menu-angle-edge)) 0, 100% 0, 100% 100%, 100% 100%);
+  --stir-menu-content-x: 1.5rem;
 }
