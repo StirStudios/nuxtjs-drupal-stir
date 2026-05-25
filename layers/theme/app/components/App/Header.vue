@@ -72,13 +72,15 @@ function menuChildren(item: MainMenuItem): MainMenuItem[] {
   return []
 }
 
-function normalizeInternalPath(value: string) {
-  const path = value.replace(/^internal:/, '').replace(/^base:/, '')
+function normalizeInternalPath(value: string, fragment?: string) {
+  const rawPath = value.replace(/^internal:/, '').replace(/^base:/, '')
+  const path = !rawPath || rawPath === '<front>'
+    ? '/'
+    : rawPath.startsWith('/') ? rawPath : `/${rawPath}`
+  const [basePath, existingFragment] = path.split('#')
+  const finalFragment = existingFragment || fragment?.replace(/^#/, '').trim()
 
-  if (!path || path === '<front>') return '/'
-  if (path.startsWith('/')) return path
-
-  return `/${path}`
+  return finalFragment ? `${basePath}#${finalFragment}` : basePath
 }
 
 function menuItemTo(item: MainMenuItem) {
@@ -92,9 +94,7 @@ function menuItemTo(item: MainMenuItem) {
     return value
   }
 
-  const path = normalizeInternalPath(value)
-
-  return `${path}${item.options?.fragment ? `#${item.options.fragment}` : ''}`
+  return normalizeInternalPath(value, item.options?.fragment)
 }
 
 function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
