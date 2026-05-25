@@ -1,5 +1,3 @@
-export {}
-
 type NodeBufferLike = {
   length: number
   toString(encoding?: string): string
@@ -7,7 +5,10 @@ type NodeBufferLike = {
 
 declare module 'node:buffer' {
   export const Buffer: {
-    from(value: string, encoding?: string): NodeBufferLike
+    from(
+      value: string,
+      encoding?: string,
+    ): NodeBufferLike
     from(value: ArrayBuffer | ArrayBufferView | ArrayLike<number>): NodeBufferLike
   }
 }
@@ -21,7 +22,7 @@ declare module 'node:crypto' {
 
   export function createHmac(
     algorithm: string,
-    secret: string | ArrayBuffer | ArrayBufferView | ArrayLike<number> | NodeBufferLike,
+    secret: string | { toString?(): string } | ArrayBuffer | ArrayBufferView | ArrayLike<number>,
   ): NodeCryptoHash
   export function timingSafeEqual(a: NodeBufferLike, b: NodeBufferLike): boolean
 }
