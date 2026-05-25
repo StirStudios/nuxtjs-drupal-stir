@@ -117,11 +117,6 @@ type MainMenuItem = {
   }
 }
 
-type MenuToLocation = {
-  path: string
-  hash: string
-}
-
 function menuChildren(item: MainMenuItem): MainMenuItem[] {
   if (Array.isArray(item.children)) return item.children
   if (Array.isArray(item.below)) return item.below
@@ -130,30 +125,53 @@ function menuChildren(item: MainMenuItem): MainMenuItem[] {
   return []
 }
 
-function normalizeInternalPath(value: string, fragment?: string): string | MenuToLocation {
-  const sanitizedValue = value.replace(/^internal:/, '').replace(/^base:/, '')
-  const [rawValue, embeddedFragment] = sanitizedValue.split('#', 2)
+function sanitizeMenuPath(value: string): string {
+  return value.replace(/^internal:/, '').replace(/^base:/, '')
+}
+
+function normalizeInternalPath(value: string, fragment?: string): string {
+  const [rawValue, embeddedFragment] = sanitizeMenuPath(value).split('#', 2)
   const rawPath = rawValue
   const path = !rawPath || rawPath === '<front>'
     ? '/'
     : rawPath.startsWith('/') ? rawPath : `/${rawPath}`
-  const finalFragment = embeddedFragment || fragment?.replace(/^#/, '').trim()
+  const finalFragment = embeddedFragment || fragment
 
-  return finalFragment ? { path, hash: `#${finalFragment}` } : path
+  return finalFragment ? `${path}#${finalFragment}` : path
 }
 
 function menuItemTo(item: MainMenuItem) {
+  const value = String(
+    item.relative || item.alias || item.uri || item.url || item.absolute || '',
+  )
+  const normalizedValue = sanitizeMenuPath(value)
+  const fragment = item.options?.fragment?.replace(/^#/, '').trim()
+
+  const toWithFragment = (path: string, existingHash?: string): string => {
+    const nextFragment = (existingHash || fragment)?.trim()
+
+    if (!nextFragment || path.includes('#')) {
+      return path
+    }
+
+    return `${path}#${nextFragment}`
+  }
+
   if (item.external) {
-    return String(item.absolute || item.url || item.uri || '')
+    return toWithFragment(value, fragment)
   }
 
-  const value = String(item.relative || item.alias || item.uri || item.url || '')
+  if (/^https?:\/\//.test(normalizedValue)) {
+    const parsed = new URL(normalizedValue)
 
-  if (/^https?:\/\//.test(value) || value.startsWith('mailto:') || value.startsWith('tel:')) {
-    return value
+    return toWithFragment(`${parsed.pathname}${parsed.search}`, parsed.hash.replace(/^#/, ''))
   }
 
-  return normalizeInternalPath(value, item.options?.fragment)
+  if (normalizedValue.startsWith('mailto:') || normalizedValue.startsWith('tel:')) {
+    return toWithFragment(normalizedValue, fragment)
+  }
+
+  return normalizeInternalPath(normalizedValue, fragment)
 }
 
 function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
