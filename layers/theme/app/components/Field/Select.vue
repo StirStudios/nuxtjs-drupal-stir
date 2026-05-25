@@ -2,6 +2,10 @@
 import type { WebformFieldProps } from '~/types'
 import { useEventBus } from '@vueuse/core'
 import { transformOptions } from '~/utils/transformUtils'
+import {
+  resolveUiButtonVariant,
+  resolveUiFieldVariant,
+} from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field?: WebformFieldProps
@@ -13,6 +17,8 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
+const buttonVariant = computed(() => resolveUiButtonVariant(webform.variant, 'outline'))
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 
 const getDefaultValue = () => {
   const value = props.field?.['#defaultValue']
@@ -62,7 +68,7 @@ const handleButtonClick = (value: string) => {
         active-color="primary"
         active-variant="solid"
         :label="item.label"
-        :variant="webform.variant"
+        :variant="buttonVariant"
         @click="handleButtonClick(item.value)"
       />
     </div>
@@ -74,6 +80,6 @@ const handleButtonClick = (value: string) => {
     :items="selectItems"
     :placeholder="placeholder || 'Select'"
     :portal="portal"
-    :variant="webform.variant"
+    :variant="fieldVariant"
   />
 </template>

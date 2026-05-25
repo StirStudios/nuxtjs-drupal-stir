@@ -2,6 +2,7 @@
 import type { WebformFieldProps } from '~/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables'
 import { clampNumberToBounds } from '~/utils/formInputUtils'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -12,6 +13,7 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
@@ -108,6 +110,6 @@ const modelValue = computed<number | undefined>({
     name=""
     :placeholder="placeholder"
     :step="stepValue"
-    :variant="webform.variant"
+    :variant="fieldVariant"
   />
 </template>

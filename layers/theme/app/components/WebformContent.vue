@@ -2,6 +2,18 @@
 import type { WebformFieldProps, WebformState } from '~/types'
 import type { ObjectSchema } from 'yup'
 import { cleanHTML } from '~/utils/cleanHTML'
+import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
+
+type WebformThemeConfig = {
+  buttonSize?: unknown
+  fieldGroup?: string
+  fieldGroupHeader?: string
+  response?: string
+  spacing?: string
+  spacingLarge?: string
+  submitAlign?: string
+  variant?: string
+}
 
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>
@@ -11,7 +23,7 @@ const props = defineProps<{
   isLoading: boolean
   isSchemaReady: boolean
   orderedFieldNames: string[]
-  themeWebform: Record<string, string>
+  themeWebform: WebformThemeConfig
   groupedFields: Record<string, string[]>
   shouldRenderGroupContainer: (fieldName: string) => boolean
   shouldRenderIndividualField: (fieldName: string) => boolean
@@ -32,14 +44,8 @@ const emit = defineEmits<{
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const safeHtml = (value?: string) => cleanHTML(value ?? '')
-const buttonSize = computed<'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | undefined>(
-  () => {
-    const size = props.themeWebform.buttonSize
-
-    return typeof size === 'string' && ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].includes(size)
-      ? (size as 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl')
-      : undefined
-  },
+const buttonSize = computed<UiSize>(() =>
+  resolveUiSize(props.themeWebform.buttonSize, 'md'),
 )
 </script>
 

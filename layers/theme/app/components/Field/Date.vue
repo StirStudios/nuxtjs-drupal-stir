@@ -5,6 +5,7 @@ import {
   DateFormatter,
   getLocalTimeZone,
 } from '@internationalized/date'
+import { resolveUiButtonVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -16,6 +17,7 @@ const { emitFormInput, emitFormChange } = useFormField()
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.variant === 'material')
+const buttonVariant = computed(() => resolveUiButtonVariant(webform.variant, 'outline'))
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = Number(props.field['#multiple']) || 1
 
@@ -92,7 +94,7 @@ const calendarModel = computed({
     :class="{ 'w-full': isMaterial }"
     :portal="portal"
   >
-    <UButton icon="i-lucide-calendar" size="md" :variant="webform.variant">
+    <UButton icon="i-lucide-calendar" size="md" :variant="buttonVariant">
       <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}
     </UButton>

@@ -15,7 +15,7 @@ const hideToggle = computed(() =>
   <ClientOnly v-if="!hideToggle">
     <UButton
       aria-label="Theme"
-      color="black"
+      color="neutral"
       :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
       size="lg"
       variant="ghost"

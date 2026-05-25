@@ -21,10 +21,14 @@ export default defineNuxtPlugin(() => {
   if (!cfg.enabled || !cfg.account) return
   if (document.getElementById('userway-widget')) return
 
+  const widgetSize = ['small', 'medium', 'large'].includes(String(cfg.size))
+    ? (cfg.size as 'small' | 'medium' | 'large')
+    : 'small'
+
   window._userway_config = {
     account: cfg.account,
     position: cfg.position ?? 3,
-    size: cfg.size ?? 'small',
+    size: widgetSize,
     color: cfg.color ?? '#ffffff',
     type: cfg.type ?? '1',
   }

@@ -7,6 +7,7 @@ import {
   shouldPreventTelKeydown,
   telPattern,
 } from '~/utils/formInputUtils'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -17,6 +18,7 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
@@ -97,7 +99,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
     :step="isNumber ? field['#step'] || 1 : undefined"
     :type="inputType"
     :ui="floatingLabel ? { base: 'peer' } : {}"
-    :variant="webform.variant"
+    :variant="fieldVariant"
     @beforeinput="handleTelBeforeInput"
     @keydown="handleTelKeydown"
     @update:model-value="updateFieldValue"

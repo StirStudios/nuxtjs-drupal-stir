@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
 import { transformOptions } from '~/utils/transformUtils'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -10,6 +11,7 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 const selectItems = computed(() => transformOptions(props.field['#options'] || {}) as Array<Record<string, unknown>>)
 const handleSelectUpdate = (value: unknown) => {
   props.state[props.fieldName] = String(
@@ -31,7 +33,7 @@ onMounted(() => {
     :model-value="state[fieldName] as never"
     placeholder="Select"
     :portal="portal"
-    :variant="webform.variant"
+    :variant="fieldVariant"
     @update:model-value="handleSelectUpdate"
   />
 </template>

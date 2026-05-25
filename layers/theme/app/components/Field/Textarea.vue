@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables'
+import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -11,6 +12,7 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const isMaterial = computed(() => webform.variant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const id = computed(() => injectedInputId?.value ?? props.fieldName)
 </script>
@@ -24,7 +26,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
     :placeholder="props.floatingLabel ? ' ' : ''"
     :rows="1"
     :ui="props.floatingLabel ? { base: 'peer' } : {}"
-    :variant="webform.variant"
+    :variant="fieldVariant"
   >
     <label
       v-if="props.floatingLabel"

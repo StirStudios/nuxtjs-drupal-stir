@@ -18,37 +18,9 @@ export const adminUiTheme = {
     },
   },
   button: {
-    slots: {
-      base: 'admin-ui-btn-base',
-      leadingIcon: 'text-current',
-      trailingIcon: 'text-current',
-    },
-    defaultVariants: {
-      color: 'neutral',
-      variant: 'soft',
-    },
-    compoundVariants: [
-      {
-        color: 'neutral',
-        variant: 'soft',
-        class: 'admin-ui-btn-neutral admin-ui-btn-soft',
-      },
-      {
-        color: 'neutral',
-        variant: 'outline',
-        class: 'admin-ui-btn-neutral admin-ui-btn-outline',
-      },
-      {
-        color: 'neutral',
-        variant: 'ghost',
-        class: 'admin-ui-btn-neutral admin-ui-btn-ghost',
-      },
-      {
-        color: 'neutral',
-        variant: 'solid',
-        class: 'admin-ui-btn-neutral admin-ui-btn-solid',
-      },
-    ],
+    base: 'admin-ui-btn-base',
+    leadingIcon: 'text-current',
+    trailingIcon: 'text-current',
   },
   fieldGroup: {
     base: 'admin-ui-field-group',

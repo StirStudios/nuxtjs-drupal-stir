@@ -4,6 +4,10 @@ import {
   DateFormatter,
   getLocalTimeZone,
 } from '@internationalized/date'
+import {
+  resolveUiButtonVariant,
+  type UiFieldNoMaterialVariant,
+} from '~/utils/nuxtUiProps'
 
 type DateTimeDate = {
   year: number
@@ -15,7 +19,7 @@ const props = defineProps<{
   label: string
   modelValue: DateTimeDate | null
   timezone: string
-  variant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none'
+  variant?: UiFieldNoMaterialVariant
 }>()
 
 const emit = defineEmits<{
@@ -31,6 +35,7 @@ const df = computed(() =>
   }),
 )
 const popoverOpen = ref(false)
+const buttonVariant = computed(() => resolveUiButtonVariant(props.variant, 'outline'))
 
 const model = computed({
   get: () => props.modelValue,
@@ -63,7 +68,7 @@ const selectedDateLabel = computed(() =>
       class="w-full justify-start"
       icon="i-lucide-calendar"
       size="md"
-      :variant="variant"
+      :variant="buttonVariant"
     >
       <span class="sr-only">{{ label }}:</span>
       {{ selectedDateLabel }}
