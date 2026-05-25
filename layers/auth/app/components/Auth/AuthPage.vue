@@ -49,9 +49,9 @@ const resolveAuthPageKey = (): AuthPageConfigKey | null => {
 
 const resolveAuthPageConfig = (pageKey: AuthPageConfigKey | null): Record<string, unknown> | undefined => {
   if (!pageKey) return undefined
-  const pageConfig = (authConfig as Record<string, Record<string, unknown>>)[pageKey]
+  const pageConfig = (authConfig as Record<string, unknown>)?.[pageKey]
 
-  return pageConfig && typeof pageConfig === 'object' ? pageConfig : undefined
+  return typeof pageConfig === 'object' && pageConfig !== null ? (pageConfig as Record<string, unknown>) : undefined
 }
 
 const pageBackgroundImage = computed(() => {
