@@ -67,9 +67,9 @@
       @apply mt-0;
     }
 
-    :where(ul.list-none),
-    :where(ol.list-none) {
-      @apply m-0;
+    :where(ul.list-none > li),
+    :where(ol.list-none > li) {
+      @apply mt-0;
     }
 
     :where(ul:not(.list-none), ol:not(.list-none)) {
