@@ -20,7 +20,7 @@ type AuthSessionResponse = {
 export default defineEventHandler(async (event) => {
   const secret = layerAuthGetProtectedAccessSecret()
   const protectedAuthenticated = secret
-    ? layerAuthIsProtectedAccessAuthenticated(event, secret)
+    ? await layerAuthIsProtectedAccessAuthenticated(event, secret)
     : false
 
   try {
