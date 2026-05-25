@@ -4,12 +4,13 @@ import {
   layerAuthIsProtectedAccessAuthenticated,
 } from '../../utils/protectedAccess'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const secret = layerAuthGetProtectedAccessSecret()
+  const protectedAuthenticated = secret
+    ? await layerAuthIsProtectedAccessAuthenticated(event, secret)
+    : false
 
   return {
-    protectedAuthenticated: secret
-      ? layerAuthIsProtectedAccessAuthenticated(event, secret)
-      : false,
+    protectedAuthenticated,
   }
 })

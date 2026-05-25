@@ -21,7 +21,7 @@ describe('/api/auth/protected', () => {
 
   it('returns true when the protected access cookie is valid', async () => {
     const secret = 'secret'
-    const token = layerAuthCreateProtectedAccessToken(secret, 60)
+    const token = await layerAuthCreateProtectedAccessToken(secret, 60)
 
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       protectedPassword: secret,

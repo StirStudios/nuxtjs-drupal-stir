@@ -14,6 +14,11 @@ const footerMenu = computed<FooterMenuItem[]>(() => {
 
   return Array.isArray(menu) ? (menu as FooterMenuItem[]) : []
 })
+const footerRights = computed(() => {
+  const rightsValue = (theme.footer as Record<string, unknown>).rights
+
+  return typeof rightsValue === 'string' ? rightsValue : ''
+})
 const footerMenuItems = computed(() =>
   footerMenu.value.map((item) => ({
     label: item.title || '',
@@ -62,8 +67,8 @@ const footerMenuItems = computed(() =>
 
       <p class="mb-0">
         © {{ page.site_info?.name }} {{ currentYear }}. All Rights Reserved.<br />
-        <template v-if="theme.footer.rights">
-          {{ theme.footer.rights }}<br />
+        <template v-if="footerRights">
+          {{ footerRights }}<br />
         </template>
         <template v-if="theme.footer.poweredby">
           Website created & powered by

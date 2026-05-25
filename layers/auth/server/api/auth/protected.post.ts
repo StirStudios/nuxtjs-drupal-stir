@@ -46,9 +46,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  layerAuthSetProtectedAccessCookie(event, secret)
+  await layerAuthSetProtectedAccessCookie(event, secret)
 
   return {
-    protectedAuthenticated: layerAuthIsProtectedAccessAuthenticated(event, secret),
+    protectedAuthenticated: await layerAuthIsProtectedAccessAuthenticated(event, secret),
   }
 })

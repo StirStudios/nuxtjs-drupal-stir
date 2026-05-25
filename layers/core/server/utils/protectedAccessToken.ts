@@ -1,65 +1,98 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-
 type ProtectedAccessPayload = {
   v: 1
   exp: number
 }
 
-const ALGO = 'sha256'
+const ALGO = 'SHA-256'
 const VERSION = 1
 
-const encode = (value: string): string =>
-  Buffer.from(value, 'utf8').toString('base64url')
+const encodeBase64Url = (value: string): string => {
+  const bytes = new TextEncoder().encode(value)
+  let binary = ''
 
-const decode = (value: string): string | null => {
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte)
+  }
+
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+const decodeBase64Url = (value: string): string | null => {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4)
+
   try {
-    return Buffer.from(value, 'base64url').toString('utf8')
+    const binary = atob(padded)
+    const bytes = new Uint8Array(binary.length)
+
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+
+    return new TextDecoder().decode(bytes)
   } catch {
     return null
   }
 }
 
-const sign = (data: string, secret: string): string =>
-  createHmac(ALGO, secret).update(data).digest('base64url')
+const sign = async (data: string, secret: string): Promise<string> => {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: ALGO },
+    false,
+    ['sign'],
+  )
+  const signature = await crypto.subtle.sign(
+    { name: 'HMAC' },
+    key,
+    new TextEncoder().encode(data),
+  )
 
-const equalsSafe = (a: string, b: string): boolean => {
-  const left = Buffer.from(a)
-  const right = Buffer.from(b)
-
-  if (left.length !== right.length) return false
-
-  return timingSafeEqual(left, right)
+  return encodeBase64Url(String.fromCharCode(...new Uint8Array(signature)))
 }
 
-export const createProtectedAccessToken = (
+const equalsSafe = (a: string, b: string): boolean => {
+  if (a.length !== b.length) return false
+
+  let mismatch = 0
+
+  for (let i = 0; i < a.length; i += 1) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+
+  return mismatch === 0
+}
+
+export const createProtectedAccessToken = async (
   secret: string,
   maxAgeSeconds: number,
-): string => {
+): Promise<string> => {
   const payload: ProtectedAccessPayload = {
     v: VERSION,
     exp: Math.floor(Date.now() / 1000) + maxAgeSeconds,
   }
-  const encodedPayload = encode(JSON.stringify(payload))
-  const signature = sign(encodedPayload, secret)
+  const encodedPayload = encodeBase64Url(JSON.stringify(payload))
+  const signature = await sign(encodedPayload, secret)
 
   return `${encodedPayload}.${signature}`
 }
 
-export const verifyProtectedAccessToken = (
+export const verifyProtectedAccessToken = async (
   token: string | undefined,
   secret: string,
-): boolean => {
+): Promise<boolean> => {
   if (!token) return false
 
   const [encodedPayload, receivedSignature] = token.split('.')
 
   if (!encodedPayload || !receivedSignature) return false
 
-  const expectedSignature = sign(encodedPayload, secret)
+  const expectedSignature = await sign(encodedPayload, secret)
 
   if (!equalsSafe(receivedSignature, expectedSignature)) return false
 
-  const decodedPayload = decode(encodedPayload)
+  const decodedPayload = decodeBase64Url(encodedPayload)
 
   if (!decodedPayload) return false
 
