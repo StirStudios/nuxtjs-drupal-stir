@@ -11,33 +11,25 @@ const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
-const slideoverMotionContent = computed(() => {
-  const angleEnabled = Boolean(theme.navigation.slideover?.angle)
+const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
+const menuContent = computed(() => {
+  const slideover = theme.navigation.slideover
+  const angleEnabled = Boolean(slideover?.angle)
 
   if (!angleEnabled) return { 'aria-label': 'Site navigation menu' }
 
-  const className = [
-    'menu-panel-motion menu-panel-angle !bg-transparent !divide-y-0 !ring-0 !shadow-none sm:!ring-0 sm:!shadow-none',
-  ].join(' ')
-
-  const degRaw = Number(theme.navigation.slideover?.angleDeg ?? 55)
-  const offsetRaw = Number(theme.navigation.slideover?.angleOffsetX ?? 175)
-  const angleDeg = Number.isFinite(degRaw) ? degRaw : 55
-  const angleOffsetX = Number.isFinite(offsetRaw) ? offsetRaw : 175
-
-  if (angleDeg === 55 && angleOffsetX === 175) {
-    return {
-      'aria-label': 'Site navigation menu',
-      class: className,
-    }
-  }
+  const degRaw = Number(slideover?.angleDeg ?? 35)
+  const angleDeg = Number.isFinite(degRaw) ? degRaw : 35
+  const angleEdge = Math.min(48, Math.max(12, angleDeg * 0.65))
 
   return {
     'aria-label': 'Site navigation menu',
-    class: className,
+    class: [
+      menuContentBase,
+      'stir-menu-panel !divide-y-0 !ring-0 sm:!ring-0',
+    ].join(' '),
     style: {
-      '--menu-angle-deg': `${angleDeg}deg`,
-      '--menu-angle-offset-x': `${angleOffsetX}%`,
+      '--stir-menu-angle-edge': `${angleEdge}%`,
     },
   }
 })
@@ -177,7 +169,7 @@ const onOpen = (val: boolean) => {
     aria-label="Site header"
     :menu="{
       side: theme.navigation.toggleDirection,
-      content: slideoverMotionContent as never,
+      content: menuContent as never,
     }"
     :mode="theme.navigation.toggleType"
     :title="page?.site_info?.name ?? ''"
@@ -186,6 +178,7 @@ const onOpen = (val: boolean) => {
     :ui="{
       root: headerRootClasses,
       container: theme.navigation.container,
+      overlay: theme.navigation.slideover?.angle ? '!bg-transparent' : undefined,
       header: theme.navigation.header,
       body: theme.navigation.slideover.body,
       right:

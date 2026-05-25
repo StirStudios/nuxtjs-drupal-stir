@@ -90,7 +90,6 @@ export default defineAppConfig({
         logo: true,
         angle: false,
         angleDeg: 35,
-        angleOffsetX: 175,
         link: 'block my-3 text-center text-xl uppercase',
         body: 'flex h-full flex-col justify-center text-center',
       },
