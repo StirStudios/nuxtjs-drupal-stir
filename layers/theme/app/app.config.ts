@@ -49,6 +49,7 @@ export default defineAppConfig({
 
   popup: {
     enabled: false,
+    component: '',
   },
 
   analytics: {
@@ -118,6 +119,7 @@ export default defineAppConfig({
 
     footer: {
       hideEmail: false,
+      rights: '',
       base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
       left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
       right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
