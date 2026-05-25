@@ -6,7 +6,7 @@ import {
 } from '@internationalized/date'
 import {
   resolveUiButtonVariant,
-  type UiFieldNoMaterialVariant,
+  type UiFieldVariant,
 } from '~/utils/nuxtUiProps'
 
 type DateTimeDate = {
@@ -19,7 +19,7 @@ const props = defineProps<{
   label: string
   modelValue: DateTimeDate | null
   timezone: string
-  variant?: UiFieldNoMaterialVariant
+  variant?: UiFieldVariant
 }>()
 
 const emit = defineEmits<{
