@@ -117,6 +117,11 @@ type MainMenuItem = {
   }
 }
 
+type MenuToLocation = {
+  path: string
+  hash: string
+}
+
 function menuChildren(item: MainMenuItem): MainMenuItem[] {
   if (Array.isArray(item.children)) return item.children
   if (Array.isArray(item.below)) return item.below
@@ -125,15 +130,16 @@ function menuChildren(item: MainMenuItem): MainMenuItem[] {
   return []
 }
 
-function normalizeInternalPath(value: string, fragment?: string) {
-  const rawPath = value.replace(/^internal:/, '').replace(/^base:/, '')
+function normalizeInternalPath(value: string, fragment?: string): string | MenuToLocation {
+  const sanitizedValue = value.replace(/^internal:/, '').replace(/^base:/, '')
+  const [rawValue, embeddedFragment] = sanitizedValue.split('#', 2)
+  const rawPath = rawValue
   const path = !rawPath || rawPath === '<front>'
     ? '/'
     : rawPath.startsWith('/') ? rawPath : `/${rawPath}`
-  const [basePath, existingFragment] = path.split('#')
-  const finalFragment = existingFragment || fragment?.replace(/^#/, '').trim()
+  const finalFragment = embeddedFragment || fragment?.replace(/^#/, '').trim()
 
-  return finalFragment ? `${basePath}#${finalFragment}` : basePath
+  return finalFragment ? { path, hash: `#${finalFragment}` } : path
 }
 
 function menuItemTo(item: MainMenuItem) {
