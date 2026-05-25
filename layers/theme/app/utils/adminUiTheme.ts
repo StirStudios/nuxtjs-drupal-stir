@@ -33,7 +33,12 @@ type AdminUiTheme = {
     content?: string
     base?: string
   }
-  editorToolbar: AdminThemeSlots<'separator'>
+  editorToolbar: {
+    root?: string
+    base?: string
+    group?: string
+    separator: string
+  }
   separator: {
     base: string
   }
@@ -76,9 +81,7 @@ export const adminUiTheme = {
     root: 'admin-ui-editor-root',
   },
   editorToolbar: {
-    slots: {
-      separator: '!bg-[var(--admin-border)]',
-    },
+    separator: '!bg-[var(--admin-border)]',
   },
   separator: {
     base: '!bg-[var(--admin-border)]',
