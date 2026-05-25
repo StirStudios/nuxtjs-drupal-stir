@@ -1,3 +1,5 @@
+import type { ThemeUI } from '@nuxt/ui/composables/useComponentUI'
+
 export const adminUiTheme = {
   navigationMenu: {
     slots: {
@@ -32,9 +34,7 @@ export const adminUiTheme = {
     },
   },
   editor: {
-    slots: {
-      root: 'admin-ui-editor-root',
-    },
+    root: 'admin-ui-editor-root',
   },
   editorToolbar: {
     slots: {
@@ -44,4 +44,4 @@ export const adminUiTheme = {
   separator: {
     base: '!bg-[var(--admin-border)]',
   },
-} as const
+} as const satisfies ThemeUI
