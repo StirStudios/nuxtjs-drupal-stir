@@ -13,6 +13,10 @@ const isBackendError = computed(() =>
   [502, 503, 504].includes(props.error?.statusCode ?? 0),
 )
 
+const normalizedNavigationMode = computed(() =>
+  navigation?.mode === 'static' ? 'static' : 'fixed',
+)
+
 const displayError = computed<NuxtError>(() => {
   const statusCode = props.error?.statusCode
 
@@ -42,7 +46,7 @@ const safeRedirect = computed(() => (route.path === '/' ? undefined : '/'))
   <template v-if="!isBackendError">
     <LazyRegionArea area="top" />
     <LazyDrupalTabs v-if="isAdministrator" />
-    <AppHeader :mode="navigation.mode" />
+    <AppHeader :mode="normalizedNavigationMode" />
   </template>
 
   <UMain id="main-content" as="main" role="main">

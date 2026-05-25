@@ -3,6 +3,8 @@ const route = useRoute()
 const appConfig = useAppConfig()
 const runtimeConfig = useRuntimeConfig()
 
+const authConfig = appConfig.auth || {}
+
 type AuthPageConfigKey =
   | 'login'
   | 'protectedPage'
@@ -45,23 +47,28 @@ const resolveAuthPageKey = (): AuthPageConfigKey | null => {
   return null
 }
 
-const pageBackgroundImage = computed(() => {
-  const auth = appConfig.auth || {}
-  const pageKey = resolveAuthPageKey()
-  const pageConfig = pageKey ? auth[pageKey] : undefined
+const resolveAuthPageConfig = (pageKey: AuthPageConfigKey | null): Record<string, unknown> | undefined => {
+  if (!pageKey) return undefined
+  const pageConfig = (authConfig as Record<string, Record<string, unknown>>)[pageKey]
 
-  const pageImage =
-    typeof pageConfig?.backgroundImage === 'string'
-      ? pageConfig.backgroundImage.trim()
-      : ''
+  return pageConfig && typeof pageConfig === 'object' ? pageConfig : undefined
+}
+
+const pageBackgroundImage = computed(() => {
+  const pageKey = resolveAuthPageKey()
+  const pageConfig = resolveAuthPageConfig(pageKey)
+
+  const pageImage = typeof pageConfig?.backgroundImage === 'string'
+    ? pageConfig.backgroundImage.trim()
+    : ''
 
   if (pageImage) {
     return pageImage
   }
 
-  return typeof auth.backgroundImage === 'string'
-    ? auth.backgroundImage.trim()
-    : ''
+  const authBackgroundImage = authConfig.backgroundImage
+
+  return typeof authBackgroundImage === 'string' ? authBackgroundImage.trim() : ''
 })
 
 const resolvedBackgroundImage = computed(() => {

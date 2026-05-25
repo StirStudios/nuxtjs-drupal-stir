@@ -12,6 +12,67 @@ const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
 const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
+
+type HeaderToggleType = 'modal' | 'slideover' | 'drawer'
+type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
+type HeaderToggleSide = 'left' | 'right'
+type NavigationMenuColor = 'neutral' | 'primary' | 'error' | 'secondary' | 'success' | 'info' | 'warning'
+type NavigationMenuVariant = 'link' | 'pill'
+
+const toHeaderToggleType = (value: unknown): HeaderToggleType => {
+  return value === 'modal' || value === 'drawer' || value === 'slideover'
+    ? value
+    : 'slideover'
+}
+const toToggleDirection = (value: unknown): ToggleDirection => {
+  return value === 'left' || value === 'right' || value === 'top' || value === 'bottom'
+    ? value
+    : 'right'
+}
+const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
+
+const toNavigationColor = (value: unknown): NavigationMenuColor | undefined => {
+  if (
+    value === 'neutral' ||
+    value === 'primary' ||
+    value === 'error' ||
+    value === 'secondary' ||
+    value === 'success' ||
+    value === 'info' ||
+    value === 'warning'
+  ) {
+    return value
+  }
+
+  return undefined
+}
+
+const toNavigationVariant = (value: unknown): NavigationMenuVariant | undefined => {
+  return value === 'link' || value === 'pill' ? value : undefined
+}
+
+const toClassName = (value: unknown): string => {
+  if (!value) return ''
+  if (typeof value === 'string') return value.trim()
+
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => toClassName(entry))
+      .filter(Boolean)
+      .join(' ')
+  }
+
+  return ''
+}
+
+const headerToggleType = computed(() => toHeaderToggleType(theme.navigation?.toggleType))
+const menuSide = computed(() => toToggleDirection(theme.navigation?.toggleDirection))
+const menuToggleSide = computed(() => toHeaderToggleSide(menuSide.value))
+const headerNavColor = computed(() => toNavigationColor(theme.navigation?.color))
+const headerHighlightColor = computed(() =>
+  theme.navigation?.highlight?.show ? toNavigationColor(theme.navigation.highlight?.color) : undefined,
+)
+const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
 const menuContent = computed(() => {
   const slideover = theme.navigation.slideover
   const angleEnabled = Boolean(slideover?.angle)
@@ -124,22 +185,21 @@ const headerRootClasses = computed(() => {
         scrollDirection.value === 'down' &&
         !atBottom.value))
 
-  return [
-    theme.navigation.base,
+  const classes = [
+    toClassName(theme.navigation?.base),
     isFixed.value
-      ? [
-          'fixed z-50 w-full',
-          isAdministrator.value && !shouldHide ? 'top-[3.1rem]' : 'top-0',
-        ]
+      ? `fixed z-50 w-full ${isAdministrator.value && !shouldHide ? 'top-[3.1rem]' : 'top-0'}`
       : 'relative w-full',
-    theme.navigation.transparentTop && !finalIsScrolled.value
-      ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
-      : theme.navigation.background,
-    {
-      'is-scrolled': finalIsScrolled.value,
-      '-translate-y-full': shouldHide,
-    },
-  ]
+    toClassName(
+      theme.navigation.transparentTop && !finalIsScrolled.value
+        ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
+        : theme.navigation?.background,
+    ),
+    finalIsScrolled.value ? 'is-scrolled' : '',
+    shouldHide ? '-translate-y-full' : '',
+  ].filter(Boolean)
+
+  return classes.filter(Boolean).join(' ')
 })
 
 onMounted(() => {
@@ -168,13 +228,13 @@ const onOpen = (val: boolean) => {
   <UHeader
     aria-label="Site header"
     :menu="{
-      side: theme.navigation.toggleDirection,
+      side: menuSide,
       content: menuContent as never,
     }"
-    :mode="theme.navigation.toggleType"
+    :mode="headerToggleType"
     :title="page?.site_info?.name ?? ''"
     :to="'/'"
-    :toggle-side="theme.navigation.toggleDirection"
+    :toggle-side="menuToggleSide"
     :ui="{
       root: headerRootClasses,
       container: theme.navigation.container,
@@ -209,13 +269,11 @@ const onOpen = (val: boolean) => {
     <UNavigationMenu
       aria-label="Site Navigation"
       class="app-nav app-nav-desktop"
-      :color="theme.navigation.color"
+      :color="headerNavColor"
       :highlight="theme.navigation.highlight.show"
-      :highlight-color="
-        theme.navigation.highlight.show ? theme.navigation.highlight.color : ''
-      "
+      :highlight-color="headerHighlightColor"
       :items="navLinks"
-      :variant="theme.navigation.variant"
+      :variant="headerNavVariant"
     />
 
     <template v-if="appConfig.colorMode?.showToggle !== false" #right>

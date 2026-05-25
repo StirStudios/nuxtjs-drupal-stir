@@ -1,4 +1,5 @@
 import { getCookie, setCookie, type H3Event } from 'h3'
+import { env } from 'node:process'
 import {
   createProtectedAccessToken,
   verifyProtectedAccessToken,
@@ -21,7 +22,7 @@ export const clearProtectedAccessCookie = (event: H3Event) => {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     maxAge: 0,
   })
 }
@@ -33,7 +34,7 @@ export const setProtectedAccessCookie = (event: H3Event, secret: string) => {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     maxAge: PROTECTED_ACCESS_MAX_AGE_SECONDS,
   })
 }
