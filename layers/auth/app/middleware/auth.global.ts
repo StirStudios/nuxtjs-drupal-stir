@@ -1,5 +1,6 @@
 import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
 import { useAuthSession } from '../composables/auth/useAuthSession'
+import { useProtectedSession } from '../composables/auth/useProtectedSession'
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {
   const normalizedRule = rule.trim()
@@ -45,15 +46,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!isProtected) return
 
-  const session = useAuthSession()
-
-  await session.fetchSession()
-
   const allowAuthenticatedUserBypass =
     config.allowAuthenticatedUserBypass !== false
-  const hasProtectedAccess = allowAuthenticatedUserBypass
-    ? session.loggedIn.value || session.protectedLoggedIn.value
-    : session.protectedLoggedIn.value
+  const protectedSession = useProtectedSession()
+
+  await protectedSession.fetchSession()
+
+  let hasProtectedAccess = protectedSession.loggedIn.value
+
+  if (allowAuthenticatedUserBypass && !hasProtectedAccess) {
+    const session = useAuthSession()
+
+    await session.fetchSession()
+    hasProtectedAccess = session.loggedIn.value
+  }
 
   if (!hasProtectedAccess) {
     return navigateTo({
