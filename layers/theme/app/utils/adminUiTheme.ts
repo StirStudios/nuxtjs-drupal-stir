@@ -1,24 +1,20 @@
-type AdminThemeSlots<T extends string> = {
-  slots: Record<T, string>
-}
-
 type AdminUiTheme = {
-  navigationMenu: AdminThemeSlots<
-    | 'root'
-    | 'list'
-    | 'item'
-    | 'link'
-    | 'linkLabel'
-    | 'linkLeadingIcon'
-    | 'linkTrailingIcon'
-    | 'viewport'
-    | 'content'
-    | 'childList'
-    | 'childItem'
-    | 'childLink'
-    | 'childLinkIcon'
-    | 'childLinkLabel'
-  >
+  navigationMenu: {
+    root: string
+    list: string
+    item: string
+    link: string
+    linkLabel: string
+    linkLeadingIcon: string
+    linkTrailingIcon: string
+    viewport: string
+    content: string
+    childList: string
+    childItem: string
+    childLink: string
+    childLinkIcon: string
+    childLinkLabel: string
+  }
   button: {
     base: string
     leadingIcon: string
@@ -27,7 +23,10 @@ type AdminUiTheme = {
   fieldGroup: {
     base: string
   }
-  tooltip: AdminThemeSlots<'content' | 'arrow'>
+  tooltip: {
+    content: string
+    arrow: string
+  }
   editor: {
     root: string
     content?: string
@@ -46,22 +45,20 @@ type AdminUiTheme = {
 
 export const adminUiTheme = {
   navigationMenu: {
-    slots: {
-      root: 'admin-ui admin-ui-scope admin-ui-nav-root app-admin-tabs-font sticky top-0 z-60 h-[3.5rem] w-full p-4',
-      list: 'isolate',
-      item: 'relative',
-      link: 'app-admin-tabs-font admin-ui-nav-link before:bg-transparent text-sm font-medium dark:before:bg-transparent',
-      linkLabel: 'sr-only md:not-sr-only md:block',
-      linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
-      linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
-      viewport: 'app-admin-tabs-font relative overflow-hidden rounded-md admin-ui-nav-surface shadow-md',
-      content: 'app-admin-tabs-font rounded-md admin-ui-nav-surface p-1',
-      childList: 'space-y-0.5 !ms-0 !border-0',
-      childItem: '',
-      childLink: 'app-admin-tabs-font admin-ui-nav-child-link',
-      childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
-      childLinkLabel: 'truncate',
-    },
+    root: 'admin-ui admin-ui-scope admin-ui-nav-root app-admin-tabs-font sticky top-0 z-60 h-[3.5rem] w-full p-4',
+    list: 'isolate',
+    item: 'relative',
+    link: 'app-admin-tabs-font admin-ui-nav-link before:bg-transparent text-sm font-medium dark:before:bg-transparent',
+    linkLabel: 'sr-only md:not-sr-only md:block',
+    linkLeadingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current',
+    linkTrailingIcon: 'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
+    viewport: 'app-admin-tabs-font relative overflow-hidden rounded-md admin-ui-nav-surface shadow-md',
+    content: 'app-admin-tabs-font rounded-md admin-ui-nav-surface p-1',
+    childList: 'space-y-0.5 !ms-0 !border-0',
+    childItem: '',
+    childLink: 'app-admin-tabs-font admin-ui-nav-child-link',
+    childLinkIcon: 'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
+    childLinkLabel: 'truncate',
   },
   button: {
     base: 'admin-ui-btn-base',
@@ -72,10 +69,8 @@ export const adminUiTheme = {
     base: 'admin-ui-field-group',
   },
   tooltip: {
-    slots: {
-      content: 'admin-ui-tooltip-content',
-      arrow: 'admin-ui-tooltip-arrow',
-    },
+    content: 'admin-ui-tooltip-content',
+    arrow: 'admin-ui-tooltip-arrow',
   },
   editor: {
     root: 'admin-ui-editor-root',
