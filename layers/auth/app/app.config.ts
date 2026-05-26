@@ -10,6 +10,11 @@ export default defineAppConfig({
     logoutRedirectPath: '/auth/login',
     protectedFallbackRedirectPath: '/',
     backgroundImage: '',
+    submitButton: {
+      class: '',
+      size: 'xl',
+      variant: 'solid',
+    },
     login: {
       title: 'Login',
       description: 'Sign in to continue.',

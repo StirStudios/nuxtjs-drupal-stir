@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AuthFormField, FormError } from '@nuxt/ui'
 
-defineProps<{
+const props = defineProps<{
   title: string
   description: string
   icon?: string
@@ -12,6 +12,18 @@ defineProps<{
     state: Record<string, unknown>,
   ) => FormError<string>[] | Promise<FormError<string>[]>
 }>()
+
+const appConfig = useAppConfig()
+const resolveSubmitButtonConfig = (value: unknown): Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {}
+}
+const submitButton = computed(() => ({
+  label: 'Continue',
+  ...resolveSubmitButtonConfig(appConfig.auth?.submitButton),
+  ...resolveSubmitButtonConfig(props.submit),
+}))
 
 defineEmits<{
   submit: [event: unknown]
@@ -34,7 +46,7 @@ defineSlots<{
       :fields="fields"
       :icon="icon || 'i-lucide-lock'"
       :loading="loading"
-      :submit="submit || { label: 'Continue' }"
+      :submit="submitButton"
       :title="title"
       :validate="validate"
       @error="$emit('error', $event)"
