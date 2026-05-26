@@ -1,86 +1,65 @@
-export const uiColors = [
-  'primary',
-  'secondary',
-  'success',
-  'info',
-  'warning',
-  'error',
-  'neutral',
-] as const
+import type {
+  UButton,
+  UInput,
+  USelect,
+  UTextarea,
+} from '#components'
 
-export const uiButtonVariants = [
-  'link',
-  'solid',
-  'outline',
-  'soft',
-  'subtle',
-  'ghost',
-  'material',
-] as const
+type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 
-export const uiFieldVariants = [
-  'outline',
-  'soft',
-  'subtle',
-  'ghost',
-  'none',
-  'material',
-] as const
+type ButtonProps = ComponentProps<typeof UButton>
+type InputProps = ComponentProps<typeof UInput>
+type SelectProps = ComponentProps<typeof USelect>
+type TextareaProps = ComponentProps<typeof UTextarea>
 
-export const uiFieldNoMaterialVariants = [
-  'outline',
-  'soft',
-  'subtle',
-  'ghost',
-  'none',
-] as const
+export type UiColor = Extract<NonNullable<ButtonProps['color']>, string>
+export type UiButtonVariant = Extract<NonNullable<ButtonProps['variant']>, string>
+export type UiFieldVariant = Extract<NonNullable<
+  InputProps['variant'] | SelectProps['variant'] | TextareaProps['variant']
+>, string>
+export type UiFieldNoMaterialVariant = Exclude<UiFieldVariant, 'material'>
+export type UiSize = Extract<NonNullable<ButtonProps['size']>, string>
 
-export const uiSizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const
-
-export type UiColor = (typeof uiColors)[number]
-export type UiButtonVariant = (typeof uiButtonVariants)[number]
-export type UiFieldVariant = (typeof uiFieldVariants)[number]
-export type UiFieldNoMaterialVariant = (typeof uiFieldNoMaterialVariants)[number]
-export type UiSize = (typeof uiSizes)[number]
-
-function includesLiteral<const T extends readonly string[]>(
-  values: T,
+function resolveStringProp<T extends string>(
   value: unknown,
-): value is T[number] {
-  return typeof value === 'string' && values.includes(value)
+  fallback: T,
+): T {
+  return typeof value === 'string' && value.trim()
+    ? value.trim() as T
+    : fallback
 }
 
 export function resolveUiColor(
   value: unknown,
-  fallback: UiColor = 'primary',
+  fallback = 'primary' as UiColor,
 ): UiColor {
-  return includesLiteral(uiColors, value) ? value : fallback
+  return resolveStringProp(value, fallback)
 }
 
 export function resolveUiButtonVariant(
   value: unknown,
-  fallback: UiButtonVariant = 'solid',
+  fallback = 'solid' as UiButtonVariant,
 ): UiButtonVariant {
-  return includesLiteral(uiButtonVariants, value) ? value : fallback
+  return resolveStringProp(value, fallback)
 }
 
 export function resolveUiFieldVariant(
   value: unknown,
-  fallback: UiFieldVariant = 'outline',
+  fallback = 'outline' as UiFieldVariant,
 ): UiFieldVariant {
-  return includesLiteral(uiFieldVariants, value) ? value : fallback
+  return resolveStringProp(value, fallback)
 }
 
 export function resolveUiFieldNoMaterialVariant(
   value: unknown,
-  fallback: UiFieldNoMaterialVariant = 'outline',
+  fallback = 'outline' as UiFieldNoMaterialVariant,
 ): UiFieldNoMaterialVariant {
-  return includesLiteral(uiFieldNoMaterialVariants, value) ? value : fallback
+  return resolveStringProp(value, fallback)
 }
 
 export function resolveUiSize(
   value: unknown,
-  fallback: UiSize = 'md',
+  fallback = 'md' as UiSize,
 ): UiSize {
-  return includesLiteral(uiSizes, value) ? value : fallback
+  return resolveStringProp(value, fallback)
 }
