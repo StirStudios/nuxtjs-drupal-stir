@@ -50,7 +50,7 @@ function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
 
 
 export default defineNuxtConfig({
-  compatibilityDate: '2026-04-29',
+  compatibilityDate: '2026-05-25',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
 
   features: {
