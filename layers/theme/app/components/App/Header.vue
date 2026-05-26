@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import type {
+  UNavigationMenu as UNavigationMenuComponent,
+} from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
@@ -16,8 +19,10 @@ const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:
 type HeaderToggleType = 'modal' | 'slideover' | 'drawer'
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
-type NavigationMenuColor = 'neutral' | 'primary' | 'error' | 'secondary' | 'success' | 'info' | 'warning'
-type NavigationMenuVariant = 'link' | 'pill'
+type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
+type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
+type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
+type NavigationMenuVariant = Extract<NonNullable<NavigationMenuProps['variant']>, string>
 
 const toHeaderToggleType = (value: unknown): HeaderToggleType => {
   return value === 'modal' || value === 'drawer' || value === 'slideover'
@@ -31,25 +36,14 @@ const toToggleDirection = (value: unknown): ToggleDirection => {
 }
 const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
 
-const toNavigationColor = (value: unknown): NavigationMenuColor | undefined => {
-  if (
-    value === 'neutral' ||
-    value === 'primary' ||
-    value === 'error' ||
-    value === 'secondary' ||
-    value === 'success' ||
-    value === 'info' ||
-    value === 'warning'
-  ) {
-    return value
-  }
+const toStringProp = <T extends string>(value: unknown): T | undefined =>
+  typeof value === 'string' && value.trim() ? value.trim() as T : undefined
 
-  return undefined
-}
+const toNavigationColor = (value: unknown): NavigationMenuColor | undefined =>
+  toStringProp<NavigationMenuColor>(value)
 
-const toNavigationVariant = (value: unknown): NavigationMenuVariant | undefined => {
-  return value === 'link' || value === 'pill' ? value : undefined
-}
+const toNavigationVariant = (value: unknown): NavigationMenuVariant | undefined =>
+  toStringProp<NavigationMenuVariant>(value)
 
 const toClassName = (value: unknown): string => {
   if (!value) return ''
