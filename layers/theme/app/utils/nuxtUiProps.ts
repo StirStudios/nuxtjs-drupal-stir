@@ -54,6 +54,8 @@ export function resolveUiFieldNoMaterialVariant(
   value: unknown,
   fallback = 'outline' as UiFieldNoMaterialVariant,
 ): UiFieldNoMaterialVariant {
+  if (value === 'material') return fallback
+
   return resolveStringProp(value, fallback)
 }
 

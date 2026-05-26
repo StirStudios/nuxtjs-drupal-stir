@@ -8,6 +8,8 @@ export const LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME = 'protected_access'
 export const LAYER_AUTH_PROTECTED_ACCESS_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 
 const getCookieSecureFlag = (event: H3Event): boolean => {
+  if (!import.meta.dev) return true
+
   const forwardedProto = getHeader(event, 'x-forwarded-proto')
   const forwardedProtoValue = Array.isArray(forwardedProto)
     ? forwardedProto[0]
