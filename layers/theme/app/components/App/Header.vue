@@ -3,6 +3,10 @@ import type {
   UNavigationMenu as UNavigationMenuComponent,
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
+import {
+  menuItemTo,
+  type DrupalMenuItemLink,
+} from '~/utils/navigation'
 
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
@@ -92,19 +96,12 @@ const menuContent = computed(() => {
 // Fetch menu items
 const mainMenu = await fetchMenu('main')
 
-type MainMenuItem = {
+type MainMenuItem = DrupalMenuItemLink & {
   title?: string
-  external?: boolean
-  absolute?: string
-  alias?: string
-  relative?: string
-  url?: string
-  uri?: string
   children?: MainMenuItem[]
   below?: MainMenuItem[]
   items?: MainMenuItem[]
-  options?: {
-    fragment?: string
+  options?: DrupalMenuItemLink['options'] & {
     attributes?: {
       target?: string
     }
@@ -117,55 +114,6 @@ function menuChildren(item: MainMenuItem): MainMenuItem[] {
   if (Array.isArray(item.items)) return item.items
 
   return []
-}
-
-function sanitizeMenuPath(value: string): string {
-  return value.replace(/^internal:/, '').replace(/^base:/, '')
-}
-
-function normalizeInternalPath(value: string, fragment?: string): string {
-  const [rawValue, embeddedFragment] = sanitizeMenuPath(value).split('#', 2)
-  const rawPath = rawValue
-  const path = !rawPath || rawPath === '<front>'
-    ? '/'
-    : rawPath.startsWith('/') ? rawPath : `/${rawPath}`
-  const finalFragment = embeddedFragment || fragment
-
-  return finalFragment ? `${path}#${finalFragment}` : path
-}
-
-function menuItemTo(item: MainMenuItem) {
-  const value = String(
-    item.relative || item.alias || item.uri || item.url || item.absolute || '',
-  )
-  const normalizedValue = sanitizeMenuPath(value)
-  const fragment = item.options?.fragment?.replace(/^#/, '').trim()
-
-  const toWithFragment = (path: string, existingHash?: string): string => {
-    const nextFragment = (existingHash || fragment)?.trim()
-
-    if (!nextFragment || path.includes('#')) {
-      return path
-    }
-
-    return `${path}#${nextFragment}`
-  }
-
-  if (item.external) {
-    return toWithFragment(value, fragment)
-  }
-
-  if (/^https?:\/\//.test(normalizedValue)) {
-    const parsed = new URL(normalizedValue)
-
-    return toWithFragment(`${parsed.pathname}${parsed.search}`, parsed.hash.replace(/^#/, ''))
-  }
-
-  if (normalizedValue.startsWith('mailto:') || normalizedValue.startsWith('tel:')) {
-    return toWithFragment(normalizedValue, fragment)
-  }
-
-  return normalizeInternalPath(normalizedValue, fragment)
 }
 
 function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
