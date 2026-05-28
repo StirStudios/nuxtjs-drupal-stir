@@ -32,8 +32,10 @@ export function normalizeApiListingQuery(query: ApiListingQuery = {}) {
 }
 
 export function useApiListing<TItem = unknown, TFilters extends ApiListingFilters = ApiListingFilters>(endpoint: string) {
+  const requestFetch = useRequestFetch()
+
   const list = (query: ApiListingQuery = {}) => {
-    return $fetch<ApiListingResponse<TItem, TFilters>>(endpoint, {
+    return requestFetch<ApiListingResponse<TItem, TFilters>>(endpoint, {
       query: normalizeApiListingQuery(query),
     })
   }
