@@ -1,7 +1,7 @@
 import type { RouterOptions } from '@nuxt/schema'
 
 export default <RouterOptions>{
-  scrollBehavior(to, _from, savedPosition) {
+  scrollBehavior(to, from, savedPosition) {
     const offset = 80
 
     return new Promise((resolve) => {
@@ -19,6 +19,8 @@ export default <RouterOptions>{
           } else {
             resolve({ top: 0 })
           }
+        } else if (to.path === from.path) {
+          resolve(false)
         } else {
           resolve({ top: 0 })
         }

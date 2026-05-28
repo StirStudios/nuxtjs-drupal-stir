@@ -13,11 +13,22 @@ type AuthPageCopyConfig = {
   backgroundImage?: string
 } & LooseRecord
 
+type AuthSubmitButtonConfig = {
+  label?: string
+  class?: string
+  color?: string
+  icon?: string
+  loadingIcon?: string
+  size?: string
+  variant?: string
+} & LooseRecord
+
 type AuthConfig = {
   loginRedirectPath?: string
   logoutRedirectPath?: string
   protectedFallbackRedirectPath?: string
   backgroundImage?: string
+  submitButton?: AuthSubmitButtonConfig
   login?: AuthPageCopyConfig
   protectedPage?: AuthPageCopyConfig
   register?: AuthPageCopyConfig

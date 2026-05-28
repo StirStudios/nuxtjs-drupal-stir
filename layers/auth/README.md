@@ -25,3 +25,21 @@ For this repository itself, the root `nuxt.config.ts` already includes:
 ```ts
 extends: ['./layers/auth']
 ```
+
+## Configuration
+
+Auth form submit button defaults can be customized through app config:
+
+```ts
+export default defineAppConfig({
+  auth: {
+    submitButton: {
+      class: '',
+      size: 'xl',
+      variant: 'solid',
+    },
+  },
+})
+```
+
+Page-level submit props passed to `AuthCard` take priority over `auth.submitButton`.
