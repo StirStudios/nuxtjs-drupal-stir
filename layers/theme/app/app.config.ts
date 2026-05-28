@@ -54,7 +54,6 @@ export default defineAppConfig({
 
   analytics: {
     plausible: {
-      enabled: false,
       domain: '',
     },
   },
