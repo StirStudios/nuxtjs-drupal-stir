@@ -3,6 +3,7 @@ defineProps<{
   headerClass?: string
   leftClass?: string
   logoClasses: string
+  menuId?: string
   rightClass?: string
   showColorModeToggle: boolean
   showLogo: boolean
@@ -49,6 +50,7 @@ defineEmits<{
       <LazyIconsColorMode v-if="showColorModeToggle" />
 
       <UButton
+        :aria-controls="menuId"
         aria-label="Close navigation menu"
         :class="toggleClass"
         color="neutral"
