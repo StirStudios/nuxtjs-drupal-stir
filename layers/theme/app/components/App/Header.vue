@@ -24,6 +24,7 @@ const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
 const menuOpen = ref(false)
+const menuMounted = ref(false)
 const menuId = useId()
 const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
 const headerUi = {
@@ -236,6 +237,16 @@ const navLinks = computed<NavigationMenuItem[]>(() =>
   mainMenu.value.map((item: MainMenuItem) => mapMenuItem(item)),
 )
 
+function toggleMenu() {
+  if (menuOpen.value) {
+    menuOpen.value = false
+    return
+  }
+
+  menuMounted.value = true
+  menuOpen.value = true
+}
+
 onMounted(() => {
   hydrated.value = true
 })
@@ -289,7 +300,7 @@ watch(menuOpen, (val) => {
           data-slot="toggle"
           :icon="toggleIcon"
           variant="ghost"
-          @click="menuOpen = !menuOpen"
+          @click="toggleMenu"
         />
 
         <ULink
@@ -339,14 +350,14 @@ watch(menuOpen, (val) => {
           data-slot="toggle"
           :icon="toggleIcon"
           variant="ghost"
-          @click="menuOpen = !menuOpen"
+          @click="toggleMenu"
         />
       </div>
     </UContainer>
   </header>
 
   <LazyUSlideover
-    v-if="menuOpen"
+    v-if="menuMounted"
     v-model:open="menuOpen"
     :content="menuContent as never"
     description="Site navigation"
