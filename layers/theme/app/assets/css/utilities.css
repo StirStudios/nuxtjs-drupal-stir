@@ -57,6 +57,16 @@ figure {
   }
 }
 
+/* Header scroll states are layer-owned so downstream projects do not need to
+   discover generated Tailwind utilities inside this package. */
+[data-slot='root'].stir-header {
+  @apply transition-all;
+}
+
+[data-slot='root'].stir-header--hidden {
+  @apply -translate-y-full;
+}
+
 /* Slideover animation system (single source of truth via CSS vars) */
 @keyframes stir-menu-panel-in {
   from {

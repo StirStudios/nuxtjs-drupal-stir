@@ -11,6 +11,7 @@ import {
   menuItemTo,
   type DrupalMenuItemLink,
 } from '~/utils/navigation'
+import { buildAppHeaderRootClasses } from '~/utils/headerClasses'
 
 export type AppHeaderMode = 'fixed' | 'static'
 
@@ -237,26 +238,15 @@ export async function useAppHeaderShell(options: UseAppHeaderShellOptions = {}) 
   })
 
   const headerRootClasses = computed(() => {
-    const shouldHide =
-      isFixed.value &&
-      ((isFront.value && !finalIsScrolled.value && theme.navigation.isHidden) ||
-        (finalIsScrolled.value &&
-          scrollDirection.value === 'down' &&
-          !atBottom.value))
-
-    return [
-      toClassName(theme.navigation?.base),
-      isFixed.value
-        ? `fixed z-50 w-full ${isAdministrator.value && !shouldHide ? 'top-[3.1rem]' : 'top-0'}`
-        : 'relative w-full',
-      toClassName(
-        theme.navigation.transparentTop && !finalIsScrolled.value
-          ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
-          : theme.navigation?.background,
-      ),
-      finalIsScrolled.value ? 'is-scrolled' : '',
-      shouldHide ? '-translate-y-full' : '',
-    ].filter(Boolean).join(' ')
+    return buildAppHeaderRootClasses({
+      atBottom: atBottom.value,
+      finalIsScrolled: finalIsScrolled.value,
+      isAdministrator: isAdministrator.value,
+      isFixed: isFixed.value,
+      isFront: isFront.value,
+      navigation: theme.navigation,
+      scrollDirection: scrollDirection.value,
+    })
   })
 
   onMounted(() => {
