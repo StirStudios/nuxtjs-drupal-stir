@@ -188,7 +188,7 @@ const onOpen = (val: boolean) => {
 </script>
 
 <template>
-  <RegionArea area="top" />
+  <LazyRegionArea area="top" />
   <LazyDrupalTabs v-if="isAdministrator" />
 
   <UHeader

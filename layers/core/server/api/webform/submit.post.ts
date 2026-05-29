@@ -6,6 +6,7 @@ import {
   getHeader,
   type H3Event,
 } from 'h3'
+import { fetchDrupalCsrfToken, getDrupalApiConfig } from '../../utils/drupalApi'
 import { buildDrupalHeaders } from '../../utils/drupalHeaders'
 
 type SubmissionBody = Record<string, unknown>
@@ -105,13 +106,8 @@ async function parseSubmission(event: H3Event): Promise<ParsedSubmission> {
 }
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const apiKey =
-    typeof config.apiKey === 'string' && config.apiKey.trim()
-      ? config.apiKey
-      : ''
-
   try {
+    const { baseUrl, apiKey } = getDrupalApiConfig()
     const fetchJson = $fetch as <T>(
       request: string,
       options?: Record<string, unknown>,
@@ -134,9 +130,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const { csrfToken } = await fetchJson<{ csrfToken: string }>('/api/auth/csrf')
+    const csrfToken = await fetchDrupalCsrfToken(event)
 
-    const drupalApiUrl = `${config.public.api}/api/stir_webform_rest/submit`
+    const drupalApiUrl = `${baseUrl}/api/stir_webform_rest/submit`
     const origin = getHeader(event, 'origin')
     const referer = getHeader(event, 'referer')
     const forwardedFor = getHeader(event, 'x-forwarded-for')

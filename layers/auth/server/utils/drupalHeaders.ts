@@ -1,23 +1,10 @@
-interface DrupalHeaderOptions {
-  apiKey?: string
-  cookie?: string
-  csrfToken?: string
-}
+import {
+  buildStirDrupalHeaders,
+  type StirDrupalHeaderOptions,
+} from '../../../../server/utils/stirDrupalApi'
 
-export function layerAuthBuildDrupalHeaders(options: DrupalHeaderOptions = {}): Record<string, string> {
-  const headers: Record<string, string> = {}
-
-  if (typeof options.cookie === 'string' && options.cookie.trim()) {
-    headers.cookie = options.cookie
-  }
-
-  if (typeof options.apiKey === 'string' && options.apiKey.trim()) {
-    headers['x-api-key'] = options.apiKey
-  }
-
-  if (typeof options.csrfToken === 'string' && options.csrfToken.trim()) {
-    headers['x-csrf-token'] = options.csrfToken
-  }
-
-  return headers
+export function layerAuthBuildDrupalHeaders(
+  options: StirDrupalHeaderOptions = {},
+): Record<string, string> {
+  return buildStirDrupalHeaders(options)
 }
