@@ -31,6 +31,7 @@ const themeWebform = (
     }
   ).webform || {}
 )
+const webformVariant = computed(() => themeWebform.variant as never)
 
 const getFieldType = (
   type: string,
@@ -106,7 +107,7 @@ const validate = (state: Record<string, unknown>): FormError[] => {
           :disabled="!field.editable"
           :model-value="getStringValue(props.values[field.name])"
           :rows="4"
-          :variant="themeWebform.variant"
+          :variant="webformVariant"
           @update:model-value="props.values[field.name] = String($event ?? '')"
         />
 
@@ -118,7 +119,7 @@ const validate = (state: Record<string, unknown>): FormError[] => {
           label-key="label"
           :model-value="getStringValue(props.values[field.name])"
           value-key="value"
-          :variant="themeWebform.variant"
+          :variant="webformVariant"
           @update:model-value="props.values[field.name] = String($event ?? '')"
         />
 
@@ -128,7 +129,7 @@ const validate = (state: Record<string, unknown>): FormError[] => {
           :disabled="!field.editable"
           :model-value="getStringValue(props.values[field.name])"
           type="text"
-          :variant="themeWebform.variant"
+          :variant="webformVariant"
           @update:model-value="props.values[field.name] = String($event ?? '')"
         />
       </UFormField>
