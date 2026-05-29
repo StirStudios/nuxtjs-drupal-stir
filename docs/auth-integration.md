@@ -14,6 +14,10 @@ This layer is designed to work with `stir_account` on Drupal and keeps a single 
 
 ## Backend endpoints expected
 
+Core webform submission is intentionally independent from the auth layer. It
+uses the shared Drupal server utilities to fetch `/session/token` directly
+before forwarding submissions to Drupal.
+
 From `stir_account`:
 
 - `GET /api/auth/session`

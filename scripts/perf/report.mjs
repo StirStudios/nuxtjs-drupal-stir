@@ -31,7 +31,7 @@ function runBuild() {
 function parseChunkLines(output) {
   const lines = output.split('\n')
   const chunkRegex =
-    /dist\/client\/(_nuxt\/[^ ]+\.js)\s+([0-9.]+)\s+kB\s+│\s+gzip:\s+([0-9.]+)\s+kB/
+    /dist\/client\/(_nuxt\/[^ ]+\.js)\s+([0-9.,]+)\s+kB\s+│\s+gzip:\s+([0-9.,]+)\s+kB/
   const chunks = []
 
   for (const line of lines) {
@@ -40,8 +40,8 @@ function parseChunkLines(output) {
     const [, name, size, gzip] = match
     chunks.push({
       name,
-      sizeKb: Number(size),
-      gzipKb: Number(gzip),
+      sizeKb: Number(size.replace(/,/g, '')),
+      gzipKb: Number(gzip.replace(/,/g, '')),
     })
   }
 

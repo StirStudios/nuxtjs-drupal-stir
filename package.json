@@ -26,9 +26,9 @@
     "release": "release-it"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.109",
-    "@internationalized/date": "^3.12.1",
-    "@nuxt/ui": "^4.8.0",
+    "@iconify-json/lucide": "^1.2.110",
+    "@internationalized/date": "^3.12.2",
+    "@nuxt/ui": "^4.8.1",
     "@nuxtjs/plausible": "^3.0.2",
     "@nuxtjs/robots": "^5.7.1",
     "@nuxtjs/sitemap": "^7.6.0",
@@ -51,7 +51,7 @@
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-nuxt": "^4.0.0",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-prettier": "^5.5.6",
     "globals": "^17.6.0",
     "h3": "^1.15.11",
     "happy-dom": "^20.9.0",
@@ -60,7 +60,7 @@
     "release-it": "^19.2.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.7",
-    "vue": "^3.5.34",
+    "vue": "^3.5.35",
     "vue-tsc": "^2.2.12"
   },
   "release-it": {

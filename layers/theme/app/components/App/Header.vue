@@ -18,9 +18,22 @@ const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
+const menuOpen = ref(false)
 const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
+const headerUi = {
+  root: 'bg-default/75 backdrop-blur border-b border-default h-(--ui-header-height) sticky top-0 z-50',
+  container: 'flex items-center justify-between gap-3 h-full',
+  left: 'lg:flex-1 flex items-center gap-1.5',
+  center: 'hidden lg:flex',
+  right: 'flex items-center justify-end lg:flex-1 gap-1.5',
+  title: 'shrink-0 font-bold text-xl text-highlighted flex items-end gap-1.5',
+  toggle: 'lg:hidden',
+  content: 'lg:hidden',
+  overlay: 'lg:hidden',
+  header: 'px-4 sm:px-6 h-(--ui-header-height) shrink-0 flex items-center justify-between gap-3',
+  body: 'p-4 sm:p-6 overflow-y-auto',
+} as const
 
-type HeaderToggleType = 'modal' | 'slideover' | 'drawer'
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
@@ -28,11 +41,6 @@ type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
 type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
 type NavigationMenuVariant = Extract<NonNullable<NavigationMenuProps['variant']>, string>
 
-const toHeaderToggleType = (value: unknown): HeaderToggleType => {
-  return value === 'modal' || value === 'drawer' || value === 'slideover'
-    ? value
-    : 'slideover'
-}
 const toToggleDirection = (value: unknown): ToggleDirection => {
   return value === 'left' || value === 'right' || value === 'top' || value === 'bottom'
     ? value
@@ -63,7 +71,6 @@ const toClassName = (value: unknown): string => {
   return ''
 }
 
-const headerToggleType = computed(() => toHeaderToggleType(theme.navigation?.toggleType))
 const menuSide = computed(() => toToggleDirection(theme.navigation?.toggleDirection))
 const menuToggleSide = computed(() => toHeaderToggleSide(menuSide.value))
 const headerNavColor = computed(() => toNavigationColor(theme.navigation?.color))
@@ -71,6 +78,17 @@ const headerHighlightColor = computed(() =>
   theme.navigation?.highlight?.show ? toNavigationColor(theme.navigation.highlight?.color) : undefined,
 )
 const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
+const siteTitle = computed(() => page.value?.site_info?.name ?? '')
+const showColorModeToggle = computed(() => appConfig.colorMode?.showToggle !== false)
+const logoClasses = computed(() =>
+  [
+    'app-logo',
+    'transition-all duration-300',
+    finalIsScrolled.value
+      ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
+      : theme.navigation.logoSize,
+  ].join(' '),
+)
 const menuContent = computed(() => {
   const slideover = theme.navigation.slideover
   const angleEnabled = Boolean(slideover?.angle)
@@ -91,6 +109,56 @@ const menuContent = computed(() => {
       '--stir-menu-angle-edge': `${angleEdge}%`,
     },
   }
+})
+const menuOverlayClasses = computed(() =>
+  [
+    headerUi.overlay,
+    theme.navigation.slideover?.angle ? '!bg-transparent' : '',
+  ].filter(Boolean).join(' '),
+)
+const menuContentClasses = computed(() => headerUi.content)
+const headerClasses = computed(() =>
+  [
+    headerUi.root,
+    headerRootClasses.value,
+  ].filter(Boolean).join(' '),
+)
+const headerContainerClasses = computed(() =>
+  [
+    headerUi.container,
+    toClassName(theme.navigation.container),
+  ].filter(Boolean).join(' '),
+)
+const menuHeaderClasses = computed(() =>
+  [
+    headerUi.header,
+    toClassName(theme.navigation.header),
+  ].filter(Boolean).join(' '),
+)
+const menuBodyClasses = computed(() =>
+  [
+    headerUi.body,
+    toClassName(theme.navigation.slideover.body),
+  ].filter(Boolean).join(' '),
+)
+const headerRightClasses = computed(() =>
+  [
+    headerUi.right,
+    appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false
+      ? 'block lg:hidden lg:flex-0'
+      : 'lg:flex-1',
+  ].filter(Boolean).join(' '),
+)
+const toggleClasses = computed(() =>
+  [
+    headerUi.toggle,
+    menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
+  ].join(' '),
+)
+const toggleIcon = computed(() => {
+  const icons = (appConfig.ui as { icons?: Partial<Record<'close' | 'menu', string>> } | undefined)?.icons
+
+  return menuOpen.value ? icons?.close || 'i-lucide-x' : icons?.menu || 'i-lucide-menu'
 })
 
 // Fetch menu items
@@ -180,80 +248,135 @@ watch(
   { immediate: true },
 )
 
+watch(
+  () => route.fullPath,
+  () => {
+    menuOpen.value = false
+  },
+)
+
 // Fix: blur active element when slideover opens (prevents aria-hidden focus warning)
 const onOpen = (val: boolean) => {
   if (val && import.meta.client)
     (document.activeElement as HTMLElement | null)?.blur()
 }
+
+watch(menuOpen, onOpen)
 </script>
 
 <template>
-  <RegionArea area="top" />
+  <LazyRegionArea area="top" />
   <LazyDrupalTabs v-if="isAdministrator" />
 
-  <UHeader
+  <header
     aria-label="Site header"
-    :menu="{
-      side: menuSide,
-      content: menuContent as never,
-    }"
-    :mode="headerToggleType"
-    :title="page?.site_info?.name ?? ''"
-    :to="'/'"
-    :toggle-side="menuToggleSide"
-    :ui="{
-      root: headerRootClasses,
-      container: theme.navigation.container,
-      overlay: theme.navigation.slideover?.angle ? '!bg-transparent' : undefined,
-      header: theme.navigation.header,
-      body: theme.navigation.slideover.body,
-      right:
-        appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false
-        ? 'block lg:hidden lg:flex-0'
-        : 'lg:flex-1',
-    }"
-    @update:open="onOpen"
+    :class="headerClasses"
+    data-slot="root"
   >
-    <template #title>
-      <AppLogo
-        v-if="theme.navigation.logo"
-        :add-classes="
-          [
-            'app-logo',
-            'transition-all duration-300',
-            finalIsScrolled
-              ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
-              : theme.navigation.logoSize,
-          ].join(' ')
-        "
+    <UContainer
+      :class="headerContainerClasses"
+      data-slot="container"
+    >
+      <div
+        :class="headerUi.left"
+        data-slot="left"
+      >
+        <UButton
+          v-if="menuToggleSide === 'left'"
+          :aria-expanded="menuOpen"
+          :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
+          :class="toggleClasses"
+          color="neutral"
+          data-slot="toggle"
+          :icon="toggleIcon"
+          variant="ghost"
+          @click="menuOpen = !menuOpen"
+        />
+
+        <ULink
+          aria-label="Home"
+          :class="headerUi.title"
+          data-slot="title"
+          to="/"
+        >
+          <AppLogo
+            v-if="theme.navigation.logo"
+            :add-classes="logoClasses"
+          />
+          <template v-else>
+            {{ siteTitle }}
+          </template>
+        </ULink>
+      </div>
+
+      <div
+        :class="headerUi.center"
+        data-slot="center"
+      >
+        <LazyUNavigationMenu
+          aria-label="Site Navigation"
+          class="app-nav app-nav-desktop"
+          :color="headerNavColor"
+          :highlight="theme.navigation.highlight.show"
+          :highlight-color="headerHighlightColor"
+          :items="navLinks"
+          :variant="headerNavVariant"
+        />
+      </div>
+
+      <div
+        :class="headerRightClasses"
+        data-slot="right"
+      >
+        <LazyIconsColorMode v-if="showColorModeToggle" />
+
+        <UButton
+          v-if="menuToggleSide === 'right'"
+          :aria-expanded="menuOpen"
+          :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
+          :class="toggleClasses"
+          color="neutral"
+          data-slot="toggle"
+          :icon="toggleIcon"
+          variant="ghost"
+          @click="menuOpen = !menuOpen"
+        />
+      </div>
+    </UContainer>
+  </header>
+
+  <LazyUSlideover
+    v-if="menuOpen"
+    v-model:open="menuOpen"
+    :content="menuContent as never"
+    description="Site navigation"
+    :side="menuSide"
+    title="Navigation"
+    :ui="{
+      overlay: menuOverlayClasses,
+      content: menuContentClasses,
+    }"
+  >
+    <template #content>
+      <LazyAppHeaderOverlayHeader
+        :header-class="menuHeaderClasses"
+        :left-class="headerUi.left"
+        :logo-classes="logoClasses"
+        :right-class="headerRightClasses"
+        :show-color-mode-toggle="showColorModeToggle"
+        :show-logo="Boolean(theme.navigation.logo)"
+        :site-title="siteTitle"
+        :title-class="headerUi.title"
+        :toggle-class="toggleClasses"
+        :toggle-icon="toggleIcon"
+        @close="menuOpen = false"
       />
-      <template v-else>
-        {{ page?.site_info?.name }}
-      </template>
-    </template>
 
-    <UNavigationMenu
-      aria-label="Site Navigation"
-      class="app-nav app-nav-desktop"
-      :color="headerNavColor"
-      :highlight="theme.navigation.highlight.show"
-      :highlight-color="headerHighlightColor"
-      :items="navLinks"
-      :variant="headerNavVariant"
-    />
-
-    <template v-if="appConfig.colorMode?.showToggle !== false" #right>
-      <LazyIconsColorMode />
-    </template>
-
-    <template #body>
-      <UNavigationMenu
-        aria-label="Mobile Navigation"
-        class="app-nav app-nav-mobile"
+      <LazyAppHeaderMobileMenu
+        :body-class="menuBodyClasses"
         :items="navLinks"
-        orientation="vertical"
-        :ui="{ link: theme.navigation.slideover.link }"
+        :link-class="theme.navigation.slideover.link"
       />
     </template>
-  </UHeader>
+  </LazyUSlideover>
 </template>

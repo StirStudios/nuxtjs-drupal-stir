@@ -2,6 +2,9 @@
 
 Optional Nuxt layer for Drupal auth/account integration.
 
+Core Drupal webform submission does not require this layer. Shared Drupal
+server utilities handle CSRF token forwarding for core endpoints.
+
 ## Scope
 
 - `/auth/*` pages

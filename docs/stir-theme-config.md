@@ -230,7 +230,6 @@ navigation: {
   background: 'border-none bg-white/90 shadow backdrop-blur-md dark:bg-gray-950/70',
   color: 'primary',
   variant: 'link',
-  toggleType: 'slideover', // 'modal', 'slideover' or 'drawer'
   toggleDirection: 'right', // 'left' or 'right'
   highlight: {
 	show: false,

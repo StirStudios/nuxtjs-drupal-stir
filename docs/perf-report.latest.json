@@ -1,59 +1,59 @@
 {
-  "generatedAt": "2026-02-14T20:36:58.707Z",
+  "generatedAt": "2026-05-29T19:36:47.412Z",
   "topClientChunks": [
     {
-      "name": "_nuxt/BEQvcIkb.js",
-      "sizeKb": 405.72,
-      "gzipKb": 141.44
+      "name": "_nuxt/_p9vSCMX.js",
+      "sizeKb": 472.58,
+      "gzipKb": 163.43
     },
     {
-      "name": "_nuxt/DGFbjtKY.js",
-      "sizeKb": 62.14,
-      "gzipKb": 15.19
+      "name": "_nuxt/CkA-tPaq.js",
+      "sizeKb": 291.71,
+      "gzipKb": 90.33
     },
     {
-      "name": "_nuxt/BgB_4XXQ.js",
-      "sizeKb": 55.56,
-      "gzipKb": 12.21
+      "name": "_nuxt/DUDBhKrM.js",
+      "sizeKb": 233.25,
+      "gzipKb": 72.74
     },
     {
-      "name": "_nuxt/vySnET7t.js",
-      "sizeKb": 53.25,
-      "gzipKb": 18.23
+      "name": "_nuxt/DE9eetLK.js",
+      "sizeKb": 126.34,
+      "gzipKb": 40.8
     },
     {
-      "name": "_nuxt/DYHF7Efc.js",
-      "sizeKb": 52.48,
-      "gzipKb": 14.57
+      "name": "_nuxt/CTeucY4V.js",
+      "sizeKb": 86.1,
+      "gzipKb": 18.27
     },
     {
-      "name": "_nuxt/BtckqxQA.js",
-      "sizeKb": 35.88,
-      "gzipKb": 10.14
+      "name": "_nuxt/CvRPYnPe.js",
+      "sizeKb": 51.54,
+      "gzipKb": 14.19
     },
     {
-      "name": "_nuxt/Dlz6C-q1.js",
-      "sizeKb": 31.41,
-      "gzipKb": 9.18
+      "name": "_nuxt/CEl66bv3.js",
+      "sizeKb": 48.8,
+      "gzipKb": 12.06
     },
     {
-      "name": "_nuxt/5azYXYdj.js",
-      "sizeKb": 30.26,
-      "gzipKb": 10.49
+      "name": "_nuxt/3P3VHtK8.js",
+      "sizeKb": 44.39,
+      "gzipKb": 14.1
     },
     {
-      "name": "_nuxt/DA3QOBgr.js",
-      "sizeKb": 29.7,
-      "gzipKb": 11.13
+      "name": "_nuxt/WBL8Si1o.js",
+      "sizeKb": 41.34,
+      "gzipKb": 12.01
     },
     {
-      "name": "_nuxt/D_GO_ZHU.js",
-      "sizeKb": 27.71,
-      "gzipKb": 10.56
+      "name": "_nuxt/Clc400xb.js",
+      "sizeKb": 39.29,
+      "gzipKb": 11.17
     }
   ],
   "totalOutputSize": {
-    "total": "5.49 MB",
-    "gzip": "1.38 MB gzip"
+    "total": "6.45 MB",
+    "gzip": "1.66 MB gzip"
   }
 }

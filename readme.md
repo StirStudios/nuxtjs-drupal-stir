@@ -44,7 +44,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 <!-- tech-stack:start -->
 - **[Nuxt 4](https://nuxt.com/)**: `^4.4.6`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.8.0`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.8.1`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.0`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.6.2`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
@@ -61,10 +61,11 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 ## 📦 Project Structure
 
-- `nuxt.config.ts` — Full config for modules, routing, environment, and build
-- `app/app.config.ts` — UI theming, layout, animation, and third-party settings
-- `assets/css/main.css` — Tailwind CSS entry point
-- `utils/uiVariants.ts` — Custom Nuxt UI material variant tokens
+- `nuxt.config.ts` — Root orchestration for layers, modules, runtime config, routing, and build
+- `layers/core` — Server/runtime Drupal integration and backend proxy endpoints
+- `layers/theme` — UI components, layouts, composables, utilities, app config, and CSS
+- `layers/auth` — Optional Drupal auth/account UI, middleware, and proxy endpoints
+- `server/utils` — Shared Nitro utilities reused by multiple layers
 
 ## 🔐 Environment Variables
 
@@ -74,7 +75,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
-- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables sitemap/robots indexing behavior)
+- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior and sitemap registration)
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
@@ -84,6 +85,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 Notes:
 - `DRUPAL_API_KEY` is forwarded by server endpoints that call Drupal backend APIs (`x-api-key` header).
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
+- `site.indexable`, Plausible runtime enablement, and sitemap registration all require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 
 ## Auth + Account Integration (stir_account)
@@ -98,6 +100,7 @@ extends: ['./layers/auth']
 ```
 
 If a downstream project does not need auth/account UI or APIs, remove that `extends` entry.
+Core webform submission and Drupal CSRF forwarding do not depend on the auth layer.
 If it only needs password-protected Nuxt pages, keep the layer and set
 `auth.accountEnabled: false` in app config.
 

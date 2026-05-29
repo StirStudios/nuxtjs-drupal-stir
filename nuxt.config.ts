@@ -5,6 +5,10 @@ const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+const isProductionEnv = process.env.NUXT_ENV === 'production'
+const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
+const drupalUrl = process.env.DRUPAL_URL || ''
+const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 
 type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
 
@@ -47,7 +51,6 @@ function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
     return true
   })
 }
-
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-25',
@@ -131,7 +134,7 @@ export default defineNuxtConfig({
   site: {
     name: process.env.NUXT_NAME,
     url: process.env.NUXT_URL,
-    indexable: process.env.NUXT_ENV === 'production',
+    indexable: isIndexable,
   },
 
   devtools: {
@@ -147,7 +150,6 @@ export default defineNuxtConfig({
       ctx.urls = dedupeSitemapUrls(ctx.urls)
     },
   } as Record<string, (ctx: SitemapInputContext) => void>,
-
 
   routeRules: {
     '/login': {
@@ -195,7 +197,7 @@ export default defineNuxtConfig({
     [
       '@nuxtjs/turnstile',
       {
-        siteKey: `${process.env.TURNSTILE_KEY}`,
+        siteKey: turnstileSiteKey,
       },
     ],
 
@@ -206,12 +208,12 @@ export default defineNuxtConfig({
       },
     ],
 
-    ...(process.env.NUXT_INDEXABLE !== 'false'
+    ...(isIndexable
       ? [
           [
             '@nuxtjs/sitemap',
             {
-              sources: [`${process.env.DRUPAL_URL}/api/sitemap`],
+              sources: drupalUrl ? [`${drupalUrl}/api/sitemap`] : [],
               exclude: ['/login'],
               runtimeCacheStorage: { driver: 'memory' },
               cacheMaxAgeSeconds: 0,
@@ -241,8 +243,8 @@ export default defineNuxtConfig({
     [
       'nuxtjs-drupal-ce',
       {
-        drupalBaseUrl: process.env.DRUPAL_URL,
-        menuBaseUrl: process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || process.env.DRUPAL_URL,
+        drupalBaseUrl: drupalUrl,
+        menuBaseUrl: process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || drupalUrl,
         exposeAPIRouteRules: true,
         disableFormHandler: true,
         enableComponentPreview: false,
@@ -252,16 +254,16 @@ export default defineNuxtConfig({
   ] as Array<string | [string, Record<string, unknown>]>,
 
   runtimeConfig: {
-    api: process.env.DRUPAL_URL,
+    api: drupalUrl,
     apiKey: process.env.DRUPAL_API_KEY || '',
     protectedPassword: process.env.PROTECTED_PASSWORD || '',
     turnstile: {
       secretKey: process.env.TURNSTILE_SECRET,
     },
     public: {
-      api: process.env.DRUPAL_URL,
+      api: drupalUrl,
       plausible: {
-        enabled: process.env.NUXT_ENV === 'production',
+        enabled: isIndexable,
         domain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
         apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
