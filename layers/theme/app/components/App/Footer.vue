@@ -52,7 +52,7 @@ const footerMenuItems = computed(() =>
     </template>
 
     <div class="center">
-      <UNavigationMenu
+      <LazyUNavigationMenu
         v-if="page.footer_menu?.length"
         aria-label="Footer Navigation"
         class="mb-3"
