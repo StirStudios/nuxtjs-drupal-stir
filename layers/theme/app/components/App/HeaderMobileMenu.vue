@@ -5,6 +5,7 @@ defineProps<{
   bodyClass?: string
   items: NavigationMenuItem[]
   linkClass?: string
+  listClass?: string
 }>()
 </script>
 
@@ -15,10 +16,13 @@ defineProps<{
   >
     <LazyUNavigationMenu
       aria-label="Mobile Navigation"
-      class="app-nav app-nav-mobile"
+      class="-mx-2.5 app-nav app-nav-mobile"
       :items="items"
       orientation="vertical"
-      :ui="{ link: linkClass }"
+      :ui="{
+        link: linkClass,
+        list: listClass,
+      }"
     />
   </div>
 </template>
