@@ -122,7 +122,6 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: string
   variant?: string
-  toggleType?: 'slideover' | 'drawer' | string
   toggleDirection?: 'left' | 'right' | string
   header?: ClassValue
   highlight?: {

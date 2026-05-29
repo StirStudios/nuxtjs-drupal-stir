@@ -79,7 +79,6 @@ export default defineAppConfig({
       container: 'flex-wrap',
       color: 'primary',
       variant: 'link',
-      toggleType: 'slideover',
       toggleDirection: 'right',
       header: 'h-auto p-4',
       highlight: {

@@ -34,7 +34,6 @@ const headerUi = {
   body: 'p-4 sm:p-6 overflow-y-auto',
 } as const
 
-type HeaderToggleType = 'modal' | 'slideover' | 'drawer'
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
@@ -42,11 +41,6 @@ type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
 type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
 type NavigationMenuVariant = Extract<NonNullable<NavigationMenuProps['variant']>, string>
 
-const toHeaderToggleType = (value: unknown): HeaderToggleType => {
-  return value === 'modal' || value === 'drawer' || value === 'slideover'
-    ? value
-    : 'slideover'
-}
 const toToggleDirection = (value: unknown): ToggleDirection => {
   return value === 'left' || value === 'right' || value === 'top' || value === 'bottom'
     ? value
@@ -77,7 +71,6 @@ const toClassName = (value: unknown): string => {
   return ''
 }
 
-const headerToggleType = computed(() => toHeaderToggleType(theme.navigation?.toggleType))
 const menuSide = computed(() => toToggleDirection(theme.navigation?.toggleDirection))
 const menuToggleSide = computed(() => toHeaderToggleSide(menuSide.value))
 const headerNavColor = computed(() => toNavigationColor(theme.navigation?.color))
@@ -86,6 +79,16 @@ const headerHighlightColor = computed(() =>
 )
 const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
 const siteTitle = computed(() => page.value?.site_info?.name ?? '')
+const showColorModeToggle = computed(() => appConfig.colorMode?.showToggle !== false)
+const logoClasses = computed(() =>
+  [
+    'app-logo',
+    'transition-all duration-300',
+    finalIsScrolled.value
+      ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
+      : theme.navigation.logoSize,
+  ].join(' '),
+)
 const menuContent = computed(() => {
   const slideover = theme.navigation.slideover
   const angleEnabled = Boolean(slideover?.angle)
@@ -298,15 +301,7 @@ watch(menuOpen, onOpen)
         >
           <AppLogo
             v-if="theme.navigation.logo"
-            :add-classes="
-              [
-                'app-logo',
-                'transition-all duration-300',
-                finalIsScrolled
-                  ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
-                  : theme.navigation.logoSize,
-              ].join(' ')
-            "
+            :add-classes="logoClasses"
           />
           <template v-else>
             {{ siteTitle }}
@@ -333,7 +328,7 @@ watch(menuOpen, onOpen)
         :class="headerRightClasses"
         data-slot="right"
       >
-        <LazyIconsColorMode v-if="appConfig.colorMode?.showToggle !== false" />
+        <LazyIconsColorMode v-if="showColorModeToggle" />
 
         <UButton
           v-if="menuToggleSide === 'right'"
@@ -351,7 +346,7 @@ watch(menuOpen, onOpen)
   </header>
 
   <LazyUSlideover
-    v-if="menuOpen && headerToggleType === 'slideover'"
+    v-if="menuOpen"
     v-model:open="menuOpen"
     :content="menuContent as never"
     description="Site navigation"
@@ -363,175 +358,25 @@ watch(menuOpen, onOpen)
     }"
   >
     <template #content>
-      <div
-        :class="menuHeaderClasses"
-        data-slot="header"
-      >
-        <div
-          :class="headerUi.left"
-          data-slot="left"
-        >
-          <ULink
-            aria-label="Home"
-            :class="headerUi.title"
-            data-slot="title"
-            to="/"
-          >
-            <AppLogo
-              v-if="theme.navigation.logo"
-              :add-classes="
-                [
-                  'app-logo',
-                  'transition-all duration-300',
-                  finalIsScrolled
-                    ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
-                    : theme.navigation.logoSize,
-                ].join(' ')
-              "
-            />
-            <template v-else>
-              {{ siteTitle }}
-            </template>
-          </ULink>
-        </div>
+      <LazyAppHeaderOverlayHeader
+        :header-class="menuHeaderClasses"
+        :left-class="headerUi.left"
+        :logo-classes="logoClasses"
+        :right-class="headerRightClasses"
+        :show-color-mode-toggle="showColorModeToggle"
+        :show-logo="Boolean(theme.navigation.logo)"
+        :site-title="siteTitle"
+        :title-class="headerUi.title"
+        :toggle-class="toggleClasses"
+        :toggle-icon="toggleIcon"
+        @close="menuOpen = false"
+      />
 
-        <div
-          :class="headerRightClasses"
-          data-slot="right"
-        >
-          <LazyIconsColorMode v-if="appConfig.colorMode?.showToggle !== false" />
-
-          <UButton
-            aria-label="Close navigation menu"
-            :class="toggleClasses"
-            color="neutral"
-            data-slot="toggle"
-            :icon="toggleIcon"
-            variant="ghost"
-            @click="menuOpen = false"
-          />
-        </div>
-      </div>
-
-      <div
-        :class="menuBodyClasses"
-        data-slot="body"
-      >
-        <LazyUNavigationMenu
-          aria-label="Mobile Navigation"
-          class="app-nav app-nav-mobile"
-          :items="navLinks"
-          orientation="vertical"
-          :ui="{ link: theme.navigation.slideover.link }"
-        />
-      </div>
+      <LazyAppHeaderMobileMenu
+        :body-class="menuBodyClasses"
+        :items="navLinks"
+        :link-class="theme.navigation.slideover.link"
+      />
     </template>
   </LazyUSlideover>
-
-  <LazyUModal
-    v-if="menuOpen && headerToggleType === 'modal'"
-    v-model:open="menuOpen"
-    :content="menuContent as never"
-    description="Site navigation"
-    fullscreen
-    title="Navigation"
-    :transition="false"
-    :ui="{
-      overlay: menuOverlayClasses,
-      content: menuContentClasses,
-    }"
-  >
-    <template #content>
-      <div
-        :class="menuHeaderClasses"
-        data-slot="header"
-      >
-        <div
-          :class="headerUi.left"
-          data-slot="left"
-        >
-          <ULink
-            aria-label="Home"
-            :class="headerUi.title"
-            data-slot="title"
-            to="/"
-          >
-            <AppLogo
-              v-if="theme.navigation.logo"
-              :add-classes="
-                [
-                  'app-logo',
-                  'transition-all duration-300',
-                  finalIsScrolled
-                    ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
-                    : theme.navigation.logoSize,
-                ].join(' ')
-              "
-            />
-            <template v-else>
-              {{ siteTitle }}
-            </template>
-          </ULink>
-        </div>
-
-        <div
-          :class="headerRightClasses"
-          data-slot="right"
-        >
-          <LazyIconsColorMode v-if="appConfig.colorMode?.showToggle !== false" />
-
-          <UButton
-            aria-label="Close navigation menu"
-            :class="toggleClasses"
-            color="neutral"
-            data-slot="toggle"
-            :icon="toggleIcon"
-            variant="ghost"
-            @click="menuOpen = false"
-          />
-        </div>
-      </div>
-
-      <div
-        :class="menuBodyClasses"
-        data-slot="body"
-      >
-        <LazyUNavigationMenu
-          aria-label="Mobile Navigation"
-          class="app-nav app-nav-mobile"
-          :items="navLinks"
-          orientation="vertical"
-          :ui="{ link: theme.navigation.slideover.link }"
-        />
-      </div>
-    </template>
-  </LazyUModal>
-
-  <LazyUDrawer
-    v-if="menuOpen && headerToggleType === 'drawer'"
-    v-model:open="menuOpen"
-    :content="menuContent as never"
-    description="Site navigation"
-    :direction="menuSide"
-    title="Navigation"
-    :ui="{
-      overlay: menuOverlayClasses,
-      content: menuContentClasses,
-    }"
-  >
-    <template #content>
-      <div
-        :class="menuBodyClasses"
-        data-slot="body"
-      >
-        <LazyUNavigationMenu
-          aria-label="Mobile Navigation"
-          class="app-nav app-nav-mobile"
-          :items="navLinks"
-          orientation="vertical"
-          :ui="{ link: theme.navigation.slideover.link }"
-        />
-      </div>
-    </template>
-  </LazyUDrawer>
 </template>
