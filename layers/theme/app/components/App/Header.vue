@@ -8,7 +8,12 @@ import {
   type DrupalMenuItemLink,
 } from '~/utils/navigation'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<{ mode?: 'fixed' | 'static' }>()
+const attrs = useAttrs()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
 const { fetchMenu, getPage } = useDrupalCe()
 const page = getPage()
@@ -21,8 +26,8 @@ const forceScrolled = ref(false)
 const menuOpen = ref(false)
 const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
 const headerUi = {
-  root: 'bg-default/75 backdrop-blur border-b border-default h-(--ui-header-height) sticky top-0 z-50',
-  container: 'flex items-center justify-between gap-3 h-full',
+  root: '',
+  container: 'flex items-center justify-between gap-3',
   left: 'lg:flex-1 flex items-center gap-1.5',
   center: 'hidden lg:flex',
   right: 'flex items-center justify-end lg:flex-1 gap-1.5',
@@ -30,7 +35,7 @@ const headerUi = {
   toggle: 'lg:hidden',
   content: 'lg:hidden',
   overlay: 'lg:hidden',
-  header: 'px-4 sm:px-6 h-(--ui-header-height) shrink-0 flex items-center justify-between gap-3',
+  header: 'shrink-0 flex items-center justify-between gap-3',
   body: 'p-4 sm:p-6 overflow-y-auto',
 } as const
 
@@ -269,6 +274,7 @@ watch(menuOpen, onOpen)
   <LazyDrupalTabs v-if="isAdministrator" />
 
   <header
+    v-bind="attrs"
     aria-label="Site header"
     :class="headerClasses"
     data-slot="root"
