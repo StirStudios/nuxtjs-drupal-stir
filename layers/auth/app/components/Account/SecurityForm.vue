@@ -24,6 +24,7 @@ const themeWebform = (
     }
   ).webform || {}
 )
+const webformVariant = computed(() => themeWebform.variant as never)
 const showCurrentPassword = ref(false)
 
 const onSubmitPassword = () => {
@@ -75,7 +76,7 @@ const confirmCancel = () => {
           :class="themeWebform.fieldInput || 'w-full'"
           :model-value="props.currentPassword"
           :type="showCurrentPassword ? 'text' : 'password'"
-          :variant="themeWebform.variant"
+          :variant="webformVariant"
           @update:model-value="emit('update:currentPassword', String($event ?? ''))"
         >
           <template #trailing>
