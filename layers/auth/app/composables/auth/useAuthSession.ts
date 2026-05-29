@@ -1,4 +1,5 @@
 import type { AuthSessionResponse, AuthSessionUser } from '../../types/auth'
+import { useAuthConfig } from './useAuthConfig'
 
 export function useAuthSession() {
   const ready = useState<boolean>('auth-session-ready', () => false)
@@ -12,8 +13,16 @@ export function useAuthSession() {
     () => null,
   )
   let pendingSessionFetch: Promise<void> | null = null
+  const { accountEnabled } = useAuthConfig()
 
   const fetchSession = async () => {
+    if (!accountEnabled.value) {
+      ready.value = true
+      loggedIn.value = false
+      user.value = null
+      return
+    }
+
     if (pendingSessionFetch) {
       await pendingSessionFetch
       return

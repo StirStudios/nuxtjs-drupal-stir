@@ -18,7 +18,7 @@ export default defineNuxtPlugin({
     const runtimeCfg = useRuntimeConfig()
     const plausible = runtimeCfg.public.plausible as PlausibleRuntimeConfig
 
-    if (typeof appCfg.enabled === 'boolean') plausible.enabled = appCfg.enabled
-    if (typeof appCfg.domain === 'string') plausible.domain = appCfg.domain
+    if (appCfg.enabled === false) plausible.enabled = false
+    if (appCfg.domain) plausible.domain = appCfg.domain
   },
 })

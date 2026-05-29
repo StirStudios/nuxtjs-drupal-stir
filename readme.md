@@ -76,6 +76,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables sitemap/robots indexing behavior)
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
+- `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
@@ -97,6 +98,8 @@ extends: ['./layers/auth']
 ```
 
 If a downstream project does not need auth/account UI or APIs, remove that `extends` entry.
+If it only needs password-protected Nuxt pages, keep the layer and set
+`auth.accountEnabled: false` in app config.
 
 When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 
@@ -110,6 +113,7 @@ When enabled, the auth layer is aligned with `stir_account` endpoints and uses `
 
 Behavior notes:
 
+- `auth.accountEnabled: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
 - Client auth state comes from `/api/auth/session` only.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
 - Password reset and verification links are backend-signed and validated before submit.

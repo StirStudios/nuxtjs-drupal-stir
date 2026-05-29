@@ -1,4 +1,5 @@
 import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
+import { useAuthConfig } from '../composables/auth/useAuthConfig'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
 
@@ -46,8 +47,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!isProtected) return
 
+  const { accountEnabled } = useAuthConfig()
   const allowAuthenticatedUserBypass =
-    config.allowAuthenticatedUserBypass !== false
+    accountEnabled.value && config.allowAuthenticatedUserBypass !== false
   const protectedSession = useProtectedSession()
 
   await protectedSession.fetchSession()

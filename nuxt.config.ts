@@ -261,8 +261,8 @@ export default defineNuxtConfig({
     public: {
       api: process.env.DRUPAL_URL,
       plausible: {
-        enabled: false,
-        domain: '',
+        enabled: process.env.NUXT_ENV === 'production',
+        domain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
         apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
         autoPageviews: true,
         proxy: false,

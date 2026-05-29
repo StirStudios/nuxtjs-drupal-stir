@@ -6,16 +6,24 @@ export function useAuthConfig() {
   const loginRedirectPath = computed(
     () => auth.value.loginRedirectPath || '/',
   )
-  const logoutRedirectPath = computed(
-    () => auth.value.logoutRedirectPath || '/auth/login',
-  )
   const protectedFallbackRedirectPath = computed(
     () => auth.value.protectedFallbackRedirectPath || '/',
   )
+  const accountEnabled = computed(() => auth.value.accountEnabled !== false)
+  const logoutRedirectPath = computed(() => {
+    const path = auth.value.logoutRedirectPath
+
+    if (!accountEnabled.value && (!path || path === '/auth/login')) {
+      return protectedFallbackRedirectPath.value
+    }
+
+    return path || '/auth/login'
+  })
 
   return {
     auth,
     protectedRoutes,
+    accountEnabled,
     loginRedirectPath,
     logoutRedirectPath,
     protectedFallbackRedirectPath,

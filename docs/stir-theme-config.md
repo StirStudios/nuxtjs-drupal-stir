@@ -90,12 +90,38 @@ protectedRoutes: {
 }
 ```
 
+### 🔑 `auth`
+
+```ts
+auth: {
+  accountEnabled: true,
+  protectedFallbackRedirectPath: '/',
+}
+```
+
+- `accountEnabled: false` disables account UI routes while keeping `/auth/protected` available.
+- Use this for sites that only need password-protected Nuxt pages.
+
+### 🔎 `cmsGlobalSeo`
+
+```ts
+cmsGlobalSeo: {
+  enabled: false,
+  ignoredPathPrefixes: ['/account', '/auth'],
+  ignoredPaths: [],
+  drupalRouteNames: ['slug'],
+}
+```
+
+- Disabled by default because `/api/seo/global` requires downstream Drupal support.
+- Set `enabled: true` to fetch `/api/seo/global` and apply Drupal global SEO defaults.
+
 ### 📊 `analytics`
 
 ```ts
 analytics: {
   plausible: {
-    enabled: false,
+    enabled: false, // optional production opt-out
     domain: 'domainname.com', // without https://www
   },
 }
@@ -104,6 +130,7 @@ analytics: {
 Migration note:
 - `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
 - Plausible now uses `@nuxtjs/plausible` with `analytics.plausible` only overriding `enabled` and `domain`.
+- `analytics.plausible.enabled` can disable Plausible, but `NUXT_ENV=production` controls whether it can run.
 - Use `NUXT_PUBLIC_PLAUSIBLE_API_HOST` for API host overrides.
 
 ### 💬 `popup`
