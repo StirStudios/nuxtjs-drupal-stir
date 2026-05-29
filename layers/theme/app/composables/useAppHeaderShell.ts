@@ -3,7 +3,10 @@ import type {
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import type { MaybeRefOrGetter } from 'vue'
-import { toValue } from 'vue'
+import {
+  toValue,
+  useId,
+} from 'vue'
 import {
   menuItemTo,
   type DrupalMenuItemLink,
@@ -104,6 +107,7 @@ export async function useAppHeaderShell(options: UseAppHeaderShellOptions = {}) 
   const hydrated = ref(false)
   const forceScrolled = ref(false)
   const menuOpen = ref(false)
+  const menuId = useId()
   const headerUi = {
     root: '',
     container: 'flex items-center justify-between gap-3',
@@ -143,13 +147,19 @@ export async function useAppHeaderShell(options: UseAppHeaderShellOptions = {}) 
     const slideover = theme.navigation.slideover
     const angleEnabled = Boolean(slideover?.angle)
 
-    if (!angleEnabled) return { 'aria-label': 'Site navigation menu' }
+    if (!angleEnabled) {
+      return {
+        id: menuId,
+        'aria-label': 'Site navigation menu',
+      }
+    }
 
     const degRaw = Number(slideover?.angleDeg ?? 35)
     const angleDeg = Number.isFinite(degRaw) ? degRaw : 35
     const angleEdge = Math.min(48, Math.max(12, angleDeg * 0.65))
 
     return {
+      id: menuId,
       'aria-label': 'Site navigation menu',
       class: [
         menuContentBase,
@@ -289,6 +299,7 @@ export async function useAppHeaderShell(options: UseAppHeaderShellOptions = {}) 
     menuContent,
     menuContentClasses,
     menuHeaderClasses,
+    menuId,
     menuOpen,
     menuOverlayClasses,
     menuSide,

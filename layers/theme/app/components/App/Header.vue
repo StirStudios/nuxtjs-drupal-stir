@@ -19,6 +19,7 @@ const {
   menuContent,
   menuContentClasses,
   menuHeaderClasses,
+  menuId,
   menuOpen,
   menuOverlayClasses,
   menuSide,
@@ -54,6 +55,7 @@ const {
       >
         <UButton
           v-if="menuToggleSide === 'left'"
+          :aria-controls="menuId"
           :aria-expanded="menuOpen"
           :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
           :class="toggleClasses"
@@ -103,6 +105,7 @@ const {
 
         <UButton
           v-if="menuToggleSide === 'right'"
+          :aria-controls="menuId"
           :aria-expanded="menuOpen"
           :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
           :class="toggleClasses"
@@ -133,6 +136,7 @@ const {
         :header-class="menuHeaderClasses"
         :left-class="headerUi.left"
         :logo-classes="logoClasses"
+        :menu-id="menuId"
         :right-class="headerRightClasses"
         :show-color-mode-toggle="showColorModeToggle"
         :show-logo="Boolean(theme.navigation.logo)"
