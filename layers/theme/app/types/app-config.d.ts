@@ -24,6 +24,7 @@ type AuthSubmitButtonConfig = {
 } & LooseRecord
 
 type AuthConfig = {
+  accountEnabled?: boolean
   loginRedirectPath?: string
   logoutRedirectPath?: string
   protectedFallbackRedirectPath?: string

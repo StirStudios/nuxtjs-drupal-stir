@@ -33,6 +33,7 @@ Auth form submit button defaults can be customized through app config:
 ```ts
 export default defineAppConfig({
   auth: {
+    accountEnabled: true,
     submitButton: {
       class: '',
       size: 'xl',
@@ -41,5 +42,9 @@ export default defineAppConfig({
   },
 })
 ```
+
+Set `auth.accountEnabled: false` when a project only needs `/auth/protected`
+for password-protected Nuxt pages. Account UI routes are redirected to
+`auth.protectedFallbackRedirectPath`, while protected-page access keeps working.
 
 Page-level submit props passed to `AuthCard` take priority over `auth.submitButton`.

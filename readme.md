@@ -98,6 +98,8 @@ extends: ['./layers/auth']
 ```
 
 If a downstream project does not need auth/account UI or APIs, remove that `extends` entry.
+If it only needs password-protected Nuxt pages, keep the layer and set
+`auth.accountEnabled: false` in app config.
 
 When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 
@@ -111,6 +113,7 @@ When enabled, the auth layer is aligned with `stir_account` endpoints and uses `
 
 Behavior notes:
 
+- `auth.accountEnabled: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
 - Client auth state comes from `/api/auth/session` only.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
 - Password reset and verification links are backend-signed and validated before submit.

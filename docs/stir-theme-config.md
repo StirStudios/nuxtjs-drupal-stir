@@ -90,6 +90,31 @@ protectedRoutes: {
 }
 ```
 
+### 🔑 `auth`
+
+```ts
+auth: {
+  accountEnabled: true,
+  protectedFallbackRedirectPath: '/',
+}
+```
+
+- `accountEnabled: false` disables account UI routes while keeping `/auth/protected` available.
+- Use this for sites that only need password-protected Nuxt pages.
+
+### 🔎 `cmsGlobalSeo`
+
+```ts
+cmsGlobalSeo: {
+  enabled: true,
+  ignoredPathPrefixes: ['/account', '/auth'],
+  ignoredPaths: [],
+  drupalRouteNames: ['slug'],
+}
+```
+
+- `enabled: false` disables the client fetch to `/api/seo/global` and skips applying Drupal global SEO defaults.
+
 ### 📊 `analytics`
 
 ```ts

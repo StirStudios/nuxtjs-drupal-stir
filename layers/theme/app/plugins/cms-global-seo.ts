@@ -107,7 +107,7 @@ export default defineNuxtPlugin(async () => {
     },
   )
 
-  if (defaults.value === null) {
+  if (config.enabled && defaults.value === null) {
     defaults.value = await $fetch<CmsGlobalSeo>('/api/seo/global').catch(() => ({
       meta: [],
       link: [],
