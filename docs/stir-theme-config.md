@@ -106,14 +106,15 @@ auth: {
 
 ```ts
 cmsGlobalSeo: {
-  enabled: true,
+  enabled: false,
   ignoredPathPrefixes: ['/account', '/auth'],
   ignoredPaths: [],
   drupalRouteNames: ['slug'],
 }
 ```
 
-- `enabled: false` disables the client fetch to `/api/seo/global` and skips applying Drupal global SEO defaults.
+- Disabled by default because `/api/seo/global` requires downstream Drupal support.
+- Set `enabled: true` to fetch `/api/seo/global` and apply Drupal global SEO defaults.
 
 ### 📊 `analytics`
 

@@ -6,7 +6,7 @@ import {
 
 export default defineAppConfig({
   cmsGlobalSeo: {
-    enabled: true,
+    enabled: false,
     ignoredPathPrefixes: ['/account', '/auth'],
     ignoredPaths: [],
     drupalRouteNames: ['slug'],
