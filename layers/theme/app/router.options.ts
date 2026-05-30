@@ -1,4 +1,5 @@
 import type { RouterOptions } from '@nuxt/schema'
+import { useNuxtApp } from '#app'
 
 const SAVED_POSITION_ATTEMPTS = 60
 const HASH_TARGET_ATTEMPTS = 60
@@ -26,7 +27,8 @@ async function waitForSavedPositionHeight(top: number) {
 function safeDecodeURIComponent(value: string) {
   try {
     return decodeURIComponent(value)
-  } catch {
+  }
+  catch {
     return value
   }
 }
@@ -50,10 +52,37 @@ async function waitForHashElement(hash: string) {
   return null
 }
 
+function waitForPageFinish() {
+  const nuxtApp = useNuxtApp()
+
+  return new Promise<void>((resolve) => {
+    let offFinish = () => {}
+    let offError = () => {}
+    const done = () => {
+      offFinish()
+      offError()
+
+      resolve()
+    }
+
+    offFinish = nuxtApp.hook('page:finish', done)
+    offError = nuxtApp.hook('app:error', done)
+  })
+}
+
+async function waitForRoutePageFinish(toPath: string, fromPath: string) {
+  if (toPath === fromPath) return
+
+  await waitForPageFinish()
+  await nextFrame()
+}
+
 export default <RouterOptions>{
   async scrollBehavior(to, from, savedPosition) {
     if (savedPosition && typeof savedPosition.top === 'number') {
+      await waitForRoutePageFinish(to.path, from.path)
       await waitForSavedPositionHeight(savedPosition.top)
+
       return savedPosition
     }
 
@@ -62,6 +91,7 @@ export default <RouterOptions>{
     if (to.path === from.path && !to.hash) return false
 
     if (to.hash) {
+      await waitForRoutePageFinish(to.path, from.path)
       const element = await waitForHashElement(to.hash)
 
       return element
@@ -71,6 +101,8 @@ export default <RouterOptions>{
           }
         : { top: 0 }
     }
+
+    await waitForRoutePageFinish(to.path, from.path)
 
     return { top: 0 }
   },
