@@ -80,7 +80,6 @@ async function waitForRoutePageFinish(toPath: string, fromPath: string) {
 export default <RouterOptions>{
   async scrollBehavior(to, from, savedPosition) {
     if (savedPosition && typeof savedPosition.top === 'number') {
-      await waitForRoutePageFinish(to.path, from.path)
       await waitForSavedPositionHeight(savedPosition.top)
 
       return savedPosition
