@@ -122,8 +122,21 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: string
   variant?: string
+  desktopLayout?: 'default' | 'split-logo' | string
+  logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   header?: ClassValue
+  splitLogo?: {
+    center?: ClassValue
+    container?: ClassValue
+    desktopNav?: ClassValue
+    leftNav?: ClassValue
+    logoLink?: ClassValue
+    mobileLogo?: ClassValue
+    mobileLeft?: ClassValue
+    right?: ClassValue
+    rightNav?: ClassValue
+  } & LooseRecord
   highlight?: {
     show?: boolean
     color?: string
@@ -133,6 +146,7 @@ type StirThemeNavigationConfig = {
     angle?: boolean
     angleDeg?: number
     link?: ClassValue
+    list?: ClassValue
     body?: ClassValue
   } & LooseRecord
 } & LooseRecord

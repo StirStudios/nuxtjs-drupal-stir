@@ -2,11 +2,10 @@
 import { Motion } from 'motion-v'
 import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
-import { useHeroSnapshot } from '~/composables/useHeroSnapshot'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
+import { useNavLockedSnapshot } from '~/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import { useNavLock } from '~/composables/useNavLock'
 
 const props = defineProps<{
   mode?: 'full' | 'simple'
@@ -32,7 +31,6 @@ const { observeVideos } = useIntersectionObserver()
 const { getPage } = useDrupalCe()
 const page = getPage()
 const { isFront } = usePageContext()
-const { locked } = useNavLock()
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => pageProps.value?.title || '')
@@ -44,16 +42,14 @@ if (props.mode !== 'simple') {
   provide('isHero', true)
 }
 
-const {
-  isFrontEffective,
-  titleEffective: pageTitleEffective,
-  hideEffective: pageHideEffective,
-} = useHeroSnapshot({
-  locked,
-  isFront,
-  title: pageTitle,
-  hide: pageHide,
-})
+const heroSnapshot = useNavLockedSnapshot(computed(() => ({
+  hide: pageHide.value,
+  isFront: isFront.value,
+  title: pageTitle.value,
+})))
+const isFrontEffective = computed(() => heroSnapshot.value.isFront)
+const pageTitleEffective = computed(() => heroSnapshot.value.title)
+const pageHideEffective = computed(() => heroSnapshot.value.hide)
 
 const hideHeroSection = computed(
   () => props.mode !== 'simple' && pageHideEffective.value && !isFrontEffective.value,

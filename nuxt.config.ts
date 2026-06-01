@@ -2,7 +2,8 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
-const resolveLayerPath = (path: string) => fileURLToPath(new URL(path, import.meta.url))
+const resolveLayerPath = (path: string) =>
+  fileURLToPath(new URL(path, import.meta.url))
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 const isProductionEnv = process.env.NUXT_ENV === 'production'
@@ -25,7 +26,8 @@ function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
 
   try {
     const url = new URL(String(loc), 'https://example.com')
-    const pathname = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
+    const pathname =
+      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
 
     return url.search ? pathname + url.search : pathname
   } catch {
@@ -53,7 +55,7 @@ function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
 }
 
 export default defineNuxtConfig({
-  compatibilityDate: '2026-05-25',
+  compatibilityDate: '2026-05-29',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
 
   features: {
@@ -143,6 +145,7 @@ export default defineNuxtConfig({
 
   experimental: {
     appManifest: false,
+    entryImportMap: false,
   },
 
   hooks: {
@@ -244,7 +247,8 @@ export default defineNuxtConfig({
       'nuxtjs-drupal-ce',
       {
         drupalBaseUrl: drupalUrl,
-        menuBaseUrl: process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || drupalUrl,
+        menuBaseUrl:
+          process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || drupalUrl,
         exposeAPIRouteRules: true,
         disableFormHandler: true,
         enableComponentPreview: false,
