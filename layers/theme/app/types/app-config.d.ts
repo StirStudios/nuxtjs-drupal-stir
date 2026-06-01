@@ -179,13 +179,55 @@ type StirThemeSocialConfig = {
 } & LooseRecord
 
 type StirThemeFooterConfig = {
-  hideEmail?: boolean
-  rights?: string
+  action?: ClassValue
+  actions?: Array<{
+    label?: string
+    to?: string
+    href?: string
+    target?: string
+    class?: ClassValue
+    color?: string
+    variant?: string
+  } & LooseRecord>
+  actionsWrapper?: ClassValue
   base?: ClassValue
+  contactEmail?: ClassValue
+  contactLinks?: ClassValue
+  container?: ClassValue
+  content?: ClassValue
+  hideEmail?: boolean
+  layout?: 'default' | 'columns' | 'stacked' | string
+  logo?: ClassValue
+  menu?: ClassValue
+  menuItem?: ClassValue
+  menuList?: ClassValue
+  requireSiteName?: boolean
+  rights?: string
   left?: ClassValue
   right?: ClassValue
+  sections?: {
+    left?: string[]
+    center?: string[]
+    right?: string[]
+  } & LooseRecord
+  showActions?: boolean
+  showCopyright?: boolean
+  showEmail?: boolean
+  showFooterRegion?: boolean
+  showLogo?: boolean
+  showMenu?: boolean
+  showPoweredBy?: boolean
+  showSlogan?: boolean
+  showSocials?: boolean
+  showSubFooterRegion?: boolean
+  copyright?: ClassValue
+  email?: ClassValue
   footerLinks?: ClassValue
+  poweredBy?: ClassValue
   poweredby?: boolean
+  slogan?: ClassValue
+  socialIcon?: ClassValue
+  socials?: ClassValue
 } & LooseRecord
 
 type StirThemeMediaConfig = {

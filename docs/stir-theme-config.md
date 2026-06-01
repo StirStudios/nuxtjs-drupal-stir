@@ -295,14 +295,56 @@ Set `portal: false` when the layer is rendered inside a Shadow DOM host and you 
 ```ts
 footer: {
   hideEmail: false,
+  layout: 'default', // 'default', 'columns', or 'stacked'
+  requireSiteName: false,
   base: 'mt-20 bg-accented dark:bg-muted/50 py-10 text-default text-sm',
+  container: '',
+  content: 'flex flex-col items-center justify-center gap-4 text-center',
   left: 'text-sm leading-relaxed lg:text-left',
   right: 'lg:items-end flex flex-col items-center gap-2 lg:text-right',
+  sections: {
+	left: ['logo'],
+	center: ['menu', 'legal'],
+	right: ['socials', 'email'],
+  },
+  actions: [
+	// { label: 'Inquire', to: '/inquire' },
+  ],
+  action: '',
+  actionsWrapper: '',
+  copyright: 'mb-0',
+  email: '',
   footerLinks: 'transition-colors text-primary hover:text-primary/90',
-  poweredby: true, // Hide powered by
+  logo: '',
+  menu: 'mb-3',
+  menuItem: 'min-w-0 py-0',
+  menuList: 'flex flex-wrap justify-center',
+  poweredBy: 'mb-0',
+  poweredby: true, // Legacy alias. Prefer showPoweredBy.
   rights: '', // Add additional rights
+  showActions: true,
+  showCopyright: true,
+  showEmail: true,
+  showFooterRegion: true,
+  showLogo: true,
+  showMenu: true,
+  showPoweredBy: true,
+  showSlogan: false,
+  showSocials: true,
+  showSubFooterRegion: true,
+  slogan: 'mb-2',
+  socialIcon: 'me-1',
+  socials: 'flex gap-1',
 }
 ```
+
+Footer `sections` accepts these atoms: `logo`, `actions`, `menu`, `socials`,
+`slogan`, `email`, `legal`, `copyright`, and `poweredBy`. The default `legal`
+atom preserves the original single copyright/powered-by paragraph. Use
+`layout: 'stacked'` for a single centered footer column, or keep
+`default`/`columns` for the standard left/center/right `UFooter` slots.
+`AppFooterContactLinks` is also available for links-page style social/email
+blocks.
 
 ### 🌐 `socials`
 
