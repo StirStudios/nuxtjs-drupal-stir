@@ -230,7 +230,20 @@ navigation: {
   background: 'border-none bg-white/90 shadow backdrop-blur-md dark:bg-gray-950/70',
   color: 'primary',
   variant: 'link',
+  desktopLayout: 'default', // 'default' or 'split-logo'
+  logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'
+  splitLogo: {
+	center: 'flex-1 items-center justify-center',
+	container: 'relative',
+	desktopNav: 'hidden lg:flex',
+	leftNav: 'app-nav app-nav-left',
+	logoLink: 'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
+	mobileLogo: 'lg:hidden',
+	mobileLeft: 'lg:hidden flex items-center gap-1.5',
+	right: 'lg:absolute lg:right-4',
+	rightNav: 'app-nav app-nav-right',
+  },
   highlight: {
 	show: false,
 	color: 'primary',
@@ -238,10 +251,17 @@ navigation: {
   slideover: {
 	logo: true,
 	link: 'text-xl text-center block my-3 uppercase',
+	list: '',
 	body: 'flex h-full flex-col justify-center text-center',
   },
 }
 ```
+
+For a centered-logo desktop header, set `navigation.desktopLayout` to
+`'split-logo'` and place a placeholder Drupal menu link whose title matches
+`navigation.logoMenuMarker`. The marker must be present in the menu API output.
+Items before that marker render to the left of the logo, items after it render
+to the right, and the marker is removed from the mobile menu.
 
 ### 🏠 `front`
 

@@ -42,6 +42,7 @@ const headerUi = {
 
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
+type DesktopHeaderLayout = 'default' | 'split-logo'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
 type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
@@ -65,6 +66,8 @@ const toToggleDirection = (value: unknown): ToggleDirection => {
     : 'right'
 }
 const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
+const toDesktopHeaderLayout = (value: unknown): DesktopHeaderLayout =>
+  value === 'split-logo' ? 'split-logo' : 'default'
 
 const toStringProp = <T extends string>(value: unknown): T | undefined =>
   typeof value === 'string' && value.trim() ? value.trim() as T : undefined
@@ -96,6 +99,8 @@ const headerHighlightColor = computed(() =>
   theme.navigation?.highlight?.show ? toNavigationColor(theme.navigation.highlight?.color) : undefined,
 )
 const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
+const desktopHeaderLayout = computed(() => toDesktopHeaderLayout(theme.navigation?.desktopLayout))
+const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-logo')
 const siteTitle = computed(() => page.value?.site_info?.name ?? '')
 const showColorModeToggle = computed(() => appConfig.colorMode?.showToggle !== false)
 const finalIsScrolled = computed(() => {
@@ -133,6 +138,7 @@ const headerContainerClasses = computed(() =>
   [
     headerUi.container,
     toClassName(theme.navigation.container),
+    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.container) : '',
   ].filter(Boolean).join(' '),
 )
 const logoClasses = computed(() =>
@@ -143,6 +149,23 @@ const logoClasses = computed(() =>
       ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
       : theme.navigation.logoSize,
   ].join(' '),
+)
+const mobileLogoClasses = computed(() =>
+  [
+    toClassName(theme.navigation.splitLogo?.mobileLogo),
+    logoClasses.value,
+  ].filter(Boolean).join(' '),
+)
+const headerLeftClasses = computed(() =>
+  isSplitLogoLayout.value
+    ? toClassName(theme.navigation.splitLogo?.mobileLeft) || headerUi.left
+    : headerUi.left,
+)
+const headerCenterClasses = computed(() =>
+  [
+    headerUi.center,
+    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.center) : '',
+  ].filter(Boolean).join(' '),
 )
 const menuContent = computed(() => {
   const slideover = theme.navigation.slideover
@@ -196,6 +219,7 @@ const headerRightClasses = computed(() =>
     appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false
       ? 'block lg:hidden lg:flex-0'
       : 'lg:flex-1',
+    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.right) : '',
   ].filter(Boolean).join(' '),
 )
 const toggleClasses = computed(() =>
@@ -211,6 +235,14 @@ const toggleIcon = computed(() => {
 })
 
 const mainMenu = await fetchMenu('main')
+const splitLogoMarker = computed(() => toStringProp(theme.navigation?.logoMenuMarker))
+const splitDesktopNavClasses = computed(() =>
+  toClassName(theme.navigation.splitLogo?.desktopNav) || 'hidden lg:flex',
+)
+const splitLeftNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.leftNav))
+const splitRightNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.rightNav))
+const splitLogoLinkClasses = computed(() => toClassName(theme.navigation.splitLogo?.logoLink))
+const slideoverListClasses = computed(() => toClassName(theme.navigation.slideover?.list))
 
 function menuChildren(item: MainMenuItem): MainMenuItem[] {
   if (Array.isArray(item.children)) return item.children
@@ -235,6 +267,22 @@ function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
 
 const navLinks = computed<NavigationMenuItem[]>(() =>
   mainMenu.value.map((item: MainMenuItem) => mapMenuItem(item)),
+)
+const logoIndex = computed(() => {
+  if (!isSplitLogoLayout.value || !splitLogoMarker.value) return -1
+
+  return navLinks.value.findIndex((item) => item.label === splitLogoMarker.value)
+})
+const beforeLogo = computed(() =>
+  logoIndex.value > -1
+    ? navLinks.value.slice(0, logoIndex.value)
+    : navLinks.value,
+)
+const afterLogo = computed(() =>
+  logoIndex.value > -1 ? navLinks.value.slice(logoIndex.value + 1) : [],
+)
+const mobileNavLinks = computed(() =>
+  logoIndex.value > -1 ? [...beforeLogo.value, ...afterLogo.value] : navLinks.value,
 )
 
 function toggleMenu() {
@@ -287,7 +335,7 @@ watch(menuOpen, (val) => {
       data-slot="container"
     >
       <div
-        :class="headerUi.left"
+        :class="headerLeftClasses"
         data-slot="left"
       >
         <UButton
@@ -311,7 +359,7 @@ watch(menuOpen, (val) => {
         >
           <AppLogo
             v-if="theme.navigation.logo"
-            :add-classes="logoClasses"
+            :add-classes="isSplitLogoLayout ? mobileLogoClasses : logoClasses"
           />
           <template v-else>
             {{ siteTitle }}
@@ -320,10 +368,44 @@ watch(menuOpen, (val) => {
       </div>
 
       <div
-        :class="headerUi.center"
+        :class="headerCenterClasses"
         data-slot="center"
       >
+        <template v-if="isSplitLogoLayout">
+          <LazyUNavigationMenu
+            v-if="beforeLogo.length"
+            aria-label="Site Navigation"
+            :class="[splitDesktopNavClasses, splitLeftNavClasses]"
+            :color="headerNavColor"
+            :highlight="theme.navigation.highlight.show"
+            :highlight-color="headerHighlightColor"
+            :items="beforeLogo"
+            :variant="headerNavVariant"
+          />
+
+          <ULink
+            v-if="theme.navigation.logo"
+            aria-label="Site Logo"
+            :class="splitLogoLinkClasses"
+            to="/"
+          >
+            <AppLogo :add-classes="logoClasses" />
+          </ULink>
+
+          <LazyUNavigationMenu
+            v-if="afterLogo.length"
+            aria-label="Site Navigation"
+            :class="[splitDesktopNavClasses, splitRightNavClasses]"
+            :color="headerNavColor"
+            :highlight="theme.navigation.highlight.show"
+            :highlight-color="headerHighlightColor"
+            :items="afterLogo"
+            :variant="headerNavVariant"
+          />
+        </template>
+
         <LazyUNavigationMenu
+          v-else
           aria-label="Site Navigation"
           class="app-nav app-nav-desktop"
           :color="headerNavColor"
@@ -386,8 +468,9 @@ watch(menuOpen, (val) => {
 
       <LazyAppHeaderMobileMenu
         :body-class="menuBodyClasses"
-        :items="navLinks"
+        :items="mobileNavLinks"
         :link-class="theme.navigation.slideover.link"
+        :list-class="slideoverListClasses"
       />
     </template>
   </LazyUSlideover>
