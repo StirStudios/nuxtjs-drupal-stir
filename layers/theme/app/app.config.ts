@@ -139,11 +139,6 @@ export default defineAppConfig({
       content: 'flex flex-col items-center justify-center gap-4 text-center',
       left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
       right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
-      sections: {
-        left: ['logo'],
-        center: ['menu', 'legal'],
-        right: ['socials', 'email'],
-      },
       actions: [],
       action: '',
       actionsWrapper: '',
