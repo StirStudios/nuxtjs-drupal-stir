@@ -66,7 +66,7 @@ const footerMenuItems = computed(() =>
   })),
 )
 const footerSections = computed<Required<FooterSections>>(() => {
-  const configured = footerConfig.value.sections || {}
+  const configured = (footerConfig.value as { sections?: FooterSections }).sections || {}
 
   if (footerLayout.value === 'stacked') {
     return {
