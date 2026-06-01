@@ -144,6 +144,8 @@ export default defineAppConfig({
       actionsWrapper: '',
       copyright: 'mb-0',
       email: '',
+      contactEmail: 'mt-3 inline-block',
+      contactLinks: 'social mt-10',
       footerLinks: 'transition-colors text-primary hover:text-primary/90',
       logo: '',
       menu: 'mb-3',
