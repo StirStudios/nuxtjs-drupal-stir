@@ -41,6 +41,11 @@ const toStringArray = (value: unknown): string[] | undefined => {
 
   return items.length ? items : undefined
 }
+const toSectionAtoms = (value: unknown): string[] | undefined => {
+  const items = toStringArray(value)
+
+  return items?.filter((item, index) => items.indexOf(item) === index)
+}
 
 const footerConfig = computed(() => theme.footer)
 const footerLayout = computed(() => toFooterLayout(footerConfig.value.layout))
@@ -66,15 +71,15 @@ const footerSections = computed<Required<FooterSections>>(() => {
   if (footerLayout.value === 'stacked') {
     return {
       left: [],
-      center: toStringArray(configured.center) || ['actions', 'menu', 'socials', 'legal'],
+      center: toSectionAtoms(configured.center) || ['actions', 'menu', 'socials', 'legal'],
       right: [],
     }
   }
 
   return {
-    left: toStringArray(configured.left) || ['logo'],
-    center: toStringArray(configured.center) || ['menu', 'legal'],
-    right: toStringArray(configured.right) || ['socials', 'email'],
+    left: toSectionAtoms(configured.left) || ['logo'],
+    center: toSectionAtoms(configured.center) || ['menu', 'legal'],
+    right: toSectionAtoms(configured.right) || ['socials', 'email'],
   }
 })
 const footerClasses = computed(() => ({
