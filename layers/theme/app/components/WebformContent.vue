@@ -5,6 +5,7 @@ import { cleanHTML } from '~/utils/cleanHTML'
 import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
+  buttonClass?: string
   buttonSize?: unknown
   fieldGroup?: string
   fieldGroupHeader?: string
@@ -125,6 +126,7 @@ const buttonSize = computed<UiSize>(() =>
 
     <WrapDiv :align="props.themeWebform.submitAlign">
       <UButton
+        :class="props.themeWebform.buttonClass"
         :disabled="!isSchemaReady || isLoading"
         :label="submitButtonLabel"
         :loading="isLoading"

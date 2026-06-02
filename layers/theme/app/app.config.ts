@@ -228,6 +228,7 @@ export default defineAppConfig({
       description: 'desc mb-3 text-muted',
       help: 'desc my-3 text-muted',
       submitAlign: '',
+      buttonClass: '',
       buttonSize: '2xl',
       variant: 'outline',
     },
