@@ -41,6 +41,11 @@ export default defineAppConfig({
     layout: 'card',
     imagePosition: 'left',
     showIcon: true,
+    backButton: {
+      enabled: false,
+      label: 'Back',
+      to: '/',
+    },
     submitButton: {
       class: '',
       size: 'xl',
@@ -66,6 +71,7 @@ Set `auth.imagePosition` or a page-level `imagePosition` to `left` or `right`.
 Page-level values under `auth.login`, `auth.register`, `auth.passwordRequest`,
 `auth.passwordReset`, and `auth.protectedPage` override the global auth values.
 Set `showIcon: false` globally or on an auth page to hide the auth form icon.
+Set `auth.backButton.enabled: true` to render a fixed auth-shell back button.
 
 Set `auth.accountEnabled: false` when a project only needs `/auth/protected`
 for password-protected Nuxt pages. Account UI routes are redirected to

@@ -64,6 +64,16 @@ const resolveAuthPageConfig = (pageKey: AuthPageConfigKey | null): Record<string
   return typeof pageConfig === 'object' && pageConfig !== null ? (pageConfig as Record<string, unknown>) : undefined
 }
 
+const resolveConfigObject = (value: unknown): Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {}
+}
+
+const resolveConfigString = (value: unknown, fallback = ''): string => {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback
+}
+
 const authPageConfig = computed(() => resolveAuthPageConfig(resolveAuthPageKey()))
 
 const pageLayout = computed<AuthLayout>(() =>
@@ -85,6 +95,8 @@ const showIcon = computed(() => {
 
   return typeof authConfig.showIcon === 'boolean' ? authConfig.showIcon : true
 })
+
+const backButtonConfig = computed(() => resolveConfigObject(authConfig.backButton))
 
 const pageBackgroundImage = computed(() => {
   const pageImage = typeof authPageConfig.value?.backgroundImage === 'string'
@@ -137,6 +149,16 @@ const isResolvedCardSplit = computed(() =>
   pageLayout.value === 'card-split' && hasResolvedBackgroundImage.value,
 )
 
+const backButtonProps = computed(() => ({
+  show: backButtonConfig.value.enabled === true,
+  label: resolveConfigString(backButtonConfig.value.label, 'Back'),
+  to: resolveConfigString(backButtonConfig.value.to, '/'),
+  class: resolveConfigString(backButtonConfig.value.class, 'fixed bottom-4 left-4 z-50 shadow-md'),
+  icon: resolveConfigString(backButtonConfig.value.icon, 'i-lucide-arrow-left'),
+  color: resolveConfigString(backButtonConfig.value.color, 'neutral'),
+  variant: resolveConfigString(backButtonConfig.value.variant, 'ghost'),
+}))
+
 const layoutContext = computed(() => ({
   layout: pageLayout.value,
   imagePosition: imagePosition.value,
@@ -157,7 +179,7 @@ provide(authLayoutContextKey, layoutContext)
     <div
       v-if="isSplitImageFirst"
       aria-hidden="true"
-      class="hidden bg-cover bg-center bg-no-repeat lg:block lg:min-h-screen"
+      class="hidden min-h-screen bg-cover bg-center bg-no-repeat lg:block"
       :style="imagePanelStyle"
     />
     <main class="flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6 lg:bg-default lg:px-12" role="main">
@@ -168,7 +190,7 @@ provide(authLayoutContextKey, layoutContext)
     <div
       v-if="!isSplitImageFirst"
       aria-hidden="true"
-      class="hidden bg-cover bg-center bg-no-repeat lg:block lg:min-h-screen"
+      class="hidden min-h-screen bg-cover bg-center bg-no-repeat lg:block"
       :style="imagePanelStyle"
     />
   </div>
@@ -184,4 +206,14 @@ provide(authLayoutContextKey, layoutContext)
       <slot />
     </main>
   </div>
+
+  <UButton
+    v-if="backButtonProps.show"
+    :class="backButtonProps.class"
+    :color="backButtonProps.color"
+    :icon="backButtonProps.icon"
+    :label="backButtonProps.label"
+    :to="backButtonProps.to"
+    :variant="backButtonProps.variant"
+  />
 </template>
