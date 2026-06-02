@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import type { AuthFormField, FormError } from '@nuxt/ui'
+
+defineProps<{
+  title: string
+  description: string
+  icon?: string
+  fields: AuthFormField[]
+  submit: Record<string, unknown>
+  loading?: boolean
+  validate?: (
+    state: Record<string, unknown>,
+  ) => FormError<string>[] | Promise<FormError<string>[]>
+}>()
+
+defineEmits<{
+  submit: [event: unknown]
+  error: [event: unknown]
+}>()
+
+defineSlots<{
+  'password-field'?: (props: { field: AuthFormField; state: Record<string, string | undefined> }) => unknown
+  'confirmPassword-field'?: (props: { field: AuthFormField; state: Record<string, string | undefined> }) => unknown
+  'password-hint'?: () => unknown
+  validation?: () => unknown
+  footer?: () => unknown
+}>()
+</script>
+
+<template>
+  <UAuthForm
+    :description="description"
+    :fields="fields"
+    :icon="icon"
+    :loading="loading"
+    :submit="submit"
+    :title="title"
+    :validate="validate"
+    @error="$emit('error', $event)"
+    @submit="$emit('submit', $event)"
+  >
+    <!-- @vue-ignore UAuthForm exposes scoped field slots that are not typed upstream. -->
+    <template #password-field="{ state, field }">
+      <slot :field="field" name="password-field" :state="state" />
+    </template>
+    <!-- @vue-ignore UAuthForm exposes scoped field slots that are not typed upstream. -->
+    <template #confirmPassword-field="{ state, field }">
+      <slot :field="field" name="confirmPassword-field" :state="state" />
+    </template>
+    <template #password-hint>
+      <slot name="password-hint" />
+    </template>
+    <template #validation>
+      <slot name="validation" />
+    </template>
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </UAuthForm>
+</template>

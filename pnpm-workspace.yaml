@@ -1,0 +1,5 @@
+packages:
+  - .
+
+overrides:
+  nuxt: 4.4.6

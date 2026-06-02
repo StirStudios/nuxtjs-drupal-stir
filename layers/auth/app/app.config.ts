@@ -11,6 +11,9 @@ export default defineAppConfig({
     logoutRedirectPath: '/auth/login',
     protectedFallbackRedirectPath: '/',
     backgroundImage: '',
+    layout: 'card',
+    imagePosition: 'left',
+    showIcon: true,
     submitButton: {
       class: '',
       size: 'xl',
@@ -30,7 +33,8 @@ export default defineAppConfig({
     },
     passwordRequest: {
       title: 'Reset Password',
-      description: 'Enter your email or username to receive reset instructions.',
+      description:
+        'Enter your email or username to receive reset instructions.',
     },
     passwordReset: {
       title: 'Choose a New Password',

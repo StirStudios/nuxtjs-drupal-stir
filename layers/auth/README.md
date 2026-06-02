@@ -37,14 +37,35 @@ Auth form submit button defaults can be customized through app config:
 export default defineAppConfig({
   auth: {
     accountEnabled: true,
+    backgroundImage: '/images/auth.jpg',
+    layout: 'card',
+    imagePosition: 'left',
+    showIcon: true,
     submitButton: {
       class: '',
       size: 'xl',
       variant: 'solid',
     },
+    login: {
+      backgroundImage: '/images/login.jpg',
+      layout: 'page-split',
+      imagePosition: 'right',
+      showIcon: false,
+    },
   },
 })
 ```
+
+Auth pages support three layouts:
+
+- `card`: centered auth card over an optional full-page background image.
+- `page-split`: full-height image panel on one side and the auth form on the other.
+- `card-split`: auth card with an image panel on one side and the form on the other.
+
+Set `auth.imagePosition` or a page-level `imagePosition` to `left` or `right`.
+Page-level values under `auth.login`, `auth.register`, `auth.passwordRequest`,
+`auth.passwordReset`, and `auth.protectedPage` override the global auth values.
+Set `showIcon: false` globally or on an auth page to hide the auth form icon.
 
 Set `auth.accountEnabled: false` when a project only needs `/auth/protected`
 for password-protected Nuxt pages. Account UI routes are redirected to
