@@ -15,7 +15,7 @@ type AuthSessionResponse = {
   mail?: string
   roles?: string[]
   user?: Record<string, unknown> | null
-}
+} & Record<string, unknown>
 
 export default defineEventHandler(async (event) => {
   const secret = layerAuthGetProtectedAccessSecret()
@@ -33,10 +33,13 @@ export default defineEventHandler(async (event) => {
       },
     )
 
+    const { authenticated, user, ...account } = response || {}
+
     return {
       authenticated: Boolean(response?.authenticated),
       protectedAuthenticated,
-      user: response?.user ?? {
+      user: user ?? {
+        ...account,
         uid: response?.uid ?? 0,
         name: response?.name ?? '',
         mail: response?.mail ?? '',

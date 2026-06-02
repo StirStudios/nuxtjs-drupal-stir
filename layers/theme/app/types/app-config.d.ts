@@ -275,6 +275,7 @@ type StirThemeWebformConfig = {
   description?: ClassValue
   help?: ClassValue
   submitAlign?: ClassValue
+  buttonClass?: ClassValue
   buttonSize?: string
   variant?: string
 } & LooseRecord

@@ -3,7 +3,7 @@ export type AuthSessionUser = {
   name: string
   mail: string
   roles: string[]
-}
+} & Record<string, unknown>
 
 export type AuthSessionResponse = {
   authenticated: boolean
@@ -18,7 +18,7 @@ export type LoginResponse = {
     name?: string
     mail?: string
     roles?: string[]
-  }
+  } & Record<string, unknown>
 }
 
 export type RegisterPayload = {
