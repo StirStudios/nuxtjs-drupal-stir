@@ -87,7 +87,6 @@ Notes:
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 - `site.indexable`, Plausible runtime enablement, and sitemap registration all require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
-- Drupal CE page and menu reads still use the internal Nuxt proxies (`/api/drupal-ce` and `/api/menu`). The layer registers those proxy handlers itself so query-bearing paths are forwarded with the original URL search string intact. Runtime overrides such as `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`, and `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL` continue to control upstream Drupal/menu targets.
 
 ## Auth + Account Integration (stir_account)
 
