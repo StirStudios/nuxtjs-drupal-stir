@@ -25,8 +25,11 @@ function checkStrength(str: string) {
 }
 
 const passwordRequirements = computed(() => {
-  const configured = auth.value.passwordPolicy?.requirements || []
-  const requirements = configured.length > 0 ? configured : defaultPasswordRequirements()
+  const policy = auth.value.passwordPolicy
+  const configured = policy?.requirements || []
+  const requirements = withPolicyLengthRequirements(
+    configured.length > 0 ? configured : defaultPasswordRequirements(policy),
+  )
   const normalized = requirements
     .map((req: AuthPasswordRequirement) => normalizePasswordRequirement(req))
     .filter((req): req is NonNullable<typeof req> => Boolean(req))
@@ -35,7 +38,7 @@ const passwordRequirements = computed(() => {
     return normalized
   }
 
-  return defaultPasswordRequirements()
+  return withPolicyLengthRequirements(defaultPasswordRequirements(policy))
     .map((req: AuthPasswordRequirement) => normalizePasswordRequirement(req))
     .filter((req): req is NonNullable<typeof req> => Boolean(req))
 })
@@ -106,9 +109,41 @@ function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
   }
 }
 
-function defaultPasswordRequirements(): AuthPasswordRequirement[] {
+function withPolicyLengthRequirements(requirements: AuthPasswordRequirement[]): AuthPasswordRequirement[] {
+  const policy = auth.value.passwordPolicy
+  const hasMinLength = requirements.some(requirement => requirement.key === 'minLength')
+  const hasMaxLength = requirements.some(requirement => requirement.key === 'maxLength')
+
   return [
-    { key: 'minLength', pattern: '.{8,}', label: 'At least 8 characters' },
+    ...(!hasMinLength && policy?.minLength
+      ? [createMinLengthRequirement(policy.minLength)]
+      : []),
+    ...requirements,
+    ...(!hasMaxLength && policy?.maxLength
+      ? [createMaxLengthRequirement(policy.maxLength)]
+      : []),
+  ]
+}
+
+function createMinLengthRequirement(minLength: number): AuthPasswordRequirement {
+  return {
+    key: 'minLength',
+    pattern: `^.{${minLength},}$`,
+    label: `At least ${minLength} characters`,
+  }
+}
+
+function createMaxLengthRequirement(maxLength: number): AuthPasswordRequirement {
+  return {
+    key: 'maxLength',
+    pattern: `^.{0,${maxLength}}$`,
+    label: `${maxLength} characters or less`,
+  }
+}
+
+function defaultPasswordRequirements(policy = auth.value.passwordPolicy): AuthPasswordRequirement[] {
+  return [
+    createMinLengthRequirement(policy?.minLength || 8),
     { key: 'number', pattern: '\\d', label: 'At least 1 number' },
     { key: 'lowercase', pattern: '[a-z]', label: 'At least 1 lowercase letter' },
     { key: 'uppercase', pattern: '[A-Z]', label: 'At least 1 uppercase letter' },
