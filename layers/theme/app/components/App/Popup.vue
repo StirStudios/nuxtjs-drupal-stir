@@ -151,20 +151,15 @@ watch(
     <UModal
       v-if="hasPopup"
       v-model:open="open"
+      :close="false"
       :description="description"
       :portal="portal"
       :title="title"
       :ui="{
         overlay: 'fixed inset-0 bg-black/60',
-        content:
-          'popup fixed bg-default divide-y divide-none flex flex-col focus:outline-none ring-0',
-        header: 'flex items-center gap-1.5 p-4 sm:px-6 min-h-16 sr-only',
-        wrapper: '',
-        body: 'flex-1 overflow-y-auto p-0 sm:p-0',
-        footer: 'flex items-center gap-1.5 p-4 sm:px-6',
-        title: 'text-highlighted font-semibold',
-        description: 'mt-1 text-muted text-sm',
-        close: 'absolute top-4 end-4',
+        content: 'popup divide-none ring-0',
+        header: 'sr-only',
+        body: 'p-0 sm:p-0',
       }"
     >
       <template #body>

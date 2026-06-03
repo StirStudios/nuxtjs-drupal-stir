@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
+import type { AuthPasswordRequirement } from '../../types/auth'
+
 const model = defineModel<string | undefined>()
 
 const props = defineProps<{
@@ -11,54 +14,141 @@ const props = defineProps<{
 }>()
 
 const show = ref(false)
+const { auth } = useAuthConfig()
 
 function checkStrength(str: string) {
-  const requirements = [
-    { regex: /.{8,}/, text: 'At least 8 characters' },
-    { regex: /\d/, text: 'At least 1 number' },
-    { regex: /[a-z]/, text: 'At least 1 lowercase letter' },
-    { regex: /[A-Z]/, text: 'At least 1 uppercase letter' },
-  ]
-
-  return requirements.map(req => ({ met: req.regex.test(str), text: req.text }))
+  return passwordRequirements.value.map((req) => ({
+    key: req.key,
+    met: req.regex.test(str),
+    text: req.text,
+  }))
 }
+
+const passwordRequirements = computed(() => {
+  const policy = auth.value.passwordPolicy
+  const configured = policy?.requirements || []
+  const requirements = withPolicyLengthRequirements(
+    configured.length > 0 ? configured : defaultPasswordRequirements(policy),
+  )
+  const normalized = requirements
+    .map((req: AuthPasswordRequirement) => normalizePasswordRequirement(req))
+    .filter((req): req is NonNullable<typeof req> => Boolean(req))
+
+  if (normalized.length > 0) {
+    return normalized
+  }
+
+  return withPolicyLengthRequirements(defaultPasswordRequirements(policy))
+    .map((req: AuthPasswordRequirement) => normalizePasswordRequirement(req))
+    .filter((req): req is NonNullable<typeof req> => Boolean(req))
+})
 
 const strength = computed(() => checkStrength(model.value || ''))
 const score = computed(() => strength.value.filter(req => req.met).length)
+const requirementCount = computed(() => Math.max(passwordRequirements.value.length, 1))
+const isComplete = computed(() => (
+  passwordRequirements.value.length > 0 &&
+  score.value === passwordRequirements.value.length
+))
+const scoreRatio = computed(() => score.value / requirementCount.value)
 
 const color = computed(() => {
   if (score.value === 0) {
     return 'neutral'
   }
 
-  if (score.value <= 1) {
+  if (isComplete.value) {
+    return 'success'
+  }
+
+  if (scoreRatio.value <= 0.34) {
     return 'error'
   }
 
-  if (score.value <= 3) {
-    return 'warning'
-  }
-
-  return 'success'
+  return 'warning'
 })
 
 const text = computed(() => {
+  const labels = auth.value.passwordPolicy?.strengthLabels
+
   if (score.value === 0) {
-    return 'Enter a password'
+    return labels?.empty || 'Enter a password'
   }
 
-  if (score.value <= 2) {
-    return 'Weak password'
+  if (isComplete.value) {
+    return labels?.strong || 'Strong password'
   }
 
-  if (score.value === 3) {
-    return 'Medium password'
+  if (scoreRatio.value >= 0.67) {
+    return labels?.medium || 'Medium password'
   }
 
-  return 'Strong password'
+  if (score.value > 0) {
+    return labels?.weak || 'Weak password'
+  }
+
+  return labels?.empty || 'Enter a password'
 })
 
 const describedBy = computed(() => props.showRequirements === false ? undefined : 'password-strength')
+const invalid = computed(() => props.showRequirements !== false && !isComplete.value)
+
+function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
+  if (!requirement.pattern) {
+    return null
+  }
+
+  try {
+    return {
+      key: requirement.key || requirement.label || requirement.pattern,
+      regex: new RegExp(requirement.pattern),
+      text: requirement.label || '',
+    }
+  } catch {
+    return null
+  }
+}
+
+function withPolicyLengthRequirements(requirements: AuthPasswordRequirement[]): AuthPasswordRequirement[] {
+  const policy = auth.value.passwordPolicy
+  const hasMinLength = requirements.some(requirement => requirement.key === 'minLength')
+  const hasMaxLength = requirements.some(requirement => requirement.key === 'maxLength')
+
+  return [
+    ...(!hasMinLength && policy?.minLength
+      ? [createMinLengthRequirement(policy.minLength)]
+      : []),
+    ...requirements,
+    ...(!hasMaxLength && policy?.maxLength
+      ? [createMaxLengthRequirement(policy.maxLength)]
+      : []),
+  ]
+}
+
+function createMinLengthRequirement(minLength: number): AuthPasswordRequirement {
+  return {
+    key: 'minLength',
+    pattern: `^.{${minLength},}$`,
+    label: `At least ${minLength} characters`,
+  }
+}
+
+function createMaxLengthRequirement(maxLength: number): AuthPasswordRequirement {
+  return {
+    key: 'maxLength',
+    pattern: `^.{0,${maxLength}}$`,
+    label: `${maxLength} characters or less`,
+  }
+}
+
+function defaultPasswordRequirements(policy = auth.value.passwordPolicy): AuthPasswordRequirement[] {
+  return [
+    createMinLengthRequirement(policy?.minLength || 8),
+    { key: 'number', pattern: '\\d', label: 'At least 1 number' },
+    { key: 'lowercase', pattern: '[a-z]', label: 'At least 1 lowercase letter' },
+    { key: 'uppercase', pattern: '[A-Z]', label: 'At least 1 uppercase letter' },
+  ]
+}
 </script>
 
 <template>
@@ -66,7 +156,7 @@ const describedBy = computed(() => props.showRequirements === false ? undefined 
     <UInput
       v-model="model"
       :aria-describedby="describedBy"
-      :aria-invalid="score < 4"
+      :aria-invalid="invalid"
       :autocomplete="field?.autocomplete"
       class="w-full"
       :color="color"
@@ -93,19 +183,19 @@ const describedBy = computed(() => props.showRequirements === false ? undefined 
       <UProgress
         :color="color"
         :indicator="text"
-        :max="4"
+        :max="requirementCount"
         :model-value="score"
         size="sm"
       />
 
       <p id="password-strength" class="text-sm font-medium">
-        {{ text }}. Must contain:
+        {{ text }}. {{ auth.passwordPolicy?.strengthLabels?.mustContain || 'Must contain:' }}
       </p>
 
       <ul aria-label="Password requirements" class="space-y-1">
         <li
           v-for="req in strength"
-          :key="req.text"
+          :key="req.key"
           class="flex items-center gap-0.5"
           :class="req.met ? 'text-success' : 'text-muted'"
         >

@@ -26,7 +26,6 @@ const forceScrolled = ref(false)
 const menuOpen = ref(false)
 const menuMounted = ref(false)
 const menuId = useId()
-const menuContentBase = '!overflow-hidden !border-0 !bg-default !shadow-none sm:!ring-0'
 const headerUi = {
   container: 'flex items-center justify-between gap-3',
   left: 'lg:flex-1 flex items-center gap-1.5',
@@ -185,10 +184,6 @@ const menuContent = computed(() => {
   return {
     id: menuId,
     'aria-label': 'Site navigation menu',
-    class: [
-      menuContentBase,
-      'stir-menu-panel !divide-y-0 !ring-0 sm:!ring-0',
-    ].join(' '),
     style: {
       '--stir-menu-angle-edge': `${angleEdge}%`,
     },
@@ -200,17 +195,26 @@ const menuOverlayClasses = computed(() =>
     theme.navigation.slideover?.angle ? '!bg-transparent' : '',
   ].filter(Boolean).join(' '),
 )
-const menuContentClasses = computed(() => headerUi.content)
+const menuContentClasses = computed(() =>
+  [
+    headerUi.content,
+    theme.navigation.slideover?.angle
+      ? 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !bg-default !shadow-none !ring-0 sm:!ring-0'
+      : '',
+  ].filter(Boolean).join(' '),
+)
 const menuHeaderClasses = computed(() =>
   [
     headerUi.header,
     toClassName(theme.navigation.header),
+    theme.navigation.slideover?.angle ? 'bg-transparent' : '',
   ].filter(Boolean).join(' '),
 )
 const menuBodyClasses = computed(() =>
   [
     headerUi.body,
     toClassName(theme.navigation.slideover?.body),
+    theme.navigation.slideover?.angle ? 'bg-transparent' : '',
   ].filter(Boolean).join(' '),
 )
 const headerRightClasses = computed(() =>
@@ -448,11 +452,12 @@ watch(menuOpen, (val) => {
     :ui="{
       overlay: menuOverlayClasses,
       content: menuContentClasses,
+      header: menuHeaderClasses,
+      body: menuBodyClasses,
     }"
   >
-    <template #content>
+    <template #header>
       <LazyAppHeaderOverlayHeader
-        :header-class="menuHeaderClasses"
         :left-class="headerUi.left"
         :logo-classes="logoClasses"
         :menu-id="menuId"
@@ -465,9 +470,10 @@ watch(menuOpen, (val) => {
         :toggle-icon="toggleIcon"
         @close="menuOpen = false"
       />
+    </template>
 
+    <template #body>
       <LazyAppHeaderMobileMenu
-        :body-class="menuBodyClasses"
         :items="mobileNavLinks"
         :link-class="theme.navigation.slideover.link"
         :list-class="slideoverListClasses"

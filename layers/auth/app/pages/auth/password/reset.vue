@@ -10,8 +10,18 @@ const title = computed(() => auth.value.passwordReset?.title || 'Choose a New Pa
 const description = computed(
   () => auth.value.passwordReset?.description || 'Set a new password for your account.',
 )
+const submitLabel = computed(
+  () => auth.value.passwordReset?.submitLabel || 'Update Password',
+)
+const checkingTitle = computed(
+  () => auth.value.passwordReset?.checkingTitle || 'Checking reset link',
+)
+const unavailableTitle = computed(
+  () => auth.value.passwordReset?.unavailableTitle || 'Reset link unavailable',
+)
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 </script>
@@ -20,21 +30,21 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="isCheckingLink || !linkValid"
-      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
+      class="w-full shadow-lg"
+      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
+      variant="outline"
     >
       <AuthStatusPanel
         :description="linkMessage"
         :icon="isCheckingLink ? 'i-lucide-loader-circle' : 'i-lucide-triangle-alert'"
         :loading="isCheckingLink"
-        :title="isCheckingLink ? 'Checking reset link' : 'Reset link unavailable'"
+        :title="isCheckingLink ? checkingTitle : unavailableTitle"
         :tone="isCheckingLink ? 'neutral' : 'warning'"
       />
       <template #footer>
-        <div class="text-center text-sm text-muted">
-          <ULink class="text-primary" to="/auth/password/request"
-            >Request a new reset link</ULink
-          >
-        </div>
+        <ULink class="text-primary" to="/auth/password/request">
+          Request a new reset link
+        </ULink>
       </template>
     </UPageCard>
     <AuthCard
@@ -43,7 +53,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-lock-keyhole"
       :loading="isLoading"
-      :submit="{ label: 'Update Password' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @submit="onSubmit($event as never)"

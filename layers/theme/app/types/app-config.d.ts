@@ -10,10 +10,16 @@ type ProtectedRoutesConfig = {
   allowAuthenticatedUserBypass?: boolean
 } & LooseRecord
 
+type AuthLayout = 'card' | 'page-split' | 'card-split'
+type AuthImagePosition = 'left' | 'right'
+
 type AuthPageCopyConfig = {
   title?: string
   description?: string
   backgroundImage?: string
+  layout?: AuthLayout
+  imagePosition?: AuthImagePosition
+  showIcon?: boolean
 } & LooseRecord
 
 type AuthSubmitButtonConfig = {
@@ -26,12 +32,26 @@ type AuthSubmitButtonConfig = {
   variant?: string
 } & LooseRecord
 
+type AuthBackButtonConfig = {
+  enabled?: boolean
+  label?: string
+  to?: string
+  icon?: string
+  color?: string
+  variant?: string
+  class?: string
+} & LooseRecord
+
 type AuthConfig = {
   accountEnabled?: boolean
   loginRedirectPath?: string
   logoutRedirectPath?: string
   protectedFallbackRedirectPath?: string
   backgroundImage?: string
+  backButton?: AuthBackButtonConfig
+  layout?: AuthLayout
+  imagePosition?: AuthImagePosition
+  showIcon?: boolean
   submitButton?: AuthSubmitButtonConfig
   login?: AuthPageCopyConfig
   protectedPage?: AuthPageCopyConfig

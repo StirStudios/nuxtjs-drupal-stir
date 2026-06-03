@@ -31,12 +31,23 @@ extends: ['./layers/auth']
 
 ## Configuration
 
-Auth form submit button defaults can be customized through app config:
+Auth shell, redirect, and fallback defaults can be customized through app config.
+Auth page copy, field labels, and password policy should come from Drupal via
+`/api/auth/config` when Drupal account integration is enabled.
 
 ```ts
 export default defineAppConfig({
   auth: {
     accountEnabled: true,
+    backgroundImage: '/images/auth.jpg',
+    layout: 'card',
+    imagePosition: 'left',
+    showIcon: true,
+    backButton: {
+      enabled: false,
+      label: 'Back',
+      to: '/',
+    },
     submitButton: {
       class: '',
       size: 'xl',
@@ -46,8 +57,33 @@ export default defineAppConfig({
 })
 ```
 
+Auth pages support three layouts:
+
+- `card`: centered auth card over an optional full-page background image.
+- `page-split`: full-height image panel on one side and the auth form on the other.
+- `card-split`: auth card with an image panel on one side and the form on the other.
+
+Set `auth.imagePosition` or a page-level `imagePosition` to `left` or `right`.
+Page-level shell values under `auth.login`, `auth.register`,
+`auth.passwordRequest`, `auth.passwordReset`, and `auth.protectedPage` can
+override global auth shell values when needed.
+Set `showIcon: false` globally or on an auth page to hide the auth form icon.
+Set `auth.backButton.enabled: true` to render a fixed auth-shell back button.
+
 Set `auth.accountEnabled: false` when a project only needs `/auth/protected`
 for password-protected Nuxt pages. Account UI routes are redirected to
 `auth.protectedFallbackRedirectPath`, while protected-page access keeps working.
 
 Page-level submit props passed to `AuthCard` take priority over `auth.submitButton`.
+
+## Public Helpers
+
+Downstream projects with local auth page overrides can use the auth layer's
+public auto-import surface instead of importing from nested layer internals:
+
+- `useAuthConfig`
+- `createLoginValidationSchema`
+- `createPasswordRequestValidationSchema`
+- `createRegisterValidationSchema`
+- `createPasswordResetValidationSchema`
+- `createAccountPasswordChangeValidationSchema`

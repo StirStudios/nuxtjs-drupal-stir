@@ -54,3 +54,124 @@ export type PasswordResetValidatePayload = {
   timestamp: number
   hash: string
 }
+
+export type AuthIdentifierMode = 'email' | 'username' | 'email_or_username'
+
+export type AuthUiField = {
+  label?: string
+  placeholder?: string
+  requiredMessage?: string
+  invalidMessage?: string
+}
+
+export type AuthUiIdentifierField = AuthUiField & {
+  mode?: AuthIdentifierMode
+}
+
+export type AuthUiMessage = {
+  title?: string
+  description?: string
+}
+
+export type AuthPasswordRequirement = {
+  key?: string
+  pattern?: string
+  label?: string
+  message?: string
+}
+
+export type AuthPasswordPolicy = {
+  minLength?: number
+  maxLength?: number
+  requiredMessage?: string
+  minLengthMessage?: string
+  maxLengthMessage?: string
+  lowercaseMessage?: string
+  uppercaseMessage?: string
+  numberMessage?: string
+  notSameAsCurrentMessage?: string
+  requirements?: AuthPasswordRequirement[]
+  strengthLabels?: {
+    empty?: string
+    weak?: string
+    medium?: string
+    strong?: string
+    mustContain?: string
+  }
+}
+
+export type AuthUiConfig = {
+  version?: number
+  accountEnabled?: boolean
+  loginRedirectPath?: string
+  logoutRedirectPath?: string
+  protectedFallbackRedirectPath?: string
+  backgroundImage?: string
+  layout?: string
+  imagePosition?: string
+  showIcon?: boolean
+  backButton?: Record<string, unknown>
+  submitButton?: Record<string, unknown>
+  identifierModes?: {
+    login?: AuthIdentifierMode
+    passwordRequest?: AuthIdentifierMode
+  }
+  login?: {
+    title?: string
+    description?: string
+    submitLabel?: string
+    identifier?: AuthUiIdentifierField
+    password?: AuthUiField
+    successToast?: AuthUiMessage
+  }
+  register?: {
+    title?: string
+    description?: string
+    submitLabel?: string
+    email?: AuthUiField
+    password?: AuthUiField
+    complete?: {
+      verificationTitle?: string
+      createdTitle?: string
+      verificationSentDescription?: string
+      verificationRequiredDescription?: string
+      createdDescription?: string
+    }
+  }
+  passwordRequest?: {
+    title?: string
+    description?: string
+    submitLabel?: string
+    identifier?: AuthUiIdentifierField
+    sentTitle?: string
+    sentDescription?: string
+  }
+  passwordReset?: {
+    title?: string
+    description?: string
+    submitLabel?: string
+    password?: AuthUiField
+    confirmPassword?: AuthUiField & {
+      mismatchMessage?: string
+    }
+    checkingTitle?: string
+    unavailableTitle?: string
+    invalidLinkMessage?: string
+    expiredLinkMessage?: string
+    successToast?: AuthUiMessage
+  }
+  verify?: {
+    loadingTitle?: string
+    successTitle?: string
+    failedTitle?: string
+    loadingDescription?: string
+    invalidDescription?: string
+    successDescription?: string
+    failedDescription?: string
+  }
+  protectedPage?: {
+    title?: string
+    description?: string
+  }
+  passwordPolicy?: AuthPasswordPolicy
+}

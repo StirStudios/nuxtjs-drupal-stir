@@ -111,8 +111,8 @@ const noticeMessage = computed(() =>
 )
 const noticeCardRootClass = computed(() =>
   isSetupNotice.value
-    ? 'bg-default text-default shadow-xl ring-1 ring-warning/40'
-    : 'bg-default text-default shadow-xl ring-1 ring-neutral-200 dark:ring-neutral-700',
+    ? 'shadow-xl ring-warning/40'
+    : 'shadow-xl',
 )
 
 watch(
@@ -162,9 +162,12 @@ watchEffect(() => {
       :ui="{
         root: noticeCardRootClass,
         body: 'space-y-3 text-sm leading-relaxed text-default',
+        footer: 'flex justify-end gap-2 pt-2',
+        header: 'flex items-start justify-between gap-3',
       }"
+      variant="outline"
     >
-      <div class="flex items-start justify-between gap-3">
+      <template #header>
         <p class="text-sm font-semibold text-default">
           {{ noticeTitle }}
         </p>
@@ -178,7 +181,7 @@ watchEffect(() => {
           variant="ghost"
           @click="dismiss"
         />
-      </div>
+      </template>
 
       <p class="text-default">{{ noticeMessage }}</p>
 
@@ -217,7 +220,7 @@ watchEffect(() => {
         </ULink>
       </p>
 
-      <div v-if="isConfigured" class="flex justify-end gap-2 pt-2">
+      <template v-if="isConfigured" #footer>
         <UButton
           v-if="isConsentMode"
           color="neutral"
@@ -227,7 +230,7 @@ watchEffect(() => {
           @click="decline"
         />
         <UButton :label="primaryButtonLabel" size="xs" @click="accept" />
-      </div>
+      </template>
     </UCard>
   </div>
 

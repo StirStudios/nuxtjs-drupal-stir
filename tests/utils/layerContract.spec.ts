@@ -24,4 +24,24 @@ describe('layer contract', () => {
     expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/nuxt.config.ts'))).toBe(true)
     expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/app.vue'))).toBe(true)
   })
+
+  it('exposes auth config and validation helpers from public layer paths', () => {
+    expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
+
+    const authConfigComposable = readFileSync(
+      resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'),
+      'utf8',
+    )
+    const authValidation = readFileSync(
+      resolve(rootDir, 'layers/auth/app/utils/authValidation.ts'),
+      'utf8',
+    )
+
+    expect(authConfigComposable).toContain('export { useAuthConfig }')
+    expect(authValidation).toContain('export function createLoginValidationSchema')
+    expect(authValidation).toContain('export function createPasswordRequestValidationSchema')
+    expect(authValidation).toContain('export function createRegisterValidationSchema')
+    expect(authValidation).toContain('export function createPasswordResetValidationSchema')
+    expect(authValidation).toContain('export function createAccountPasswordChangeValidationSchema')
+  })
 })

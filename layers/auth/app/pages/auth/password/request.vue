@@ -12,8 +12,20 @@ const description = computed(
     auth.value.passwordRequest?.description ||
     'Enter your email or username to receive reset instructions.',
 )
+const submitLabel = computed(
+  () => auth.value.passwordRequest?.submitLabel || 'Send Reset Instructions',
+)
+const sentTitle = computed(
+  () => auth.value.passwordRequest?.sentTitle || 'Check your inbox',
+)
+const sentDescription = computed(
+  () =>
+    auth.value.passwordRequest?.sentDescription ||
+    'If an account exists for that email or username, reset instructions have been sent.',
+)
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 </script>
@@ -22,18 +34,18 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="requestSent"
-      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
+      class="w-full shadow-lg"
+      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
+      variant="outline"
     >
       <AuthStatusPanel
-        description="If an account exists for that email or username, reset instructions have been sent."
+        :description="sentDescription"
         icon="i-lucide-mail-check"
-        title="Check your inbox"
+        :title="sentTitle"
         tone="success"
       />
       <template #footer>
-        <div class="text-center text-sm text-muted">
-          <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-        </div>
+        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
       </template>
     </UPageCard>
 
@@ -43,7 +55,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-key-round"
       :loading="isLoading"
-      :submit="{ label: 'Send Reset Instructions' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @submit="onSubmit($event as never)"
