@@ -19,6 +19,15 @@ const title = computed(() => auth.value.register?.title || 'Create Account')
 const description = computed(
   () => auth.value.register?.description || 'Create your account to continue.',
 )
+const submitLabel = computed(
+  () => auth.value.register?.submitLabel || 'Create Account',
+)
+const verificationTitle = computed(
+  () => auth.value.register?.complete?.verificationTitle || 'Verify your email',
+)
+const createdTitle = computed(
+  () => auth.value.register?.complete?.createdTitle || 'Account created',
+)
 
 useSeoMeta({
   robots: 'noindex, nofollow',
@@ -36,7 +45,7 @@ useSeoMeta({
       <AuthStatusPanel
         :description="registrationMessage"
         :icon="requiresVerification ? 'i-lucide-mail-check' : 'i-lucide-circle-check'"
-        :title="requiresVerification ? 'Verify your email' : 'Account created'"
+        :title="requiresVerification ? verificationTitle : createdTitle"
         :tone="requiresVerification ? 'warning' : 'success'"
       />
       <template #footer>
@@ -49,7 +58,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-user-plus"
       :loading="isLoading"
-      :submit="{ label: 'Create Account' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @submit="onSubmit($event as never)"

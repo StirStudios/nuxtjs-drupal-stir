@@ -1,6 +1,7 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
-import { passwordResetValidationSchema } from '../../utils/authValidation'
+import { useAuthConfig } from './useAuthConfig'
+import { createPasswordResetValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 export function usePasswordReset() {
@@ -12,23 +13,30 @@ export function usePasswordReset() {
   const linkMessage = ref('Validating reset link...')
   const { resetPassword, validatePasswordReset, getFetchErrorMessage } =
     useAuthActions()
+  const { auth } = useAuthConfig()
 
-  const fields: AuthFormField[] = [
+  const fields = computed<AuthFormField[]>(() => [
     {
       name: 'password',
       type: 'password',
-      label: 'New password',
-      placeholder: 'Enter your new password',
+      label: auth.value.passwordReset?.password?.label || 'New password',
+      placeholder:
+        auth.value.passwordReset?.password?.placeholder ||
+        'Enter your new password',
       required: true,
     },
     {
       name: 'confirmPassword',
       type: 'password',
-      label: 'Confirm password',
-      placeholder: 'Confirm your new password',
+      label:
+        auth.value.passwordReset?.confirmPassword?.label ||
+        'Confirm password',
+      placeholder:
+        auth.value.passwordReset?.confirmPassword?.placeholder ||
+        'Confirm your new password',
       required: true,
     },
-  ]
+  ])
 
   const uid = computed(() => Number.parseInt(String(route.query.uid || ''), 10))
   const timestamp = computed(() =>
@@ -40,15 +48,24 @@ export function usePasswordReset() {
     const errors: Array<{ name: string; message: string }> = []
 
     try {
-      passwordResetValidationSchema.validateSync(formState, {
-        abortEarly: false,
-      })
+      createPasswordResetValidationSchema(
+        auth.value.passwordPolicy,
+        auth.value.passwordReset?.confirmPassword?.requiredMessage ||
+          'Confirm password is required',
+        auth.value.passwordReset?.confirmPassword?.mismatchMessage ||
+          'Passwords do not match',
+      ).validateSync(formState, { abortEarly: false })
     } catch (error: unknown) {
       errors.push(...mapYupValidationErrors(error))
     }
 
     if (!Number.isInteger(uid.value) || !Number.isInteger(timestamp.value) || !hash.value) {
-      errors.push({ name: 'password', message: 'Reset link is invalid or incomplete' })
+      errors.push({
+        name: 'password',
+        message:
+          auth.value.passwordReset?.invalidLinkMessage ||
+          'Reset link is invalid or incomplete.',
+      })
     }
 
     return errors
@@ -68,8 +85,12 @@ export function usePasswordReset() {
       })
 
       toast.add({
-        title: 'Password updated',
-        description: 'Your password has been reset. You can now sign in.',
+        title:
+          auth.value.passwordReset?.successToast?.title ||
+          'Password updated',
+        description:
+          auth.value.passwordReset?.successToast?.description ||
+          'Your password has been reset. You can now sign in.',
         color: 'success',
       })
 
@@ -98,7 +119,9 @@ export function usePasswordReset() {
     ) {
       isCheckingLink.value = false
       linkValid.value = false
-      linkMessage.value = 'Reset link is invalid or incomplete.'
+      linkMessage.value =
+        auth.value.passwordReset?.invalidLinkMessage ||
+        'Reset link is invalid or incomplete.'
       return
     }
 
@@ -111,7 +134,9 @@ export function usePasswordReset() {
       linkValid.value = true
     } catch {
       linkValid.value = false
-      linkMessage.value = 'This reset link is invalid, expired, or already used.'
+      linkMessage.value =
+        auth.value.passwordReset?.expiredLinkMessage ||
+        'This reset link is invalid, expired, or already used.'
     } finally {
       isCheckingLink.value = false
     }

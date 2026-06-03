@@ -10,6 +10,15 @@ const title = computed(() => auth.value.passwordReset?.title || 'Choose a New Pa
 const description = computed(
   () => auth.value.passwordReset?.description || 'Set a new password for your account.',
 )
+const submitLabel = computed(
+  () => auth.value.passwordReset?.submitLabel || 'Update Password',
+)
+const checkingTitle = computed(
+  () => auth.value.passwordReset?.checkingTitle || 'Checking reset link',
+)
+const unavailableTitle = computed(
+  () => auth.value.passwordReset?.unavailableTitle || 'Reset link unavailable',
+)
 
 useSeoMeta({
   robots: 'noindex, nofollow',
@@ -28,7 +37,7 @@ useSeoMeta({
         :description="linkMessage"
         :icon="isCheckingLink ? 'i-lucide-loader-circle' : 'i-lucide-triangle-alert'"
         :loading="isCheckingLink"
-        :title="isCheckingLink ? 'Checking reset link' : 'Reset link unavailable'"
+        :title="isCheckingLink ? checkingTitle : unavailableTitle"
         :tone="isCheckingLink ? 'neutral' : 'warning'"
       />
       <template #footer>
@@ -43,7 +52,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-lock-keyhole"
       :loading="isLoading"
-      :submit="{ label: 'Update Password' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @submit="onSubmit($event as never)"

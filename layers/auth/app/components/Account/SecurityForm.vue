@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FormError } from '@nuxt/ui'
-import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
+import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 const props = defineProps<{
@@ -26,6 +27,7 @@ const themeWebform = (
 )
 const webformVariant = computed(() => themeWebform.variant as never)
 const showCurrentPassword = ref(false)
+const { auth } = useAuthConfig()
 
 const onSubmitPassword = () => {
   emit('change-password')
@@ -36,9 +38,9 @@ const validate = (state: {
   newPassword?: string
 }): FormError[] => {
   try {
-    accountPasswordChangeValidationSchema.validateSync(state, {
-      abortEarly: false,
-    })
+    createAccountPasswordChangeValidationSchema(
+      auth.value.passwordPolicy,
+    ).validateSync(state, { abortEarly: false })
     return []
   } catch (error: unknown) {
     return mapYupValidationErrors(error)

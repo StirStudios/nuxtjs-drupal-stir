@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useAccountSettings } from '../../composables/account/useAccountSettings'
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
-import { accountPasswordChangeValidationSchema } from '../../utils/authValidation'
+import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 definePageMeta({
@@ -12,6 +13,7 @@ definePageMeta({
 
 const toast = useToast()
 const session = useAuthSession()
+const { auth } = useAuthConfig()
 const { values, fieldEditability, hasChanges, loading, saving, load, save } = useAccountSettings()
 
 const isReady = ref(false)
@@ -93,7 +95,9 @@ const onSubmitSettings = async () => {
 const onChangePassword = async () => {
   const validationErrors = (() => {
     try {
-      accountPasswordChangeValidationSchema.validateSync(
+      createAccountPasswordChangeValidationSchema(
+        auth.value.passwordPolicy,
+      ).validateSync(
         {
           currentPassword: currentPassword.value,
           newPassword: newPassword.value,

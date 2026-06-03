@@ -1,7 +1,9 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
-import { passwordRequestValidationSchema } from '../../utils/authValidation'
+import { useAuthConfig } from './useAuthConfig'
+import { createPasswordRequestValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
+import type { AuthUiIdentifierField } from '../../types/auth'
 
 export function usePasswordRequest() {
   const toast = useToast()
@@ -9,22 +11,33 @@ export function usePasswordRequest() {
   const requestSent = ref(false)
   const turnstileToken = ref('')
   const { requestPasswordReset, getFetchErrorMessage } = useAuthActions()
+  const { auth } = useAuthConfig()
 
-  const fields: AuthFormField[] = [
+  const identifierField = computed<AuthUiIdentifierField>(() => ({
+    ...auth.value.passwordRequest?.identifier,
+    mode:
+      auth.value.passwordRequest?.identifier?.mode ||
+      auth.value.identifierModes?.passwordRequest ||
+      auth.value.identifierModes?.login,
+  }))
+
+  const fields = computed<AuthFormField[]>(() => [
     {
       name: 'identifier',
-      type: 'text',
-      label: 'Email or username',
-      placeholder: 'Enter your email or username',
+      type: identifierField.value.mode === 'email' ? 'email' : 'text',
+      label: identifierField.value.label || 'Email or username',
+      placeholder:
+        identifierField.value.placeholder ||
+        'Enter your email or username',
       required: true,
     },
-  ]
+  ])
 
   const validate = (formState: { identifier?: string }) => {
     try {
-      passwordRequestValidationSchema.validateSync(formState, {
-        abortEarly: false,
-      })
+      createPasswordRequestValidationSchema(
+        identifierField.value,
+      ).validateSync(formState, { abortEarly: false })
       return []
     } catch (error: unknown) {
       return mapYupValidationErrors(error)
@@ -46,6 +59,7 @@ export function usePasswordRequest() {
       toast.add({
         title: 'Request sent',
         description:
+          auth.value.passwordRequest?.sentDescription ||
           'If an account exists for that email or username, reset instructions have been sent.',
         color: 'success',
       })

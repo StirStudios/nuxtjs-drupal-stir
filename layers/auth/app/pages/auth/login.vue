@@ -10,6 +10,7 @@ const title = computed(() => auth.value.login?.title || 'Login')
 const description = computed(
   () => auth.value.login?.description || 'Sign in to continue.',
 )
+const submitLabel = computed(() => auth.value.login?.submitLabel || 'Continue')
 
 useSeoMeta({
   robots: 'noindex, nofollow',
@@ -23,7 +24,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-lock"
       :loading="isLoading"
-      :submit="{ label: 'Continue' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @error="onError($event as never)"

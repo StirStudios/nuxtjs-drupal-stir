@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useAuthConfig } from '../../composables/auth/useAuthConfig'
+
 const route = useRoute()
+const { auth } = useAuthConfig()
 
 const uid = computed(() => Number.parseInt(String(route.query.uid || ''), 10))
 const timestamp = computed(() =>
@@ -9,7 +12,19 @@ const token = computed(() => String(route.query.token || '').trim())
 
 const isLoading = ref(true)
 const verified = ref(false)
-const message = ref('Verifying your account...')
+const message = ref(
+  auth.value.verify?.loadingDescription || 'Verifying your account...',
+)
+
+const loadingTitle = computed(
+  () => auth.value.verify?.loadingTitle || 'Verifying account',
+)
+const successTitle = computed(
+  () => auth.value.verify?.successTitle || 'Account verified',
+)
+const failedTitle = computed(
+  () => auth.value.verify?.failedTitle || 'Verification failed',
+)
 
 useSeoMeta({
   robots: 'noindex, nofollow',
@@ -19,7 +34,9 @@ onMounted(async () => {
   if (!Number.isInteger(uid.value) || !Number.isInteger(timestamp.value) || !token.value) {
     isLoading.value = false
     verified.value = false
-    message.value = 'Verification link is invalid or incomplete.'
+    message.value =
+      auth.value.verify?.invalidDescription ||
+      'Verification link is invalid or incomplete.'
     return
   }
 
@@ -34,7 +51,9 @@ onMounted(async () => {
     })
 
     verified.value = true
-    message.value = 'Your account has been verified. You can now sign in.'
+    message.value =
+      auth.value.verify?.successDescription ||
+      'Your account has been verified. You can now sign in.'
     await new Promise((resolve) => setTimeout(resolve, 1200))
     await navigateTo('/auth/login')
   } catch (error: unknown) {
@@ -45,7 +64,8 @@ onMounted(async () => {
       'statusMessage' in error &&
       typeof (error as { statusMessage?: unknown }).statusMessage === 'string'
         ? (error as { statusMessage: string }).statusMessage
-        : 'Verification failed or link expired.'
+        : auth.value.verify?.failedDescription ||
+          'Verification failed or link expired.'
   } finally {
     isLoading.value = false
   }
@@ -63,7 +83,7 @@ onMounted(async () => {
         :description="message"
         :icon="isLoading ? 'i-lucide-loader-circle' : verified ? 'i-lucide-check-circle' : 'i-lucide-alert-circle'"
         :loading="isLoading"
-        :title="isLoading ? 'Verifying account' : verified ? 'Account verified' : 'Verification failed'"
+        :title="isLoading ? loadingTitle : verified ? successTitle : failedTitle"
         :tone="isLoading ? 'neutral' : verified ? 'success' : 'error'"
       />
       <template #footer>

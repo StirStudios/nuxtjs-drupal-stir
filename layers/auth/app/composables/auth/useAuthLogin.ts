@@ -2,38 +2,50 @@ import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { useAuthSession } from './useAuthSession'
-import { loginValidationSchema } from '../../utils/authValidation'
+import { createLoginValidationSchema } from '../../utils/authValidation'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
+import type { AuthUiIdentifierField } from '../../types/auth'
 
 export function useAuthLogin() {
   const toast = useToast()
   const isLoading = ref(false)
   const turnstileToken = ref('')
   const { login, getFetchErrorMessage } = useAuthActions()
-  const { loginRedirectPath } = useAuthConfig()
+  const { auth, loginRedirectPath } = useAuthConfig()
   const session = useAuthSession()
   const { onError } = useValidation()
 
-  const fields: AuthFormField[] = [
+  const identifierField = computed<AuthUiIdentifierField>(() => ({
+    ...auth.value.login?.identifier,
+    mode: auth.value.login?.identifier?.mode || auth.value.identifierModes?.login,
+  }))
+
+  const fields = computed<AuthFormField[]>(() => [
     {
       name: 'identifier',
-      type: 'text',
-      label: 'Email or username',
-      placeholder: 'Enter your email or username',
+      type: identifierField.value.mode === 'email' ? 'email' : 'text',
+      label: identifierField.value.label || 'Email or username',
+      placeholder:
+        identifierField.value.placeholder ||
+        'Enter your email or username',
       required: true,
     },
     {
       name: 'password',
       type: 'password',
-      label: 'Password',
-      placeholder: 'Enter your password',
+      label: auth.value.login?.password?.label || 'Password',
+      placeholder:
+        auth.value.login?.password?.placeholder || 'Enter your password',
       required: true,
     },
-  ]
+  ])
 
   const validate = (formState: { identifier?: string; password?: string }) => {
     try {
-      loginValidationSchema.validateSync(formState, { abortEarly: false })
+      createLoginValidationSchema(
+        identifierField.value,
+        auth.value.login?.password?.requiredMessage || 'Password is required',
+      ).validateSync(formState, { abortEarly: false })
       return []
     } catch (error: unknown) {
       return mapYupValidationErrors(error)
@@ -54,8 +66,10 @@ export function useAuthLogin() {
 
       if (loginResult.loggedIn) {
         toast.add({
-          title: 'Success',
-          description: 'Signed in successfully.',
+          title: auth.value.login?.successToast?.title || 'Success',
+          description:
+            auth.value.login?.successToast?.description ||
+            'Signed in successfully.',
           color: 'success',
         })
         await navigateTo(loginRedirectPath.value)
