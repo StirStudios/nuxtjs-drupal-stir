@@ -8,11 +8,12 @@ const { pageLayout, isAdministrator, isFront } = usePageContext()
 const pageState = getPage()
 const route = useRoute()
 const pageRequest = useResolvedPageRequest(route)
+const pageRequestQuery = computed(() => sanitizePageRequestQuery(route.query))
 const theme = useAppConfig().stirTheme
 
 const page = await fetchPage(
   pageRequest.path.value,
-  { query: route.query },
+  { query: pageRequestQuery.value },
   customPageError,
 )
 const layout = computed(() => props.forcedLayout || pageLayout.value)
