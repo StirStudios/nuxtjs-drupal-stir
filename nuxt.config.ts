@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
+import stirDrupalCeProxy from './modules/stir-drupal-ce-proxy'
 
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
@@ -249,12 +250,14 @@ export default defineNuxtConfig({
         drupalBaseUrl: drupalUrl,
         menuBaseUrl:
           process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || drupalUrl,
-        exposeAPIRouteRules: true,
+        exposeAPIRouteRules: false,
+        serverApiProxy: false,
         disableFormHandler: true,
         enableComponentPreview: false,
         customErrorPages: true,
       },
     ],
+    stirDrupalCeProxy,
   ] as Array<string | [string, Record<string, unknown>]>,
 
   runtimeConfig: {
