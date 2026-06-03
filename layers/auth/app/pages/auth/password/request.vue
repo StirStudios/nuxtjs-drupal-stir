@@ -25,6 +25,7 @@ const sentDescription = computed(
 )
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 </script>

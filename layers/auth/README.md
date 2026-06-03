@@ -31,7 +31,9 @@ extends: ['./layers/auth']
 
 ## Configuration
 
-Auth form submit button defaults can be customized through app config:
+Auth shell, redirect, and fallback defaults can be customized through app config.
+Auth page copy, field labels, and password policy should come from Drupal via
+`/api/auth/config` when Drupal account integration is enabled.
 
 ```ts
 export default defineAppConfig({
@@ -51,12 +53,6 @@ export default defineAppConfig({
       size: 'xl',
       variant: 'solid',
     },
-    login: {
-      backgroundImage: '/images/login.jpg',
-      layout: 'page-split',
-      imagePosition: 'right',
-      showIcon: false,
-    },
   },
 })
 ```
@@ -68,8 +64,9 @@ Auth pages support three layouts:
 - `card-split`: auth card with an image panel on one side and the form on the other.
 
 Set `auth.imagePosition` or a page-level `imagePosition` to `left` or `right`.
-Page-level values under `auth.login`, `auth.register`, `auth.passwordRequest`,
-`auth.passwordReset`, and `auth.protectedPage` override the global auth values.
+Page-level shell values under `auth.login`, `auth.register`,
+`auth.passwordRequest`, `auth.passwordReset`, and `auth.protectedPage` can
+override global auth shell values when needed.
 Set `showIcon: false` globally or on an auth page to hide the auth form icon.
 Set `auth.backButton.enabled: true` to render a fixed auth-shell back button.
 

@@ -25,8 +25,16 @@ const successTitle = computed(
 const failedTitle = computed(
   () => auth.value.verify?.failedTitle || 'Verification failed',
 )
+const title = computed(() => {
+  if (isLoading.value) {
+    return loadingTitle.value
+  }
+
+  return verified.value ? successTitle.value : failedTitle.value
+})
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 

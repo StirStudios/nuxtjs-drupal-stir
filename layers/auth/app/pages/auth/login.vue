@@ -13,6 +13,7 @@ const description = computed(
 const submitLabel = computed(() => auth.value.login?.submitLabel || 'Continue')
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 </script>

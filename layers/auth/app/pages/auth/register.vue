@@ -30,6 +30,7 @@ const createdTitle = computed(
 )
 
 useSeoMeta({
+  title: () => title.value,
   robots: 'noindex, nofollow',
 })
 </script>
