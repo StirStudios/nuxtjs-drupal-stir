@@ -414,7 +414,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function isSafeViewControlValue(value: string): boolean {
-    return !value.includes('?') && !value.includes('&')
+    return !/[?&][\w%.-]+=/u.test(value)
   }
 
   function validSortByValue(sort: ExposedSort, value: string): boolean {

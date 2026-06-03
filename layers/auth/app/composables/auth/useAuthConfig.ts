@@ -3,15 +3,23 @@ import { mergeAuthUiConfig } from '../../utils/authUiConfig'
 
 export function useAuthConfig() {
   const appConfig = useAppConfig()
+  const configuredAuth = computed(
+    () => (appConfig.auth || {}) as Partial<AuthUiConfig>,
+  )
+  const configuredAccountEnabled = computed(
+    () => configuredAuth.value.accountEnabled !== false,
+  )
   const { data: drupalAuth } = useAsyncData(
     'stir-auth-ui-config',
-    () => $fetch<Partial<AuthUiConfig>>('/api/auth/config'),
+    async () => configuredAccountEnabled.value
+      ? await $fetch<Partial<AuthUiConfig>>('/api/auth/config')
+      : {},
     {
       default: () => ({}),
     },
   )
   const auth = computed(() => mergeAuthUiConfig(
-    appConfig.auth as Partial<AuthUiConfig>,
+    configuredAuth.value,
     drupalAuth.value || {},
   ))
   const protectedRoutes = computed(() => appConfig.protectedRoutes || {})
