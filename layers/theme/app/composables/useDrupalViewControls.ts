@@ -37,6 +37,14 @@ interface ViewStateSnapshot {
   savedAt?: number
 }
 
+interface NormalizedFilter {
+  label: string
+  queryParamName: string
+  multiple?: boolean
+  disabled?: boolean
+  options: Array<{ label: string, value: string }>
+}
+
 interface UseDrupalViewControlsProps {
   viewId?: string
   displayId?: string
@@ -69,6 +77,12 @@ function normalizeSortOrderValue(value: string): string {
   if (normalized === 'desc') return 'DESC'
 
   return value
+}
+
+function firstStringValue(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return String(value[0] ?? '')
+
+  return String(value ?? '')
 }
 
 function buildSearchParams(
@@ -273,20 +287,14 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     if (!sort) return
 
     if (sort.queryParamSortBy && !(sort.queryParamSortBy in sortValues.value)) {
-      sortValues.value[sort.queryParamSortBy] =
-        routeQueryValue(sort.queryParamSortBy) ||
-        sort.sortByValue ||
-        ''
+      sortValues.value[sort.queryParamSortBy] = routeValueForSortBy(sort)
     }
 
     if (
       sort.queryParamSortOrder &&
       !(sort.queryParamSortOrder in sortValues.value)
     ) {
-      sortValues.value[sort.queryParamSortOrder] =
-        routeQueryValue(sort.queryParamSortOrder) ||
-        sort.submittedOrder ||
-        ''
+      sortValues.value[sort.queryParamSortOrder] = routeValueForSortOrder(sort)
     }
   })
 
@@ -365,6 +373,148 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return String(submitted[0] ?? '')
   }
 
+  function validFilterValue(filter: NormalizedFilter, value: string | string[]): boolean {
+    const values = Array.isArray(value) ? value : [value]
+    const allowed = new Set(filter.options.map(option => option.value))
+
+    return values.every(item => (
+      isSafeViewControlValue(item) &&
+      (allowed.size === 0 || allowed.has(item))
+    ))
+  }
+
+  function defaultSortByValue(sort: ExposedSort): string {
+    return sort.sortByValue || ''
+  }
+
+  function defaultSortOrderValue(sort: ExposedSort): string {
+    return sort.submittedOrder || ''
+  }
+
+  function validSortByValues(): Set<string> {
+    return new Set(sortByOptions.value.map(option => option.value))
+  }
+
+  function validSortOrderValues(sort: ExposedSort): Set<string> {
+    const values = new Set<string>()
+
+    for (const option of sortOrderOptions.value) {
+      values.add(option.value)
+      values.add(normalizeSortOrderValue(option.value))
+    }
+
+    const submitted = defaultSortOrderValue(sort)
+
+    if (submitted) {
+      values.add(submitted)
+      values.add(normalizeSortOrderValue(submitted))
+    }
+
+    return values
+  }
+
+  function isSafeViewControlValue(value: string): boolean {
+    return !value.includes('?') && !value.includes('&')
+  }
+
+  function validSortByValue(sort: ExposedSort, value: string): boolean {
+    if (!value || !isSafeViewControlValue(value)) return false
+
+    const values = validSortByValues()
+
+    return values.size === 0 || values.has(value)
+  }
+
+  function validSortOrderValue(sort: ExposedSort, value: string): boolean {
+    if (!value || !isSafeViewControlValue(value)) return false
+
+    return validSortOrderValues(sort).has(value)
+  }
+
+  function routeValueForSortBy(sort: ExposedSort): string {
+    const key = sort.queryParamSortBy
+    const fallback = defaultSortByValue(sort)
+
+    if (!key) return fallback
+
+    const value = firstStringValue(routeQueryValue(key))
+
+    return validSortByValue(sort, value) ? value : fallback
+  }
+
+  function routeValueForSortOrder(sort: ExposedSort): string {
+    const key = sort.queryParamSortOrder
+    const fallback = defaultSortOrderValue(sort)
+
+    if (!key) return fallback
+
+    const value = firstStringValue(routeQueryValue(key))
+
+    return validSortOrderValue(sort, value) ? value : fallback
+  }
+
+  function sanitizeStoredSorts(
+    sorts: ViewStateSnapshot['sorts'] | undefined,
+  ): ViewStateSnapshot['sorts'] | null {
+    const sort = primarySort.value
+
+    if (!sort) return {}
+
+    const sanitized: ViewStateSnapshot['sorts'] = {}
+
+    if (sort.queryParamSortBy) {
+      const value = Object.prototype.hasOwnProperty.call(
+        sorts ?? {},
+        sort.queryParamSortBy,
+      )
+        ? firstStringValue(sorts?.[sort.queryParamSortBy])
+        : defaultSortByValue(sort)
+
+      if (!validSortByValue(sort, value)) return null
+
+      sanitized[sort.queryParamSortBy] = value
+    }
+
+    if (sort.queryParamSortOrder) {
+      const value = Object.prototype.hasOwnProperty.call(
+        sorts ?? {},
+        sort.queryParamSortOrder,
+      )
+        ? firstStringValue(sorts?.[sort.queryParamSortOrder])
+        : defaultSortOrderValue(sort)
+
+      if (!validSortOrderValue(sort, value)) return null
+
+      sanitized[sort.queryParamSortOrder] = value
+    }
+
+    return sanitized
+  }
+
+  function sanitizeStoredFilters(
+    filters: ViewStateSnapshot['filters'] | undefined,
+  ): ViewStateSnapshot['filters'] | null {
+    const sanitized: ViewStateSnapshot['filters'] = {}
+
+    for (const filter of normalizedFilters.value) {
+      const source = effectiveFilters.value.find(
+        (item) => item.queryParamName === filter.queryParamName,
+      )
+      const value = Object.prototype.hasOwnProperty.call(
+        filters ?? {},
+        filter.queryParamName,
+      )
+        ? filters?.[filter.queryParamName] ?? defaultValueForFilter(filter, source)
+        : defaultValueForFilter(filter, source)
+
+      if (!validFilterValue(filter, value)) return null
+
+      sanitized[filter.queryParamName] = value
+    }
+
+    return sanitized
+  }
+
   function saveViewState(page = currentPage.value): void {
     if (!import.meta.client) return
 
@@ -403,13 +553,24 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     if (!stored) return null
 
+    const sanitizedFilters = sanitizeStoredFilters(stored.filters)
+    const sanitizedSorts = sanitizeStoredSorts(stored.sorts)
+
+    if (!sanitizedFilters || !sanitizedSorts) {
+      if (import.meta.client) {
+        sessionStorage.removeItem(viewStateStorageKeyFor())
+      }
+
+      return null
+    }
+
     filterValues.value = {
       ...filterValues.value,
-      ...stored.filters,
+      ...sanitizedFilters,
     }
     sortValues.value = {
       ...sortValues.value,
-      ...stored.sorts,
+      ...sanitizedSorts,
     }
 
     const page = typeof stored.page === 'number' && stored.page > 0
@@ -462,19 +623,28 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return routeControls.routeHasQuery(managedQueryKeys(), fullPath)
   }
 
-  function routeValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
+  function routeValueForFilter(filter: NormalizedFilter, source?: ExposedFilter): string | string[] {
     const routeValue = routeQueryValue(filter.queryParamName)
+    const defaultValue = defaultValueForFilter(filter, source)
+    let value: string | string[]
 
     if (filter.multiple) {
-      if (Array.isArray(routeValue)) return routeValue
-      if (routeValue) return [routeValue]
+      if (Array.isArray(routeValue)) {
+        value = routeValue
+      } else if (routeValue) {
+        value = [routeValue]
+      } else {
+        value = defaultValue
+      }
 
-      return (source?.submittedValues ?? []).map((value) => String(value))
+      return validFilterValue(filter, value) ? value : defaultValue
     }
 
-    if (Array.isArray(routeValue)) return String(routeValue[0] ?? '')
+    value = Array.isArray(routeValue)
+      ? String(routeValue[0] ?? '')
+      : String(routeValue ?? defaultValue)
 
-    return String(routeValue ?? source?.submittedValues?.[0] ?? '')
+    return validFilterValue(filter, value) ? value : defaultValue
   }
 
   function applyRouteStateToControls(): number {
@@ -489,17 +659,11 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     const sort = primarySort.value
 
     if (sort?.queryParamSortBy) {
-      sortValues.value[sort.queryParamSortBy] =
-        routeQueryValue(sort.queryParamSortBy) ||
-        sort.sortByValue ||
-        ''
+      sortValues.value[sort.queryParamSortBy] = routeValueForSortBy(sort)
     }
 
     if (sort?.queryParamSortOrder) {
-      sortValues.value[sort.queryParamSortOrder] =
-        routeQueryValue(sort.queryParamSortOrder) ||
-        sort.submittedOrder ||
-        ''
+      sortValues.value[sort.queryParamSortOrder] = routeValueForSortOrder(sort)
     }
 
     const page = routePageValue() ?? 0
@@ -516,13 +680,17 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       const value = filterValues.value[filter.queryParamName]
 
       if (Array.isArray(value)) {
-        if (value.length > 0) {
+        if (value.length > 0 && validFilterValue(filter, value)) {
           query[`${filter.queryParamName}[]`] = value
         }
 
         continue
       }
-      if (typeof value === 'string' && value.length > 0) {
+      if (
+        typeof value === 'string' &&
+        value.length > 0 &&
+        validFilterValue(filter, value)
+      ) {
         query[filter.queryParamName] = value
       }
     }
@@ -532,7 +700,11 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     if (sort?.queryParamSortBy) {
       const value = sortValues.value[sort.queryParamSortBy]
 
-      if (typeof value === 'string' && value.length > 0) {
+      if (
+        typeof value === 'string' &&
+        value.length > 0 &&
+        validSortByValue(sort, value)
+      ) {
         query[sort.queryParamSortBy] = value
       }
     }
@@ -540,7 +712,11 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     if (sort?.queryParamSortOrder) {
       const value = sortValues.value[sort.queryParamSortOrder]
 
-      if (typeof value === 'string' && value.length > 0) {
+      if (
+        typeof value === 'string' &&
+        value.length > 0 &&
+        validSortOrderValue(sort, value)
+      ) {
         query[sort.queryParamSortOrder] = normalizeSortOrderValue(value)
       }
     }
