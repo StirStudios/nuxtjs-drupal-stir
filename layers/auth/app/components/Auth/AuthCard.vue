@@ -140,8 +140,9 @@ defineSlots<{
 
   <UPageCard
     v-else
-    class="bg-default w-full rounded-lg shadow-lg"
+    class="w-full shadow-lg"
     :ui="{ container: 'p-6 sm:p-6' }"
+    variant="outline"
   >
     <AuthFormPanel
       v-bind="formPanelProps"

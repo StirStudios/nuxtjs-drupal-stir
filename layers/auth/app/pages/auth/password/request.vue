@@ -22,7 +22,9 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="requestSent"
-      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
+      class="w-full shadow-lg"
+      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
+      variant="outline"
     >
       <AuthStatusPanel
         description="If an account exists for that email or username, reset instructions have been sent."
@@ -31,9 +33,7 @@ useSeoMeta({
         tone="success"
       />
       <template #footer>
-        <div class="text-center text-sm text-muted">
-          <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-        </div>
+        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
       </template>
     </UPageCard>
 

@@ -20,7 +20,9 @@ useSeoMeta({
   <AuthPage>
     <UPageCard
       v-if="isCheckingLink || !linkValid"
-      class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full"
+      class="w-full shadow-lg"
+      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
+      variant="outline"
     >
       <AuthStatusPanel
         :description="linkMessage"
@@ -30,11 +32,9 @@ useSeoMeta({
         :tone="isCheckingLink ? 'neutral' : 'warning'"
       />
       <template #footer>
-        <div class="text-center text-sm text-muted">
-          <ULink class="text-primary" to="/auth/password/request"
-            >Request a new reset link</ULink
-          >
-        </div>
+        <ULink class="text-primary" to="/auth/password/request">
+          Request a new reset link
+        </ULink>
       </template>
     </UPageCard>
     <AuthCard

@@ -36,9 +36,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center p-6 text-center">
-    <UPageCard class="w-full max-w-md">
+  <AuthPage>
+    <UPageCard class="w-full shadow-lg" variant="outline">
       <p>Signing you out...</p>
     </UPageCard>
-  </div>
+  </AuthPage>
 </template>

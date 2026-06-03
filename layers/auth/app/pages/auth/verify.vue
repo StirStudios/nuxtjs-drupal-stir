@@ -54,7 +54,11 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <UPageCard class="w-full rounded-lg bg-white shadow-lg ring ring-default dark:bg-black [&_[data-slot=wrapper]]:w-full">
+    <UPageCard
+      class="w-full shadow-lg"
+      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
+      variant="outline"
+    >
       <AuthStatusPanel
         :description="message"
         :icon="isLoading ? 'i-lucide-loader-circle' : verified ? 'i-lucide-check-circle' : 'i-lucide-alert-circle'"
@@ -63,9 +67,7 @@ onMounted(async () => {
         :tone="isLoading ? 'neutral' : verified ? 'success' : 'error'"
       />
       <template #footer>
-        <div class="text-center text-sm text-muted">
-          <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-        </div>
+        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
       </template>
     </UPageCard>
   </AuthPage>

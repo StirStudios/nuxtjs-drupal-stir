@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{
-  headerClass?: string
   leftClass?: string
   logoClasses: string
   menuId?: string
@@ -19,46 +18,33 @@ defineEmits<{
 </script>
 
 <template>
-  <div
-    :class="headerClass"
-    data-slot="header"
-  >
-    <div
-      :class="leftClass"
-      data-slot="left"
+  <div :class="leftClass">
+    <ULink
+      aria-label="Home"
+      :class="titleClass"
+      to="/"
     >
-      <ULink
-        aria-label="Home"
-        :class="titleClass"
-        data-slot="title"
-        to="/"
-      >
-        <AppLogo
-          v-if="showLogo"
-          :add-classes="logoClasses"
-        />
-        <template v-else>
-          {{ siteTitle }}
-        </template>
-      </ULink>
-    </div>
-
-    <div
-      :class="rightClass"
-      data-slot="right"
-    >
-      <LazyIconsColorMode v-if="showColorModeToggle" />
-
-      <UButton
-        :aria-controls="menuId"
-        aria-label="Close navigation menu"
-        :class="toggleClass"
-        color="neutral"
-        data-slot="toggle"
-        :icon="toggleIcon"
-        variant="ghost"
-        @click="$emit('close')"
+      <AppLogo
+        v-if="showLogo"
+        :add-classes="logoClasses"
       />
-    </div>
+      <template v-else>
+        {{ siteTitle }}
+      </template>
+    </ULink>
+  </div>
+
+  <div :class="rightClass">
+    <LazyIconsColorMode v-if="showColorModeToggle" />
+
+    <UButton
+      :aria-controls="menuId"
+      aria-label="Close navigation menu"
+      :class="toggleClass"
+      color="neutral"
+      :icon="toggleIcon"
+      variant="ghost"
+      @click="$emit('close')"
+    />
   </div>
 </template>
