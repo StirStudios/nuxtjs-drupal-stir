@@ -43,8 +43,15 @@ type FaqAccordionItem = AccordionItem & {
 
 const slots = useSlots()
 const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
-const wrapStyles = computed(() =>
-  [props.width, props.spacing].filter(
+const sectionClasses = computed(() =>
+  [
+    'paragraph-faq space-y-6',
+    props.align ? 'w-full' : '',
+    props.align,
+    props.width,
+    props.spacing,
+    props.classes,
+  ].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )
@@ -71,49 +78,47 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
 </script>
 
 <template>
-  <WrapDiv :align="align" :styles="wrapStyles">
-    <section :class="['paragraph-faq space-y-6', classes].filter(Boolean).join(' ')">
-      <EditLink :link="editLink" :parent-uuid="parentUuid" />
+  <section :class="sectionClasses">
+    <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
-      <div v-if="header || safeTextHtml" class="space-y-3">
-        <component
-          :is="headerTag || 'h2'"
-          v-if="header"
-          class="text-highlighted text-3xl font-semibold tracking-tight md:text-4xl"
-        >
-          {{ header }}
-        </component>
-        <div
-          v-if="safeTextHtml"
-          class="prose max-w-none text-muted"
-          v-html="safeTextHtml"
-        />
-      </div>
-
-      <UAccordion
-        v-if="accordionItems.length"
-        :items="accordionItems"
-        trailing-icon="i-lucide-plus"
-        :ui="{
-          root: 'rounded-2xl border border-default bg-default',
-          item: 'border-b border-default last:border-b-0',
-          trigger: 'px-5 py-5 text-left hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
-          label: 'text-highlighted text-lg font-semibold',
-          trailingIcon: 'text-muted size-5 group-data-[state=open]:rotate-45',
-          body: 'px-5 pb-5 pt-0 md:px-6 md:pb-6',
-        }"
-        :unmount-on-hide="false"
+    <div v-if="header || safeTextHtml" class="space-y-3">
+      <component
+        :is="headerTag || 'h2'"
+        v-if="header"
+        class="text-highlighted text-3xl font-semibold tracking-tight md:text-4xl"
       >
-        <template #body="{ item }">
-          <div
-            v-if="item.answerHtml"
-            class="prose max-w-none text-muted"
-            v-html="item.answerHtml"
-          />
+        {{ header }}
+      </component>
+      <div
+        v-if="safeTextHtml"
+        class="prose max-w-none text-muted"
+        v-html="safeTextHtml"
+      />
+    </div>
 
-          <EditLink :link="item.editLink" :parent-uuid="item.parentUuid" />
-        </template>
-      </UAccordion>
-    </section>
-  </WrapDiv>
+    <UAccordion
+      v-if="accordionItems.length"
+      :items="accordionItems"
+      trailing-icon="i-lucide-plus"
+      :ui="{
+        root: 'rounded-2xl border border-default bg-default',
+        item: 'border-b border-default last:border-b-0',
+        trigger: 'px-5 py-5 text-left hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
+        label: 'text-highlighted text-lg font-semibold',
+        trailingIcon: 'text-muted size-5 group-data-[state=open]:rotate-45',
+        body: 'px-5 pb-5 pt-0 md:px-6 md:pb-6',
+      }"
+      :unmount-on-hide="false"
+    >
+      <template #body="{ item }">
+        <div
+          v-if="item.answerHtml"
+          class="prose max-w-none text-muted"
+          v-html="item.answerHtml"
+        />
+
+        <EditLink :link="item.editLink" :parent-uuid="item.parentUuid" />
+      </template>
+    </UAccordion>
+  </section>
 </template>
