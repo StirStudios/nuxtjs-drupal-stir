@@ -1,23 +1,26 @@
 <script setup lang="ts">
+import type { LayoutContextBlock } from '~/composables/useLayoutContext'
+
 const { renderCustomElements, getPage } = useDrupalCe()
 const page = getPage()
 const props = defineProps<{ area: string }>()
 
-type RegionBlock = {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-  [key: string]: unknown
-}
+const { data: layoutContext } = await useLayoutContext()
 
-const regionBlocks = computed<RegionBlock[]>(() => {
-  const raw = page.value?.blocks?.[props.area]
-
-  if (Array.isArray(raw)) return raw as RegionBlock[]
+function normalizeRegionBlocks(raw: unknown): LayoutContextBlock[] {
+  if (Array.isArray(raw)) return raw as LayoutContextBlock[]
   if (raw && typeof raw === 'object') {
-    return Object.values(raw as Record<string, RegionBlock>)
+    return Object.values(raw as Record<string, LayoutContextBlock>)
   }
   return []
+}
+
+const regionBlocks = computed<LayoutContextBlock[]>(() => {
+  const pageBlocks = normalizeRegionBlocks(page.value?.blocks?.[props.area])
+
+  if (pageBlocks.length) return pageBlocks
+
+  return normalizeRegionBlocks(layoutContext.value?.blocks?.[props.area])
 })
 </script>
 
