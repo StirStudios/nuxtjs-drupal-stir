@@ -9,7 +9,32 @@ const isTestEnv =
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = process.env.DRUPAL_URL || ''
+const sitemapSources = drupalUrl ? [`${drupalUrl}/api/sitemap`] : []
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
+const sitemapModuleOptions = {
+  sources: sitemapSources,
+  exclude: ['/login'],
+  runtimeCacheStorage: { driver: 'memory' },
+  cacheMaxAgeSeconds: 0,
+  xslColumns: [
+    { label: 'URL', width: '50%' },
+    {
+      label: 'Last Modified',
+      select: 'sitemap:lastmod',
+      width: '25%',
+    },
+    {
+      label: 'Priority',
+      select: 'sitemap:priority',
+      width: '12.5%',
+    },
+    {
+      label: 'Change Frequency',
+      select: 'sitemap:changefreq',
+      width: '12.5%',
+    },
+  ],
+}
 
 type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
 
@@ -211,37 +236,10 @@ export default defineNuxtConfig({
       },
     ],
 
-    ...(isIndexable
-      ? [
-          [
-            '@nuxtjs/sitemap',
-            {
-              sources: drupalUrl ? [`${drupalUrl}/api/sitemap`] : [],
-              exclude: ['/login'],
-              runtimeCacheStorage: { driver: 'memory' },
-              cacheMaxAgeSeconds: 0,
-              xslColumns: [
-                { label: 'URL', width: '50%' },
-                {
-                  label: 'Last Modified',
-                  select: 'sitemap:lastmod',
-                  width: '25%',
-                },
-                {
-                  label: 'Priority',
-                  select: 'sitemap:priority',
-                  width: '12.5%',
-                },
-                {
-                  label: 'Change Frequency',
-                  select: 'sitemap:changefreq',
-                  width: '12.5%',
-                },
-              ],
-            },
-          ],
-        ]
-      : []),
+    [
+      '@nuxtjs/sitemap',
+      sitemapModuleOptions,
+    ],
 
     [
       'nuxtjs-drupal-ce',

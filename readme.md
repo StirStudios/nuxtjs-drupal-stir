@@ -75,7 +75,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
-- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior and sitemap registration)
+- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
@@ -85,7 +85,8 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 Notes:
 - `DRUPAL_API_KEY` is forwarded by server endpoints that call Drupal backend APIs (`x-api-key` header).
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
-- `site.indexable`, Plausible runtime enablement, and sitemap registration all require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
+- `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
+- Sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 
 ## Auth + Account Integration (stir_account)
