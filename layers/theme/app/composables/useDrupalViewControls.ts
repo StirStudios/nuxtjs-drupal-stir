@@ -977,9 +977,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     captureDefaultViewState()
 
     if (routeHasManagedQuery()) {
-      const page = applyRouteStateToControls()
-
-      void refreshView(page)
+      applyRouteStateToControls()
       return
     }
 

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import type {
+  LayoutContextFooterMenuItem,
+  LayoutContextSiteInfo,
+} from '~/composables/useLayoutContext'
+
 const { getPage } = useDrupalCe()
 const page = getPage()
 const theme = useAppConfig().stirTheme
@@ -6,15 +11,13 @@ const { iconsSocialConfig } = useSocialIcons()
 const currentYear = new Date().getFullYear()
 
 type FooterLayout = 'default' | 'columns' | 'stacked'
-type FooterMenuItem = {
-  title?: string
-  url?: string
-}
 type FooterSections = {
   left?: string[]
   center?: string[]
   right?: string[]
 }
+
+const { data: layoutContext } = await useLayoutContext()
 
 const toFooterLayout = (value: unknown): FooterLayout => {
   return value === 'columns' || value === 'stacked' ? value : 'default'
@@ -49,10 +52,19 @@ const toSectionAtoms = (value: unknown): string[] | undefined => {
 
 const footerConfig = computed(() => theme.footer)
 const footerLayout = computed(() => toFooterLayout(footerConfig.value.layout))
-const footerMenu = computed<FooterMenuItem[]>(() => {
-  const menu = page.value?.footer_menu
+const footerMenu = computed<LayoutContextFooterMenuItem[]>(() => {
+  const menu = Array.isArray(page.value?.footer_menu) && page.value.footer_menu.length
+    ? page.value.footer_menu
+    : layoutContext.value?.footer_menu
 
-  return Array.isArray(menu) ? (menu as FooterMenuItem[]) : []
+  return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : []
+})
+const siteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
+  const pageSiteInfo = page.value?.site_info as LayoutContextSiteInfo | undefined
+
+  return pageSiteInfo?.name || pageSiteInfo?.mail || pageSiteInfo?.slogan
+    ? pageSiteInfo
+    : layoutContext.value?.site_info
 })
 const footerRights = computed(() => {
   const rightsValue = (footerConfig.value as Record<string, unknown>).rights
@@ -120,7 +132,7 @@ const stackedContentClasses = computed(() =>
   ].filter(Boolean).join(' '),
 )
 const shouldRenderFooter = computed(() =>
-  !footerConfig.value.requireSiteName || Boolean(page.value?.site_info?.name),
+  !footerConfig.value.requireSiteName || Boolean(siteInfo.value?.name),
 )
 </script>
 
@@ -159,7 +171,7 @@ const shouldRenderFooter = computed(() =>
         :menu-items="footerMenuItems"
         :rights="footerRights"
         :show="footerShow"
-        :site-info="page?.site_info"
+        :site-info="siteInfo"
         :social-icons="iconsSocialConfig"
       />
     </div>
@@ -178,7 +190,7 @@ const shouldRenderFooter = computed(() =>
         :menu-items="footerMenuItems"
         :rights="footerRights"
         :show="footerShow"
-        :site-info="page?.site_info"
+        :site-info="siteInfo"
         :social-icons="iconsSocialConfig"
       >
         <template #logo>
@@ -187,7 +199,7 @@ const shouldRenderFooter = computed(() =>
             :add-classes="footerClasses.logo"
           />
           <template v-else-if="footerShow.logo">
-            {{ page?.site_info?.name }}
+            {{ siteInfo?.name }}
           </template>
         </template>
       </AppFooterSection>
@@ -207,7 +219,7 @@ const shouldRenderFooter = computed(() =>
         :menu-items="footerMenuItems"
         :rights="footerRights"
         :show="footerShow"
-        :site-info="page?.site_info"
+        :site-info="siteInfo"
         :social-icons="iconsSocialConfig"
       />
     </div>
@@ -226,7 +238,7 @@ const shouldRenderFooter = computed(() =>
         :menu-items="footerMenuItems"
         :rights="footerRights"
         :show="footerShow"
-        :site-info="page?.site_info"
+        :site-info="siteInfo"
         :social-icons="iconsSocialConfig"
       />
     </template>

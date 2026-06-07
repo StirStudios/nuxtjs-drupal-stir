@@ -85,7 +85,6 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
       <component
         :is="headerTag || 'h2'"
         v-if="header"
-        class="text-highlighted text-3xl font-semibold tracking-tight md:text-4xl"
       >
         {{ header }}
       </component>

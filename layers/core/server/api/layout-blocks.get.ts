@@ -3,6 +3,16 @@ import { drupalApiRequest } from '../utils/drupalApi'
 
 type LayoutBlocksResponse = {
   blocks?: Record<string, unknown>
+  footer_menu?: Array<{
+    title?: string
+    url?: string
+  }>
+  site_info?: {
+    name?: string
+    mail?: string
+    slogan?: string
+    [key: string]: unknown
+  }
 }
 
 export default defineEventHandler(async (event): Promise<LayoutBlocksResponse> => {
