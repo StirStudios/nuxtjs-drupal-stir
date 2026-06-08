@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import {
+  resolveUiButtonVariant,
+  resolveUiColor,
+} from '../../utils/nuxtUiProps'
+import {
   authLayoutContextKey,
   defaultAuthImagePosition,
   defaultAuthLayout,
@@ -155,8 +159,8 @@ const backButtonProps = computed(() => ({
   to: resolveConfigString(backButtonConfig.value.to, '/'),
   class: resolveConfigString(backButtonConfig.value.class, 'fixed bottom-4 left-4 z-50 shadow-md'),
   icon: resolveConfigString(backButtonConfig.value.icon, 'i-lucide-arrow-left'),
-  color: resolveConfigString(backButtonConfig.value.color, 'neutral'),
-  variant: resolveConfigString(backButtonConfig.value.variant, 'ghost'),
+  color: resolveUiColor(backButtonConfig.value.color, 'neutral'),
+  variant: resolveUiButtonVariant(backButtonConfig.value.variant, 'ghost'),
 }))
 
 const layoutContext = computed(() => ({

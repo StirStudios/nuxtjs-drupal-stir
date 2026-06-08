@@ -38,6 +38,11 @@ const emit = defineEmits<{
 
 const theme = useAppConfig().stirTheme
 const mediaProps = computed(() => props.tk.propsOf(props.node))
+const overlayImageProps = computed(() => {
+  const { imageClass, ...rest } = mediaProps.value
+
+  return rest
+})
 const isVideo = computed(() => mediaProps.value.type === 'video')
 const isDocument = computed(() => mediaProps.value.type === 'document')
 const isAudio = computed(() => mediaProps.value.type === 'audio')
@@ -110,7 +115,7 @@ const shouldAnimate = computed(() =>
   >
     <MediaImage
       v-if="!isVideo"
-      v-bind="mediaProps"
+      v-bind="overlayImageProps"
       :aria-label="'Open media modal'"
       class="cursor-pointer"
       :image-class="[

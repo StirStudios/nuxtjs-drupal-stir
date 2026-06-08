@@ -353,13 +353,19 @@ socials: [
   {
     title: 'IMDB',
     url: '//imdb.com/name/CLIENT/',
-    icon: 'i-social-icons:imdb',
+    icon: 'i-social-imdb',
     iconSize: 'size-10',
   },
   {
     title: 'LinkedIn',
     url: '//linkedin.com/in/CLIENT',
-    icon: 'i-social:linkedin',
+    icon: 'i-social-linkedin',
+    iconSize: 'size-10',
+  },
+  {
+    title: 'TikTok',
+    url: '//tiktok.com/@CLIENT',
+    icon: 'i-social-tiktok',
     iconSize: 'size-10',
   },
 ]
