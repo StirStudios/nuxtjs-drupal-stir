@@ -34,6 +34,8 @@ extends: ['./layers/auth']
 Auth shell, redirect, and fallback defaults can be customized through app config.
 Auth page copy, field labels, and password policy should come from Drupal via
 `/api/auth/config` when Drupal account integration is enabled.
+Drupal account auth is opt-in; set `auth.accountEnabled: true` only for projects
+that provide the `stir_account` Drupal endpoints.
 
 ```ts
 export default defineAppConfig({
@@ -70,9 +72,10 @@ override global auth shell values when needed.
 Set `showIcon: false` globally or on an auth page to hide the auth form icon.
 Set `auth.backButton.enabled: true` to render a fixed auth-shell back button.
 
-Set `auth.accountEnabled: false` when a project only needs `/auth/protected`
-for password-protected Nuxt pages. Account UI routes are redirected to
-`auth.protectedFallbackRedirectPath`, while protected-page access keeps working.
+Leave `auth.accountEnabled` unset or set it to `false` when a project only needs
+`/auth/protected` for password-protected Nuxt pages. Account UI routes are
+redirected to `auth.protectedFallbackRedirectPath`, while protected-page access
+keeps working.
 
 Page-level submit props passed to `AuthCard` take priority over `auth.submitButton`.
 
