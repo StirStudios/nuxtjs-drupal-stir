@@ -1,4 +1,6 @@
 export default defineAppConfig({
+  ui: {},
+
   protectedRoutes: {
     requireLoginPaths: [],
     loginPath: '/auth/protected',
