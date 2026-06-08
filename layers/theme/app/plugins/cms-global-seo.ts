@@ -14,7 +14,7 @@ type CmsGlobalSeoConfig = {
 
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
-    enabled: config.enabled !== false,
+    enabled: config.enabled === true,
     ignoredPathPrefixes: Array.isArray(config.ignoredPathPrefixes)
       ? config.ignoredPathPrefixes
       : [],
