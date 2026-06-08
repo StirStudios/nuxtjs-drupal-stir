@@ -8,7 +8,7 @@ export default defineAppConfig({
   },
 
   auth: {
-    accountEnabled: true,
+    accountEnabled: false,
     loginRedirectPath: '/',
     logoutRedirectPath: '/auth/login',
     protectedFallbackRedirectPath: '/',

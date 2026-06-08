@@ -91,7 +91,8 @@ Notes:
 
 ## Auth + Account Integration (stir_account)
 
-Auth/account features now live in the optional sub-layer: `layers/auth`.
+Auth/account and password-protected page features live in the optional sub-layer:
+`layers/auth`.
 
 In this repository, auth is enabled by default through:
 
@@ -100,10 +101,13 @@ In this repository, auth is enabled by default through:
 extends: ['./layers/auth']
 ```
 
-If a downstream project does not need auth/account UI or APIs, remove that `extends` entry.
+Drupal account auth is disabled by default. If a downstream project does not
+need any auth routes or APIs, remove that `extends` entry.
 Core webform submission and Drupal CSRF forwarding do not depend on the auth layer.
-If it only needs password-protected Nuxt pages, keep the layer and set
-`auth.accountEnabled: false` in app config.
+If it only needs password-protected Nuxt pages, keep the layer and leave
+`auth.accountEnabled` unset or set it to `false` in app config.
+Set `auth.accountEnabled: true` only for projects that provide the Drupal
+`stir_account` endpoints.
 
 When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 

@@ -94,13 +94,13 @@ protectedRoutes: {
 
 ```ts
 auth: {
-  accountEnabled: true,
+  accountEnabled: false,
   protectedFallbackRedirectPath: '/',
 }
 ```
 
-- `accountEnabled: false` disables account UI routes while keeping `/auth/protected` available.
-- Use this for sites that only need password-protected Nuxt pages.
+- `accountEnabled: false` disables Drupal account UI routes while keeping `/auth/protected` available.
+- Set `accountEnabled: true` only for sites that use Drupal account auth endpoints.
 
 ### 🔎 `cmsGlobalSeo`
 

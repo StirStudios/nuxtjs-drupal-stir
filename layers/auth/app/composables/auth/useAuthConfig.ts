@@ -7,7 +7,7 @@ export function useAuthConfig() {
     () => (appConfig.auth || {}) as Partial<AuthUiConfig>,
   )
   const configuredAccountEnabled = computed(
-    () => configuredAuth.value.accountEnabled !== false,
+    () => configuredAuth.value.accountEnabled === true,
   )
   const { data: drupalAuth } = useAsyncData(
     'stir-auth-ui-config',
@@ -30,7 +30,7 @@ export function useAuthConfig() {
   const protectedFallbackRedirectPath = computed(
     () => auth.value.protectedFallbackRedirectPath || '/',
   )
-  const accountEnabled = computed(() => auth.value.accountEnabled !== false)
+  const accountEnabled = computed(() => auth.value.accountEnabled === true)
   const logoutRedirectPath = computed(() => {
     const path = auth.value.logoutRedirectPath
 
