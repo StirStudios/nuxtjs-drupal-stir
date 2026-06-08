@@ -1,3 +1,5 @@
+import { layoutContextQuery } from './useLayoutContext'
+
 export type PopupNode = {
   element?: string
   props?: Record<string, unknown>
@@ -227,7 +229,9 @@ export const usePopupData = () => {
     const requestId = ++fallbackRequestId
 
     try {
-      const fallbackPage = await $fetch<LayoutBlocksPayload>('/api/layout-blocks')
+      const fallbackPage = await $fetch<LayoutBlocksPayload>('/api/layout-blocks', {
+        query: layoutContextQuery(routePath.value),
+      })
 
       if (requestId !== fallbackRequestId) return
 
@@ -238,6 +242,15 @@ export const usePopupData = () => {
       }
     }
   }
+
+  watch(
+    routePath,
+    () => {
+      fallbackLoaded.value = false
+      fallbackDecoupledSource.value = null
+      fallbackRequestId++
+    },
+  )
 
   watch(
     [pagePopup, fallbackPopup],

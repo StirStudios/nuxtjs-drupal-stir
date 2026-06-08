@@ -23,8 +23,16 @@ export type LayoutContextPayload = {
   site_info?: LayoutContextSiteInfo
 }
 
+export function layoutContextQuery(path = '/') {
+  return { path: path || '/' }
+}
+
 export function useLayoutContext() {
+  const route = useRoute()
+  const path = computed(() => route.path || '/')
+
   return useFetch<LayoutContextPayload>('/api/layout-blocks', {
-    key: 'layout-context',
+    key: computed(() => `layout-context:${path.value}`),
+    query: computed(() => layoutContextQuery(path.value)),
   })
 }

@@ -1,4 +1,4 @@
-import { defineEventHandler } from 'h3'
+import { defineEventHandler, getQuery } from 'h3'
 import { drupalApiRequest } from '../utils/drupalApi'
 
 type LayoutBlocksResponse = {
@@ -16,8 +16,14 @@ type LayoutBlocksResponse = {
 }
 
 export default defineEventHandler(async (event): Promise<LayoutBlocksResponse> => {
+  const query = getQuery(event)
+  const path = typeof query.path === 'string' ? query.path : ''
+  const endpoint = path
+    ? `/api/layout-blocks?${new URLSearchParams({ path }).toString()}`
+    : '/api/layout-blocks'
+
   try {
-    return await drupalApiRequest<LayoutBlocksResponse>(event, '/api/layout-blocks', {
+    return await drupalApiRequest<LayoutBlocksResponse>(event, endpoint, {
       method: 'GET',
     })
   }
