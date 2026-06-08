@@ -52,6 +52,13 @@ const openOverlay = () => {
   emit('open', props.index)
 }
 
+const handleOpenOverlayKeydown = (event: KeyboardEvent) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return
+
+  event.preventDefault()
+  openOverlay()
+}
+
 const componentMap: Record<MediaType, string> = {
   image: 'MediaImage',
   video: 'MediaVideo',
@@ -127,8 +134,7 @@ const shouldAnimate = computed(() =>
       role="button"
       tabindex="0"
       @click="openOverlay"
-      @keydown.enter.prevent="openOverlay"
-      @keydown.space.prevent="openOverlay"
+      @keydown="handleOpenOverlayKeydown"
     />
 
     <div
@@ -146,8 +152,7 @@ const shouldAnimate = computed(() =>
       role="button"
       tabindex="0"
       @click="openOverlay"
-      @keydown.enter.prevent="openOverlay"
-      @keydown.space.prevent="openOverlay"
+      @keydown="handleOpenOverlayKeydown"
     >
       <MediaImage
         v-bind="{ ...mediaProps, hideCredit: true }"
