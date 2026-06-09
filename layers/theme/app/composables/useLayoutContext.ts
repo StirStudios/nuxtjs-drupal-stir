@@ -23,15 +23,21 @@ export type LayoutContextPayload = {
   site_info?: LayoutContextSiteInfo
 }
 
+export type LayoutContextOptions = {
+  immediate?: boolean
+}
+
 export function layoutContextQuery(path = '/') {
   return { path: path || '/' }
 }
 
-export function useLayoutContext() {
+export function useLayoutContext(options: LayoutContextOptions = {}) {
   const route = useRoute()
   const path = computed(() => route.path || '/')
 
   return useFetch<LayoutContextPayload>('/api/layout-blocks', {
+    dedupe: 'defer',
+    immediate: options.immediate ?? true,
     key: computed(() => `layout-context:${path.value}`),
     query: computed(() => layoutContextQuery(path.value)),
   })

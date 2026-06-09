@@ -5,7 +5,7 @@ const { renderCustomElements, getPage } = useDrupalCe()
 const page = getPage()
 const props = defineProps<{ area: string }>()
 
-const { data: layoutContext } = await useLayoutContext()
+const { data: layoutContext, execute: loadLayoutContext } = await useLayoutContext({ immediate: false })
 
 function normalizeRegionBlocks(raw: unknown): LayoutContextBlock[] {
   if (Array.isArray(raw)) return raw as LayoutContextBlock[]
@@ -15,10 +15,22 @@ function normalizeRegionBlocks(raw: unknown): LayoutContextBlock[] {
   return []
 }
 
-const regionBlocks = computed<LayoutContextBlock[]>(() => {
-  const pageBlocks = normalizeRegionBlocks(page.value?.blocks?.[props.area])
+const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
+const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
+const needsLayoutContext = computed(() => !hasPageBlocksPayload.value)
 
-  if (pageBlocks.length) return pageBlocks
+if (needsLayoutContext.value) {
+  await loadLayoutContext()
+}
+
+watch(needsLayoutContext, (needsContext) => {
+  if (needsContext) {
+    void loadLayoutContext()
+  }
+})
+
+const regionBlocks = computed<LayoutContextBlock[]>(() => {
+  if (hasPageBlocksPayload.value) return pageBlocks.value
 
   return normalizeRegionBlocks(layoutContext.value?.blocks?.[props.area])
 })

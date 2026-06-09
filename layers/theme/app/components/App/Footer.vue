@@ -17,7 +17,7 @@ type FooterSections = {
   right?: string[]
 }
 
-const { data: layoutContext } = await useLayoutContext()
+const { data: layoutContext, execute: loadLayoutContext } = await useLayoutContext({ immediate: false })
 
 const toFooterLayout = (value: unknown): FooterLayout => {
   return value === 'columns' || value === 'stacked' ? value : 'default'
@@ -52,19 +52,37 @@ const toSectionAtoms = (value: unknown): string[] | undefined => {
 
 const footerConfig = computed(() => theme.footer)
 const footerLayout = computed(() => toFooterLayout(footerConfig.value.layout))
+const pageFooterMenu = computed<LayoutContextFooterMenuItem[] | undefined>(() => {
+  const menu = page.value?.footer_menu
+
+  return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : undefined
+})
+const pageSiteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
+  const siteInfo = page.value?.site_info
+
+  return siteInfo && typeof siteInfo === 'object'
+    ? siteInfo as LayoutContextSiteInfo
+    : undefined
+})
+const needsLayoutContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
+
+if (needsLayoutContext.value) {
+  await loadLayoutContext()
+}
+
+watch(needsLayoutContext, (needsContext) => {
+  if (needsContext) {
+    void loadLayoutContext()
+  }
+})
+
 const footerMenu = computed<LayoutContextFooterMenuItem[]>(() => {
-  const menu = Array.isArray(page.value?.footer_menu) && page.value.footer_menu.length
-    ? page.value.footer_menu
-    : layoutContext.value?.footer_menu
+  const menu = pageFooterMenu.value ?? layoutContext.value?.footer_menu
 
   return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : []
 })
 const siteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
-  const pageSiteInfo = page.value?.site_info as LayoutContextSiteInfo | undefined
-
-  return pageSiteInfo?.name || pageSiteInfo?.mail || pageSiteInfo?.slogan
-    ? pageSiteInfo
-    : layoutContext.value?.site_info
+  return pageSiteInfo.value ?? layoutContext.value?.site_info
 })
 const footerRights = computed(() => {
   const rightsValue = (footerConfig.value as Record<string, unknown>).rights
