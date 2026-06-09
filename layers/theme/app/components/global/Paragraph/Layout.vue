@@ -31,6 +31,10 @@ const props = defineProps<{
 
 const vueSlots = useSlots()
 const orderedSlots = computed(() => Object.entries(vueSlots))
+const isGridLayout = computed(
+  () => props.layout === 'grid' || props.layout?.startsWith('grid_col') === true,
+)
+const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
 const sectionId = computed(() => {
   if (props.label) return slugify(props.label)
   return `section-${props.id ?? 'unknown'}`
@@ -49,8 +53,11 @@ const sectionId = computed(() => {
         {{ props.header }}
       </component>
 
+      <slot v-if="hasGridItems" name="items" />
+
       <template v-for="[slotName] in orderedSlots" :key="slotName">
         <div
+          v-if="!hasGridItems || slotName !== 'items'"
           :class="[
             'region',
             slotName,
