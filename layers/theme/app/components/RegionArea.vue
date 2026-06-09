@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import type { LayoutContextBlock } from '~/composables/useLayoutContext'
+import type { AppContextBlock } from '~/composables/useAppContext'
 
 const { renderCustomElements, getPage } = useDrupalCe()
 const page = getPage()
 const props = defineProps<{ area: string }>()
 
-const { data: layoutContext, execute: loadLayoutContext } = await useLayoutContext({ immediate: false })
+const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
 
-function normalizeRegionBlocks(raw: unknown): LayoutContextBlock[] {
-  if (Array.isArray(raw)) return raw as LayoutContextBlock[]
+function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
+  if (Array.isArray(raw)) return raw as AppContextBlock[]
   if (raw && typeof raw === 'object') {
-    return Object.values(raw as Record<string, LayoutContextBlock>)
+    return Object.values(raw as Record<string, AppContextBlock>)
   }
   return []
 }
 
 const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
 const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
-const needsLayoutContext = computed(() => !hasPageBlocksPayload.value)
+const needsAppContext = computed(() => !hasPageBlocksPayload.value)
 
-if (needsLayoutContext.value) {
-  await loadLayoutContext()
+if (needsAppContext.value) {
+  await loadAppContext()
 }
 
-watch(needsLayoutContext, (needsContext) => {
+watch(needsAppContext, (needsContext) => {
   if (needsContext) {
-    void loadLayoutContext()
+    void loadAppContext()
   }
 })
 
-const regionBlocks = computed<LayoutContextBlock[]>(() => {
+const regionBlocks = computed<AppContextBlock[]>(() => {
   if (hasPageBlocksPayload.value) return pageBlocks.value
 
-  return normalizeRegionBlocks(layoutContext.value?.blocks?.[props.area])
+  return normalizeRegionBlocks(appContext.value?.blocks?.[props.area])
 })
 </script>
 

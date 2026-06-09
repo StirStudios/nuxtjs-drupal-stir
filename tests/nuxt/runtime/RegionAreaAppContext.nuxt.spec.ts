@@ -19,14 +19,14 @@ mockNuxtImport('useDrupalCe', () => {
   })
 })
 
-describe('RegionArea layout context fallback', () => {
+describe('RegionArea app context fallback', () => {
   let unregisterEndpoint: (() => void) | undefined
 
   beforeEach(() => {
     state.layoutBlockCalls = 0
     state.page.value = {}
     unregisterEndpoint?.()
-    unregisterEndpoint = registerEndpoint('/api/layout-blocks', () => {
+    unregisterEndpoint = registerEndpoint('/api/app-context', () => {
       state.layoutBlockCalls++
 
       return {

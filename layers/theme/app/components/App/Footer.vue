@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type {
-  LayoutContextFooterMenuItem,
-  LayoutContextSiteInfo,
-} from '~/composables/useLayoutContext'
+  AppContextFooterMenuItem,
+  AppContextSiteInfo,
+} from '~/composables/useAppContext'
 
 const { getPage } = useDrupalCe()
 const page = getPage()
@@ -17,7 +17,7 @@ type FooterSections = {
   right?: string[]
 }
 
-const { data: layoutContext, execute: loadLayoutContext } = await useLayoutContext({ immediate: false })
+const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
 
 const toFooterLayout = (value: unknown): FooterLayout => {
   return value === 'columns' || value === 'stacked' ? value : 'default'
@@ -52,37 +52,37 @@ const toSectionAtoms = (value: unknown): string[] | undefined => {
 
 const footerConfig = computed(() => theme.footer)
 const footerLayout = computed(() => toFooterLayout(footerConfig.value.layout))
-const pageFooterMenu = computed<LayoutContextFooterMenuItem[] | undefined>(() => {
+const pageFooterMenu = computed<AppContextFooterMenuItem[] | undefined>(() => {
   const menu = page.value?.footer_menu
 
-  return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : undefined
+  return Array.isArray(menu) ? (menu as AppContextFooterMenuItem[]) : undefined
 })
-const pageSiteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
+const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() => {
   const siteInfo = page.value?.site_info
 
   return siteInfo && typeof siteInfo === 'object'
-    ? siteInfo as LayoutContextSiteInfo
+    ? siteInfo as AppContextSiteInfo
     : undefined
 })
-const needsLayoutContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
+const needsAppContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
 
-if (needsLayoutContext.value) {
-  await loadLayoutContext()
+if (needsAppContext.value) {
+  await loadAppContext()
 }
 
-watch(needsLayoutContext, (needsContext) => {
+watch(needsAppContext, (needsContext) => {
   if (needsContext) {
-    void loadLayoutContext()
+    void loadAppContext()
   }
 })
 
-const footerMenu = computed<LayoutContextFooterMenuItem[]>(() => {
-  const menu = pageFooterMenu.value ?? layoutContext.value?.footer_menu
+const footerMenu = computed<AppContextFooterMenuItem[]>(() => {
+  const menu = pageFooterMenu.value ?? appContext.value?.footer_menu
 
-  return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : []
+  return Array.isArray(menu) ? (menu as AppContextFooterMenuItem[]) : []
 })
-const siteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
-  return pageSiteInfo.value ?? layoutContext.value?.site_info
+const siteInfo = computed<AppContextSiteInfo | undefined>(() => {
+  return pageSiteInfo.value ?? appContext.value?.site_info
 })
 const footerRights = computed(() => {
   const rightsValue = (footerConfig.value as Record<string, unknown>).rights

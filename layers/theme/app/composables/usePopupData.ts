@@ -188,7 +188,7 @@ export const usePopupData = () => {
   const popup = ref<PopupNode | null>(null)
   const fallbackLoaded = ref(false)
   let fallbackRequestId = 0
-  const { data: layoutContext, execute: loadLayoutContext } = useLayoutContext({ immediate: false })
+  const { data: appContext, execute: loadAppContext } = useAppContext({ immediate: false })
 
   const contentSource = computed(() => page.value?.content)
   const decoupledSource = computed(() => page.value?.blocks?.decoupled)
@@ -204,7 +204,7 @@ export const usePopupData = () => {
 
     return findPopupInSources(
       undefined,
-      layoutContext.value?.blocks?.decoupled,
+      appContext.value?.blocks?.decoupled,
       routePath.value,
     )
   })
@@ -217,7 +217,7 @@ export const usePopupData = () => {
     const requestId = ++fallbackRequestId
 
     try {
-      await loadLayoutContext()
+      await loadAppContext()
 
       if (requestId !== fallbackRequestId) return
     } catch {
