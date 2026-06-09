@@ -180,12 +180,19 @@ const menuContent = computed(() => {
   const degRaw = Number(slideover?.angleDeg ?? 35)
   const angleDeg = Number.isFinite(degRaw) ? degRaw : 35
   const angleEdge = Math.min(48, Math.max(12, angleDeg * 0.65))
+  const offsetX = slideover?.angleOffsetX
 
   return {
     id: menuId,
     'aria-label': 'Site navigation menu',
     style: {
       '--stir-menu-angle-edge': `${angleEdge}%`,
+      ...(offsetX !== undefined
+        ? {
+            '--stir-menu-offset-x':
+              typeof offsetX === 'number' ? `${offsetX}px` : String(offsetX),
+          }
+        : {}),
     },
   }
 })
@@ -246,6 +253,8 @@ const splitDesktopNavClasses = computed(() =>
 const splitLeftNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.leftNav))
 const splitRightNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.rightNav))
 const splitLogoLinkClasses = computed(() => toClassName(theme.navigation.splitLogo?.logoLink))
+const showSlideoverBrand = computed(() => theme.navigation.slideover?.logo !== false)
+const slideoverLinkClasses = computed(() => toClassName(theme.navigation.slideover?.link))
 const slideoverListClasses = computed(() => toClassName(theme.navigation.slideover?.list))
 
 function menuChildren(item: MainMenuItem): MainMenuItem[] {
@@ -462,6 +471,7 @@ watch(menuOpen, (val) => {
         :logo-classes="logoClasses"
         :menu-id="menuId"
         :right-class="headerRightClasses"
+        :show-brand="showSlideoverBrand"
         :show-color-mode-toggle="showColorModeToggle"
         :show-logo="Boolean(theme.navigation.logo)"
         :site-title="siteTitle"
@@ -475,7 +485,7 @@ watch(menuOpen, (val) => {
     <template #body>
       <LazyAppHeaderMobileMenu
         :items="mobileNavLinks"
-        :link-class="theme.navigation.slideover.link"
+        :link-class="slideoverLinkClasses"
         :list-class="slideoverListClasses"
       />
     </template>

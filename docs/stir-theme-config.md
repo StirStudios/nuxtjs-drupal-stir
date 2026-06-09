@@ -250,6 +250,9 @@ navigation: {
   },
   slideover: {
 	logo: true,
+	angle: false,
+	angleDeg: 35,
+	angleOffsetX: '1.5rem',
 	link: 'text-xl text-center block my-3 uppercase',
 	list: '',
 	body: 'flex h-full flex-col justify-center text-center',
