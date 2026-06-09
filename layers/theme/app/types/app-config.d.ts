@@ -165,6 +165,7 @@ type StirThemeNavigationConfig = {
     logo?: boolean
     angle?: boolean
     angleDeg?: number
+    angleOffsetX?: number | string
     link?: ClassValue
     list?: ClassValue
     body?: ClassValue

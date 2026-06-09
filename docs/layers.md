@@ -16,8 +16,9 @@ This repository is structured into three Nuxt layers with clear ownership:
 
 ## Type Placement
 
-- Shared contracts used by multiple layers: keep at root `types/`.
-- Layer-private types: keep in that layer (for example `layers/theme/app/types/*`, `layers/auth/app/types/*`).
+- Webform/form contracts owned by the theme layer live in `layers/theme/app/types/*` and are imported through `~/types`.
+- Layer-private types stay in that layer (for example `layers/theme/app/types/*`, `layers/auth/app/types/*`).
+- Cross-layer server contracts should live near the shared server utility or endpoint that owns them.
 
 ## Override Guidance (Consuming Apps)
 
@@ -31,7 +32,7 @@ Common override order for downstream projects:
 ## Boundary Guidelines
 
 - Avoid importing internals from another layer's implementation folders.
-- Prefer public/shared contracts (`~/types`) for cross-layer data shapes.
+- Prefer public aliases such as `~/types` for shared app-facing data shapes.
 - Keep server concerns in `core`/`auth` server directories, not in `theme`.
 
 ## Notes

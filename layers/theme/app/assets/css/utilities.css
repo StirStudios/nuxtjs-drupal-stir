@@ -86,6 +86,7 @@ figure {
   --stir-menu-duration: 980ms;
   --stir-menu-ease-in: cubic-bezier(0.16, 0.72, 0.28, 1);
   --stir-menu-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
+  --stir-menu-offset-x: 1.5rem;
 
   background: var(--stir-menu-panel-bg, var(--ui-bg));
 }
@@ -102,10 +103,10 @@ figure {
 
 .stir-menu-panel[data-side='left'] {
   --stir-menu-clip-from: polygon(0 0, var(--stir-menu-angle-edge) 0, 0 100%, 0 100%);
-  --stir-menu-content-x: -1.5rem;
+  --stir-menu-content-x: calc(var(--stir-menu-offset-x) * -1);
 }
 
 .stir-menu-panel[data-side='right'] {
   --stir-menu-clip-from: polygon(calc(100% - var(--stir-menu-angle-edge)) 0, 100% 0, 100% 100%, 100% 100%);
-  --stir-menu-content-x: 1.5rem;
+  --stir-menu-content-x: var(--stir-menu-offset-x);
 }

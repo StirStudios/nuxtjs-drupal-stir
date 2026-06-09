@@ -4,6 +4,7 @@ defineProps<{
   logoClasses: string
   menuId?: string
   rightClass?: string
+  showBrand: boolean
   showColorModeToggle: boolean
   showLogo: boolean
   siteTitle: string
@@ -18,23 +19,22 @@ defineEmits<{
 </script>
 
 <template>
-  <div :class="leftClass">
-    <ULink
-      aria-label="Home"
-      :class="titleClass"
-      to="/"
-    >
-      <AppLogo
-        v-if="showLogo"
-        :add-classes="logoClasses"
-      />
-      <template v-else>
-        {{ siteTitle }}
-      </template>
-    </ULink>
-  </div>
+  <ULink
+    v-if="showBrand"
+    aria-label="Home"
+    :class="[leftClass, titleClass]"
+    to="/"
+  >
+    <AppLogo
+      v-if="showLogo"
+      :add-classes="logoClasses"
+    />
+    <template v-else>
+      {{ siteTitle }}
+    </template>
+  </ULink>
 
-  <div :class="rightClass">
+  <div :class="[rightClass, !showBrand ? 'ms-auto' : '']">
     <LazyIconsColorMode v-if="showColorModeToggle" />
 
     <UButton

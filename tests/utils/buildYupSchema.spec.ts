@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildYupSchema } from '../../layers/theme/app/utils/buildYupSchema'
-import type { WebformFieldProps, WebformState } from '../../types'
+import type { WebformFieldProps, WebformState } from '../../layers/theme/app/types'
 
 function createDateTimeField(
   overrides: Partial<WebformFieldProps> = {},

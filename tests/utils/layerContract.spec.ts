@@ -17,7 +17,7 @@ describe('layer contract', () => {
     expect(nuxtConfig).toContain('\'~/utils\': resolveLayerPath(\'./layers/theme/app/utils\')')
     expect(nuxtConfig).toContain('\'~/composables\': resolveLayerPath(\'./layers/theme/app/composables\')')
     expect(nuxtConfig).toContain('\'~/components\': resolveLayerPath(\'./layers/theme/app/components\')')
-    expect(nuxtConfig).toContain('\'~/types\': resolveLayerPath(\'./types\')')
+    expect(nuxtConfig).toContain('\'~/types\': resolveLayerPath(\'./layers/theme/app/types\')')
   })
 
   it('has consumer fixture for smoke testing the layer from a root app', () => {

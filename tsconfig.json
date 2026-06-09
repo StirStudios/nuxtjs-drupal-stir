@@ -13,8 +13,8 @@
       "~/composables/*": ["./layers/theme/app/composables/*"],
       "~/components": ["./layers/theme/app/components"],
       "~/components/*": ["./layers/theme/app/components/*"],
-      "~/types": ["./types"],
-      "~/types/*": ["./types/*"]
+      "~/types": ["./layers/theme/app/types"],
+      "~/types/*": ["./layers/theme/app/types/*"]
     }
   }
 }
