@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CustomElementNode, EditAction } from '~/types'
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -13,6 +15,7 @@ const props = defineProps<{
   quickEditDisabled?: boolean
   quickEditLabel?: string
   fullEditLabel?: string
+  controlsPlacement?: 'sibling' | 'slot'
 }>()
 
 const emit = defineEmits<{
@@ -21,12 +24,6 @@ const emit = defineEmits<{
 
 const { getPage } = useDrupalCe()
 const page = getPage()
-
-type CustomElementNode = {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-}
 
 function findLayoutEditLinkByUuid(value: unknown, uuid: string): string {
   if (!value) return ''
@@ -60,19 +57,6 @@ function findLayoutEditLinkByUuid(value: unknown, uuid: string): string {
   }
 
   return ''
-}
-
-interface EditAction {
-  key: 'quick' | 'full' | 'layout'
-  tooltip: string
-  ariaLabel: string
-  icon: string
-  variant: 'soft' | 'outline'
-  buttonClass: string
-  disabled?: boolean
-  to?: string
-  target?: '_blank'
-  rel?: 'noopener noreferrer'
 }
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
@@ -182,6 +166,9 @@ const actions = computed<EditAction[]>(() => {
 })
 
 const hasActions = computed(() => actions.value.length > 0)
+const rendersSiblingControls = computed(
+  () => props.controlsPlacement !== 'slot',
+)
 
 const handleActionSelect = (key: EditAction['key']) => {
   if (key === 'quick') emit('quick-edit')
@@ -189,9 +176,13 @@ const handleActionSelect = (key: EditAction['key']) => {
 </script>
 
 <template>
-  <slot />
+  <slot
+    :actions="actions"
+    :has-actions="hasActions"
+    :select-action="handleActionSelect"
+  />
   <LazyEditControls
-    v-if="hasActions"
+    v-if="hasActions && rendersSiblingControls"
     :actions="actions"
     @select="handleActionSelect"
   />

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
+import type { EditAction, EditActionKey } from '~/types/EditControls'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
@@ -29,11 +30,13 @@ const props = defineProps<{
   direction?: string
   revealMode?: RevealMode
   overlay?: boolean
+  editActions?: EditAction[]
   tk: SlotsToolkit
 }>()
 
 const emit = defineEmits<{
   (e: 'open', index: number): void
+  (e: 'edit-action-select', key: EditActionKey): void
 }>()
 
 const theme = useAppConfig().stirTheme
@@ -57,6 +60,10 @@ const handleOpenOverlayKeydown = (event: KeyboardEvent) => {
 
   event.preventDefault()
   openOverlay()
+}
+
+const handleEditActionSelect = (key: EditActionKey) => {
+  emit('edit-action-select', key)
 }
 
 const componentMap: Record<MediaType, string> = {
@@ -103,6 +110,8 @@ const shouldAnimate = computed(() =>
     :is="componentMap[mediaProps.type]"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
     v-bind="mediaProps"
+    :edit-actions="editActions"
+    @edit-action-select="handleEditActionSelect"
   />
 
   <Motion
@@ -111,7 +120,12 @@ const shouldAnimate = computed(() =>
     as-child
     v-bind="revealMotionProps"
   >
-    <component :is="componentMap[mediaProps.type]" v-bind="mediaProps" />
+    <component
+      :is="componentMap[mediaProps.type]"
+      v-bind="mediaProps"
+      :edit-actions="editActions"
+      @edit-action-select="handleEditActionSelect"
+    />
   </Motion>
 
   <Motion
@@ -125,6 +139,7 @@ const shouldAnimate = computed(() =>
       v-bind="overlayImageProps"
       :aria-label="'Open media modal'"
       class="cursor-pointer"
+      :edit-actions="editActions"
       :image-class="[
         'transition-transform',
         theme.media.effects.scale,
@@ -134,6 +149,7 @@ const shouldAnimate = computed(() =>
       role="button"
       tabindex="0"
       @click="openOverlay"
+      @edit-action-select="handleEditActionSelect"
       @keydown="handleOpenOverlayKeydown"
     />
 

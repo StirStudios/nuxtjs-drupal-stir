@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CustomElementNode } from '~/types'
+
 const isDev = import.meta.dev
 
 const props = defineProps<{
@@ -10,12 +12,6 @@ const props = defineProps<{
 
   editLink?: string
 }>()
-
-type CustomElementNode = {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-}
 
 const { getPage } = useDrupalCe()
 const page = getPage()

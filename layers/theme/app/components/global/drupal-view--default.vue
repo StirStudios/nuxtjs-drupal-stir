@@ -7,13 +7,9 @@ import type {
   ExposedSort,
   ViewPager,
 } from '~/composables/useDrupalViewControls'
+import type { CustomElementNode } from '~/types'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-
-interface CeElementNode {
-  props?: Record<string, unknown>
-  [key: string]: unknown
-}
 
 type RenderedViewRow =
   | {
@@ -130,10 +126,10 @@ const dynamicRenderedRows = computed(() => {
       row &&
       typeof row === 'object' &&
       'props' in (row as Record<string, unknown>) &&
-      typeof (row as CeElementNode).props === 'object'
+      typeof (row as CustomElementNode).props === 'object'
     ) {
-      const node = row as CeElementNode
-      const patched: CeElementNode = {
+      const node = row as CustomElementNode
+      const patched: CustomElementNode = {
         ...node,
         props: {
           isHero: false,

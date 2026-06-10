@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { DateTimeBlock, DateTimeDate, WebformFieldProps, WebformState } from '~/types'
 import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
@@ -24,17 +24,6 @@ const siteTimezone =
     ? props.field['#timezone']
     : 'America/Los_Angeles'
 const timeOptions = generateTimeOptions(minTime, maxTime, step)
-
-type DateTimeDate = {
-  year: number
-  month: number
-  day: number
-}
-
-type DateTimeBlock = {
-  date: DateTimeDate | null
-  start: string
-}
 
 function formatCalendarDate(date: DateTimeDate): string {
   return `${date.year}-${String(date.month).padStart(2, '0')}-${String(

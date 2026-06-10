@@ -1,20 +1,6 @@
 <script setup lang="ts">
+import type { EditAction, EditActionKey } from '~/types/EditControls'
 import { adminUiTheme } from '~/utils/adminUiTheme'
-
-type EditActionKey = 'quick' | 'full' | 'layout'
-
-interface EditAction {
-  key: EditActionKey
-  tooltip: string
-  ariaLabel: string
-  icon: string
-  variant: 'soft' | 'outline'
-  buttonClass: string
-  disabled?: boolean
-  to?: string
-  target?: '_blank'
-  rel?: 'noopener noreferrer'
-}
 
 defineProps<{
   actions: EditAction[]
@@ -53,6 +39,9 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
       class="admin-ui admin-ui-scope admin-ui-controls pointer-events-none absolute top-2 right-2 z-100 rounded-md opacity-0 shadow-lg transition-opacity"
       data-admin-ui-controls
       size="xs"
+      @click.stop
+      @keydown.stop
+      @pointerdown.stop
     >
       <UTooltip
         v-for="action in actions"
