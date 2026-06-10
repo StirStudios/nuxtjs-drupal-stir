@@ -14,6 +14,28 @@ export function getVNodeProps(vnode: VNode | undefined) {
   return vnode && isVNode(vnode) ? (vnode.props ?? {}) : {}
 }
 
+export function getVNodeChildren(vnode: VNode | undefined): VNode[] {
+  if (!vnode?.children) {
+    return []
+  }
+
+  if (Array.isArray(vnode.children)) {
+    return vnode.children.filter(isVNode)
+  }
+
+  if (typeof vnode.children === 'object') {
+    return Object.values(vnode.children).flatMap((child) =>
+      typeof child === 'function' ? child().filter(isVNode) : [],
+    )
+  }
+
+  return []
+}
+
+export function getAllVNodes(nodes: VNode[]): VNode[] {
+  return nodes.flatMap((node) => [node, ...getAllVNodes(getVNodeChildren(node))])
+}
+
 export function extractHeroMedia(slots: unknown) {
   const heroNodes = useSlotVNode(slots, 'hero')
 
@@ -65,6 +87,8 @@ function hydrateOrder<T>(baseFn: () => T[], clientFn: () => T[]) {
 
 export function useSlotsToolkit(slots: unknown) {
   const slot = (name: string): VNode[] => useSlotVNode(slots, name)
+  const all = (nodes: VNode[]): VNode[] => getAllVNodes(nodes)
+  const childrenOf = (vnode: VNode | undefined): VNode[] => getVNodeChildren(vnode)
   const heroMedia = () => extractHeroMedia(slots)
   const mediaItems = () => extractMediaItems(slots)
   const isMediaEmbed = (vnode: VNode | undefined) => isVNodeMediaEmbed(vnode)
@@ -72,6 +96,8 @@ export function useSlotsToolkit(slots: unknown) {
   return {
     slots,
     slot,
+    all,
+    childrenOf,
     propsOf: getVNodeProps,
     heroMedia,
     mediaItems,
