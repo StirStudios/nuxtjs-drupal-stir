@@ -8,12 +8,7 @@ import {
   resolveUiButtonVariant,
   type UiFieldVariant,
 } from '~/utils/nuxtUiProps'
-
-type DateTimeDate = {
-  year: number
-  month: number
-  day: number
-}
+import type { DateTimeDate } from '~/types'
 
 const props = defineProps<{
   label: string

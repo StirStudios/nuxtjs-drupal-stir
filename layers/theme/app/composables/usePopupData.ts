@@ -1,8 +1,4 @@
-export type PopupNode = {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-}
+import type { PopupNode } from '~/types'
 
 type UnknownRecord = Record<string, unknown>
 

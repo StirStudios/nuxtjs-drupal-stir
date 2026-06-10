@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { EditAction, EditActionKey } from '~/types/EditControls'
+
 defineOptions({ inheritAttrs: false })
 
 const props = defineProps<{
@@ -29,6 +31,11 @@ const props = defineProps<{
   isHero?: boolean
   wrapperClass?: unknown
   imageClass?: unknown
+  editActions?: EditAction[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit-action-select', key: EditActionKey): void
 }>()
 
 const theme = useAppConfig().stirTheme
@@ -60,6 +67,9 @@ const rootAttrs = computed(() =>
 )
 const hasImageSource = computed(() =>
   Boolean(props.src?.trim() || props.srcset?.trim()),
+)
+const hasInlineEditActions = computed(
+  () => props.link ? false : (props.editActions?.length ?? 0) > 0,
 )
 const imageElement = ref<HTMLImageElement | null>(null)
 
@@ -204,5 +214,11 @@ onMounted(() => {
         {{ credit }}
       </span>
     </ClientOnly>
+
+    <LazyEditControls
+      v-if="hasInlineEditActions"
+      :actions="editActions ?? []"
+      @select="emit('edit-action-select', $event)"
+    />
   </component>
 </template>

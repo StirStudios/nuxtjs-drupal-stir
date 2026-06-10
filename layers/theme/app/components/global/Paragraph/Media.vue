@@ -151,6 +151,14 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   onSelect: onSelectModal,
 })
 const firstItem = computed(() => itemsOrdered.value[0] ?? null)
+const canPlaceAdminControlsInMediaImage = computed(() => {
+  if (slotMediaOrdered.value.length !== 1) return false
+
+  const media = tk.propsOf(slotMediaOrdered.value[0])
+  const link = typeof media.link === 'string' ? media.link.trim() : ''
+
+  return media.type === 'image' && link.length === 0
+})
 const singleVideoFrameStyle = computed(() => {
   if (firstItem.value?.type !== 'video') return undefined
 
@@ -172,7 +180,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
+  <EditLink
+    v-slot="{ actions, selectAction }"
+    :controls-placement="canPlaceAdminControlsInMediaImage ? 'slot' : 'sibling'"
+    :link="editLink"
+    :parent-uuid="parentUuid"
+  >
     <WrapDiv :align="align">
       <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}
@@ -194,11 +207,15 @@ onMounted(() => {
         <MediaItem
           :key="getMediaItemKey(node, i)"
           :direction="direction"
+          :edit-actions="
+            canPlaceAdminControlsInMediaImage ? actions : undefined
+          "
           :index="i"
           :node="node as never"
           :overlay="overlay"
           :reveal-mode="revealMode"
           :tk="tk as never"
+          @edit-action-select="selectAction"
           @open="openModal"
         />
       </LazyUScrollArea>
@@ -214,11 +231,15 @@ onMounted(() => {
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
           :direction="direction"
+          :edit-actions="
+            canPlaceAdminControlsInMediaImage ? actions : undefined
+          "
           :index="i"
           :node="node as never"
           :overlay="overlay"
           :reveal-mode="revealMode"
           :tk="tk as never"
+          @edit-action-select="selectAction"
           @open="openModal"
         />
       </WrapGrid>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, resolveComponent } from 'vue'
-import type { WebformDefinition } from '~/types'
+import type { PopupMedia, PopupNode, PopupProps } from '~/types'
 
 const appConfig = useAppConfig()
 const { renderCustomElements } = useDrupalCe()
@@ -8,24 +8,6 @@ const { popup, config } = usePopupData()
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),
 )
-
-type PopupNode = {
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-}
-
-type PopupProps = {
-  id?: string | number
-  uuid?: string
-  parentUuid?: string
-  region?: string
-  text?: string
-  webform?: WebformDefinition
-  editLink?: string
-  direction?: string
-}
-
-type PopupMedia = Record<string, unknown>
 
 function getPopupProps(node: PopupNode | null): PopupProps {
   if (!node?.props || typeof node.props !== 'object') return {}

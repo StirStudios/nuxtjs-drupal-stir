@@ -1,4 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
+import type { CustomElementNode } from '~/types'
 
 export interface ViewPager {
   current: number
@@ -21,13 +22,6 @@ export interface ExposedSort {
   queryParamSortBy?: string
   queryParamSortOrder?: string
   sortOrderOptions?: Record<string, string>
-}
-
-interface CeElementNode {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-  [key: string]: unknown
 }
 
 interface ViewStateSnapshot {
@@ -105,7 +99,7 @@ function buildSearchParams(
   return params
 }
 
-function getNodeProps(node: CeElementNode): Record<string, unknown> {
+function getNodeProps(node: CustomElementNode): Record<string, unknown> {
   if (node.props && typeof node.props === 'object') {
     return node.props
   }
@@ -119,7 +113,7 @@ function getNodeProps(node: CeElementNode): Record<string, unknown> {
   return flat as Record<string, unknown>
 }
 
-function getNodeSlots(node: CeElementNode): Record<string, unknown> {
+function getNodeSlots(node: CustomElementNode): Record<string, unknown> {
   if (node.slots && typeof node.slots === 'object') {
     return node.slots
   }
@@ -127,7 +121,7 @@ function getNodeSlots(node: CeElementNode): Record<string, unknown> {
   return {}
 }
 
-function getNodeRows(node: CeElementNode): unknown[] {
+function getNodeRows(node: CustomElementNode): unknown[] {
   const slots = getNodeSlots(node)
   const slotRows = slots.rows
 
@@ -728,7 +722,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return query
   }
 
-  function isMatchingView(node: CeElementNode): boolean {
+  function isMatchingView(node: CustomElementNode): boolean {
     const nodeProps = getNodeProps(node)
     const nodeViewId = String(nodeProps.viewId || '')
     const nodeDisplayId = String(nodeProps.displayId || '')
@@ -745,7 +739,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return true
   }
 
-  function findViewNode(input: unknown): CeElementNode | null {
+  function findViewNode(input: unknown): CustomElementNode | null {
     if (!input) return null
 
     if (Array.isArray(input)) {
@@ -759,7 +753,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     }
 
     if (typeof input !== 'object') return null
-    const node = input as CeElementNode
+    const node = input as CustomElementNode
 
     if (isMatchingView(node)) return node
 
@@ -817,7 +811,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         responseRecord?.data,
       ]
 
-      let viewNode: CeElementNode | null = null
+      let viewNode: CustomElementNode | null = null
 
       for (const candidate of candidates) {
         viewNode = findViewNode(candidate)
