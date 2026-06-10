@@ -112,12 +112,17 @@ const footerSections = computed<Required<FooterSections>>(() => {
     right: toSectionAtoms(configured.right) || ['socials', 'email'],
   }
 })
+const navigationConfig = computed(() => theme.navigation as Record<string, unknown>)
 const footerClasses = computed(() => ({
   action: toClassName(footerConfig.value.action),
   actions: toClassName(footerConfig.value.actionsWrapper),
   copyright: toClassName(footerConfig.value.copyright),
   email: toClassName(footerConfig.value.email),
-  logo: toClassName(footerConfig.value.logo || theme.navigation.logoScrolledSize || theme.navigation.logoSize),
+  logo: toClassName(
+    footerConfig.value.logo
+      || navigationConfig.value.logoScrolledSize
+      || navigationConfig.value.logoSize,
+  ),
   menu: toClassName(footerConfig.value.menu),
   menuItem: toClassName(footerConfig.value.menuItem),
   menuList: toClassName(footerConfig.value.menuList),
