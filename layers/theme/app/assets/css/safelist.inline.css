@@ -41,4 +41,12 @@
 @source inline("xl:p-20 xl:p-3 xl:p-4 xl:p-5 xl:pb-0 xl:pb-1 xl:pb-10 xl:pb-15 xl:pb-2 xl:pb-20 xl:pb-3 xl:pb-4 xl:pb-5 xl:pl-0 xl:pl-1 xl:pl-10 xl:pl-15 xl:pl-2 xl:pl-20 xl:pl-3");
 @source inline("xl:pl-4 xl:pl-5 xl:pr-0 xl:pr-1 xl:pr-10 xl:pr-15 xl:pr-2 xl:pr-20 xl:pr-3 xl:pr-4 xl:pr-5 xl:pt-0 xl:pt-1 xl:pt-10 xl:pt-15 xl:pt-2 xl:pt-20 xl:pt-3 xl:pt-4 xl:pt-5");
 @source inline("xl:px-0 xl:px-1 xl:px-10 xl:px-15 xl:px-2 xl:px-20 xl:px-3 xl:px-4 xl:px-5 xl:py-0 xl:py-1 xl:py-10 xl:py-15 xl:py-2 xl:py-20 xl:py-3 xl:py-4 xl:py-5 xl:space-y-1 xl:space-y-10");
-@source inline("xl:space-y-2 xl:space-y-20 xl:space-y-3 xl:space-y-4 xl:space-y-5 xl:space-y-6 xl:space-y-7 xl:space-y-8 xl:space-y-9");
+@source inline("xl:space-y-2 xl:space-y-20 xl:space-y-3 xl:space-y-4 xl:space-y-5 xl:space-y-6 xl:space-y-7 xl:space-y-8 xl:space-y-9 xs:basis-1/1 xs:basis-1/2 xs:basis-1/3 xs:basis-1/4 xs:basis-1/5 xs:basis-1/6 xs:basis-1/7 xs:block xs:col-span-1 xs:col-span-2 xs:col-span-3");
+@source inline("xs:columns-1 xs:columns-2 xs:columns-3 xs:columns-4 xs:columns-5 xs:gap-1 xs:gap-10 xs:gap-2 xs:gap-20 xs:gap-3 xs:gap-4 xs:gap-5 xs:gap-6 xs:gap-7 xs:gap-8 xs:gap-9 xs:grid-cols-1 xs:grid-cols-2 xs:grid-cols-3 xs:grid-cols-4");
+@source inline("xs:grid-cols-5 xs:grid-cols-6 xs:hidden xs:m-0 xs:m-1 xs:m-10 xs:m-15 xs:m-2 xs:m-20 xs:m-3 xs:m-4 xs:m-5 xs:mb-0 xs:mb-1 xs:mb-10 xs:mb-15 xs:mb-2 xs:mb-20 xs:mb-3 xs:mb-4");
+@source inline("xs:mb-5 xs:ml-0 xs:ml-1 xs:ml-10 xs:ml-15 xs:ml-2 xs:ml-20 xs:ml-3 xs:ml-4 xs:ml-5 xs:mr-0 xs:mr-1 xs:mr-10 xs:mr-15 xs:mr-2 xs:mr-20 xs:mr-3 xs:mr-4 xs:mr-5 xs:mt-0");
+@source inline("xs:mt-1 xs:mt-10 xs:mt-15 xs:mt-2 xs:mt-20 xs:mt-3 xs:mt-4 xs:mt-5 xs:mx-0 xs:mx-1 xs:mx-10 xs:mx-15 xs:mx-2 xs:mx-20 xs:mx-3 xs:mx-4 xs:mx-5 xs:my-0 xs:my-1 xs:my-10");
+@source inline("xs:my-15 xs:my-2 xs:my-20 xs:my-3 xs:my-4 xs:my-5 xs:p-0 xs:p-1 xs:p-10 xs:p-15 xs:p-2 xs:p-20 xs:p-3 xs:p-4 xs:p-5 xs:pb-0 xs:pb-1 xs:pb-10 xs:pb-15 xs:pb-2");
+@source inline("xs:pb-20 xs:pb-3 xs:pb-4 xs:pb-5 xs:pl-0 xs:pl-1 xs:pl-10 xs:pl-15 xs:pl-2 xs:pl-20 xs:pl-3 xs:pl-4 xs:pl-5 xs:pr-0 xs:pr-1 xs:pr-10 xs:pr-15 xs:pr-2 xs:pr-20 xs:pr-3");
+@source inline("xs:pr-4 xs:pr-5 xs:pt-0 xs:pt-1 xs:pt-10 xs:pt-15 xs:pt-2 xs:pt-20 xs:pt-3 xs:pt-4 xs:pt-5 xs:px-0 xs:px-1 xs:px-10 xs:px-15 xs:px-2 xs:px-20 xs:px-3 xs:px-4 xs:px-5");
+@source inline("xs:py-0 xs:py-1 xs:py-10 xs:py-15 xs:py-2 xs:py-20 xs:py-3 xs:py-4 xs:py-5 xs:space-y-1 xs:space-y-10 xs:space-y-2 xs:space-y-20 xs:space-y-3 xs:space-y-4 xs:space-y-5 xs:space-y-6 xs:space-y-7 xs:space-y-8 xs:space-y-9");

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 // Run with: node ./layers/theme/app/utils/generateSafelist.ts
-const breakpoints = ['', 'sm:', 'md:', 'lg:', 'xl:']
+const breakpoints = ['', 'xs:', 'sm:', 'md:', 'lg:', 'xl:']
 const columns = Array.from({ length: 6 }, (_, i) => `grid-cols-${i + 1}`)
 const spans = Array.from({ length: 3 }, (_, i) => `col-span-${i + 1}`)
 const gaps = [...Array.from({ length: 10 }, (_, i) => `gap-${i + 1}`), 'gap-20']
