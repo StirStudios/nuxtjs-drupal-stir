@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type {
-  LayoutContextFooterMenuItem,
-  LayoutContextSiteInfo,
-} from '~/composables/useLayoutContext'
+  AppContextFooterMenuItem,
+  AppContextSiteInfo,
+} from '~/composables/useAppContext'
 
 const { getPage } = useDrupalCe()
 const page = getPage()
@@ -17,7 +17,7 @@ type FooterSections = {
   right?: string[]
 }
 
-const { data: layoutContext } = await useLayoutContext()
+const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
 
 const toFooterLayout = (value: unknown): FooterLayout => {
   return value === 'columns' || value === 'stacked' ? value : 'default'
@@ -52,19 +52,37 @@ const toSectionAtoms = (value: unknown): string[] | undefined => {
 
 const footerConfig = computed(() => theme.footer)
 const footerLayout = computed(() => toFooterLayout(footerConfig.value.layout))
-const footerMenu = computed<LayoutContextFooterMenuItem[]>(() => {
-  const menu = Array.isArray(page.value?.footer_menu) && page.value.footer_menu.length
-    ? page.value.footer_menu
-    : layoutContext.value?.footer_menu
+const pageFooterMenu = computed<AppContextFooterMenuItem[] | undefined>(() => {
+  const menu = page.value?.footer_menu
 
-  return Array.isArray(menu) ? (menu as LayoutContextFooterMenuItem[]) : []
+  return Array.isArray(menu) ? (menu as AppContextFooterMenuItem[]) : undefined
 })
-const siteInfo = computed<LayoutContextSiteInfo | undefined>(() => {
-  const pageSiteInfo = page.value?.site_info as LayoutContextSiteInfo | undefined
+const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() => {
+  const siteInfo = page.value?.site_info
 
-  return pageSiteInfo?.name || pageSiteInfo?.mail || pageSiteInfo?.slogan
-    ? pageSiteInfo
-    : layoutContext.value?.site_info
+  return siteInfo && typeof siteInfo === 'object'
+    ? siteInfo as AppContextSiteInfo
+    : undefined
+})
+const needsAppContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
+
+if (needsAppContext.value) {
+  await loadAppContext()
+}
+
+watch(needsAppContext, (needsContext) => {
+  if (needsContext) {
+    void loadAppContext()
+  }
+})
+
+const footerMenu = computed<AppContextFooterMenuItem[]>(() => {
+  const menu = pageFooterMenu.value ?? appContext.value?.footer_menu
+
+  return Array.isArray(menu) ? (menu as AppContextFooterMenuItem[]) : []
+})
+const siteInfo = computed<AppContextSiteInfo | undefined>(() => {
+  return pageSiteInfo.value ?? appContext.value?.site_info
 })
 const footerRights = computed(() => {
   const rightsValue = (footerConfig.value as Record<string, unknown>).rights
@@ -94,12 +112,17 @@ const footerSections = computed<Required<FooterSections>>(() => {
     right: toSectionAtoms(configured.right) || ['socials', 'email'],
   }
 })
+const navigationConfig = computed(() => theme.navigation as Record<string, unknown>)
 const footerClasses = computed(() => ({
   action: toClassName(footerConfig.value.action),
   actions: toClassName(footerConfig.value.actionsWrapper),
   copyright: toClassName(footerConfig.value.copyright),
   email: toClassName(footerConfig.value.email),
-  logo: toClassName(footerConfig.value.logo || theme.navigation.logoScrolledSize || theme.navigation.logoSize),
+  logo: toClassName(
+    footerConfig.value.logo
+      || navigationConfig.value.logoScrolledSize
+      || navigationConfig.value.logoSize,
+  ),
   menu: toClassName(footerConfig.value.menu),
   menuItem: toClassName(footerConfig.value.menuItem),
   menuList: toClassName(footerConfig.value.menuList),

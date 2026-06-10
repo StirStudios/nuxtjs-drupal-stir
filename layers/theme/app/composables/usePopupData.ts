@@ -1,5 +1,3 @@
-import { layoutContextQuery } from './useLayoutContext'
-
 export type PopupNode = {
   element?: string
   props?: Record<string, unknown>
@@ -9,12 +7,6 @@ export type PopupNode = {
 type UnknownRecord = Record<string, unknown>
 
 type VisibilityMode = 'show' | 'hide'
-
-type LayoutBlocksPayload = {
-  blocks?: {
-    decoupled?: unknown
-  }
-}
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null
@@ -173,10 +165,6 @@ function findPopupInContent(content: unknown): PopupNode | null {
   return findPopup(content)
 }
 
-function hasDecoupledBlocks(decoupled: unknown): boolean {
-  return isRecord(decoupled) && Object.keys(decoupled).length > 0
-}
-
 function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
   return findPopupInDecoupledBlocks(decoupled, routePath) || findPopupInContent(content)
 }
@@ -198,13 +186,13 @@ export const usePopupData = () => {
   const page = getPage()
   const route = useRoute()
   const popup = ref<PopupNode | null>(null)
-  const fallbackDecoupledSource = ref<unknown>(null)
   const fallbackLoaded = ref(false)
   let fallbackRequestId = 0
+  const { data: appContext, execute: loadAppContext } = useAppContext({ immediate: false })
 
   const contentSource = computed(() => page.value?.content)
   const decoupledSource = computed(() => page.value?.blocks?.decoupled)
-  const hasPageDecoupledBlocks = computed(() => hasDecoupledBlocks(decoupledSource.value))
+  const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
   const routePath = computed(() => route.path || '/')
   const pagePopup = computed(() => findPopupInSources(
     contentSource.value,
@@ -212,11 +200,11 @@ export const usePopupData = () => {
     routePath.value,
   ))
   const fallbackPopup = computed(() => {
-    if (hasPageDecoupledBlocks.value) return null
+    if (hasPageBlocksPayload.value) return null
 
     return findPopupInSources(
       undefined,
-      fallbackDecoupledSource.value,
+      appContext.value?.blocks?.decoupled,
       routePath.value,
     )
   })
@@ -229,17 +217,11 @@ export const usePopupData = () => {
     const requestId = ++fallbackRequestId
 
     try {
-      const fallbackPage = await $fetch<LayoutBlocksPayload>('/api/layout-blocks', {
-        query: layoutContextQuery(routePath.value),
-      })
+      await loadAppContext()
 
       if (requestId !== fallbackRequestId) return
-
-      fallbackDecoupledSource.value = fallbackPage?.blocks?.decoupled ?? null
     } catch {
-      if (requestId === fallbackRequestId) {
-        fallbackDecoupledSource.value = null
-      }
+      return
     }
   }
 
@@ -247,7 +229,6 @@ export const usePopupData = () => {
     routePath,
     () => {
       fallbackLoaded.value = false
-      fallbackDecoupledSource.value = null
       fallbackRequestId++
     },
   )
@@ -261,9 +242,9 @@ export const usePopupData = () => {
   )
 
   watch(
-    [pagePopup, hasPageDecoupledBlocks],
-    ([currentPagePopup, currentHasPageDecoupledBlocks]) => {
-      if (currentPagePopup || currentHasPageDecoupledBlocks) {
+    [pagePopup, hasPageBlocksPayload],
+    ([currentPagePopup, currentHasPageBlocksPayload]) => {
+      if (currentPagePopup || currentHasPageBlocksPayload) {
         return
       }
 

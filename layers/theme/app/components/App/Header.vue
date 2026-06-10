@@ -140,13 +140,14 @@ const headerContainerClasses = computed(() =>
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.container) : '',
   ].filter(Boolean).join(' '),
 )
+const navigationConfig = computed(() => theme.navigation as Record<string, unknown>)
 const logoClasses = computed(() =>
   [
     'app-logo',
     'transition-all duration-300',
     finalIsScrolled.value
-      ? theme.navigation.logoScrolledSize || theme.navigation.logoSize
-      : theme.navigation.logoSize,
+      ? navigationConfig.value.logoScrolledSize || navigationConfig.value.logoSize
+      : navigationConfig.value.logoSize,
   ].join(' '),
 )
 const mobileLogoClasses = computed(() =>
