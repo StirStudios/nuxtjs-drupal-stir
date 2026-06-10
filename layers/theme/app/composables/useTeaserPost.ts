@@ -4,6 +4,7 @@ export function useTeaserPost(
   input: unknown,
   extra: {
     title?: string
+    nid?: number | string
     url?: string
     created?: string
     orientation?: 'horizontal' | 'vertical'
@@ -70,7 +71,11 @@ export function useTeaserPost(
     const editLink =
       sourceRecord.editLink ?? sourceProps.editLink
 
-    return typeof editLink === 'string' && editLink !== '' ? editLink : undefined
+    if (typeof editLink === 'string' && editLink !== '') return editLink
+
+    const nid = String(extra.nid ?? '').trim()
+
+    return nid ? `/node/${nid}/edit` : undefined
   })
 
   const post = computed(() => ({
