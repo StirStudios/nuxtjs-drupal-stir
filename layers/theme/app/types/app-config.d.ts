@@ -297,6 +297,7 @@ type StirThemeWebformConfig = {
   description?: ClassValue
   help?: ClassValue
   submitAlign?: ClassValue
+  submitComponent?: string
   buttonClass?: ClassValue
   buttonSize?: string
   variant?: string
