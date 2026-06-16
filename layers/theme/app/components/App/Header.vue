@@ -466,29 +466,37 @@ watch(menuOpen, (val) => {
       body: menuBodyClasses,
     }"
   >
-    <template #header>
-      <LazyAppHeaderOverlayHeader
-        :left-class="headerUi.left"
-        :logo-classes="logoClasses"
-        :menu-id="menuId"
-        :right-class="headerRightClasses"
-        :show-brand="showSlideoverBrand"
-        :show-color-mode-toggle="showColorModeToggle"
-        :show-logo="Boolean(theme.navigation.logo)"
-        :site-title="siteTitle"
-        :title-class="headerUi.title"
-        :toggle-class="toggleClasses"
-        :toggle-icon="toggleIcon"
-        @close="menuOpen = false"
-      />
-    </template>
+    <template #content>
+      <div
+        :class="menuHeaderClasses"
+        data-slot="header"
+      >
+        <LazyAppHeaderOverlayHeader
+          :left-class="headerUi.left"
+          :logo-classes="logoClasses"
+          :menu-id="menuId"
+          :right-class="headerRightClasses"
+          :show-brand="showSlideoverBrand"
+          :show-color-mode-toggle="showColorModeToggle"
+          :show-logo="Boolean(theme.navigation.logo)"
+          :site-title="siteTitle"
+          :title-class="headerUi.title"
+          :toggle-class="toggleClasses"
+          :toggle-icon="toggleIcon"
+          @close="menuOpen = false"
+        />
+      </div>
 
-    <template #body>
-      <LazyAppHeaderMobileMenu
-        :items="mobileNavLinks"
-        :link-class="slideoverLinkClasses"
-        :list-class="slideoverListClasses"
-      />
+      <div
+        :class="menuBodyClasses"
+        data-slot="body"
+      >
+        <LazyAppHeaderMobileMenu
+          :items="mobileNavLinks"
+          :link-class="slideoverLinkClasses"
+          :list-class="slideoverListClasses"
+        />
+      </div>
     </template>
   </LazyUSlideover>
 </template>
