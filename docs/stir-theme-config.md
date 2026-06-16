@@ -505,6 +505,7 @@ webform: {
   scrollToTopFallbackDelayMs: 180,
   spacing: 'space-y-5',
   spacingLarge: 'space-y-10',
+  formClass: '',
   labels: {
 	floating: false,
 	base: [
@@ -520,10 +521,14 @@ webform: {
   description: 'desc mb-3 text-muted',
   help: 'desc my-3 text-muted',
   submitAlign: '',
+  submitComponent: '',
   buttonSize: '2xl',
   variant: 'outline',
 },
 ```
+
+- `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
+- `submitComponent` optionally names a custom submit action component. When empty, the default `UButton` submit action is used.
 
 ---
 
