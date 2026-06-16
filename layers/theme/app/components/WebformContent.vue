@@ -7,6 +7,7 @@ import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 type WebformThemeConfig = {
   buttonClass?: string
   buttonSize?: unknown
+  formClass?: string
   fieldGroup?: string
   fieldGroupHeader?: string
   response?: string
@@ -53,11 +54,12 @@ const buttonSize = computed<UiSize>(() =>
 <template>
   <UForm
     v-if="!isFormSubmitted"
-    :class="
+    :class="[
+      props.themeWebform.formClass,
       props.themeWebform.variant === 'material'
         ? props.themeWebform.spacingLarge
-        : props.themeWebform.spacing
-    "
+        : props.themeWebform.spacing,
+    ]"
     :schema="schema"
     :state="state"
     :validate-on="validateOn"

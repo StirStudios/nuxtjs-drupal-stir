@@ -214,6 +214,7 @@ export default defineAppConfig({
       scrollToTopFallbackDelayMs: 180,
       spacing: 'space-y-5',
       spacingLarge: 'space-y-10',
+      formClass: '',
       labels: {
         floating: false,
         base: [
