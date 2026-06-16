@@ -8,6 +8,8 @@ const props = defineProps<{
   region?: string
 
   embedUrl?: string
+  apiOrigin?: string
+  piperOrigin?: string
   venueId?: string
 
   editLink?: string
@@ -18,6 +20,14 @@ const attrs = useAttrs()
 const toTrimmedString = (value: unknown) =>
   typeof value === 'string' ? value.trim() : ''
 
+const toOrigin = (value: string) => {
+  try {
+    return value ? new URL(value).origin : ''
+  } catch {
+    return ''
+  }
+}
+
 const venueId = computed(() =>
   toTrimmedString(props.venueId || attrs.venue_id),
 )
@@ -26,13 +36,21 @@ const loaderSrc = computed(() =>
   toTrimmedString(props.embedUrl || attrs.embed_url),
 )
 
-const apiBase = computed(() => {
-  try {
-    return loaderSrc.value ? new URL(loaderSrc.value).origin : ''
-  } catch {
-    return ''
-  }
-})
+const appOrigin = computed(() =>
+  toTrimmedString(
+    props.apiOrigin ||
+      props.piperOrigin ||
+      attrs.api_origin ||
+      attrs.piper_origin ||
+      attrs.apiBase ||
+      attrs.api_base ||
+      attrs.origin,
+  ),
+)
+
+const apiBase = computed(() =>
+  toOrigin(appOrigin.value) || toOrigin(loaderSrc.value),
+)
 
 const widgetAttrs = computed<Record<string, string>>(() => {
   const elementAttrs: Record<string, string> = {
