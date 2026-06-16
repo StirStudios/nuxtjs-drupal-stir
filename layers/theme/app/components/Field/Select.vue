@@ -76,7 +76,7 @@ const handleButtonClick = (value: string) => {
   <USelect
     v-else
     v-model="state[fieldName]"
-    class="w-full"
+    :class="['w-full', webform.fieldText]"
     :items="selectItems"
     :placeholder="placeholder || 'Select'"
     :portal="portal"

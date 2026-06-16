@@ -293,6 +293,7 @@ type StirThemeWebformConfig = {
   fieldGroupHeader?: ClassValue
   fieldGroup?: ClassValue
   fieldInput?: ClassValue
+  fieldText?: ClassValue
   response?: ClassValue
   description?: ClassValue
   help?: ClassValue

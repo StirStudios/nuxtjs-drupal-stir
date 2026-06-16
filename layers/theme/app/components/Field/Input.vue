@@ -89,7 +89,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
   <UInput
     :id="id"
     :autocomplete="inputAutocomplete"
-    :class="webform.fieldInput"
+    :class="[webform.fieldInput, webform.fieldText]"
     :inputmode="isTel ? 'tel' : undefined"
     :max="isNumber ? field['#max'] : undefined"
     :min="isNumber ? field['#min'] : undefined"
