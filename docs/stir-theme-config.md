@@ -528,7 +528,7 @@ webform: {
 ```
 
 - `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
-- `submitComponent` optionally names a custom submit action component. When empty, the default `UButton` submit action is used.
+- `submitComponent` optionally names a globally registered custom submit action component. When empty or unresolved, the default `UButton` submit action is used.
 
 ---
 

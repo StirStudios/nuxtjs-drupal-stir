@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformState } from '~/types'
 import type { ObjectSchema } from 'yup'
-import { resolveComponent } from 'vue'
 import { cleanHTML } from '~/utils/cleanHTML'
 import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 
@@ -52,13 +51,12 @@ const buttonSize = computed<UiSize>(() =>
   resolveUiSize(props.themeWebform.buttonSize, 'md'),
 )
 const submitDisabled = computed(() => !props.isSchemaReady || props.isLoading)
+const nuxtApp = useNuxtApp()
 const submitComponent = computed(() => {
   const componentName = props.themeWebform.submitComponent?.trim()
 
   if (!componentName) return null
-  const resolvedComponent = resolveComponent(componentName)
-
-  return typeof resolvedComponent === 'string' ? null : resolvedComponent
+  return nuxtApp.vueApp.component(componentName) ?? null
 })
 const submitComponentProps = computed(() => ({
   buttonClass: props.themeWebform.buttonClass,
