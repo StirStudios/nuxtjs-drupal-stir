@@ -109,7 +109,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
       :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
       :for="id"
     >
-      <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
+      <span :class="[isMaterial ? '' : 'bg-default px-1', 'inline-flex']">
         {{ field['#title'] }}
       </span>
     </label>
