@@ -44,9 +44,9 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 <!-- tech-stack:start -->
 - **[Nuxt 4](https://nuxt.com/)**: `^4.4.8`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.8.2`
-- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.0`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.6.2`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.9.0`
+- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.1`
+- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.6.3`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
 <!-- tech-stack:end -->
 

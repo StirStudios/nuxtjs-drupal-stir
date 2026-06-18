@@ -2,9 +2,7 @@
 import type { NuxtError } from '#app'
 
 const stirTheme = useAppConfig()?.stirTheme ?? {}
-const navigation = stirTheme.navigation ?? { mode: 'default' }
 const errorConfig = stirTheme.error
-const { isAdministrator } = usePageContext()
 const route = useRoute()
 
 const props = defineProps<{ error: NuxtError }>()
@@ -12,17 +10,9 @@ const props = defineProps<{ error: NuxtError }>()
 const isBackendError = computed(() =>
   [502, 503, 504].includes(props.error?.statusCode ?? 0),
 )
-
-const normalizedNavigationMode = computed(() =>
-  navigation?.mode === 'static' ? 'static' : 'fixed',
-)
-
+const statusCode = computed(() => props.error?.statusCode ?? 500)
 const displayError = computed<NuxtError>(() => {
-  const statusCode = props.error?.statusCode
-
-  if (statusCode !== 502 && statusCode !== 503 && statusCode !== 504) {
-    return props.error
-  }
+  if (!isBackendError.value) return props.error
 
   return {
     ...props.error,
@@ -30,6 +20,22 @@ const displayError = computed<NuxtError>(() => {
     message: 'We cannot reach the CMS right now. Please try again later.',
   }
 })
+const statusMessage = computed(() => {
+  if (statusCode.value === 404) return 'Page not found'
+  return displayError.value?.statusMessage || 'Something went wrong'
+})
+const message = computed(() => {
+  if (statusCode.value === 404) {
+    return 'The page you are looking for does not exist.'
+  }
+
+  return displayError.value?.message || 'Please try again.'
+})
+const renderedError = computed<NuxtError>(() => ({
+  ...displayError.value,
+  statusMessage: statusMessage.value,
+  message: message.value,
+}))
 
 const clearAction = computed(() => ({
   label: errorConfig?.label || 'Back to home',
@@ -43,18 +49,11 @@ const safeRedirect = computed(() => (route.path === '/' ? undefined : '/'))
 </script>
 
 <template>
-  <template v-if="!isBackendError">
-    <LazyRegionArea area="top" />
-    <LazyDrupalTabs v-if="isAdministrator" />
-    <AppHeader :mode="normalizedNavigationMode" />
-  </template>
-
   <UMain id="main-content" as="main" role="main">
-    <UError :clear="clearAction" :error="displayError" :redirect="safeRedirect" />
+    <UError
+      :clear="clearAction"
+      :error="renderedError"
+      :redirect="safeRedirect"
+    />
   </UMain>
-
-  <template v-if="!isBackendError">
-    <LazyRegionArea area="sub_footer" />
-    <LazyAppFooter />
-  </template>
 </template>
