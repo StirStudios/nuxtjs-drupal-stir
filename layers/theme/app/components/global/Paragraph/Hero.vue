@@ -107,7 +107,7 @@ const sectionClasses = computed(() => {
     .flat()
     .filter(Boolean)
 })
-const { useRevealMotionProps } = useRevealMotionConfig()
+const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
 const heroMotionProps = useRevealMotionProps(() => props.direction)
 </script>
 
@@ -122,6 +122,7 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
     <template v-else>
       <section :class="sectionClasses">
         <Motion
+          :key="`hero-${revealMotionKey}`"
           as-child
           v-bind="heroMotionProps"
         >
