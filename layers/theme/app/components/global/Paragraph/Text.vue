@@ -42,7 +42,7 @@ const sourceText = computed(() => {
 const safeTextHtml = computed(() => cleanHTML(renderedText.value))
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
-const { useRevealMotionProps } = useRevealMotionConfig()
+const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
 const motionProps = useRevealMotionProps(() => props.direction)
 const wrapStyles = computed(() =>
   [props.width, props.spacing].filter(
@@ -101,7 +101,11 @@ watch(() => props.text, (value) => {
       />
 
       <template v-else-if="safeTextHtml">
-        <Motion as-child v-bind="motionProps">
+        <Motion
+          :key="`text-${paragraphId}-${revealMotionKey}`"
+          as-child
+          v-bind="motionProps"
+        >
           <div
             :class="[classes, richTextClass].filter(Boolean).join(' ')"
             v-html="safeTextHtml"
