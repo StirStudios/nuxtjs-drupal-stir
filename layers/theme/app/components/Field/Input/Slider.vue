@@ -89,7 +89,7 @@ const stepValue = computed(() => {
     <USlider
       :id="id"
       v-model="modelValue"
-      :class="webform.fieldInput"
+      :class="[webform.fieldInput, webform.fieldText]"
       :max="maxValue"
       :min="minValue"
       :step="stepValue"

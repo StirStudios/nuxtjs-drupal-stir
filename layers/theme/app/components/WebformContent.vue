@@ -7,12 +7,14 @@ import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 type WebformThemeConfig = {
   buttonClass?: string
   buttonSize?: unknown
+  formClass?: string
   fieldGroup?: string
   fieldGroupHeader?: string
   response?: string
   spacing?: string
   spacingLarge?: string
   submitAlign?: string
+  submitComponent?: string
   variant?: string
 }
 
@@ -48,16 +50,42 @@ const safeHtml = (value?: string) => cleanHTML(value ?? '')
 const buttonSize = computed<UiSize>(() =>
   resolveUiSize(props.themeWebform.buttonSize, 'md'),
 )
+const submitDisabled = computed(() => !props.isSchemaReady || props.isLoading)
+const nuxtApp = useNuxtApp()
+const submitComponent = computed(() => {
+  const componentName = props.themeWebform.submitComponent?.trim()
+
+  if (!componentName) return null
+  return nuxtApp.vueApp.component(componentName) ?? null
+})
+const submitComponentProps = computed(() => ({
+  buttonClass: props.themeWebform.buttonClass,
+  buttonSize: buttonSize.value,
+  disabled: submitDisabled.value,
+  isLoading: props.isLoading,
+  label: props.submitButtonLabel,
+  loading: props.isLoading,
+  submitAlign: props.themeWebform.submitAlign,
+}))
+const submitButtonProps = computed(() => ({
+  class: props.themeWebform.buttonClass,
+  disabled: submitDisabled.value,
+  label: props.submitButtonLabel,
+  loading: props.isLoading,
+  size: buttonSize.value,
+  type: 'submit' as const,
+}))
 </script>
 
 <template>
   <UForm
     v-if="!isFormSubmitted"
-    :class="
+    :class="[
+      props.themeWebform.formClass,
       props.themeWebform.variant === 'material'
         ? props.themeWebform.spacingLarge
-        : props.themeWebform.spacing
-    "
+        : props.themeWebform.spacing,
+    ]"
     :schema="schema"
     :state="state"
     :validate-on="validateOn"
@@ -125,13 +153,14 @@ const buttonSize = computed<UiSize>(() =>
     />
 
     <WrapDiv :align="props.themeWebform.submitAlign">
+      <component
+        :is="submitComponent"
+        v-if="submitComponent"
+        v-bind="submitComponentProps"
+      />
       <UButton
-        :class="props.themeWebform.buttonClass"
-        :disabled="!isSchemaReady || isLoading"
-        :label="submitButtonLabel"
-        :loading="isLoading"
-        :size="buttonSize"
-        type="submit"
+        v-else
+        v-bind="submitButtonProps"
       />
     </WrapDiv>
   </UForm>

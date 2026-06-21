@@ -214,6 +214,7 @@ export default defineAppConfig({
       scrollToTopFallbackDelayMs: 180,
       spacing: 'space-y-5',
       spacingLarge: 'space-y-10',
+      formClass: '',
       labels: {
         floating: false,
         base: [
@@ -225,10 +226,12 @@ export default defineAppConfig({
       fieldGroupHeader: 'mb-6 text-xl font-semibold',
       fieldGroup: 'space-y-10',
       fieldInput: 'w-full',
+      fieldText: '!text-sm !leading-normal',
       response: 'rounded-lg bg-muted px-6 py-3 italic',
       description: 'desc mb-3 text-muted',
       help: 'desc my-3 text-muted',
       submitAlign: '',
+      submitComponent: '',
       buttonClass: '',
       buttonSize: '2xl',
       variant: 'outline',

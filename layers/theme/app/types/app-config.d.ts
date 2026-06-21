@@ -285,6 +285,7 @@ type StirThemeWebformConfig = {
   scrollToTopFallbackDelayMs?: number
   spacing?: ClassValue
   spacingLarge?: ClassValue
+  formClass?: ClassValue
   labels?: {
     floating?: boolean
     base?: string | string[]
@@ -292,10 +293,12 @@ type StirThemeWebformConfig = {
   fieldGroupHeader?: ClassValue
   fieldGroup?: ClassValue
   fieldInput?: ClassValue
+  fieldText?: ClassValue
   response?: ClassValue
   description?: ClassValue
   help?: ClassValue
   submitAlign?: ClassValue
+  submitComponent?: string
   buttonClass?: ClassValue
   buttonSize?: string
   variant?: string

@@ -22,7 +22,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
     :id="id"
     v-model="props.state[props.fieldName]"
     autoresize
-    class="w-full"
+    :class="['w-full', webform.fieldText]"
     :placeholder="props.floatingLabel ? ' ' : ''"
     :rows="1"
     :ui="props.floatingLabel ? { base: 'peer' } : {}"
@@ -33,7 +33,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
       :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
       :for="id"
     >
-      <span :class="[isMaterial ? '' : 'px-1', 'bg-default inline-flex']">
+      <span :class="[isMaterial ? '' : 'bg-default px-1', 'inline-flex']">
         {{ props.field['#title'] }}
       </span>
     </label>

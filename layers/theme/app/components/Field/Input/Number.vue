@@ -102,7 +102,7 @@ const modelValue = computed<number | undefined>({
   <UInputNumber
     :id="id"
     v-model="modelValue"
-    :class="webform.fieldInput"
+    :class="[webform.fieldInput, webform.fieldText]"
     :decrement="{ size: 'sm', color: 'neutral' }"
     :increment="{ size: 'sm', color: 'neutral' }"
     :max="maxValue"
