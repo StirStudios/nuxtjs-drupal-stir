@@ -1,4 +1,5 @@
 import type { ComputedRef, MaybeRefOrGetter } from 'vue'
+import { usePreferredReducedMotion, useSupported } from '@vueuse/core'
 import { onMounted, toValue } from 'vue'
 
 type RevealLike = {
@@ -103,14 +104,6 @@ function toViewportMargin(value: unknown, fallback: string): string {
     : fallback
 }
 
-function isIphoneLikeDevice(): boolean {
-  if (!import.meta.client) return false
-
-  const ua = window.navigator.userAgent
-
-  return /iPhone|iPod/i.test(ua)
-}
-
 export function useRevealConfig() {
   const theme = useAppConfig().stirTheme
 
@@ -135,6 +128,8 @@ export function useRevealMotionConfig() {
   const theme = useAppConfig().stirTheme
   const animateOnce = computed(() => theme.animations?.once !== false)
   const { resolved } = useRevealConfig()
+  const preferredMotion = usePreferredReducedMotion()
+  const supportsIntersectionObserver = useSupported(() => 'IntersectionObserver' in window)
   const hasMounted = ref(false)
   const revealMotionKey = ref(0)
 
@@ -169,18 +164,17 @@ export function useRevealMotionConfig() {
     delayMs: number = 0,
     options: RevealMotionOptions = {},
   ): Record<string, unknown> => {
-    const shouldReduceMotion =
-      import.meta.client &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const shouldReduceMotion = preferredMotion.value === 'reduce'
     const shouldUseStaticReveal =
       shouldReduceMotion ||
-      (import.meta.client && (!('IntersectionObserver' in window) || isIphoneLikeDevice()))
+      (import.meta.client && !supportsIntersectionObserver.value)
 
     if (shouldUseStaticReveal) {
       return { initial: false }
     }
 
     const resolvedDelay = Math.max(0, Number(delayMs || 0)) / 1000
+    const ssrVisible = options.ssrVisible !== false
 
     if (!effect) {
       return { initial: false }
@@ -193,7 +187,7 @@ export function useRevealMotionConfig() {
     }
 
     return {
-      initial: options.ssrVisible && !hasMounted.value ? false : initial,
+      initial: ssrVisible && !hasMounted.value ? false : initial,
       whileInView: REVEAL_VISIBLE_TARGET,
       transition: {
         type: 'tween',
