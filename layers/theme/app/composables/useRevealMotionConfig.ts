@@ -5,12 +5,16 @@ type RevealLike = {
   durationMs?: unknown
   staggerMs?: unknown
   ease?: unknown
+  threshold?: unknown
+  rootMargin?: unknown
 }
 
 export type RevealMotionResolved = {
   durationMs: number
   staggerMs: number
   ease: [number, number, number, number]
+  threshold: number
+  rootMargin: string
 }
 
 export type RevealStaggerMode = 'default' | 'dense'
@@ -23,6 +27,8 @@ const REVEAL_DEFAULTS = {
   durationMs: 800,
   staggerMs: 250,
   ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
+  threshold: 0,
+  rootMargin: '0px 0px -10% 0px',
 }
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
@@ -91,6 +97,20 @@ function toCubicBezier(
   return [parsed[0]!, parsed[1]!, parsed[2]!, parsed[3]!]
 }
 
+function toViewportMargin(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.trim().length > 0
+    ? value
+    : fallback
+}
+
+function isIphoneLikeDevice(): boolean {
+  if (!import.meta.client) return false
+
+  const ua = window.navigator.userAgent
+
+  return /iPhone|iPod/i.test(ua)
+}
+
 export function useRevealConfig() {
   const theme = useAppConfig().stirTheme
 
@@ -102,6 +122,8 @@ export function useRevealConfig() {
     durationMs: toFiniteNumber(raw.value.durationMs, REVEAL_DEFAULTS.durationMs),
     staggerMs: toFiniteNumber(raw.value.staggerMs, REVEAL_DEFAULTS.staggerMs),
     ease: toCubicBezier(raw.value.ease, REVEAL_DEFAULTS.ease),
+    threshold: toFiniteNumber(raw.value.threshold, REVEAL_DEFAULTS.threshold),
+    rootMargin: toViewportMargin(raw.value.rootMargin, REVEAL_DEFAULTS.rootMargin),
   }))
 
   return {
@@ -150,8 +172,11 @@ export function useRevealMotionConfig() {
     const shouldReduceMotion =
       import.meta.client &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const shouldUseStaticReveal =
+      shouldReduceMotion ||
+      (import.meta.client && (!('IntersectionObserver' in window) || isIphoneLikeDevice()))
 
-    if (shouldReduceMotion) {
+    if (shouldUseStaticReveal) {
       return { initial: false }
     }
 
@@ -178,6 +203,8 @@ export function useRevealMotionConfig() {
       },
       inViewOptions: {
         once: animateOnce.value,
+        amount: resolved.value.threshold,
+        margin: resolved.value.rootMargin,
       },
       style: effect.startsWith('flip-')
         ? { transformStyle: 'preserve-3d' }

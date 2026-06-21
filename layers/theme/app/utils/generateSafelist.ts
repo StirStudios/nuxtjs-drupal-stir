@@ -62,6 +62,8 @@ const additionalClasses = [
   'lg:max-w-2xl',
   'lg:max-w-3xl',
   'lg:max-w-4xl',
+  'lg:max-w-5xl',
+  'lg:max-w-6xl',
   'lg:grid-cols-[8fr_4fr]',
   'lg:grid-cols-[4fr_8fr]',
   'text-muted',
@@ -87,7 +89,9 @@ function generateInlineSources(classes: Set<string>): string {
   return lines.join('\n')
 }
 
-const safelistPath = path.resolve('layers/theme/app/assets/css/safelist.inline.css')
+const safelistPath = path.resolve(
+  'layers/theme/app/assets/css/safelist.inline.css',
+)
 const inlineCSS = generateInlineSources(safelist)
 
 fs.writeFileSync(safelistPath, inlineCSS)
