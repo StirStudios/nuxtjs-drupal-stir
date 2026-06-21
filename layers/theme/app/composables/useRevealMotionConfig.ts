@@ -34,6 +34,7 @@ const REVEAL_DEFAULTS = {
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
 const DENSE_REVEAL_STAGGER_MS = 28
+const DISABLED_REVEAL_EFFECTS = new Set(['none', 'off', 'unset', 'false', '0'])
 
 type MotionEffectTarget = {
   opacity: number
@@ -102,6 +103,16 @@ function toViewportMargin(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim().length > 0
     ? value
     : fallback
+}
+
+function normalizeRevealEffect(effect: string | undefined): string | undefined {
+  if (typeof effect !== 'string') return undefined
+
+  const normalized = effect.trim().toLowerCase()
+
+  return normalized && !DISABLED_REVEAL_EFFECTS.has(normalized)
+    ? normalized
+    : undefined
 }
 
 export function useRevealConfig() {
@@ -176,11 +187,13 @@ export function useRevealMotionConfig() {
     const resolvedDelay = Math.max(0, Number(delayMs || 0)) / 1000
     const ssrVisible = options.ssrVisible !== false
 
-    if (!effect) {
+    const normalizedEffect = normalizeRevealEffect(effect)
+
+    if (!normalizedEffect) {
       return { initial: false }
     }
 
-    const initial = REVEAL_HIDDEN_TARGETS[effect]
+    const initial = REVEAL_HIDDEN_TARGETS[normalizedEffect]
 
     if (!initial) {
       return { initial: false }
@@ -200,7 +213,7 @@ export function useRevealMotionConfig() {
         amount: resolved.value.threshold,
         margin: resolved.value.rootMargin,
       },
-      style: effect.startsWith('flip-')
+      style: normalizedEffect.startsWith('flip-')
         ? { transformStyle: 'preserve-3d' }
         : undefined,
     }

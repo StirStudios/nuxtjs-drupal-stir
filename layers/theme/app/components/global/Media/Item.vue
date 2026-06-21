@@ -75,18 +75,6 @@ const componentMap: Record<MediaType, string> = {
 }
 
 const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } = useRevealMotionConfig()
-const effectDirection = computed(() => {
-  const direction =
-    typeof props.direction === 'string'
-      ? props.direction.trim().toLowerCase()
-      : ''
-
-  if (!direction || ['none', 'off', 'unset', 'false', '0'].includes(direction)) {
-    return undefined
-  }
-
-  return direction
-})
 
 const resolvedDelayMs = computed(() =>
   props.revealMode === 'gallery'
@@ -95,7 +83,7 @@ const resolvedDelayMs = computed(() =>
 )
 
 const revealMotionProps = computed(() =>
-  getRevealMotionProps(effectDirection.value, resolvedDelayMs.value, {
+  getRevealMotionProps(props.direction, resolvedDelayMs.value, {
     ssrVisible: true,
   }),
 )
