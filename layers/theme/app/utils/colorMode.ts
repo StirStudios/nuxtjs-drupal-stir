@@ -36,7 +36,17 @@ function matchesRoute(path: string, rule: string): boolean {
 
   if (!normalizedRule) return false
   if (normalizedRule === '/') return path === '/'
-  return path === normalizedRule || path.startsWith(`${normalizedRule}/`)
+  if (normalizedRule.endsWith('*')) {
+    const prefix = normalizedRule.slice(0, -1)
+
+    if (prefix === '') return false
+    if (prefix.endsWith('/')) {
+      return path.startsWith(prefix) && path.length > prefix.length
+    }
+
+    return path === prefix || path.startsWith(`${prefix}/`)
+  }
+  return path === normalizedRule
 }
 
 export function getRouteColorModeOverride({

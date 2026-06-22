@@ -38,7 +38,9 @@ colorMode: {
 #### Route matching rules
 
 - Use `'/'` for homepage only.
-- Route arrays use prefix matching for non-root entries (e.g. `'/pricing'` matches `/pricing` and child paths).
+- Route arrays use exact matching by default (e.g. `'/pricing'` matches `/pricing` only).
+- Use a trailing `*` to match a route and its child paths (e.g. `'/pricing*'` matches `/pricing` and `/pricing/teams`).
+- Use a trailing `/*` to match child paths only (e.g. `'/pricing/*'` matches `/pricing/teams`, but not `/pricing`).
 - Empty entries are ignored (do not use `''`).
 
 #### Common patterns
