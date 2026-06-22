@@ -45,6 +45,7 @@ const props = withDefaults(
 
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
+const attrs = useAttrs()
 const { initializePlayers } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
@@ -77,10 +78,7 @@ const aspectClass = computed(() => {
 })
 
 const shouldShowIframe = computed(
-  () =>
-    !!props.mediaEmbed &&
-    !isProcessing.value &&
-    isEmbedActive.value,
+  () => !!props.mediaEmbed && !isProcessing.value && isEmbedActive.value,
 )
 const previewSrc = computed(() => {
   if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
@@ -124,7 +122,8 @@ watch(
 
 <template>
   <video
-    v-if="isBare && mediaEmbed"
+    v-if="isBare"
+    v-bind="attrs"
     aria-hidden="true"
     class="absolute inset-0 h-full w-full object-cover"
     disablepictureinpicture
@@ -138,7 +137,8 @@ watch(
   </video>
 
   <div
-    v-else-if="mediaEmbed"
+    v-else
+    v-bind="attrs"
     :class="['m-auto max-w-6xl', mediaTheme.base, aspectClass]"
   >
     <div
@@ -153,7 +153,14 @@ watch(
 
     <iframe
       v-if="shouldShowIframe"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allow="
+        accelerometer;
+        autoplay;
+        clipboard-write;
+        encrypted-media;
+        gyroscope;
+        picture-in-picture;
+      "
       allowfullscreen
       :class="['absolute inset-0 h-full w-full bg-black', theme.media.rounded]"
       :data-mid="mid"
