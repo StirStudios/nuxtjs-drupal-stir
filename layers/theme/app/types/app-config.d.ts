@@ -131,7 +131,8 @@ type StirThemeOverlayConfig = {
 } & LooseRecord
 
 type StirThemeNavigationConfig = {
-  mode?: 'fixed' | 'sticky' | 'static'
+  mode?: 'fixed' | 'sticky'
+  modeRoutes?: Partial<Record<'fixed' | 'sticky', string[]>>
   logo?: boolean
   logoSize?: ClassValue
   logoScrolledSize?: ClassValue
