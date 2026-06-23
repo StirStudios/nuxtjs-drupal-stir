@@ -1,8 +1,18 @@
 <script setup lang="ts">
+type HeaderMode = 'fixed' | 'sticky'
+
+const route = useRoute()
 const { navigation } = useAppConfig().stirTheme
 
-const normalizedNavigationMode = computed(() =>
-  navigation?.mode === 'static' ? 'static' : 'fixed',
+const toHeaderMode = (value: unknown): HeaderMode =>
+  value === 'sticky' ? 'sticky' : 'fixed'
+
+const normalizedNavigationMode = computed<HeaderMode>(() =>
+  (['fixed', 'sticky'] as const).find((mode) =>
+    navigation?.modeRoutes?.[mode]?.some((pattern) =>
+      matchesRoutePattern(route.path, pattern),
+    ),
+  ) ?? toHeaderMode(navigation?.mode),
 )
 </script>
 
