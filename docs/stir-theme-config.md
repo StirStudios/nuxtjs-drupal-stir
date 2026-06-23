@@ -224,6 +224,9 @@ header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
 ```ts
 navigation: {
   mode: 'fixed',
+  modeRoutes: {
+    sticky: ['/work*'],
+  },
   logo: true,
   logoSize: 'h-[5rem]',
   isHidden: false,
@@ -261,6 +264,16 @@ navigation: {
   },
 }
 ```
+
+`navigation.mode` accepts `'fixed'` or `'sticky'`. Use `'fixed'` for an overlay
+header that sits above page content, and `'sticky'` for an in-flow header that
+reserves its own document space while keeping the same scroll hide/reveal
+behavior.
+
+Use `navigation.modeRoutes` to override the default mode for specific routes.
+In the example above, the header defaults to `'fixed'`, while `/work` and nested
+work routes use `'sticky'`. Patterns ending in `*` match the route and its child
+paths.
 
 For a centered-logo desktop header, set `navigation.desktopLayout` to
 `'split-logo'` and place a placeholder Drupal menu link whose title matches

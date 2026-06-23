@@ -12,7 +12,9 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const props = defineProps<{ mode?: 'fixed' | 'static' }>()
+type HeaderMode = 'fixed' | 'sticky'
+
+const props = defineProps<{ mode?: HeaderMode }>()
 const attrs = useAttrs()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
 const { fetchMenu, getPage } = useDrupalCe()
@@ -106,12 +108,21 @@ const finalIsScrolled = computed(() => {
   if (!hydrated.value) return false
   return isScrolled.value || forceScrolled.value
 })
-const isFixed = computed(() => {
-  if (props.mode === 'fixed') return true
-  return isFront.value || finalIsScrolled.value
+const headerMode = computed<HeaderMode>(() => props.mode ?? 'fixed')
+const isFixed = computed(() => headerMode.value === 'fixed')
+const isSticky = computed(() => headerMode.value === 'sticky')
+const isPinned = computed(() => isFixed.value || isSticky.value)
+const headerPositionClasses = computed(() => {
+  if (!isPinned.value) return 'relative w-full'
+
+  return [
+    isFixed.value ? 'fixed' : 'sticky',
+    'z-50 w-full',
+    isAdministrator.value && !shouldHide.value ? 'top-[3.1rem]' : 'top-0',
+  ].join(' ')
 })
 const shouldHide = computed(() =>
-  isFixed.value &&
+  isPinned.value &&
   ((isFront.value && !finalIsScrolled.value && theme.navigation.isHidden) ||
     (finalIsScrolled.value &&
       scrollDirection.value === 'down' &&
@@ -121,9 +132,7 @@ const headerClasses = computed(() =>
   [
     'stir-header transition-all',
     toClassName(theme.navigation.base),
-    isFixed.value
-      ? `fixed z-50 w-full ${isAdministrator.value && !shouldHide.value ? 'top-[3.1rem]' : 'top-0'}`
-      : 'relative w-full',
+    headerPositionClasses.value,
     toClassName(
       theme.navigation.transparentTop && !finalIsScrolled.value
         ? 'bg-transparent backdrop-none border-none backdrop-blur-none'

@@ -31,7 +31,7 @@ export function shouldLockGlobalColorMode(config: ColorModePolicyInput): boolean
   return forced || !showToggle
 }
 
-function matchesRoute(path: string, rule: string): boolean {
+export function matchesRoutePattern(path: string, rule: string): boolean {
   const normalizedRule = rule.trim()
 
   if (!normalizedRule) return false
@@ -54,8 +54,8 @@ export function getRouteColorModeOverride({
   lightRoutes = [],
   darkRoutes = [],
 }: RouteOverrideInput): Exclude<ColorModePreference, 'system'> | undefined {
-  const isLight = lightRoutes.some((prefix) => matchesRoute(path, prefix))
-  const isDark = darkRoutes.some((prefix) => matchesRoute(path, prefix))
+  const isLight = lightRoutes.some((prefix) => matchesRoutePattern(path, prefix))
+  const isDark = darkRoutes.some((prefix) => matchesRoutePattern(path, prefix))
 
   if (isLight) return 'light'
   if (isDark) return 'dark'
