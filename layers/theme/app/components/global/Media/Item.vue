@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
+import { resolveComponent } from 'vue'
+import type { Component } from 'vue'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
@@ -66,15 +68,18 @@ const handleEditActionSelect = (key: EditActionKey) => {
   emit('edit-action-select', key)
 }
 
-const componentMap: Record<MediaType, string> = {
-  image: 'MediaImage',
-  video: 'MediaVideo',
-  document: 'MediaDocument',
-  audio: 'MediaAudio',
-  link: 'MediaLink',
+const componentMap: Record<MediaType, Component> = {
+  image: resolveComponent('MediaImage') as Component,
+  video: resolveComponent('MediaVideo') as Component,
+  document: resolveComponent('MediaDocument') as Component,
+  audio: resolveComponent('MediaAudio') as Component,
+  link: resolveComponent('MediaLink') as Component,
 }
 
-const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } = useRevealMotionConfig()
+const mediaComponent = computed(() => componentMap[mediaProps.value.type])
+
+const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } =
+  useRevealMotionConfig()
 
 const resolvedDelayMs = computed(() =>
   props.revealMode === 'gallery'
@@ -88,6 +93,14 @@ const revealMotionProps = computed(() =>
   }),
 )
 
+const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
+  as: mediaComponent.value,
+  ...mediaProps.value,
+  ...revealMotionProps.value,
+  editActions: props.editActions,
+  onEditActionSelect: handleEditActionSelect,
+}))
+
 const shouldAnimate = computed(() =>
   Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
 )
@@ -95,7 +108,7 @@ const shouldAnimate = computed(() =>
 
 <template>
   <component
-    :is="componentMap[mediaProps.type]"
+    :is="mediaComponent"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
     v-bind="mediaProps"
     :edit-actions="editActions"
@@ -105,16 +118,8 @@ const shouldAnimate = computed(() =>
   <Motion
     v-else-if="!overlay || isDocument || isAudio"
     :key="`media-${props.index}-${revealMotionKey}`"
-    as-child
-    v-bind="revealMotionProps"
-  >
-    <component
-      :is="componentMap[mediaProps.type]"
-      v-bind="mediaProps"
-      :edit-actions="editActions"
-      @edit-action-select="handleEditActionSelect"
-    />
-  </Motion>
+    v-bind="animatedMediaMotionProps"
+  />
 
   <Motion
     v-else
