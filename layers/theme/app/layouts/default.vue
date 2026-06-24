@@ -7,13 +7,17 @@ const { navigation } = useAppConfig().stirTheme
 const toHeaderMode = (value: unknown): HeaderMode =>
   value === 'sticky' ? 'sticky' : 'fixed'
 
-const normalizedNavigationMode = computed<HeaderMode>(() =>
-  (['fixed', 'sticky'] as const).find((mode) =>
-    navigation?.modeRoutes?.[mode]?.some((pattern) =>
+const normalizedNavigationMode = computed<HeaderMode>(() => {
+  const modeRoutes = navigation?.modeRoutes as
+    | Partial<Record<HeaderMode, string[]>>
+    | undefined
+
+  return (['fixed', 'sticky'] as const).find((mode) =>
+    modeRoutes?.[mode]?.some((pattern) =>
       matchesRoutePattern(route.path, pattern),
     ),
-  ) ?? toHeaderMode(navigation?.mode),
-)
+  ) ?? toHeaderMode(navigation?.mode)
+})
 </script>
 
 <template>
