@@ -158,6 +158,7 @@ onMounted(() => {
       :alt="alt || ''"
       :class="[
         theme.media.base,
+        theme.media.rounded,
         platform === 'instagram' ? 'aspect-3/4' : '',
         !isLoaded && 'opacity-0',
         imageClass,
@@ -176,7 +177,12 @@ onMounted(() => {
       v-else
       ref="imageElement"
       :alt="alt || ''"
-      :class="[theme.media.base, !isLoaded && 'opacity-0', imageClass]"
+      :class="[
+        theme.media.base,
+        theme.media.rounded,
+        !isLoaded && 'opacity-0',
+        imageClass,
+      ]"
       fetchpriority="high"
       :height="height"
       :loading="normalizedLoading"
