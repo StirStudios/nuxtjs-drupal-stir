@@ -99,11 +99,7 @@ const orderedRows = computed(() =>
 )
 const randomizedRows = tk.hydrateOrder(
   () => orderedRows.value,
-  () =>
-    tk.shuffle(rawRows.value).map((vnode, index) => ({
-      ...vnode,
-      key: vnode.key ?? `slide-${index}`,
-    })),
+  () => tk.shuffle(orderedRows.value),
 )
 const slotRows = computed(() =>
   randomizeEnabled.value ? randomizedRows.value : orderedRows.value,
