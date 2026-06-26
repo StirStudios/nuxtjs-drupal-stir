@@ -1,13 +1,27 @@
 import type { VNode } from 'vue'
 import { isVNode, onMounted, ref, computed } from 'vue'
 
-type SlotMap = Record<string, (() => VNode[]) | undefined>
+type SlotMap = Record<string, (() => unknown) | undefined>
+
+function normalizeVNodes(content: unknown): VNode[] {
+  const items = Array.isArray(content) ? content : [content]
+
+  return items.filter(isVNode)
+}
+
+function normalizeVNodeSlotValue(slotValue: unknown): VNode[] {
+  if (typeof slotValue === 'function') {
+    return normalizeVNodes(slotValue())
+  }
+
+  return normalizeVNodes(slotValue)
+}
 
 export function useSlotVNode(slots: unknown, name: string): VNode[] {
   const slotMap = slots as SlotMap
   const content = slotMap[name]?.()
 
-  return Array.isArray(content) ? content : []
+  return normalizeVNodes(content)
 }
 
 export function getVNodeProps(vnode: VNode | undefined) {
@@ -24,8 +38,23 @@ export function getVNodeChildren(vnode: VNode | undefined): VNode[] {
   }
 
   if (typeof vnode.children === 'object') {
-    return Object.values(vnode.children).flatMap((child) =>
-      typeof child === 'function' ? child().filter(isVNode) : [],
+    return Object.values(vnode.children).flatMap(normalizeVNodeSlotValue)
+  }
+
+  return []
+}
+
+export function getVNodeSlotChildren(
+  vnode: VNode | undefined,
+  name: string,
+): VNode[] {
+  if (!vnode?.children || Array.isArray(vnode.children)) {
+    return []
+  }
+
+  if (typeof vnode.children === 'object') {
+    return normalizeVNodeSlotValue(
+      (vnode.children as Record<string, unknown>)[name],
     )
   }
 
@@ -89,6 +118,8 @@ export function useSlotsToolkit(slots: unknown) {
   const slot = (name: string): VNode[] => useSlotVNode(slots, name)
   const all = (nodes: VNode[]): VNode[] => getAllVNodes(nodes)
   const childrenOf = (vnode: VNode | undefined): VNode[] => getVNodeChildren(vnode)
+  const slotChildrenOf = (vnode: VNode | undefined, name: string): VNode[] =>
+    getVNodeSlotChildren(vnode, name)
   const heroMedia = () => extractHeroMedia(slots)
   const mediaItems = () => extractMediaItems(slots)
   const isMediaEmbed = (vnode: VNode | undefined) => isVNodeMediaEmbed(vnode)
@@ -98,6 +129,7 @@ export function useSlotsToolkit(slots: unknown) {
     slot,
     all,
     childrenOf,
+    slotChildrenOf,
     propsOf: getVNodeProps,
     heroMedia,
     mediaItems,

@@ -21,13 +21,7 @@ export function useNode(slots: unknown) {
 
       if (!node) return {}
 
-      type SlotDict = Record<string, (() => VNode[]) | undefined>
-      const children = node.children as unknown as SlotDict
-      const mediaFn = children.media
-
-      if (!mediaFn) return {}
-
-      const mediaVNode = mediaFn()?.[0]
+      const mediaVNode = tk.slotChildrenOf(node, 'media')[0]
 
       return tk.propsOf(mediaVNode) ?? {}
     })
