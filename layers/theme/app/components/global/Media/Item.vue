@@ -102,6 +102,7 @@ const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
 }))
 
 const shouldAnimate = computed(() =>
+  !isVideo.value &&
   Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
 )
 </script>
