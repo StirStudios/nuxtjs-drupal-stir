@@ -162,7 +162,10 @@ watch(
         picture-in-picture;
       "
       allowfullscreen
-      :class="['absolute inset-0 h-full w-full bg-black', theme.media.rounded]"
+      :class="[
+        'absolute inset-0 h-full w-full bg-black',
+        theme.media.rounded,
+      ]"
       :data-mid="mid"
       loading="lazy"
       :src="mediaEmbed"

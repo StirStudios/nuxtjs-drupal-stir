@@ -94,7 +94,6 @@ const revealMotionProps = computed(() =>
 )
 
 const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
-  as: mediaComponent.value,
   ...mediaProps.value,
   ...revealMotionProps.value,
   editActions: props.editActions,
@@ -118,8 +117,16 @@ const shouldAnimate = computed(() =>
   <Motion
     v-else-if="!overlay || isDocument || isAudio"
     :key="`media-${props.index}-${revealMotionKey}`"
+    as-child
     v-bind="animatedMediaMotionProps"
-  />
+  >
+    <component
+      :is="mediaComponent"
+      v-bind="mediaProps"
+      :edit-actions="editActions"
+      @edit-action-select="handleEditActionSelect"
+    />
+  </Motion>
 
   <Motion
     v-else
