@@ -199,9 +199,7 @@ onMounted(() => {
         <MediaItem
           :key="getMediaItemKey(node, i)"
           :direction="direction"
-          :edit-actions="
-            i === 0 ? actions : undefined
-          "
+          :edit-actions="actions"
           :index="i"
           :node="node as never"
           :overlay="overlay"
@@ -223,9 +221,7 @@ onMounted(() => {
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
           :direction="direction"
-          :edit-actions="
-            i === 0 ? actions : undefined
-          "
+          :edit-actions="actions"
           :index="i"
           :node="node as never"
           :overlay="overlay"
