@@ -112,15 +112,25 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
 </script>
 
 <template>
-  <EditLink :link="editLink">
+  <EditLink
+    v-slot="{ actions, hasActions, selectAction }"
+    controls-placement="slot"
+    :link="editLink"
+  >
     <template v-if="mode === 'simple'">
       <slot name="header" />
       <slot name="media" />
       <slot name="footer" />
+
+      <LazyEditControls
+        v-if="hasActions"
+        :actions="actions"
+        @select="selectAction"
+      />
     </template>
 
     <template v-else>
-      <section :class="sectionClasses">
+      <section class="relative" :class="sectionClasses">
         <Motion
           :key="`hero-${revealMotionKey}`"
           as-child
@@ -151,6 +161,12 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
         </Motion>
 
         <component :is="heroMediaNode" />
+
+        <LazyEditControls
+          v-if="hasActions"
+          :actions="actions"
+          @select="selectAction"
+        />
       </section>
     </template>
   </EditLink>
