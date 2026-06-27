@@ -1,4 +1,7 @@
 import { computed, unref } from 'vue'
+import type { ImgHTMLAttributes } from 'vue'
+
+type TeaserImage = Partial<ImgHTMLAttributes>
 
 export function useTeaserPost(
   input: unknown,
@@ -50,18 +53,27 @@ export function useTeaserPost(
   const image = computed(() => {
     const m = teaserSource.value.media
 
-    if (!m?.src) return null
+    if (typeof m.src !== 'string' || m.src.trim() === '') return null
+
+    const media = m as Record<string, unknown>
+    const width = typeof media.width === 'number'
+      ? media.width
+      : Number(media.width)
+    const height = typeof media.height === 'number'
+      ? media.height
+      : Number(media.height)
+
     return {
       src: m.src,
-      alt: m.alt ?? extra.title ?? '',
-      width: m.width,
-      height: m.height,
-      srcset: m.srcset,
-      sizes: m.sizes ?? '(min-width: 768px) 50vw, 100vw',
+      alt: typeof media.alt === 'string' ? media.alt : extra.title ?? '',
+      width: Number.isFinite(width) ? width : undefined,
+      height: Number.isFinite(height) ? height : undefined,
+      srcset: typeof media.srcset === 'string' ? media.srcset : undefined,
+      sizes: typeof media.sizes === 'string' ? media.sizes : '(min-width: 768px) 50vw, 100vw',
       loading: 'lazy',
       fetchpriority: 'low',
       decoding: 'async',
-    }
+    } satisfies TeaserImage
   })
 
   const resolveEditLink = (value: unknown) =>

@@ -8,7 +8,7 @@ const toHeaderMode = (value: unknown): HeaderMode =>
   value === 'sticky' ? 'sticky' : 'fixed'
 
 const normalizedNavigationMode = computed<HeaderMode>(() => {
-  const modeRoutes = navigation?.modeRoutes as
+  const modeRoutes = (navigation as Record<string, unknown> | undefined)?.modeRoutes as
     | Partial<Record<HeaderMode, string[]>>
     | undefined
 
