@@ -172,12 +172,14 @@ const shouldAnimate = computed(() =>
     >
       <MediaImage
         v-bind="{ ...mediaProps, hideCredit: true }"
+        :edit-actions="editActions"
         :wrapper-class="[
           mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,
           theme.media.effects.scale,
           'group-focus-within:scale-105',
         ]"
+        @edit-action-select="handleEditActionSelect"
       />
 
       <span

@@ -50,12 +50,6 @@ const wrapStyles = computed(() =>
   ),
 )
 
-const editWrapperStyles = computed(() => {
-  if (wrapStyles.value.length === 0) return ['relative']
-
-  return [...wrapStyles.value, 'relative']
-})
-
 async function startEditing() {
   editSourceText.value = sourceText.value
 
@@ -90,7 +84,7 @@ watch(() => props.text, (value) => {
 </script>
 
 <template>
-  <WrapDiv :align="align" :styles="editWrapperStyles">
+  <WrapDiv :align="align" :styles="wrapStyles">
     <EditLink
       v-slot="{ actions, hasActions, selectAction }"
       controls-placement="slot"
@@ -110,22 +104,21 @@ watch(() => props.text, (value) => {
       </template>
 
       <template v-else-if="safeTextHtml">
-        <Motion
-          :key="`text-${paragraphId}-${revealMotionKey}`"
-          as-child
-          v-bind="motionProps"
-        >
-          <div
-            :class="[classes, richTextClass].filter(Boolean).join(' ')"
-            v-html="safeTextHtml"
-          />
-        </Motion>
+        <div :class="[classes, richTextClass, 'relative'].filter(Boolean).join(' ')">
+          <Motion
+            :key="`text-${paragraphId}-${revealMotionKey}`"
+            as-child
+            v-bind="motionProps"
+          >
+            <div v-html="safeTextHtml" />
+          </Motion>
 
-        <LazyEditControls
-          v-if="hasActions"
-          :actions="actions"
-          @select="selectAction"
-        />
+          <LazyEditControls
+            v-if="hasActions"
+            :actions="actions"
+            @select="selectAction"
+          />
+        </div>
       </template>
 
       <template v-else-if="hasActions">
