@@ -8,7 +8,7 @@ defineOptions({
 const props = defineProps<{
   title?: string
   url?: string
-  nid?: string
+  editLink?: string
   created?: string
   orientation?: 'horizontal' | 'vertical'
   teaser: unknown
@@ -19,10 +19,10 @@ const props = defineProps<{
 
 const { post, orientation } = useTeaserPost(props.teaser, {
   title: props.title,
-  nid: props.nid,
   url: props.url,
   created: props.created,
   orientation: props.orientation,
+  editLink: props.editLink,
 })
 
 const showDate = computed(() => props.showDate ?? true)
