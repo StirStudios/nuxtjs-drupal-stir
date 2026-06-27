@@ -115,19 +115,17 @@ watch(() => props.text, (value) => {
           as-child
           v-bind="motionProps"
         >
-          <div>
-            <div
-              :class="[classes, richTextClass].filter(Boolean).join(' ')"
-              v-html="safeTextHtml"
-            />
-
-            <LazyEditControls
-              v-if="hasActions"
-              :actions="actions"
-              @select="selectAction"
-            />
-          </div>
+          <div
+            :class="[classes, richTextClass].filter(Boolean).join(' ')"
+            v-html="safeTextHtml"
+          />
         </Motion>
+
+        <LazyEditControls
+          v-if="hasActions"
+          :actions="actions"
+          @select="selectAction"
+        />
       </template>
 
       <template v-else-if="hasActions">
