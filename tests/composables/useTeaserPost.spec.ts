@@ -44,7 +44,22 @@ describe('useTeaserPost', () => {
     expect(post.value.editLink).toBeUndefined()
   })
 
-  it('ignores nested props.editLink on child payloads', () => {
+  it('uses props.editLink when it is a node edit link', () => {
+    const { post } = useTeaserPost(
+      {
+        props: {
+          editLink: 'https://cms.local/node/15/edit',
+        },
+      },
+      {
+        title: 'Nested node link',
+      },
+    )
+
+    expect(post.value.editLink).toBe('https://cms.local/node/15/edit')
+  })
+
+  it('ignores non-node props.editLink on child payloads', () => {
     const { post } = useTeaserPost(
       {
         props: {
@@ -52,7 +67,7 @@ describe('useTeaserPost', () => {
         },
       },
       {
-        title: 'Nested link only',
+        title: 'Nested paragraph link only',
       },
     )
 

@@ -67,14 +67,20 @@ export function useTeaserPost(
   const resolveEditLink = (value: unknown) =>
     typeof value === 'string' ? value.trim() : ''
 
+  const isNodeEditLink = (value: string) =>
+    /(?:^|\/)node\/\d+\/edit(?:$|[?#])/i.test(value)
+
   const backendEditLink = computed(() => {
     const source = unref(input)
     const sourceRecord = isRecord(source) ? source : {}
+    const sourceProps = isRecord(sourceRecord.props) ? sourceRecord.props : {}
     const rootLink = resolveEditLink(extra.editLink)
-    const sourceLink = resolveEditLink(sourceRecord.editLink)
+    const sourceLink =
+      resolveEditLink(sourceRecord.editLink)
+      || resolveEditLink(sourceProps.editLink)
 
-    if (rootLink.length > 0) return rootLink
-    if (sourceLink.length > 0) return sourceLink
+    if (rootLink.length > 0 && isNodeEditLink(rootLink)) return rootLink
+    if (sourceLink.length > 0 && isNodeEditLink(sourceLink)) return sourceLink
 
     return undefined
   })
