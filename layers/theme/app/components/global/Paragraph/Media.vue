@@ -173,6 +173,11 @@ const singleVideoFrameStyle = computed(() => {
     maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
   }
 })
+const editWrapperStyles = computed(() =>
+  canPlaceAdminControlsInMediaImage.value
+    ? undefined
+    : 'relative',
+)
 
 onMounted(() => {
   hydrated.value = true
@@ -182,11 +187,11 @@ onMounted(() => {
 <template>
   <EditLink
     v-slot="{ actions, selectAction }"
-    :controls-placement="canPlaceAdminControlsInMediaImage ? 'slot' : 'sibling'"
+    controls-placement="slot"
     :link="editLink"
     :parent-uuid="parentUuid"
   >
-    <WrapDiv :align="align">
+    <WrapDiv :align="align" :styles="editWrapperStyles">
       <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}
       </component>
@@ -243,6 +248,12 @@ onMounted(() => {
           @open="openModal"
         />
       </WrapGrid>
+
+      <LazyEditControls
+        v-if="!canPlaceAdminControlsInMediaImage && actions.length > 0"
+        :actions="actions"
+        @select="selectAction"
+      />
     </WrapDiv>
   </EditLink>
 

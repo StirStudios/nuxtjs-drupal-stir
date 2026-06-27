@@ -50,6 +50,12 @@ const wrapStyles = computed(() =>
   ),
 )
 
+const editWrapperStyles = computed(() => {
+  if (wrapStyles.value.length === 0) return ['relative']
+
+  return [...wrapStyles.value, 'relative']
+})
+
 async function startEditing() {
   editSourceText.value = sourceText.value
 
@@ -84,21 +90,24 @@ watch(() => props.text, (value) => {
 </script>
 
 <template>
-  <WrapDiv :align="align" :styles="wrapStyles">
+  <WrapDiv :align="align" :styles="editWrapperStyles">
     <EditLink
+      v-slot="{ actions, hasActions, selectAction }"
+      controls-placement="slot"
       :link="editLink"
       :parent-uuid="parentUuid"
       :show-quick-edit="canInlineEdit && isEditing === false"
       @quick-edit="startEditing"
     >
-      <LazyEditText
-        v-if="isEditing && canInlineEdit"
-        :classes="classes"
-        :paragraph-id="paragraphId"
-        :source-text="editSourceText ?? sourceText"
-        @cancel="stopEditing"
-        @saved="handleSaved"
-      />
+      <template v-if="isEditing && canInlineEdit">
+        <LazyEditText
+          :classes="classes"
+          :paragraph-id="paragraphId"
+          :source-text="editSourceText ?? sourceText"
+          @cancel="stopEditing"
+          @saved="handleSaved"
+        />
+      </template>
 
       <template v-else-if="safeTextHtml">
         <Motion
@@ -106,11 +115,26 @@ watch(() => props.text, (value) => {
           as-child
           v-bind="motionProps"
         >
-          <div
-            :class="[classes, richTextClass].filter(Boolean).join(' ')"
-            v-html="safeTextHtml"
-          />
+          <div>
+            <div
+              :class="[classes, richTextClass].filter(Boolean).join(' ')"
+              v-html="safeTextHtml"
+            />
+
+            <LazyEditControls
+              v-if="hasActions"
+              :actions="actions"
+              @select="selectAction"
+            />
+          </div>
         </Motion>
+      </template>
+
+      <template v-else-if="hasActions">
+        <LazyEditControls
+          :actions="actions"
+          @select="selectAction"
+        />
       </template>
     </EditLink>
   </WrapDiv>
