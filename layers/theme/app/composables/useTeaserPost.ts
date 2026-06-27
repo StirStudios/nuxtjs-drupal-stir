@@ -53,7 +53,7 @@ export function useTeaserPost(
   const image = computed(() => {
     const m = teaserSource.value.media
 
-    if (typeof m.src !== 'string' || m.src.trim() === '') return null
+    if (typeof m.src !== 'string' || m.src.trim() === '') return undefined
 
     const media = m as Record<string, unknown>
     const width = typeof media.width === 'number'
