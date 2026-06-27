@@ -180,14 +180,8 @@ watch(
       @load="scheduleInitializePlayers()"
     />
 
-    <LazyEditControls
-      v-if="editActions?.length"
-      :actions="editActions"
-      @select="emit('edit-action-select', $event)"
-    />
-
     <button
-      v-else-if="!isProcessing"
+      v-if="!shouldShowIframe && !isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
         'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',
@@ -218,5 +212,11 @@ watch(
         name="i-lucide-play-circle"
       />
     </button>
+
+    <LazyEditControls
+      v-if="editActions?.length"
+      :actions="editActions"
+      @select="emit('edit-action-select', $event)"
+    />
   </div>
 </template>
