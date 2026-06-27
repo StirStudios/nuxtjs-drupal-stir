@@ -1,13 +1,13 @@
-import { unref } from 'vue'
+import { computed, unref } from 'vue'
 
 export function useTeaserPost(
   input: unknown,
   extra: {
     title?: string
-    nid?: number | string
     url?: string
     created?: string
     orientation?: 'horizontal' | 'vertical'
+    editLink?: string
   } = {},
 ) {
   const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -64,18 +64,21 @@ export function useTeaserPost(
     }
   })
 
+  const resolveEditLink = (value: unknown) =>
+    typeof value === 'string' ? value.trim() : ''
+
   const backendEditLink = computed(() => {
     const source = unref(input)
     const sourceRecord = isRecord(source) ? source : {}
     const sourceProps = isRecord(sourceRecord.props) ? sourceRecord.props : {}
-    const editLink =
-      sourceRecord.editLink ?? sourceProps.editLink
+    const rootLink = resolveEditLink(extra.editLink)
+    const sourceLink =
+      resolveEditLink(sourceRecord.editLink) || resolveEditLink(sourceProps.editLink)
 
-    if (typeof editLink === 'string' && editLink !== '') return editLink
+    if (rootLink.length > 0) return rootLink
+    if (sourceLink.length > 0) return sourceLink
 
-    const nid = String(extra.nid ?? '').trim()
-
-    return nid ? `/node/${nid}/edit` : undefined
+    return undefined
   })
 
   const post = computed(() => ({

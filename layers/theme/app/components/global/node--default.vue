@@ -11,6 +11,7 @@ const props = defineProps<{
   title: string
   type?: string
   isArticle?: boolean | string
+  editLink?: string
   created: string
   uid?: string | object
   hide?: boolean | string
@@ -55,6 +56,7 @@ const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
   <LazyNodeTeaser
     v-if="isTeaser"
     :created="props.created"
+    :edit-link="props.editLink"
     orientation="vertical"
     :teaser="teaser"
     :title="props.title"
