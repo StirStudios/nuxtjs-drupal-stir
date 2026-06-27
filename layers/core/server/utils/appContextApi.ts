@@ -28,6 +28,7 @@ export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>
   try {
     return await drupalApiRequest<AppContextResponse>(event, buildAppContextEndpoint(path), {
       method: 'GET',
+      forwardCookies: true,
     })
   }
   catch {
