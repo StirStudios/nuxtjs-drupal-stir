@@ -70,10 +70,8 @@ export function useTeaserPost(
   const backendEditLink = computed(() => {
     const source = unref(input)
     const sourceRecord = isRecord(source) ? source : {}
-    const sourceProps = isRecord(sourceRecord.props) ? sourceRecord.props : {}
     const rootLink = resolveEditLink(extra.editLink)
-    const sourceLink =
-      resolveEditLink(sourceRecord.editLink) || resolveEditLink(sourceProps.editLink)
+    const sourceLink = resolveEditLink(sourceRecord.editLink)
 
     if (rootLink.length > 0) return rootLink
     if (sourceLink.length > 0) return sourceLink
