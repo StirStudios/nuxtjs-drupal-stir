@@ -151,14 +151,6 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   onSelect: onSelectModal,
 })
 const firstItem = computed(() => itemsOrdered.value[0] ?? null)
-const canPlaceAdminControlsInMediaImage = computed(() => {
-  if (slotMediaOrdered.value.length !== 1) return false
-
-  const media = tk.propsOf(slotMediaOrdered.value[0])
-  const link = typeof media.link === 'string' ? media.link.trim() : ''
-
-  return media.type === 'image' && link.length === 0
-})
 const singleVideoFrameStyle = computed(() => {
   if (firstItem.value?.type !== 'video') return undefined
 
@@ -173,11 +165,6 @@ const singleVideoFrameStyle = computed(() => {
     maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
   }
 })
-const editWrapperStyles = computed(() =>
-  canPlaceAdminControlsInMediaImage.value
-    ? undefined
-    : 'relative',
-)
 
 onMounted(() => {
   hydrated.value = true
@@ -191,7 +178,7 @@ onMounted(() => {
     :link="editLink"
     :parent-uuid="parentUuid"
   >
-    <WrapDiv :align="align" :styles="editWrapperStyles">
+    <WrapDiv :align="align">
       <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}
       </component>
@@ -213,7 +200,7 @@ onMounted(() => {
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :edit-actions="
-            canPlaceAdminControlsInMediaImage ? actions : undefined
+            i === 0 ? actions : undefined
           "
           :index="i"
           :node="node as never"
@@ -237,7 +224,7 @@ onMounted(() => {
           :key="getMediaItemKey(node, i)"
           :direction="direction"
           :edit-actions="
-            canPlaceAdminControlsInMediaImage ? actions : undefined
+            i === 0 ? actions : undefined
           "
           :index="i"
           :node="node as never"
@@ -248,12 +235,6 @@ onMounted(() => {
           @open="openModal"
         />
       </WrapGrid>
-
-      <LazyEditControls
-        v-if="!canPlaceAdminControlsInMediaImage && actions.length > 0"
-        :actions="actions"
-        @select="selectAction"
-      />
     </WrapDiv>
   </EditLink>
 

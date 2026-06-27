@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
+import type { EditAction, EditActionKey } from '~/types/EditControls'
 
 defineOptions({
   inheritAttrs: false,
@@ -24,6 +25,7 @@ const props = withDefaults(
 
     noWrapper?: boolean
     deferEmbed?: boolean
+    editActions?: EditAction[]
   }>(),
   {
     mid: undefined,
@@ -40,6 +42,7 @@ const props = withDefaults(
     height: undefined,
     noWrapper: false,
     deferEmbed: true,
+    editActions: undefined,
   },
 )
 
@@ -87,6 +90,10 @@ const previewSrc = computed(() => {
 
   return props.src
 })
+
+const emit = defineEmits<{
+  (e: 'edit-action-select', key: EditActionKey): void
+}>()
 
 async function scheduleInitializePlayers(): Promise<void> {
   await nextTick()
@@ -171,6 +178,12 @@ watch(
       :src="mediaEmbed"
       :title="title"
       @load="scheduleInitializePlayers()"
+    />
+
+    <LazyEditControls
+      v-if="editActions?.length"
+      :actions="editActions"
+      @select="emit('edit-action-select', $event)"
     />
 
     <button

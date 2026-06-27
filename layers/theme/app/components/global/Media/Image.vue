@@ -69,7 +69,7 @@ const hasImageSource = computed(() =>
   Boolean(props.src?.trim() || props.srcset?.trim()),
 )
 const hasInlineEditActions = computed(
-  () => props.link ? false : (props.editActions?.length ?? 0) > 0,
+  () => (props.editActions?.length ?? 0) > 0,
 )
 const imageElement = ref<HTMLImageElement | null>(null)
 
@@ -224,6 +224,7 @@ onMounted(() => {
     <LazyEditControls
       v-if="hasInlineEditActions"
       :actions="editActions ?? []"
+      :render-as-buttons="Boolean(props.link)"
       @select="emit('edit-action-select', $event)"
     />
   </component>

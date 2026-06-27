@@ -2,9 +2,12 @@
 import type { EditAction, EditActionKey } from '~/types/EditControls'
 import { adminUiTheme } from '~/utils/adminUiTheme'
 
-defineProps<{
+const props = defineProps<{
   actions: EditAction[]
+  renderAsButtons?: boolean
 }>()
+
+const router = useRouter()
 
 const emit = defineEmits<{
   (e: 'select', key: EditActionKey): void
@@ -23,9 +26,30 @@ const closeAllTooltips = () => {
   tooltipOpen.value = {}
 }
 
-const handleActionClick = (key: EditActionKey) => {
+const openActionInBrowser = (action: EditAction) => {
+  if (!action.to || !import.meta.client) return
+
+  if (action.target === '_blank') {
+    window.open(action.to, '_blank', 'noopener,noreferrer')
+    return
+  }
+
+  if (/^[a-z][a-z\d+.-]*:/.test(action.to)) {
+    window.location.assign(action.to)
+    return
+  }
+
+  void router.push(action.to)
+}
+
+const handleActionClick = (action: EditAction) => {
   closeAllTooltips()
-  emit('select', key)
+
+  if (action.to && props.renderAsButtons === true) {
+    openActionInBrowser(action)
+  }
+
+  emit('select', action.key)
 }
 
 const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
@@ -61,12 +85,12 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
           color="neutral"
           :disabled="action.disabled"
           :icon="action.icon"
-          :rel="action.rel"
-          :target="action.target"
-          :to="action.to"
+          :rel="props.renderAsButtons ? undefined : action.rel"
+          :target="props.renderAsButtons ? undefined : action.target"
+          :to="props.renderAsButtons ? undefined : action.to"
           :ui="{ base: action.buttonClass }"
           :variant="action.variant"
-          @click="handleActionClick(action.key)"
+          @click="handleActionClick(action)"
           @pointerdown="closeAllTooltips()"
         >
           <span class="sr-only">{{ action.ariaLabel }}</span>
