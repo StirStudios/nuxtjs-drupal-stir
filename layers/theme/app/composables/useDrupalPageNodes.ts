@@ -36,8 +36,14 @@ export function isDrupalPageViewNode(
 }
 
 export function isDrupalPageMediaNode(node: VNode | undefined): boolean {
+  const type = getVNodeProp<unknown>(node, 'type')
+
   return (
-    getVNodeProp(node, 'type') === 'image' ||
+    type === 'image' ||
+    type === 'video' ||
+    type === 'document' ||
+    type === 'audio' ||
+    type === 'link' ||
     getVNodeElement(node) === 'media-image'
   )
 }
