@@ -43,6 +43,7 @@ const props = defineProps<{
   carouselIndicators?: boolean
   carouselInterval?: number
   direction?: string
+  args?: unknown
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
   restoreScrollLinkPattern?: string
@@ -90,27 +91,6 @@ const randomizeEnabled = computed(() => {
   return false
 })
 
-const rawRows = computed(() => tk.slot('rows'))
-const orderedRows = computed(() =>
-  rawRows.value.map((vnode, index) => ({
-    ...vnode,
-    key: vnode.key ?? `slide-${index}`,
-  })),
-)
-const randomizedRows = tk.hydrateOrder(
-  () => orderedRows.value,
-  () => tk.shuffle(orderedRows.value),
-)
-const slotRows = computed(() =>
-  randomizeEnabled.value ? randomizedRows.value : orderedRows.value,
-)
-
-const staticTeaserRows = computed(() =>
-  slotRows.value.map((node) =>
-    cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true),
-  ),
-)
-
 const hasDynamicRows = computed(() => dynamicRows.value !== null)
 const dynamicRenderedRows = computed(() => {
   const rows = dynamicRows.value
@@ -147,12 +127,32 @@ const dynamicRenderedRows = computed(() => {
   })
 })
 
-const hasRows = computed(() =>
-  hasDynamicRows.value
+function hasRows(): boolean {
+  return hasDynamicRows.value
     ? dynamicRenderedRows.value.length > 0
-    : staticTeaserRows.value.length > 0,
-)
-const renderedRows = computed<RenderedViewRow[]>(() => {
+    : getStaticRows().length > 0
+}
+
+const randomizeRowsOnClient = ref(false)
+
+function resolveSlotRows() {
+  const rows = tk.slot('rows')
+
+  return rows.map((vnode, index) => ({
+    ...vnode,
+    key: vnode.key ?? `slide-${index}`,
+  }))
+}
+
+function getStaticRows() {
+  const rows = randomizeEnabled.value && randomizeRowsOnClient.value
+    ? tk.shuffle(resolveSlotRows())
+    : resolveSlotRows()
+
+  return rows.map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
+}
+
+function getRenderedRows(): RenderedViewRow[] {
   if (hasDynamicRows.value) {
     return dynamicRenderedRows.value.map((row) => ({
       key: row.key,
@@ -161,11 +161,24 @@ const renderedRows = computed<RenderedViewRow[]>(() => {
     }))
   }
 
-  return staticTeaserRows.value.map((node, index) => ({
+  return getStaticRows().map((node, index) => ({
     key: String(node.key ?? index),
     type: 'static',
     node: node as VNode,
   }))
+}
+
+watch(
+  () => hasDynamicRows.value && dynamicRenderedRows.value.length > 0,
+  (value, oldValue) => {
+    if (!value || oldValue) return
+
+    restoreScrollPosition()
+  },
+)
+
+onMounted(() => {
+  randomizeRowsOnClient.value = true
 })
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
 const { getRevealDelayMs, getRevealMotionProps, revealMotionKey } = useRevealMotionConfig()
@@ -287,12 +300,6 @@ watch(currentPage, (value, oldValue) => {
   scrollToViewTop()
 })
 
-watch(hasRows, (value) => {
-  if (!value) return
-
-  restoreScrollPosition()
-})
-
 watch(
   () => [route.path, route.fullPath] as const,
   ([path], [oldPath, oldFullPath]) => {
@@ -387,7 +394,7 @@ onBeforeUnmount(() => {
     :carousel-indicators="carouselIndicators"
     :carousel-interval="carouselInterval"
     :grid-items="gridItems"
-    :items="slotRows"
+    :items="getStaticRows()"
     :randomize="randomizeEnabled"
     :spacing="spacing"
     :width="width"
@@ -411,7 +418,7 @@ onBeforeUnmount(() => {
   </WrapGrid>
 
   <WrapGrid
-    v-else-if="hasRows"
+    v-else-if="hasRows()"
     :classes="rowsWrapper"
     :container="container"
     :grid-items="gridItems"
@@ -419,8 +426,8 @@ onBeforeUnmount(() => {
     :width="width"
     @click.capture="handleViewClick"
   >
-    <Motion
-      v-for="(row, i) in renderedRows"
+      <Motion
+      v-for="(row, i) in getRenderedRows()"
       :key="`${row.key}-${revealMotionKey}`"
       as="div"
       class="item"
