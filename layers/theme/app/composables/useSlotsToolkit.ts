@@ -1,7 +1,13 @@
-import type { VNode } from 'vue'
-import { isVNode, onMounted, ref, computed } from 'vue'
+import type { MaybeRefOrGetter, VNode } from 'vue'
+import { isVNode, onMounted, ref, computed, toValue } from 'vue'
 
 type SlotMap = Record<string, (() => unknown) | undefined>
+export type VNodeInput = MaybeRefOrGetter<VNode[] | null | undefined>
+export type VNodePredicate = (
+  node: VNode,
+  index: number,
+  nodes: VNode[],
+) => boolean
 
 function normalizeVNodes(content: unknown): VNode[] {
   const items = Array.isArray(content) ? content : [content]
@@ -62,7 +68,83 @@ export function getVNodeSlotChildren(
 }
 
 export function getAllVNodes(nodes: VNode[]): VNode[] {
-  return nodes.flatMap((node) => [node, ...getAllVNodes(getVNodeChildren(node))])
+  const all: VNode[] = []
+  const stack = [...nodes].reverse()
+
+  while (stack.length) {
+    const node = stack.pop()
+
+    if (!node) continue
+
+    all.push(node)
+    stack.push(...getVNodeChildren(node).reverse())
+  }
+
+  return all
+}
+
+function resolveNodeInput(input: VNodeInput): VNode[] {
+  return toValue(input) ?? []
+}
+
+export function getVNodeElement(vnode: VNode | undefined): string {
+  const element = getVNodeProps(vnode).element
+
+  if (typeof element === 'string') return element
+  if (typeof vnode?.type === 'string') return vnode.type
+
+  return ''
+}
+
+export function getVNodeProp<T = unknown>(
+  vnode: VNode | undefined,
+  key: string,
+): T | undefined {
+  return getVNodeProps(vnode)[key] as T | undefined
+}
+
+export function findVNodes(
+  nodes: VNode[],
+  predicate: VNodePredicate,
+): VNode[] {
+  return getAllVNodes(nodes).filter(predicate)
+}
+
+export function findVNodesByElement(nodes: VNode[], element: string): VNode[] {
+  return findVNodes(nodes, (node) => getVNodeElement(node) === element)
+}
+
+export function findVNodesByProp(
+  nodes: VNode[],
+  key: string,
+  value: unknown,
+): VNode[] {
+  return findVNodes(nodes, (node) => getVNodeProp(node, key) === value)
+}
+
+export function useVNodes(input: VNodeInput) {
+  const allNodes = computed(() => getAllVNodes(resolveNodeInput(input)))
+  const filter = (predicate: VNodePredicate) => allNodes.value.filter(predicate)
+  const byProp = (key: string, value: unknown) =>
+    filter((node) => getVNodeProp(node, key) === value)
+
+  return {
+    all: () => allNodes.value,
+    filter,
+    byElement: (element: string) =>
+      filter((node) => getVNodeElement(node) === element),
+    byProp,
+    byParent: (parentUuid: unknown) =>
+      parentUuid === undefined || parentUuid === null
+        ? []
+        : byProp('parentUuid', parentUuid),
+    byRegion: (region: string) => byProp('region', region),
+    propsOf: getVNodeProps,
+    propOf: getVNodeProp,
+    elementOf: getVNodeElement,
+    childrenOf: getVNodeChildren,
+    slotChildrenOf: getVNodeSlotChildren,
+  }
 }
 
 export function extractHeroMedia(slots: unknown) {
@@ -117,6 +199,7 @@ function hydrateOrder<T>(baseFn: () => T[], clientFn: () => T[]) {
 export function useSlotsToolkit(slots: unknown) {
   const slot = (name: string): VNode[] => useSlotVNode(slots, name)
   const all = (nodes: VNode[]): VNode[] => getAllVNodes(nodes)
+  const query = (nodes: VNodeInput) => useVNodes(nodes)
   const childrenOf = (vnode: VNode | undefined): VNode[] => getVNodeChildren(vnode)
   const slotChildrenOf = (vnode: VNode | undefined, name: string): VNode[] =>
     getVNodeSlotChildren(vnode, name)
@@ -128,6 +211,7 @@ export function useSlotsToolkit(slots: unknown) {
     slots,
     slot,
     all,
+    query,
     childrenOf,
     slotChildrenOf,
     propsOf: getVNodeProps,
