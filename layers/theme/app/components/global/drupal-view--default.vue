@@ -444,7 +444,6 @@ onBeforeUnmount(() => {
     :grid-items="gridItems"
     :spacing="spacing"
     :width="width"
-    @click.capture="handleViewClick"
   >
       <Motion
       v-for="(row, i) in getRenderedRows()"
@@ -452,6 +451,7 @@ onBeforeUnmount(() => {
       as="div"
       class="item"
       v-bind="getRowMotionProps(i)"
+      @click.capture="handleViewClick"
     >
       <component
         :is="row.type === 'dynamic' ? renderCustomElements(row.node) : row.node"
