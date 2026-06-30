@@ -11,6 +11,13 @@ type UITimelineItem = {
   slot?: string
 }
 
+type TimelineNodeProps = {
+  date?: unknown
+  header?: unknown
+  icon?: unknown
+  text?: unknown
+}
+
 const props = defineProps<{
   id?: number | string
   uuid?: string
@@ -31,15 +38,19 @@ const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const timelineNodes = computed(() => tk.slot('timeline'))
 
+function stringProp(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback
+}
+
 const timelineItems = computed<UITimelineItem[]>(() =>
   timelineNodes.value.map((vnode) => {
-    const p = tk.propsOf(vnode)
+    const p = tk.propsOf<TimelineNodeProps>(vnode)
 
     return {
-      date: p.date ?? 'Present',
-      title: p.header ?? '',
-      icon: p.icon ?? 'i-lucide-rocket',
-      description: cleanHTML(typeof p.text === 'string' ? p.text : ''),
+      date: stringProp(p.date, 'Present'),
+      title: stringProp(p.header),
+      icon: stringProp(p.icon, 'i-lucide-rocket'),
+      description: cleanHTML(stringProp(p.text)),
       slot: 'rich',
     }
   }),

@@ -4,10 +4,7 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import type {
-  DrupalMediaSlotNode,
-  DrupalMediaSlotsToolkit,
-} from '~/types'
+import type { DrupalMediaNodeProps } from '~/types'
 import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
@@ -46,7 +43,6 @@ const resolvedWidth = computed(() => props.widthClass || props.width || '')
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
-const mediaTk = tk as unknown as DrupalMediaSlotsToolkit
 const slotMedia = computed(() => tk.mediaItems())
 
 type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
@@ -56,7 +52,7 @@ function mediaComponentFor(type: unknown) {
 }
 
 const getMediaItemKey = (node: MediaNode, index: number) => {
-  const data = tk.propsOf(node) as Record<string, unknown>
+  const data = tk.propsOf<DrupalMediaNodeProps>(node)
   const candidates = [data.uuid, data.id, data.mid, data.url, data.src]
 
   for (const candidate of candidates) {
@@ -210,10 +206,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as DrupalMediaSlotNode"
+          :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="mediaTk"
+          :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -234,10 +230,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as DrupalMediaSlotNode"
+          :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="mediaTk"
+          :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"
         />

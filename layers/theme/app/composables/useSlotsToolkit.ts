@@ -2,6 +2,7 @@ import type { MaybeRefOrGetter, VNode } from 'vue'
 import { isVNode, onMounted, ref, computed, toValue } from 'vue'
 
 type SlotMap = Record<string, (() => unknown) | undefined>
+export type VNodePropsRecord = Record<string, unknown>
 export type VNodeInput = MaybeRefOrGetter<VNode[] | null | undefined>
 export type VNodePredicate = (
   node: VNode,
@@ -30,8 +31,10 @@ export function useSlotVNode(slots: unknown, name: string): VNode[] {
   return normalizeVNodes(content)
 }
 
-export function getVNodeProps(vnode: VNode | undefined) {
-  return vnode && isVNode(vnode) ? (vnode.props ?? {}) : {}
+export function getVNodeProps<T extends VNodePropsRecord = VNodePropsRecord>(
+  vnode: VNode | undefined,
+): T {
+  return (vnode && isVNode(vnode) ? (vnode.props ?? {}) : {}) as T
 }
 
 export function getVNodeChildren(vnode: VNode | undefined): VNode[] {
@@ -206,6 +209,9 @@ export function useSlotsToolkit(slots: unknown) {
   const heroMedia = () => extractHeroMedia(slots)
   const mediaItems = () => extractMediaItems(slots)
   const isMediaEmbed = (vnode: VNode | undefined) => isVNodeMediaEmbed(vnode)
+  const propsOf = <T extends VNodePropsRecord = VNodePropsRecord>(
+    vnode: VNode | undefined,
+  ): T => getVNodeProps<T>(vnode)
 
   return {
     slots,
@@ -214,7 +220,7 @@ export function useSlotsToolkit(slots: unknown) {
     query,
     childrenOf,
     slotChildrenOf,
-    propsOf: getVNodeProps,
+    propsOf,
     heroMedia,
     mediaItems,
     shuffle: shuffleArray,
@@ -222,3 +228,5 @@ export function useSlotsToolkit(slots: unknown) {
     hydrateOrder,
   }
 }
+
+export type SlotsToolkit = ReturnType<typeof useSlotsToolkit>

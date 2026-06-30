@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
 import { resolveComponent } from 'vue'
-import type { Component } from 'vue'
+import type { Component, VNode } from 'vue'
+import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
-import type {
-  DrupalMediaSlotNode,
-  DrupalMediaSlotsToolkit,
-  NormalizedDrupalMediaNodeProps,
-} from '~/types'
+import type { NormalizedDrupalMediaNodeProps } from '~/types'
 import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
@@ -18,13 +15,13 @@ import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 type RevealMode = 'default' | 'gallery'
 
 const props = defineProps<{
-  node: DrupalMediaSlotNode
+  node: VNode
   index: number
   direction?: string
   revealMode?: RevealMode
   overlay?: boolean
   editActions?: EditAction[]
-  tk: DrupalMediaSlotsToolkit
+  tk: Pick<SlotsToolkit, 'propsOf'>
 }>()
 
 const emit = defineEmits<{
