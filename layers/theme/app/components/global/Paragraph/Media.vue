@@ -262,7 +262,7 @@ onMounted(() => {
         icon="i-lucide-x"
         size="lg"
         variant="soft"
-        @click="open = false"
+        @click="() => { open = false }"
       />
 
       <div
