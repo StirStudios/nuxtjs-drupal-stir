@@ -6,7 +6,7 @@ import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
   buttonClass?: string
-  buttonSize?: unknown
+  submitButtonSize?: unknown
   formClass?: string
   fieldGroup?: string
   fieldGroupHeader?: string
@@ -15,7 +15,7 @@ type WebformThemeConfig = {
   spacingLarge?: string
   submitAlign?: string
   submitComponent?: string
-  variant?: string
+  fieldVariant?: string
 }
 
 const props = defineProps<{
@@ -48,7 +48,7 @@ const emit = defineEmits<{
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const safeHtml = (value?: string) => cleanHTML(value ?? '')
 const buttonSize = computed<UiSize>(() =>
-  resolveUiSize(props.themeWebform.buttonSize, 'md'),
+  resolveUiSize(props.themeWebform.submitButtonSize, 'md'),
 )
 const submitDisabled = computed(() => !props.isSchemaReady || props.isLoading)
 const nuxtApp = useNuxtApp()
@@ -82,7 +82,7 @@ const submitButtonProps = computed(() => ({
     v-if="!isFormSubmitted"
     :class="[
       props.themeWebform.formClass,
-      props.themeWebform.variant === 'material'
+      props.themeWebform.fieldVariant === 'material'
         ? props.themeWebform.spacingLarge
         : props.themeWebform.spacing,
     ]"

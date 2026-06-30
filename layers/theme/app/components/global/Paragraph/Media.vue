@@ -328,18 +328,18 @@ onMounted(() => {
       >
         <div
           v-if="
-            (theme.modal.title && modalTitle) ||
-            (theme.modal.description?.media && modalDescription) ||
+            (theme.mediaModal.title && modalTitle) ||
+            (theme.mediaModal.description?.media && modalDescription) ||
             modalCredit
           "
           class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/75 px-4 py-3 text-center text-white backdrop-blur-sm"
         >
-          <div v-if="theme.modal.title && modalTitle" class="font-semibold">
+          <div v-if="theme.mediaModal.title && modalTitle" class="font-semibold">
             {{ modalTitle }}
           </div>
 
           <div
-            v-if="theme.modal.description?.media && modalDescription"
+            v-if="theme.mediaModal.description?.media && modalDescription"
             class="text-sm text-neutral-100"
           >
             {{ modalDescription }}

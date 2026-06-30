@@ -77,7 +77,7 @@ const h1Classes = computed(() => {
   const base = hasMediaSlot.value
     ? isFrontEffective.value
       ? heroTheme.text?.isFront
-      : heroTheme.text?.h1
+      : heroTheme.text?.heading
     : null
 
   return [base].filter(Boolean)

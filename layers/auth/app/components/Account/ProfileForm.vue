@@ -27,11 +27,11 @@ const emit = defineEmits<{
 const themeWebform = (
   (
     useAppConfig().stirTheme as {
-      webform?: { variant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
+      webform?: { fieldVariant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
     }
   ).webform || {}
 )
-const webformVariant = computed(() => themeWebform.variant as never)
+const webformVariant = computed(() => themeWebform.fieldVariant as never)
 
 const getFieldType = (
   type: string,

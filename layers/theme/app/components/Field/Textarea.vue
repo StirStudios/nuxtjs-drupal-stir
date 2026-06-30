@@ -11,8 +11,8 @@ const props = defineProps<{
 }>()
 
 const { webform } = useAppConfig().stirTheme
-const isMaterial = computed(() => webform.variant === 'material')
-const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
+const isMaterial = computed(() => webform.fieldVariant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const id = computed(() => injectedInputId?.value ?? props.fieldName)
 </script>

@@ -68,4 +68,16 @@ describe('useDrupalPageNodes', () => {
     expect(nodes.isView(view, 'testimonials')).toBe(true)
     expect(nodes.isMedia(media)).toBe(true)
   })
+
+  it('treats all supported Drupal media custom elements as media nodes', () => {
+    const image = h(TestComponent, { element: 'media-image', type: 'image' })
+    const video = h(TestComponent, { element: 'media-video', type: 'video' })
+    const document = h(TestComponent, { element: 'media-document', type: 'document' })
+    const audio = h(TestComponent, { element: 'media-audio', type: 'audio' })
+    const link = h(TestComponent, { element: 'media-link', type: 'link' })
+    const text = h(TestComponent, { element: 'paragraph-text', type: 'text' })
+
+    expect([image, video, document, audio, link].every(isDrupalPageMediaNode)).toBe(true)
+    expect(isDrupalPageMediaNode(text)).toBe(false)
+  })
 })

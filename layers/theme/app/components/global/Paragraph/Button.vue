@@ -113,7 +113,7 @@ const pdfUrl = computed(() =>
   </div>
 
   <LazyUModal
-    v-if="hasPdf && theme.pdf"
+    v-if="hasPdf && theme.showPdf"
     v-model:open="open"
     :description="pdfDescription"
     fullscreen

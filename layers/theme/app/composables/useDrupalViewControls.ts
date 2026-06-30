@@ -134,6 +134,53 @@ export function getDrupalViewNodeRows(node: CustomElementNode): unknown[] {
   return []
 }
 
+export function isSafeDrupalViewControlValue(value: string): boolean {
+  return !/[?&][\w%.-]+=/u.test(value)
+}
+
+export function isValidDrupalViewFilterValue(
+  filter: Pick<NormalizedFilter, 'options'>,
+  value: string | string[],
+): boolean {
+  const values = Array.isArray(value) ? value : [value]
+  const allowed = new Set(filter.options.map(option => option.value))
+
+  return values.every(item => (
+    isSafeDrupalViewControlValue(item) &&
+    (allowed.size === 0 || allowed.has(item))
+  ))
+}
+
+export function isDrupalViewAbortError(error: unknown): boolean {
+  const message = String(
+    (error as { message?: string })?.message || error || '',
+  )
+  const causeMessage = String(
+    (error as { cause?: { message?: string } })?.cause?.message || '',
+  )
+  const abortMessage = `${message} ${causeMessage}`.toLowerCase()
+
+  return (
+    (error instanceof DOMException && error.name === 'AbortError') ||
+    message.includes('AbortError') ||
+    abortMessage.includes('operation was aborted') ||
+    abortMessage.includes('request aborted')
+  )
+}
+
+export function drupalViewLoadErrorMessage(error: unknown): string {
+  const message = String(
+    (error as { message?: string })?.message || error || '',
+  )
+  const isDrupalMemoryError =
+    message.includes('Allowed memory size') ||
+    message.includes('ApcuBackend.php')
+
+  return isDrupalMemoryError
+    ? 'Drupal ran out of memory while processing this view. Please try again or adjust backend memory/cache settings.'
+    : 'Unable to load results. Please try again.'
+}
+
 export function isMatchingDrupalViewNode(
   node: CustomElementNode,
   criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
@@ -191,6 +238,30 @@ export function findDrupalViewNode(
     const found = findDrupalViewNode(child, criteria)
 
     if (found) return found
+  }
+
+  return null
+}
+
+export function findDrupalViewNodeInResponse(
+  response: unknown,
+  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
+): CustomElementNode | null {
+  const responseRecord =
+    response && typeof response === 'object'
+      ? (response as Record<string, unknown>)
+      : null
+  const candidates = [
+    response,
+    responseRecord?.content,
+    responseRecord?.items,
+    responseRecord?.data,
+  ]
+
+  for (const candidate of candidates) {
+    const viewNode = findDrupalViewNode(candidate, criteria)
+
+    if (viewNode) return viewNode
   }
 
   return null
@@ -430,13 +501,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function validFilterValue(filter: NormalizedFilter, value: string | string[]): boolean {
-    const values = Array.isArray(value) ? value : [value]
-    const allowed = new Set(filter.options.map(option => option.value))
-
-    return values.every(item => (
-      isSafeViewControlValue(item) &&
-      (allowed.size === 0 || allowed.has(item))
-    ))
+    return isValidDrupalViewFilterValue(filter, value)
   }
 
   function defaultSortByValue(sort: ExposedSort): string {
@@ -469,12 +534,8 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return values
   }
 
-  function isSafeViewControlValue(value: string): boolean {
-    return !/[?&][\w%.-]+=/u.test(value)
-  }
-
   function validSortByValue(sort: ExposedSort, value: string): boolean {
-    if (!value || !isSafeViewControlValue(value)) return false
+    if (!value || !isSafeDrupalViewControlValue(value)) return false
 
     const values = validSortByValues()
 
@@ -482,7 +543,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function validSortOrderValue(sort: ExposedSort, value: string): boolean {
-    if (!value || !isSafeViewControlValue(value)) return false
+    if (!value || !isSafeDrupalViewControlValue(value)) return false
 
     return validSortOrderValues(sort).has(value)
   }
@@ -806,23 +867,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       const pageResponse = await api(requestPath, {
         signal: activeAbortController.signal,
       })
-      const responseRecord =
-        pageResponse && typeof pageResponse === 'object'
-          ? (pageResponse as Record<string, unknown>)
-          : null
-      const candidates = [
-        pageResponse,
-        responseRecord?.content,
-        responseRecord?.items,
-        responseRecord?.data,
-      ]
-
-      let viewNode: CustomElementNode | null = null
-
-      for (const candidate of candidates) {
-        viewNode = findDrupalViewNode(candidate, props)
-        if (viewNode) break
-      }
+      const viewNode = findDrupalViewNodeInResponse(pageResponse, props)
 
       if (requestId !== activeRequestId) return
 
@@ -859,31 +904,9 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     } catch (error) {
       if (requestId !== activeRequestId) return
 
-      const message = String(
-        (error as { message?: string })?.message || error || '',
-      )
-      const causeMessage = String(
-        (error as { cause?: { message?: string } })?.cause?.message || '',
-      )
-      const abortMessage = `${message} ${causeMessage}`.toLowerCase()
-      const isAbortError =
-        (error instanceof DOMException && error.name === 'AbortError') ||
-        message.includes('AbortError') ||
-        abortMessage.includes('operation was aborted') ||
-        abortMessage.includes('request aborted')
+      if (isDrupalViewAbortError(error)) return
 
-      if (isAbortError) return
-
-      const isDrupalMemoryError =
-        message.includes('Allowed memory size') ||
-        message.includes('ApcuBackend.php')
-
-      if (isDrupalMemoryError) {
-        loadError.value =
-          'Drupal ran out of memory while processing this view. Please try again or adjust backend memory/cache settings.'
-      } else {
-        loadError.value = 'Unable to load results. Please try again.'
-      }
+      loadError.value = drupalViewLoadErrorMessage(error)
 
       console.error('Failed to refresh Drupal view:', error)
     } finally {

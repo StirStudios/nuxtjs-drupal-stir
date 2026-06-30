@@ -203,19 +203,19 @@ privacyNotice: {
 Recommended key order in `stirTheme`:
 
 1. Global flags and layout primitives:
-   `pdf`, `crumbs`, `h1`, `container`, `header`, `navigation`, `hero`, `footer`
+   `showPdf`, `showBreadcrumbs`, `heading`, `container`, `header`, `navigation`, `hero`, `footer`
 2. Content/component behavior:
-   `media`, `carousel`, `modal`, `overlay`, `webform`, `turnstile`
+   `media`, `carousel`, `mediaModal`, `overlay`, `webform`, `turnstile`
 3. Visual/system tokens and utilities:
    `card`, `gradients`, `animations`, `scrollButton`, `error`
 
 ### ✨ General
 
 ```ts
-pdf: false,
+showPdf: false,
 loadingIndicator: 'repeating-linear-gradient(to right,#D21B18 0%,#ED6663 50%,#F28E8D 100%)',
-crumbs: false,
-h1: 'mb-20 text-center text-6xl',
+showBreadcrumbs: false,
+heading: 'mb-20 text-center text-6xl',
 header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
 ```
 
@@ -228,9 +228,9 @@ navigation: {
     sticky: ['/work*'],
   },
   logo: true,
-  logoSize: 'h-[5rem]',
-  isHidden: false,
-  transparentTop: false,
+  logoClass: 'h-[5rem]',
+  hidden: false,
+  transparentAtTop: false,
   base: 'h-auto transform py-3 duration-500',
   background: 'border-none bg-white/90 shadow backdrop-blur-md dark:bg-gray-950/70',
   color: 'primary',
@@ -287,7 +287,7 @@ Common downstream override:
 stirTheme: {
   navigation: {
     mode: 'fixed',
-    transparentTop: true,
+    transparentAtTop: true,
     desktopLayout: 'split-logo',
     logoMenuMarker: '--logo--',
     color: 'primary',
@@ -296,11 +296,11 @@ stirTheme: {
 },
 ```
 
-### 🏠 `front`
+### 🏠 `frontPage`
 
 ```ts
-front: {
-  h1: 'sr-only',
+frontPage: {
+  heading: 'sr-only',
   main: 'mt-0',
 }
 ```
@@ -327,7 +327,6 @@ Set `portal: false` when the layer is rendered inside a Shadow DOM host and you 
 
 ```ts
 footer: {
-  hideEmail: false,
   layout: 'default', // 'default', 'columns', or 'stacked'
   requireSiteName: false,
   base: 'mt-20 bg-accented dark:bg-muted/50 py-10 text-default text-sm',
@@ -348,7 +347,6 @@ footer: {
   menuItem: 'min-w-0 py-0',
   menuList: 'flex flex-wrap justify-center',
   poweredBy: 'mb-0',
-  poweredby: true, // Legacy alias. Prefer showPoweredBy.
   rights: '', // Add additional rights
   showCopyright: true,
   showEmail: true,
@@ -430,7 +428,7 @@ stirTheme: {
       scale: 'group-hover:scale-105',
     },
   },
-  modal: {
+  mediaModal: {
     title: false,
     description: {
       media: false,
@@ -502,7 +500,7 @@ gradients: {
 ```ts
 carousel: {
   padding: 'pb-12',
-  root: '',
+ root: '',
   arrows: {
 	prev: { color: 'neutral', variant: 'outline', size: 'md' },
 	next: { color: 'neutral', variant: 'outline', size: 'md' },
@@ -512,10 +510,10 @@ carousel: {
 },
 ```
 
-### 🧊 Modal
+### 🧊 Media modal
 
 ```ts
-modal: { header: true },
+mediaModal: { title: true },
 ```
 
 ### 🧊 Error
@@ -579,8 +577,8 @@ webform: {
   help: 'desc my-3 text-muted',
   submitAlign: '',
   submitComponent: '',
-  buttonSize: '2xl',
-  variant: 'outline',
+  submitButtonSize: '2xl',
+  fieldVariant: 'outline',
 },
 ```
 
@@ -592,8 +590,8 @@ Common downstream webform override:
 ```ts
 stirTheme: {
   webform: {
-    variant: 'material',
-    buttonSize: 'xl',
+    fieldVariant: 'material',
+    submitButtonSize: 'xl',
     submitAlign: 'flex justify-center',
   },
 },

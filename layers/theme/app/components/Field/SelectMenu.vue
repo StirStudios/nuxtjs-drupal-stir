@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
-const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const selectItems = computed(() => transformOptions(props.field['#options'] || {}) as Array<Record<string, unknown>>)
 const handleSelectUpdate = (value: unknown) => {
   props.state[props.fieldName] = String(

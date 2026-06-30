@@ -131,7 +131,7 @@ const headerPositionClasses = computed(() => {
 })
 const shouldHide = computed(() =>
   isPinned.value &&
-  ((isFront.value && !finalIsScrolled.value && theme.navigation.isHidden) ||
+  ((isFront.value && !finalIsScrolled.value && theme.navigation.hidden) ||
     (finalIsScrolled.value &&
       scrollDirection.value === 'down' &&
       !atBottom.value)),
@@ -142,7 +142,7 @@ const headerClasses = computed(() =>
     toClassName(theme.navigation.base),
     headerPositionClasses.value,
     toClassName(
-      theme.navigation.transparentTop && !finalIsScrolled.value
+      theme.navigation.transparentAtTop && !finalIsScrolled.value
         ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
         : theme.navigation.background,
     ),
@@ -163,8 +163,8 @@ const logoClasses = computed(() =>
     'app-logo',
     'transition-all duration-300',
     finalIsScrolled.value
-      ? navigationConfig.value.logoScrolledSize || navigationConfig.value.logoSize
-      : navigationConfig.value.logoSize,
+      ? navigationConfig.value.logoScrolledClass || navigationConfig.value.logoClass
+      : navigationConfig.value.logoClass,
   ].join(' '),
 )
 const mobileLogoClasses = computed(() =>
