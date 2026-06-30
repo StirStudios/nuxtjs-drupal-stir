@@ -6,6 +6,7 @@ import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
 import { useNavLockedSnapshot } from '~/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
   mode?: 'full' | 'simple'
@@ -66,7 +67,10 @@ const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
   slotMedia.value
-    .some((node) => node?.props?.type === 'video' || node?.props?.mediaEmbed),
+    .some((node) =>
+      normalizeDrupalMediaType(node?.props?.type) === 'video' ||
+      node?.props?.mediaEmbed,
+    ),
 )
 
 const h1Classes = computed(() => {
