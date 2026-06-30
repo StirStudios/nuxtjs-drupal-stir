@@ -40,6 +40,18 @@ describe('appContextApi', () => {
 
   it('logs app context fetch failures while preserving the fallback response', async () => {
     const error = new Error('Drupal unavailable')
+
+    Object.assign(error, {
+      statusCode: 503,
+      statusMessage: 'Service Unavailable',
+      request: {
+        headers: {
+          cookie: 'SSESS=secret',
+          'x-api-key': 'secret-key',
+        },
+      },
+    })
+
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     vi.mocked(drupalApiRequest).mockRejectedValue(error)
@@ -49,7 +61,9 @@ describe('appContextApi', () => {
     await expect(fetchAppContext(event, '/broken')).resolves.toEqual({ blocks: {} })
     expect(consoleError).toHaveBeenCalledWith('Failed to fetch Drupal app context', {
       path: '/broken',
-      error,
+      message: 'Drupal unavailable',
+      statusCode: 503,
+      statusMessage: 'Service Unavailable',
     })
 
     consoleError.mockRestore()
