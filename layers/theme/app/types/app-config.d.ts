@@ -201,20 +201,7 @@ type StirThemeSocialConfig = {
 } & LooseRecord
 
 type StirThemeFooterConfig = {
-  action?: ClassValue
-  actions?: Array<{
-    label?: string
-    to?: string
-    href?: string
-    target?: string
-    class?: ClassValue
-    color?: string
-    variant?: string
-  } & LooseRecord>
-  actionsWrapper?: ClassValue
   base?: ClassValue
-  contactEmail?: ClassValue
-  contactLinks?: ClassValue
   container?: ClassValue
   content?: ClassValue
   hideEmail?: boolean
@@ -232,7 +219,6 @@ type StirThemeFooterConfig = {
     center?: string[]
     right?: string[]
   } & LooseRecord
-  showActions?: boolean
   showCopyright?: boolean
   showEmail?: boolean
   showFooterRegion?: boolean

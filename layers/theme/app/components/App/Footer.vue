@@ -16,6 +16,11 @@ type FooterSections = {
   center?: string[]
   right?: string[]
 }
+type FooterRenderSection = {
+  key: 'center' | 'left' | 'right'
+  atoms: string[]
+  class: string
+}
 
 const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
 
@@ -101,7 +106,7 @@ const footerSections = computed<Required<FooterSections>>(() => {
   if (footerLayout.value === 'stacked') {
     return {
       left: [],
-      center: toSectionAtoms(configured.center) || ['actions', 'menu', 'socials', 'legal'],
+      center: toSectionAtoms(configured.center) || ['menu', 'socials', 'legal'],
       right: [],
     }
   }
@@ -114,8 +119,6 @@ const footerSections = computed<Required<FooterSections>>(() => {
 })
 const navigationConfig = computed(() => theme.navigation as Record<string, unknown>)
 const footerClasses = computed(() => ({
-  action: toClassName(footerConfig.value.action),
-  actions: toClassName(footerConfig.value.actionsWrapper),
   copyright: toClassName(footerConfig.value.copyright),
   email: toClassName(footerConfig.value.email),
   logo: toClassName(
@@ -132,7 +135,6 @@ const footerClasses = computed(() => ({
   socials: toClassName(footerConfig.value.socials),
 }))
 const footerShow = computed(() => ({
-  actions: footerConfig.value.showActions !== false,
   copyright: footerConfig.value.showCopyright !== false,
   email: footerConfig.value.showEmail !== false,
   logo: footerConfig.value.showLogo !== false && theme.navigation.logo !== false,
@@ -144,16 +146,46 @@ const footerShow = computed(() => ({
 const footerContainerClasses = computed(() =>
   [
     theme.container,
-    'text-center',
+    footerLayout.value === 'stacked' ? 'text-center' : '',
     toClassName(footerConfig.value.container),
   ].filter(Boolean).join(' '),
 )
-const stackedContentClasses = computed(() =>
-  [
-    theme.container,
-    toClassName(footerConfig.value.content),
-  ].filter(Boolean).join(' '),
+const footerContentClasses = computed(() =>
+  footerLayout.value === 'stacked'
+    ? toClassName(footerConfig.value.content)
+    : 'grid gap-6 text-center lg:grid-cols-3 lg:items-start',
 )
+const footerRenderSections = computed<FooterRenderSection[]>(() => {
+  if (footerLayout.value === 'stacked') {
+    return [
+      {
+        key: 'center',
+        atoms: footerSections.value.center,
+        class: '',
+      },
+    ]
+  }
+
+  const sections: FooterRenderSection[] = [
+    {
+      key: 'left',
+      atoms: footerSections.value.left,
+      class: toClassName(footerConfig.value.left),
+    },
+    {
+      key: 'center',
+      atoms: footerSections.value.center,
+      class: 'center',
+    },
+    {
+      key: 'right',
+      atoms: footerSections.value.right,
+      class: toClassName(footerConfig.value.right),
+    },
+  ]
+
+  return sections.filter(section => section.atoms.length > 0)
+})
 const shouldRenderFooter = computed(() =>
   !footerConfig.value.requireSiteName || Boolean(siteInfo.value?.name),
 )
@@ -171,8 +203,6 @@ const shouldRenderFooter = computed(() =>
     :ui="{
       root: theme.footer.base,
       container: footerContainerClasses,
-      left: theme.footer.left,
-      right: theme.footer.right,
     }"
   >
     <LazyRegionArea
@@ -180,90 +210,118 @@ const shouldRenderFooter = computed(() =>
       area="footer"
     />
 
-    <div
-      v-if="footerLayout === 'stacked'"
-      :class="stackedContentClasses"
-    >
-      <AppFooterSection
-        :actions="theme.footer.actions"
-        :atoms="footerSections.center"
-        :classes="footerClasses"
-        :current-year="currentYear"
-        :footer-links="theme.footer.footerLinks"
-        :hide-email="theme.footer.hideEmail"
-        :menu-items="footerMenuItems"
-        :rights="footerRights"
-        :show="footerShow"
-        :site-info="siteInfo"
-        :social-icons="iconsSocialConfig"
-      />
-    </div>
-
-    <template
-      v-if="footerLayout !== 'stacked'"
-      #left
-    >
-      <AppFooterSection
-        :actions="theme.footer.actions"
-        :atoms="footerSections.left"
-        :classes="footerClasses"
-        :current-year="currentYear"
-        :footer-links="theme.footer.footerLinks"
-        :hide-email="theme.footer.hideEmail"
-        :menu-items="footerMenuItems"
-        :rights="footerRights"
-        :show="footerShow"
-        :site-info="siteInfo"
-        :social-icons="iconsSocialConfig"
+    <div :class="footerContentClasses">
+      <div
+        v-for="section in footerRenderSections"
+        :key="section.key"
+        :class="section.class"
       >
-        <template #logo>
-          <LazyAppLogo
-            v-if="footerShow.logo && theme.navigation.logo"
-            :add-classes="footerClasses.logo"
-          />
-          <template v-else-if="footerShow.logo">
-            {{ siteInfo?.name }}
+        <template
+          v-for="atom in section.atoms"
+          :key="atom"
+        >
+          <template v-if="atom === 'logo' && footerShow.logo">
+            <LazyAppLogo
+              v-if="theme.navigation.logo"
+              :add-classes="footerClasses.logo"
+            />
+            <template v-else>
+              {{ siteInfo?.name }}
+            </template>
           </template>
+
+          <LazyUNavigationMenu
+            v-else-if="atom === 'menu' && footerShow.menu && footerMenuItems.length"
+            aria-label="Footer Navigation"
+            :class="footerClasses.menu"
+            :items="footerMenuItems"
+            :ui="{
+              list: footerClasses.menuList,
+              item: footerClasses.menuItem,
+              link: theme.footer.footerLinks,
+            }"
+            variant="link"
+          />
+
+          <div
+            v-else-if="atom === 'socials' && footerShow.socials && iconsSocialConfig.length"
+            :class="footerClasses.socials"
+          >
+            <LazyIconsSocial
+              v-for="(icon, index) in iconsSocialConfig"
+              :key="String(icon.url || icon.title || index)"
+              v-bind="icon"
+              :class="footerClasses.socialIcon"
+            />
+          </div>
+
+          <p
+            v-else-if="atom === 'slogan' && footerShow.slogan && siteInfo?.slogan"
+            :class="footerClasses.slogan"
+          >
+            {{ siteInfo.slogan }}
+          </p>
+
+          <ULink
+            v-else-if="atom === 'email' && footerShow.email && !theme.footer.hideEmail && siteInfo?.mail"
+            :class="footerClasses.email"
+            :inactive-class="theme.footer.footerLinks"
+            raw
+            target="_blank"
+            :to="`mailto:${siteInfo.mail}`"
+          >
+            {{ siteInfo.mail }}
+          </ULink>
+
+          <p
+            v-else-if="atom === 'legal' && (footerShow.copyright || footerShow.poweredBy) && siteInfo?.name"
+            :class="footerClasses.copyright"
+          >
+            <template v-if="footerShow.copyright">
+              © {{ siteInfo.name }} {{ currentYear }}. All Rights Reserved.<br />
+              <template v-if="footerRights">
+                {{ footerRights }}<br />
+              </template>
+            </template>
+            <template v-if="footerShow.poweredBy">
+              Website created & powered by
+              <ULink
+                :inactive-class="theme.footer.footerLinks"
+                raw
+                target="_blank"
+                to="https://www.stirstudiosdesign.com"
+              >
+                StirStudios
+              </ULink>
+            </template>
+          </p>
+
+          <p
+            v-else-if="atom === 'copyright' && footerShow.copyright && siteInfo?.name"
+            :class="footerClasses.copyright"
+          >
+            © {{ siteInfo.name }} {{ currentYear }}. All Rights Reserved.<br />
+            <template v-if="footerRights">
+              {{ footerRights }}<br />
+            </template>
+          </p>
+
+          <p
+            v-else-if="atom === 'poweredBy' && footerShow.poweredBy"
+            :class="footerClasses.poweredBy"
+          >
+            Website created & powered by
+            <ULink
+              :inactive-class="theme.footer.footerLinks"
+              raw
+              target="_blank"
+              to="https://www.stirstudiosdesign.com"
+            >
+              StirStudios
+            </ULink>
+          </p>
         </template>
-      </AppFooterSection>
-    </template>
-
-    <div
-      v-if="footerLayout !== 'stacked'"
-      class="center"
-    >
-      <AppFooterSection
-        :actions="theme.footer.actions"
-        :atoms="footerSections.center"
-        :classes="footerClasses"
-        :current-year="currentYear"
-        :footer-links="theme.footer.footerLinks"
-        :hide-email="theme.footer.hideEmail"
-        :menu-items="footerMenuItems"
-        :rights="footerRights"
-        :show="footerShow"
-        :site-info="siteInfo"
-        :social-icons="iconsSocialConfig"
-      />
+      </div>
     </div>
-
-    <template
-      v-if="footerLayout !== 'stacked'"
-      #right
-    >
-      <AppFooterSection
-        :actions="theme.footer.actions"
-        :atoms="footerSections.right"
-        :classes="footerClasses"
-        :current-year="currentYear"
-        :footer-links="theme.footer.footerLinks"
-        :hide-email="theme.footer.hideEmail"
-        :menu-items="footerMenuItems"
-        :rights="footerRights"
-        :show="footerShow"
-        :site-info="siteInfo"
-        :social-icons="iconsSocialConfig"
-      />
-    </template>
   </UFooter>
 </template>

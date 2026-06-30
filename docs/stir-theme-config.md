@@ -325,11 +325,6 @@ footer: {
 	center: ['menu', 'legal'],
 	right: ['socials', 'email'],
   },
-  actions: [
-	// { label: 'Inquire', to: '/inquire' },
-  ],
-  action: '',
-  actionsWrapper: '',
   copyright: 'mb-0',
   email: '',
   footerLinks: 'transition-colors text-primary hover:text-primary/90',
@@ -340,7 +335,6 @@ footer: {
   poweredBy: 'mb-0',
   poweredby: true, // Legacy alias. Prefer showPoweredBy.
   rights: '', // Add additional rights
-  showActions: true,
   showCopyright: true,
   showEmail: true,
   showFooterRegion: true,
@@ -356,13 +350,13 @@ footer: {
 }
 ```
 
-Footer `sections` accepts these atoms: `logo`, `actions`, `menu`, `socials`,
+Footer `sections` accepts these atoms: `logo`, `menu`, `socials`,
 `slogan`, `email`, `legal`, `copyright`, and `poweredBy`. The default `legal`
 atom preserves the original single copyright/powered-by paragraph. Use
 `layout: 'stacked'` for a single centered footer column, or keep
 `default`/`columns` for the standard left/center/right `UFooter` slots.
-`AppFooterContactLinks` is also available for links-page style social/email
-blocks.
+Project-specific CTA links should be implemented in the downstream project by
+overriding the footer component or adding a project footer region.
 
 ### 🌐 `socials`
 
