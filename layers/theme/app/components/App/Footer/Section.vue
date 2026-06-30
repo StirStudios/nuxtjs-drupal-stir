@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import {
+  resolveOptionalUiButtonVariant,
+  resolveOptionalUiColor,
+} from '~/utils/nuxtUiProps'
 
 type FooterAction = {
   label?: string
@@ -47,6 +51,8 @@ const props = defineProps<{
 }>()
 
 const shouldShow = (atom: string) => props.show?.[atom] !== false
+const actionColor = (action: FooterAction) => resolveOptionalUiColor(action.color)
+const actionVariant = (action: FooterAction) => resolveOptionalUiButtonVariant(action.variant)
 </script>
 
 <template>
@@ -84,10 +90,10 @@ const shouldShow = (atom: string) => props.show?.[atom] !== false
           v-for="(action, index) in actions"
           :key="action.to || action.href || action.label || index"
           :class="[classes?.action, action.class]"
-          :color="action.color as never"
+          :color="actionColor(action)"
           :target="action.target"
           :to="action.to || action.href"
-          :variant="action.variant as never"
+          :variant="actionVariant(action)"
         >
           {{ action.label }}
         </UButton>

@@ -75,7 +75,7 @@ export default defineAppConfig({
       transparentTop: false,
       base: 'h-auto transform py-3 duration-500',
       background:
-        'border-none bg-white/90 shadow backdrop-blur-md dark:bg-gray-950/70',
+        'border-none bg-default/90 shadow backdrop-blur-md dark:bg-default/70',
       container: 'flex-wrap',
       color: 'primary',
       variant: 'link',
