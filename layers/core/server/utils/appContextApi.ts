@@ -25,9 +25,29 @@ export function buildAppContextEndpoint(path = '') {
 }
 
 export function logAppContextFetchError(path: string, error: unknown) {
+  const errorRecord = error && typeof error === 'object'
+    ? error as Record<string, unknown>
+    : {}
+  const responseRecord = errorRecord.response && typeof errorRecord.response === 'object'
+    ? errorRecord.response as Record<string, unknown>
+    : {}
+  const message = error instanceof Error ? error.message : String(error)
+  const statusCode = typeof errorRecord.statusCode === 'number'
+    ? errorRecord.statusCode
+    : typeof responseRecord.status === 'number'
+      ? responseRecord.status
+      : undefined
+  const statusMessage = typeof errorRecord.statusMessage === 'string'
+    ? errorRecord.statusMessage
+    : typeof responseRecord.statusText === 'string'
+      ? responseRecord.statusText
+      : undefined
+
   console.error('Failed to fetch Drupal app context', {
     path,
-    error,
+    message,
+    statusCode,
+    statusMessage,
   })
 }
 
