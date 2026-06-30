@@ -3,37 +3,25 @@ import { Motion } from 'motion-v'
 import { resolveComponent } from 'vue'
 import type { Component } from 'vue'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
+import type {
+  DrupalMediaSlotNode,
+  DrupalMediaSlotsToolkit,
+  DrupalMediaType,
+  NormalizedDrupalMediaNodeProps,
+} from '~/types'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
-interface SlotNode {
-  props?: Record<string, unknown>
-}
-
-type MediaType = 'image' | 'video' | 'document' | 'audio' | 'link'
 type RevealMode = 'default' | 'gallery'
 
-interface MediaProps {
-  type: MediaType
-  credit?: string
-  mediaEmbed?: unknown
-  loading?: 'lazy' | 'eager'
-  fetchpriority?: 'high' | 'auto' | 'low'
-  [key: string]: unknown
-}
-
-interface SlotsToolkit {
-  propsOf(node: SlotNode): MediaProps
-}
-
 const props = defineProps<{
-  node: SlotNode
+  node: DrupalMediaSlotNode
   index: number
   direction?: string
   revealMode?: RevealMode
   overlay?: boolean
   editActions?: EditAction[]
-  tk: SlotsToolkit
+  tk: DrupalMediaSlotsToolkit
 }>()
 
 const emit = defineEmits<{
@@ -42,7 +30,27 @@ const emit = defineEmits<{
 }>()
 
 const theme = useAppConfig().stirTheme
-const mediaProps = computed(() => props.tk.propsOf(props.node))
+
+function toDrupalMediaType(value: unknown): DrupalMediaType {
+  return (
+    value === 'audio' ||
+    value === 'document' ||
+    value === 'image' ||
+    value === 'link' ||
+    value === 'video'
+  )
+    ? value
+    : 'image'
+}
+
+const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
+  const raw = props.tk.propsOf(props.node)
+
+  return {
+    ...raw,
+    type: toDrupalMediaType(raw.type),
+  }
+})
 const overlayImageProps = computed(() => {
   const { imageClass, ...rest } = mediaProps.value
 
@@ -68,7 +76,7 @@ const handleEditActionSelect = (key: EditActionKey) => {
   emit('edit-action-select', key)
 }
 
-const componentMap: Record<MediaType, Component> = {
+const componentMap: Record<DrupalMediaType, Component> = {
   image: resolveComponent('MediaImage') as Component,
   video: resolveComponent('MediaVideo') as Component,
   document: resolveComponent('MediaDocument') as Component,

@@ -37,4 +37,21 @@ describe('appContextApi', () => {
       forwardCookies: true,
     })
   })
+
+  it('logs app context fetch failures while preserving the fallback response', async () => {
+    const error = new Error('Drupal unavailable')
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    vi.mocked(drupalApiRequest).mockRejectedValue(error)
+
+    const event = {} as Parameters<typeof fetchAppContext>[0]
+
+    await expect(fetchAppContext(event, '/broken')).resolves.toEqual({ blocks: {} })
+    expect(consoleError).toHaveBeenCalledWith('Failed to fetch Drupal app context', {
+      path: '/broken',
+      error,
+    })
+
+    consoleError.mockRestore()
+  })
 })

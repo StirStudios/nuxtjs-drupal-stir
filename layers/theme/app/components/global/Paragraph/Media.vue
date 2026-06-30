@@ -4,6 +4,11 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
+import type {
+  DrupalMediaSlotNode,
+  DrupalMediaSlotsToolkit,
+  DrupalMediaType,
+} from '~/types'
 import { unrefElement, useElementSize, useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -38,16 +43,21 @@ const resolvedWidth = computed(() => props.widthClass || props.width || '')
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
+const mediaTk = tk as unknown as DrupalMediaSlotsToolkit
 const slotMedia = computed(() => tk.mediaItems())
 
 type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
 
-const componentMap: Record<string, string> = {
+const componentMap: Record<DrupalMediaType, string> = {
   image: 'MediaImage',
   video: 'MediaVideo',
   document: 'MediaDocument',
   audio: 'MediaAudio',
   link: 'MediaLink',
+}
+
+function mediaComponentFor(type: DrupalMediaType) {
+  return componentMap[type]
 }
 
 const getMediaItemKey = (node: MediaNode, index: number) => {
@@ -203,10 +213,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as never"
+          :node="node as DrupalMediaSlotNode"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk as never"
+          :tk="mediaTk"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -227,10 +237,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as never"
+          :node="node as DrupalMediaSlotNode"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk as never"
+          :tk="mediaTk"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -275,7 +285,7 @@ onMounted(() => {
           :style="singleVideoFrameStyle"
         >
           <component
-            :is="componentMap[firstItem.type]"
+            :is="mediaComponentFor(firstItem.type)"
             v-bind="{
               ...firstItem,
               ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
@@ -301,7 +311,7 @@ onMounted(() => {
         <template #default="{ item }">
           <div :class="['overflow-hidden', theme.media.rounded]">
             <component
-              :is="componentMap[item.type]"
+              :is="mediaComponentFor(item.type)"
               :key="item.key"
               class="shadow-2xl"
               v-bind="{

@@ -134,6 +134,7 @@ function hasRows(): boolean {
 }
 
 const randomizeRowsOnClient = ref(false)
+let randomizedRowsCache: { signature: string, rows: VNode[] } | null = null
 
 function resolveSlotRows() {
   const rows = tk.slot('rows')
@@ -144,12 +145,32 @@ function resolveSlotRows() {
   }))
 }
 
-function getStaticRows() {
-  const rows = randomizeEnabled.value && randomizeRowsOnClient.value
-    ? tk.shuffle(resolveSlotRows())
-    : resolveSlotRows()
+function rowSignature(rows: VNode[]): string {
+  return rows.map((node, index) => String(node.key ?? index)).join('|')
+}
 
-  return rows.map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
+function getOrderedStaticRows() {
+  return resolveSlotRows().map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
+}
+
+function getStaticRows() {
+  const rows = getOrderedStaticRows()
+
+  if (!randomizeEnabled.value || !randomizeRowsOnClient.value) {
+    randomizedRowsCache = null
+    return rows
+  }
+
+  const signature = rowSignature(rows)
+
+  if (randomizedRowsCache?.signature !== signature) {
+    randomizedRowsCache = {
+      signature,
+      rows: tk.shuffle(rows),
+    }
+  }
+
+  return randomizedRowsCache.rows
 }
 
 function getRenderedRows(): RenderedViewRow[] {

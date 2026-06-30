@@ -49,7 +49,7 @@ interface UseDrupalViewControlsProps {
   noResults?: string
 }
 
-function mapFilterOptions(
+export function mapDrupalViewFilterOptions(
   options: Record<string, string> | string[] | undefined,
 ): Array<{ label: string; value: string }> {
   if (!options) return []
@@ -64,7 +64,7 @@ function mapFilterOptions(
   return Object.entries(options).map(([value, label]) => ({ label, value }))
 }
 
-function normalizeSortOrderValue(value: string): string {
+export function normalizeDrupalViewSortOrderValue(value: string): string {
   const normalized = value.trim().toLowerCase()
 
   if (normalized === 'asc') return 'ASC'
@@ -79,7 +79,7 @@ function firstStringValue(value: string | string[] | undefined): string {
   return String(value ?? '')
 }
 
-function buildSearchParams(
+export function buildDrupalViewSearchParams(
   query: Record<string, string | string[]>,
 ): URLSearchParams {
   const params = new URLSearchParams()
@@ -99,7 +99,7 @@ function buildSearchParams(
   return params
 }
 
-function getNodeProps(node: CustomElementNode): Record<string, unknown> {
+export function getDrupalViewNodeProps(node: CustomElementNode): Record<string, unknown> {
   if (node.props && typeof node.props === 'object') {
     return node.props
   }
@@ -113,7 +113,7 @@ function getNodeProps(node: CustomElementNode): Record<string, unknown> {
   return flat as Record<string, unknown>
 }
 
-function getNodeSlots(node: CustomElementNode): Record<string, unknown> {
+export function getDrupalViewNodeSlots(node: CustomElementNode): Record<string, unknown> {
   if (node.slots && typeof node.slots === 'object') {
     return node.slots
   }
@@ -121,8 +121,8 @@ function getNodeSlots(node: CustomElementNode): Record<string, unknown> {
   return {}
 }
 
-function getNodeRows(node: CustomElementNode): unknown[] {
-  const slots = getNodeSlots(node)
+export function getDrupalViewNodeRows(node: CustomElementNode): unknown[] {
+  const slots = getDrupalViewNodeSlots(node)
   const slotRows = slots.rows
 
   if (Array.isArray(slotRows)) return slotRows
@@ -132,6 +132,68 @@ function getNodeRows(node: CustomElementNode): unknown[] {
   if (Array.isArray(legacyRows)) return legacyRows
 
   return []
+}
+
+export function isMatchingDrupalViewNode(
+  node: CustomElementNode,
+  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
+): boolean {
+  const nodeProps = getDrupalViewNodeProps(node)
+  const nodeViewId = String(nodeProps.viewId || '')
+  const nodeDisplayId = String(nodeProps.displayId || '')
+  const nodeParentUuid = String(nodeProps.parentUuid || '')
+  const hasViewProps = nodeViewId.length > 0 || nodeDisplayId.length > 0
+  const hasViewElement = Boolean(node.element?.startsWith('drupal-view-'))
+
+  if (!hasViewProps && !hasViewElement) return false
+
+  if (criteria.viewId && nodeViewId !== criteria.viewId) return false
+  if (criteria.displayId && nodeDisplayId !== criteria.displayId) return false
+  if (criteria.parentUuid && nodeParentUuid !== criteria.parentUuid) return false
+
+  return true
+}
+
+export function findDrupalViewNode(
+  input: unknown,
+  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
+): CustomElementNode | null {
+  if (!input) return null
+
+  if (Array.isArray(input)) {
+    for (const item of input) {
+      const found = findDrupalViewNode(item, criteria)
+
+      if (found) return found
+    }
+
+    return null
+  }
+
+  if (typeof input !== 'object') return null
+  const node = input as CustomElementNode
+
+  if (isMatchingDrupalViewNode(node, criteria)) return node
+
+  const childCandidates: unknown[] = []
+  const slots = getDrupalViewNodeSlots(node)
+
+  if (Object.keys(slots).length > 0) {
+    childCandidates.push(...Object.values(slots))
+  }
+
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    if (key === 'element' || key === 'props' || key === 'slots') continue
+    childCandidates.push(value)
+  }
+
+  for (const child of childCandidates) {
+    const found = findDrupalViewNode(child, criteria)
+
+    if (found) return found
+  }
+
+  return null
 }
 
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
@@ -217,7 +279,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         queryParamName: filter.queryParamName,
         multiple: filter.multiple,
         disabled: filter.disabled,
-        options: mapFilterOptions(filter.options),
+        options: mapDrupalViewFilterOptions(filter.options),
       })),
   )
 
@@ -394,14 +456,14 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     for (const option of sortOrderOptions.value) {
       values.add(option.value)
-      values.add(normalizeSortOrderValue(option.value))
+      values.add(normalizeDrupalViewSortOrderValue(option.value))
     }
 
     const submitted = defaultSortOrderValue(sort)
 
     if (submitted) {
       values.add(submitted)
-      values.add(normalizeSortOrderValue(submitted))
+      values.add(normalizeDrupalViewSortOrderValue(submitted))
     }
 
     return values
@@ -711,7 +773,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         value.length > 0 &&
         validSortOrderValue(sort, value)
       ) {
-        query[sort.queryParamSortOrder] = normalizeSortOrderValue(value)
+        query[sort.queryParamSortOrder] = normalizeDrupalViewSortOrderValue(value)
       }
     }
 
@@ -720,62 +782,6 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     }
 
     return query
-  }
-
-  function isMatchingView(node: CustomElementNode): boolean {
-    const nodeProps = getNodeProps(node)
-    const nodeViewId = String(nodeProps.viewId || '')
-    const nodeDisplayId = String(nodeProps.displayId || '')
-    const nodeParentUuid = String(nodeProps.parentUuid || '')
-    const hasViewProps = nodeViewId.length > 0 || nodeDisplayId.length > 0
-    const hasViewElement = Boolean(node.element?.startsWith('drupal-view-'))
-
-    if (!hasViewProps && !hasViewElement) return false
-
-    if (props.viewId && nodeViewId !== props.viewId) return false
-    if (props.displayId && nodeDisplayId !== props.displayId) return false
-    if (props.parentUuid && nodeParentUuid !== props.parentUuid) return false
-
-    return true
-  }
-
-  function findViewNode(input: unknown): CustomElementNode | null {
-    if (!input) return null
-
-    if (Array.isArray(input)) {
-      for (const item of input) {
-        const found = findViewNode(item)
-
-        if (found) return found
-      }
-
-      return null
-    }
-
-    if (typeof input !== 'object') return null
-    const node = input as CustomElementNode
-
-    if (isMatchingView(node)) return node
-
-    const childCandidates: unknown[] = []
-    const slots = getNodeSlots(node)
-
-    if (Object.keys(slots).length > 0) {
-      childCandidates.push(...Object.values(slots))
-    }
-
-    for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
-      if (key === 'element' || key === 'props' || key === 'slots') continue
-      childCandidates.push(value)
-    }
-
-    for (const child of childCandidates) {
-      const found = findViewNode(child)
-
-      if (found) return found
-    }
-
-    return null
   }
 
   async function refreshView(page = currentPage.value) {
@@ -792,7 +798,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     try {
       const query = buildQueryParams(page)
-      const params = buildSearchParams(query)
+      const params = buildDrupalViewSearchParams(query)
       const queryString = params.toString()
       const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
 
@@ -814,7 +820,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       let viewNode: CustomElementNode | null = null
 
       for (const candidate of candidates) {
-        viewNode = findViewNode(candidate)
+        viewNode = findDrupalViewNode(candidate, props)
         if (viewNode) break
       }
 
@@ -833,9 +839,9 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         return
       }
 
-      const viewNodeProps = getNodeProps(viewNode)
+      const viewNodeProps = getDrupalViewNodeProps(viewNode)
 
-      dynamicRows.value = getNodeRows(viewNode)
+      dynamicRows.value = getDrupalViewNodeRows(viewNode)
       dynamicPager.value = (viewNodeProps.pager as ViewPager) ?? {
         current: page,
         totalPages: 1,
