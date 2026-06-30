@@ -24,6 +24,13 @@ export function buildAppContextEndpoint(path = '') {
     : '/api/app-context'
 }
 
+export function logAppContextFetchError(path: string, error: unknown) {
+  console.error('Failed to fetch Drupal app context', {
+    path,
+    error,
+  })
+}
+
 export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>[0], path = '') {
   try {
     return await drupalApiRequest<AppContextResponse>(event, buildAppContextEndpoint(path), {
@@ -31,7 +38,9 @@ export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>
       forwardCookies: true,
     })
   }
-  catch {
+  catch (error) {
+    logAppContextFetchError(path, error)
+
     return { blocks: {} }
   }
 }

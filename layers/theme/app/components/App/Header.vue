@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type {
+  USlideover as USlideoverComponent,
   UNavigationMenu as UNavigationMenuComponent,
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
@@ -46,8 +47,15 @@ type HeaderToggleSide = 'left' | 'right'
 type DesktopHeaderLayout = 'default' | 'split-logo'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
+type SlideoverProps = ComponentProps<typeof USlideoverComponent>
 type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
 type NavigationMenuVariant = Extract<NonNullable<NavigationMenuProps['variant']>, string>
+type SlideoverContent = NonNullable<SlideoverProps['content']>
+type SlideoverContentAttrs = SlideoverContent & {
+  'aria-label'?: string
+  id?: string
+  style?: Record<`--${string}`, string>
+}
 
 type MainMenuItem = DrupalMenuItemLink & {
   title?: string
@@ -176,7 +184,7 @@ const headerCenterClasses = computed(() =>
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.center) : '',
   ].filter(Boolean).join(' '),
 )
-const menuContent = computed(() => {
+const menuContent = computed<SlideoverContentAttrs>(() => {
   const slideover = theme.navigation.slideover
   const angleEnabled = Boolean(slideover?.angle)
 
@@ -464,7 +472,7 @@ watch(menuOpen, (val) => {
   <LazyUSlideover
     v-if="menuMounted"
     v-model:open="menuOpen"
-    :content="menuContent as never"
+    :content="menuContent"
     description="Site navigation"
     :side="menuSide"
     title="Navigation"

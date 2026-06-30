@@ -4,6 +4,11 @@ import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
+import type { DrupalMediaNodeProps } from '~/types'
+import {
+  drupalMediaComponentName,
+  normalizeDrupalMediaType,
+} from '../../../utils/drupalMediaTypes'
 import { unrefElement, useElementSize, useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -42,16 +47,12 @@ const slotMedia = computed(() => tk.mediaItems())
 
 type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
 
-const componentMap: Record<string, string> = {
-  image: 'MediaImage',
-  video: 'MediaVideo',
-  document: 'MediaDocument',
-  audio: 'MediaAudio',
-  link: 'MediaLink',
+function mediaComponentFor(type: unknown) {
+  return drupalMediaComponentName(type)
 }
 
 const getMediaItemKey = (node: MediaNode, index: number) => {
-  const data = tk.propsOf(node) as Record<string, unknown>
+  const data = tk.propsOf<DrupalMediaNodeProps>(node)
   const candidates = [data.uuid, data.id, data.mid, data.url, data.src]
 
   for (const candidate of candidates) {
@@ -117,13 +118,15 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
 const isImageGallery = computed(
   () =>
     slotMediaOrdered.value.length > 1 &&
-    slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
+    slotMediaOrdered.value.every(
+      (node) => normalizeDrupalMediaType(tk.propsOf(node).type) === 'image',
+    ),
 )
 const isVisualGallery = computed(
   () =>
     slotMediaOrdered.value.length > 1 &&
     slotMediaOrdered.value.every((node) => {
-      const type = tk.propsOf(node).type
+      const type = normalizeDrupalMediaType(tk.propsOf(node).type)
 
       return type === 'image' || type === 'video'
     }),
@@ -203,10 +206,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as never"
+          :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk as never"
+          :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -227,10 +230,10 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
-          :node="node as never"
+          :node="node"
           :overlay="overlay"
           :reveal-mode="revealMode"
-          :tk="tk as never"
+          :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -275,7 +278,7 @@ onMounted(() => {
           :style="singleVideoFrameStyle"
         >
           <component
-            :is="componentMap[firstItem.type]"
+            :is="mediaComponentFor(firstItem.type)"
             v-bind="{
               ...firstItem,
               ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
@@ -301,7 +304,7 @@ onMounted(() => {
         <template #default="{ item }">
           <div :class="['overflow-hidden', theme.media.rounded]">
             <component
-              :is="componentMap[item.type]"
+              :is="mediaComponentFor(item.type)"
               :key="item.key"
               class="shadow-2xl"
               v-bind="{

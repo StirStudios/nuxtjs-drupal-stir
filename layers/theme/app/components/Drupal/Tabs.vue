@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
 import { adminUiTheme } from '~/utils/adminUiTheme'
 
@@ -56,13 +57,7 @@ const getValidTo = (value: unknown): string | null => {
   return trimmed.length ? trimmed : null
 }
 
-const isCompactTabs = ref(false)
-
-const updateCompactTabs = () => {
-  if (import.meta.client === false) return
-
-  isCompactTabs.value = window.matchMedia('(max-width: 767px)').matches
-}
+const isCompactTabs = useMediaQuery('(max-width: 767px)')
 
 const tabs = computed<LocalTasks>(() => {
   const localTasks = page.value?.local_tasks as Partial<LocalTasks> | undefined
@@ -210,15 +205,7 @@ const loadAccountMenu = async () => {
 }
 
 onMounted(() => {
-  updateCompactTabs()
-  window.addEventListener('resize', updateCompactTabs)
   void loadAccountMenu()
-})
-
-onBeforeUnmount(() => {
-  if (import.meta.client === false) return
-
-  window.removeEventListener('resize', updateCompactTabs)
 })
 
 watch(

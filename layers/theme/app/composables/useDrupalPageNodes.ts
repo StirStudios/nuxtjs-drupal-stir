@@ -8,6 +8,7 @@ import {
   getVNodeProp,
   useVNodes,
 } from './useSlotsToolkit'
+import { normalizeDrupalMediaType } from '../utils/drupalMediaTypes'
 
 export function getDrupalPageNodeView(
   node: VNode | undefined,
@@ -39,11 +40,7 @@ export function isDrupalPageMediaNode(node: VNode | undefined): boolean {
   const type = getVNodeProp<unknown>(node, 'type')
 
   return (
-    type === 'image' ||
-    type === 'video' ||
-    type === 'document' ||
-    type === 'audio' ||
-    type === 'link' ||
+    normalizeDrupalMediaType(type) === type ||
     getVNodeElement(node) === 'media-image'
   )
 }

@@ -1,39 +1,27 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
 import { resolveComponent } from 'vue'
-import type { Component } from 'vue'
+import type { Component, VNode } from 'vue'
+import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
+import type { NormalizedDrupalMediaNodeProps } from '~/types'
+import {
+  drupalMediaComponentName,
+  normalizeDrupalMediaType,
+} from '../../../utils/drupalMediaTypes'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
-interface SlotNode {
-  props?: Record<string, unknown>
-}
-
-type MediaType = 'image' | 'video' | 'document' | 'audio' | 'link'
 type RevealMode = 'default' | 'gallery'
 
-interface MediaProps {
-  type: MediaType
-  credit?: string
-  mediaEmbed?: unknown
-  loading?: 'lazy' | 'eager'
-  fetchpriority?: 'high' | 'auto' | 'low'
-  [key: string]: unknown
-}
-
-interface SlotsToolkit {
-  propsOf(node: SlotNode): MediaProps
-}
-
 const props = defineProps<{
-  node: SlotNode
+  node: VNode
   index: number
   direction?: string
   revealMode?: RevealMode
   overlay?: boolean
   editActions?: EditAction[]
-  tk: SlotsToolkit
+  tk: Pick<SlotsToolkit, 'propsOf'>
 }>()
 
 const emit = defineEmits<{
@@ -42,7 +30,15 @@ const emit = defineEmits<{
 }>()
 
 const theme = useAppConfig().stirTheme
-const mediaProps = computed(() => props.tk.propsOf(props.node))
+
+const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
+  const raw = props.tk.propsOf(props.node)
+
+  return {
+    ...raw,
+    type: normalizeDrupalMediaType(raw.type),
+  }
+})
 const overlayImageProps = computed(() => {
   const { imageClass, ...rest } = mediaProps.value
 
@@ -68,15 +64,9 @@ const handleEditActionSelect = (key: EditActionKey) => {
   emit('edit-action-select', key)
 }
 
-const componentMap: Record<MediaType, Component> = {
-  image: resolveComponent('MediaImage') as Component,
-  video: resolveComponent('MediaVideo') as Component,
-  document: resolveComponent('MediaDocument') as Component,
-  audio: resolveComponent('MediaAudio') as Component,
-  link: resolveComponent('MediaLink') as Component,
-}
-
-const mediaComponent = computed(() => componentMap[mediaProps.value.type])
+const mediaComponent = computed(
+  () => resolveComponent(drupalMediaComponentName(mediaProps.value.type)) as Component,
+)
 
 const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } =
   useRevealMotionConfig()

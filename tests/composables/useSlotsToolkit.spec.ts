@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { h } from 'vue'
 import {
   getAllVNodes,
+  getVNodeProps,
   getVNodeChildren,
   getVNodeSlotChildren,
+  useSlotsToolkit,
   useSlotVNode,
 } from '../../layers/theme/app/composables/useSlotsToolkit'
 
@@ -71,5 +73,18 @@ describe('useSlotsToolkit VNode traversal', () => {
     )
 
     expect(getAllVNodes([sectionNode])).toEqual([sectionNode, imageNode, textNode])
+  })
+
+  it('supports typed props for downstream Drupal custom-element helpers', () => {
+    type MediaProps = {
+      src?: string
+      mid?: string
+    }
+
+    const mediaNode = h('img', { src: '/media.jpg', mid: '10' })
+    const tk = useSlotsToolkit({ media: () => [mediaNode] })
+
+    expect(getVNodeProps<MediaProps>(mediaNode).src).toBe('/media.jpg')
+    expect(tk.propsOf<MediaProps>(mediaNode).mid).toBe('10')
   })
 })
