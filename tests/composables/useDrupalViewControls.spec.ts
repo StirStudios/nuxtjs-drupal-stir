@@ -2,8 +2,13 @@ import { describe, expect, it } from 'vitest'
 import type { CustomElementNode } from '../../layers/theme/app/types'
 import {
   buildDrupalViewSearchParams,
+  drupalViewLoadErrorMessage,
   findDrupalViewNode,
+  findDrupalViewNodeInResponse,
   getDrupalViewNodeRows,
+  isDrupalViewAbortError,
+  isSafeDrupalViewControlValue,
+  isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
   normalizeDrupalViewSortOrderValue,
 } from '../../layers/theme/app/composables/useDrupalViewControls'
@@ -82,5 +87,47 @@ describe('useDrupalViewControls helpers', () => {
     }
 
     expect(findDrupalViewNode(view, { viewId: 'testimonials' })).toBeNull()
+  })
+
+  it('finds view nodes in common CE response envelopes', () => {
+    const view: CustomElementNode = {
+      element: 'drupal-view-default',
+      props: {
+        viewId: 'podcast',
+        displayId: 'podcast',
+      },
+    }
+
+    expect(findDrupalViewNodeInResponse({ content: [view] }, {
+      viewId: 'podcast',
+      displayId: 'podcast',
+    })).toBe(view)
+    expect(findDrupalViewNodeInResponse({ items: [view] }, { viewId: 'podcast' })).toBe(view)
+    expect(findDrupalViewNodeInResponse({ data: [view] }, { viewId: 'podcast' })).toBe(view)
+  })
+
+  it('rejects unsafe filter values that look like injected query strings', () => {
+    const filter = {
+      options: [
+        { label: 'News', value: 'news' },
+        { label: 'Events', value: 'events' },
+      ],
+    }
+
+    expect(isSafeDrupalViewControlValue('news')).toBe(true)
+    expect(isSafeDrupalViewControlValue('news?sort_by=created')).toBe(false)
+    expect(isValidDrupalViewFilterValue(filter, ['news', 'events'])).toBe(true)
+    expect(isValidDrupalViewFilterValue(filter, ['news', 'missing'])).toBe(false)
+  })
+
+  it('classifies abort errors separately from visible load failures', () => {
+    expect(isDrupalViewAbortError(new DOMException('aborted', 'AbortError'))).toBe(true)
+    expect(isDrupalViewAbortError(new Error('operation was aborted'))).toBe(true)
+    expect(isDrupalViewAbortError(new Error('Network failed'))).toBe(false)
+  })
+
+  it('returns a specific message for known Drupal memory failures', () => {
+    expect(drupalViewLoadErrorMessage(new Error('Allowed memory size exhausted'))).toContain('Drupal ran out of memory')
+    expect(drupalViewLoadErrorMessage(new Error('Network failed'))).toBe('Unable to load results. Please try again.')
   })
 })
