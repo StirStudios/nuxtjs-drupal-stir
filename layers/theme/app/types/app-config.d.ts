@@ -1,8 +1,19 @@
 // Nuxt app config is intentionally extensible so downstream layers can add
 // project-specific keys without augmenting every branch up front.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LooseRecord = Record<string, any>
+type LooseRecord = Record<string, unknown>
 type ClassValue = string
+type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
+type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
+type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
+type UiNavigationVariantName = 'link' | 'pill'
+type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+type StirThemeButtonLikeConfig = {
+  class?: ClassValue
+  color?: UiColorName
+  icon?: string
+  size?: UiSizeName
+  variant?: UiButtonVariantName
+} & LooseRecord
 
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
@@ -25,11 +36,11 @@ type AuthPageCopyConfig = {
 type AuthSubmitButtonConfig = {
   label?: string
   class?: string
-  color?: string
+  color?: UiColorName
   icon?: string
   loadingIcon?: string
-  size?: string
-  variant?: string
+  size?: UiSizeName
+  variant?: UiButtonVariantName
 } & LooseRecord
 
 type AuthBackButtonConfig = {
@@ -37,8 +48,8 @@ type AuthBackButtonConfig = {
   label?: string
   to?: string
   icon?: string
-  color?: string
-  variant?: string
+  color?: UiColorName
+  variant?: UiButtonVariantName
   class?: string
 } & LooseRecord
 
@@ -141,8 +152,8 @@ type StirThemeNavigationConfig = {
   base?: ClassValue
   background?: ClassValue
   container?: ClassValue
-  color?: string
-  variant?: string
+  color?: UiColorName
+  variant?: UiNavigationVariantName
   desktopLayout?: 'default' | 'split-logo' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
@@ -160,7 +171,7 @@ type StirThemeNavigationConfig = {
   } & LooseRecord
   highlight?: {
     show?: boolean
-    color?: string
+    color?: UiColorName
   } & LooseRecord
   slideover?: {
     logo?: boolean
@@ -249,8 +260,8 @@ type StirThemeCarouselConfig = {
   padding?: ClassValue
   root?: ClassValue
   arrows?: {
-    prev?: LooseRecord
-    next?: LooseRecord
+    prev?: StirThemeButtonLikeConfig
+    next?: StirThemeButtonLikeConfig
     prevIcon?: string
     nextIcon?: string
   } & LooseRecord
@@ -287,8 +298,8 @@ type StirThemeWebformConfig = {
   submitAlign?: ClassValue
   submitComponent?: string
   buttonClass?: ClassValue
-  buttonSize?: string
-  variant?: string
+  buttonSize?: UiSizeName
+  variant?: UiFieldVariantName
 } & LooseRecord
 
 type StirThemeTurnstileConfig = {
@@ -306,16 +317,16 @@ type StirThemeScrollButtonConfig = {
   enabled?: boolean
   base?: ClassValue
   icon?: string
-  variant?: string
+  variant?: UiButtonVariantName
   showAtScrollY?: number
 } & LooseRecord
 
 type StirThemeErrorConfig = {
   label?: string
-  color?: string
-  size?: string
+  color?: UiColorName
+  size?: UiSizeName
   icon?: string
-  variant?: string
+  variant?: UiButtonVariantName
 } & LooseRecord
 
 type StirThemeRevealConfig = {

@@ -281,6 +281,21 @@ For a centered-logo desktop header, set `navigation.desktopLayout` to
 Items before that marker render to the left of the logo, items after it render
 to the right, and the marker is removed from the mobile menu.
 
+Common downstream override:
+
+```ts
+stirTheme: {
+  navigation: {
+    mode: 'fixed',
+    transparentTop: true,
+    desktopLayout: 'split-logo',
+    logoMenuMarker: '--logo--',
+    color: 'primary',
+    variant: 'link',
+  },
+},
+```
+
 ### 🏠 `front`
 
 ```ts
@@ -358,6 +373,19 @@ atom preserves the original single copyright/powered-by paragraph. Use
 Project-specific CTA links should be implemented in the downstream project by
 overriding the footer component or adding a project footer region.
 
+Common downstream atom-order override:
+
+```ts
+stirTheme: {
+  footer: {
+    layout: 'stacked',
+    sections: {
+      center: ['logo', 'menu', 'socials', 'email', 'legal'],
+    },
+  },
+},
+```
+
 ### 🌐 `socials`
 
 ```ts
@@ -389,6 +417,26 @@ socials: [
 media: {
   base: 'relative h-full w-full overflow-hidden object-cover',
   rounded: 'rounded-xl',
+},
+```
+
+Common downstream media override:
+
+```ts
+stirTheme: {
+  media: {
+    rounded: 'rounded-none',
+    effects: {
+      scale: 'group-hover:scale-105',
+    },
+  },
+  modal: {
+    title: false,
+    description: {
+      media: false,
+      default: false,
+    },
+  },
 },
 ```
 
@@ -538,6 +586,18 @@ webform: {
 
 - `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
 - `submitComponent` optionally names a globally registered custom submit action component. When empty or unresolved, the default `UButton` submit action is used.
+
+Common downstream webform override:
+
+```ts
+stirTheme: {
+  webform: {
+    variant: 'material',
+    buttonSize: 'xl',
+    submitAlign: 'flex justify-center',
+  },
+},
+```
 
 ---
 
