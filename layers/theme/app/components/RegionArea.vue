@@ -15,24 +15,13 @@ function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
   return []
 }
 
-const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
 const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
-const needsAppContext = computed(() => !hasPageBlocksPayload.value)
+const appContextBlocks = computed(() => normalizeRegionBlocks(appContext.value?.blocks?.[props.area]))
 
-if (needsAppContext.value) {
-  await loadAppContext()
-}
-
-watch(needsAppContext, (needsContext) => {
-  if (needsContext) {
-    void loadAppContext()
-  }
-})
+await loadAppContext()
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
-  if (hasPageBlocksPayload.value) return pageBlocks.value
-
-  return normalizeRegionBlocks(appContext.value?.blocks?.[props.area])
+  return appContextBlocks.value.length > 0 ? appContextBlocks.value : pageBlocks.value
 })
 </script>
 
