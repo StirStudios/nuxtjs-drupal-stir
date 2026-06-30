@@ -59,20 +59,20 @@ export default defineAppConfig({
   },
 
   stirTheme: {
-    pdf: false,
-    crumbs: false,
+    showPdf: false,
+    showBreadcrumbs: false,
 
-    h1: 'mb-12 text-center text-6xl lg:mb-20',
+    heading: 'mb-12 text-center text-6xl lg:mb-20',
     container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
     header: 'fixed top-0 z-30 w-full !p-0 md:px-auto',
 
     navigation: {
       mode: 'fixed',
       logo: true,
-      logoSize: 'h-[5rem]',
-      // logoScrolledSize: 'h-[4rem]',
-      isHidden: false,
-      transparentTop: false,
+      logoClass: 'h-[5rem]',
+      // logoScrolledClass: 'h-[4rem]',
+      hidden: false,
+      transparentAtTop: false,
       base: 'h-auto transform py-3 duration-500',
       background:
         'border-none bg-default/90 shadow backdrop-blur-md dark:bg-default/70',
@@ -123,15 +123,19 @@ export default defineAppConfig({
         isFront: 'object-cover',
       },
       text: {
-        h1: 'mb-0 text-white',
+        heading: 'mb-0 text-white',
         base: 'relative z-10 max-w-6xl p-5 text-center',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
       hide: 'pt-15 lg:pt-30',
     },
 
+    frontPage: {
+      heading: '',
+      main: '',
+    },
+
     footer: {
-      hideEmail: false,
       layout: 'default',
       requireSiteName: false,
       rights: '',
@@ -148,7 +152,6 @@ export default defineAppConfig({
       menuItem: 'min-w-0 py-0',
       menuList: 'flex flex-wrap justify-center',
       poweredBy: 'mb-0',
-      poweredby: true,
       showCopyright: true,
       showEmail: true,
       showFooterRegion: true,
@@ -188,7 +191,7 @@ export default defineAppConfig({
       },
     },
 
-    modal: {
+    mediaModal: {
       title: true,
       description: {
         media: true,
@@ -227,8 +230,8 @@ export default defineAppConfig({
       submitAlign: '',
       submitComponent: '',
       buttonClass: '',
-      buttonSize: '2xl',
-      variant: 'outline',
+      submitButtonSize: '2xl',
+      fieldVariant: 'outline',
     },
 
     turnstile: {

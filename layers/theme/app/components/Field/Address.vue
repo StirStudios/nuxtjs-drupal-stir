@@ -11,8 +11,8 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
-const isMaterial = computed(() => webform.variant === 'material')
-const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
+const isMaterial = computed(() => webform.fieldVariant === 'material')
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 
 const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
   typeof props.field['#composite'] === 'object' &&

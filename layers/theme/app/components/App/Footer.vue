@@ -123,8 +123,8 @@ const footerClasses = computed(() => ({
   email: toClassName(footerConfig.value.email),
   logo: toClassName(
     footerConfig.value.logo
-      || navigationConfig.value.logoScrolledSize
-      || navigationConfig.value.logoSize,
+      || navigationConfig.value.logoScrolledClass
+      || navigationConfig.value.logoClass,
   ),
   menu: toClassName(footerConfig.value.menu),
   menuItem: toClassName(footerConfig.value.menuItem),
@@ -139,7 +139,7 @@ const footerShow = computed(() => ({
   email: footerConfig.value.showEmail !== false,
   logo: footerConfig.value.showLogo !== false && theme.navigation.logo !== false,
   menu: footerConfig.value.showMenu !== false,
-  poweredBy: footerConfig.value.showPoweredBy !== false && footerConfig.value.poweredby !== false,
+  poweredBy: footerConfig.value.showPoweredBy !== false,
   slogan: footerConfig.value.showSlogan === true,
   socials: footerConfig.value.showSocials !== false,
 }))
@@ -263,7 +263,7 @@ const shouldRenderFooter = computed(() =>
           </p>
 
           <ULink
-            v-else-if="atom === 'email' && footerShow.email && !theme.footer.hideEmail && siteInfo?.mail"
+            v-else-if="atom === 'email' && footerShow.email && siteInfo?.mail"
             :class="footerClasses.email"
             :inactive-class="theme.footer.footerLinks"
             raw

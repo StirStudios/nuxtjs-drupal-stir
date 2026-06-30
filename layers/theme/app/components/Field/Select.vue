@@ -17,8 +17,8 @@ const props = defineProps<{
 
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
-const buttonVariant = computed(() => resolveUiButtonVariant(webform.variant, 'outline'))
-const fieldVariant = computed(() => resolveUiFieldVariant(webform.variant))
+const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
+const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 
 const getDefaultValue = () => {
   const value = props.field?.['#defaultValue']

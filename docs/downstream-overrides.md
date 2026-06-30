@@ -22,7 +22,7 @@ export default defineAppConfig({
   stirTheme: {
     navigation: {
       mode: 'fixed',
-      transparentTop: true,
+      transparentAtTop: true,
       desktopLayout: 'split-logo',
       logoMenuMarker: '--logo--',
       color: 'primary',
@@ -56,8 +56,8 @@ Webform styling:
 export default defineAppConfig({
   stirTheme: {
     webform: {
-      variant: 'material',
-      buttonSize: 'xl',
+      fieldVariant: 'material',
+      submitButtonSize: 'xl',
       submitAlign: 'flex justify-center',
     },
   },

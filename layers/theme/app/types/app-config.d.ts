@@ -146,10 +146,10 @@ type StirThemeNavigationConfig = {
   mode?: 'fixed' | 'sticky'
   modeRoutes?: Partial<Record<'fixed' | 'sticky', string[]>>
   logo?: boolean
-  logoSize?: ClassValue
-  logoScrolledSize?: ClassValue
-  isHidden?: boolean
-  transparentTop?: boolean
+  logoClass?: ClassValue
+  logoScrolledClass?: ClassValue
+  hidden?: boolean
+  transparentAtTop?: boolean
   base?: ClassValue
   background?: ClassValue
   container?: ClassValue
@@ -197,11 +197,16 @@ type StirThemeHeroConfig = {
     isFront?: ClassValue
   } & LooseRecord
   text?: {
-    h1?: ClassValue
+    heading?: ClassValue
     base?: ClassValue
     isFront?: ClassValue
   } & LooseRecord
   hide?: ClassValue
+} & LooseRecord
+
+type StirThemeFrontPageConfig = {
+  heading?: ClassValue
+  main?: ClassValue
 } & LooseRecord
 
 type StirThemeSocialConfig = {
@@ -216,7 +221,6 @@ type StirThemeFooterConfig = {
   base?: ClassValue
   container?: ClassValue
   content?: ClassValue
-  hideEmail?: boolean
   layout?: 'default' | 'columns' | 'stacked' | string
   logo?: ClassValue
   menu?: ClassValue
@@ -244,7 +248,6 @@ type StirThemeFooterConfig = {
   email?: ClassValue
   footerLinks?: ClassValue
   poweredBy?: ClassValue
-  poweredby?: boolean
   slogan?: ClassValue
   socialIcon?: ClassValue
   socials?: ClassValue
@@ -299,8 +302,8 @@ type StirThemeWebformConfig = {
   submitAlign?: ClassValue
   submitComponent?: string
   buttonClass?: ClassValue
-  buttonSize?: UiSizeName
-  variant?: UiFieldVariantName
+  submitButtonSize?: UiSizeName
+  fieldVariant?: UiFieldVariantName
 } & LooseRecord
 
 type StirThemeTurnstileConfig = {
@@ -344,19 +347,20 @@ type StirThemeAnimationsConfig = {
 } & LooseRecord
 
 type StirThemeConfig = {
-  pdf?: boolean
-  crumbs?: boolean
+  showPdf?: boolean
+  showBreadcrumbs?: boolean
   loadingIndicator?: string | false
-  h1?: ClassValue
+  heading?: ClassValue
   container?: ClassValue
   header?: ClassValue
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
+  frontPage?: StirThemeFrontPageConfig
   socials?: StirThemeSocialConfig[]
   footer?: StirThemeFooterConfig
   media?: StirThemeMediaConfig
   carousel?: StirThemeCarouselConfig
-  modal?: StirThemeModalConfig
+  mediaModal?: StirThemeModalConfig
   overlay?: StirThemeOverlayConfig
   webform?: StirThemeWebformConfig
   turnstile?: StirThemeTurnstileConfig
@@ -399,18 +403,19 @@ type ResolvedStirThemeCardConfig = StirThemeCardConfig & {
 }
 
 type ResolvedStirThemeConfig = StirThemeConfig & {
-  pdf: boolean
-  crumbs: boolean
-  h1: ClassValue
+  showPdf: boolean
+  showBreadcrumbs: boolean
+  heading: ClassValue
   container: ClassValue
   header: ClassValue
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
+  frontPage: StirThemeFrontPageConfig
   socials: StirThemeSocialConfig[]
   footer: StirThemeFooterConfig
   media: ResolvedStirThemeMediaConfig
   carousel: ResolvedStirThemeCarouselConfig
-  modal: ResolvedStirThemeModalConfig
+  mediaModal: ResolvedStirThemeModalConfig
   overlay: StirThemeOverlayConfig
   webform: ResolvedStirThemeWebformConfig
   turnstile: StirThemeTurnstileConfig

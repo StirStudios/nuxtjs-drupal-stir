@@ -16,8 +16,8 @@ const props = defineProps<{
 const { emitFormInput, emitFormChange } = useFormField()
 const { webform } = useAppConfig().stirTheme
 const portal = useOverlayPortal()
-const isMaterial = computed(() => webform.variant === 'material')
-const buttonVariant = computed(() => resolveUiButtonVariant(webform.variant, 'outline'))
+const isMaterial = computed(() => webform.fieldVariant === 'material')
+const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = Number(props.field['#multiple']) || 1
 
