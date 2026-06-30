@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
+import { useEventListener } from '@vueuse/core'
 import type { VNode } from 'vue'
 import { cloneVNode } from 'vue'
 import type {
@@ -351,14 +352,12 @@ function handlePageHide() {
 
 onMounted(() => {
   restoreScrollPosition()
-  window.addEventListener('popstate', markHistoryNavigation)
-  window.addEventListener('pagehide', handlePageHide)
+  useEventListener(window, 'popstate', markHistoryNavigation)
+  useEventListener(window, 'pagehide', handlePageHide)
 })
 
 onBeforeUnmount(() => {
   saveScrollPosition()
-  window.removeEventListener('popstate', markHistoryNavigation)
-  window.removeEventListener('pagehide', handlePageHide)
 })
 </script>
 
