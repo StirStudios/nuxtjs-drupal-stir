@@ -6,9 +6,12 @@ import type { EditAction, EditActionKey } from '~/types/EditControls'
 import type {
   DrupalMediaSlotNode,
   DrupalMediaSlotsToolkit,
-  DrupalMediaType,
   NormalizedDrupalMediaNodeProps,
 } from '~/types'
+import {
+  drupalMediaComponentName,
+  normalizeDrupalMediaType,
+} from '../../../utils/drupalMediaTypes'
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 
@@ -31,24 +34,12 @@ const emit = defineEmits<{
 
 const theme = useAppConfig().stirTheme
 
-function toDrupalMediaType(value: unknown): DrupalMediaType {
-  return (
-    value === 'audio' ||
-    value === 'document' ||
-    value === 'image' ||
-    value === 'link' ||
-    value === 'video'
-  )
-    ? value
-    : 'image'
-}
-
 const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
   const raw = props.tk.propsOf(props.node)
 
   return {
     ...raw,
-    type: toDrupalMediaType(raw.type),
+    type: normalizeDrupalMediaType(raw.type),
   }
 })
 const overlayImageProps = computed(() => {
@@ -76,15 +67,9 @@ const handleEditActionSelect = (key: EditActionKey) => {
   emit('edit-action-select', key)
 }
 
-const componentMap: Record<DrupalMediaType, Component> = {
-  image: resolveComponent('MediaImage') as Component,
-  video: resolveComponent('MediaVideo') as Component,
-  document: resolveComponent('MediaDocument') as Component,
-  audio: resolveComponent('MediaAudio') as Component,
-  link: resolveComponent('MediaLink') as Component,
-}
-
-const mediaComponent = computed(() => componentMap[mediaProps.value.type])
+const mediaComponent = computed(
+  () => resolveComponent(drupalMediaComponentName(mediaProps.value.type)) as Component,
+)
 
 const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } =
   useRevealMotionConfig()

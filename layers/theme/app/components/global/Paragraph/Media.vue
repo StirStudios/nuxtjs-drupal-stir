@@ -7,8 +7,11 @@ import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
 import type {
   DrupalMediaSlotNode,
   DrupalMediaSlotsToolkit,
-  DrupalMediaType,
 } from '~/types'
+import {
+  drupalMediaComponentName,
+  normalizeDrupalMediaType,
+} from '../../../utils/drupalMediaTypes'
 import { unrefElement, useElementSize, useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -48,16 +51,8 @@ const slotMedia = computed(() => tk.mediaItems())
 
 type MediaNode = NonNullable<(typeof slotMedia.value)[number]>
 
-const componentMap: Record<DrupalMediaType, string> = {
-  image: 'MediaImage',
-  video: 'MediaVideo',
-  document: 'MediaDocument',
-  audio: 'MediaAudio',
-  link: 'MediaLink',
-}
-
-function mediaComponentFor(type: DrupalMediaType) {
-  return componentMap[type]
+function mediaComponentFor(type: unknown) {
+  return drupalMediaComponentName(type)
 }
 
 const getMediaItemKey = (node: MediaNode, index: number) => {
@@ -127,13 +122,15 @@ const gap = computed(() => props.masonry?.gap?.default ?? 16)
 const isImageGallery = computed(
   () =>
     slotMediaOrdered.value.length > 1 &&
-    slotMediaOrdered.value.every((node) => tk.propsOf(node).type === 'image'),
+    slotMediaOrdered.value.every(
+      (node) => normalizeDrupalMediaType(tk.propsOf(node).type) === 'image',
+    ),
 )
 const isVisualGallery = computed(
   () =>
     slotMediaOrdered.value.length > 1 &&
     slotMediaOrdered.value.every((node) => {
-      const type = tk.propsOf(node).type
+      const type = normalizeDrupalMediaType(tk.propsOf(node).type)
 
       return type === 'image' || type === 'video'
     }),

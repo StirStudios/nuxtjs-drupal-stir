@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { VNode } from 'vue'
 import { h, ref } from 'vue'
 import { useMediaModal } from '../../layers/theme/app/composables/useMediaModal'
+import {
+  drupalMediaComponentName,
+  normalizeDrupalMediaType,
+} from '../../layers/theme/app/utils/drupalMediaTypes'
 
 describe('useMediaModal', () => {
   it('normalizes supported media items for modal rendering', () => {
@@ -50,5 +54,24 @@ describe('useMediaModal', () => {
     } as never)
 
     expect(modal.itemsOrdered.value[0]?.type).toBe('image')
+  })
+
+  it('normalizes media types through the shared Drupal media helper', () => {
+    expect(normalizeDrupalMediaType('audio')).toBe('audio')
+    expect(normalizeDrupalMediaType('document')).toBe('document')
+    expect(normalizeDrupalMediaType('image')).toBe('image')
+    expect(normalizeDrupalMediaType('link')).toBe('link')
+    expect(normalizeDrupalMediaType('video')).toBe('video')
+    expect(normalizeDrupalMediaType('unknown')).toBe('image')
+    expect(normalizeDrupalMediaType(undefined)).toBe('image')
+  })
+
+  it('resolves media component names from normalized media types', () => {
+    expect(drupalMediaComponentName('audio')).toBe('MediaAudio')
+    expect(drupalMediaComponentName('document')).toBe('MediaDocument')
+    expect(drupalMediaComponentName('image')).toBe('MediaImage')
+    expect(drupalMediaComponentName('link')).toBe('MediaLink')
+    expect(drupalMediaComponentName('video')).toBe('MediaVideo')
+    expect(drupalMediaComponentName('unknown')).toBe('MediaImage')
   })
 })

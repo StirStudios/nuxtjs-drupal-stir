@@ -1,25 +1,11 @@
 import type { Ref, VNode } from 'vue'
 import { computed, ref } from 'vue'
 import type { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import type {
-  DrupalMediaType,
-  NormalizedDrupalMediaNodeProps,
-} from '~/types'
+import type { NormalizedDrupalMediaNodeProps } from '~/types'
+import { normalizeDrupalMediaType } from '../utils/drupalMediaTypes'
 
 export type ModalMediaItem = NormalizedDrupalMediaNodeProps & {
   key: string
-}
-
-function toDrupalMediaType(value: unknown): DrupalMediaType {
-  return (
-    value === 'audio' ||
-    value === 'document' ||
-    value === 'image' ||
-    value === 'link' ||
-    value === 'video'
-  )
-    ? value
-    : 'image'
 }
 
 export function useMediaModal(
@@ -32,7 +18,7 @@ export function useMediaModal(
   const itemsOrdered = computed<ModalMediaItem[]>(() =>
     slotMedia.value.map((vnode, i) => {
       const props = tk.propsOf(vnode) as Record<string, unknown>
-      const type = toDrupalMediaType(props.type)
+      const type = normalizeDrupalMediaType(props.type)
       const mid = typeof props.mid === 'string' ? props.mid : undefined
       const src = typeof props.src === 'string' ? props.src : undefined
       const item: ModalMediaItem = {
