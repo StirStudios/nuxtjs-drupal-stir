@@ -129,6 +129,7 @@ Behavior notes:
 
 See [Auth Integration Guide](./docs/auth-integration.md) for endpoint contracts, deployment notes, and rate-limit recommendations.
 See [Validation Architecture](./docs/validation.md) for Yup validation flow across webforms and auth/account forms.
+See [Drupal Downstream Contracts](./docs/drupal-downstream-contracts.md) for app-context, Drupal view, media, and theme override expectations.
 
 ## 🎨 Styling Conventions
 
