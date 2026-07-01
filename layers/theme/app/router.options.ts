@@ -102,8 +102,6 @@ export default <RouterOptions>{
         : { top: 0 }
     }
 
-    await waitForRoutePageFinish(to.path, from.path)
-
     return { top: 0 }
   },
 }
