@@ -104,13 +104,16 @@ watch(() => props.text, (value) => {
       </template>
 
       <template v-else-if="safeTextHtml">
-        <div :class="[classes, richTextClass, 'relative'].filter(Boolean).join(' ')">
+        <div class="relative">
           <Motion
             :key="`text-${paragraphId}-${revealMotionKey}`"
             as-child
             v-bind="motionProps"
           >
-            <div v-html="safeTextHtml" />
+            <div
+              :class="[classes, richTextClass].filter(Boolean).join(' ')"
+              v-html="safeTextHtml"
+            />
           </Motion>
 
           <LazyEditControls
