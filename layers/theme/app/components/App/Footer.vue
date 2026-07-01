@@ -22,7 +22,10 @@ type FooterRenderSection = {
   class: string
 }
 
-const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
+const {
+  data: appContext,
+  execute: loadAppFooterContext,
+} = await useAppFooterContext({ immediate: false })
 
 const toFooterLayout = (value: unknown): FooterLayout => {
   return value === 'columns' || value === 'stacked' ? value : 'default'
@@ -72,12 +75,12 @@ const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() => {
 const needsAppContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
 
 if (needsAppContext.value) {
-  await loadAppContext()
+  await loadAppFooterContext()
 }
 
 watch(needsAppContext, (needsContext) => {
   if (needsContext) {
-    void loadAppContext()
+    void loadAppFooterContext()
   }
 })
 

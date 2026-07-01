@@ -83,10 +83,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
   extends: ['./layers/core', './layers/theme', './layers/auth'],
 
-  features: {
-    inlineStyles: true,
-  },
-
   app: {
     head: {
       htmlAttrs: {
