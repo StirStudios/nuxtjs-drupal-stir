@@ -76,8 +76,6 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
-- `NUXT_SITEMAP_SWR`: Optional route cache switch; set to `'true'` to apply SWR route rules to URLs returned by the Drupal sitemap
-- `NUXT_SITEMAP_SWR_TTL`: Optional SWR TTL in seconds for sitemap routes; defaults to `300`
 - `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
@@ -89,7 +87,6 @@ Notes:
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 - `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
 - Sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
-- Sitemap SWR is opt-in and only generated from `DRUPAL_URL/api/sitemap`; if the sitemap is unavailable or `NUXT_SITEMAP_SWR` is not `'true'`, no sitemap-derived route rules are added.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 
 ## Auth + Account Integration (stir_account)
@@ -126,6 +123,7 @@ Behavior notes:
 
 - `auth.accountEnabled: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
 - Client auth state comes from `/api/auth/session` only.
+- Requests with Drupal `SESS*`/`SSESS*` cookies skip SSR for page routes and return `Cache-Control: private, no-store, max-age=0`; anonymous requests keep normal SSR for SEO.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
 - Password reset and verification links are backend-signed and validated before submit.
 - Turnstile tokens are required in auth form submissions when enabled by backend policy.
