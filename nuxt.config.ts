@@ -55,15 +55,21 @@ type SitemapInputContext = {
 
 type RouteRules = Record<string, Record<string, unknown>>
 
-function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
+function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
   const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
+
+  return loc ? String(loc) : null
+}
+
+function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
+  const loc = sitemapEntryLoc(entry)
 
   if (!loc) {
     return null
   }
 
   try {
-    const url = new URL(String(loc), 'https://example.com')
+    const url = new URL(loc, 'https://example.com')
     const pathname =
       url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
 
@@ -108,6 +114,24 @@ function routePathFromSitemapLoc(loc: string): string | null {
   }
 }
 
+function sitemapLocsFromSource(source: string): string[] {
+  try {
+    const urls = JSON.parse(source) as unknown
+
+    if (Array.isArray(urls)) {
+      return urls
+        .map((entry) => sitemapEntryLoc(entry as SitemapInputEntry))
+        .filter((loc): loc is string => loc !== null)
+    }
+  } catch {
+    // Fall back to XML parsing below.
+  }
+
+  return [...source.matchAll(/<loc>(.*?)<\/loc>/gims)]
+    .map((match) => match[1])
+    .filter((loc): loc is string => Boolean(loc))
+}
+
 async function loadSitemapSwrRouteRules(): Promise<RouteRules> {
   if (!sitemapSwrEnabled || !Number.isFinite(sitemapSwrTtl)) {
     return {}
@@ -131,13 +155,11 @@ async function loadSitemapSwrRouteRules(): Promise<RouteRules> {
       return {}
     }
 
-    const sitemapXml = await response.text()
-    const locs = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/gims)]
+    const sitemapSourceText = await response.text()
     const routeRules: RouteRules = {}
 
-    for (const match of locs) {
-      const loc = match[1]
-      const pathname = loc ? routePathFromSitemapLoc(loc.trim()) : null
+    for (const loc of sitemapLocsFromSource(sitemapSourceText)) {
+      const pathname = routePathFromSitemapLoc(loc.trim())
 
       if (pathname) {
         routeRules[pathname] = { swr: sitemapSwrTtl }
