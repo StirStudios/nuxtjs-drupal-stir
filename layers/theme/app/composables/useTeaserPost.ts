@@ -39,8 +39,23 @@ export function useTeaserPost(
     const source = unref(input)
     const raw = isRecord(source) ? source : {}
     const props = isRecord(raw.props) ? raw.props : {}
-    const media = isRecord(raw.media) ? raw.media : {}
-    const text = typeof raw.text === 'string' ? raw.text : ''
+    const rawMedia = Array.isArray(raw.media)
+      ? raw.media.find(isRecord)
+      : raw.media
+    const rawMediaRecord = isRecord(rawMedia) ? rawMedia : {}
+    const rawMediaProps = isRecord(rawMediaRecord.props) ? rawMediaRecord.props : {}
+    const media = isRecord(rawMediaProps) && Object.keys(rawMediaProps).length > 0
+      ? rawMediaProps
+      : isRecord(rawMedia)
+        ? rawMedia
+        : isRecord(props.media)
+          ? props.media
+          : {}
+    const text = typeof raw.text === 'string'
+      ? raw.text
+      : typeof props.text === 'string'
+        ? props.text
+        : ''
 
     return {
       props,
