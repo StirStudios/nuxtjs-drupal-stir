@@ -16,12 +16,6 @@ const sitemapExcludedRoutes = [
   '/auth/**',
   '/login',
 ]
-const sitemapSwrEnabled =
-  process.env.NUXT_SITEMAP_SWR === 'true' && sitemapSources.length > 0
-const sitemapSwrTtl = Number.parseInt(
-  process.env.NUXT_SITEMAP_SWR_TTL || '300',
-  10,
-)
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
@@ -49,15 +43,7 @@ const sitemapModuleOptions = {
   ],
 }
 
-type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
-
 type RouteRules = Record<string, Record<string, unknown>>
-
-function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
-  const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
-
-  return loc ? String(loc) : null
-}
 
 function sitemapCanonicalKey(loc: string): string | null {
   try {
@@ -114,84 +100,6 @@ function dedupeResolvedSitemapUrls(
 
   return deduped
 }
-
-function routePathFromSitemapLoc(loc: string): string | null {
-  try {
-    const url = new URL(loc.replaceAll('&amp;', '&'), drupalUrl)
-    const pathname =
-      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
-
-    if (pathname.startsWith('/api/') || pathname.startsWith('/_nuxt/')) {
-      return null
-    }
-
-    return pathname
-  } catch {
-    return null
-  }
-}
-
-function sitemapLocsFromSource(source: string): string[] {
-  try {
-    const urls = JSON.parse(source) as unknown
-
-    if (Array.isArray(urls)) {
-      return urls
-        .map((entry) => sitemapEntryLoc(entry as SitemapInputEntry))
-        .filter((loc): loc is string => loc !== null)
-    }
-  } catch {
-    // Fall back to XML parsing below.
-  }
-
-  return [...source.matchAll(/<loc>(.*?)<\/loc>/gims)]
-    .map((match) => match[1])
-    .filter((loc): loc is string => Boolean(loc))
-}
-
-async function loadSitemapSwrRouteRules(): Promise<RouteRules> {
-  if (!sitemapSwrEnabled || !Number.isFinite(sitemapSwrTtl)) {
-    return {}
-  }
-
-  const sitemapSource = sitemapSources[0]
-
-  if (!sitemapSource) {
-    return {}
-  }
-
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 3000)
-
-  try {
-    const response = await fetch(sitemapSource, {
-      signal: controller.signal,
-    })
-
-    if (!response.ok) {
-      return {}
-    }
-
-    const sitemapSourceText = await response.text()
-    const routeRules: RouteRules = {}
-
-    for (const loc of sitemapLocsFromSource(sitemapSourceText)) {
-      const pathname = routePathFromSitemapLoc(loc.trim())
-
-      if (pathname) {
-        routeRules[pathname] = { swr: sitemapSwrTtl }
-      }
-    }
-
-    return routeRules
-  } catch {
-    return {}
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-const sitemapSwrRouteRules = await loadSitemapSwrRouteRules()
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
@@ -290,7 +198,6 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    ...sitemapSwrRouteRules,
     '/account/**': {
       robots: false,
     },
