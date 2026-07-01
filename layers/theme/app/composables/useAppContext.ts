@@ -38,6 +38,7 @@ const serverAppContextRequests = new WeakMap<
   object,
   Map<string, Promise<AppContextPayload>>
 >()
+const appContextRequests = new Map<string, Promise<AppContextPayload>>()
 
 export function appContextQuery(path = '/') {
   return { path: path || '/' }
@@ -94,9 +95,25 @@ async function fetchSharedAppContext(path: string): Promise<AppContextPayload> {
     }
   }
 
-  return $fetch<AppContextPayload>('/api/app-context', {
+  const cached = appContextRequests.get(normalizedPath)
+
+  if (cached) {
+    return cached
+  }
+
+  const request = $fetch<AppContextPayload>('/api/app-context', {
     query: appContextQuery(normalizedPath),
   })
+
+  appContextRequests.set(normalizedPath, request)
+
+  request.finally(() => {
+    if (appContextRequests.get(normalizedPath) === request) {
+      appContextRequests.delete(normalizedPath)
+    }
+  })
+
+  return request
 }
 
 export function useAppFooterContext(options: AppContextOptions = {}) {
