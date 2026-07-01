@@ -43,7 +43,11 @@ defineSlots<{
 
 const slots = useSlots()
 const teaser = useNodeTeaser(slots)
-const isTeaser = computed(() => props.type?.includes('teaser'))
+const isTeaser = computed(() => {
+  const type = props.type || ''
+
+  return ['teaser', 'listing', 'card'].some((mode) => type.includes(mode))
+})
 const isArticle = computed(() => !!props.isArticle)
 const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
 </script>

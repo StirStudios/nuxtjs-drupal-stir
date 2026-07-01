@@ -190,6 +190,14 @@ function getRenderedRows(): RenderedViewRow[] {
   }))
 }
 
+function getCarouselRows(): unknown[] {
+  if (hasDynamicRows.value) {
+    return dynamicRenderedRows.value.map((row) => renderCustomElements(row.node))
+  }
+
+  return getStaticRows()
+}
+
 watch(
   () => hasDynamicRows.value && dynamicRenderedRows.value.length > 0,
   (value, oldValue) => {
@@ -414,7 +422,7 @@ onBeforeUnmount(() => {
     :carousel-indicators="carouselIndicators"
     :carousel-interval="carouselInterval"
     :grid-items="gridItems"
-    :items="getStaticRows()"
+    :items="getCarouselRows()"
     :randomize="randomizeEnabled"
     :spacing="spacing"
     :width="width"
