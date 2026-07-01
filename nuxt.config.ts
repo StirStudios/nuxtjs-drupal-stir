@@ -210,6 +210,11 @@ export default defineNuxtConfig({
     experimental: {
       asyncContext: true,
     },
+    hooks: {
+      'sitemap:resolved'(ctx: SitemapRenderCtx) {
+        ctx.urls = dedupeResolvedSitemapUrls(ctx.urls)
+      },
+    } as Record<string, (ctx: SitemapRenderCtx) => void>,
   },
 
   devServer: {
@@ -282,12 +287,6 @@ export default defineNuxtConfig({
     entryImportMap: false,
     payloadExtraction: true,
   },
-
-  hooks: {
-    'sitemap:resolved'(ctx: SitemapRenderCtx) {
-      ctx.urls = dedupeResolvedSitemapUrls(ctx.urls)
-    },
-  } as Record<string, (ctx: SitemapRenderCtx) => void>,
 
   routeRules: {
     ...sitemapSwrRouteRules,
