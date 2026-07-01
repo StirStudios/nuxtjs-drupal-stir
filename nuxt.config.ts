@@ -24,6 +24,7 @@ const sitemapSwrTtl = Number.parseInt(
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
+  excludeAppSources: sitemapSources.length > 0,
   exclude: sitemapExcludedRoutes,
   runtimeCacheStorage: { driver: 'memory' },
   cacheMaxAgeSeconds: 0,
@@ -49,53 +50,12 @@ const sitemapModuleOptions = {
 
 type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
 
-type SitemapInputContext = {
-  urls: SitemapInputEntry[]
-}
-
 type RouteRules = Record<string, Record<string, unknown>>
 
 function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
   const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
 
   return loc ? String(loc) : null
-}
-
-function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
-  const loc = sitemapEntryLoc(entry)
-
-  if (!loc) {
-    return null
-  }
-
-  try {
-    const url = new URL(loc, 'https://example.com')
-    const pathname =
-      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
-
-    return url.search ? pathname + url.search : pathname
-  } catch {
-    return null
-  }
-}
-
-function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
-  const seen = new Set<string>()
-
-  return urls.filter((entry) => {
-    const key = sitemapDedupeKey(entry)
-
-    if (key === null) {
-      return true
-    }
-
-    if (seen.has(key)) {
-      return false
-    }
-
-    seen.add(key)
-    return true
-  })
 }
 
 function routePathFromSitemapLoc(loc: string): string | null {
@@ -266,12 +226,6 @@ export default defineNuxtConfig({
     entryImportMap: false,
     payloadExtraction: true,
   },
-
-  hooks: {
-    'sitemap:input'(ctx: SitemapInputContext) {
-      ctx.urls = dedupeSitemapUrls(ctx.urls)
-    },
-  } as Record<string, (ctx: SitemapInputContext) => void>,
 
   routeRules: {
     ...sitemapSwrRouteRules,
