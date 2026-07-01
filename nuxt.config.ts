@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
+import type { ResolvedSitemapUrl, SitemapRenderCtx } from '@nuxtjs/sitemap'
 
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
@@ -24,7 +25,6 @@ const sitemapSwrTtl = Number.parseInt(
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
-  excludeAppSources: sitemapSources.length > 0,
   exclude: sitemapExcludedRoutes,
   runtimeCacheStorage: { driver: 'memory' },
   cacheMaxAgeSeconds: 0,
@@ -56,6 +56,62 @@ function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
   const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
 
   return loc ? String(loc) : null
+}
+
+function sitemapCanonicalKey(loc: string): string | null {
+  try {
+    const url = new URL(
+      loc.replaceAll('&amp;', '&'),
+      process.env.NUXT_URL || 'https://example.com',
+    )
+    const pathname =
+      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
+
+    return url.search ? pathname + url.search : pathname
+  } catch {
+    return null
+  }
+}
+
+function sitemapMetadataScore(entry: ResolvedSitemapUrl): number {
+  return Number(Boolean(entry.lastmod)) +
+    Number(Boolean(entry.changefreq)) +
+    Number(entry.priority !== undefined)
+}
+
+function dedupeResolvedSitemapUrls(
+  urls: ResolvedSitemapUrl[],
+): ResolvedSitemapUrl[] {
+  const deduped: ResolvedSitemapUrl[] = []
+  const indexes = new Map<string, number>()
+
+  for (const entry of urls) {
+    const key = sitemapCanonicalKey(entry.loc)
+
+    if (key === null) {
+      deduped.push(entry)
+      continue
+    }
+
+    const existingIndex = indexes.get(key)
+
+    if (existingIndex === undefined) {
+      indexes.set(key, deduped.length)
+      deduped.push(entry)
+      continue
+    }
+
+    const existingEntry = deduped[existingIndex]
+
+    if (
+      existingEntry &&
+      sitemapMetadataScore(entry) > sitemapMetadataScore(existingEntry)
+    ) {
+      deduped[existingIndex] = entry
+    }
+  }
+
+  return deduped
 }
 
 function routePathFromSitemapLoc(loc: string): string | null {
@@ -226,6 +282,12 @@ export default defineNuxtConfig({
     entryImportMap: false,
     payloadExtraction: true,
   },
+
+  hooks: {
+    'sitemap:resolved'(ctx: SitemapRenderCtx) {
+      ctx.urls = dedupeResolvedSitemapUrls(ctx.urls)
+    },
+  } as Record<string, (ctx: SitemapRenderCtx) => void>,
 
   routeRules: {
     ...sitemapSwrRouteRules,
