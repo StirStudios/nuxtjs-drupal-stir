@@ -25,6 +25,7 @@ const sitemapSwrTtl = Number.parseInt(
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
+  excludeAppSources: ['nuxt:route-rules'],
   exclude: sitemapExcludedRoutes,
   runtimeCacheStorage: { driver: 'memory' },
   cacheMaxAgeSeconds: 0,
