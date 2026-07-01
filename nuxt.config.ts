@@ -10,6 +10,11 @@ const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = process.env.DRUPAL_URL || ''
 const sitemapSources = drupalUrl ? [`${drupalUrl}/api/sitemap`] : []
+const sitemapExcludedRoutes = [
+  '/account/**',
+  '/auth/**',
+  '/login',
+]
 const sitemapSwrEnabled =
   process.env.NUXT_SITEMAP_SWR === 'true' && sitemapSources.length > 0
 const sitemapSwrTtl = Number.parseInt(
@@ -19,7 +24,7 @@ const sitemapSwrTtl = Number.parseInt(
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
-  exclude: ['/login'],
+  exclude: sitemapExcludedRoutes,
   runtimeCacheStorage: { driver: 'memory' },
   cacheMaxAgeSeconds: 0,
   xslColumns: [
@@ -248,6 +253,12 @@ export default defineNuxtConfig({
 
   routeRules: {
     ...sitemapSwrRouteRules,
+    '/account/**': {
+      robots: false,
+    },
+    '/auth/**': {
+      robots: false,
+    },
     '/login': {
       robots: false,
     },
