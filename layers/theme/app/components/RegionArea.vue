@@ -5,7 +5,10 @@ const { renderCustomElements, getPage } = useDrupalCe()
 const page = getPage()
 const props = defineProps<{ area: string }>()
 
-const { data: appContext, execute: loadAppContext } = await useAppContext({ immediate: false })
+const {
+  data: appContextBlocks,
+  execute: loadAppContextBlocks,
+} = await useAppRegionBlocks(() => props.area, { immediate: false })
 
 function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
   if (Array.isArray(raw)) return raw as AppContextBlock[]
@@ -15,24 +18,12 @@ function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
   return []
 }
 
-const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
 const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
-const needsAppContext = computed(() => !hasPageBlocksPayload.value)
 
-if (needsAppContext.value) {
-  await loadAppContext()
-}
-
-watch(needsAppContext, (needsContext) => {
-  if (needsContext) {
-    void loadAppContext()
-  }
-})
+await loadAppContextBlocks()
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
-  if (hasPageBlocksPayload.value) return pageBlocks.value
-
-  return normalizeRegionBlocks(appContext.value?.blocks?.[props.area])
+  return appContextBlocks.value?.length ? appContextBlocks.value : pageBlocks.value
 })
 </script>
 

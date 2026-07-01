@@ -93,7 +93,7 @@ const pdfUrl = computed(() =>
         :label="pdfTitle"
         :size="btnSize"
         :variant="btnVariant"
-        @click="open = true"
+        @click="() => { open = true }"
       />
 
       <UButton

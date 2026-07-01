@@ -19,7 +19,7 @@ const hideToggle = computed(() =>
       :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
       size="lg"
       variant="ghost"
-      @click="isDark = !isDark"
+      @click="() => { isDark = !isDark }"
     />
 
     <template #fallback>

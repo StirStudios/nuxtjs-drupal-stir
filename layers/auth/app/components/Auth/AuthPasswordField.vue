@@ -174,7 +174,7 @@ function defaultPasswordRequirements(policy = auth.value.passwordPolicy): AuthPa
           size="sm"
           type="button"
           variant="link"
-          @click="show = !show"
+          @click="() => { show = !show }"
         />
       </template>
     </UInput>
