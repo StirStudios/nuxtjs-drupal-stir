@@ -10,6 +10,12 @@ const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = process.env.DRUPAL_URL || ''
 const sitemapSources = drupalUrl ? [`${drupalUrl}/api/sitemap`] : []
+const sitemapSwrEnabled =
+  process.env.NUXT_SITEMAP_SWR === 'true' && sitemapSources.length > 0
+const sitemapSwrTtl = Number.parseInt(
+  process.env.NUXT_SITEMAP_SWR_TTL || '300',
+  10,
+)
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = {
   sources: sitemapSources,
@@ -41,6 +47,8 @@ type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
 type SitemapInputContext = {
   urls: SitemapInputEntry[]
 }
+
+type RouteRules = Record<string, Record<string, unknown>>
 
 function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
   const loc = typeof entry === 'string' ? entry : entry.loc || entry.url
@@ -78,6 +86,68 @@ function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
     return true
   })
 }
+
+function routePathFromSitemapLoc(loc: string): string | null {
+  try {
+    const url = new URL(loc.replaceAll('&amp;', '&'), drupalUrl)
+    const pathname =
+      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
+
+    if (pathname.startsWith('/api/') || pathname.startsWith('/_nuxt/')) {
+      return null
+    }
+
+    return pathname
+  } catch {
+    return null
+  }
+}
+
+async function loadSitemapSwrRouteRules(): Promise<RouteRules> {
+  if (!sitemapSwrEnabled || !Number.isFinite(sitemapSwrTtl)) {
+    return {}
+  }
+
+  const sitemapSource = sitemapSources[0]
+
+  if (!sitemapSource) {
+    return {}
+  }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 3000)
+
+  try {
+    const response = await fetch(sitemapSource, {
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      return {}
+    }
+
+    const sitemapXml = await response.text()
+    const locs = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/gims)]
+    const routeRules: RouteRules = {}
+
+    for (const match of locs) {
+      const loc = match[1]
+      const pathname = loc ? routePathFromSitemapLoc(loc.trim()) : null
+
+      if (pathname) {
+        routeRules[pathname] = { swr: sitemapSwrTtl }
+      }
+    }
+
+    return routeRules
+  } catch {
+    return {}
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+const sitemapSwrRouteRules = await loadSitemapSwrRouteRules()
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
@@ -177,10 +247,11 @@ export default defineNuxtConfig({
   } as Record<string, (ctx: SitemapInputContext) => void>,
 
   routeRules: {
+    ...sitemapSwrRouteRules,
     '/login': {
       robots: false,
     },
-  } as Record<string, Record<string, unknown>>,
+  } as RouteRules,
 
   icon: {
     clientBundle: {
@@ -213,7 +284,6 @@ export default defineNuxtConfig({
     [
       'nuxt-vitalizer',
       {
-        disableStylesheets: 'entry',
         disablePrefetchLinks: true,
         disablePreloadLinks: false,
       },
@@ -242,8 +312,7 @@ export default defineNuxtConfig({
       'nuxtjs-drupal-ce',
       {
         drupalBaseUrl: drupalUrl,
-        menuBaseUrl:
-          process.env.NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL || drupalUrl,
+        menuBaseUrl: drupalUrl,
         exposeAPIRouteRules: true,
         disableFormHandler: true,
         enableComponentPreview: false,
