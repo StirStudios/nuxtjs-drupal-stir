@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
+import type { ResolvedSitemapUrl, SitemapRenderCtx } from '@nuxtjs/sitemap'
 
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
@@ -49,10 +50,6 @@ const sitemapModuleOptions = {
 
 type SitemapInputEntry = string | { loc?: string | URL; url?: string | URL }
 
-type SitemapInputContext = {
-  urls: SitemapInputEntry[]
-}
-
 type RouteRules = Record<string, Record<string, unknown>>
 
 function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
@@ -61,15 +58,12 @@ function sitemapEntryLoc(entry: SitemapInputEntry): string | null {
   return loc ? String(loc) : null
 }
 
-function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
-  const loc = sitemapEntryLoc(entry)
-
-  if (!loc) {
-    return null
-  }
-
+function sitemapCanonicalKey(loc: string): string | null {
   try {
-    const url = new URL(loc, 'https://example.com')
+    const url = new URL(
+      loc.replaceAll('&amp;', '&'),
+      process.env.NUXT_URL || 'https://example.com',
+    )
     const pathname =
       url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
 
@@ -79,23 +73,45 @@ function sitemapDedupeKey(entry: SitemapInputEntry): string | null {
   }
 }
 
-function dedupeSitemapUrls<T extends SitemapInputEntry>(urls: T[]): T[] {
-  const seen = new Set<string>()
+function sitemapMetadataScore(entry: ResolvedSitemapUrl): number {
+  return Number(Boolean(entry.lastmod)) +
+    Number(Boolean(entry.changefreq)) +
+    Number(entry.priority !== undefined)
+}
 
-  return urls.filter((entry) => {
-    const key = sitemapDedupeKey(entry)
+function dedupeResolvedSitemapUrls(
+  urls: ResolvedSitemapUrl[],
+): ResolvedSitemapUrl[] {
+  const deduped: ResolvedSitemapUrl[] = []
+  const indexes = new Map<string, number>()
+
+  for (const entry of urls) {
+    const key = sitemapCanonicalKey(entry.loc)
 
     if (key === null) {
-      return true
+      deduped.push(entry)
+      continue
     }
 
-    if (seen.has(key)) {
-      return false
+    const existingIndex = indexes.get(key)
+
+    if (existingIndex === undefined) {
+      indexes.set(key, deduped.length)
+      deduped.push(entry)
+      continue
     }
 
-    seen.add(key)
-    return true
-  })
+    const existingEntry = deduped[existingIndex]
+
+    if (
+      existingEntry &&
+      sitemapMetadataScore(entry) > sitemapMetadataScore(existingEntry)
+    ) {
+      deduped[existingIndex] = entry
+    }
+  }
+
+  return deduped
 }
 
 function routePathFromSitemapLoc(loc: string): string | null {
@@ -268,10 +284,10 @@ export default defineNuxtConfig({
   },
 
   hooks: {
-    'sitemap:input'(ctx: SitemapInputContext) {
-      ctx.urls = dedupeSitemapUrls(ctx.urls)
+    'sitemap:resolved'(ctx: SitemapRenderCtx) {
+      ctx.urls = dedupeResolvedSitemapUrls(ctx.urls)
     },
-  } as Record<string, (ctx: SitemapInputContext) => void>,
+  } as Record<string, (ctx: SitemapRenderCtx) => void>,
 
   routeRules: {
     ...sitemapSwrRouteRules,
