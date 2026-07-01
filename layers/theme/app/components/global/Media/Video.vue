@@ -146,7 +146,7 @@ watch(
   <div
     v-else
     v-bind="attrs"
-    :class="['m-auto max-w-6xl', mediaTheme.base, aspectClass]"
+    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
   >
     <div
       v-if="isProcessing"

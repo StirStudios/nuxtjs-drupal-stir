@@ -256,6 +256,9 @@ type StirThemeFooterConfig = {
 type StirThemeMediaConfig = {
   base?: ClassValue
   rounded?: ClassValue
+  video?: {
+    wrapper?: ClassValue
+  }
   transitions?: Record<string, ClassValue>
   effects?: Record<string, ClassValue>
 } & LooseRecord
@@ -382,6 +385,7 @@ type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
+  video: NonNullable<StirThemeMediaConfig['video']>
   transitions: Record<string, ClassValue>
   effects: Record<string, ClassValue>
 }

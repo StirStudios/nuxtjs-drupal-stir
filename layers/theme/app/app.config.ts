@@ -169,6 +169,9 @@ export default defineAppConfig({
     media: {
       base: 'relative h-full w-full overflow-hidden object-cover',
       rounded: 'rounded-xl',
+      video: {
+        wrapper: 'm-auto max-w-6xl',
+      },
 
       transitions: {
         fast: 'duration-300',
