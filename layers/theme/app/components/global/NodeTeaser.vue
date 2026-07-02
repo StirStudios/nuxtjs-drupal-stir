@@ -7,6 +7,8 @@ defineOptions({
 
 const props = defineProps<{
   title?: string
+  id?: string | number
+  nid?: string | number
   url?: string
   editLink?: string
   created?: string
@@ -15,11 +17,18 @@ const props = defineProps<{
   titleOverlay?: boolean
   showDate?: boolean
   showDescription?: boolean
+  path?: {
+    alias?: string
+  }
 }>()
+
+const href = computed(() =>
+  props.url || props.path?.alias || (props.id || props.nid ? `/node/${props.id || props.nid}` : undefined),
+)
 
 const { post, orientation } = useTeaserPost(props.teaser, {
   title: props.title,
-  url: props.url,
+  url: href.value,
   created: props.created,
   orientation: props.orientation,
   editLink: props.editLink,
