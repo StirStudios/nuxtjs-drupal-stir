@@ -78,7 +78,7 @@ const postUi = computed(() => {
     image: 'object-center duration-800',
     date: 'sr-only',
     title: 'text-white text-lg mb-0',
-    body: 'absolute inset-0 flex items-center justify-center text-center bg-black/50',
+    body: 'pointer-events-none absolute inset-0 flex items-center justify-center text-center bg-black/50',
   }
 })
 
