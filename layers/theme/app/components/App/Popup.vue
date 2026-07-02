@@ -152,7 +152,7 @@ watch(
             color="neutral"
             icon="i-lucide-x"
             variant="solid"
-            @click="open = false"
+            @click="closeModal"
           />
 
           <component

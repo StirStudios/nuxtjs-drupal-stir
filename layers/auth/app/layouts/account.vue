@@ -10,6 +10,10 @@ const pageTitle = computed(() =>
     ? route.meta.accountTitle
     : 'Account',
 )
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
 </script>
 
 <template>
@@ -53,7 +57,7 @@ const pageTitle = computed(() =>
           color="neutral"
           icon="i-lucide-panel-left"
           variant="ghost"
-          @click="sidebarOpen = !sidebarOpen"
+          @click="toggleSidebar"
         />
 
         <span class="text-muted text-sm">{{ pageTitle }}</span>
