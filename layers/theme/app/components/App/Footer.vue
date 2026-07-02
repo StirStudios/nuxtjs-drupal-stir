@@ -4,6 +4,7 @@ import type {
   AppContextFooterMenuItem,
   AppContextSiteInfo,
 } from '~/composables/useAppContext'
+import type { SocialIcon } from '~/types'
 
 type FooterAtom = 'logo' | 'menu' | 'socials' | 'slogan' | 'email' | 'legal' | 'copyright' | 'poweredBy'
 type FooterLayout = 'default' | 'columns' | 'stacked'
@@ -183,7 +184,7 @@ const {
   execute: loadAppFooterContext,
 } = await useAppFooterContext({ immediate: false })
 
-const socialIcons = computed(() => iconsSocialConfig.value ?? [])
+const socialIcons = computed<SocialIcon[]>(() => Array.isArray(iconsSocialConfig.value) ? [...iconsSocialConfig.value] : [])
 
 const pageFooterMenu = computed<AppContextFooterMenuItem[] | undefined>(() =>
   Array.isArray(page.value?.footer_menu) ? page.value?.footer_menu as AppContextFooterMenuItem[] : undefined,
