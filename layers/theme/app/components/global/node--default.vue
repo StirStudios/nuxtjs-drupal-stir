@@ -12,7 +12,7 @@ const props = defineProps<{
   type?: string
   isArticle?: boolean | string
   editLink?: string
-  created: string
+  created?: string
   uid?: string | object
   hide?: boolean | string
 
