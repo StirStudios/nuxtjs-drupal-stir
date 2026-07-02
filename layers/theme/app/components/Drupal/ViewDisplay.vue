@@ -160,7 +160,7 @@ function getStaticRows(options: { teaser?: boolean } = { teaser: true }) {
   return randomizedRowsCache.rows
 }
 
-function getRenderedRows(): RenderedViewRow[] {
+function getRenderedRows(options: { teaser?: boolean } = { teaser: true }): RenderedViewRow[] {
   if (hasDynamicRows.value) {
     return dynamicRenderedRows.value.map((row) => ({
       key: row.key,
@@ -169,7 +169,7 @@ function getRenderedRows(): RenderedViewRow[] {
     }))
   }
 
-  return getStaticRows().map((node, index) => ({
+  return getStaticRows(options).map((node, index) => ({
     key: String(node.key ?? index),
     type: 'static',
     node: node as VNode,
@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
     name="grid"
     :render-custom-elements="renderCustomElements"
     :reveal-motion-key="revealMotionKey"
-    :rows="getRenderedRows()"
+    :rows="getRenderedRows({ teaser: false })"
   />
 
   <WrapGrid
