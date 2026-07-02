@@ -33,6 +33,10 @@ const onSubmitPassword = () => {
   emit('change-password')
 }
 
+const toggleCurrentPassword = () => {
+  showCurrentPassword.value = !showCurrentPassword.value
+}
+
 const validate = (state: {
   currentPassword?: string
   newPassword?: string
@@ -87,7 +91,7 @@ const confirmCancel = () => {
               :icon="showCurrentPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
               size="xs"
               variant="ghost"
-              @click="showCurrentPassword = !showCurrentPassword"
+              @click="toggleCurrentPassword"
             />
           </template>
         </UInput>
