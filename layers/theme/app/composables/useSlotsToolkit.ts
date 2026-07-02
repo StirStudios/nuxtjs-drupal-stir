@@ -1,5 +1,5 @@
 import type { MaybeRefOrGetter, VNode } from 'vue'
-import { isVNode, onMounted, ref, computed, toValue } from 'vue'
+import { Fragment, isVNode, onMounted, ref, computed, toValue } from 'vue'
 
 type SlotMap = Record<string, (() => unknown) | undefined>
 export type VNodePropsRecord = Record<string, unknown>
@@ -12,8 +12,20 @@ export type VNodePredicate = (
 
 function normalizeVNodes(content: unknown): VNode[] {
   const items = Array.isArray(content) ? content : [content]
+  const nodes: VNode[] = []
 
-  return items.filter(isVNode)
+  for (const item of items) {
+    if (!isVNode(item)) continue
+
+    if (item.type === Fragment) {
+      nodes.push(...normalizeVNodes(item.children))
+      continue
+    }
+
+    nodes.push(item)
+  }
+
+  return nodes
 }
 
 function normalizeVNodeSlotValue(slotValue: unknown): VNode[] {
@@ -43,7 +55,7 @@ export function getVNodeChildren(vnode: VNode | undefined): VNode[] {
   }
 
   if (Array.isArray(vnode.children)) {
-    return vnode.children.filter(isVNode)
+    return normalizeVNodes(vnode.children)
   }
 
   if (typeof vnode.children === 'object') {
