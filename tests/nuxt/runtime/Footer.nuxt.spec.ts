@@ -15,15 +15,6 @@ const appFooterContextData = ref({
     slogan: 'Fine food and wine',
   },
 })
-const runtimeConfig = ref({
-  public: {
-    ui: {
-      icons: {
-        provider: 'iconify',
-      },
-    },
-  },
-})
 const appConfig = ref({
   stirTheme: {
     container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
@@ -49,10 +40,6 @@ const appConfig = ref({
   },
 })
 let appFooterContextExecuteCalls = 0
-
-mockNuxtImport('useRuntimeConfig', () => {
-  return () => runtimeConfig.value
-})
 
 mockNuxtImport('useAppConfig', () => {
   return () => appConfig.value
