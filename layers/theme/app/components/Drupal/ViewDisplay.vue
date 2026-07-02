@@ -132,12 +132,16 @@ function rowSignature(rows: VNode[]): string {
   return rows.map((node, index) => String(node.key ?? index)).join('|')
 }
 
-function getOrderedStaticRows() {
-  return resolveSlotRows().map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
+function getOrderedStaticRows(options: { teaser?: boolean } = {}) {
+  const rows = resolveSlotRows()
+
+  if (!options.teaser) return rows
+
+  return rows.map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
 }
 
-function getStaticRows() {
-  const rows = getOrderedStaticRows()
+function getStaticRows(options: { teaser?: boolean } = { teaser: true }) {
+  const rows = getOrderedStaticRows(options)
 
   if (!randomizeEnabled.value || !randomizeRowsOnClient.value) {
     randomizedRowsCache = null
@@ -177,7 +181,7 @@ function getCarouselRows(): unknown[] {
     return dynamicRenderedRows.value.map((row) => renderCustomElements(row.node))
   }
 
-  return getStaticRows()
+  return getStaticRows({ teaser: false })
 }
 
 watch(
