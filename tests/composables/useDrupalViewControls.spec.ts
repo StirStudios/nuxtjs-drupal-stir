@@ -10,6 +10,7 @@ import {
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
+  normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
 } from '../../layers/theme/app/composables/useDrupalViewControls'
 
@@ -40,6 +41,18 @@ describe('useDrupalViewControls helpers', () => {
     expect(normalizeDrupalViewSortOrderValue('asc')).toBe('ASC')
     expect(normalizeDrupalViewSortOrderValue('DESC')).toBe('DESC')
     expect(normalizeDrupalViewSortOrderValue('custom')).toBe('custom')
+  })
+
+  it('normalizes Drupal pager shapes', () => {
+    expect(normalizeDrupalViewPager({ current: '1', total_pages: '3' })).toEqual({
+      current: 1,
+      totalPages: 3,
+    })
+    expect(normalizeDrupalViewPager({ current: 2, totalPages: 4 })).toEqual({
+      current: 2,
+      totalPages: 4,
+    })
+    expect(normalizeDrupalViewPager({ current: 0 })).toBeNull()
   })
 
   it('finds matching view nodes nested in custom element slots', () => {

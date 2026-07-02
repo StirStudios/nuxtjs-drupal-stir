@@ -6,6 +6,12 @@ export interface ViewPager {
   totalPages: number
 }
 
+interface RawViewPager {
+  current?: unknown
+  totalPages?: unknown
+  total_pages?: unknown
+}
+
 export interface ExposedFilter {
   label: string
   queryParamName: string
@@ -71,6 +77,21 @@ export function normalizeDrupalViewSortOrderValue(value: string): string {
   if (normalized === 'desc') return 'DESC'
 
   return value
+}
+
+export function normalizeDrupalViewPager(pager: unknown): ViewPager | null {
+  if (!pager || typeof pager !== 'object') return null
+
+  const candidate = pager as RawViewPager
+  const current = Number(candidate.current)
+  const totalPages = Number(candidate.totalPages ?? candidate.total_pages)
+
+  if (!Number.isFinite(current) || !Number.isFinite(totalPages)) return null
+
+  return {
+    current: Math.max(0, Math.trunc(current)),
+    totalPages: Math.max(0, Math.trunc(totalPages)),
+  }
 }
 
 function firstStringValue(value: string | string[] | undefined): string {
@@ -319,20 +340,8 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   )
   const effectivePager = computed<ViewPager | null>(() => {
     if (dynamicPager.value) return dynamicPager.value
-    const candidate = props.pager as Partial<ViewPager> | undefined
 
-    if (
-      !candidate ||
-      typeof candidate.current !== 'number' ||
-      typeof candidate.totalPages !== 'number'
-    ) {
-      return null
-    }
-
-    return {
-      current: Math.max(0, candidate.current),
-      totalPages: Math.max(0, candidate.totalPages),
-    }
+    return normalizeDrupalViewPager(props.pager)
   })
 
   const normalizedFilters = computed(() =>
@@ -887,7 +896,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
       const viewNodeProps = getDrupalViewNodeProps(viewNode)
 
       dynamicRows.value = getDrupalViewNodeRows(viewNode)
-      dynamicPager.value = (viewNodeProps.pager as ViewPager) ?? {
+      dynamicPager.value = normalizeDrupalViewPager(viewNodeProps.pager) ?? {
         current: page,
         totalPages: 1,
       }
