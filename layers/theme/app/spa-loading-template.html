@@ -1,0 +1,160 @@
+<div class="stir-spa-loader" role="status" aria-live="polite">
+  <div class="stir-spa-loader__panel">
+    <div class="stir-spa-loader__mark" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <p class="stir-spa-loader__title">Loading</p>
+  </div>
+</div>
+
+<style>
+  .stir-spa-loader {
+    --stir-orange: #f26a00;
+    --stir-graphite: #383533;
+    --stir-pearl: #f4f1ee;
+    --stir-sand: #f59a54;
+    --stir-charcoal: #605d5c;
+    --stir-jumbo: #888685;
+
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(242, 106, 0, 0.18), transparent 34rem),
+      radial-gradient(circle at 82% 72%, rgba(245, 154, 84, 0.2), transparent 30rem),
+      linear-gradient(135deg, var(--stir-pearl), #ffffff);
+    color: var(--stir-graphite);
+    font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
+  }
+
+  .stir-spa-loader__panel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: calc(100vw - 2rem);
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(96, 93, 92, 0.28);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 24px 80px rgba(56, 53, 51, 0.18);
+    backdrop-filter: blur(18px);
+  }
+
+  .stir-spa-loader__mark {
+    position: relative;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(242, 106, 0, 0.14);
+  }
+
+  .stir-spa-loader__mark::before {
+    position: absolute;
+    inset: 0.35rem;
+    content: "";
+    border: 2px solid transparent;
+    border-top-color: var(--stir-orange);
+    border-right-color: rgba(245, 154, 84, 0.42);
+    border-radius: inherit;
+    animation: stir-loader-spin 900ms linear infinite;
+  }
+
+  .stir-spa-loader__mark span {
+    position: absolute;
+    width: 0.28rem;
+    height: 0.28rem;
+    border-radius: 999px;
+    background: var(--stir-orange);
+    opacity: 0.36;
+    animation: stir-loader-pulse 1.2s ease-in-out infinite;
+  }
+
+  .stir-spa-loader__mark span:nth-child(1) {
+    transform: translateX(-0.48rem);
+  }
+
+  .stir-spa-loader__mark span:nth-child(2) {
+    animation-delay: 150ms;
+  }
+
+  .stir-spa-loader__mark span:nth-child(3) {
+    transform: translateX(0.48rem);
+    animation-delay: 300ms;
+  }
+
+  .stir-spa-loader__title {
+    margin: 0;
+    color: var(--stir-charcoal);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  @keyframes stir-loader-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes stir-loader-pulse {
+    0%,
+    100% {
+      opacity: 0.22;
+      transform: translateY(0) scale(0.82);
+    }
+
+    50% {
+      opacity: 1;
+      transform: translateY(-0.08rem) scale(1);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .stir-spa-loader {
+      background:
+        radial-gradient(circle at 18% 20%, rgba(242, 106, 0, 0.2), transparent 34rem),
+        radial-gradient(circle at 82% 72%, rgba(245, 154, 84, 0.14), transparent 30rem),
+        linear-gradient(135deg, var(--stir-graphite), #1f1d20);
+      color: var(--stir-pearl);
+    }
+
+    .stir-spa-loader__panel {
+      border-color: rgba(244, 241, 238, 0.16);
+      background: rgba(56, 53, 51, 0.86);
+    }
+
+    .stir-spa-loader__mark {
+      background: rgba(245, 154, 84, 0.14);
+    }
+
+    .stir-spa-loader__mark::before {
+      border-top-color: var(--stir-sand);
+    }
+
+    .stir-spa-loader__mark span {
+      background: var(--stir-sand);
+    }
+
+    .stir-spa-loader__title {
+      color: var(--stir-jumbo);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stir-spa-loader__mark::before,
+    .stir-spa-loader__mark span {
+      animation: none;
+    }
+  }
+</style>
