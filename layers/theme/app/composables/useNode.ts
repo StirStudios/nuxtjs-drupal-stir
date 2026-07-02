@@ -1,5 +1,6 @@
+import { computed } from 'vue'
 import type { VNode } from 'vue'
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import { useSlotsToolkit } from './useSlotsToolkit'
 
 /**
  * Extracts paragraph-like slot data (`section`, `hero`, or custom slots).
@@ -11,13 +12,23 @@ export function useNode(slots: unknown) {
    * Extracts `vnode`, `props`, `text`, and nested `media` from a slot.
    */
   const useParagraph = (slotName: string) => {
-    const vnode = computed<VNode | undefined>(() => {
-      return tk.slot(slotName)[0] ?? undefined
-    })
+    const nodes = computed<VNode[]>(() => tk.all(tk.slot(slotName)))
+    const vnode = computed<VNode | undefined>(() => nodes.value[0] ?? undefined)
+    const textNode = computed<VNode | undefined>(() =>
+      nodes.value.find((node) => {
+        const text = tk.propsOf(node).text
 
-    const props = computed(() => tk.propsOf(vnode.value) ?? {})
+        return typeof text === 'string' && text.trim().length > 0
+      }),
+    )
+    const mediaNode = computed<VNode | undefined>(() =>
+      nodes.value.find((node) => tk.slotChildrenOf(node, 'media').length > 0),
+    )
+    const props = computed(() =>
+      tk.propsOf(textNode.value ?? mediaNode.value ?? vnode.value) ?? {},
+    )
     const mediaProps = computed(() => {
-      const node = vnode.value
+      const node = mediaNode.value
 
       if (!node) return {}
 
@@ -26,9 +37,11 @@ export function useNode(slots: unknown) {
       return tk.propsOf(mediaVNode) ?? {}
     })
 
-    const text = computed(() =>
-      typeof props.value.text === 'string' ? props.value.text : '',
-    )
+    const text = computed(() => {
+      const value = tk.propsOf(textNode.value).text
+
+      return typeof value === 'string' ? value : ''
+    })
 
     return {
       get vnode() {
@@ -88,7 +101,10 @@ export function useNodeTeaser(slots: unknown) {
 
     if (mediaSource) {
       return {
-        props: mediaSource.props ?? {},
+        props: {
+          ...(mediaSource.props ?? {}),
+          ...(textSource?.props ?? {}),
+        },
         media: mediaSource.media ?? {},
         text: textSource?.text ?? '',
       }
