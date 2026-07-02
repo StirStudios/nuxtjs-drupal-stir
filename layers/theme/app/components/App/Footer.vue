@@ -183,6 +183,8 @@ const {
   execute: loadAppFooterContext,
 } = await useAppFooterContext({ immediate: false })
 
+const socialIcons = computed(() => iconsSocialConfig.value ?? [])
+
 const pageFooterMenu = computed<AppContextFooterMenuItem[] | undefined>(() =>
   Array.isArray(page.value?.footer_menu) ? page.value?.footer_menu as AppContextFooterMenuItem[] : undefined,
 )
@@ -226,7 +228,7 @@ const canRenderAtom = computed<FooterAtomVisibility>(() => {
   return {
     logo: showLogo.value,
     menu: footerConfig.value.showMenu && footerMenuItems.value.length > 0,
-    socials: footerConfig.value.showSocials && iconsSocialConfig.length > 0,
+    socials: footerConfig.value.showSocials && socialIcons.value.length > 0,
     slogan: footerConfig.value.showSlogan && Boolean(siteInfo.value?.slogan),
     email: footerConfig.value.showEmail && Boolean(siteInfo.value?.mail),
     legal: (footerConfig.value.showCopyright || footerConfig.value.showPoweredBy)
@@ -251,7 +253,7 @@ const footerAtomProps = computed(() => ({
   config: footerConfig.value,
   menuItems: footerMenuItems.value,
   siteInfo: siteInfo.value,
-  socialIcons: iconsSocialConfig,
+  socialIcons: socialIcons.value,
   showCopyright: footerConfig.value.showCopyright,
   showPoweredBy: footerConfig.value.showPoweredBy,
   showLogo: showLogo.value,
