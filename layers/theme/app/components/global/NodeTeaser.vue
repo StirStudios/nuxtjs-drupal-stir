@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTeaserPost } from '~/composables/useTeaserPost'
+import { resolveDrupalTeaserLink } from '~/composables/useDrupalTeaserLink'
 
 defineOptions({
   inheritAttrs: false,
@@ -23,7 +24,7 @@ const props = defineProps<{
 }>()
 
 const href = computed(() =>
-  props.url || props.path?.alias || (props.id || props.nid ? `/node/${props.id || props.nid}` : undefined),
+  resolveDrupalTeaserLink(props),
 )
 
 const { post, orientation } = useTeaserPost(props.teaser, {
