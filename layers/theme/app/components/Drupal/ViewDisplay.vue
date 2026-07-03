@@ -357,10 +357,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="viewRoot" class="scroll-mt-24">
-    <h2 v-if="title" class="text-highlighted mb-4 text-2xl font-semibold">
-      {{ title }}
-    </h2>
-
     <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
       <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 flex-1">
