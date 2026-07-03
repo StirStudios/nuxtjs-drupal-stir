@@ -2,17 +2,21 @@ import { describe, expect, it } from 'vitest'
 import type { CustomElementNode } from '../../layers/theme/app/types'
 import {
   buildDrupalViewSearchParams,
-  drupalViewLoadErrorMessage,
-  findDrupalViewNode,
-  findDrupalViewNodeInResponse,
-  getDrupalViewNodeRows,
-  isDrupalViewAbortError,
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
   normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
-} from '../../layers/theme/app/composables/useDrupalViewControls'
+} from '../../layers/theme/app/composables/useDrupalViewQuery'
+import {
+  findDrupalViewNode,
+  findDrupalViewNodeInResponse,
+  getDrupalViewNodeRows,
+} from '../../layers/theme/app/composables/useDrupalViewNode'
+import {
+  drupalViewLoadErrorMessage,
+  isDrupalViewAbortError,
+} from '../../layers/theme/app/composables/useDrupalViewErrors'
 
 describe('useDrupalViewControls helpers', () => {
   it('normalizes Drupal exposed filter option shapes', () => {

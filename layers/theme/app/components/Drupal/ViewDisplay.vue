@@ -1,23 +1,12 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
-import { useEventListener } from '@vueuse/core'
 import type { VNode } from 'vue'
-import { cloneVNode } from 'vue'
-import type { CustomElementNode, DrupalViewProps } from '~/types'
+import type { DrupalViewProps } from '~/types'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-
-type RenderedViewRow =
-  | {
-      key: string
-      type: 'dynamic'
-      node: unknown
-    }
-  | {
-      key: string
-      type: 'static'
-      node: VNode
-    }
+import type { RenderedDrupalViewRow } from '~/composables/useDrupalViewRows'
+import { normalizeDynamicDrupalViewRows, withDrupalViewTeaserProps } from '~/composables/useDrupalViewRows'
+import { useDrupalViewScrollRestore } from '~/composables/useDrupalViewScrollRestore'
 
 const props = defineProps<DrupalViewProps>()
 
@@ -26,7 +15,7 @@ const { renderCustomElements } = useDrupalCe()
 defineSlots<{
   rows?(): unknown
   grid?(props: {
-    rows: RenderedViewRow[]
+    rows: RenderedDrupalViewRow[]
     renderCustomElements: typeof renderCustomElements
     getRowMotionProps: typeof getRowMotionProps
     revealMotionKey: typeof revealMotionKey.value
@@ -34,13 +23,9 @@ defineSlots<{
   }): unknown
 }>()
 
-const route = useRoute()
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const viewRoot = useTemplateRef<HTMLElement>('viewRoot')
-const restoredScrollPosition = ref(false)
-const isHistoryNavigation = ref(false)
-const restoreTargetKey = 'stir:view-scroll-restore-target'
 
 const {
   isLoading,
@@ -75,40 +60,7 @@ const randomizeEnabled = computed(() => {
 })
 
 const hasDynamicRows = computed(() => dynamicRows.value !== null)
-const dynamicRenderedRows = computed(() => {
-  const rows = dynamicRows.value
-
-  if (!rows) return []
-
-  return rows.map((row, index) => {
-    if (
-      row &&
-      typeof row === 'object' &&
-      'props' in (row as Record<string, unknown>) &&
-      typeof (row as CustomElementNode).props === 'object'
-    ) {
-      const node = row as CustomElementNode
-      const patched: CustomElementNode = {
-        ...node,
-        props: {
-          isHero: false,
-          ...node.props,
-          type: 'teaser',
-        },
-      }
-
-      return {
-        key: String(node.props?.uuid || node.props?.id || index),
-        node: patched,
-      }
-    }
-
-    return {
-      key: String(index),
-      node: row,
-    }
-  })
-})
+const dynamicRenderedRows = computed(() => normalizeDynamicDrupalViewRows(dynamicRows.value))
 
 function hasRows(): boolean {
   return hasDynamicRows.value
@@ -137,7 +89,7 @@ function getOrderedStaticRows(options: { teaser?: boolean } = {}) {
 
   if (!options.teaser) return rows
 
-  return rows.map((node) => cloneVNode(node as VNode, { isHero: false, type: 'teaser' }, true))
+  return withDrupalViewTeaserProps(rows)
 }
 
 function getStaticRows(options: { teaser?: boolean } = { teaser: true }) {
@@ -160,7 +112,7 @@ function getStaticRows(options: { teaser?: boolean } = { teaser: true }) {
   return randomizedRowsCache.rows
 }
 
-function getRenderedRows(options: { teaser?: boolean } = { teaser: true }): RenderedViewRow[] {
+function getRenderedRows(options: { teaser?: boolean } = { teaser: true }): RenderedDrupalViewRow[] {
   if (hasDynamicRows.value) {
     return dynamicRenderedRows.value.map((row) => ({
       key: row.key,
@@ -198,6 +150,10 @@ onMounted(() => {
 })
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
 const { getRevealDelayMs, getRevealMotionProps, revealMotionKey } = useRevealMotionConfig()
+const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(props, {
+  currentPage,
+  viewRoot,
+})
 
 const getRowMotionProps = (index: number) =>
   getRevealMotionProps(
@@ -206,153 +162,6 @@ const getRowMotionProps = (index: number) =>
     { ssrVisible: true },
   )
 
-function scrollStorageKeyFor(fullPath = route.fullPath) {
-  return [
-    'stir:view-scroll',
-    fullPath,
-    props.viewId || '',
-    props.displayId || '',
-    props.parentUuid || '',
-  ].join(':')
-}
-
-function saveScrollPosition(key = scrollStorageKeyFor()) {
-  if (!import.meta.client) return
-
-  sessionStorage.setItem(
-    key,
-    JSON.stringify({
-      top: window.scrollY,
-      savedAt: Date.now(),
-    }),
-  )
-}
-
-function restoreScrollPosition() {
-  if (
-    !import.meta.client ||
-    restoredScrollPosition.value
-  ) {
-    return
-  }
-
-  const shouldRestore =
-    isHistoryNavigation.value ||
-    sessionStorage.getItem(restoreTargetKey) === route.fullPath
-
-  if (!shouldRestore) return
-
-  const stored = sessionStorage.getItem(scrollStorageKeyFor())
-
-  if (!stored) return
-
-  try {
-    const data = JSON.parse(stored) as { top?: unknown, savedAt?: unknown }
-    const top = typeof data.top === 'number' ? data.top : null
-    const savedAt = typeof data.savedAt === 'number' ? data.savedAt : 0
-
-    if (top === null || Date.now() - savedAt > 30 * 60 * 1000) {
-      sessionStorage.removeItem(scrollStorageKeyFor())
-      return
-    }
-
-    restoredScrollPosition.value = true
-    isHistoryNavigation.value = false
-    sessionStorage.removeItem(restoreTargetKey)
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.scrollTo({
-          top,
-          behavior: 'instant',
-        })
-      })
-    })
-  }
-  catch {
-    sessionStorage.removeItem(scrollStorageKeyFor())
-  }
-}
-
-function shouldRestoreScrollForHref(href: string): boolean {
-  if (!href.startsWith('/') || href === route.path) return false
-  if (!props.restoreScrollLinkPattern) return true
-
-  try {
-    return new RegExp(props.restoreScrollLinkPattern).test(href)
-  }
-  catch {
-    return false
-  }
-}
-
-function handleViewClick(event: MouseEvent) {
-  if (!import.meta.client) return
-
-  const target = event.target instanceof Element ? event.target : null
-  const link = target?.closest('a[href]')
-  const href = link?.getAttribute('href') || ''
-
-  if (!shouldRestoreScrollForHref(href)) return
-
-  saveScrollPosition()
-  sessionStorage.setItem(restoreTargetKey, route.fullPath)
-}
-
-function scrollToViewTop() {
-  if (!import.meta.client) return
-
-  nextTick(() => {
-    viewRoot.value?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  })
-}
-
-watch(currentPage, (value, oldValue) => {
-  if (oldValue === undefined || value === oldValue) return
-
-  scrollToViewTop()
-})
-
-watch(
-  () => [route.path, route.fullPath] as const,
-  ([path], [oldPath, oldFullPath]) => {
-    if (!oldPath || path === oldPath) return
-
-    saveScrollPosition(scrollStorageKeyFor(oldFullPath))
-    restoredScrollPosition.value = false
-
-    if (
-      isHistoryNavigation.value ||
-      sessionStorage.getItem(restoreTargetKey) === route.fullPath
-    ) {
-      nextTick(restoreScrollPosition)
-      return
-    }
-
-    scrollToViewTop()
-  },
-)
-
-function markHistoryNavigation() {
-  isHistoryNavigation.value = true
-}
-
-function handlePageHide() {
-  saveScrollPosition()
-}
-
-onMounted(() => {
-  restoreScrollPosition()
-  useEventListener(window, 'popstate', markHistoryNavigation)
-  useEventListener(window, 'pagehide', handlePageHide)
-})
-
-onBeforeUnmount(() => {
-  saveScrollPosition()
-})
 </script>
 
 <template>

@@ -1,4 +1,5 @@
-import type { ExposedFilter, ExposedSort, ViewPager } from '~/composables/useDrupalViewControls'
+import type { ExposedFilter, ExposedSort } from '~/composables/useDrupalViewControls'
+import type { ViewPager } from '~/composables/useDrupalViewQuery'
 
 export interface DrupalViewProps {
   title?: string

@@ -1,16 +1,22 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
-import type { CustomElementNode } from '~/types'
-
-export interface ViewPager {
-  current: number
-  totalPages: number
-}
-
-interface RawViewPager {
-  current?: unknown
-  totalPages?: unknown
-  total_pages?: unknown
-}
+import {
+  buildDrupalViewSearchParams,
+  isSafeDrupalViewControlValue,
+  isValidDrupalViewFilterValue,
+  mapDrupalViewFilterOptions,
+  normalizeDrupalViewPager,
+  normalizeDrupalViewSortOrderValue,
+} from '~/composables/useDrupalViewQuery'
+import type { ViewPager } from '~/composables/useDrupalViewQuery'
+import {
+  drupalViewLoadErrorMessage,
+  isDrupalViewAbortError,
+} from '~/composables/useDrupalViewErrors'
+import {
+  findDrupalViewNodeInResponse,
+  getDrupalViewNodeProps,
+  getDrupalViewNodeRows,
+} from '~/composables/useDrupalViewNode'
 
 export interface ExposedFilter {
   label: string
@@ -55,237 +61,10 @@ interface UseDrupalViewControlsProps {
   noResults?: string
 }
 
-export function mapDrupalViewFilterOptions(
-  options: Record<string, string> | string[] | undefined,
-): Array<{ label: string; value: string }> {
-  if (!options) return []
-
-  if (Array.isArray(options)) {
-    return options.map((label, index) => ({
-      label,
-      value: String(index),
-    }))
-  }
-
-  return Object.entries(options).map(([value, label]) => ({ label, value }))
-}
-
-export function normalizeDrupalViewSortOrderValue(value: string): string {
-  const normalized = value.trim().toLowerCase()
-
-  if (normalized === 'asc') return 'ASC'
-  if (normalized === 'desc') return 'DESC'
-
-  return value
-}
-
-export function normalizeDrupalViewPager(pager: unknown): ViewPager | null {
-  if (!pager || typeof pager !== 'object') return null
-
-  const candidate = pager as RawViewPager
-  const current = Number(candidate.current)
-  const totalPages = Number(candidate.totalPages ?? candidate.total_pages)
-
-  if (!Number.isFinite(current) || !Number.isFinite(totalPages)) return null
-
-  return {
-    current: Math.max(0, Math.trunc(current)),
-    totalPages: Math.max(0, Math.trunc(totalPages)),
-  }
-}
-
 function firstStringValue(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return String(value[0] ?? '')
 
   return String(value ?? '')
-}
-
-export function buildDrupalViewSearchParams(
-  query: Record<string, string | string[]>,
-): URLSearchParams {
-  const params = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(query)) {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        params.append(key, item)
-      }
-
-      continue
-    }
-
-    params.set(key, value)
-  }
-
-  return params
-}
-
-export function getDrupalViewNodeProps(node: CustomElementNode): Record<string, unknown> {
-  if (node.props && typeof node.props === 'object') {
-    return node.props
-  }
-
-  const flat = { ...node }
-
-  delete flat.element
-  delete flat.props
-  delete flat.slots
-
-  return flat as Record<string, unknown>
-}
-
-export function getDrupalViewNodeSlots(node: CustomElementNode): Record<string, unknown> {
-  if (node.slots && typeof node.slots === 'object') {
-    return node.slots
-  }
-
-  return {}
-}
-
-export function getDrupalViewNodeRows(node: CustomElementNode): unknown[] {
-  const slots = getDrupalViewNodeSlots(node)
-  const slotRows = slots.rows
-
-  if (Array.isArray(slotRows)) return slotRows
-
-  const legacyRows = (node as Record<string, unknown>).rows
-
-  if (Array.isArray(legacyRows)) return legacyRows
-
-  return []
-}
-
-export function isSafeDrupalViewControlValue(value: string): boolean {
-  return !/[?&][\w%.-]+=/u.test(value)
-}
-
-export function isValidDrupalViewFilterValue(
-  filter: Pick<NormalizedFilter, 'options'>,
-  value: string | string[],
-): boolean {
-  const values = Array.isArray(value) ? value : [value]
-  const allowed = new Set(filter.options.map(option => option.value))
-
-  return values.every(item => (
-    isSafeDrupalViewControlValue(item) &&
-    (allowed.size === 0 || allowed.has(item))
-  ))
-}
-
-export function isDrupalViewAbortError(error: unknown): boolean {
-  const message = String(
-    (error as { message?: string })?.message || error || '',
-  )
-  const causeMessage = String(
-    (error as { cause?: { message?: string } })?.cause?.message || '',
-  )
-  const abortMessage = `${message} ${causeMessage}`.toLowerCase()
-
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    message.includes('AbortError') ||
-    abortMessage.includes('operation was aborted') ||
-    abortMessage.includes('request aborted')
-  )
-}
-
-export function drupalViewLoadErrorMessage(error: unknown): string {
-  const message = String(
-    (error as { message?: string })?.message || error || '',
-  )
-  const isDrupalMemoryError =
-    message.includes('Allowed memory size') ||
-    message.includes('ApcuBackend.php')
-
-  return isDrupalMemoryError
-    ? 'Drupal ran out of memory while processing this view. Please try again or adjust backend memory/cache settings.'
-    : 'Unable to load results. Please try again.'
-}
-
-export function isMatchingDrupalViewNode(
-  node: CustomElementNode,
-  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
-): boolean {
-  const nodeProps = getDrupalViewNodeProps(node)
-  const nodeViewId = String(nodeProps.viewId || '')
-  const nodeDisplayId = String(nodeProps.displayId || '')
-  const nodeParentUuid = String(nodeProps.parentUuid || '')
-  const hasViewProps = nodeViewId.length > 0 || nodeDisplayId.length > 0
-  const hasViewElement = Boolean(node.element?.startsWith('drupal-view-'))
-
-  if (!hasViewProps && !hasViewElement) return false
-
-  if (criteria.viewId && nodeViewId !== criteria.viewId) return false
-  if (criteria.displayId && nodeDisplayId !== criteria.displayId) return false
-  if (criteria.parentUuid && nodeParentUuid !== criteria.parentUuid) return false
-
-  return true
-}
-
-export function findDrupalViewNode(
-  input: unknown,
-  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
-): CustomElementNode | null {
-  if (!input) return null
-
-  if (Array.isArray(input)) {
-    for (const item of input) {
-      const found = findDrupalViewNode(item, criteria)
-
-      if (found) return found
-    }
-
-    return null
-  }
-
-  if (typeof input !== 'object') return null
-  const node = input as CustomElementNode
-
-  if (isMatchingDrupalViewNode(node, criteria)) return node
-
-  const childCandidates: unknown[] = []
-  const slots = getDrupalViewNodeSlots(node)
-
-  if (Object.keys(slots).length > 0) {
-    childCandidates.push(...Object.values(slots))
-  }
-
-  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
-    if (key === 'element' || key === 'props' || key === 'slots') continue
-    childCandidates.push(value)
-  }
-
-  for (const child of childCandidates) {
-    const found = findDrupalViewNode(child, criteria)
-
-    if (found) return found
-  }
-
-  return null
-}
-
-export function findDrupalViewNodeInResponse(
-  response: unknown,
-  criteria: Pick<UseDrupalViewControlsProps, 'displayId' | 'parentUuid' | 'viewId'> = {},
-): CustomElementNode | null {
-  const responseRecord =
-    response && typeof response === 'object'
-      ? (response as Record<string, unknown>)
-      : null
-  const candidates = [
-    response,
-    responseRecord?.content,
-    responseRecord?.items,
-    responseRecord?.data,
-  ]
-
-  for (const candidate of candidates) {
-    const viewNode = findDrupalViewNode(candidate, criteria)
-
-    if (viewNode) return viewNode
-  }
-
-  return null
 }
 
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
