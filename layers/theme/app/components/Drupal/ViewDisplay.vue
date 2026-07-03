@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
-import type { VNode } from 'vue'
 import type { DrupalViewProps } from '~/types'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
 import type { RenderedDrupalViewRow } from '~/composables/useDrupalViewRows'
-import { normalizeDynamicDrupalViewRows, withDrupalViewTeaserProps } from '~/composables/useDrupalViewRows'
+import { useDrupalViewRenderedRows } from '~/composables/useDrupalViewRows'
 import { useDrupalViewScrollRestore } from '~/composables/useDrupalViewScrollRestore'
 
 const props = defineProps<DrupalViewProps>()
@@ -59,17 +58,7 @@ const randomizeEnabled = computed(() => {
   return false
 })
 
-const hasDynamicRows = computed(() => dynamicRows.value !== null)
-const dynamicRenderedRows = computed(() => normalizeDynamicDrupalViewRows(dynamicRows.value))
-
-function hasRows(): boolean {
-  return hasDynamicRows.value
-    ? dynamicRenderedRows.value.length > 0
-    : getStaticRows().length > 0
-}
-
 const randomizeRowsOnClient = ref(false)
-let randomizedRowsCache: { signature: string, rows: VNode[] } | null = null
 
 function resolveSlotRows() {
   const rows = tk.slot('rows')
@@ -80,53 +69,19 @@ function resolveSlotRows() {
   }))
 }
 
-function rowSignature(rows: VNode[]): string {
-  return rows.map((node, index) => String(node.key ?? index)).join('|')
-}
-
-function getOrderedStaticRows(options: { teaser?: boolean } = {}) {
-  const rows = resolveSlotRows()
-
-  if (!options.teaser) return rows
-
-  return withDrupalViewTeaserProps(rows)
-}
-
-function getStaticRows(options: { teaser?: boolean } = { teaser: true }) {
-  const rows = getOrderedStaticRows(options)
-
-  if (!randomizeEnabled.value || !randomizeRowsOnClient.value) {
-    randomizedRowsCache = null
-    return rows
-  }
-
-  const signature = rowSignature(rows)
-
-  if (randomizedRowsCache?.signature !== signature) {
-    randomizedRowsCache = {
-      signature,
-      rows: tk.shuffle(rows),
-    }
-  }
-
-  return randomizedRowsCache.rows
-}
-
-function getRenderedRows(options: { teaser?: boolean } = { teaser: true }): RenderedDrupalViewRow[] {
-  if (hasDynamicRows.value) {
-    return dynamicRenderedRows.value.map((row) => ({
-      key: row.key,
-      type: 'dynamic',
-      node: row.node,
-    }))
-  }
-
-  return getStaticRows(options).map((node, index) => ({
-    key: String(node.key ?? index),
-    type: 'static',
-    node: node as VNode,
-  }))
-}
+const {
+  dynamicRenderedRows,
+  getRenderedRows,
+  getStaticRows,
+  hasDynamicRows,
+  hasRows,
+} = useDrupalViewRenderedRows({
+  dynamicRows,
+  randomizeEnabled,
+  randomizeRowsOnClient,
+  resolveSlotRows,
+  shuffleRows: tk.shuffle,
+})
 
 function getCarouselRows(): unknown[] {
   if (hasDynamicRows.value) {

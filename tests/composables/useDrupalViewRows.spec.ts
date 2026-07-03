@@ -1,7 +1,8 @@
-import { h } from 'vue'
+import { h, ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import {
   normalizeDynamicDrupalViewRows,
+  useDrupalViewRenderedRows,
   withDrupalViewTeaserProps,
 } from '../../layers/theme/app/composables/useDrupalViewRows'
 
@@ -50,5 +51,44 @@ describe('Drupal view row helpers', () => {
       type: 'teaser',
     })
   })
-})
 
+  it('renders dynamic rows before static slot rows', () => {
+    const rows = useDrupalViewRenderedRows({
+      dynamicRows: ref([
+        {
+          element: 'node-project',
+          props: {
+            id: 1,
+          },
+        },
+      ]),
+      randomizeEnabled: ref(false),
+      randomizeRowsOnClient: ref(false),
+      resolveSlotRows: () => [h('article', { key: 'static' })],
+      shuffleRows: rows => rows,
+    })
+
+    expect(rows.hasRows()).toBe(true)
+    expect(rows.getRenderedRows()).toMatchObject([
+      {
+        key: '1',
+        type: 'dynamic',
+      },
+    ])
+  })
+
+  it('can randomize static rows after client mount', () => {
+    const rows = useDrupalViewRenderedRows({
+      dynamicRows: ref(null),
+      randomizeEnabled: ref(true),
+      randomizeRowsOnClient: ref(true),
+      resolveSlotRows: () => [
+        h('article', { key: 'first' }),
+        h('article', { key: 'second' }),
+      ],
+      shuffleRows: rows => [...rows].reverse(),
+    })
+
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['second', 'first'])
+  })
+})
