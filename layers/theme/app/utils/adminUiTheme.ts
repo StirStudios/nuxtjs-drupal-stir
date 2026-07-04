@@ -75,7 +75,7 @@ export const adminUiTheme = {
     base: 'admin-ui-field-group',
   },
   tooltip: {
-    content: 'admin-ui-tooltip-content',
+    content: 'admin-ui-scope admin-ui-tooltip-content',
     arrow: 'admin-ui-tooltip-arrow',
   },
   editor: {

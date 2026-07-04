@@ -77,7 +77,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
         :open="Boolean(tooltipOpen[action.key])"
         :text="action.tooltip"
         :ui="{
-          content: 'admin-ui-tooltip-content',
+          content: 'admin-ui-scope admin-ui-tooltip-content',
           arrow: 'admin-ui-tooltip-arrow',
         }"
         @update:open="
