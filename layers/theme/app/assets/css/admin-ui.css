@@ -107,10 +107,6 @@
     background-color: var(--admin-bg-muted);
   }
 
-  .admin-ui-controls-sticky {
-    @apply sticky top-2 right-2 z-[500];
-  }
-
   .admin-ui-edit-shell {
     @apply relative;
   }

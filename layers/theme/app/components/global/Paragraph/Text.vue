@@ -104,11 +104,11 @@ watch(() => props.text, (value) => {
       </template>
 
       <template v-else-if="safeTextHtml">
-        <div class="relative">
+        <div class="relative grid">
           <LazyEditControls
             v-if="hasActions"
             :actions="actions"
-            sticky
+            container-class="sticky top-16 z-[500] col-start-1 row-start-1 self-start justify-self-end"
             @select="selectAction"
           />
           <Motion
@@ -117,7 +117,11 @@ watch(() => props.text, (value) => {
             v-bind="motionProps"
           >
             <div
-              :class="[classes, richTextClass].filter(Boolean).join(' ')"
+              :class="
+                ['col-start-1 row-start-1', classes, richTextClass]
+                  .filter(Boolean)
+                  .join(' ')
+              "
               v-html="safeTextHtml"
             />
           </Motion>
@@ -127,7 +131,6 @@ watch(() => props.text, (value) => {
       <template v-else-if="hasActions">
         <LazyEditControls
           :actions="actions"
-          sticky
           @select="selectAction"
         />
       </template>
