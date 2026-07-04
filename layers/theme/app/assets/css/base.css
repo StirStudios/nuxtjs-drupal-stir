@@ -94,7 +94,7 @@
     }
 
     :where(a) {
-      @apply text-primary underline underline-offset-4 font-medium transition-colors;
+      @apply text-primary font-medium underline underline-offset-4 transition-colors;
     }
 
     :where(a:hover) {
@@ -103,6 +103,9 @@
 
     :where(blockquote) {
       @apply border-accented my-5 border-s-4 ps-4 italic;
+      p {
+        @apply !my-0;
+      }
     }
 
     :where(hr) {
@@ -110,7 +113,7 @@
     }
 
     :where(pre) {
-      @apply my-5 max-w-full overflow-x-auto rounded-md border border-muted p-4;
+      @apply border-muted my-5 max-w-full overflow-x-auto rounded-md border p-4;
     }
 
     :where(pre code) {
@@ -118,11 +121,11 @@
     }
 
     :where(code) {
-      @apply rounded-sm bg-muted px-1.5 py-0.5;
+      @apply bg-muted rounded-sm px-1.5 py-0.5;
     }
 
     :where(img, video, iframe, audio, figure) {
-      @apply my-8 max-w-full h-auto;
+      @apply my-8 h-auto max-w-full;
     }
 
     :where(table) {
@@ -130,21 +133,19 @@
     }
 
     :where(figcaption) {
-      @apply mt-2 mb-0 text-sm text-muted text-center;
+      @apply text-muted mt-2 mb-0 text-center text-sm;
     }
 
     :where(th, td) {
-      @apply border-b border-muted/70 px-2 py-2 align-top text-left;
+      @apply border-muted/70 border-b px-2 py-2 text-left align-top;
     }
 
     :where(thead th) {
-      @apply border-b-2 border-muted;
+      @apply border-muted border-b-2;
     }
-
   }
 
   section {
     @apply overflow-x-clip;
   }
-
 }
