@@ -94,15 +94,11 @@
     }
 
     :where(a) {
-      @apply text-primary border-b border-transparent font-medium transition-colors;
+      @apply text-primary underline underline-offset-4 font-medium transition-colors;
     }
 
     :where(a:hover) {
-      @apply text-primary/90 border-primary;
-    }
-
-    :where(a:focus-visible) {
-      @apply outline-none ring-2 ring-primary/90 ring-offset-2 rounded-sm border-primary;
+      @apply text-primary/90;
     }
 
     :where(blockquote) {
