@@ -66,11 +66,19 @@
     }
 
     :where(ul) {
-      @apply my-5 list-disc ps-6;
+      @apply my-5 ps-6;
     }
 
     :where(ol) {
-      @apply my-5 list-decimal ps-6;
+      @apply my-5 ps-6;
+    }
+
+    :where(ul:not(.list-none) > li) {
+      @apply list-disc;
+    }
+
+    :where(ol:not(.list-none) > li) {
+      @apply list-decimal;
     }
 
     :where(ul.list-none, ol.list-none) {
