@@ -107,6 +107,10 @@
     background-color: var(--admin-bg-muted);
   }
 
+  .admin-ui-controls-sticky {
+    @apply fixed top-2 right-2 z-[500];
+  }
+
   .admin-ui-edit-shell {
     @apply relative;
   }
@@ -253,11 +257,13 @@
     color: var(--admin-text) !important;
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
+    @apply z-[500];
   }
 
   [data-slot='content'].admin-ui-tooltip-content {
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
+    @apply z-[500];
   }
 
   .admin-ui-tooltip-arrow {

@@ -119,6 +119,7 @@ watch(() => props.text, (value) => {
           <LazyEditControls
             v-if="hasActions"
             :actions="actions"
+            sticky
             @select="selectAction"
           />
         </div>
@@ -127,6 +128,7 @@ watch(() => props.text, (value) => {
       <template v-else-if="hasActions">
         <LazyEditControls
           :actions="actions"
+          sticky
           @select="selectAction"
         />
       </template>

@@ -5,6 +5,7 @@ import { adminUiTheme } from '~/utils/adminUiTheme'
 const props = defineProps<{
   actions: EditAction[]
   renderAsButtons?: boolean
+  sticky?: boolean
 }>()
 
 const router = useRouter()
@@ -60,7 +61,10 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
 <template>
   <UTheme :ui="adminUiTheme">
     <UFieldGroup
-      class="admin-ui admin-ui-scope admin-ui-controls pointer-events-none absolute top-2 right-2 z-100 rounded-md opacity-0 shadow-lg transition-opacity"
+      :class="[
+        'admin-ui admin-ui-scope admin-ui-controls pointer-events-none top-2 right-2 rounded-md opacity-0 shadow-lg transition-opacity',
+        props.sticky === true ? 'admin-ui-controls-sticky' : 'absolute z-100',
+      ]"
       data-admin-ui-controls
       size="xs"
       @click.stop
