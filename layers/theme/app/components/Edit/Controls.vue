@@ -4,6 +4,7 @@ import { adminUiTheme } from '~/utils/adminUiTheme'
 
 const props = defineProps<{
   actions: EditAction[]
+  containerClass?: string | string[]
   renderAsButtons?: boolean
 }>()
 
@@ -60,7 +61,10 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
 <template>
   <UTheme :ui="adminUiTheme">
     <UFieldGroup
-      class="admin-ui admin-ui-scope admin-ui-controls pointer-events-none top-2 right-2 rounded-md opacity-0 shadow-lg transition-opacity absolute z-100"
+      :class="[
+        'admin-ui admin-ui-scope admin-ui-controls pointer-events-none top-2 right-2 rounded-md opacity-0 shadow-lg transition-opacity absolute z-100',
+        props.containerClass,
+      ]"
       data-admin-ui-controls
       size="xs"
       @click.stop

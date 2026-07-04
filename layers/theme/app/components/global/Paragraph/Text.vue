@@ -104,22 +104,27 @@ watch(() => props.text, (value) => {
       </template>
 
       <template v-else-if="safeTextHtml">
-        <div class="relative">
+        <div class="relative grid">
+          <LazyEditControls
+            v-if="hasActions"
+            :actions="actions"
+            container-class="sticky top-16 z-[500] col-start-1 row-start-1 self-start justify-self-end"
+            @select="selectAction"
+          />
           <Motion
             :key="`text-${paragraphId}-${revealMotionKey}`"
             as-child
             v-bind="motionProps"
           >
             <div
-              :class="[classes, richTextClass].filter(Boolean).join(' ')"
+              :class="
+                ['col-start-1 row-start-1', classes, richTextClass]
+                  .filter(Boolean)
+                  .join(' ')
+              "
               v-html="safeTextHtml"
             />
           </Motion>
-          <LazyEditControls
-            v-if="hasActions"
-            :actions="actions"
-            @select="selectAction"
-          />
         </div>
       </template>
 
