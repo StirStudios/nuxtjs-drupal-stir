@@ -108,7 +108,7 @@
   }
 
   .admin-ui-controls-sticky {
-    @apply fixed top-2 right-2 z-[500];
+    @apply sticky top-2 right-2 z-[500];
   }
 
   .admin-ui-edit-shell {

@@ -105,6 +105,12 @@ watch(() => props.text, (value) => {
 
       <template v-else-if="safeTextHtml">
         <div class="relative">
+          <LazyEditControls
+            v-if="hasActions"
+            :actions="actions"
+            sticky
+            @select="selectAction"
+          />
           <Motion
             :key="`text-${paragraphId}-${revealMotionKey}`"
             as-child
@@ -115,13 +121,6 @@ watch(() => props.text, (value) => {
               v-html="safeTextHtml"
             />
           </Motion>
-
-          <LazyEditControls
-            v-if="hasActions"
-            :actions="actions"
-            sticky
-            @select="selectAction"
-          />
         </div>
       </template>
 
