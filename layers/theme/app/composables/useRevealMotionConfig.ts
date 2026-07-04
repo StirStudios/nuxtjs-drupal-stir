@@ -35,6 +35,9 @@ const REVEAL_DEFAULTS = {
 const DENSE_REVEAL_STAGGER_GROUP = 6
 const DENSE_REVEAL_STAGGER_MS = 28
 const DISABLED_REVEAL_EFFECTS = new Set(['none', 'off', 'unset', 'false', '0'])
+const REVEAL_EFFECT_ALIASES: Record<string, string> = {
+  fade: 'fade-in',
+}
 
 type MotionEffectTarget = {
   opacity: number
@@ -108,10 +111,11 @@ function toViewportMargin(value: unknown, fallback: string): string {
 function normalizeRevealEffect(effect: string | undefined): string | undefined {
   if (typeof effect !== 'string') return undefined
 
-  const normalized = effect.trim().toLowerCase()
+  const normalized = effect.trim().toLowerCase().replace(/[\s_]+/g, '-')
+  const aliased = REVEAL_EFFECT_ALIASES[normalized] ?? normalized
 
-  return normalized && !DISABLED_REVEAL_EFFECTS.has(normalized)
-    ? normalized
+  return aliased && !DISABLED_REVEAL_EFFECTS.has(aliased)
+    ? aliased
     : undefined
 }
 
