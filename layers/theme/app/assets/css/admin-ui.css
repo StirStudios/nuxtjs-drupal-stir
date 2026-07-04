@@ -56,6 +56,10 @@
     --admin-status-success: #047857 !important;
   }
 
+  .app-admin-tabs-font {
+    font-family: var(--font-admin);
+  }
+
   .dark {
     .admin-ui-scope {
       --admin-bg: var(--admin-z-950) !important;
@@ -245,8 +249,8 @@
 
   .admin-ui-tooltip-content {
     @apply border ring ring-inset;
-    background-color: #f4f4f5 !important;
-    color: #18181b !important;
+    background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text) !important;
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
   }
@@ -257,7 +261,7 @@
   }
 
   .admin-ui-tooltip-arrow {
-    fill: #f4f4f5 !important;
+    fill: var(--admin-bg-muted) !important;
     stroke: var(--admin-border) !important;
   }
 
@@ -266,8 +270,8 @@
   }
 
   .dark .admin-ui-tooltip-content {
-    background-color: #18181b !important;
-    color: #fafafa !important;
+    background-color: var(--admin-bg-muted) !important;
+    color: var(--admin-text) !important;
     border-color: var(--admin-border) !important;
     --tw-ring-color: var(--admin-border) !important;
   }
@@ -278,7 +282,7 @@
   }
 
   .dark .admin-ui-tooltip-arrow {
-    fill: #18181b !important;
+    fill: var(--admin-bg-muted) !important;
     stroke: var(--admin-border) !important;
   }
 

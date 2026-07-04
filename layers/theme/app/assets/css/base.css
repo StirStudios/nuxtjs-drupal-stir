@@ -32,76 +32,115 @@
     @apply cursor-pointer;
   }
 
-  .prose {
-    :where(p, ul, ol, blockquote) {
-      @apply leading-7;
-    }
-
-    :where(p, ul, ol, blockquote) + :where(p, ul, ol, blockquote) {
-      @apply mt-4;
-    }
-
-    :where(p, ul, ol, blockquote) + :where(h2),
-    > :where(div) + :where(h2) {
+  :where(.prose, .admin-editor-prose) {
+    :where(section + section) {
       @apply mt-12;
     }
 
-    :where(p, ul, ol, blockquote) + :where(h3),
-    > :where(div) + :where(h3) {
-      @apply mt-10;
-    }
-
-    :where(p, ul, ol, blockquote) + :where(h4),
-    > :where(div) + :where(h4) {
-      @apply mt-8;
-    }
-
-    :where(h2, h3, h4) {
-      @apply mb-3 leading-tight;
-    }
-
-    :where(h2, h3, h4) + :where(p, ul, ol, blockquote),
-    > :where(h2, h3, h4)
-      + :where(div)
-      > :where(p, ul, ol, blockquote):first-child {
+    :where(section > :where(h1, h2, h3, h4, h5, h6):first-child) {
       @apply mt-0;
     }
 
-    :where(ul.list-none > li),
-    :where(ol.list-none > li) {
-      @apply mt-0;
+    :where(h1) {
+      @apply mt-0 mb-6 leading-tight;
     }
 
-    :where(ul:not(.list-none), ol:not(.list-none)) {
-      @apply ps-6;
+    :where(h2) {
+      @apply mt-12 mb-6 leading-tight;
     }
 
-    :where(ul:not(.list-none) > li) {
-      @apply list-disc;
+    :where(h3) {
+      @apply mt-8 mb-3 leading-tight;
     }
 
-    :where(ol:not(.list-none) > li) {
-      @apply list-decimal;
+    :where(h4) {
+      @apply mt-6 mb-2 leading-tight;
     }
 
-    :where(li + li) {
-      @apply mt-2;
+    :where(h5, h6) {
+      @apply mt-5 mb-2 leading-tight;
     }
 
-    :is(ul.list-none, ol.list-none) > li + li {
-      @apply !mt-0;
+    :where(p) {
+      @apply my-5 leading-7 text-pretty;
+    }
+
+    :where(ul) {
+      @apply my-5 list-disc ps-6;
+    }
+
+    :where(ol) {
+      @apply my-5 list-decimal ps-6;
+    }
+
+    :where(ul.list-none, ol.list-none) {
+      @apply my-0 ps-0;
+    }
+
+    :where(ul.list-none > li, ol.list-none > li) {
+      @apply my-0 list-none;
+    }
+
+    :where(li) {
+      @apply my-1.5 leading-7;
     }
 
     :where(a) {
-      @apply text-primary hover:text-primary/80 underline underline-offset-4;
+      @apply text-primary border-b border-transparent font-medium transition-colors;
     }
+
+    :where(a:hover) {
+      @apply text-primary/90 border-primary;
+    }
+
+    :where(a:focus-visible) {
+      @apply outline-none ring-2 ring-primary/90 ring-offset-2 rounded-sm border-primary;
+    }
+
+    :where(blockquote) {
+      @apply border-accented my-5 border-s-4 ps-4 italic;
+    }
+
+    :where(hr) {
+      @apply my-12;
+    }
+
+    :where(pre) {
+      @apply my-5 max-w-full overflow-x-auto rounded-md border border-muted p-4;
+    }
+
+    :where(pre code) {
+      @apply bg-transparent p-0;
+    }
+
+    :where(code) {
+      @apply rounded-sm bg-muted px-1.5 py-0.5;
+    }
+
+    :where(img, video, iframe, audio, figure) {
+      @apply my-8 max-w-full h-auto;
+    }
+
+    :where(table) {
+      @apply my-5 block w-full overflow-x-auto;
+    }
+
+    :where(figcaption) {
+      @apply mt-2 mb-0 text-sm text-muted text-center;
+    }
+
+    :where(th, td) {
+      @apply border-b border-muted/70 px-2 py-2 align-top text-left;
+    }
+
+    :where(thead th) {
+      @apply border-b-2 border-muted;
+    }
+
   }
 
   section {
     @apply overflow-x-clip;
   }
 
-  .app-admin-tabs-font {
-    font-family: var(--font-admin);
-  }
 }
