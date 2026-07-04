@@ -63,10 +63,11 @@
     "vue": "^3.5.39",
     "vue-tsc": "^2.2.12"
   },
-  "release-it": {
+    "release-it": {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
     "github": {
-      "release": true
+      "release": true,
+      "releaseName": "v${version}"
     },
     "npm": {
       "publish": false
