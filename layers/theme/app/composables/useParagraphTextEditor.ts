@@ -8,7 +8,7 @@ import ListItem from '@tiptap/extension-list-item'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
   const adminTooltipUi = {
-    content: 'admin-ui-tooltip-content',
+    content: 'admin-ui-scope admin-ui-tooltip-content',
     arrow: 'admin-ui-tooltip-arrow',
   }
   const withTooltip = (text: string) => ({ text, ui: adminTooltipUi })
