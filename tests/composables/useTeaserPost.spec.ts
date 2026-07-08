@@ -73,4 +73,19 @@ describe('useTeaserPost', () => {
 
     expect(post.value.editLink).toBeUndefined()
   })
+
+  it('ignores non-node edit links with node edit paths in query strings', () => {
+    const { post } = useTeaserPost(
+      {
+        props: {
+          editLink: 'https://cms.local/stir_layout_builder/node/1/paragraphs/999/edit?destination=/node/15/edit',
+        },
+      },
+      {
+        title: 'Nested paragraph destination',
+      },
+    )
+
+    expect(post.value.editLink).toBeUndefined()
+  })
 })
