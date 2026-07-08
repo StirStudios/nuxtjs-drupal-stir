@@ -3,7 +3,7 @@ import type { ImgHTMLAttributes } from 'vue'
 
 type TeaserImage = Partial<ImgHTMLAttributes>
 
-const nodeEditPathPattern = /\/node\/\d+\/edit(?:[/?#]|$)/
+const nodeEditPathPattern = /^\/node\/\d+\/edit\/?$/
 
 export function useTeaserPost(
   input: unknown,
@@ -98,7 +98,16 @@ export function useTeaserPost(
   const resolveNodeEditLink = (value: unknown) => {
     const link = resolveEditLink(value)
 
-    return nodeEditPathPattern.test(link) ? link : ''
+    if (!link) return ''
+
+    try {
+      const url = new URL(link, 'https://drupal.local')
+
+      return nodeEditPathPattern.test(url.pathname) ? link : ''
+    }
+    catch {
+      return ''
+    }
   }
 
   const backendEditLink = computed(() => {
