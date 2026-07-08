@@ -59,7 +59,7 @@ describe('useTeaserPost', () => {
     expect(post.value.editLink).toBe('https://cms.local/node/15/edit')
   })
 
-  it('uses non-node props.editLink from child payloads', () => {
+  it('ignores non-node props.editLink on child payloads', () => {
     const { post } = useTeaserPost(
       {
         props: {
@@ -71,8 +71,6 @@ describe('useTeaserPost', () => {
       },
     )
 
-    expect(post.value.editLink).toBe(
-      'https://cms.local/stir_layout_builder/node/1/paragraphs/999/edit',
-    )
+    expect(post.value.editLink).toBeUndefined()
   })
 })

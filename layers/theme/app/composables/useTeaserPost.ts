@@ -3,6 +3,8 @@ import type { ImgHTMLAttributes } from 'vue'
 
 type TeaserImage = Partial<ImgHTMLAttributes>
 
+const nodeEditPathPattern = /\/node\/\d+\/edit(?:[/?#]|$)/
+
 export function useTeaserPost(
   input: unknown,
   extra: {
@@ -93,15 +95,20 @@ export function useTeaserPost(
 
   const resolveEditLink = (value: unknown) =>
     typeof value === 'string' ? value.trim() : ''
+  const resolveNodeEditLink = (value: unknown) => {
+    const link = resolveEditLink(value)
+
+    return nodeEditPathPattern.test(link) ? link : ''
+  }
 
   const backendEditLink = computed(() => {
     const source = unref(input)
     const sourceRecord = isRecord(source) ? source : {}
     const sourceProps = isRecord(sourceRecord.props) ? sourceRecord.props : {}
-    const rootLink = resolveEditLink(extra.editLink)
+    const rootLink = resolveNodeEditLink(extra.editLink)
     const sourceLink =
-      resolveEditLink(sourceRecord.editLink)
-      || resolveEditLink(sourceProps.editLink)
+      resolveNodeEditLink(sourceRecord.editLink)
+      || resolveNodeEditLink(sourceProps.editLink)
 
     return rootLink || sourceLink || undefined
   })
