@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AuthFormField, FormError } from '@nuxt/ui'
+import type { StirThemeAuthConfig } from '../../../../theme/app/types/app-config'
 import { authLayoutContextKey } from '../../utils/authLayout'
 
 const props = defineProps<{
@@ -15,6 +16,9 @@ const props = defineProps<{
 }>()
 
 const appConfig = useAppConfig()
+const themeAuth = (appConfig.stirTheme || {}) as {
+  auth?: StirThemeAuthConfig
+}
 const authLayout = inject(authLayoutContextKey, undefined)
 const isCardSplit = computed(() =>
   authLayout?.value.layout === 'card-split' && Boolean(authLayout.value.image),
@@ -37,7 +41,7 @@ const formIcon = computed(() => {
 })
 const authFormPaddingClass = 'p-6'
 const submitButton = computed(() => ({
-  ...appConfig.stirTheme?.auth?.submitButton,
+  ...themeAuth.auth?.submitButton,
   ...props.submit,
   label: typeof props.submit?.label === 'string' ? props.submit.label : 'Continue',
 }))

@@ -12,6 +12,10 @@ import {
   type AuthImagePosition,
   type AuthLayout,
 } from '../../utils/authLayout'
+import type {
+  StirThemeAuthConfig,
+  StirThemeAuthPageConfig,
+} from '../../../../theme/app/types/app-config'
 
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
@@ -70,10 +74,16 @@ const resolveConfigString = (value: unknown, fallback = ''): string => {
 }
 
 const authPageKey = computed(resolveAuthPageKey)
-const themeAuth = computed(() => appConfig.stirTheme?.auth || {})
-const themePageConfig = computed(() => authPageKey.value
-  ? themeAuth.value.pages?.[authPageKey.value] || {}
-  : {})
+const themeAuth = computed<StirThemeAuthConfig>(() => {
+  const theme = (appConfig.stirTheme || {}) as {
+    auth?: StirThemeAuthConfig
+  }
+
+  return theme.auth || {}
+})
+const themePageConfig = computed<StirThemeAuthPageConfig>(() =>
+  authPageKey.value ? themeAuth.value.pages?.[authPageKey.value] || {} : {},
+)
 
 const pageLayout = computed<AuthLayout>(() =>
   resolveAuthLayout(themePageConfig.value.layout) ||

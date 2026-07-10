@@ -7,7 +7,7 @@ type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | '
 type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
 type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
-type StirThemeButtonLikeConfig = {
+export type StirThemeButtonLikeConfig = {
   class?: ClassValue
   color?: UiColorName
   icon?: string
@@ -291,7 +291,7 @@ type StirThemeErrorConfig = {
   variant?: UiButtonVariantName
 } & LooseRecord
 
-type StirThemeAuthConfig = {
+export type StirThemeAuthConfig = {
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
@@ -310,7 +310,7 @@ type StirThemeAuthPageKey =
   | 'passwordReset'
   | 'verify'
 
-type StirThemeAuthPageConfig = {
+export type StirThemeAuthPageConfig = {
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
@@ -318,7 +318,7 @@ type StirThemeAuthPageConfig = {
   backButton?: StirThemeAuthBackButtonConfig
 } & LooseRecord
 
-type StirThemeAuthBackButtonConfig = StirThemeButtonLikeConfig & {
+export type StirThemeAuthBackButtonConfig = StirThemeButtonLikeConfig & {
   enabled?: boolean
   label?: string
   to?: string
