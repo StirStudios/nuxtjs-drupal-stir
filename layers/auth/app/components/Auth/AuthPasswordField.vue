@@ -10,7 +10,7 @@ const props = defineProps<{
     placeholder?: string
   }
   passwordPolicy?: AuthPasswordPolicy
-  showRequirements?: boolean
+  hideStrength?: boolean
 }>()
 
 const show = ref(false)
@@ -81,12 +81,12 @@ const text = computed(() => {
 })
 
 const describedBy = computed(() =>
-  props.showRequirements === false
+  props.hideStrength
     ? undefined
     : 'password-strength',
 )
 const invalid = computed(() =>
-  props.showRequirements !== false && !isComplete.value,
+  !props.hideStrength && !isComplete.value,
 )
 
 function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
@@ -164,7 +164,7 @@ function defaultPasswordRequirements(policy?: AuthPasswordPolicy): AuthPasswordR
       </template>
     </UInput>
 
-    <template v-if="showRequirements !== false">
+    <template v-if="!hideStrength">
       <UProgress
         :color="color"
         :indicator="text"

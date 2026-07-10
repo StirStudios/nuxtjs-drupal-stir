@@ -69,8 +69,8 @@ useSeoMeta({
         <AuthPasswordField
           v-model="state.confirmPassword"
           :field="field"
+          hide-strength
           :password-policy="auth.passwordPolicy"
-          :show-requirements="false"
         />
       </template>
       <template #footer>
