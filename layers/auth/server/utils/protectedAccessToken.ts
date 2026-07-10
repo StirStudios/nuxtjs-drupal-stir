@@ -61,16 +61,17 @@ const sign = async (data: string, secret: string): Promise<string> =>
   encodeBytesBase64Url(await createSignatureBytes(data, secret))
 
 const equalsSafe = (a: string, b: string): boolean => {
-  if (a.length !== b.length) return false
+  const maxLength = Math.max(a.length, b.length)
+  let mismatch = a.length ^ b.length
 
-  let mismatch = 0
-
-  for (let i = 0; i < a.length; i += 1) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  for (let i = 0; i < maxLength; i += 1) {
+    mismatch |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0)
   }
 
   return mismatch === 0
 }
+
+export const layerAuthConstantTimeEquals = equalsSafe
 
 export const layerAuthCreateProtectedAccessToken = async (
   secret: string,

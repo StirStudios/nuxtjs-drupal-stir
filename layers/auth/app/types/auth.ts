@@ -104,11 +104,6 @@ export type AuthUiConfig = {
   version?: number
   loginRedirectPath?: string
   logoutRedirectPath?: string
-  backgroundImage?: string
-  layout?: string
-  imagePosition?: string
-  showIcon?: boolean
-  backButton?: Record<string, unknown>
   identifierModes?: {
     login?: AuthIdentifierMode
     passwordRequest?: AuthIdentifierMode

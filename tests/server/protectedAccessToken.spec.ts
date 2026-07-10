@@ -5,6 +5,7 @@ import {
 } from '../../layers/core/server/utils/protectedAccessToken'
 import {
   layerAuthCreateProtectedAccessToken,
+  layerAuthConstantTimeEquals,
   layerAuthVerifyProtectedAccessToken,
 } from '../../layers/auth/server/utils/protectedAccessToken'
 
@@ -29,6 +30,11 @@ describe('protected access tokens', () => {
 
     await expect(verifyProtectedAccessToken(NODE_COMPATIBLE_TOKEN, SECRET)).resolves.toBe(true)
     await expect(layerAuthVerifyProtectedAccessToken(NODE_COMPATIBLE_TOKEN, SECRET)).resolves.toBe(true)
+  })
+
+  it('compares protected passwords without normalizing whitespace', () => {
+    expect(layerAuthConstantTimeEquals(' secret ', ' secret ')).toBe(true)
+    expect(layerAuthConstantTimeEquals(' secret ', 'secret')).toBe(false)
   })
 
 })

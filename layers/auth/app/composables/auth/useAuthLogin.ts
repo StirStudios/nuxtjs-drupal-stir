@@ -60,7 +60,7 @@ export function useAuthLogin() {
     try {
       const loginResult = await login({
         identifier: event.data.identifier?.trim(),
-        password: event.data.password?.trim(),
+        password: event.data.password,
         turnstile_response: turnstileToken.value,
       })
 

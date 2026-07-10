@@ -58,7 +58,7 @@ export function useAuthRegister() {
     try {
       const response = await register({
         email: event.data.email.trim(),
-        password: event.data.password.trim(),
+        password: event.data.password,
         turnstile_response: turnstileToken.value,
       })
 

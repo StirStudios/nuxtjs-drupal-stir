@@ -121,6 +121,7 @@ stirTheme: {
       enabled: false,
     },
     submitButton: {
+      size: 'xl',
       class: 'uppercase',
     },
     pages: {
@@ -142,8 +143,13 @@ stirTheme: {
 ```
 
 - Layout options are `card`, `card-split`, and `page-split`.
+- `imagePosition` accepts `'left'` or `'right'` for split-layout visuals.
+- `submitButton` accepts Nuxt UI `UButton` props, including `size: 'xl'`,
+  `color`, `variant`, `icon`, and `class`.
 - `pages` also supports `register`, `passwordRequest`, `verify`, and `protectedPage`.
 - Per-page settings override global auth theme settings.
+- Auth layouts and visuals are read only from `stirTheme.auth`, never from
+  Drupal's auth configuration response.
 
 ### 🔎 `cmsGlobalSeo`
 

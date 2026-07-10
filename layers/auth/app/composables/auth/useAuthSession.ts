@@ -16,40 +16,36 @@ export function useAuthSession() {
     'auth-session-user',
     () => null,
   )
-  let pendingSessionFetch: Promise<void> | null = null
   const integrationEnabled = useAuthIntegration()
-
-  const fetchSession = async (options: FetchSessionOptions = {}) => {
-    if (!integrationEnabled) {
-      ready.value = true
-      loggedIn.value = false
-      user.value = null
-      return
-    }
-
-    if (ready.value && !options.force) return
-
-    if (pendingSessionFetch) {
-      await pendingSessionFetch
-      return
-    }
-
-    const requestFetch = useRequestFetch()
-
-    pendingSessionFetch = (async () => {
+  const requestFetch = useRequestFetch()
+  const { execute } = useAsyncData(
+    'stir-auth-session',
+    async () => {
       const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
 
       loggedIn.value = Boolean(session?.authenticated)
       protectedLoggedIn.value = Boolean(session?.protectedAuthenticated)
       user.value = session?.user ?? null
       ready.value = true
-    })()
 
-    try {
-      await pendingSessionFetch
-    } finally {
-      pendingSessionFetch = null
+      return session
+    },
+    {
+      default: () => null,
+      immediate: false,
+      dedupe: 'defer',
+    },
+  )
+
+  const fetchSession = async (options: FetchSessionOptions = {}) => {
+    if (!integrationEnabled) {
+      clearSession()
+      return
     }
+
+    if (ready.value && !options.force) return
+
+    await execute({ dedupe: 'defer' })
   }
 
   const clearSession = () => {

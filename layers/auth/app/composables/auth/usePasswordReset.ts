@@ -81,7 +81,7 @@ export function usePasswordReset() {
         uid: uid.value,
         timestamp: timestamp.value,
         hash: hash.value,
-        password: event.data.password.trim(),
+        password: event.data.password,
       })
 
       toast.add({

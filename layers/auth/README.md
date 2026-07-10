@@ -58,6 +58,7 @@ Drupal:
 stirTheme: {
   auth: {
     submitButton: {
+      size: 'xl',
       class: 'uppercase',
     },
   },
@@ -91,9 +92,14 @@ stirTheme: {
 },
 ```
 
-`backgroundImage`, `imagePosition`, `showIcon`, and `backButton` support the
-same global and per-page structure. Drupal remains the source for auth
-behaviour, fields, copy, password policy, and redirects.
+`imagePosition` accepts `'left'` or `'right'`; it controls which side displays
+the image or illustration in split layouts. `backgroundImage`, `imagePosition`,
+`showIcon`, and `backButton` support the same global and per-page structure.
+`submitButton` accepts Nuxt UI `UButton` props, such as `size: 'xl'`, `color`,
+`variant`, `icon`, and `class`. Drupal remains the source for auth
+behaviour, fields, copy, password policy, and redirects. Drupal presentation
+values are not read; configure all auth layouts and visuals through
+`stirTheme.auth`.
 
 ## Public Helpers
 

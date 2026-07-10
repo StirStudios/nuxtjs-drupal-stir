@@ -20,7 +20,7 @@ export function useProtectedLogin() {
   ]
 
   const validate = (formState: { password?: string }) => {
-    if (formState.password?.trim()) {
+    if (formState.password) {
       return []
     }
 
@@ -32,7 +32,7 @@ export function useProtectedLogin() {
   ) => {
     isLoading.value = true
     try {
-      const hasAccess = await login(event.data.password?.trim())
+      const hasAccess = await login(event.data.password)
 
       if (hasAccess) {
         const redirectTarget =
