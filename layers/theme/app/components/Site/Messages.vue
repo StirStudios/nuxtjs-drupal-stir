@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 const { getMessages } = useDrupalCe()
 const toast = useToast()
@@ -16,7 +16,9 @@ onMounted(() => {
       // Show the toast
       toast.add({
         title: message.type === 'success' ? 'Success!' : 'Error!',
-        description: h('div', { innerHTML: cleanHTML(message.message || '') }),
+        description: h('div', {
+          innerHTML: trustedDrupalHtml(message.message),
+        }),
         icon: getAlertIcon(message.type),
         color: message.type === 'success' ? 'success' : 'error',
       })

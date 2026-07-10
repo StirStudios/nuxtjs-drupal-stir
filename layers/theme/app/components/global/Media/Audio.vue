@@ -1,13 +1,15 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   mediaEmbed?: string
   url?: string
   title?: string
 }>()
+
+const trustedMediaEmbed = computed(() => trustedDrupalHtml(props.mediaEmbed))
 </script>
 
 <template>
-  <div v-if="mediaEmbed" v-html="mediaEmbed" />
+  <div v-if="trustedMediaEmbed" v-html="trustedMediaEmbed" />
 
   <audio v-else-if="url" class="w-full" controls>
     <source :src="url" />

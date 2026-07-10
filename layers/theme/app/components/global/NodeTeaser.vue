@@ -37,6 +37,9 @@ const { post, orientation } = useTeaserPost(props.teaser, {
 
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
+const trustedDescription = computed(() =>
+  trustedDrupalHtml(post.value.description),
+)
 const titleOverlay = computed(() => props.titleOverlay ?? false)
 const teaserImage = computed(() => {
   const image = post.value.image
@@ -89,7 +92,7 @@ const postUi = computed(() => {
   <EditLink :link="post.editLink">
     <UBlogPost
       :date="showDate ? post.date : undefined"
-      :description="showDescription ? post.description : undefined"
+      :description="showDescription ? trustedDescription : undefined"
       :orientation="orientation"
       :title="post.title"
       :to="post.to"
@@ -106,7 +109,7 @@ const postUi = computed(() => {
       </template>
 
       <template v-if="showDescription" #description>
-        <div v-html="post.description" />
+        <div v-html="trustedDescription" />
       </template>
     </UBlogPost>
   </EditLink>

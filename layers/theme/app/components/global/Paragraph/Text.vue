@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   id?: number | string
@@ -39,7 +39,7 @@ const sourceText = computed(() => {
   return normalizedTextSource ?? (snakeSource.trim() ? snakeSource : undefined) ?? props.text ?? ''
 })
 
-const safeTextHtml = computed(() => cleanHTML(renderedText.value))
+const trustedTextHtml = computed(() => trustedDrupalHtml(renderedText.value))
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
 const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
@@ -103,7 +103,7 @@ watch(() => props.text, (value) => {
         />
       </template>
 
-      <template v-else-if="safeTextHtml">
+      <template v-else-if="trustedTextHtml">
         <div class="relative grid">
           <LazyEditControls
             v-if="hasActions"
@@ -122,7 +122,7 @@ watch(() => props.text, (value) => {
                   .filter(Boolean)
                   .join(' ')
               "
-              v-html="safeTextHtml"
+              v-html="trustedTextHtml"
             />
           </Motion>
         </div>

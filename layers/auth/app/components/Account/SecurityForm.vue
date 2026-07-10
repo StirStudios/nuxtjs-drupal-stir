@@ -99,6 +99,7 @@ const confirmCancel = () => {
       <UFormField label="New password" name="newPassword" required>
         <AuthPasswordField
           :model-value="props.newPassword"
+          :password-policy="auth.passwordPolicy"
           @update:model-value="emit('update:newPassword', String($event ?? ''))"
         />
       </UFormField>

@@ -85,9 +85,13 @@ const items = computed(() => {
     const disabled = isFieldDisabled.value || disabledByRule || disabledByRange
 
     return {
-      label,
+      label: trustedDrupalHtml(String(label ?? '')),
       value: key,
-      props: { ...rawProps, disabled },
+      props: {
+        ...rawProps,
+        description: trustedDrupalHtml(String(rawProps.description ?? '')),
+        disabled,
+      },
       disabled,
     }
   })

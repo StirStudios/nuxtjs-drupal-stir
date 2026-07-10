@@ -20,6 +20,19 @@ extends: ['./layers/core', './layers/theme', './layers/auth']
 
 ## Boundary guidance
 
+### Trusted Drupal HTML
+
+Drupal is the single sanitization authority for CMS markup. Every value passed to
+`v-html` must come from a Drupal field configured with an appropriate filtered
+text format, then pass through `trustedDrupalHtml()` to make that trust boundary
+explicit. Never use this helper for browser input, third-party responses, or
+otherwise untrusted HTML.
+
+Nuxt auto-imports are preferred for framework composables and components in
+normal application code. Keep explicit imports for external packages, types,
+shared utilities, and isolated test components where Nuxt auto-import context is
+not guaranteed.
+
 Keep in `layers/theme`:
 - Presentation and layout components
 - Theme-level UI wrappers and CE display components

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 const props = withDefaults(
   defineProps<{
@@ -16,7 +16,7 @@ const props = withDefaults(
   },
 )
 
-const safeHeroText = computed(() => cleanHTML(props.heroText ?? ''))
+const trustedHeroText = computed(() => trustedDrupalHtml(props.heroText))
 
 defineSlots<{ button?(): unknown }>()
 </script>
@@ -31,7 +31,11 @@ defineSlots<{ button?(): unknown }>()
     {{ pageTitle }}
   </h1>
 
-  <div v-if="safeHeroText" class="hero-copy prose" v-html="safeHeroText" />
+  <div
+    v-if="trustedHeroText"
+    class="hero-copy prose"
+    v-html="trustedHeroText"
+  />
 
   <slot name="button" />
 </template>

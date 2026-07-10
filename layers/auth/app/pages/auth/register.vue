@@ -65,7 +65,11 @@ useSeoMeta({
       @submit="onSubmit($event as never)"
     >
       <template #password-field="{ state, field }">
-        <AuthPasswordField v-model="state.password" :field="field" />
+        <AuthPasswordField
+          v-model="state.password"
+          :field="field"
+          :password-policy="auth.passwordPolicy"
+        />
       </template>
       <template #validation>
         <FieldTurnstile v-model="turnstileToken" />

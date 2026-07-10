@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 import { useEvaluateState } from '~/composables/useEvaluateState'
 
 const props = defineProps<{
@@ -18,7 +18,7 @@ const checkboxLabel = computed(() =>
   String(props.field['#title'] || props.fieldName),
 )
 const descriptionContent = computed(() =>
-  cleanHTML(String(props.field['#description'] ?? '')),
+  trustedDrupalHtml(String(props.field['#description'] ?? '')),
 )
 const { disabled, checked } = useEvaluateState(
   props.field['#states'] ?? {},

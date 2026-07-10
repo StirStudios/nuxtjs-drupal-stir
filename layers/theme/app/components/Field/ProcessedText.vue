@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   field: WebformFieldProps
   fieldName: string
 }>()
 
-const safeTextHtml = computed(() => cleanHTML(String(props.field['#text'] ?? '')))
+const trustedTextHtml = computed(() =>
+  trustedDrupalHtml(String(props.field['#text'] ?? '')),
+)
 </script>
 
 <template>
-  <div :class="['prose', fieldName]" v-html="safeTextHtml" />
+  <div :class="['prose', fieldName]" v-html="trustedTextHtml" />
 </template>

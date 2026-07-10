@@ -103,3 +103,5 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
     </UFieldGroup>
   </UTheme>
 </template>
+
+<style src="../../assets/css/admin-ui.css"></style>

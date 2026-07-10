@@ -59,10 +59,19 @@ useSeoMeta({
       @submit="onSubmit($event as never)"
     >
       <template #password-field="{ state, field }">
-        <AuthPasswordField v-model="state.password" :field="field" />
+        <AuthPasswordField
+          v-model="state.password"
+          :field="field"
+          :password-policy="auth.passwordPolicy"
+        />
       </template>
       <template #confirmPassword-field="{ state, field }">
-        <AuthPasswordField v-model="state.confirmPassword" :field="field" :show-requirements="false" />
+        <AuthPasswordField
+          v-model="state.confirmPassword"
+          :field="field"
+          hide-strength
+          :password-policy="auth.passwordPolicy"
+        />
       </template>
       <template #footer>
         <ULink class="text-primary" to="/auth/login">Back to login</ULink>

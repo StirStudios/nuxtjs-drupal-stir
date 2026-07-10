@@ -148,7 +148,7 @@ export function createAccountPasswordChangeValidationSchema(
   })
 }
 
-function createPasswordValidationSchema(policy: AuthPasswordPolicy = {}) {
+export function createPasswordValidationSchema(policy: AuthPasswordPolicy = {}) {
   const requirements = validPasswordRequirements(policy)
   let schema = string().required(policy.requiredMessage || 'Password is required')
 
