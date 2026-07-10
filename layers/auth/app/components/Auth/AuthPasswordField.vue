@@ -25,7 +25,10 @@ function checkStrength(str: string) {
 
 const passwordRequirements = computed(() => {
   const policy = props.passwordPolicy
-  const requirements = withPolicyLengthRequirements(policy?.requirements || [])
+  const configuredRequirements = policy?.requirements || []
+  const requirements = configuredRequirements.length > 0
+    ? withPolicyLengthRequirements(configuredRequirements)
+    : defaultPasswordRequirements(policy)
 
   return requirements
     .map((req: AuthPasswordRequirement) => normalizePasswordRequirement(req))
@@ -33,13 +36,11 @@ const passwordRequirements = computed(() => {
 })
 
 const strength = computed(() => checkStrength(model.value || ''))
-const hasPasswordRequirements = computed(() => passwordRequirements.value.length > 0)
 const score = computed(() => strength.value.filter(req => req.met).length)
 const isComplete = computed(() => (
-  hasPasswordRequirements.value &&
   score.value === passwordRequirements.value.length
 ))
-const scoreRatio = computed(() => score.value / passwordRequirements.value.length)
+const scoreRatio = computed(() => score.value / Math.max(passwordRequirements.value.length, 1))
 
 const color = computed(() => {
   if (score.value === 0) {
@@ -80,12 +81,12 @@ const text = computed(() => {
 })
 
 const describedBy = computed(() =>
-  props.showRequirements === false || !hasPasswordRequirements.value
+  props.showRequirements === false
     ? undefined
     : 'password-strength',
 )
 const invalid = computed(() =>
-  props.showRequirements !== false && hasPasswordRequirements.value && !isComplete.value,
+  props.showRequirements !== false && !isComplete.value,
 )
 
 function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
@@ -107,16 +108,12 @@ function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
 function withPolicyLengthRequirements(requirements: AuthPasswordRequirement[]): AuthPasswordRequirement[] {
   const policy = props.passwordPolicy
   const hasMinLength = requirements.some(requirement => requirement.key === 'minLength')
-  const hasMaxLength = requirements.some(requirement => requirement.key === 'maxLength')
 
   return [
     ...(!hasMinLength && policy?.minLength
       ? [createMinLengthRequirement(policy.minLength)]
       : []),
     ...requirements,
-    ...(!hasMaxLength && policy?.maxLength
-      ? [createMaxLengthRequirement(policy.maxLength)]
-      : []),
   ]
 }
 
@@ -128,12 +125,13 @@ function createMinLengthRequirement(minLength: number): AuthPasswordRequirement 
   }
 }
 
-function createMaxLengthRequirement(maxLength: number): AuthPasswordRequirement {
-  return {
-    key: 'maxLength',
-    pattern: `^.{0,${maxLength}}$`,
-    label: `${maxLength} characters or less`,
-  }
+function defaultPasswordRequirements(policy?: AuthPasswordPolicy): AuthPasswordRequirement[] {
+  return [
+    createMinLengthRequirement(policy?.minLength || 8),
+    { key: 'number', pattern: '\\d', label: 'At least 1 number' },
+    { key: 'lowercase', pattern: '[a-z]', label: 'At least 1 lowercase letter' },
+    { key: 'uppercase', pattern: '[A-Z]', label: 'At least 1 uppercase letter' },
+  ]
 }
 
 </script>
@@ -166,7 +164,7 @@ function createMaxLengthRequirement(maxLength: number): AuthPasswordRequirement 
       </template>
     </UInput>
 
-    <template v-if="showRequirements !== false && hasPasswordRequirements">
+    <template v-if="showRequirements !== false">
       <UProgress
         :color="color"
         :indicator="text"
