@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
       ? body.timestamp
       : Number.parseInt(String(body?.timestamp ?? '0'), 10)
   const hash = typeof body?.hash === 'string' ? body.hash.trim() : ''
-  const password = typeof body?.password === 'string' ? body.password.trim() : ''
+  const password = typeof body?.password === 'string' ? body.password : ''
 
   try {
     return await layerAuthDrupalApiRequest(event, '/api/auth/password/reset', {

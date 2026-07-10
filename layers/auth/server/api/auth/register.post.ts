@@ -11,15 +11,15 @@ export default defineEventHandler(async (event) => {
   }>(event)
 
   const email = typeof body?.email === 'string' ? body.email.trim() : ''
-  const password = typeof body?.password === 'string' ? body.password.trim() : ''
+  const password = typeof body?.password === 'string' ? body.password : ''
   const displayName =
     typeof body?.display_name === 'string' ? body.display_name.trim() : ''
   const turnstileResponse =
     typeof body?.turnstile_response === 'string'
       ? body.turnstile_response.trim()
       : ''
-  const fields = body?.fields && typeof body.fields === 'object'
-    ? body.fields
+  const fields = body?.fields && typeof body.fields === 'object' && !Array.isArray(body.fields)
+    ? body.fields as Record<string, unknown>
     : {}
 
   if (!email || !password) {

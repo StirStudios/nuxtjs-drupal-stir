@@ -14,22 +14,16 @@ const email = string()
   .required('Email is required')
 
 const password = string()
-  .trim()
   .required('Password is required')
-  .min(8, 'Password must be at least 8 characters')
-  .max(128, 'Password must be 128 characters or less')
-  .matches(/[a-z]/, 'Password must include a lowercase letter')
-  .matches(/[A-Z]/, 'Password must include an uppercase letter')
-  .matches(/[0-9]/, 'Password must include a number')
 
-const currentPassword = string().trim().required('Current password is required')
+const currentPassword = string().required('Current password is required')
 
 const newPassword = password.test(
   'not-same-as-current',
   'New password must be different from current password',
   function (value) {
-    const current = String(this.parent.currentPassword ?? '').trim()
-    const next = String(value ?? '').trim()
+    const current = String(this.parent.currentPassword ?? '')
+    const next = String(value ?? '')
 
     if (!current || !next) {
       return true
@@ -41,7 +35,7 @@ const newPassword = password.test(
 
 export const loginValidationSchema = object({
   identifier,
-  password: string().trim().required('Password is required'),
+  password: string().required('Password is required'),
 })
 
 export const registerValidationSchema = object({
@@ -57,7 +51,6 @@ export const passwordRequestValidationSchema = object({
 export const passwordResetValidationSchema = object({
   password,
   confirmPassword: string()
-    .trim()
     .required('Confirm password is required')
     .oneOf([yupRef('password')], 'Passwords do not match'),
 })
@@ -88,7 +81,7 @@ export function createLoginValidationSchema(
 ) {
   return object({
     identifier: createIdentifierValidationSchema(identifierField),
-    password: string().trim().required(passwordRequiredMessage),
+    password: string().required(passwordRequiredMessage),
   })
 }
 
@@ -127,7 +120,6 @@ export function createPasswordResetValidationSchema(
   return object({
     password: policyPassword,
     confirmPassword: string()
-      .trim()
       .required(confirmPasswordRequiredMessage)
       .oneOf([yupRef('password')], confirmPasswordMismatchMessage),
   })
@@ -143,8 +135,8 @@ export function createAccountPasswordChangeValidationSchema(
       passwordPolicy.notSameAsCurrentMessage ||
         'New password must be different from current password',
       function (value) {
-        const current = String(this.parent.currentPassword ?? '').trim()
-        const next = String(value ?? '').trim()
+        const current = String(this.parent.currentPassword ?? '')
+        const next = String(value ?? '')
 
         if (!current || !next) {
           return true
@@ -157,14 +149,22 @@ export function createAccountPasswordChangeValidationSchema(
 }
 
 function createPasswordValidationSchema(policy: AuthPasswordPolicy = {}) {
-  const minLength = policy.minLength ?? 8
-  const maxLength = policy.maxLength ?? 128
   const requirements = validPasswordRequirements(policy)
-  let schema = string()
-    .trim()
-    .required(policy.requiredMessage || 'Password is required')
-    .min(minLength, policy.minLengthMessage || `Password must be at least ${minLength} characters`)
-    .max(maxLength, policy.maxLengthMessage || `Password must be ${maxLength} characters or less`)
+  let schema = string().required(policy.requiredMessage || 'Password is required')
+
+  if (typeof policy.minLength === 'number') {
+    schema = schema.min(
+      policy.minLength,
+      policy.minLengthMessage || `Password must be at least ${policy.minLength} characters`,
+    )
+  }
+
+  if (typeof policy.maxLength === 'number') {
+    schema = schema.max(
+      policy.maxLength,
+      policy.maxLengthMessage || `Password must be ${policy.maxLength} characters or less`,
+    )
+  }
 
   if (requirements.length > 0) {
     for (const requirement of requirements) {
@@ -181,9 +181,6 @@ function createPasswordValidationSchema(policy: AuthPasswordPolicy = {}) {
   }
 
   return schema
-    .matches(/[a-z]/, policy.lowercaseMessage || 'Password must include a lowercase letter')
-    .matches(/[A-Z]/, policy.uppercaseMessage || 'Password must include an uppercase letter')
-    .matches(/[0-9]/, policy.numberMessage || 'Password must include a number')
 }
 
 function validPasswordRequirements(policy: AuthPasswordPolicy) {

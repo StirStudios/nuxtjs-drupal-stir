@@ -97,7 +97,9 @@ the image or illustration in split layouts. `backgroundImage`, `imagePosition`,
 `showIcon`, and `backButton` support the same global and per-page structure.
 `submitButton` accepts Nuxt UI `UButton` props, such as `size: 'xl'`, `color`,
 `variant`, `icon`, and `class`. Drupal remains the source for auth
-behaviour, fields, copy, password policy, and redirects.
+behaviour, fields, copy, password policy, and redirects. Drupal presentation
+values are not read; configure all auth layouts and visuals through
+`stirTheme.auth`.
 
 ## Public Helpers
 

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const identifier =
     typeof body?.identifier === 'string' ? body.identifier.trim() : ''
-  const password = typeof body?.password === 'string' ? body.password.trim() : ''
+  const password = typeof body?.password === 'string' ? body.password : ''
   const turnstileResponse =
     typeof body?.turnstile_response === 'string'
       ? body.turnstile_response.trim()

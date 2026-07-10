@@ -5,6 +5,19 @@ import {
 } from '../../layers/auth/app/utils/authValidation'
 
 describe('auth validation', () => {
+  it('preserves whitespace in passwords', () => {
+    const schema = createPasswordResetValidationSchema({
+      minLength: 8,
+      maxLength: 128,
+    })
+    const password = ' Password1 '
+
+    expect(schema.validateSync({ password, confirmPassword: password })).toEqual({
+      password,
+      confirmPassword: password,
+    })
+  })
+
   it('uses configured Drupal password requirements instead of fixed defaults', () => {
     const schema = createRegisterValidationSchema(
       {},
@@ -34,16 +47,14 @@ describe('auth validation', () => {
     })).toThrow('Password must include a symbol')
   })
 
-  it('falls back to the default password requirements without Drupal patterns', () => {
+  it('does not invent password requirements when Drupal sends none', () => {
     const schema = createPasswordResetValidationSchema({
-      minLength: 8,
-      maxLength: 128,
       requirements: [],
     })
 
     expect(() => schema.validateSync({
       password: 'abcdefgh',
       confirmPassword: 'abcdefgh',
-    })).toThrow('Password must include an uppercase letter')
+    })).not.toThrow()
   })
 })

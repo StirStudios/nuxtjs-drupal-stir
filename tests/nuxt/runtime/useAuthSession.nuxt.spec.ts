@@ -73,4 +73,30 @@ describe('useAuthSession', () => {
     expect(sessionCalls).toBe(2)
     wrapper.unmount()
   })
+
+  it('deduplicates concurrent session reads', async () => {
+    const SessionHarness = defineComponent({
+      setup() {
+        return {
+          first: useAuthSession().fetchSession,
+          second: useAuthSession().fetchSession,
+        }
+      },
+      template: '<div />',
+    })
+
+    const wrapper = await mountSuspended(SessionHarness)
+    const session = wrapper.vm as {
+      first: (options?: { force?: boolean }) => Promise<void>
+      second: (options?: { force?: boolean }) => Promise<void>
+    }
+
+    await Promise.all([
+      session.first({ force: true }),
+      session.second({ force: true }),
+    ])
+
+    expect(sessionCalls).toBe(1)
+    wrapper.unmount()
+  })
 })

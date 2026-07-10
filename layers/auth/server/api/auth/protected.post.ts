@@ -5,6 +5,7 @@ import {
   layerAuthIsProtectedAccessAuthenticated,
   layerAuthSetProtectedAccessCookie,
 } from '../../utils/protectedAccess'
+import { layerAuthConstantTimeEquals } from '../../utils/protectedAccessToken'
 
 type ProtectedBody = {
   action?: unknown
@@ -22,14 +23,13 @@ export default defineEventHandler(async (event) => {
     return { protectedAuthenticated: false }
   }
 
-  const submittedPassword =
-    typeof body?.password === 'string' ? body.password.trim() : ''
+  const submittedPassword = typeof body?.password === 'string' ? body.password : ''
   const expectedPassword = String(useRuntimeConfig().protectedPassword || '')
 
   if (
     !submittedPassword ||
     !expectedPassword ||
-    submittedPassword !== expectedPassword
+    !layerAuthConstantTimeEquals(submittedPassword, expectedPassword)
   ) {
     throw createError({
       statusCode: 401,

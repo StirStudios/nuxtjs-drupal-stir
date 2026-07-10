@@ -148,6 +148,8 @@ stirTheme: {
   `color`, `variant`, `icon`, and `class`.
 - `pages` also supports `register`, `passwordRequest`, `verify`, and `protectedPage`.
 - Per-page settings override global auth theme settings.
+- Auth layouts and visuals are read only from `stirTheme.auth`, never from
+  Drupal's auth configuration response.
 
 ### 🔎 `cmsGlobalSeo`
 
