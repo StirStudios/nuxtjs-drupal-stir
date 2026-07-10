@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 import type { WebformDefinition } from '~/types'
 
 const props = defineProps<{
@@ -18,7 +18,7 @@ const props = defineProps<{
   editLink?: string
 }>()
 
-const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
+const trustedTextHtml = computed(() => trustedDrupalHtml(props.text))
 </script>
 
 <template>
@@ -27,7 +27,11 @@ const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
     <slot name="schedule" />
 
     <div class="space-y-6 p-5">
-      <div v-if="safeTextHtml" class="prose max-w-none" v-html="safeTextHtml" />
+      <div
+        v-if="trustedTextHtml"
+        class="prose max-w-none"
+        v-html="trustedTextHtml"
+      />
       <ParagraphWebform
         v-if="props.webform"
         :on-close="props.onClose"

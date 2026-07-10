@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,
@@ -11,7 +11,7 @@ const props = defineProps<{
   hide?: boolean
   isArticle?: boolean | string
 }>()
-const safeHtml = computed(() => cleanHTML(props.content ?? ''))
+const trustedHtml = computed(() => trustedDrupalHtml(props.content))
 
 defineSlots<{
   default(): unknown
@@ -20,5 +20,5 @@ defineSlots<{
 
 <template>
   <slot />
-  <div v-if="safeHtml" v-html="safeHtml" />
+  <div v-if="trustedHtml" v-html="trustedHtml" />
 </template>

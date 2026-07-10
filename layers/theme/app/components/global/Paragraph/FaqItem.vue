@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,
@@ -21,7 +21,9 @@ const props = defineProps<{
 }>()
 
 const displayQuestion = computed(() => props.question ?? props.header ?? '')
-const safeAnswerHtml = computed(() => cleanHTML(props.answer ?? props.text ?? ''))
+const trustedAnswerHtml = computed(() =>
+  trustedDrupalHtml(props.answer ?? props.text),
+)
 </script>
 
 <template>
@@ -34,9 +36,9 @@ const safeAnswerHtml = computed(() => cleanHTML(props.answer ?? props.text ?? ''
   </component>
 
   <div
-    v-if="safeAnswerHtml"
+    v-if="trustedAnswerHtml"
     class="prose max-w-none text-muted"
-    v-html="safeAnswerHtml"
+    v-html="trustedAnswerHtml"
   />
 
   <EditLink :link="editLink" :parent-uuid="parentUuid" />

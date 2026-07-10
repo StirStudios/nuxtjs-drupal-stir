@@ -2,7 +2,7 @@
 import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '~/types'
 import { useEvaluateState } from '~/composables/useEvaluateState'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 import {
   LazyFieldInput,
@@ -113,9 +113,11 @@ const { visible, checked } = useEvaluateState(
 )
 
 const descriptionContent = computed(() =>
-  cleanHTML(String(props.field['#description'] ?? '')),
+  trustedDrupalHtml(String(props.field['#description'] ?? '')),
 )
-const helpContent = computed(() => cleanHTML(String(props.field['#help'] ?? '')))
+const helpContent = computed(() =>
+  trustedDrupalHtml(String(props.field['#help'] ?? '')),
+)
 const labelClass = computed(() => String(props.field['#class'] ?? ''))
 const fieldUi = computed(() => {
   if (

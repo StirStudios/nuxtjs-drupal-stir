@@ -59,6 +59,9 @@ const randomizeEnabled = computed(() => {
 })
 
 const randomizeRowsOnClient = ref(false)
+const trustedDynamicNoResults = computed(() =>
+  trustedDrupalHtml(dynamicNoResults.value),
+)
 
 function resolveSlotRows() {
   const rows = tk.slot('rows')
@@ -247,7 +250,10 @@ const getRowMotionProps = (index: number) =>
     variant="subtle"
   >
     <template #description>
-      <span v-if="dynamicNoResults" v-html="dynamicNoResults" />
+      <span
+        v-if="trustedDynamicNoResults"
+        v-html="trustedDynamicNoResults"
+      />
       <span v-else>Try changing filters or reset to defaults.</span>
     </template>
 

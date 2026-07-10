@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 import { resolveUiColor } from '~/utils/nuxtUiProps'
 
 type UITimelineItem = {
@@ -50,7 +50,7 @@ const timelineItems = computed<UITimelineItem[]>(() =>
       date: stringProp(p.date, 'Present'),
       title: stringProp(p.header),
       icon: stringProp(p.icon, 'i-lucide-rocket'),
-      description: cleanHTML(stringProp(p.text)),
+      description: trustedDrupalHtml(stringProp(p.text)),
       slot: 'rich',
     }
   }),

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformState } from '~/types'
 import type { ObjectSchema } from 'yup'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
@@ -46,7 +46,7 @@ const emit = defineEmits<{
 }>()
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
-const safeHtml = (value?: string) => cleanHTML(value ?? '')
+const trustedHtml = (value?: string) => trustedDrupalHtml(value)
 const buttonSize = computed<UiSize>(() =>
   resolveUiSize(props.themeWebform.submitButtonSize, 'md'),
 )
@@ -107,7 +107,7 @@ const submitButtonProps = computed(() => ({
         <div
           v-if="fields[fieldName]?.parentDescription"
           class="section-desc"
-          v-html="safeHtml(String(fields[fieldName]?.parentDescription ?? ''))"
+          v-html="trustedHtml(String(fields[fieldName]?.parentDescription ?? ''))"
         />
         <div :class="props.themeWebform.fieldGroup">
           <template
@@ -166,7 +166,7 @@ const submitButtonProps = computed(() => ({
   </UForm>
 
   <div v-else :class="themeWebform.response">
-    <div class="prose" v-html="safeHtml(webformConfirmation)" />
+    <div class="prose" v-html="trustedHtml(webformConfirmation)" />
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
   </div>
 </template>

@@ -1,3 +1,5 @@
+@reference './main.css';
+
 @layer base {
   :root {
     --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);

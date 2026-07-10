@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AccordionItem } from '@nuxt/ui'
 import type { VNode } from 'vue'
-import { cleanHTML } from '~/utils/cleanHTML'
+import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,
@@ -42,7 +42,7 @@ type FaqAccordionItem = AccordionItem & {
 }
 
 const slots = useSlots()
-const safeTextHtml = computed(() => cleanHTML(props.text ?? ''))
+const trustedTextHtml = computed(() => trustedDrupalHtml(props.text))
 const sectionClasses = computed(() =>
   [
     'paragraph-faq space-y-6',
@@ -69,7 +69,7 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
     return {
       label,
       value,
-      answerHtml: cleanHTML(itemProps.answer ?? itemProps.text ?? ''),
+      answerHtml: trustedDrupalHtml(itemProps.answer ?? itemProps.text),
       editLink: itemProps.editLink,
       parentUuid: itemProps.parentUuid,
     }
@@ -81,7 +81,7 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
   <section :class="sectionClasses">
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
-    <div v-if="header || safeTextHtml" class="space-y-3">
+    <div v-if="header || trustedTextHtml" class="space-y-3">
       <component
         :is="headerTag || 'h2'"
         v-if="header"
@@ -89,9 +89,9 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
         {{ header }}
       </component>
       <div
-        v-if="safeTextHtml"
+        v-if="trustedTextHtml"
         class="prose max-w-none text-muted"
-        v-html="safeTextHtml"
+        v-html="trustedTextHtml"
       />
     </div>
 

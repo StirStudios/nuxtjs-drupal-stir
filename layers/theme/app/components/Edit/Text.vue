@@ -231,3 +231,5 @@ onMounted(async () => {
     </div>
   </UTheme>
 </template>
+
+<style src="../../assets/css/admin-ui.css"></style>
