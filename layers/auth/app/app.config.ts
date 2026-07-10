@@ -1,5 +1,7 @@
+import type { AppConfigInput } from 'nuxt/schema'
+
 export default defineAppConfig({
-  ui: {},
+  ui: {} as unknown as NonNullable<AppConfigInput['ui']>,
 
   protectedRoutes: {
     requireLoginPaths: [],

@@ -1,3 +1,4 @@
+import type { AppConfigInput } from 'nuxt/schema'
 import {
   materialVariant,
   materialVariantWithPB,
@@ -394,5 +395,5 @@ export default defineAppConfig({
         variant: 'material',
       },
     },
-  },
+  } as unknown as NonNullable<AppConfigInput['ui']>,
 })
