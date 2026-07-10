@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { createError } from 'h3'
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { useAuthSession } from '../../../layers/auth/app/composables/auth/useAuthSession'
@@ -97,6 +98,32 @@ describe('useAuthSession', () => {
     ])
 
     expect(sessionCalls).toBe(1)
+    wrapper.unmount()
+  })
+
+  it('propagates a failed forced refresh', async () => {
+    const SessionHarness = defineComponent({
+      setup() {
+        return {
+          fetchSession: useAuthSession().fetchSession,
+        }
+      },
+      template: '<div />',
+    })
+
+    const wrapper = await mountSuspended(SessionHarness)
+    const session = wrapper.vm as {
+      fetchSession: (options?: { force?: boolean }) => Promise<void>
+    }
+
+    unregisterEndpoint?.()
+    unregisterEndpoint = registerEndpoint('/api/auth/session', () => {
+      throw createError({ statusCode: 502, statusMessage: 'Drupal unavailable' })
+    })
+
+    await expect(session.fetchSession({ force: true })).rejects.toMatchObject({
+      statusCode: 502,
+    })
     wrapper.unmount()
   })
 })

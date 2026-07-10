@@ -18,7 +18,7 @@ export function useAuthSession() {
   )
   const integrationEnabled = useAuthIntegration()
   const requestFetch = useRequestFetch()
-  const { execute } = useAsyncData(
+  const { error, execute } = useAsyncData(
     'stir-auth-session',
     async () => {
       const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
@@ -46,6 +46,10 @@ export function useAuthSession() {
     if (ready.value && !options.force) return
 
     await execute({ dedupe: 'defer' })
+
+    if (error.value) {
+      throw error.value
+    }
   }
 
   const clearSession = () => {
