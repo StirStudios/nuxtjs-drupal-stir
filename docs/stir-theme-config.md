@@ -89,20 +89,21 @@ protectedRoutes: {
   loginPath: '/login',
   redirectOnLogin: '/',
   requireLoginPaths: [],
+  fallbackRedirectPath: '/',
 }
 ```
 
-### 🔑 `auth`
+### 🔑 `authIntegration`
 
 ```ts
-auth: {
-  accountEnabled: false,
-  protectedFallbackRedirectPath: '/',
+authIntegration: {
+  drupalAccounts: false,
 }
 ```
 
-- `accountEnabled: false` disables Drupal account UI routes while keeping `/auth/protected` available.
-- Set `accountEnabled: true` only for sites that use Drupal account auth endpoints.
+- `drupalAccounts: false` disables Drupal account UI routes while keeping `/auth/protected` available.
+- Set `drupalAccounts: true` only for sites that use the Drupal `stir_account` endpoints.
+- Drupal `/api/auth/config` owns account-auth redirects, UI copy, and password policy.
 
 ### 🔎 `cmsGlobalSeo`
 

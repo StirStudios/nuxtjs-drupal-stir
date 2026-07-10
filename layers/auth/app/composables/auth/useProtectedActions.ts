@@ -7,14 +7,14 @@ export function useProtectedActions() {
 
   const login = async (password: string) => {
     await authApi.loginProtected(password)
-    await session.fetchSession()
+    await session.fetchSession({ force: true })
 
     return session.loggedIn.value
   }
 
   const logout = async () => {
     await authApi.logoutProtected()
-    await session.fetchSession()
+    await session.fetchSession({ force: true })
   }
 
   return {

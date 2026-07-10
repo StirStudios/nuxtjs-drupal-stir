@@ -1,3 +1,7 @@
+type FetchProtectedSessionOptions = {
+  force?: boolean
+}
+
 export function useProtectedSession() {
   const ready = useState<boolean>('auth-protected-session-ready', () => false)
   const loggedIn = useState<boolean>(
@@ -6,7 +10,9 @@ export function useProtectedSession() {
   )
   let pendingSessionFetch: Promise<void> | null = null
 
-  const fetchSession = async () => {
+  const fetchSession = async (options: FetchProtectedSessionOptions = {}) => {
+    if (ready.value && !options.force) return
+
     if (pendingSessionFetch) {
       await pendingSessionFetch
       return

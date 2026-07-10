@@ -11,7 +11,7 @@ export function useAuthLogin() {
   const isLoading = ref(false)
   const turnstileToken = ref('')
   const { login, getFetchErrorMessage } = useAuthActions()
-  const { auth, loginRedirectPath } = useAuthConfig()
+  const { auth } = useAuthConfig()
   const session = useAuthSession()
   const { onError } = useValidation()
 
@@ -72,7 +72,7 @@ export function useAuthLogin() {
             'Signed in successfully.',
           color: 'success',
         })
-        await navigateTo(loginRedirectPath.value)
+        await navigateTo(auth.value.loginRedirectPath || '/')
       } else {
         const backendAuthenticated = Boolean(
           loginResult.response?.session?.authenticated,

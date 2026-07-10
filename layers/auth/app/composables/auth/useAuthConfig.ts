@@ -1,52 +1,30 @@
 import type { AuthUiConfig } from '../../types/auth'
-import { mergeAuthUiConfig } from '../../utils/authUiConfig'
+import { useAuthIntegration } from './useAuthIntegration'
 
 export function useAuthConfig() {
-  const appConfig = useAppConfig()
-  const configuredAuth = computed(
-    () => (appConfig.auth || {}) as Partial<AuthUiConfig>,
-  )
-  const configuredAccountEnabled = computed(
-    () => configuredAuth.value.accountEnabled === true,
-  )
-  const { data: drupalAuth } = useAsyncData(
+  const integrationEnabled = useAuthIntegration()
+  const { data: drupalAuth, status, execute } = useAsyncData(
     'stir-auth-ui-config',
-    async () => configuredAccountEnabled.value
+    async () => integrationEnabled
       ? await $fetch<Partial<AuthUiConfig>>('/api/auth/config')
       : {},
     {
       default: () => ({}),
+      dedupe: 'defer',
     },
   )
-  const auth = computed(() => mergeAuthUiConfig(
-    configuredAuth.value,
-    drupalAuth.value || {},
-  ))
-  const protectedRoutes = computed(() => appConfig.protectedRoutes || {})
+  const auth = computed<Partial<AuthUiConfig>>(() => drupalAuth.value || {})
 
-  const loginRedirectPath = computed(
-    () => auth.value.loginRedirectPath || '/',
-  )
-  const protectedFallbackRedirectPath = computed(
-    () => auth.value.protectedFallbackRedirectPath || '/',
-  )
-  const accountEnabled = computed(() => auth.value.accountEnabled === true)
-  const logoutRedirectPath = computed(() => {
-    const path = auth.value.logoutRedirectPath
+  const ensureLoaded = async () => {
+    if (!integrationEnabled || status.value === 'success') return
 
-    if (!accountEnabled.value && (!path || path === '/auth/login')) {
-      return protectedFallbackRedirectPath.value
-    }
-
-    return path || '/auth/login'
-  })
+    await execute({ dedupe: 'defer' })
+  }
 
   return {
     auth,
-    protectedRoutes,
-    accountEnabled,
-    loginRedirectPath,
-    logoutRedirectPath,
-    protectedFallbackRedirectPath,
+    integrationEnabled,
+    status,
+    ensureLoaded,
   }
 }

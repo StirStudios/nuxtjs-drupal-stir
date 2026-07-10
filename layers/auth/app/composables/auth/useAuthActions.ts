@@ -13,7 +13,7 @@ export function useAuthActions() {
   }) => {
     const response = await authApi.login(payload)
 
-    await session.fetchSession()
+    await session.fetchSession({ force: true })
 
     return {
       response,

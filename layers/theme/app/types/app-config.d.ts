@@ -20,56 +20,11 @@ type ProtectedRoutesConfig = {
   loginPath?: string
   redirectOnLogin?: string
   allowAuthenticatedUserBypass?: boolean
+  fallbackRedirectPath?: string
 } & LooseRecord
 
-type AuthLayout = 'card' | 'page-split' | 'card-split'
-type AuthImagePosition = 'left' | 'right'
-
-type AuthPageCopyConfig = {
-  title?: string
-  description?: string
-  backgroundImage?: string
-  layout?: AuthLayout
-  imagePosition?: AuthImagePosition
-  showIcon?: boolean
-} & LooseRecord
-
-type AuthSubmitButtonConfig = {
-  label?: string
-  class?: string
-  color?: UiColorName
-  icon?: string
-  loadingIcon?: string
-  size?: UiSizeName
-  variant?: UiButtonVariantName
-} & LooseRecord
-
-type AuthBackButtonConfig = {
-  enabled?: boolean
-  label?: string
-  to?: string
-  icon?: string
-  color?: UiColorName
-  variant?: UiButtonVariantName
-  class?: string
-} & LooseRecord
-
-type AuthConfig = {
-  accountEnabled?: boolean
-  loginRedirectPath?: string
-  logoutRedirectPath?: string
-  protectedFallbackRedirectPath?: string
-  backgroundImage?: string
-  backButton?: AuthBackButtonConfig
-  layout?: AuthLayout
-  imagePosition?: AuthImagePosition
-  showIcon?: boolean
-  submitButton?: AuthSubmitButtonConfig
-  login?: AuthPageCopyConfig
-  protectedPage?: AuthPageCopyConfig
-  register?: AuthPageCopyConfig
-  passwordRequest?: AuthPageCopyConfig
-  passwordReset?: AuthPageCopyConfig
+type AuthIntegrationConfig = {
+  drupalAccounts?: boolean
 } & LooseRecord
 
 type PlausibleConfig = {
@@ -336,6 +291,10 @@ type StirThemeErrorConfig = {
   variant?: UiButtonVariantName
 } & LooseRecord
 
+type StirThemeAuthConfig = {
+  submitButton?: StirThemeButtonLikeConfig
+} & LooseRecord
+
 type StirThemeRevealConfig = {
   durationMs?: number
   threshold?: number
@@ -372,6 +331,7 @@ type StirThemeConfig = {
   animations?: StirThemeAnimationsConfig
   scrollButton?: StirThemeScrollButtonConfig
   error?: StirThemeErrorConfig
+  auth?: StirThemeAuthConfig
 } & LooseRecord
 
 type ResolvedStirThemeNavigationConfig = StirThemeNavigationConfig & {
@@ -428,12 +388,13 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   animations: StirThemeAnimationsConfig
   scrollButton: StirThemeScrollButtonConfig
   error: StirThemeErrorConfig
+  auth: StirThemeAuthConfig
 }
 
 declare module 'nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
-    auth?: AuthConfig
+    authIntegration?: AuthIntegrationConfig
     analytics?: AnalyticsConfig
     userway?: UserwayConfig
     privacyNotice?: PrivacyNoticeConfig
@@ -445,7 +406,7 @@ declare module 'nuxt/schema' {
 
   interface AppConfig {
     protectedRoutes: ProtectedRoutesConfig
-    auth: AuthConfig
+    authIntegration: AuthIntegrationConfig
     analytics: AnalyticsConfig
     userway: UserwayConfig
     privacyNotice: PrivacyNoticeConfig

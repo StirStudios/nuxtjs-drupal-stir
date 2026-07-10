@@ -102,16 +102,13 @@ export type AuthPasswordPolicy = {
 
 export type AuthUiConfig = {
   version?: number
-  accountEnabled?: boolean
   loginRedirectPath?: string
   logoutRedirectPath?: string
-  protectedFallbackRedirectPath?: string
   backgroundImage?: string
   layout?: string
   imagePosition?: string
   showIcon?: boolean
   backButton?: Record<string, unknown>
-  submitButton?: Record<string, unknown>
   identifierModes?: {
     login?: AuthIdentifierMode
     passwordRequest?: AuthIdentifierMode

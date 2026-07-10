@@ -14,10 +14,8 @@ import {
 } from '../../utils/authLayout'
 
 const route = useRoute()
-const appConfig = useAppConfig()
 const runtimeConfig = useRuntimeConfig()
-
-const authConfig = appConfig.auth || {}
+const { auth } = useAuthConfig()
 
 type AuthPageConfigKey =
   | 'login'
@@ -63,7 +61,7 @@ const resolveAuthPageKey = (): AuthPageConfigKey | null => {
 
 const resolveAuthPageConfig = (pageKey: AuthPageConfigKey | null): Record<string, unknown> | undefined => {
   if (!pageKey) return undefined
-  const pageConfig = (authConfig as Record<string, unknown>)?.[pageKey]
+  const pageConfig = (auth.value as Record<string, unknown>)?.[pageKey]
 
   return typeof pageConfig === 'object' && pageConfig !== null ? (pageConfig as Record<string, unknown>) : undefined
 }
@@ -82,13 +80,13 @@ const authPageConfig = computed(() => resolveAuthPageConfig(resolveAuthPageKey()
 
 const pageLayout = computed<AuthLayout>(() =>
   resolveAuthLayout(authPageConfig.value?.layout) ||
-  resolveAuthLayout(authConfig.layout) ||
+  resolveAuthLayout(auth.value.layout) ||
   defaultAuthLayout,
 )
 
 const imagePosition = computed<AuthImagePosition>(() =>
   resolveAuthImagePosition(authPageConfig.value?.imagePosition) ||
-  resolveAuthImagePosition(authConfig.imagePosition) ||
+  resolveAuthImagePosition(auth.value.imagePosition) ||
   defaultAuthImagePosition,
 )
 
@@ -97,10 +95,10 @@ const showIcon = computed(() => {
     return authPageConfig.value.showIcon
   }
 
-  return typeof authConfig.showIcon === 'boolean' ? authConfig.showIcon : true
+  return typeof auth.value.showIcon === 'boolean' ? auth.value.showIcon : true
 })
 
-const backButtonConfig = computed(() => resolveConfigObject(authConfig.backButton))
+const backButtonConfig = computed(() => resolveConfigObject(auth.value.backButton))
 
 const pageBackgroundImage = computed(() => {
   const pageImage = typeof authPageConfig.value?.backgroundImage === 'string'
@@ -111,7 +109,7 @@ const pageBackgroundImage = computed(() => {
     return pageImage
   }
 
-  const authBackgroundImage = authConfig.backgroundImage
+  const authBackgroundImage = auth.value.backgroundImage
 
   return typeof authBackgroundImage === 'string' ? authBackgroundImage.trim() : ''
 })

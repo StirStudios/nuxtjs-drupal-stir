@@ -1,4 +1,4 @@
-import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
+import { defineNuxtRouteMiddleware, navigateTo } from '#app'
 import { useAuthConfig } from '../composables/auth/useAuthConfig'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 
@@ -12,12 +12,13 @@ const GUEST_ONLY_AUTH_ROUTES = new Set([
 export default defineNuxtRouteMiddleware(async (to) => {
   if (!GUEST_ONLY_AUTH_ROUTES.has(to.path)) return
 
-  const { accountEnabled } = useAuthConfig()
+  const { auth, ensureLoaded, integrationEnabled } = useAuthConfig()
 
-  if (!accountEnabled.value) return
+  if (!integrationEnabled) return
 
-  const appConfig = useAppConfig()
-  const redirectPath = appConfig.auth?.loginRedirectPath || '/'
+  await ensureLoaded()
+
+  const redirectPath = auth.value.loginRedirectPath || '/'
   const session = useAuthSession()
 
   await session.fetchSession()

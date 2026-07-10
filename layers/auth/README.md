@@ -31,53 +31,38 @@ extends: ['./layers/auth']
 
 ## Configuration
 
-Auth shell, redirect, and fallback defaults can be customized through app config.
-Auth page copy, field labels, and password policy should come from Drupal via
-`/api/auth/config` when Drupal account integration is enabled.
-Drupal account auth is opt-in; set `auth.accountEnabled: true` only for projects
-that provide the `stir_account` Drupal endpoints.
+Drupal owns account-auth redirects, UI copy, field labels, and password policy
+through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
+integration is installed.
 
 ```ts
 export default defineAppConfig({
-  auth: {
-    accountEnabled: true,
-    backgroundImage: '/images/auth.jpg',
-    layout: 'card',
-    imagePosition: 'left',
-    showIcon: true,
-    backButton: {
-      enabled: false,
-      label: 'Back',
-      to: '/',
-    },
-    submitButton: {
-      class: '',
-      size: 'xl',
-      variant: 'solid',
-    },
+  authIntegration: {
+    drupalAccounts: true,
   },
 })
 ```
 
-Auth pages support three layouts:
+Leave `authIntegration.drupalAccounts` unset or `false` when a project only
+needs `/auth/protected` for password-protected Nuxt pages. Account UI routes are
+redirected to `protectedRoutes.fallbackRedirectPath`, while protected-page
+access keeps working.
 
-- `card`: centered auth card over an optional full-page background image.
-- `page-split`: full-height image panel on one side and the auth form on the other.
-- `card-split`: auth card with an image panel on one side and the form on the other.
+Normal pages only read this integration flag. Drupal auth UI configuration is
+requested only by account and auth routes that need it.
 
-Set `auth.imagePosition` or a page-level `imagePosition` to `left` or `right`.
-Page-level shell values under `auth.login`, `auth.register`,
-`auth.passwordRequest`, `auth.passwordReset`, and `auth.protectedPage` can
-override global auth shell values when needed.
-Set `showIcon: false` globally or on an auth page to hide the auth form icon.
-Set `auth.backButton.enabled: true` to render a fixed auth-shell back button.
+Theme all auth submit buttons from Nuxt without adding presentation settings to
+Drupal:
 
-Leave `auth.accountEnabled` unset or set it to `false` when a project only needs
-`/auth/protected` for password-protected Nuxt pages. Account UI routes are
-redirected to `auth.protectedFallbackRedirectPath`, while protected-page access
-keeps working.
-
-Page-level submit props passed to `AuthCard` take priority over `auth.submitButton`.
+```ts
+stirTheme: {
+  auth: {
+    submitButton: {
+      class: 'uppercase',
+    },
+  },
+},
+```
 
 ## Public Helpers
 
