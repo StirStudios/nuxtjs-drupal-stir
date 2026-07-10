@@ -22,6 +22,7 @@ describe('layer contract', () => {
 
   it('has consumer fixture for smoke testing the layer from a root app', () => {
     expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/nuxt.config.ts'))).toBe(true)
+    expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/app.config.ts'))).toBe(true)
     expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/app.vue'))).toBe(true)
   })
 
