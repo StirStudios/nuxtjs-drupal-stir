@@ -13,10 +13,10 @@ export function useAuthSession() {
     () => null,
   )
   let pendingSessionFetch: Promise<void> | null = null
-  const { accountEnabled } = useAuthConfig()
+  const { integrationEnabled } = useAuthConfig()
 
   const fetchSession = async () => {
-    if (!accountEnabled.value) {
+    if (!integrationEnabled) {
       ready.value = true
       loggedIn.value = false
       user.value = null

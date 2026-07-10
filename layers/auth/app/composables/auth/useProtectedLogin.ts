@@ -1,13 +1,13 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useProtectedActions } from './useProtectedActions'
-import { useAuthConfig } from './useAuthConfig'
 
 export function useProtectedLogin() {
   const toast = useToast()
   const isLoading = ref(false)
   const route = useRoute()
   const { login } = useProtectedActions()
-  const { protectedFallbackRedirectPath } = useAuthConfig()
+  const protectedFallbackRedirectPath =
+    useAppConfig().protectedRoutes?.fallbackRedirectPath || '/'
 
   const fields: AuthFormField[] = [
     {
@@ -39,7 +39,7 @@ export function useProtectedLogin() {
           typeof route.query.redirect === 'string' &&
           route.query.redirect.startsWith('/')
             ? route.query.redirect
-            : protectedFallbackRedirectPath.value
+            : protectedFallbackRedirectPath
 
         await navigateTo(redirectTarget)
       }

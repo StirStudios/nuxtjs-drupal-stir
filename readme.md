@@ -105,9 +105,9 @@ Drupal account auth is disabled by default. If a downstream project does not
 need any auth routes or APIs, remove that `extends` entry.
 Core webform submission and Drupal CSRF forwarding do not depend on the auth layer.
 If it only needs password-protected Nuxt pages, keep the layer and leave
-`auth.accountEnabled` unset or set it to `false` in app config.
-Set `auth.accountEnabled: true` only for projects that provide the Drupal
-`stir_account` endpoints.
+`authIntegration.drupalAccounts` unset or set it to `false` in app config.
+Set `authIntegration.drupalAccounts: true` only for projects that provide the
+Drupal `stir_account` endpoints.
 
 When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 
@@ -121,7 +121,8 @@ When enabled, the auth layer is aligned with `stir_account` endpoints and uses `
 
 Behavior notes:
 
-- `auth.accountEnabled: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
+- `authIntegration.drupalAccounts: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
+- Drupal `/api/auth/config` is the source of truth for account-auth redirects, UI copy, and password policy; frontend values are safe fallbacks only.
 - Client auth state comes from `/api/auth/session` only.
 - Requests with Drupal `SESS*`/`SSESS*` cookies skip SSR for page routes and return `Cache-Control: private, no-store, max-age=0`; anonymous requests keep normal SSR for SEO.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.

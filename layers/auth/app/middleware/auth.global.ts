@@ -47,9 +47,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!isProtected) return
 
-  const { accountEnabled } = useAuthConfig()
+  const { integrationEnabled } = useAuthConfig()
   const allowAuthenticatedUserBypass =
-    accountEnabled.value && config.allowAuthenticatedUserBypass !== false
+    integrationEnabled && config.allowAuthenticatedUserBypass !== false
   const protectedSession = useProtectedSession()
 
   await protectedSession.fetchSession()

@@ -15,16 +15,6 @@ const props = defineProps<{
 }>()
 
 const appConfig = useAppConfig()
-const resolveSubmitButtonConfig = (value: unknown): Record<string, unknown> => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : {}
-}
-const submitButton = computed(() => ({
-  label: 'Continue',
-  ...resolveSubmitButtonConfig(appConfig.auth?.submitButton),
-  ...resolveSubmitButtonConfig(props.submit),
-}))
 const authLayout = inject(authLayoutContextKey, undefined)
 const isCardSplit = computed(() =>
   authLayout?.value.layout === 'card-split' && Boolean(authLayout.value.image),
@@ -46,6 +36,11 @@ const formIcon = computed(() => {
   return props.icon || 'i-lucide-lock'
 })
 const authFormPaddingClass = 'p-6'
+const submitButton = computed(() => ({
+  ...appConfig.stirTheme?.auth?.submitButton,
+  ...props.submit,
+  label: typeof props.submit?.label === 'string' ? props.submit.label : 'Continue',
+}))
 const formPanelProps = computed(() => ({
   title: props.title,
   description: props.description,

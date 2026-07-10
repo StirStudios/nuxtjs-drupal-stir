@@ -5,7 +5,7 @@ import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
 const { logout } = useAuthActions()
 const { logout: logoutProtected } = useProtectedActions()
-const { logoutRedirectPath } = useAuthConfig()
+const { auth } = useAuthConfig()
 const toast = useToast()
 
 useSeoMeta({
@@ -31,7 +31,7 @@ onMounted(async () => {
     color: 'success',
   })
 
-  await navigateTo(logoutRedirectPath.value)
+  await navigateTo(auth.value.logoutRedirectPath || '/auth/login')
 })
 </script>
 
