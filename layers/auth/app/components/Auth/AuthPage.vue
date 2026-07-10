@@ -13,9 +13,9 @@ import {
   type AuthLayout,
 } from '../../utils/authLayout'
 import type {
-  StirThemeAuthConfig,
-  StirThemeAuthPageConfig,
-} from '../../../../theme/app/types/app-config'
+  AuthPageConfig,
+  AuthThemeConfig,
+} from '../../types/theme'
 
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
@@ -74,14 +74,14 @@ const resolveConfigString = (value: unknown, fallback = ''): string => {
 }
 
 const authPageKey = computed(resolveAuthPageKey)
-const themeAuth = computed<StirThemeAuthConfig>(() => {
+const themeAuth = computed<AuthThemeConfig>(() => {
   const theme = (appConfig.stirTheme || {}) as {
-    auth?: StirThemeAuthConfig
+    auth?: AuthThemeConfig
   }
 
   return theme.auth || {}
 })
-const themePageConfig = computed<StirThemeAuthPageConfig>(() =>
+const themePageConfig = computed<AuthPageConfig>(() =>
   authPageKey.value ? themeAuth.value.pages?.[authPageKey.value] || {} : {},
 )
 
