@@ -64,6 +64,37 @@ stirTheme: {
 },
 ```
 
+Auth layouts are also frontend theme settings. Use `card`, `card-split`, or
+`page-split` globally, then override individual routes when needed:
+
+```ts
+stirTheme: {
+  auth: {
+    layout: 'card-split',
+    backgroundImage: '/themes/custom/site/auth.jpg',
+    imagePosition: 'left',
+    pages: {
+      login: {
+        layout: 'page-split',
+        backgroundImage: '/themes/custom/site/login.jpg',
+      },
+      logout: {
+        layout: 'card',
+        backgroundImage: '/themes/custom/site/logout.jpg',
+      },
+      passwordReset: {
+        layout: 'card-split',
+        backgroundImage: '/themes/custom/site/reset-password.jpg',
+      },
+    },
+  },
+},
+```
+
+`backgroundImage`, `imagePosition`, `showIcon`, and `backButton` support the
+same global and per-page structure. Drupal remains the source for auth
+behaviour, fields, copy, password policy, and redirects.
+
 ## Public Helpers
 
 Downstream projects with local auth page overrides can use the auth layer's
