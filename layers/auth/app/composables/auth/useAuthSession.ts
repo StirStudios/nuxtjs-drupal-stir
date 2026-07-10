@@ -1,5 +1,9 @@
 import type { AuthSessionResponse, AuthSessionUser } from '../../types/auth'
-import { useAuthConfig } from './useAuthConfig'
+import { useAuthIntegration } from './useAuthIntegration'
+
+type FetchSessionOptions = {
+  force?: boolean
+}
 
 export function useAuthSession() {
   const ready = useState<boolean>('auth-session-ready', () => false)
@@ -13,15 +17,17 @@ export function useAuthSession() {
     () => null,
   )
   let pendingSessionFetch: Promise<void> | null = null
-  const { integrationEnabled } = useAuthConfig()
+  const integrationEnabled = useAuthIntegration()
 
-  const fetchSession = async () => {
+  const fetchSession = async (options: FetchSessionOptions = {}) => {
     if (!integrationEnabled) {
       ready.value = true
       loggedIn.value = false
       user.value = null
       return
     }
+
+    if (ready.value && !options.force) return
 
     if (pendingSessionFetch) {
       await pendingSessionFetch

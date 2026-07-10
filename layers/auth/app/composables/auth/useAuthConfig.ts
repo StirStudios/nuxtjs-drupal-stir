@@ -1,8 +1,8 @@
 import type { AuthUiConfig } from '../../types/auth'
+import { useAuthIntegration } from './useAuthIntegration'
 
 export function useAuthConfig() {
-  const appConfig = useAppConfig()
-  const integrationEnabled = appConfig.authIntegration?.drupalAccounts === true
+  const integrationEnabled = useAuthIntegration()
   const { data: drupalAuth, status, execute } = useAsyncData(
     'stir-auth-ui-config',
     async () => integrationEnabled

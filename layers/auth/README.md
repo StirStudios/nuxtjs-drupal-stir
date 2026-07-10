@@ -48,6 +48,9 @@ needs `/auth/protected` for password-protected Nuxt pages. Account UI routes are
 redirected to `protectedRoutes.fallbackRedirectPath`, while protected-page
 access keeps working.
 
+Normal pages only read this integration flag. Drupal auth UI configuration is
+requested only by account and auth routes that need it.
+
 Theme all auth submit buttons from Nuxt without adding presentation settings to
 Drupal:
 
