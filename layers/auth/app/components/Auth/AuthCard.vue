@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AuthFormField, FormError } from '@nuxt/ui'
-import type { StirThemeAuthConfig } from '../../../../theme/app/types/app-config'
+import type { AuthThemeConfig } from '../../types/theme'
 import { authLayoutContextKey } from '../../utils/authLayout'
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ const props = defineProps<{
 
 const appConfig = useAppConfig()
 const themeAuth = (appConfig.stirTheme || {}) as {
-  auth?: StirThemeAuthConfig
+  auth?: AuthThemeConfig
 }
 const authLayout = inject(authLayoutContextKey, undefined)
 const isCardSplit = computed(() =>

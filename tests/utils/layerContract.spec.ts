@@ -45,4 +45,18 @@ describe('layer contract', () => {
     expect(authValidation).toContain('export function createPasswordResetValidationSchema')
     expect(authValidation).toContain('export function createAccountPasswordChangeValidationSchema')
   })
+
+  it('keeps auth component types independent from the theme layer', () => {
+    const authComponents = ['AuthCard.vue', 'AuthPage.vue'].map((file) =>
+      readFileSync(
+        resolve(rootDir, 'layers/auth/app/components/Auth', file),
+        'utf8',
+      ),
+    )
+
+    for (const component of authComponents) {
+      expect(component).not.toContain('theme/app/types')
+      expect(component).toContain('from \'../../types/theme\'')
+    }
+  })
 })
