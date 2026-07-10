@@ -15,14 +15,17 @@ import {
 
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
+const appConfig = useAppConfig()
 const { auth } = useAuthConfig()
 
 type AuthPageConfigKey =
   | 'login'
+  | 'logout'
   | 'protectedPage'
   | 'register'
   | 'passwordRequest'
   | 'passwordReset'
+  | 'verify'
 
 const resolveAuthPageKey = (): AuthPageConfigKey | null => {
   const explicitKey = route.meta.authPageKey
@@ -30,10 +33,12 @@ const resolveAuthPageKey = (): AuthPageConfigKey | null => {
   if (typeof explicitKey === 'string' && explicitKey.trim()) {
     switch (explicitKey) {
       case 'login':
+      case 'logout':
       case 'protectedPage':
       case 'register':
       case 'passwordRequest':
       case 'passwordReset':
+      case 'verify':
         return explicitKey
       default:
         break
@@ -51,10 +56,12 @@ const resolveAuthPageKey = (): AuthPageConfigKey | null => {
   const path = route.path
 
   if (path.endsWith('/auth/login')) return 'login'
+  if (path.endsWith('/auth/logout')) return 'logout'
   if (path.endsWith('/auth/protected')) return 'protectedPage'
   if (path.endsWith('/auth/register')) return 'register'
   if (path.endsWith('/auth/password/request')) return 'passwordRequest'
   if (path.endsWith('/auth/password/reset')) return 'passwordReset'
+  if (path.endsWith('/auth/verify')) return 'verify'
 
   return null
 }
@@ -76,21 +83,38 @@ const resolveConfigString = (value: unknown, fallback = ''): string => {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback
 }
 
-const authPageConfig = computed(() => resolveAuthPageConfig(resolveAuthPageKey()))
+const authPageKey = computed(resolveAuthPageKey)
+const authPageConfig = computed(() => resolveAuthPageConfig(authPageKey.value))
+const themeAuth = computed(() => appConfig.stirTheme?.auth || {})
+const themePageConfig = computed(() => authPageKey.value
+  ? themeAuth.value.pages?.[authPageKey.value] || {}
+  : {})
 
 const pageLayout = computed<AuthLayout>(() =>
+  resolveAuthLayout(themePageConfig.value.layout) ||
+  resolveAuthLayout(themeAuth.value.layout) ||
   resolveAuthLayout(authPageConfig.value?.layout) ||
   resolveAuthLayout(auth.value.layout) ||
   defaultAuthLayout,
 )
 
 const imagePosition = computed<AuthImagePosition>(() =>
+  resolveAuthImagePosition(themePageConfig.value.imagePosition) ||
+  resolveAuthImagePosition(themeAuth.value.imagePosition) ||
   resolveAuthImagePosition(authPageConfig.value?.imagePosition) ||
   resolveAuthImagePosition(auth.value.imagePosition) ||
   defaultAuthImagePosition,
 )
 
 const showIcon = computed(() => {
+  if (typeof themePageConfig.value.showIcon === 'boolean') {
+    return themePageConfig.value.showIcon
+  }
+
+  if (typeof themeAuth.value.showIcon === 'boolean') {
+    return themeAuth.value.showIcon
+  }
+
   if (typeof authPageConfig.value?.showIcon === 'boolean') {
     return authPageConfig.value.showIcon
   }
@@ -98,9 +122,26 @@ const showIcon = computed(() => {
   return typeof auth.value.showIcon === 'boolean' ? auth.value.showIcon : true
 })
 
-const backButtonConfig = computed(() => resolveConfigObject(auth.value.backButton))
+const backButtonConfig = computed(() => ({
+  ...resolveConfigObject(auth.value.backButton),
+  ...resolveConfigObject(authPageConfig.value?.backButton),
+  ...resolveConfigObject(themeAuth.value.backButton),
+  ...resolveConfigObject(themePageConfig.value.backButton),
+}))
 
 const pageBackgroundImage = computed(() => {
+  const themePageImage = themePageConfig.value.backgroundImage?.trim() || ''
+
+  if (themePageImage) {
+    return themePageImage
+  }
+
+  const themeImage = themeAuth.value.backgroundImage?.trim() || ''
+
+  if (themeImage) {
+    return themeImage
+  }
+
   const pageImage = typeof authPageConfig.value?.backgroundImage === 'string'
     ? authPageConfig.value.backgroundImage.trim()
     : ''

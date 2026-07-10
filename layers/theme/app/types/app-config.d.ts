@@ -292,8 +292,37 @@ type StirThemeErrorConfig = {
 } & LooseRecord
 
 type StirThemeAuthConfig = {
+  backgroundImage?: string
+  layout?: 'card' | 'page-split' | 'card-split'
+  imagePosition?: 'left' | 'right'
+  showIcon?: boolean
+  backButton?: StirThemeAuthBackButtonConfig
   submitButton?: StirThemeButtonLikeConfig
+  pages?: Partial<Record<StirThemeAuthPageKey, StirThemeAuthPageConfig>>
 } & LooseRecord
+
+type StirThemeAuthPageKey =
+  | 'login'
+  | 'logout'
+  | 'protectedPage'
+  | 'register'
+  | 'passwordRequest'
+  | 'passwordReset'
+  | 'verify'
+
+type StirThemeAuthPageConfig = {
+  backgroundImage?: string
+  layout?: 'card' | 'page-split' | 'card-split'
+  imagePosition?: 'left' | 'right'
+  showIcon?: boolean
+  backButton?: StirThemeAuthBackButtonConfig
+} & LooseRecord
+
+type StirThemeAuthBackButtonConfig = StirThemeButtonLikeConfig & {
+  enabled?: boolean
+  label?: string
+  to?: string
+}
 
 type StirThemeRevealConfig = {
   durationMs?: number

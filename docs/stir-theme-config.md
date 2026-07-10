@@ -105,6 +105,46 @@ authIntegration: {
 - Set `drupalAccounts: true` only for sites that use the Drupal `stir_account` endpoints.
 - Drupal `/api/auth/config` owns account-auth redirects, UI copy, and password policy.
 
+### 🔐 `stirTheme.auth`
+
+Auth presentation stays in Nuxt so projects can choose a shared layout without
+adding visual concerns to Drupal:
+
+```ts
+stirTheme: {
+  auth: {
+    layout: 'card-split',
+    backgroundImage: '/themes/custom/site/auth.jpg',
+    imagePosition: 'left',
+    showIcon: true,
+    backButton: {
+      enabled: false,
+    },
+    submitButton: {
+      class: 'uppercase',
+    },
+    pages: {
+      login: {
+        layout: 'page-split',
+        backgroundImage: '/themes/custom/site/login.jpg',
+      },
+      logout: {
+        layout: 'card',
+        backgroundImage: '/themes/custom/site/logout.jpg',
+      },
+      passwordReset: {
+        layout: 'card-split',
+        backgroundImage: '/themes/custom/site/reset-password.jpg',
+      },
+    },
+  },
+}
+```
+
+- Layout options are `card`, `card-split`, and `page-split`.
+- `pages` also supports `register`, `passwordRequest`, `verify`, and `protectedPage`.
+- Per-page settings override global auth theme settings.
+
 ### 🔎 `cmsGlobalSeo`
 
 ```ts
