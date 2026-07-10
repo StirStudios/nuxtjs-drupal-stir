@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useAuthConfig } from '../../composables/auth/useAuthConfig'
-import type { AuthPasswordRequirement } from '../../types/auth'
+import type { AuthPasswordPolicy, AuthPasswordRequirement } from '../../types/auth'
 
 const model = defineModel<string | undefined>()
 
@@ -10,11 +9,11 @@ const props = defineProps<{
     name?: string
     placeholder?: string
   }
+  passwordPolicy?: AuthPasswordPolicy
   showRequirements?: boolean
 }>()
 
 const show = ref(false)
-const { auth } = useAuthConfig()
 
 function checkStrength(str: string) {
   return passwordRequirements.value.map((req) => ({
@@ -25,7 +24,7 @@ function checkStrength(str: string) {
 }
 
 const passwordRequirements = computed(() => {
-  const policy = auth.value.passwordPolicy
+  const policy = props.passwordPolicy
   const requirements = withPolicyLengthRequirements(policy?.requirements || [])
 
   return requirements
@@ -59,7 +58,7 @@ const color = computed(() => {
 })
 
 const text = computed(() => {
-  const labels = auth.value.passwordPolicy?.strengthLabels
+  const labels = props.passwordPolicy?.strengthLabels
 
   if (score.value === 0) {
     return labels?.empty || 'Enter a password'
@@ -106,7 +105,7 @@ function normalizePasswordRequirement(requirement: AuthPasswordRequirement) {
 }
 
 function withPolicyLengthRequirements(requirements: AuthPasswordRequirement[]): AuthPasswordRequirement[] {
-  const policy = auth.value.passwordPolicy
+  const policy = props.passwordPolicy
   const hasMinLength = requirements.some(requirement => requirement.key === 'minLength')
   const hasMaxLength = requirements.some(requirement => requirement.key === 'maxLength')
 
@@ -177,7 +176,7 @@ function createMaxLengthRequirement(maxLength: number): AuthPasswordRequirement 
       />
 
       <p id="password-strength" class="text-sm font-medium">
-        {{ text }}. {{ auth.passwordPolicy?.strengthLabels?.mustContain || 'Must contain:' }}
+        {{ text }}. {{ passwordPolicy?.strengthLabels?.mustContain || 'Must contain:' }}
       </p>
 
       <ul aria-label="Password requirements" class="space-y-1">
