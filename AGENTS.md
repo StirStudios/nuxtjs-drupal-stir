@@ -134,6 +134,11 @@ Use these rules for all changes.
 - Use `import.meta.client`/`import.meta.server` (or Nuxt-safe guards) where runtime-specific logic is required.
 - Keep server/client behavior consistent when touching hydration-sensitive UI.
 - When changing `nuxt-vitalizer`, hydration timing, or motion behavior, verify no regression in interaction readiness.
+- For LCP, loading-priority, media, or critical-rendering changes, test a production
+  build with `pnpm perf:lighthouse` against a representative Drupal payload.
+  Use at least three mobile runs, compare medians before and after, and report
+  score, FCP, LCP, TBT, total transfer, media transfer, and video request count.
+  Component tests alone are not performance evidence.
 - Avoid breaking public interfaces/config defaults unless explicitly requested.
 
 ## Validation checklist

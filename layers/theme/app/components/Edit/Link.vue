@@ -187,14 +187,3 @@ const handleActionSelect = (key: EditAction['key']) => {
     @select="handleActionSelect"
   />
 </template>
-
-<style>
-:where(*):has(> [data-admin-ui-controls]) {
-  @apply relative;
-
-  &:is(:hover, :focus-within) > [data-admin-ui-controls],
-  > [data-admin-ui-controls]:is(:hover, :focus-within) {
-    @apply opacity-100 pointer-events-auto;
-  }
-}
-</style>

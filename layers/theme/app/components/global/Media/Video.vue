@@ -19,6 +19,8 @@ const props = withDefaults(
     animatedPreviewSrc?: string
     thumbnailStatus?: 'ready' | 'processing' | 'missing'
     thumbnailIsDefault?: boolean
+    loadStrategy?: 'after-load' | 'immediate'
+    loadMinWidth?: number
 
     width?: number
     height?: number
@@ -38,6 +40,8 @@ const props = withDefaults(
     animatedPreviewSrc: undefined,
     thumbnailStatus: undefined,
     thumbnailIsDefault: false,
+    loadStrategy: undefined,
+    loadMinWidth: undefined,
     width: undefined,
     height: undefined,
     noWrapper: false,
@@ -52,6 +56,15 @@ const attrs = useAttrs()
 const { initializePlayers } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
+const videoElement = ref<HTMLVideoElement | null>(null)
+const isBareVideoSourceActive = ref(false)
+const bareVideoLoadStrategy = computed(
+  () => props.loadStrategy ?? mediaTheme.video?.loadStrategy ?? 'after-load',
+)
+const bareVideoLoadMinWidth = computed(
+  () => props.loadMinWidth ?? mediaTheme.video?.loadMinWidth ?? 768,
+)
+let bareVideoMediaQuery: MediaQueryList | undefined
 const isProcessing = computed(() => {
   if (props.thumbnailStatus) {
     return props.thumbnailStatus === 'processing'
@@ -106,7 +119,54 @@ function activateEmbed() {
   void scheduleInitializePlayers()
 }
 
+async function activateBareVideoSource(): Promise<void> {
+  if (!isBare.value || isBareVideoSourceActive.value || !props.mediaEmbed) return
+
+  isBareVideoSourceActive.value = true
+  await nextTick()
+  videoElement.value?.load()
+}
+
+function scheduleBareVideoSource(): void {
+  const minWidth = bareVideoLoadMinWidth.value
+
+  if (minWidth > 0) {
+    bareVideoMediaQuery = window.matchMedia(`(min-width: ${minWidth}px)`)
+
+    if (!bareVideoMediaQuery.matches) {
+      bareVideoMediaQuery.addEventListener(
+        'change',
+        handleBareVideoMediaQueryChange,
+        { once: true },
+      )
+      return
+    }
+  }
+
+  if (!isBare.value || bareVideoLoadStrategy.value === 'immediate') {
+    void activateBareVideoSource()
+    return
+  }
+
+  if (document.readyState === 'complete') {
+    requestAnimationFrame(() => void activateBareVideoSource())
+    return
+  }
+
+  window.addEventListener(
+    'load',
+    () => requestAnimationFrame(() => void activateBareVideoSource()),
+    { once: true },
+  )
+}
+
+function handleBareVideoMediaQueryChange(event: MediaQueryListEvent): void {
+  if (event.matches) scheduleBareVideoSource()
+}
+
 onMounted(() => {
+  scheduleBareVideoSource()
+
   if (!isBare.value && !props.deferEmbed) {
     isEmbedActive.value = true
   }
@@ -114,6 +174,13 @@ onMounted(() => {
   if (!isBare.value && shouldShowIframe.value) {
     void scheduleInitializePlayers()
   }
+})
+
+onBeforeUnmount(() => {
+  bareVideoMediaQuery?.removeEventListener(
+    'change',
+    handleBareVideoMediaQueryChange,
+  )
 })
 
 watch(
@@ -130,6 +197,7 @@ watch(
 <template>
   <video
     v-if="isBare"
+    ref="videoElement"
     v-bind="attrs"
     aria-hidden="true"
     class="absolute inset-0 h-full w-full object-cover"
@@ -138,9 +206,13 @@ watch(
     muted
     playsinline
     :poster="src"
-    preload="metadata"
+    :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
   >
-    <source :src="mediaEmbed" type="video/mp4" />
+    <source
+      v-if="isBareVideoSourceActive"
+      :src="mediaEmbed"
+      type="video/mp4"
+    />
   </video>
 
   <div

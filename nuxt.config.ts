@@ -241,7 +241,7 @@ export default defineNuxtConfig({
       'nuxt-vitalizer',
       {
         disablePrefetchLinks: true,
-        disablePreloadLinks: false,
+        disablePreloadLinks: true,
       },
     ],
 
