@@ -40,6 +40,8 @@ function requestBytes(requests, resourceType) {
 
 function summarize(lhr) {
   const requests = lhr.audits['network-requests']?.details?.items || []
+  const imageBytes = requestBytes(requests, 'Image')
+  const videoBytes = requestBytes(requests, 'Media')
 
   return {
     score: Math.round(Number(lhr.categories.performance?.score || 0) * 100),
@@ -51,7 +53,9 @@ function summarize(lhr) {
     requestCount: requests.length,
     cssBytes: requestBytes(requests, 'Stylesheet'),
     jsBytes: requestBytes(requests, 'Script'),
-    mediaBytes: requestBytes(requests, 'Media'),
+    imageBytes,
+    videoBytes,
+    mediaBytes: imageBytes + videoBytes,
     unusedCssBytes: auditDetailNumber(lhr, 'unused-css-rules', 'overallSavingsBytes'),
     unusedJsBytes: auditDetailNumber(lhr, 'unused-javascript', 'overallSavingsBytes'),
     renderBlockingFcpMs: Number(
@@ -149,7 +153,11 @@ async function main() {
     `(unused ${formatBytes(result.unusedJsBytes)}, execution ${result.scriptExecutionMs.toFixed(0)}ms)`,
   )
   console.log(`Main thread: ${result.mainThreadMs.toFixed(0)}ms`)
-  console.log(`Media: ${formatBytes(result.mediaBytes)} (${result.videoRequestCount} video requests)`)
+  console.log(
+    `Media: ${formatBytes(result.mediaBytes)} ` +
+    `(images ${formatBytes(result.imageBytes)}, video ${formatBytes(result.videoBytes)}, ` +
+    `${result.videoRequestCount} video requests)`,
+  )
   console.log(`Saved: ${outputDirectory}/summary.json`)
 
   if (!shouldAssert) return

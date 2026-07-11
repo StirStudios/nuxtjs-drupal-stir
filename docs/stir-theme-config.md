@@ -490,9 +490,10 @@ Add `--assert` to enforce the default budgets, or override them with
 `--min-score`, `--max-lcp`, `--max-tbt`, `--max-total-bytes`, and
 `--max-media-bytes`. Set `LIGHTHOUSE_CHROME_PATH` when Chrome is not installed
 in a standard system location. Reports are written to the ignored
-`.lighthouse/` directory. The summary includes CSS and JavaScript transfer,
-estimated unused bytes, render-blocking savings, script execution, and total
-main-thread work so performance changes can target measured bottlenecks.
+`.lighthouse/` directory. The summary includes separate image and video
+transfer, combined media transfer, CSS and JavaScript transfer, estimated
+unused bytes, render-blocking savings, script execution, and total main-thread
+work so performance changes can target measured bottlenecks.
 
 Common downstream media override:
 
