@@ -212,6 +212,8 @@ type StirThemeMediaConfig = {
   base?: ClassValue
   rounded?: ClassValue
   video?: {
+    loadMinWidth?: number
+    loadStrategy?: 'after-load' | 'immediate'
     wrapper?: ClassValue
   }
   transitions?: Record<string, ClassValue>

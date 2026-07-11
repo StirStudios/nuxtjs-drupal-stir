@@ -171,6 +171,8 @@ export default defineAppConfig({
       base: 'relative h-full w-full overflow-hidden object-cover',
       rounded: 'rounded-xl',
       video: {
+        loadMinWidth: 768,
+        loadStrategy: 'after-load',
         wrapper: 'm-auto max-w-6xl',
       },
 
