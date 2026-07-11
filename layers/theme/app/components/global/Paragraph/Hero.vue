@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Motion } from 'motion-v'
 import { cloneVNode } from 'vue'
 import { usePageContext } from '~/composables/usePageContext'
 import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
@@ -135,7 +134,7 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
 
     <template v-else>
       <section class="relative" :class="sectionClasses">
-        <Motion
+        <RevealMotion
           :key="`hero-${revealMotionKey}`"
           as-child
           v-bind="heroMotionProps"
@@ -162,7 +161,7 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
 
             <slot name="button" />
           </div>
-        </Motion>
+        </RevealMotion>
 
         <component :is="heroMediaNode" />
 

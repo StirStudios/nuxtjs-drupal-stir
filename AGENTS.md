@@ -72,6 +72,16 @@ Use these rules for all changes.
   - Nuxt UI docs pages (`https://ui.nuxt.com/docs/...`)
 - This is recommended guidance, not a hard requirement; do not block work if MCP is unavailable.
 
+## UI architecture and reuse
+
+- Use Nuxt UI components, composables, and generated themes before building local equivalents.
+- Configure shared Nuxt UI behavior in `app.config.ts`; downstream projects should inherit these defaults and override only genuine project requirements.
+- Prefer semantic colors such as `primary`, `neutral`, `success`, and `error` in application UI. Reserve direct brand utilities for intentional artwork, gradients, and brand-specific treatments.
+- Use Tailwind utilities directly in templates for one-off layout and presentation. Do not create custom CSS classes or TypeScript string constants that only rename a utility recipe.
+- Extract a local component when a repeated composition has semantic meaning, behavior, slots, or variants. Keep wrappers thin and delegate primitives such as containers, buttons, forms, and overlays to Nuxt UI.
+- Before adding an abstraction, search for an existing Nuxt UI component, local component, theme variant, composable, or token. Remove superseded styles and duplicate wrappers in the same change.
+- Centralize stable defaults in the layer; keep application content, brand exceptions, and deployment-specific behavior in downstream projects.
+
 ## Drupal CE integration guidance
 
 - Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
