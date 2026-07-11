@@ -1,59 +1,59 @@
 {
-  "generatedAt": "2026-05-29T19:36:47.412Z",
+  "generatedAt": "2026-07-11T17:35:55.375Z",
   "topClientChunks": [
     {
-      "name": "_nuxt/_p9vSCMX.js",
-      "sizeKb": 472.58,
-      "gzipKb": 163.43
+      "name": "_nuxt/DUDug9Ca.js",
+      "sizeKb": 460.64,
+      "gzipKb": 158.74
     },
     {
-      "name": "_nuxt/CkA-tPaq.js",
-      "sizeKb": 291.71,
-      "gzipKb": 90.33
+      "name": "_nuxt/rD1edPUc.js",
+      "sizeKb": 297.96,
+      "gzipKb": 92.31
     },
     {
-      "name": "_nuxt/DUDBhKrM.js",
-      "sizeKb": 233.25,
-      "gzipKb": 72.74
+      "name": "_nuxt/Cn90WH12.js",
+      "sizeKb": 275.64,
+      "gzipKb": 85.44
     },
     {
-      "name": "_nuxt/DE9eetLK.js",
-      "sizeKb": 126.34,
-      "gzipKb": 40.8
+      "name": "_nuxt/BC5N40np.js",
+      "sizeKb": 144.85,
+      "gzipKb": 26.2
     },
     {
-      "name": "_nuxt/CTeucY4V.js",
-      "sizeKb": 86.1,
-      "gzipKb": 18.27
+      "name": "_nuxt/DTIbtCUb.js",
+      "sizeKb": 80.79,
+      "gzipKb": 27.9
     },
     {
-      "name": "_nuxt/CvRPYnPe.js",
-      "sizeKb": 51.54,
-      "gzipKb": 14.19
-    },
-    {
-      "name": "_nuxt/CEl66bv3.js",
-      "sizeKb": 48.8,
-      "gzipKb": 12.06
+      "name": "_nuxt/D6_sMQcq.js",
+      "sizeKb": 53.29,
+      "gzipKb": 14.62
     },
     {
       "name": "_nuxt/3P3VHtK8.js",
       "sizeKb": 44.39,
-      "gzipKb": 14.1
+      "gzipKb": 14.03
     },
     {
-      "name": "_nuxt/WBL8Si1o.js",
-      "sizeKb": 41.34,
-      "gzipKb": 12.01
+      "name": "_nuxt/CKTHXMrv.js",
+      "sizeKb": 41.48,
+      "gzipKb": 11.99
     },
     {
-      "name": "_nuxt/Clc400xb.js",
-      "sizeKb": 39.29,
-      "gzipKb": 11.17
+      "name": "_nuxt/Dw0rLCLl.js",
+      "sizeKb": 40.75,
+      "gzipKb": 10.27
+    },
+    {
+      "name": "_nuxt/RF3KqwAr.js",
+      "sizeKb": 40.25,
+      "gzipKb": 11.31
     }
   ],
   "totalOutputSize": {
-    "total": "6.45 MB",
-    "gzip": "1.66 MB gzip"
+    "total": "10.2 MB",
+    "gzip": "2.71 MB gzip"
   }
 }

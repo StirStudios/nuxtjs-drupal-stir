@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Motion } from 'motion-v'
 import type { DrupalViewProps } from '~/types'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
@@ -212,7 +211,7 @@ const getRowMotionProps = (index: number) =>
     :spacing="spacing"
     :width="width"
   >
-    <Motion
+    <RevealMotion
       v-for="(row, i) in getRenderedRows()"
       :key="`${row.key}-${revealMotionKey}`"
       as="div"
@@ -223,7 +222,7 @@ const getRowMotionProps = (index: number) =>
       <component
         :is="row.type === 'dynamic' ? renderCustomElements(row.node) : row.node"
       />
-    </Motion>
+    </RevealMotion>
   </WrapGrid>
 
   <UEmpty

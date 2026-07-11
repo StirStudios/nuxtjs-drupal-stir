@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Motion } from 'motion-v'
 import { resolveComponent } from 'vue'
 import type { Component, VNode } from 'vue'
 import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
@@ -104,7 +103,7 @@ const shouldAnimate = computed(() =>
     @edit-action-select="handleEditActionSelect"
   />
 
-  <Motion
+  <RevealMotion
     v-else-if="!overlay || isDocument || isAudio"
     :key="`media-${props.index}-${revealMotionKey}`"
     as-child
@@ -116,9 +115,9 @@ const shouldAnimate = computed(() =>
       :edit-actions="editActions"
       @edit-action-select="handleEditActionSelect"
     />
-  </Motion>
+  </RevealMotion>
 
-  <Motion
+  <RevealMotion
     v-else
     :key="`media-overlay-${props.index}-${revealMotionKey}`"
     as-child
@@ -187,5 +186,5 @@ const shouldAnimate = computed(() =>
         <UIcon name="i-lucide-play-circle" size="60" />
       </span>
     </div>
-  </Motion>
+  </RevealMotion>
 </template>

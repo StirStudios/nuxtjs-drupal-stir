@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Motion } from 'motion-v'
 import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
 import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
 
@@ -111,7 +110,7 @@ watch(() => props.text, (value) => {
             container-class="sticky top-16 z-[500] col-start-1 row-start-1 self-start justify-self-end"
             @select="selectAction"
           />
-          <Motion
+          <RevealMotion
             :key="`text-${paragraphId}-${revealMotionKey}`"
             as-child
             v-bind="motionProps"
@@ -124,7 +123,7 @@ watch(() => props.text, (value) => {
               "
               v-html="trustedTextHtml"
             />
-          </Motion>
+          </RevealMotion>
         </div>
       </template>
 
