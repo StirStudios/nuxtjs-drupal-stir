@@ -44,7 +44,7 @@ const isPopupDismissed = computed(() => {
 const { open, shouldRenderPopupContent } = usePopupBehavior({
   popup,
   config,
-  suppress: computed(() => isPopupDismissed.value),
+  suppress: isPopupDismissed,
 })
 const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
@@ -64,8 +64,17 @@ const popupComponent = computed(() => {
     : resolvedComponent
 })
 const popupRenderProps = computed(() => {
-  const { id, uuid, parentUuid, region, text, webform, editLink, direction } =
-    popupProps.value
+  const {
+    id,
+    uuid,
+    parentUuid,
+    region,
+    text,
+    alert,
+    webform,
+    editLink,
+    direction,
+  } = popupProps.value
 
   if (id === undefined || uuid === undefined) {
     return null
@@ -77,6 +86,7 @@ const popupRenderProps = computed(() => {
     parentUuid,
     region,
     text,
+    alert,
     webform,
     editLink,
     direction,

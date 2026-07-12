@@ -9,6 +9,7 @@ export type PopupProps = {
   parentUuid?: string
   region?: string
   text?: string
+  alert?: string
   webform?: WebformDefinition
   editLink?: string
   direction?: string

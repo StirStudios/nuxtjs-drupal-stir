@@ -83,7 +83,7 @@ export default defineAppConfig({
       desktopLayout: 'default',
       logoMenuMarker: '--logo--',
       toggleDirection: 'right',
-      header: 'h-auto p-4',
+      header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',
         container: 'relative',
@@ -104,9 +104,10 @@ export default defineAppConfig({
         angle: false,
         angleDeg: 35,
         angleOffsetX: '1.5rem',
-        link: 'block my-3 text-center text-xl uppercase',
-        list: '',
-        body: 'flex h-full flex-col justify-center text-center',
+        link:
+          'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
+        list: 'w-full space-y-1.5',
+        body: 'flex flex-col',
       },
     },
 
