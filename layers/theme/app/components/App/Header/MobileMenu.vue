@@ -11,7 +11,7 @@ defineProps<{
 <template>
   <LazyUNavigationMenu
     aria-label="Mobile Navigation"
-    class="-mx-2.5 app-nav app-nav-mobile"
+    class="app-nav app-nav-mobile"
     :items="items"
     orientation="vertical"
     :ui="{
