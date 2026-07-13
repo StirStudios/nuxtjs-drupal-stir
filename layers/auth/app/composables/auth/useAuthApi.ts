@@ -47,10 +47,13 @@ export function useAuthApi() {
       body: payload,
     })
 
-  const loginProtected = (password: string) =>
+  const loginProtected = (password: string, turnstileResponse: string) =>
     $fetch('/api/auth/protected', {
       method: 'POST',
-      body: { password },
+      body: {
+        password,
+        turnstile_response: turnstileResponse,
+      },
     })
 
   const logoutProtected = () =>

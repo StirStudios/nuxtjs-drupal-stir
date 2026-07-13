@@ -39,6 +39,11 @@ From `stir_account`:
 
 - Auth forms can include Turnstile tokens.
 - Server-side validation belongs in Drupal (`stir_turnstile` + consuming modules).
+- The local `/auth/protected` password gate verifies Turnstile in Nuxt before
+  comparing the configured password. `TURNSTILE_KEY` and `TURNSTILE_SECRET`
+  are therefore required whenever `PROTECTED_PASSWORD` is enabled.
+- Production also requires a separate high-entropy `PROTECTED_COOKIE_SECRET`
+  for signing the protected-access cookie.
 
 ## Recommended rate limits (Drupal Flood)
 
@@ -52,6 +57,15 @@ Suggested defaults:
 - Verify: `20 attempts / 60 minutes` per IP.
 
 Return `429` JSON responses when limits are exceeded.
+
+The local protected-password gate also tracks failed attempts through Nitro
+storage. For multi-worker deployments, mount the cache storage on a shared
+backend and apply a persistent edge or ingress limit to
+`POST /api/auth/protected`; process-local state is not a sufficient control.
+
+`PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only when a
+trusted ingress removes client-supplied forwarding headers and sets
+`X-Forwarded-For` itself.
 
 ## Deployment notes
 

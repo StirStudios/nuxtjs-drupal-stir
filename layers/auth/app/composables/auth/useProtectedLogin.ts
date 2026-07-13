@@ -4,6 +4,8 @@ import { useProtectedActions } from './useProtectedActions'
 export function useProtectedLogin() {
   const toast = useToast()
   const isLoading = ref(false)
+  const turnstileKey = ref(0)
+  const turnstileToken = ref('')
   const route = useRoute()
   const { login } = useProtectedActions()
   const protectedFallbackRedirectPath =
@@ -32,7 +34,7 @@ export function useProtectedLogin() {
   ) => {
     isLoading.value = true
     try {
-      const hasAccess = await login(event.data.password)
+      const hasAccess = await login(event.data.password, turnstileToken.value)
 
       if (hasAccess) {
         const redirectTarget =
@@ -50,12 +52,16 @@ export function useProtectedLogin() {
         color: 'error',
       })
     } finally {
+      turnstileToken.value = ''
+      turnstileKey.value += 1
       isLoading.value = false
     }
   }
 
   return {
     fields,
+    turnstileKey,
+    turnstileToken,
     validate,
     onSubmit,
     isLoading,
