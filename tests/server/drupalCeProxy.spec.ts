@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { proxyRequest } from 'h3'
 import {
   createStirDrupalProxyFetch,
   getStirDrupalCeProxyTargets,
@@ -9,16 +10,27 @@ import {
 } from '../../layers/core/server/utils/drupalCeProxy'
 import { replaceStirDrupalSetCookies } from '../../server/utils/stirDrupalApi'
 
+vi.mock('h3', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('h3')>()),
+  proxyRequest: vi.fn(),
+}))
+
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 
-const createEvent = (cookie = '') => {
+const createEvent = (cookie = '', url = '/') => {
   const responseHeaders = new Map<string, string | string[]>()
 
   return {
     event: {
       context: {},
+      method: 'GET',
+      path: url,
       node: {
-        req: { headers: cookie ? { cookie } : {} },
+        req: {
+          headers: cookie ? { cookie } : {},
+          method: 'GET',
+          url,
+        },
         res: {
           getHeader: (name: string) => responseHeaders.get(name.toLowerCase()),
           removeHeader: (name: string) => responseHeaders.delete(name.toLowerCase()),
@@ -159,6 +171,22 @@ describe('Drupal CE proxy boundary', () => {
     } as never, 'api/menu_items/main')).rejects.toMatchObject({
       statusCode: 405,
     })
+  })
+
+  it('preserves query options when proxying menu requests', async () => {
+    stubRuntimeConfig()
+    const { event } = createEvent(
+      '',
+      '/api/menu/api/menu_items/main?_format=json&depth=3',
+    )
+
+    await proxyStirDrupalMenuRequest(event, 'api/menu_items/main')
+
+    expect(proxyRequest).toHaveBeenCalledWith(
+      event,
+      'https://menus.example.test/api/menu_items/main?_format=json&depth=3',
+      expect.any(Object),
+    )
   })
 
   it('does not forward empty or client-supplied credentials', async () => {
