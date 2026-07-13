@@ -33,6 +33,8 @@ Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, 
 
 ## ⚡ Quick Start
 
+Use Node `22.13+`, `24.11+`, or `26+` and the repository-declared pnpm version.
+
 ```bash
 pnpm install
 pnpm dev
@@ -56,7 +58,9 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - Type safety: `pnpm typecheck` (Nuxt + Vue TS)
 - Unit testing: `pnpm test` (Vitest)
 - Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
-- CI/local gate: `pnpm verify:ci` (test + test:nuxt + lint + typecheck + build)
+- E2E smoke testing: `pnpm test:e2e` (built Nuxt health/runtime smoke)
+- Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
+- CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`
 
 ## 📦 Project Structure
@@ -71,39 +75,61 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
 - `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
-- `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate
+- `DRUPAL_SESSION_COOKIE_NAMES`: Optional comma-separated allowlist for deployments that override Drupal's standard session cookie name
+- `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
+- `DRUPAL_TRUST_PROXY`: Set to `'true'` only when a trusted ingress replaces `X-Forwarded-For` and `DRUPAL_FORWARD_CLIENT_IP` is enabled (default: `false`)
+- `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate; requires the Turnstile keys below
+- `PROTECTED_COOKIE_SECRET`: High-entropy server-only HMAC secret for protected-access cookies; required with `PROTECTED_PASSWORD` in production
+- `PROTECTED_RATE_LIMIT_ENABLED`: Set to `'false'` to disable the protected-login limiter (default: enabled)
+- `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)
+- `PROTECTED_RATE_LIMIT_WINDOW_SECONDS`: Protected-login window in seconds (default: `900`)
+- `PROTECTED_RATE_LIMIT_TRUST_PROXY`: Set to `'true'` only behind an ingress that replaces, rather than appends to, `X-Forwarded-For` (default: `false`)
+- `DRUPAL_REQUEST_TIMEOUT_MS`: Timeout for custom Nitro-to-Drupal requests in milliseconds (default: `10000`)
+- `WEBFORM_MAX_REQUEST_BYTES`: Maximum webform request size (default: `10485760`, 10 MB)
+- `WEBFORM_MAX_FILE_BYTES`: Maximum size of one webform upload (default: `5242880`, 5 MB)
+- `WEBFORM_MAX_FILES`: Maximum files per webform submission (default: `5`)
+- `WEBFORM_MAX_FIELDS`: Maximum non-file multipart fields per submission (default: `100`)
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
-- `SERVER_DOMAIN_CLIENT`: Trusted frontend domain for server-side origin/cookie handling
+- `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
 
 Notes:
-- `DRUPAL_API_KEY` is forwarded by server endpoints that call Drupal backend APIs (`x-api-key` header).
+
+- `DRUPAL_API_KEY` is injected automatically only for the internal Drupal CE and menu proxies. Custom server endpoints add it explicitly when calling Drupal; unrelated `/api/*` routes never receive it.
+- Deployed runtime overrides supported by `nuxtjs-drupal-ce` include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
+- The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its Nitro limiter is best-effort and non-atomic; production must independently enforce a persistent, atomic or provider-native edge rule for `POST /api/auth/protected` using a trusted client-IP boundary.
+- H3 buffers multipart bodies before application-level file checks. The Nuxt limits are validation, not a pre-buffer memory cap; production must reject fixed-length and chunked multipart bodies at or below `WEBFORM_MAX_REQUEST_BYTES` before they reach Nitro.
+- Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
+- When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.
 - `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
 - Sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
+- Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_URL`.
 
 ## Auth + Account Integration (stir_account)
 
-Auth/account and password-protected page features live in the optional sub-layer:
-`layers/auth`.
+Auth/account and password-protected page features live in `layers/auth`. The
+published root layer includes it by default so all downstream projects receive
+one stable contract.
 
 In this repository, auth is enabled by default through:
 
 ```ts
 // nuxt.config.ts
-extends: ['./layers/auth']
+extends: ['./layers/core', './layers/theme', './layers/auth']
 ```
 
-Drupal account auth is disabled by default. If a downstream project does not
-need any auth routes or APIs, remove that `extends` entry.
-Core webform submission and Drupal CSRF forwarding do not depend on the auth layer.
+Drupal account auth is disabled by default through app config. There is not a
+separate auth-free distribution preset; extending individual internal layers is
+not a supported substitute for extending the root layer. Core webform
+submission and Drupal CSRF forwarding remain independent of account auth.
 If it only needs password-protected Nuxt pages, keep the layer and leave
 `authIntegration.drupalAccounts` unset or set it to `false` in app config.
 Set `authIntegration.drupalAccounts: true` only for projects that provide the
@@ -151,9 +177,13 @@ pnpm lint       # Lint project
 pnpm typecheck  # Nuxt + Vue TypeScript checks
 pnpm test       # Run unit tests
 pnpm test:nuxt  # Run Nuxt runtime tests
-pnpm test:e2e   # Run E2E smoke tests (optional/local)
+pnpm test:e2e   # Run built Nuxt E2E smoke tests
+pnpm test:consumer # Typecheck and build the downstream consumer fixture
+pnpm test:all   # Run unit, Nuxt runtime, and E2E tests
 pnpm test:watch # Run unit tests in watch mode
-pnpm verify:ci  # Full local quality gate (test/test:nuxt/lint/typecheck/build)
+pnpm verify:core # Tests, lint, typecheck, and root production build
+pnpm verify:ci  # Full gate, including downstream consumer compatibility
+pnpm css:generate-safelist # Regenerate Tailwind's CMS-driven inline safelist
 pnpm perf:report # Build + output top client chunk size report
 pnpm deps:update:safe # Safe dependency update flow
 pnpm release    # Tag + prepare release
@@ -162,12 +192,11 @@ pnpm release    # Tag + prepare release
 ## ✅ Pre-Merge Checks
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm test:nuxt
-pnpm build
+pnpm verify:ci
 ```
+
+This includes unit, Nuxt runtime, E2E, lint, typecheck, root build, and
+downstream consumer checks.
 
 ## Dependency Update Policy
 
@@ -177,9 +206,14 @@ See `docs/dependency-update-policy.md` for the full policy.
 ## Plausible Migration Note (April 1, 2026)
 
 - Plausible tracking now uses `@nuxtjs/plausible`.
+- Consent-deferred initialization uses the direct `@plausible-analytics/tracker` runtime.
 - Layer-level `analytics.plausible` only overrides `enabled` and `domain`; runtime defaults live in `nuxt.config.ts`.
 - `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
 - Use `NUXT_PUBLIC_PLAUSIBLE_API_HOST` (or `proxy: true`) with `domain` for endpoint/domain control.
+- When `privacyNotice.mode` is `consent`, Plausible does not initialize until the visitor accepts.
+
+See [Runtime Security and Proxy Configuration](./docs/runtime-security.md) for
+request limits, proxy trust, cookie forwarding, and Drupal server-origin details.
 
 ## Release Checklist
 

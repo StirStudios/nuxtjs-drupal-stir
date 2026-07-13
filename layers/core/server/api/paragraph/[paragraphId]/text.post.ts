@@ -1,4 +1,10 @@
-import { createError, defineEventHandler, getHeader, readBody } from 'h3'
+import { createError, defineEventHandler, readBody } from 'h3'
+import {
+  assertDrupalResponseNotRedirect,
+  captureDrupalApiError,
+  getForwardedCookie,
+  markPrivateResponse,
+} from '../../../utils/drupalApi'
 import { buildDrupalHeaders } from '../../../utils/drupalHeaders'
 import {
   buildParagraphTextPath,
@@ -12,6 +18,8 @@ interface ParagraphTextPayload {
 }
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
 
   const body = await readBody<ParagraphTextPayload>(event)
@@ -29,27 +37,45 @@ export default defineEventHandler(async (event) => {
     apiKey,
     ceApiEndpoint,
     drupalBaseUrl,
+    requestTimeoutMs,
   } = resolveParagraphTextApiConfig(config)
   const savePath = buildParagraphTextPath(ceApiEndpoint, paragraphId)
-  const cookie = getHeader(event, 'cookie')
+  const cookie = getForwardedCookie(event)
+
+  if (cookie) markPrivateResponse(event)
 
   try {
-    const csrfToken = await $fetch<string>(`${drupalBaseUrl}/session/token`, {
+    const csrfResponse = await $fetch.raw<string>(`${drupalBaseUrl}/session/token`, {
       headers: buildDrupalHeaders({
-        cookie: cookie ? String(cookie) : undefined,
+        cookie,
         apiKey,
       }),
+      redirect: 'manual',
+      timeout: requestTimeoutMs,
     })
 
-    return await $fetch<{ ok: boolean; message?: string }>(savePath, {
+    assertDrupalResponseNotRedirect(csrfResponse)
+
+    const csrfToken = csrfResponse._data
+
+    const saveResponse = await $fetch.raw<{ ok: boolean; message?: string }>(savePath, {
       method: 'POST',
       body: { text },
       headers: buildDrupalHeaders({
-        cookie: cookie ? String(cookie) : undefined,
+        apiKey,
+        cookie,
         csrfToken: csrfToken ? String(csrfToken) : undefined,
       }),
+      redirect: 'manual',
+      timeout: requestTimeoutMs,
     })
+
+    assertDrupalResponseNotRedirect(saveResponse)
+
+    return saveResponse._data
   } catch (error) {
+    captureDrupalApiError(event, error)
+
     throw createUpstreamParagraphTextError(error, 'Failed to save paragraph text.')
   }
 })

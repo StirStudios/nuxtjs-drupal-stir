@@ -16,6 +16,7 @@ const props = defineProps<{
   values: Record<string, unknown>
   editableFieldsCount: number
   hasProfileSave: boolean
+  requiresCurrentPassword?: boolean
   saving: boolean
   heading?: string
   subheading?: string
@@ -70,7 +71,16 @@ const getStringValue = (value: unknown): string => (typeof value === 'string' ? 
 const getCheckboxValue = (value: unknown): boolean => value === true
 
 const validate = (state: Record<string, unknown>): FormError[] => {
-  return validateProfileValues(props.fields, state)
+  const errors = validateProfileValues(props.fields, state)
+
+  if (props.requiresCurrentPassword && !getStringValue(state.current_password)) {
+    errors.push({
+      name: 'current_password',
+      message: 'Enter your current password to change your email address.',
+    })
+  }
+
+  return errors
 }
 </script>
 
@@ -128,9 +138,26 @@ const validate = (state: Record<string, unknown>): FormError[] => {
           :class="themeWebform.fieldInput || 'w-full'"
           :disabled="!field.editable"
           :model-value="getStringValue(props.values[field.name])"
-          type="text"
+          :type="field.type === 'email' ? 'email' : 'text'"
           :variant="webformVariant"
           @update:model-value="props.values[field.name] = String($event ?? '')"
+        />
+      </UFormField>
+
+      <UFormField
+        v-if="props.requiresCurrentPassword"
+        description="Required to confirm your email address change."
+        label="Current password"
+        name="current_password"
+        required
+      >
+        <UInput
+          autocomplete="current-password"
+          :class="themeWebform.fieldInput || 'w-full'"
+          :model-value="getStringValue(props.values.current_password)"
+          type="password"
+          :variant="webformVariant"
+          @update:model-value="props.values.current_password = String($event ?? '')"
         />
       </UFormField>
 

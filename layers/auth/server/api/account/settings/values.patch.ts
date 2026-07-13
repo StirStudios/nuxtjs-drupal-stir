@@ -6,6 +6,8 @@ type SettingsValuesPayload = {
 }
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const body = await readBody<SettingsValuesPayload>(event)
   const values =
     body && typeof body.values === 'object' && body.values !== null

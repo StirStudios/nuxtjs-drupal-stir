@@ -1,13 +1,26 @@
 import {
   defineEventHandler,
-  readBody,
   readMultipartFormData,
+  readRawBody,
   createError,
   getHeader,
   type H3Event,
 } from 'h3'
-import { fetchDrupalCsrfToken, getDrupalApiConfig } from '../../utils/drupalApi'
+import {
+  assertDrupalResponseNotRedirect,
+  captureDrupalApiError,
+  fetchDrupalCsrfToken,
+  getDrupalApiConfig,
+  getForwardedCookie,
+} from '../../utils/drupalApi'
 import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+import {
+  assertWebformContentLength,
+  assertWebformMultipartLimits,
+  assertWebformRawBodySize,
+  getWebformSubmissionLimits,
+  type WebformSubmissionLimits,
+} from '../../utils/webformLimits'
 
 type SubmissionBody = Record<string, unknown>
 type ParsedSubmission = {
@@ -16,32 +29,15 @@ type ParsedSubmission = {
   contentType?: string
 }
 
-function normalizeErrorStatus(error: unknown): number {
-  if (!error || typeof error !== 'object') return 500
+function normalizeUpstreamErrorStatus(error: unknown): number {
+  if (!error || typeof error !== 'object') return 502
   const statusCode =
     (error as { statusCode?: unknown; status?: unknown }).statusCode ??
     (error as { status?: unknown }).status
 
-  return typeof statusCode === 'number' ? statusCode : 500
-}
-
-function normalizeErrorMessage(error: unknown): string {
-  if (!error || typeof error !== 'object')
-    return 'Form submission failed. Please try again later.'
-
-  const statusMessage = (error as { statusMessage?: unknown }).statusMessage
-
-  if (typeof statusMessage === 'string' && statusMessage.trim()) {
-    return statusMessage
-  }
-
-  const message = (error as { message?: unknown }).message
-
-  if (typeof message === 'string' && message.trim()) {
-    return message
-  }
-
-  return 'Form submission failed. Please try again later.'
+  return typeof statusCode === 'number' && statusCode >= 400 && statusCode < 500
+    ? statusCode
+    : 502
 }
 
 function setBodyValue(
@@ -62,11 +58,50 @@ function setBodyValue(
     : [existing, value]
 }
 
-async function parseSubmission(event: H3Event): Promise<ParsedSubmission> {
+const parseUrlEncodedBody = (rawBody: string): SubmissionBody => {
+  const body: SubmissionBody = {}
+
+  for (const [key, value] of new URLSearchParams(rawBody)) {
+    setBodyValue(body, key, value)
+  }
+
+  return body
+}
+
+async function parseSubmission(
+  event: H3Event,
+  limits: WebformSubmissionLimits,
+): Promise<ParsedSubmission> {
   const contentType = getHeader(event, 'content-type') ?? ''
 
   if (!contentType.toLowerCase().includes('multipart/form-data')) {
-    const body = await readBody<SubmissionBody>(event)
+    const rawBody = await readRawBody(event, false)
+    const byteLength = rawBody?.byteLength ?? 0
+
+    assertWebformRawBodySize(byteLength, limits)
+
+    const value = rawBody?.toString('utf8') ?? ''
+    let body: SubmissionBody
+
+    try {
+      body = contentType.toLowerCase().includes('application/x-www-form-urlencoded')
+        ? parseUrlEncodedBody(value)
+        : value
+          ? JSON.parse(value) as SubmissionBody
+          : {}
+    } catch {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid form submission body',
+      })
+    }
+
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid form submission body',
+      })
+    }
 
     return {
       body,
@@ -76,6 +111,9 @@ async function parseSubmission(event: H3Event): Promise<ParsedSubmission> {
   }
 
   const parts = await readMultipartFormData(event)
+
+  assertWebformMultipartLimits(parts ?? [], limits)
+
   const body: SubmissionBody = {}
   const formData = new FormData()
 
@@ -106,59 +144,64 @@ async function parseSubmission(event: H3Event): Promise<ParsedSubmission> {
 }
 
 export default defineEventHandler(async (event) => {
+  const limits = getWebformSubmissionLimits()
+
+  assertWebformContentLength(event, limits)
+
+  const submission = await parseSubmission(event, limits)
+  const body = submission.body
+
+  if (!body.webform_id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Missing required fields',
+    })
+  }
+
+  // Require a Turnstile token; Drupal stir_webform_rest performs verification.
+  if (!body.turnstile_response) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'CAPTCHA validation failed',
+    })
+  }
+
   try {
-    const { baseUrl, apiKey } = getDrupalApiConfig()
-    const fetchJson = $fetch as <T>(
-      request: string,
-      options?: Record<string, unknown>,
-    ) => Promise<T>
-    const submission = await parseSubmission(event)
-    const body = submission.body
-
-    if (!body?.webform_id) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Missing required fields',
-      })
-    }
-
-    // Require a Turnstile token; Drupal stir_webform_rest performs verification.
-    if (!body.turnstile_response) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'CAPTCHA validation failed',
-      })
-    }
-
+    const { baseUrl, apiKey, requestTimeoutMs } = getDrupalApiConfig()
     const csrfToken = await fetchDrupalCsrfToken(event)
+    const cookie = getForwardedCookie(event)
 
     const drupalApiUrl = `${baseUrl}/api/stir_webform_rest/submit`
     const origin = getHeader(event, 'origin')
     const referer = getHeader(event, 'referer')
-    const forwardedFor = getHeader(event, 'x-forwarded-for')
-    const forwardedProto = getHeader(event, 'x-forwarded-proto')
     const userAgent = getHeader(event, 'user-agent')
 
-    return await fetchJson<Record<string, unknown>>(drupalApiUrl, {
+    const response = await $fetch.raw<Record<string, unknown>>(drupalApiUrl, {
       method: 'POST',
       headers: {
         ...(submission.contentType
           ? { 'Content-Type': submission.contentType }
           : {}),
         Accept: 'application/json',
-        ...buildDrupalHeaders({ apiKey, csrfToken }),
+        ...buildDrupalHeaders({ apiKey, cookie, csrfToken }),
         ...(origin ? { Origin: origin } : {}),
         ...(referer ? { Referer: referer } : {}),
-        ...(forwardedFor ? { 'X-Forwarded-For': forwardedFor } : {}),
-        ...(forwardedProto ? { 'X-Forwarded-Proto': forwardedProto } : {}),
         ...(userAgent ? { 'User-Agent': userAgent } : {}),
       },
       body: submission.forwardBody,
+      redirect: 'manual',
+      timeout: requestTimeoutMs,
     })
+
+    assertDrupalResponseNotRedirect(response)
+
+    return response._data
   } catch (error) {
+    captureDrupalApiError(event, error)
+
     throw createError({
-      statusCode: normalizeErrorStatus(error),
-      statusMessage: normalizeErrorMessage(error),
+      statusCode: normalizeUpstreamErrorStatus(error),
+      statusMessage: 'Form submission failed. Please try again later.',
     })
   }
 })

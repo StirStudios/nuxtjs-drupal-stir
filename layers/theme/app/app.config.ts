@@ -59,6 +59,13 @@ export default defineAppConfig({
     },
   },
 
+  thirdPartyScripts: {
+    allowedOrigins: {
+      calculator: ['https://piper.b-cdn.net'],
+      enzuzo: ['https://app.enzuzo.com'],
+    },
+  },
+
   stirTheme: {
     showPdf: false,
     showBreadcrumbs: false,

@@ -1,11 +1,12 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import {
   layerAuthDrupalApiRequest,
-  layerAuthGetDrupalApiConfig,
   layerAuthThrowDrupalApiError,
 } from '../../utils/drupalApi'
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const body = await readBody<{
     identifier?: unknown
     password?: unknown
@@ -39,8 +40,6 @@ export default defineEventHandler(async (event) => {
       forwardSetCookies: true,
     })
   } catch (error: unknown) {
-    const { baseUrl } = layerAuthGetDrupalApiConfig()
-
     if (
       typeof error === 'object' &&
       error !== null &&
@@ -48,8 +47,8 @@ export default defineEventHandler(async (event) => {
       (error as { statusCode?: unknown }).statusCode === 404
     ) {
       throw createError({
-        statusCode: 404,
-        statusMessage: `Drupal auth endpoint not found at ${baseUrl}/api/auth/login`,
+        statusCode: 502,
+        statusMessage: 'Authentication service is unavailable',
       })
     }
 

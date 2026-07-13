@@ -14,7 +14,16 @@ definePageMeta({
 const toast = useToast()
 const session = useAuthSession()
 const { auth } = useAuthConfig()
-const { values, fieldEditability, hasChanges, loading, saving, load, save } = useAccountSettings()
+const {
+  values,
+  fieldEditability,
+  hasChanges,
+  requiresCurrentPassword,
+  loading,
+  saving,
+  load,
+  save,
+} = useAccountSettings()
 
 const isReady = ref(false)
 const currentPassword = ref('')
@@ -189,6 +198,7 @@ const onCancelAccount = async () => {
           :fields="displaySettingsFields"
           :has-profile-save="hasChanges"
           heading="Settings"
+          :requires-current-password="requiresCurrentPassword"
           :saving="saving"
           subheading="Update your account login details."
           :values="values"

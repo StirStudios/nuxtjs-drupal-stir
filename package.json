@@ -2,11 +2,15 @@
   "name": "nuxtjs-drupal-stir",
   "version": "4.3.8",
   "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": "^22.13.0 || ^24.11.0 || >=26.0.0"
+  },
   "scripts": {
     "build": "nuxi build",
     "dev": "nuxi dev",
     "generate": "nuxi generate",
     "preview": "nuxi preview",
+    "css:generate-safelist": "node scripts/generate-safelist.mjs",
     "postinstall": "nuxi prepare",
     "lint": "eslint . --no-warn-ignored",
     "lint:fix": "eslint . --fix --no-warn-ignored",
@@ -16,10 +20,14 @@
     "test": "vitest run",
     "test:nuxt:runtime": "vitest run --config vitest.nuxt.config.ts",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:consumer:typecheck": "nuxi typecheck --cwd tests/fixtures/consumer-app",
+    "test:consumer:build": "nuxi build --cwd tests/fixtures/consumer-app",
+    "test:consumer": "pnpm test:consumer:typecheck && pnpm test:consumer:build",
     "test:nuxt": "pnpm test:nuxt:runtime",
-    "test:all": "pnpm test && pnpm test:nuxt",
+    "test:all": "pnpm test && pnpm test:nuxt && pnpm test:e2e",
     "test:watch": "vitest",
-    "verify:ci": "pnpm test && pnpm test:nuxt && pnpm lint && pnpm typecheck && pnpm build",
+    "verify:core": "pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
+    "verify:ci": "pnpm verify:core && pnpm test:consumer",
     "deps:update": "pnpm update",
     "deps:verify": "pnpm verify:ci",
     "deps:update:safe": "pnpm deps:update && pnpm docs:sync-tech-stack && pnpm deps:verify",
@@ -34,6 +42,7 @@
     "@nuxtjs/robots": "^6.1.2",
     "@nuxtjs/sitemap": "^8.2.2",
     "@nuxtjs/turnstile": "^1.1.3",
+    "@plausible-analytics/tracker": "^0.4.5",
     "@tiptap/core": "3.27.1",
     "@tiptap/extension-bullet-list": "3.27.1",
     "@tiptap/extension-heading": "3.27.1",
@@ -67,7 +76,7 @@
     "lighthouse": "^13.4.0",
     "prettier": "^3.9.5",
     "prettier-plugin-tailwindcss": "^0.7.4",
-    "release-it": "^19.2.4",
+    "release-it": "^20.2.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10",
     "vue": "^3.5.39",
@@ -75,6 +84,9 @@
   },
   "release-it": {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
+    "hooks": {
+      "before:init": "pnpm verify:ci"
+    },
     "github": {
       "release": true,
       "releaseName": "v${version}"

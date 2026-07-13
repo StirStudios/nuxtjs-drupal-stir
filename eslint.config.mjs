@@ -25,16 +25,15 @@ export default withNuxt(
       'vue/this-in-template': 'off',
       'vue/html-self-closing': 'off',
       'vue/no-mutating-props': 'off',
-      'vue/no-unused-vars':
-        process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+      'vue/no-unused-vars': 'error',
       quotes: ['error', 'single'],
       'vue/multi-word-component-names': 'off',
       'vue/component-name-in-template-casing': ['error', 'PascalCase'],
       'vue/order-in-components': 'error',
       'vue/attributes-order': ['error', { alphabetical: true }],
       'vue/block-order': ['error', { order: ['script', 'template', 'style'] }],
-      'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+      'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
+      'no-debugger': 'error',
     },
   },
   {
@@ -57,6 +56,12 @@ export default withNuxt(
     files: ['layers/theme/app/components/global/node--default.vue'],
     rules: {
       'vue/prop-name-casing': 'off',
+    },
+  },
+  {
+    files: ['scripts/**/*.{js,mjs,ts}'],
+    rules: {
+      'no-console': 'off',
     },
   },
   {

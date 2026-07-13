@@ -35,6 +35,18 @@ From `stir_account`:
 - UI auth state must always come from `GET /api/auth/session`.
 - Do not maintain parallel client auth stores that can drift from server session state.
 
+## Cookie-authenticated CSRF
+
+The shared Nitro Drupal client automatically fetches `/session/token` with the
+forwarded Drupal session cookie and attaches `X-CSRF-Token` to non-GET Drupal
+requests whenever that cookie is present. Auth/account route handlers should use
+`layerAuthDrupalApiRequest()` rather than implementing token forwarding locally.
+
+This matches `stir_account` protection for logout, account settings, email,
+password, and cancellation mutations. Public login, registration, verification,
+and reset-token workflows do not depend on ambient authenticated authority and
+remain available without a pre-existing session token.
+
 ## Turnstile
 
 - Auth forms can include Turnstile tokens.
@@ -59,9 +71,10 @@ Suggested defaults:
 Return `429` JSON responses when limits are exceeded.
 
 The local protected-password gate also tracks failed attempts through Nitro
-storage. For multi-worker deployments, mount the cache storage on a shared
-backend and apply a persistent edge or ingress limit to
-`POST /api/auth/protected`; process-local state is not a sufficient control.
+storage. This limiter is best-effort: shared storage gives workers visibility,
+but the counter is not atomic and storage failures fail open. Production must
+independently enforce a persistent, atomic or provider-native edge limit on
+`POST /api/auth/protected` using a trusted client-IP boundary.
 
 `PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only when a
 trusted ingress removes client-supplied forwarding headers and sets

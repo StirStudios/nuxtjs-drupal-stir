@@ -29,5 +29,8 @@ export async function layerAuthDrupalApiRequest<T>(
   path: string,
   options: StirDrupalRequestOptions = {},
 ): Promise<T> {
-  return await stirDrupalApiRequest<T>(event, path, options)
+  return await stirDrupalApiRequest<T>(event, path, {
+    ...options,
+    forwardClientIp: options.forwardClientIp ?? true,
+  })
 }
