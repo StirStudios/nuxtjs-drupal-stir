@@ -95,14 +95,15 @@ function formatBytes(bytes) {
 
 async function main() {
   await mkdir(outputDirectory, { recursive: true })
-  const chrome = await launch({
-    chromePath: process.env.LIGHTHOUSE_CHROME_PATH,
-    chromeFlags: ['--headless', '--ignore-certificate-errors', '--no-sandbox'],
-  })
   const results = []
 
-  try {
-    for (let index = 1; index <= runs; index += 1) {
+  for (let index = 1; index <= runs; index += 1) {
+    const chrome = await launch({
+      chromePath: process.env.LIGHTHOUSE_CHROME_PATH,
+      chromeFlags: ['--headless', '--ignore-certificate-errors', '--no-sandbox'],
+    })
+
+    try {
       const runner = await lighthouse(url, {
         formFactor: 'mobile',
         logLevel: 'error',
@@ -123,9 +124,9 @@ async function main() {
         `Run ${index}: score ${summary.score}, LCP ${(summary.lcpMs / 1000).toFixed(2)}s, ` +
         `${formatBytes(summary.totalBytes)}, media ${formatBytes(summary.mediaBytes)}`,
       )
+    } finally {
+      await chrome.kill()
     }
-  } finally {
-    await chrome.kill()
   }
 
   const report = {
