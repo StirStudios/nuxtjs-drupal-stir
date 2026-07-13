@@ -39,11 +39,13 @@ export function resolveParagraphTextApiConfig(config: ReturnType<typeof useRunti
   const drupalBaseUrl = normalizeBaseUrl(drupalApi.baseUrl)
   const ceApiEndpoint = normalizeEndpoint(drupalCeConfig.ceApiEndpoint)
   const apiKey = drupalApi.apiKey
+  const requestTimeoutMs = drupalApi.requestTimeoutMs
 
   return {
     apiKey,
     ceApiEndpoint,
     drupalBaseUrl,
+    requestTimeoutMs,
   }
 }
 
@@ -52,23 +54,20 @@ export function buildParagraphTextPath(ceApiEndpoint: string, paragraphId: numbe
 }
 
 export function createUpstreamParagraphTextError(error: unknown, fallbackMessage: string) {
-  const statusCode =
+  const upstreamStatusCode =
     typeof (error as { statusCode?: unknown })?.statusCode === 'number'
       ? Number((error as { statusCode: number }).statusCode)
       : typeof (error as { status?: unknown })?.status === 'number'
         ? Number((error as { status: number }).status)
-        : 502
-  const statusMessage =
-    typeof (error as { statusMessage?: unknown })?.statusMessage === 'string' &&
-    (error as { statusMessage?: string }).statusMessage?.trim()
-      ? String((error as { statusMessage: string }).statusMessage)
-      : typeof (error as { message?: unknown })?.message === 'string' &&
-          (error as { message?: string }).message?.trim()
-        ? String((error as { message: string }).message)
-        : fallbackMessage
+        : undefined
+  const statusCode = upstreamStatusCode !== undefined
+    && upstreamStatusCode >= 400
+    && upstreamStatusCode < 500
+    ? upstreamStatusCode
+    : 502
 
   return createError({
     statusCode,
-    statusMessage,
+    statusMessage: fallbackMessage,
   })
 }

@@ -5,7 +5,7 @@ This project favors small, predictable file structure patterns over custom per-f
 ## Import order
 - `type` imports first.
 - Third-party/runtime imports next (`#imports`, `@vueuse/*`, `vue`, etc.).
-- Project imports last, using aliases (`~/...`, `~/types`) for app code.
+- Project imports last. Shared theme-layer imports use the established `~/...` aliases.
 
 ## `script setup` component order
 1. Imports
@@ -29,7 +29,7 @@ Keep this order stable unless a dependency relationship requires a different pla
 - Avoid section banners and conversational comments.
 
 ## Paths and naming
-- Prefer alias imports for app-level modules (`~/composables/...`, `~/utils/...`).
+- Use `~/composables`, `~/utils`, `~/components`, and `~/types` for public theme-layer imports.
 - Keep Nuxt naming conventions:
   - Components: `PascalCase.vue`
   - Composables: `useXxx.ts`

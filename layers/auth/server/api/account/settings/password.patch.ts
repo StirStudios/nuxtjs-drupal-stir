@@ -7,6 +7,8 @@ type PasswordPayload = {
 }
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const body = await readBody<PasswordPayload>(event)
 
   const currentPassword =

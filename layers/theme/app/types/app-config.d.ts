@@ -37,6 +37,13 @@ type AnalyticsConfig = {
   plausible?: PlausibleConfig
 } & LooseRecord
 
+type ThirdPartyScriptsConfig = {
+  allowedOrigins?: {
+    calculator?: string[]
+    enzuzo?: string[]
+  }
+} & LooseRecord
+
 type UserwayConfig = {
   enabled?: boolean
   account?: string
@@ -427,6 +434,7 @@ declare module 'nuxt/schema' {
     protectedRoutes?: ProtectedRoutesConfig
     authIntegration?: AuthIntegrationConfig
     analytics?: AnalyticsConfig
+    thirdPartyScripts?: ThirdPartyScriptsConfig
     userway?: UserwayConfig
     privacyNotice?: PrivacyNoticeConfig
     popup?: PopupConfig
@@ -439,6 +447,7 @@ declare module 'nuxt/schema' {
     protectedRoutes: ProtectedRoutesConfig
     authIntegration: AuthIntegrationConfig
     analytics: AnalyticsConfig
+    thirdPartyScripts: ThirdPartyScriptsConfig
     userway: UserwayConfig
     privacyNotice: PrivacyNoticeConfig
     popup: PopupConfig

@@ -16,25 +16,14 @@ const normalizedEmbedUrl = computed(() => {
   return raw.startsWith('http') ? raw : `https://${raw}`
 })
 
-onMounted(() => {
-  const scriptId = '__enzuzo-root-script'
-  const rootId = '__enzuzo-root'
-
-  if (!normalizedEmbedUrl.value || document.getElementById(scriptId)) return
-
-  const target = document.getElementById(rootId)
-
-  if (!target) return
-
-  const script = document.createElement('script')
-
-  script.id = scriptId
-  script.src = normalizedEmbedUrl.value
-  script.defer = true
-  script.crossOrigin = 'anonymous'
-  script.referrerPolicy = 'no-referrer'
-
-  target.insertAdjacentElement('afterend', script)
+useThirdPartyScript(normalizedEmbedUrl, {
+  attrs: {
+    crossorigin: 'anonymous',
+    referrerpolicy: 'no-referrer',
+  },
+  id: '__enzuzo-root-script',
+  kind: 'enzuzo',
+  requiresConsent: false,
 })
 </script>
 

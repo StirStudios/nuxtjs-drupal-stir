@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - dev
       - release/**
   pull_request:
 
@@ -31,20 +32,8 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Test
-        run: pnpm test
-
-      - name: Test Nuxt Runtime
-        run: pnpm test:nuxt
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Build
-        run: pnpm build
+      - name: Verify Core
+        run: pnpm verify:core
 
   consumer-smoke:
     runs-on: ubuntu-latest
@@ -53,8 +42,8 @@ jobs:
       fail-fast: false
       matrix:
         command:
-          - typecheck
-          - build
+          - test:consumer:typecheck
+          - test:consumer:build
 
     steps:
       - name: Checkout
@@ -75,4 +64,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Consumer Layer Smoke Test
-        run: pnpm exec nuxi ${{ matrix.command }} --cwd tests/fixtures/consumer-app
+        run: pnpm ${{ matrix.command }}

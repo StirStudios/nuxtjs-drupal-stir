@@ -14,9 +14,12 @@ const open = ref(false)
 const isHydrated = ref(false)
 const isDev = import.meta.dev
 const config = computed(() => appConfig.privacyNotice)
-const consent = useCookie<boolean | string>('cookie_consent', {
-  maxAge: 60 * 60 * 24 * 365,
-})
+const {
+  accept: acceptConsent,
+  decline: declineConsent,
+  dismiss: dismissConsent,
+  hasDecision,
+} = usePrivacyConsent()
 const isConsentMode = computed(() => config.value?.mode === 'consent')
 const isDismissible = computed(() => config.value?.dismissible !== false)
 const primaryButtonLabel = computed(() =>
@@ -24,10 +27,6 @@ const primaryButtonLabel = computed(() =>
 )
 const declineButtonLabel = computed(() =>
   config.value?.declineButtonLabel || (isConsentMode.value ? 'Reject all' : 'Decline'),
-)
-const hasDecision = computed(() =>
-  consent.value === true ||
-  (typeof consent.value === 'string' && consent.value.length > 0),
 )
 const noticeTermsUrl = computed(() =>
   config.value?.cookiePolicyUrl ? '' : config.value?.termsUrl,
@@ -51,21 +50,23 @@ onMounted(() => {
   isHydrated.value = true
 })
 
-function setDecision(status: 'accepted' | 'declined' | 'dismissed') {
-  consent.value = status
+function closeNotice() {
   open.value = false
 }
 
 function accept() {
-  setDecision('accepted')
+  acceptConsent()
+  closeNotice()
 }
 
 function decline() {
-  setDecision('declined')
+  declineConsent()
+  closeNotice()
 }
 
 function dismiss() {
-  setDecision(isConsentMode.value ? 'declined' : 'dismissed')
+  dismissConsent()
+  closeNotice()
 }
 
 function toRoutePath(url: string) {

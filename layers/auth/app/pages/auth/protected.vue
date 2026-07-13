@@ -2,7 +2,14 @@
 import { useProtectedLogin } from '../../composables/auth/useProtectedLogin'
 import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 
-const { fields, validate, onSubmit, isLoading } = useProtectedLogin()
+const {
+  fields,
+  turnstileKey,
+  turnstileToken,
+  validate,
+  onSubmit,
+  isLoading,
+} = useProtectedLogin()
 const { auth } = useAuthConfig()
 
 const title = computed(
@@ -31,6 +38,10 @@ useSeoMeta({
       :title="title"
       :validate="validate"
       @submit="onSubmit($event as never)"
-    />
+    >
+      <template #validation>
+        <FieldTurnstile :key="turnstileKey" v-model="turnstileToken" />
+      </template>
+    </AuthCard>
   </AuthPage>
 </template>

@@ -1,15 +1,25 @@
-import { createError, defineEventHandler, readBody } from 'h3'
+import {
+  createError,
+  defineEventHandler,
+  readBody,
+  setResponseHeader,
+} from 'h3'
 import {
   layerAuthClearProtectedAccessCookie,
   layerAuthGetProtectedAccessSecret,
-  layerAuthIsProtectedAccessAuthenticated,
   layerAuthSetProtectedAccessCookie,
 } from '../../utils/protectedAccess'
 import { layerAuthConstantTimeEquals } from '../../utils/protectedAccessToken'
+import {
+  layerAuthCheckProtectedLoginRateLimit,
+  layerAuthRecordProtectedLoginFailure,
+  layerAuthResetProtectedLoginRateLimit,
+} from '../../utils/protectedRateLimit'
 
 type ProtectedBody = {
   action?: unknown
   password?: unknown
+  turnstile_response?: unknown
 }
 
 export default defineEventHandler(async (event) => {
@@ -23,6 +33,42 @@ export default defineEventHandler(async (event) => {
     return { protectedAuthenticated: false }
   }
 
+  const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
+
+  if (!rateLimit.allowed) {
+    setResponseHeader(event, 'Retry-After', rateLimit.retryAfterSeconds)
+
+    throw createError({
+      statusCode: 429,
+      statusMessage: 'Too many attempts. Please try again later',
+    })
+  }
+
+  const turnstileResponse =
+    typeof body?.turnstile_response === 'string'
+      ? body.turnstile_response.trim()
+      : ''
+
+  if (!turnstileResponse) {
+    await layerAuthRecordProtectedLoginFailure(event)
+
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'Security challenge is required',
+    })
+  }
+
+  const turnstileValidation = await verifyTurnstileToken(turnstileResponse, event)
+
+  if (!turnstileValidation.success) {
+    await layerAuthRecordProtectedLoginFailure(event)
+
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Security challenge failed',
+    })
+  }
+
   const submittedPassword = typeof body?.password === 'string' ? body.password : ''
   const expectedPassword = String(useRuntimeConfig().protectedPassword || '')
 
@@ -31,6 +77,8 @@ export default defineEventHandler(async (event) => {
     !expectedPassword ||
     !layerAuthConstantTimeEquals(submittedPassword, expectedPassword)
   ) {
+    await layerAuthRecordProtectedLoginFailure(event)
+
     throw createError({
       statusCode: 401,
       statusMessage: 'Invalid password',
@@ -47,8 +95,9 @@ export default defineEventHandler(async (event) => {
   }
 
   await layerAuthSetProtectedAccessCookie(event, secret)
+  await layerAuthResetProtectedLoginRateLimit(event)
 
   return {
-    protectedAuthenticated: await layerAuthIsProtectedAccessAuthenticated(event, secret),
+    protectedAuthenticated: true,
   }
 })

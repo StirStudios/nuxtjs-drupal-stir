@@ -66,56 +66,18 @@ const widgetAttrs = computed<Record<string, string>>(() => {
 const getInitPiperWidget = () =>
   (window as Window & { initPiperWidget?: () => void }).initPiperWidget
 
-const ensureLoaderScript = async (src: string) => {
-  if (typeof getInitPiperWidget() === 'function') return
-
-  const existing = document.querySelector<HTMLScriptElement>(
-    `script[data-piper-loader-src="${src}"]`,
-  )
-
-  if (existing) {
-    await new Promise<void>((resolve, reject) => {
-      if (typeof getInitPiperWidget() === 'function') {
-        resolve()
-        return
-      }
-
-      existing.addEventListener('load', () => resolve(), { once: true })
-      existing.addEventListener(
-        'error',
-        () => reject(new Error('piper_loader_failed')),
-        { once: true },
-      )
-    })
-    return
-  }
-
-  await new Promise<void>((resolve, reject) => {
-    const script = document.createElement('script')
-
-    script.src = src
-    script.defer = true
-    script.dataset.piperLoaderSrc = src
-    script.addEventListener('load', () => resolve(), { once: true })
-    script.addEventListener(
-      'error',
-      () => reject(new Error('piper_loader_failed')),
-      { once: true },
-    )
-    document.head.appendChild(script)
-  })
-}
-
-onMounted(async () => {
-  if (!loaderSrc.value || !venueId.value) return
-
-  try {
-    await ensureLoaderScript(loaderSrc.value)
-    getInitPiperWidget()?.()
-  } catch {
-    // Do not throw on widget loader failure; this component should fail gracefully.
-  }
+const { isLoaded } = useThirdPartyScript(loaderSrc, {
+  kind: 'calculator',
+  isReady: () => typeof getInitPiperWidget() === 'function',
 })
+
+watch(
+  isLoaded,
+  (loaded) => {
+    if (loaded && venueId.value) getInitPiperWidget()?.()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

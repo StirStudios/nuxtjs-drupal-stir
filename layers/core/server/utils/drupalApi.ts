@@ -1,9 +1,12 @@
 import type { H3Event } from 'h3'
 import {
   appendStirDrupalSetCookies,
+  assertStirDrupalResponseNotRedirect,
+  captureStirDrupalApiError,
   fetchStirDrupalCsrfToken,
   getStirDrupalApiConfig,
   getStirForwardedCookie,
+  markStirPrivateResponse,
   stirDrupalApiRequest,
   throwStirDrupalApiError,
   type StirDrupalRequestOptions,
@@ -15,7 +18,14 @@ export function getDrupalApiConfig() {
 
 export const getForwardedCookie = getStirForwardedCookie
 
+export const markPrivateResponse = markStirPrivateResponse
+
+export const captureDrupalApiError = captureStirDrupalApiError
+
 export const appendDrupalSetCookies = appendStirDrupalSetCookies
+
+export const assertDrupalResponseNotRedirect =
+  assertStirDrupalResponseNotRedirect
 
 export const throwDrupalApiError = throwStirDrupalApiError
 

@@ -177,10 +177,37 @@ analytics: {
 ```
 
 Migration note:
+
 - `analytics.plausible.scriptUrl` and `analytics.plausible.scriptId` are removed.
 - Plausible now uses `@nuxtjs/plausible` with `analytics.plausible` only overriding `enabled` and `domain`.
 - `analytics.plausible.enabled` can disable Plausible, but `NUXT_ENV=production` controls whether it can run.
 - Use `NUXT_PUBLIC_PLAUSIBLE_API_HOST` for API host overrides.
+- In privacy `consent` mode, Plausible initialization and events are deferred until acceptance.
+
+### 🔗 `thirdPartyScripts`
+
+CMS-provided script URLs are accepted only from exact HTTPS origins in this
+allowlist:
+
+```ts
+thirdPartyScripts: {
+  allowedOrigins: {
+    calculator: ['https://piper.b-cdn.net'],
+    enzuzo: ['https://app.enzuzo.com'],
+  },
+}
+```
+
+The calculator default matches the widget URL shipped by `stir-tools`.
+Downstream projects using another calculator host must add its exact origin;
+lookalike subdomains and HTTP URLs are rejected. Enzuzo remains available after
+a visitor declines optional tracking because it renders legal/compliance
+content, but its URL is still origin-validated.
+
+Calendly and Bunny PlayerJS use fixed vendor origins. PlayerJS retains Bunny's
+official `playerjs-latest.min.js` URL because Bunny does not publish a supported
+pinned loader URL. UserWay remains ungated as an accessibility-essential
+service.
 
 ### 💬 `popup`
 
@@ -242,6 +269,16 @@ privacyNotice: {
   privacyUrl: '/privacy-policy',
 }
 ```
+
+In `consent` mode, Plausible, Calculator, Calendly, and Bunny PlayerJS wait for
+acceptance. In `notice` mode, or when the notice is disabled, existing loading
+behavior is preserved. Enzuzo legal content and the UserWay accessibility
+widget are treated as essential exceptions.
+
+Application code can read or change the shared decision through
+`usePrivacyConsent()`. Calling `withdraw()` marks consent declined and reloads
+the page by default so already-executed vendor code is fully torn down; use
+`withdraw({ reload: false })` only when the caller handles teardown itself.
 
 ---
 
@@ -305,12 +342,18 @@ navigation: {
 	angle: false,
 	angleDeg: 35,
 	angleOffsetX: '1.5rem',
-	link: 'text-xl text-center block my-3 uppercase',
-	list: '',
-	body: 'flex h-full flex-col justify-center text-center',
+	link: 'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
+	list: 'w-full space-y-1.5',
+	body: 'flex flex-col',
   },
 }
 ```
+
+The mobile panel defaults to top/left-aligned, full-width navigation rows. Its
+header and body have responsive horizontal padding, and hover/active surfaces
+span the row for a conventional touch target. Override `slideover.link`,
+`slideover.list`, or `slideover.body` only for a project-specific navigation
+treatment.
 
 `navigation.mode` accepts `'fixed'` or `'sticky'`. Use `'fixed'` for an overlay
 header that sits above page content, and `'sticky'` for an in-flow header that
@@ -488,7 +531,10 @@ pnpm perf:lighthouse -- --url=http://127.0.0.1:3000/ --runs=3
 
 Add `--assert` to enforce the default budgets, or override them with
 `--min-score`, `--max-lcp`, `--max-tbt`, `--max-total-bytes`, and
-`--max-media-bytes`. Set `LIGHTHOUSE_CHROME_PATH` when Chrome is not installed
+`--max-image-bytes` and `--max-video-bytes`. The default transfer budgets are
+2 MB total, 1 MB images, and no initial video transfer. Use
+`--max-media-bytes` only when a project intentionally needs an additional
+combined image/video cap. Set `LIGHTHOUSE_CHROME_PATH` when Chrome is not installed
 in a standard system location. Reports are written to the ignored
 `.lighthouse/` directory. The summary includes separate image and video
 transfer, combined media transfer, CSS and JavaScript transfer, estimated

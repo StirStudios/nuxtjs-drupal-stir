@@ -1,9 +1,15 @@
 # Auth Layer
 
-Optional Nuxt layer for Drupal auth/account integration.
+Nuxt sub-layer for Drupal auth/account and protected-page integration. The
+published root layer includes it by default.
 
 Core Drupal webform submission does not require this layer. Shared Drupal
 server utilities handle CSRF token forwarding for core endpoints.
+
+Cookie-authenticated Drupal mutations are also CSRF-protected centrally. The
+server utility fetches Drupal's session token with the forwarded session cookie
+and adds `X-CSRF-Token`; page components and downstream applications do not
+manage Drupal tokens directly.
 
 ## Scope
 
@@ -13,21 +19,20 @@ server utilities handle CSRF token forwarding for core endpoints.
 - auth/account server proxy routes under `/api/auth/*` and `/api/account/*`
 - auth/account validation utilities
 
-## Enable
+## Consumption
 
-Add this layer to your project:
+Downstream applications should extend the repository's root layer. Extending
+this internal sub-layer alone is not a supported distribution contract.
 
-```ts
-export default defineNuxtConfig({
-  extends: ['./layers/auth'],
-})
-```
-
-For this repository itself, the root `nuxt.config.ts` already includes:
+The root configuration includes:
 
 ```ts
-extends: ['./layers/auth']
+extends: ['./layers/core', './layers/theme', './layers/auth']
 ```
+
+There is currently no separate auth-free preset. Leave
+`authIntegration.drupalAccounts` disabled when Drupal account UI is not used;
+the local `/auth/protected` route remains available.
 
 ## Configuration
 

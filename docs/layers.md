@@ -32,10 +32,10 @@ Common override order for downstream projects:
 ## Boundary Guidelines
 
 - Avoid importing internals from another layer's implementation folders.
-- Prefer public aliases such as `~/types` for shared app-facing data shapes.
+- Use the established `~/types`, `~/composables`, `~/utils`, and `~/components` contracts for shared theme-layer APIs.
 - Keep server concerns in `core`/`auth` server directories, not in `theme`.
 
 ## Notes
 
-- Theme CSS is registered in `layers/theme/nuxt.config.ts` using a resolved file path. This is intentional for stable layer asset resolution.
+- Theme CSS is registered in `layers/theme/nuxt.config.ts` using a resolved file path. When a consumer provides `app/assets/css/main.css`, that file is the single entry and should import `@stir/base/layers/theme/app/assets/css/main` before its local partials.
 - Core webform submission fetches Drupal CSRF tokens through shared server utilities and does not require `layers/auth`.

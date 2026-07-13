@@ -16,5 +16,6 @@
       "~/types": ["./layers/theme/app/types"],
       "~/types/*": ["./layers/theme/app/types/*"]
     }
-  }
+  },
+  "exclude": ["tests/fixtures/consumer-app"]
 }

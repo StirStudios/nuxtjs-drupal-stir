@@ -1,4 +1,3 @@
-import { watchOnce } from '@vueuse/core'
 import type { MaybeRefOrGetter } from 'vue'
 
 export interface VideoPlayer {
@@ -36,10 +35,11 @@ declare global {
 }
 
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())
-const isScriptLoaded = ref(false)
-let scriptInjected = false
 const DEFAULT_EVENT_POLL_INTERVAL_MS = 1000
 const MIN_EVENT_POLL_INTERVAL_MS = 250
+const PLAYER_SCRIPT_ORIGIN = 'https://assets.mediadelivery.net'
+const PLAYER_SCRIPT_URL =
+  `${PLAYER_SCRIPT_ORIGIN}/playerjs/playerjs-latest.min.js`
 const PLAYER_ORIGINS = new Set([
   'https://player.mediadelivery.net',
   'https://iframe.mediadelivery.net',
@@ -77,27 +77,18 @@ function debugVideoPlayer(message: string, context: Record<string, unknown> = {}
 }
 
 export function useVideoPlayers() {
-  if (import.meta.client && !scriptInjected) {
-    scriptInjected = true
+  const { isLoaded } = useThirdPartyScript(PLAYER_SCRIPT_URL, {
+    allowedOrigins: [PLAYER_SCRIPT_ORIGIN],
+    isReady: () => typeof window.playerjs?.Player === 'function',
+  })
 
-    useHead({
-      script: [
-        {
-          src: 'https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js',
-          defer: true,
-          onload: () => {
-            isScriptLoaded.value = true
-          },
-        },
-      ],
-    })
-
-    watchOnce(isScriptLoaded, (loaded) => {
-      if (loaded) {
-        initializePlayers()
-      }
-    })
-  }
+  watch(
+    isLoaded,
+    (loaded) => {
+      if (loaded) initializePlayers()
+    },
+    { immediate: true },
+  )
 
   async function initializePlayers(): Promise<void> {
     if (!import.meta.client) return

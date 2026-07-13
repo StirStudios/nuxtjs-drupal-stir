@@ -15,13 +15,16 @@ const url = option('url', process.env.LIGHTHOUSE_URL || 'http://127.0.0.1:3000/'
 const runs = Math.max(1, numberOption('runs', 3))
 const shouldAssert = args.includes('--assert')
 const outputDirectory = '.lighthouse'
+const combinedMediaBudget = option('max-media-bytes', '')
 
 const budgets = {
+  imageBytes: numberOption('max-image-bytes', 1_000_000),
   lcpMs: numberOption('max-lcp', 4000),
-  mediaBytes: numberOption('max-media-bytes', 0),
+  mediaBytes: combinedMediaBudget ? Number(combinedMediaBudget) : null,
   minScore: numberOption('min-score', 80),
   tbtMs: numberOption('max-tbt', 300),
   totalBytes: numberOption('max-total-bytes', 2_000_000),
+  videoBytes: numberOption('max-video-bytes', 0),
 }
 
 function auditNumber(lhr, id) {
@@ -101,6 +104,7 @@ async function main() {
   try {
     for (let index = 1; index <= runs; index += 1) {
       const runner = await lighthouse(url, {
+        formFactor: 'mobile',
         logLevel: 'error',
         onlyCategories: ['performance'],
         output: 'json',
@@ -168,7 +172,11 @@ async function main() {
     result.tbtMs > budgets.tbtMs && `TBT ${result.tbtMs.toFixed(0)}ms > ${budgets.tbtMs}ms`,
     result.totalBytes > budgets.totalBytes &&
       `transfer ${result.totalBytes}B > ${budgets.totalBytes}B`,
-    result.mediaBytes > budgets.mediaBytes &&
+    result.imageBytes > budgets.imageBytes &&
+      `images ${result.imageBytes}B > ${budgets.imageBytes}B`,
+    result.videoBytes > budgets.videoBytes &&
+      `video ${result.videoBytes}B > ${budgets.videoBytes}B`,
+    budgets.mediaBytes !== null && result.mediaBytes > budgets.mediaBytes &&
       `media ${result.mediaBytes}B > ${budgets.mediaBytes}B`,
   ].filter(Boolean)
 

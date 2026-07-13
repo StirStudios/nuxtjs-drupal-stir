@@ -1,7 +1,10 @@
 import { defineEventHandler, getRequestURL, parseCookies, setResponseHeader } from 'h3'
+import {
+  getStirDrupalSessionCookieNames,
+  isStirDrupalSessionCookieName,
+} from '../utils/stirDrupalApi'
 
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
-const DRUPAL_SESSION_COOKIE_NAME = /^S?SESS/
 const SKIP_PATH = /^(?:\/__(?:\/|$)|\/_ipx(?:\/|$)|\/_nuxt(?:\/|$)|\/api(?:\/|$)|\/favicon)|\.(?:avif|css|gif|ico|jpe?g|js|json|map|png|svg|txt|webmanifest|webp|woff2?)$/i
 
 export default defineEventHandler((event) => {
@@ -9,7 +12,12 @@ export default defineEventHandler((event) => {
 
   if (SKIP_PATH.test(getRequestURL(event).pathname)) return
 
-  if (!Object.keys(parseCookies(event)).some(cookieName => DRUPAL_SESSION_COOKIE_NAME.test(cookieName))) return
+  const configuredNames = getStirDrupalSessionCookieNames()
+  const hasDrupalSession = Object.keys(parseCookies(event)).some(cookieName =>
+    isStirDrupalSessionCookieName(cookieName, configuredNames),
+  )
+
+  if (!hasDrupalSession) return
 
   event.context.nuxt ||= {}
   event.context.nuxt.noSSR = true

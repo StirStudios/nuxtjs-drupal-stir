@@ -34,9 +34,12 @@ Where `pnpm verify:ci` runs:
 
 - `pnpm test`
 - `pnpm test:nuxt`
+- `pnpm test:e2e`
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm build`
+- `pnpm test:consumer:typecheck`
+- `pnpm test:consumer:build`
 
 ## Major-version upgrades
 
@@ -48,6 +51,11 @@ For major upgrades:
 2. Upgrade one major surface at a time.
 3. Run the full gate.
 4. Fix typing/linting regressions before continuing.
+
+When updating `nuxtjs-drupal-ce`, H3, or Nitro, verify that only the
+layer-owned `/api/drupal-ce` and `/api/menu` handlers are generated and that H3
+still invokes `proxyRequest.onResponse` after copying headers but before
+streaming the body.
 
 ## Why
 

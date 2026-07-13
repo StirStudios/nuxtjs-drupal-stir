@@ -1,5 +1,8 @@
 type SettingsValuesResponse = {
-  fields?: Record<string, { editable?: boolean }>
+  fields?: Record<string, {
+    editable?: boolean
+    requires_current_password?: boolean
+  }>
   values?: Record<string, unknown>
 }
 
@@ -11,9 +14,18 @@ type SettingsUpdateResponse = {
 
 const SETTINGS_FIELDS = ['account_email'] as const
 
+type SettingsField = typeof SETTINGS_FIELDS[number]
+
+const normalizeComparableValue = (field: SettingsField, value: unknown): string => {
+  const normalized = String(value ?? '').trim()
+
+  return field === 'account_email' ? normalized.toLowerCase() : normalized
+}
+
 export function useAccountSettings() {
   const values = ref<Record<string, unknown>>({
     account_email: '',
+    current_password: '',
   })
   const baselineValues = ref<Record<string, unknown>>({
     account_email: '',
@@ -23,11 +35,23 @@ export function useAccountSettings() {
   const fieldEditability = ref<Record<string, boolean>>({
     account_email: true,
   })
+  const accountEmailRequiresCurrentPassword = ref(false)
+
+  const accountEmailChanged = computed(() => {
+    const current = normalizeComparableValue('account_email', values.value.account_email)
+    const baseline = normalizeComparableValue('account_email', baselineValues.value.account_email)
+
+    return current !== baseline
+  })
+
+  const requiresCurrentPassword = computed(() => {
+    return accountEmailRequiresCurrentPassword.value && accountEmailChanged.value
+  })
 
   const hasChanges = computed(() => {
     return SETTINGS_FIELDS.some((field) => {
-      const current = String(values.value[field] ?? '').trim()
-      const baseline = String(baselineValues.value[field] ?? '').trim()
+      const current = normalizeComparableValue(field, values.value[field])
+      const baseline = normalizeComparableValue(field, baselineValues.value[field])
 
       return current !== baseline
     })
@@ -44,6 +68,7 @@ export function useAccountSettings() {
 
       values.value = {
         account_email: String(sourceValues.account_email ?? ''),
+        current_password: '',
       }
 
       const sourceFields =
@@ -57,8 +82,12 @@ export function useAccountSettings() {
             ? sourceFields.account_email.editable
             : true,
       }
+      accountEmailRequiresCurrentPassword.value =
+        sourceFields.account_email?.requires_current_password === true
 
-      baselineValues.value = { ...values.value }
+      baselineValues.value = {
+        account_email: values.value.account_email,
+      }
     } finally {
       loading.value = false
     }
@@ -77,14 +106,25 @@ export function useAccountSettings() {
     try {
       const changedValues = SETTINGS_FIELDS.reduce<Record<string, string>>((acc, field) => {
         const current = String(values.value[field] ?? '').trim()
-        const baseline = String(baselineValues.value[field] ?? '').trim()
+        const comparableCurrent = normalizeComparableValue(field, current)
+        const baseline = normalizeComparableValue(field, baselineValues.value[field])
 
-        if (current !== baseline) {
+        if (comparableCurrent !== baseline) {
           acc[field] = current
         }
 
         return acc
       }, {})
+
+      if (requiresCurrentPassword.value) {
+        const currentPassword = String(values.value.current_password ?? '')
+
+        if (!currentPassword) {
+          throw new Error('Current password is required to change your email address.')
+        }
+
+        changedValues.current_password = currentPassword
+      }
 
       const response = await $fetch<SettingsUpdateResponse>(
         '/api/account/settings/values',
@@ -96,7 +136,10 @@ export function useAccountSettings() {
         },
       )
 
-      baselineValues.value = { ...values.value }
+      baselineValues.value = {
+        account_email: values.value.account_email,
+      }
+      values.value.current_password = ''
       return response
     } finally {
       saving.value = false
@@ -107,6 +150,7 @@ export function useAccountSettings() {
     values,
     fieldEditability,
     hasChanges,
+    requiresCurrentPassword,
     loading,
     saving,
     load,

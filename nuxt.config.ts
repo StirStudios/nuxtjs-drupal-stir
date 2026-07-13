@@ -9,7 +9,7 @@ const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
-const drupalUrl = process.env.DRUPAL_URL || ''
+const drupalUrl = (process.env.DRUPAL_URL || '').replace(/\/+$/, '')
 const sitemapSources = drupalUrl ? [`${drupalUrl}/api/sitemap`] : []
 const sitemapExcludedRoutes = [
   '/account/**',
@@ -17,6 +17,13 @@ const sitemapExcludedRoutes = [
   '/login',
 ]
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
+
+const positiveIntegerEnv = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value)
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
+}
+
 const sitemapModuleOptions = {
   sources: sitemapSources,
   excludeAppSources: ['nuxt:route-rules'],
@@ -278,9 +285,47 @@ export default defineNuxtConfig({
   ] as Array<string | [string, Record<string, unknown>]>,
 
   runtimeConfig: {
+    siteUrl: process.env.NUXT_URL || '',
     api: drupalUrl,
     apiKey: process.env.DRUPAL_API_KEY || '',
     protectedPassword: process.env.PROTECTED_PASSWORD || '',
+    protectedCookieSecret: process.env.PROTECTED_COOKIE_SECRET || '',
+    protectedRateLimit: {
+      enabled: process.env.PROTECTED_RATE_LIMIT_ENABLED !== 'false',
+      maxAttempts: positiveIntegerEnv(
+        process.env.PROTECTED_RATE_LIMIT_MAX_ATTEMPTS,
+        5,
+      ),
+      windowSeconds: positiveIntegerEnv(
+        process.env.PROTECTED_RATE_LIMIT_WINDOW_SECONDS,
+        15 * 60,
+      ),
+      trustProxy: process.env.PROTECTED_RATE_LIMIT_TRUST_PROXY === 'true',
+    },
+    drupalRequestTimeoutMs: positiveIntegerEnv(
+      process.env.DRUPAL_REQUEST_TIMEOUT_MS,
+      10_000,
+    ),
+    drupalSessionCookieNames: (process.env.DRUPAL_SESSION_COOKIE_NAMES || '')
+      .split(',')
+      .map(name => name.trim())
+      .filter(Boolean),
+    drupalClientIpForwarding: {
+      enabled: process.env.DRUPAL_FORWARD_CLIENT_IP === 'true',
+      trustProxy: process.env.DRUPAL_TRUST_PROXY === 'true',
+    },
+    webformSubmissionLimits: {
+      maxRequestBytes: positiveIntegerEnv(
+        process.env.WEBFORM_MAX_REQUEST_BYTES,
+        10 * 1024 * 1024,
+      ),
+      maxFileBytes: positiveIntegerEnv(
+        process.env.WEBFORM_MAX_FILE_BYTES,
+        5 * 1024 * 1024,
+      ),
+      maxFiles: positiveIntegerEnv(process.env.WEBFORM_MAX_FILES, 5),
+      maxFields: positiveIntegerEnv(process.env.WEBFORM_MAX_FIELDS, 100),
+    },
     turnstile: {
       secretKey: process.env.TURNSTILE_SECRET,
     },
@@ -289,7 +334,8 @@ export default defineNuxtConfig({
       plausible: {
         enabled: isIndexable,
         domain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
-        apiHost: process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || '',
+        apiHost:
+          process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || 'https://plausible.io',
         autoPageviews: true,
         proxy: false,
         proxyBaseEndpoint: '/_plausible',
