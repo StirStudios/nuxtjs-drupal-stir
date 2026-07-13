@@ -257,7 +257,11 @@ export const proxyStirDrupalMenuRequest = async (
   }
 
   const { menuBaseUrl } = getStirDrupalCeProxyTargets()
-  const target = assertContainedProxyTarget(menuBaseUrl, path)
+  const target = assertContainedProxyTarget(
+    menuBaseUrl,
+    path,
+    getRequestURL(event).search,
+  )
 
   return await proxyRequest(event, target, {
     ...stirDrupalProxyOptions(event),

@@ -3,20 +3,34 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaVideo from '../../../layers/theme/app/components/global/Media/Video.vue'
 
 describe('MediaVideo (Nuxt runtime)', () => {
-  it('keeps bare video bytes out of the initial render', async () => {
+  it('renders a responsive hero poster without initial video bytes', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
+        fetchpriority: 'high',
+        height: 720,
         mediaEmbed: '/hero.mp4',
         noWrapper: true,
+        sizes: '100vw',
         src: '/hero-poster.webp',
+        srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
+        width: 1280,
       },
     })
 
     const video = wrapper.get('video')
+    const poster = wrapper.get('img')
 
-    expect(video.attributes('poster')).toBe('/hero-poster.webp')
+    expect(video.attributes('poster')).toBeUndefined()
     expect(video.attributes('preload')).toBe('none')
     expect(wrapper.find('source').exists()).toBe(false)
+    expect(poster.attributes()).toMatchObject({
+      fetchpriority: 'high',
+      height: '720',
+      sizes: '100vw',
+      src: '/hero-poster.webp',
+      srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
+      width: '1280',
+    })
   })
 
   it('supports explicitly loading a bare video immediately', async () => {
@@ -62,5 +76,41 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(wrapper.find('source').exists()).toBe(false)
     expect(wrapper.get('video').attributes('preload')).toBe('none')
     matchMedia.mockRestore()
+  })
+
+  it('defers animated previews until hover and restores responsive thumbnails', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        animatedPreviewSrc: '/animated-preview.webp',
+        height: 360,
+        previewMode: 'animated',
+        sizes: '(min-width: 768px) 33vw, 100vw',
+        src: '/static-preview.webp',
+        srcset: '/static-320.webp 320w, /static-640.webp 640w',
+        width: 640,
+      },
+    })
+    const button = wrapper.get('button')
+
+    expect(button.get('img').attributes()).toMatchObject({
+      height: '360',
+      loading: 'lazy',
+      sizes: '(min-width: 768px) 33vw, 100vw',
+      src: '/static-preview.webp',
+      srcset: '/static-320.webp 320w, /static-640.webp 640w',
+      width: '640',
+    })
+
+    await button.trigger('mouseenter')
+
+    expect(button.get('img').attributes('src')).toBe('/animated-preview.webp')
+    expect(button.get('img').attributes('srcset')).toBeUndefined()
+
+    await button.trigger('mouseleave')
+
+    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+    expect(button.get('img').attributes('srcset')).toBe(
+      '/static-320.webp 320w, /static-640.webp 640w',
+    )
   })
 })

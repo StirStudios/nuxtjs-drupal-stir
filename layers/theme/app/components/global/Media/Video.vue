@@ -24,6 +24,10 @@ const props = withDefaults(
 
     width?: number
     height?: number
+    srcset?: string
+    sizes?: string
+    loading?: 'eager' | 'lazy'
+    fetchpriority?: 'high' | 'low' | 'auto'
 
     noWrapper?: boolean
     deferEmbed?: boolean
@@ -44,6 +48,10 @@ const props = withDefaults(
     loadMinWidth: undefined,
     width: undefined,
     height: undefined,
+    srcset: undefined,
+    sizes: undefined,
+    loading: 'lazy',
+    fetchpriority: 'auto',
     noWrapper: false,
     deferEmbed: true,
     editActions: undefined,
@@ -73,6 +81,7 @@ const isProcessing = computed(() => {
   return props.width === 180
 })
 const isEmbedActive = ref(false)
+const isAnimatedPreviewActive = ref(false)
 const ratioConfig = {
   portrait: 'aspect-[9/16]',
   landscape: 'aspect-[16/9]',
@@ -97,12 +106,19 @@ const shouldShowIframe = computed(
   () => !!props.mediaEmbed && !isProcessing.value && isEmbedActive.value,
 )
 const previewSrc = computed(() => {
-  if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
+  if (
+    isAnimatedPreviewActive.value
+    && props.previewMode === 'animated'
+    && props.animatedPreviewSrc
+  ) {
     return props.animatedPreviewSrc
   }
 
   return props.src
 })
+const previewSrcset = computed(() =>
+  isAnimatedPreviewActive.value ? undefined : props.srcset,
+)
 
 const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
@@ -117,6 +133,16 @@ function activateEmbed() {
   if (shouldShowIframe.value) return
   isEmbedActive.value = true
   void scheduleInitializePlayers()
+}
+
+function activateAnimatedPreview(): void {
+  if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
+    isAnimatedPreviewActive.value = true
+  }
+}
+
+function deactivateAnimatedPreview(): void {
+  isAnimatedPreviewActive.value = false
 }
 
 async function activateBareVideoSource(): Promise<void> {
@@ -195,6 +221,21 @@ watch(
 </script>
 
 <template>
+  <img
+    v-if="isBare && src"
+    v-bind="attrs"
+    :alt="alt || ''"
+    aria-hidden="true"
+    class="absolute inset-0 h-full w-full object-cover"
+    :fetchpriority="fetchpriority"
+    :height="height"
+    :loading="loading"
+    :sizes="sizes || '100vw'"
+    :src="src"
+    :srcset="srcset"
+    :width="width"
+  />
+
   <video
     v-if="isBare"
     ref="videoElement"
@@ -205,7 +246,6 @@ watch(
     loop
     muted
     playsinline
-    :poster="src"
     :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
   >
     <source
@@ -263,6 +303,8 @@ watch(
       ]"
       type="button"
       @click="activateEmbed"
+      @mouseenter="activateAnimatedPreview"
+      @mouseleave="deactivateAnimatedPreview"
     >
       <div
         v-if="previewSrc"
@@ -276,7 +318,13 @@ watch(
         <img
           :alt="alt || title || 'Video thumbnail'"
           class="h-full w-full object-cover"
+          :fetchpriority="fetchpriority"
+          :height="height"
+          :loading="loading"
+          :sizes="sizes || '100vw'"
           :src="previewSrc"
+          :srcset="previewSrcset"
+          :width="width"
         />
       </div>
       <UIcon
