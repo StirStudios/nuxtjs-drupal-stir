@@ -77,8 +77,9 @@ function debugVideoPlayer(message: string, context: Record<string, unknown> = {}
 }
 
 export function useVideoPlayers() {
-  const { isLoaded } = useThirdPartyScript(PLAYER_SCRIPT_URL, {
+  const { isLoaded, requestLoad } = useThirdPartyScript(PLAYER_SCRIPT_URL, {
     allowedOrigins: [PLAYER_SCRIPT_ORIGIN],
+    immediate: false,
     isReady: () => typeof window.playerjs?.Player === 'function',
   })
 
@@ -92,6 +93,7 @@ export function useVideoPlayers() {
 
   async function initializePlayers(): Promise<void> {
     if (!import.meta.client) return
+    requestLoad()
     await nextTick()
 
     const Player = window.playerjs?.Player
