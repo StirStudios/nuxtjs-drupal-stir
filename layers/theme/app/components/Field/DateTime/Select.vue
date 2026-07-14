@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inputIdInjectionKey } from '@nuxt/ui/composables'
+import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import type { UiFieldVariant } from '~/utils/nuxtUiProps'
 
 type SelectItem = {

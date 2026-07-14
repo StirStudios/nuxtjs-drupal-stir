@@ -110,4 +110,32 @@ describe('layer contract', () => {
       expect(component).toContain('from \'../../types/theme\'')
     }
   })
+
+  it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
+    const fieldComponents = [
+      'DateTime/Select.vue',
+      'Input.vue',
+      'Input/Number.vue',
+      'Input/Slider.vue',
+      'Textarea.vue',
+    ].map((file) => readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/Field', file),
+      'utf8',
+    ))
+
+    for (const component of fieldComponents) {
+      expect(component).toContain('from \'@nuxt/ui/composables/useFormField\'')
+      expect(component).not.toContain('from \'@nuxt/ui/composables\'')
+    }
+  })
+
+  it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
+    const userwayPlugin = readFileSync(
+      resolve(rootDir, 'layers/theme/app/plugins/userway.client.ts'),
+      'utf8',
+    )
+
+    expect(userwayPlugin).toContain('useScriptTriggerIdleTimeout')
+    expect(userwayPlugin).not.toContain('requestIdleCallback')
+  })
 })

@@ -47,6 +47,7 @@ type ThirdPartyScriptsConfig = {
 type UserwayConfig = {
   enabled?: boolean
   account?: string
+  loadDelayMs?: number
   position?: number
   size?: 'small' | 'medium' | 'large'
   color?: string

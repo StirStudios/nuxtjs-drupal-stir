@@ -42,6 +42,7 @@ export default defineAppConfig({
   userway: {
     enabled: false,
     account: '',
+    loadDelayMs: 5000,
     position: 3,
     size: 'small',
     color: '#ffffff',
