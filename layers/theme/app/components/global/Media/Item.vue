@@ -78,8 +78,8 @@ const resolvedDelayMs = computed(() =>
 
 const revealMotionProps = computed(() =>
   getRevealMotionProps(props.direction, resolvedDelayMs.value, {
-    // Preserve the hidden reveal state through hydration to prevent a visible flash.
-    ssrVisible: false,
+    // CSS supplies the motion-safe pre-hydration state; Motion owns the reveal.
+    ssrVisible: true,
   }),
 )
 
