@@ -78,7 +78,8 @@ const resolvedDelayMs = computed(() =>
 
 const revealMotionProps = computed(() =>
   getRevealMotionProps(props.direction, resolvedDelayMs.value, {
-    ssrVisible: true,
+    // Preserve the hidden reveal state through hydration to prevent a visible flash.
+    ssrVisible: false,
   }),
 )
 
@@ -111,6 +112,7 @@ const shouldAnimate = computed(() =>
   >
     <component
       :is="mediaComponent"
+      class="motion-safe:opacity-0"
       v-bind="mediaProps"
       :edit-actions="editActions"
       @edit-action-select="handleEditActionSelect"
@@ -127,7 +129,7 @@ const shouldAnimate = computed(() =>
       v-if="!isVideo"
       v-bind="overlayImageProps"
       :aria-label="'Open media modal'"
-      class="cursor-pointer"
+      class="motion-safe:opacity-0 cursor-pointer"
       :edit-actions="editActions"
       :image-class="[
         'transition-transform',
@@ -145,7 +147,7 @@ const shouldAnimate = computed(() =>
     <div
       v-else
       aria-label="Open video modal"
-      class="group relative overflow-hidden"
+      class="group motion-safe:opacity-0 relative overflow-hidden"
       :class="[
         theme.media.rounded,
         'cursor-pointer',
