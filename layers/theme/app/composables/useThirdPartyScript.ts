@@ -6,6 +6,7 @@ type ThirdPartyScriptOptions = {
   allowedOrigins?: MaybeRefOrGetter<readonly string[] | undefined>
   attrs?: Record<string, string>
   id?: string
+  immediate?: boolean
   isReady?: () => boolean
   kind?: ThirdPartyScriptKind
   requiresConsent?: boolean
@@ -109,6 +110,7 @@ export function useThirdPartyScript(
   const appConfig = useAppConfig()
   const { allowsNonEssential } = usePrivacyConsent()
   const isMounted = ref(false)
+  const isRequested = ref(options.immediate !== false)
   const isLoaded = ref(false)
   const error = shallowRef<Error | null>(null)
   const configuredOrigins = computed<readonly string[]>(() => {
@@ -124,6 +126,7 @@ export function useThirdPartyScript(
     Boolean(
       import.meta.client &&
       isMounted.value &&
+      isRequested.value &&
       (options.requiresConsent === false || allowsNonEssential.value) &&
       safeSrc.value,
     ),
@@ -132,6 +135,10 @@ export function useThirdPartyScript(
   onMounted(() => {
     isMounted.value = true
   })
+
+  function requestLoad(): void {
+    isRequested.value = true
+  }
 
   watch(
     canLoad,
@@ -154,6 +161,7 @@ export function useThirdPartyScript(
     canLoad,
     error,
     isLoaded,
+    requestLoad,
     safeSrc,
   }
 }

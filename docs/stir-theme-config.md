@@ -204,10 +204,10 @@ lookalike subdomains and HTTP URLs are rejected. Enzuzo remains available after
 a visitor declines optional tracking because it renders legal/compliance
 content, but its URL is still origin-validated.
 
-Calendly and Bunny PlayerJS use fixed vendor origins. PlayerJS retains Bunny's
-official `playerjs-latest.min.js` URL because Bunny does not publish a supported
-pinned loader URL. UserWay remains ungated as an accessibility-essential
-service.
+Calendly and Bunny PlayerJS use fixed vendor origins. PlayerJS is requested only
+when a visitor activates an embedded video and retains Bunny's official
+`playerjs-latest.min.js` URL because Bunny does not publish a supported pinned
+loader URL. UserWay remains ungated as an accessibility-essential service.
 
 ### 💬 `popup`
 

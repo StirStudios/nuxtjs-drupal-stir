@@ -23,6 +23,10 @@ mockNuxtImport('useCookie', () => () => consentCookie)
 
 const ScriptHarness = defineComponent({
   props: {
+    immediate: {
+      type: Boolean,
+      default: true,
+    },
     requiresConsent: {
       type: Boolean,
       default: true,
@@ -35,12 +39,16 @@ const ScriptHarness = defineComponent({
   setup(props) {
     const { accept } = usePrivacyConsent()
 
-    useThirdPartyScript(toRef(props, 'src'), {
+    const { requestLoad } = useThirdPartyScript(toRef(props, 'src'), {
+      immediate: props.immediate,
       kind: 'enzuzo',
       requiresConsent: props.requiresConsent,
     })
 
-    return () => h('button', { onClick: accept }, 'Accept')
+    return () => h('div', [
+      h('button', { class: 'accept', onClick: accept }, 'Accept'),
+      h('button', { class: 'load', onClick: requestLoad }, 'Load'),
+    ])
   },
 })
 
@@ -61,7 +69,26 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
 
     expect(document.querySelector(`script[src="${src}"]`)).toBeNull()
 
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.accept').trigger('click')
+    await nextTick()
+
+    expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    wrapper.unmount()
+  })
+
+  it('defers an allowed script until loading is requested', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/request-test'
+
+    appConfig.value.privacyNotice.mode = 'notice'
+
+    const wrapper = await mountSuspended(ScriptHarness, {
+      props: { immediate: false, src },
+    })
+
+    await nextTick()
+    expect(document.querySelector(`script[src="${src}"]`)).toBeNull()
+
+    await wrapper.get('.load').trigger('click')
     await nextTick()
 
     expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()

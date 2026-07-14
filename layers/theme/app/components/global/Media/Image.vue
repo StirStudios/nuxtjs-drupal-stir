@@ -51,6 +51,12 @@ const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
+const fallbackSizes = computed(() => props.sizes?.trim() || '100vw')
+const wrappedSizes = computed(() => {
+  const sizes = fallbackSizes.value.replace(/^auto(?:\s*,\s*)?/i, '')
+
+  return sizes || '100vw'
+})
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
 )
@@ -129,7 +135,7 @@ onMounted(() => {
     :fetchpriority="fetchpriority || undefined"
     :height="height"
     :loading="normalizedLoading"
-    :sizes="sizes || '100vw'"
+    :sizes="fallbackSizes"
     :src="src"
     :srcset="srcset"
     :width="width"
@@ -165,7 +171,7 @@ onMounted(() => {
       ]"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="sizes || '100vw'"
+      :sizes="wrappedSizes"
       :src="src"
       :srcset="srcset"
       :width="width"
@@ -186,7 +192,7 @@ onMounted(() => {
       fetchpriority="high"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="sizes || '100vw'"
+      :sizes="wrappedSizes"
       :src="src"
       :srcset="srcset"
       :width="width"
