@@ -115,7 +115,7 @@
   }
 
   .admin-ui-controls {
-    @apply border;
+    @apply pointer-events-none border opacity-0;
     border-color: var(--admin-border);
     background-color: var(--admin-bg-muted);
   }

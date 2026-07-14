@@ -62,7 +62,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
   <UTheme :ui="adminUiTheme">
     <UFieldGroup
       :class="[
-        'admin-ui admin-ui-scope admin-ui-controls pointer-events-none top-2 right-2 rounded-md opacity-0 shadow-lg transition-opacity absolute z-100',
+        'admin-ui admin-ui-scope admin-ui-controls top-2 right-2 rounded-md shadow-lg transition-opacity absolute z-100',
         props.containerClass,
       ]"
       data-admin-ui-controls

@@ -219,7 +219,6 @@ export default defineNuxtConfig({
   icon: {
     clientBundle: {
       scan: true,
-      icons: ['lucide:chevron-left', 'lucide:chevron-right', 'lucide:arrow-up'],
       includeCustomCollections: true,
       sizeLimitKb: 256,
     },
