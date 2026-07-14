@@ -12,6 +12,9 @@ This layer uses Yup for client-side validation with two intentionally different 
 - Notes:
   - Handles visibility/conditional logic from Drupal definitions.
   - Optimized for reusable content-driven forms where fields vary per webform.
+  - Forms remain server-rendered, then hydrate when their paragraph becomes
+    visible. Field renderers remain async code-split so only field types used by
+    that form are loaded after hydration.
 
 ## 2) Explicit Auth and Account Forms
 
