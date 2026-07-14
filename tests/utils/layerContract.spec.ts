@@ -136,6 +136,7 @@ describe('layer contract', () => {
     )
 
     expect(userwayPlugin).toContain('useScriptTriggerIdleTimeout')
+    expect(userwayPlugin).toContain('warmupStrategy: false')
     expect(userwayPlugin).not.toContain('requestIdleCallback')
   })
 })
