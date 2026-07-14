@@ -1,6 +1,5 @@
 import { ref, watch, type Ref } from 'vue'
 import { Node, mergeAttributes } from '@tiptap/core'
-import '@tiptap/extension-link'
 import type { Editor } from '@tiptap/vue-3'
 import Heading from '@tiptap/extension-heading'
 import BulletList from '@tiptap/extension-bullet-list'

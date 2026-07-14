@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '~/types'
-import { inputIdInjectionKey } from '@nuxt/ui/composables'
+import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import {
   formatTelDisplayValue,
   shouldPreventTelBeforeInput,

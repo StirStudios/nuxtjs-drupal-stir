@@ -75,12 +75,17 @@ colorMode: {
 userway: {
   enabled: false,
   account: '',
+  loadDelayMs: 5000,
   position: 3,
   size: 'small',
   color: '#ffffff',
   type: '1',
 }
 ```
+
+`loadDelayMs` delays the accessibility widget until after Nuxt is ready. The
+default uses Nuxt Scripts' idle-timeout trigger to keep UserWay out of the
+initial rendering and hydration window without gating it on tracking consent.
 
 ### 🔐 `protectedRoutes`
 

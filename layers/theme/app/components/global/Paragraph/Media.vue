@@ -255,7 +255,7 @@ onMounted(() => {
       header: 'hidden',
     }"
   >
-    <template #body>
+    <template v-if="open" #body>
       <UButton
         class="absolute top-4 right-4 z-10"
         color="neutral"

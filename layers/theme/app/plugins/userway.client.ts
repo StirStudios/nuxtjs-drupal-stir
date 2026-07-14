@@ -33,21 +33,21 @@ export default defineNuxtPlugin(() => {
     type: cfg.type ?? '1',
   }
 
-  const loadUserway = () =>
-    useScript({
+  const configuredDelayMs = Number(cfg.loadDelayMs)
+  const loadDelayMs =
+    Number.isFinite(configuredDelayMs) && configuredDelayMs >= 0
+      ? configuredDelayMs
+      : 5000
+
+  useScript(
+    {
       id: 'userway-widget',
       src: 'https://cdn.userway.org/widget.js',
       crossorigin: 'anonymous',
       referrerpolicy: 'no-referrer',
-    })
-
-  const idleApi = globalThis as typeof globalThis & {
-    requestIdleCallback?: (callback: IdleRequestCallback) => number
-  }
-
-  if (typeof idleApi.requestIdleCallback === 'function') {
-    idleApi.requestIdleCallback(() => loadUserway())
-  } else {
-    setTimeout(() => loadUserway(), 1)
-  }
+    },
+    {
+      trigger: useScriptTriggerIdleTimeout({ timeout: loadDelayMs }),
+    },
+  )
 })
