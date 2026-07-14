@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
 
 defineOptions({ inheritAttrs: false })
@@ -21,6 +22,7 @@ const props = defineProps<{
   height?: number
   loading?: 'lazy' | 'eager'
   fetchpriority?: 'high' | 'auto' | 'low'
+  deferSource?: boolean
   noWrapper?: boolean
 
   link?: string
@@ -77,7 +79,38 @@ const hasImageSource = computed(() =>
 const hasInlineEditActions = computed(
   () => (props.editActions?.length ?? 0) > 0,
 )
+const imageRoot = ref<HTMLElement | null>(null)
+const sourceDeferred = ref(props.deferSource === true)
+const isSourceDeferred = computed(
+  () => props.deferSource === true && sourceDeferred.value,
+)
+const deferredFrameStyle = computed(() => {
+  if (!isSourceDeferred.value) return undefined
+
+  const width = Number(props.width)
+  const height = Number(props.height)
+
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    return undefined
+  }
+
+  return { aspectRatio: `${width} / ${height}` }
+})
 const imageElement = ref<HTMLImageElement | null>(null)
+
+const { isSupported, stop } = useIntersectionObserver(
+  imageRoot,
+  ([entry]) => {
+    if (!entry?.isIntersecting) return
+
+    sourceDeferred.value = false
+    stop()
+  },
+  {
+    immediate: props.deferSource === true,
+    rootMargin: '200px 0px',
+  },
+)
 
 const isLoaded = ref(!hasImageSource.value)
 
@@ -113,6 +146,10 @@ function handleError() {
 }
 
 onMounted(() => {
+  if (props.deferSource === true && !isSupported.value) {
+    sourceDeferred.value = false
+  }
+
   nextTick(syncLoadedFromImageElement)
 })
 </script>
@@ -146,20 +183,24 @@ onMounted(() => {
   <component
     :is="link ? 'a' : 'div'"
     v-else
+    ref="imageRoot"
     v-bind="rootAttrs"
+    :aria-busy="isSourceDeferred ? 'true' : undefined"
     :class="[
       'media group @container relative block overflow-hidden',
       theme.media.rounded,
+      isSourceDeferred && !deferredFrameStyle && 'min-h-64',
       wrapperClass,
     ]"
+    :style="deferredFrameStyle"
   >
     <USkeleton
-      v-if="!isLoaded"
+      v-if="isSourceDeferred || !isLoaded"
       class="absolute inset-0 z-0 h-full w-full rounded-none"
     />
 
     <img
-      v-if="!isEager"
+      v-if="!isSourceDeferred && !isEager"
       ref="imageElement"
       :alt="alt || ''"
       :class="[
@@ -180,7 +221,7 @@ onMounted(() => {
     />
 
     <img
-      v-else
+      v-else-if="!isSourceDeferred"
       ref="imageElement"
       :alt="alt || ''"
       :class="[
