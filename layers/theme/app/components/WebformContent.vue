@@ -21,7 +21,7 @@ type WebformThemeConfig = {
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>
   state: WebformState
-  schema: ObjectSchema<Record<string, unknown>>
+  schema?: ObjectSchema<Record<string, unknown>>
   isFormSubmitted: boolean
   isLoading: boolean
   isSchemaReady: boolean
@@ -43,6 +43,7 @@ const emit = defineEmits<{
   (e: 'submit', event: { data: Record<string, unknown> }): void
   (e: 'error', event: unknown): void
   (e: 'update:turnstileToken', value: string): void
+  (e: 'validation-activate'): void
 }>()
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
@@ -90,6 +91,8 @@ const submitButtonProps = computed(() => ({
     :state="state"
     :validate-on="validateOn"
     @error="emit('error', $event)"
+    @focusin.capture="emit('validation-activate')"
+    @pointerdown.capture="emit('validation-activate')"
     @submit="emit('submit', $event)"
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />

@@ -5,13 +5,13 @@ import { evaluateContainerVisibility } from '~/composables/useContainerVisibilit
 import { transformPayloadToSnakeCase } from '~/utils/transformUtils'
 import { getHiddenDefaults } from '~/utils/getHiddenDefaults'
 import { useValidation } from '~/composables/useValidation'
-import { useWindowScroll } from '@vueuse/core'
+import { useIntersectionObserver, useWindowScroll } from '@vueuse/core'
+import type { ComponentPublicInstance } from 'vue'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
 } from '~/utils/webformScrollToTop'
 import { evaluateCondition } from '~/utils/evaluateUtils'
-import { buildYupSchema } from '~/utils/buildYupSchema'
 import {
   buildWebformFormData,
   hasFileValue,
@@ -23,6 +23,8 @@ import type {
   WebformState,
 } from '~/types'
 import type { ObjectSchema } from 'yup'
+
+type BuildYupSchema = typeof import('~/utils/buildYupSchema')['buildYupSchema']
 
 const props = defineProps<{
   id?: number
@@ -76,10 +78,11 @@ const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
-const schema = shallowRef<ObjectSchema<Record<string, unknown>>>(
-  buildYupSchema(fields, state),
-)
-const isSchemaReady = ref(true)
+const schemaLoadRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
+const schema = shallowRef<ObjectSchema<Record<string, unknown>>>()
+const isSchemaReady = ref(false)
+let buildSchema: BuildYupSchema | undefined
+let schemaLoadPromise: Promise<void> | undefined
 const visibilitySignature = computed(() =>
   orderedFieldNames.value
     .map((fieldName) =>
@@ -93,9 +96,41 @@ const visibilitySignature = computed(() =>
 watch(
   visibilitySignature,
   () => {
-    schema.value = buildYupSchema(fields, state)
+    if (buildSchema) schema.value = buildSchema(fields, state)
   },
   { flush: 'post' },
+)
+
+function requestSchema(): void {
+  void ensureSchemaReady().catch((error: unknown) => {
+    console.error('Unable to load webform validation:', error)
+  })
+}
+
+async function ensureSchemaReady(): Promise<void> {
+  if (isSchemaReady.value) return
+
+  schemaLoadPromise ??= import('~/utils/buildYupSchema')
+    .then((module) => {
+      buildSchema = module.buildYupSchema
+      schema.value = buildSchema(fields, state)
+      isSchemaReady.value = true
+      stopSchemaObserver()
+    })
+    .catch((error: unknown) => {
+      schemaLoadPromise = undefined
+      throw error
+    })
+
+  await schemaLoadPromise
+}
+
+const { stop: stopSchemaObserver } = useIntersectionObserver(
+  schemaLoadRoot,
+  ([entry]) => {
+    if (entry?.isIntersecting) requestSchema()
+  },
+  { rootMargin: '0px' },
 )
 const submitButtonLabel = computed(
   () => actions[0]?.['#submit_Label'] || 'Submit',
@@ -306,6 +341,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
   <WrapDiv :align="props.align" :styles="wrapStyles">
     <WebformContent
       :key="formResetKey"
+      ref="schemaLoadRoot"
       v-model:turnstile-token="turnstileToken"
       :edit-link="webformSubmissions"
       :fields="fields"
@@ -327,6 +363,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       @error="onError($event as never)"
       @reset-submission="handleResetSubmission"
       @submit="onSubmit"
+      @validation-activate="requestSchema"
     />
   </WrapDiv>
 </template>
