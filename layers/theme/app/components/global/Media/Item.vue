@@ -16,6 +16,7 @@ type RevealMode = 'default' | 'gallery'
 const props = defineProps<{
   node: VNode
   index: number
+  deferLoad?: boolean
   direction?: string
   revealMode?: RevealMode
   overlay?: boolean
@@ -41,8 +42,13 @@ const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
 const overlayImageProps = computed(() => {
   const { imageClass, ...rest } = mediaProps.value
 
-  return rest
+  return props.deferLoad === true ? { ...rest, deferSource: true } : rest
 })
+const renderedMediaProps = computed(() =>
+  props.deferLoad === true
+    ? { ...mediaProps.value, deferSource: true }
+    : mediaProps.value,
+)
 const isVideo = computed(() => mediaProps.value.type === 'video')
 const isDocument = computed(() => mediaProps.value.type === 'document')
 const isAudio = computed(() => mediaProps.value.type === 'audio')
@@ -84,7 +90,7 @@ const revealMotionProps = computed(() =>
 )
 
 const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
-  ...mediaProps.value,
+  ...renderedMediaProps.value,
   ...revealMotionProps.value,
   editActions: props.editActions,
   onEditActionSelect: handleEditActionSelect,
@@ -99,7 +105,7 @@ const shouldAnimate = computed(() =>
   <component
     :is="mediaComponent"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
-    v-bind="mediaProps"
+    v-bind="renderedMediaProps"
     :edit-actions="editActions"
     @edit-action-select="handleEditActionSelect"
   />
@@ -113,7 +119,7 @@ const shouldAnimate = computed(() =>
     <component
       :is="mediaComponent"
       class="motion-safe:opacity-0"
-      v-bind="mediaProps"
+      v-bind="renderedMediaProps"
       :edit-actions="editActions"
       @edit-action-select="handleEditActionSelect"
     />

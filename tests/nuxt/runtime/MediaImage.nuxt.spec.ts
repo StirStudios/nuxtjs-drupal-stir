@@ -44,4 +44,23 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(wrapper.get('img').attributes('sizes')).toBe('100vw')
   })
+
+  it('preserves image dimensions without exposing deferred sources', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Deferred gallery image',
+        deferSource: true,
+        height: 800,
+        src: '/image.webp',
+        srcset: '/image-480.webp 480w, /image-640.webp 640w',
+        width: 600,
+      },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.get('.media').attributes('aria-busy')).toBe('true')
+    expect(wrapper.get('.media').attributes('style')).toContain(
+      'aspect-ratio: 600 / 800',
+    )
+  })
 })

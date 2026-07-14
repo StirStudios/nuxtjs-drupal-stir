@@ -225,6 +225,7 @@ onMounted(() => {
         <MediaItem
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
+          :defer-load="isImageGallery && i >= 4"
           :direction="direction"
           :edit-actions="
             i === 0 ? actions : undefined
