@@ -37,8 +37,16 @@ export interface DrupalFormProps {
 }
 
 export interface WebformProps {
-  webform: WebformDefinition
+  id?: number
+  uuid?: string
+  parentUuid?: string
+  region?: string
+  webform?: WebformDefinition
+  align?: string
+  width?: string
+  spacing?: string
   editLink?: string
+  onClose?: () => void
 }
 
 export interface WebformDefinition {
