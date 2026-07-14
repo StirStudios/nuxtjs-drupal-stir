@@ -60,8 +60,52 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
 - E2E smoke testing: `pnpm test:e2e` (built Nuxt health/runtime smoke)
 - Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
+- Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`
+
+### Accessibility audits in downstream projects
+
+The package exposes the reusable `stir-a11y` command. Add these scripts to a
+downstream project's `package.json` (package scripts are not inherited through
+Nuxt layers):
+
+```json
+{
+  "scripts": {
+    "test:a11y": "stir-a11y",
+    "test:a11y:install": "stir-a11y install chromium",
+    "test:a11y:report": "stir-a11y show-report playwright-report"
+  }
+}
+```
+
+Run `pnpm test:a11y:install` once, then `pnpm test:a11y`. The portable default
+starts the downstream's Nuxt dev server and scans `/` in desktop/mobile and
+light/dark modes. Configure a deployed target and representative routes with:
+
+```bash
+A11Y_BASE_URL=https://www.example.com \
+  A11Y_ROUTES=/,/about,/contact pnpm test:a11y
+```
+
+Supported audit configuration:
+
+- `A11Y_BASE_URL`: scan an existing site and skip the managed local server.
+- `A11Y_ROUTES`: comma-separated route list; defaults to `/`.
+- `A11Y_SERVER_URL`: managed local server URL; defaults to `http://127.0.0.1:4173`.
+- `A11Y_SERVER_COMMAND`: managed server command; defaults to `pnpm dev --host 127.0.0.1 --port 4173`.
+- `A11Y_HOVER_SELECTOR`: controls whose completed hover states are scanned; defaults to `[data-a11y-scan-hover]`.
+- `A11Y_OPAQUE_SELECTOR`: controls that must expose an opaque resting background; defaults to `[data-a11y-scan-opaque]`.
+- `A11Y_STATE_SETTLE_MS`: interaction settling time; defaults to `350`.
+- `A11Y_MOTION_SETTLE_MS`: entrance-animation settling time before baseline and interaction scans; defaults to `1200`.
+
+The audit scrolls through lazy/viewport content and checks WCAG 2 A/AA,
+WCAG 2.1/2.2 AA, and axe best practices. Failures include affected selectors,
+current contrast values, and nearest passing foreground/background suggestions.
+Full axe JSON, screenshots, traces, and an HTML report are written to the
+downstream project. Opt into animation-state coverage with the generic data
+attributes above; the harness does not depend on project-specific components.
 
 ## 📦 Project Structure
 

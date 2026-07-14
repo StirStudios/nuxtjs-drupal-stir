@@ -10,5 +10,7 @@ dist
 .DS_Store
 .nuxtrc
 .lighthouse/
+playwright-report/
+test-results/
 
 .pnpm-store/
