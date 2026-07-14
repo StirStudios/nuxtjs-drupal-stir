@@ -55,6 +55,13 @@ payload before and after the change:
 pnpm perf:lighthouse -- --url=https://staging.example.com --runs=3
 ```
 
+For a local production build, use the lifecycle runner so stale builds and
+uncompressed preview servers cannot affect the result:
+
+```bash
+pnpm perf:lighthouse:local -- --path=/ --runs=3
+```
+
 Report the before/after mobile medians for score, FCP, LCP, TBT, total transfer,
 media transfer, and video request count.
 

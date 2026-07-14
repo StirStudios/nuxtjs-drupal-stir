@@ -96,6 +96,7 @@ function formatBytes(bytes) {
 async function main() {
   await mkdir(outputDirectory, { recursive: true })
   const results = []
+  let environment
 
   for (let index = 1; index <= runs; index += 1) {
     const chrome = await launch({
@@ -114,6 +115,11 @@ async function main() {
 
       if (!runner) throw new Error(`Lighthouse run ${index} returned no result`)
 
+      environment ||= {
+        benchmarkIndex: runner.lhr.environment?.benchmarkIndex,
+        hostUserAgent: runner.lhr.environment?.hostUserAgent,
+        lighthouseVersion: runner.lhr.lighthouseVersion,
+      }
       const summary = summarize(runner.lhr)
       results.push(summary)
       await writeFile(
@@ -135,6 +141,7 @@ async function main() {
     runs: results,
     median: medianSummary(results),
     budgets,
+    environment,
   }
 
   await writeFile(
@@ -164,6 +171,10 @@ async function main() {
     `${result.videoRequestCount} video requests)`,
   )
   console.log(`Saved: ${outputDirectory}/summary.json`)
+  console.log(
+    `Environment: Lighthouse ${environment?.lighthouseVersion || 'unknown'}, ` +
+    `${environment?.hostUserAgent || 'unknown Chrome'}`,
+  )
 
   if (!shouldAssert) return
 

@@ -86,6 +86,7 @@ userway: {
 `loadDelayMs` delays the accessibility widget until after Nuxt is ready. The
 default uses Nuxt Scripts' idle-timeout trigger to keep UserWay out of the
 initial rendering and hydration window without gating it on tracking consent.
+Connection warmup is disabled so the widget is not fetched before that trigger.
 
 ### 🔐 `protectedRoutes`
 
@@ -527,8 +528,15 @@ intentionally accepts that performance tradeoff. The Drupal media payload
 remains the source of truth for image loading,
 priority, responsive derivatives, dimensions, and quality.
 
-For repeatable mobile performance measurements, run the production server and
-then use:
+For repeatable local mobile performance measurements, let the repository build,
+start, warm, verify compression, test, and stop the production server:
+
+```bash
+pnpm perf:lighthouse:local -- --path=/ --runs=3
+```
+
+Use `--port=3012` to change the local port. For an existing local, staging, or
+production server, use the lower-level runner directly:
 
 ```bash
 pnpm perf:lighthouse -- --url=http://127.0.0.1:3000/ --runs=3
