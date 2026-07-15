@@ -168,6 +168,27 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-button',
+        props: {
+          block: false,
+          color: 'primary',
+          icon: 'i-lucide-file-text',
+          size: 'lg',
+          variant: 'solid',
+        },
+        slots: {
+          media: [{
+            element: 'media-document',
+            props: {
+              type: 'document',
+              title: 'Project brochure',
+              url: '/sites/default/files/project-brochure.pdf',
+              alt: 'Download the project brochure',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])

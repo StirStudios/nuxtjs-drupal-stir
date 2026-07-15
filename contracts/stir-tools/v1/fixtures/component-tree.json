@@ -186,6 +186,30 @@
             }
           ]
         }
+      },
+      {
+        "element": "paragraph-button",
+        "props": {
+          "block": false,
+          "color": "primary",
+          "icon": "i-lucide-file-text",
+          "size": "lg",
+          "variant": "solid"
+        },
+        "slots": {
+          "media": [
+            {
+              "element": "media-document",
+              "props": {
+                "type": "document",
+                "title": "Project brochure",
+                "url": "/sites/default/files/project-brochure.pdf",
+                "alt": "Download the project brochure"
+              },
+              "slots": {}
+            }
+          ]
+        }
       }
     ],
     "media": [
