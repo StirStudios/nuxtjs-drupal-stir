@@ -31,6 +31,25 @@ describe('componentTree', () => {
         },
       },
       {
+        element: 'paragraph-layout',
+        props: {
+          uuid: '00000000-0000-4000-8000-000000000042',
+          layout: 'two_column',
+          card: false,
+          classes: 'feature-layout',
+          container: true,
+          header: 'Layout section',
+          headerTag: 'h2',
+          gridClass: 'lg:grid-cols-2 lg:gap-6',
+        },
+        slots: {
+          left: [{
+            element: 'paragraph-text',
+            props: { text: '<p>Left region content.</p>' },
+          }],
+        },
+      },
+      {
         element: 'paragraph-icon',
         props: { iconName: 'i-lucide-star', iconSize: 7 },
       },
