@@ -163,6 +163,7 @@ const getRowMotionProps = (index: number) =>
 
   <ParagraphCarousel
     v-if="carousel"
+    :id="`${viewId}-${displayId}`"
     :carousel-arrows="carouselArrows"
     :carousel-autoheight="carouselAutoheight"
     :carousel-autoscroll="carouselAutoscroll"
