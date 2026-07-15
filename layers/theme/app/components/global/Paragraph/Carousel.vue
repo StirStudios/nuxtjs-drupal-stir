@@ -1,25 +1,8 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
 import {
-  resolveUiButtonVariant,
-  resolveUiColor,
-  resolveUiSize,
-  type UiButtonVariant,
-  type UiColor,
-  type UiSize,
+  resolveCarouselArrowButton,
 } from '~/utils/nuxtUiProps'
-
-type CarouselArrowButton = {
-  color: UiColor
-  variant: UiButtonVariant
-  size: UiSize
-}
-
-type CarouselArrowConfig = {
-  color?: unknown
-  variant?: unknown
-  size?: unknown
-}
 
 const props = defineProps<{
   id?: number | string
@@ -99,16 +82,6 @@ const autoplayOptions = computed(() =>
       }
     : false,
 )
-
-function resolveCarouselArrowButton(
-  value: CarouselArrowConfig | undefined,
-): CarouselArrowButton {
-  return {
-    color: resolveUiColor(value?.color, 'neutral'),
-    variant: resolveUiButtonVariant(value?.variant, 'outline'),
-    size: resolveUiSize(value?.size, 'xl'),
-  }
-}
 
 const prevButton = computed(() =>
   resolveCarouselArrowButton(theme.carousel.arrows?.prev),

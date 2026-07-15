@@ -5,6 +5,7 @@ import { useMediaOrdering } from '~/composables/useMediaOrdering'
 import { useMediaModal } from '~/composables/useMediaModal'
 import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
 import type { DrupalMediaNodeProps } from '~/types'
+import { resolveCarouselArrowButton } from '~/utils/nuxtUiProps'
 import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
@@ -154,6 +155,12 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   onSelect: onSelectModal,
 })
 const firstItem = computed(() => itemsOrdered.value[0] ?? null)
+const prevCarouselButton = computed(() =>
+  resolveCarouselArrowButton(theme.carousel.arrows?.prev),
+)
+const nextCarouselButton = computed(() =>
+  resolveCarouselArrowButton(theme.carousel.arrows?.next),
+)
 const singleVideoFrameStyle = computed(() => {
   if (firstItem.value?.type !== 'video') return undefined
 
@@ -294,9 +301,9 @@ onMounted(() => {
         :arrows="itemsOrdered.length > 1"
         :items="itemsOrdered"
         loop
-        :next="theme.carousel.arrows?.next"
+        :next="nextCarouselButton"
         :next-icon="theme.carousel.arrows?.nextIcon"
-        :prev="theme.carousel.arrows?.prev"
+        :prev="prevCarouselButton"
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{ container: 'items-center h-full' }"

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  resolveCarouselArrowButton,
   resolveOptionalUiButtonVariant,
   resolveOptionalUiColor,
   resolveUiButtonVariant,
@@ -10,6 +11,23 @@ import {
 } from '../../layers/theme/app/utils/nuxtUiProps'
 
 describe('nuxtUiProps', () => {
+  it('normalizes shared carousel arrow button defaults', () => {
+    expect(resolveCarouselArrowButton()).toEqual({
+      color: 'neutral',
+      variant: 'outline',
+      size: 'xl',
+    })
+    expect(resolveCarouselArrowButton({
+      color: ' primary ',
+      variant: 'ghost',
+      size: 'sm',
+    })).toEqual({
+      color: 'primary',
+      variant: 'ghost',
+      size: 'sm',
+    })
+  })
+
   it('normalizes Nuxt UI color values without blocking custom strings', () => {
     expect(resolveUiColor(undefined)).toBe('primary')
     expect(resolveUiColor(' neutral ')).toBe('neutral')
