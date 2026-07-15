@@ -32,11 +32,16 @@ const regionBlocks = computed<AppContextBlock[]>(() => {
 </script>
 
 <template>
-  <template v-if="regionBlocks.length">
-    <component :is="as" v-if="as" :aria-label="ariaLabel">
-      <component :is="renderCustomElements(regionBlocks)" />
-    </component>
+  <component
+    :is="as"
+    v-if="regionBlocks.length && as"
+    :aria-label="ariaLabel"
+  >
+    <component :is="renderCustomElements(regionBlocks)" />
+  </component>
 
-    <component :is="renderCustomElements(regionBlocks)" v-else />
-  </template>
+  <component
+    :is="renderCustomElements(regionBlocks)"
+    v-else-if="regionBlocks.length"
+  />
 </template>

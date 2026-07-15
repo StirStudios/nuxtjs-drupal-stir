@@ -41,11 +41,7 @@ figure {
 }
 
 .sr-hide {
-  @apply visible h-auto opacity-100;
-
-  > div {
-    @apply sr-only;
-  }
+  @apply invisible h-0 opacity-0;
 }
 
 .front {
