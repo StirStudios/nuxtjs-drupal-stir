@@ -138,3 +138,109 @@ export function isValidDrupalViewFilterValue(
     (allowed.size === 0 || allowed.has(item))
   ))
 }
+
+export function isValidDrupalViewSortByValue(
+  value: string,
+  options: Array<{ value: string }>,
+): boolean {
+  if (!value || !isSafeDrupalViewControlValue(value)) return false
+
+  const allowed = new Set(options.map(option => option.value))
+
+  return allowed.size === 0 || allowed.has(value)
+}
+
+export function isValidDrupalViewSortOrderValue(
+  sort: ExposedSort,
+  value: string,
+  options: Array<{ value: string }>,
+): boolean {
+  if (!value || !isSafeDrupalViewControlValue(value)) return false
+
+  const allowed = new Set<string>()
+
+  for (const option of options) {
+    allowed.add(option.value)
+    allowed.add(normalizeDrupalViewSortOrderValue(option.value))
+  }
+
+  if (sort.submittedOrder) {
+    allowed.add(sort.submittedOrder)
+    allowed.add(normalizeDrupalViewSortOrderValue(sort.submittedOrder))
+  }
+
+  return allowed.has(value)
+}
+
+export function drupalViewManagedQueryKeys(
+  filters: NormalizedViewFilter[],
+  sort: ExposedSort | null,
+): string[] {
+  const keys = ['page']
+
+  for (const filter of filters) {
+    keys.push(filter.queryParamName, `${filter.queryParamName}[]`)
+  }
+
+  if (sort?.queryParamSortBy) {
+    keys.push(sort.queryParamSortBy, `${sort.queryParamSortBy}[]`)
+  }
+
+  if (sort?.queryParamSortOrder) {
+    keys.push(sort.queryParamSortOrder, `${sort.queryParamSortOrder}[]`)
+  }
+
+  return keys
+}
+
+export function buildDrupalViewControlQuery(options: {
+  filters: NormalizedViewFilter[]
+  filterValues: Record<string, string | string[]>
+  sort: ExposedSort | null
+  sortValues: Record<string, string | string[]>
+  sortByOptions: Array<{ value: string }>
+  sortOrderOptions: Array<{ value: string }>
+  page: number
+}): Record<string, string | string[]> {
+  const query: Record<string, string | string[]> = {}
+
+  for (const filter of options.filters) {
+    const value = options.filterValues[filter.queryParamName]
+
+    if (Array.isArray(value)) {
+      if (value.length && isValidDrupalViewFilterValue(filter, value)) {
+        query[`${filter.queryParamName}[]`] = value
+      }
+    } else if (value && isValidDrupalViewFilterValue(filter, value)) {
+      query[filter.queryParamName] = value
+    }
+  }
+
+  const sort = options.sort
+
+  if (sort?.queryParamSortBy) {
+    const value = options.sortValues[sort.queryParamSortBy]
+
+    if (
+      typeof value === 'string'
+      && isValidDrupalViewSortByValue(value, options.sortByOptions)
+    ) {
+      query[sort.queryParamSortBy] = value
+    }
+  }
+
+  if (sort?.queryParamSortOrder) {
+    const value = options.sortValues[sort.queryParamSortOrder]
+
+    if (
+      typeof value === 'string'
+      && isValidDrupalViewSortOrderValue(sort, value, options.sortOrderOptions)
+    ) {
+      query[sort.queryParamSortOrder] = normalizeDrupalViewSortOrderValue(value)
+    }
+  }
+
+  if (options.page > 0) query.page = String(options.page)
+
+  return query
+}

@@ -1,13 +1,15 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import {
+  buildDrupalViewControlQuery,
   buildDrupalViewSearchParams,
-  isSafeDrupalViewControlValue,
+  drupalViewManagedQueryKeys,
   isValidDrupalViewFilterValue,
+  isValidDrupalViewSortByValue,
+  isValidDrupalViewSortOrderValue,
   mapDrupalViewSortByOptions,
   mapDrupalViewSortOrderOptions,
   normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
-  normalizeDrupalViewSortOrderValue,
   primaryDrupalViewSort,
 } from '~/composables/useDrupalViewQuery'
 import type { NormalizedViewFilter, ViewPager } from '~/composables/useDrupalViewQuery'
@@ -231,40 +233,12 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return sort.submittedOrder || ''
   }
 
-  function validSortByValues(): Set<string> {
-    return new Set(sortByOptions.value.map(option => option.value))
-  }
-
-  function validSortOrderValues(sort: ExposedSort): Set<string> {
-    const values = new Set<string>()
-
-    for (const option of sortOrderOptions.value) {
-      values.add(option.value)
-      values.add(normalizeDrupalViewSortOrderValue(option.value))
-    }
-
-    const submitted = defaultSortOrderValue(sort)
-
-    if (submitted) {
-      values.add(submitted)
-      values.add(normalizeDrupalViewSortOrderValue(submitted))
-    }
-
-    return values
-  }
-
   function validSortByValue(sort: ExposedSort, value: string): boolean {
-    if (!value || !isSafeDrupalViewControlValue(value)) return false
-
-    const values = validSortByValues()
-
-    return values.size === 0 || values.has(value)
+    return isValidDrupalViewSortByValue(value, sortByOptions.value)
   }
 
   function validSortOrderValue(sort: ExposedSort, value: string): boolean {
-    if (!value || !isSafeDrupalViewControlValue(value)) return false
-
-    return validSortOrderValues(sort).has(value)
+    return isValidDrupalViewSortOrderValue(sort, value, sortOrderOptions.value)
   }
 
   function routeValueForSortBy(sort: ExposedSort): string {
@@ -412,23 +386,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function managedQueryKeys(): string[] {
-    const keys = ['page']
-
-    for (const filter of normalizedFilters.value) {
-      keys.push(filter.queryParamName, `${filter.queryParamName}[]`)
-    }
-
-    const sort = primarySort.value
-
-    if (sort?.queryParamSortBy) {
-      keys.push(sort.queryParamSortBy, `${sort.queryParamSortBy}[]`)
-    }
-
-    if (sort?.queryParamSortOrder) {
-      keys.push(sort.queryParamSortOrder, `${sort.queryParamSortOrder}[]`)
-    }
-
-    return keys
+    return drupalViewManagedQueryKeys(normalizedFilters.value, primarySort.value)
   }
 
   function syncUrlQuery(page: number): void {
@@ -503,58 +461,15 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function buildQueryParams(page: number): Record<string, string | string[]> {
-    const query: Record<string, string | string[]> = {}
-
-    for (const filter of normalizedFilters.value) {
-      const value = filterValues.value[filter.queryParamName]
-
-      if (Array.isArray(value)) {
-        if (value.length > 0 && validFilterValue(filter, value)) {
-          query[`${filter.queryParamName}[]`] = value
-        }
-
-        continue
-      }
-      if (
-        typeof value === 'string' &&
-        value.length > 0 &&
-        validFilterValue(filter, value)
-      ) {
-        query[filter.queryParamName] = value
-      }
-    }
-
-    const sort = primarySort.value
-
-    if (sort?.queryParamSortBy) {
-      const value = sortValues.value[sort.queryParamSortBy]
-
-      if (
-        typeof value === 'string' &&
-        value.length > 0 &&
-        validSortByValue(sort, value)
-      ) {
-        query[sort.queryParamSortBy] = value
-      }
-    }
-
-    if (sort?.queryParamSortOrder) {
-      const value = sortValues.value[sort.queryParamSortOrder]
-
-      if (
-        typeof value === 'string' &&
-        value.length > 0 &&
-        validSortOrderValue(sort, value)
-      ) {
-        query[sort.queryParamSortOrder] = normalizeDrupalViewSortOrderValue(value)
-      }
-    }
-
-    if (page > 0) {
-      query.page = String(page)
-    }
-
-    return query
+    return buildDrupalViewControlQuery({
+      filters: normalizedFilters.value,
+      filterValues: filterValues.value,
+      sort: primarySort.value,
+      sortValues: sortValues.value,
+      sortByOptions: sortByOptions.value,
+      sortOrderOptions: sortOrderOptions.value,
+      page,
+    })
   }
 
   async function refreshView(page = currentPage.value) {

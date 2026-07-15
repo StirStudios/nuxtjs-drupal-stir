@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { CustomElementNode } from '../../layers/theme/app/types'
 import {
+  buildDrupalViewControlQuery,
   buildDrupalViewSearchParams,
+  drupalViewManagedQueryKeys,
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
@@ -79,6 +81,65 @@ describe('useDrupalViewControls helpers', () => {
 
     expect(params.getAll('category')).toEqual(['news', 'events'])
     expect(params.get('page')).toBe('2')
+  })
+
+  it('builds managed keys and safe Drupal view control queries', () => {
+    const filters = normalizeDrupalViewFilters([{
+      label: 'Category',
+      queryParamName: 'category',
+      multiple: true,
+      options: { news: 'News', events: 'Events' },
+    }])
+    const sort = primaryDrupalViewSort([{
+      label: 'Newest',
+      sortByValue: 'created',
+      submittedOrder: 'ASC',
+      queryParamSortBy: 'sort_by',
+      queryParamSortOrder: 'sort_order',
+      sortOrderOptions: { ASC: 'Ascending', DESC: 'Descending' },
+    }])
+
+    expect(drupalViewManagedQueryKeys(filters, sort)).toEqual([
+      'page',
+      'category',
+      'category[]',
+      'sort_by',
+      'sort_by[]',
+      'sort_order',
+      'sort_order[]',
+    ])
+    expect(buildDrupalViewControlQuery({
+      filters,
+      filterValues: { category: ['news', 'events'] },
+      sort,
+      sortValues: { sort_by: 'created', sort_order: 'DESC' },
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+      page: 2,
+    })).toEqual({
+      'category[]': ['news', 'events'],
+      'sort_by': 'created',
+      'sort_order': 'DESC',
+      'page': '2',
+    })
+  })
+
+  it('omits unsafe and unknown values from Drupal view queries', () => {
+    const filters = normalizeDrupalViewFilters([{
+      label: 'Category',
+      queryParamName: 'category',
+      options: { news: 'News' },
+    }])
+
+    expect(buildDrupalViewControlQuery({
+      filters,
+      filterValues: { category: 'news?category=other' },
+      sort: null,
+      sortValues: {},
+      sortByOptions: [],
+      sortOrderOptions: [],
+      page: 0,
+    })).toEqual({})
   })
 
   it('normalizes sort order values for Drupal view requests', () => {
