@@ -278,6 +278,7 @@ const shouldRenderFooter = computed(() =>
   <LazyRegionArea
     v-if="footerConfig.showSubFooterRegion"
     area="sub_footer"
+    as="aside"
   />
 
   <UFooter

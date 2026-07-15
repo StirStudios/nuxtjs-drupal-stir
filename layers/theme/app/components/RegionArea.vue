@@ -3,7 +3,11 @@ import type { AppContextBlock } from '~/composables/useAppContext'
 
 const { renderCustomElements, getPage } = useDrupalCe()
 const page = getPage()
-const props = defineProps<{ area: string }>()
+const props = defineProps<{
+  area: string
+  as?: string
+  ariaLabel?: string
+}>()
 
 const {
   data: appContextBlocks,
@@ -28,5 +32,11 @@ const regionBlocks = computed<AppContextBlock[]>(() => {
 </script>
 
 <template>
-  <component :is="renderCustomElements(regionBlocks)" v-if="regionBlocks.length" />
+  <template v-if="regionBlocks.length">
+    <component :is="as" v-if="as" :aria-label="ariaLabel">
+      <component :is="renderCustomElements(regionBlocks)" />
+    </component>
+
+    <component :is="renderCustomElements(regionBlocks)" v-else />
+  </template>
 </template>
