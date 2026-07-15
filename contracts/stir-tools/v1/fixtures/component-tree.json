@@ -254,6 +254,32 @@
             }
           ]
         }
+      },
+      {
+        "element": "paragraph-tabs",
+        "props": {},
+        "slots": {
+          "tab": [
+            {
+              "element": "paragraph-tab",
+              "props": {
+                "title": "Overview",
+                "headerTag": "h2"
+              },
+              "slots": {
+                "tabContent": [
+                  {
+                    "element": "paragraph-text",
+                    "props": {
+                      "text": "<p>Visible tab content.</p>"
+                    },
+                    "slots": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
       }
     ],
     "media": [

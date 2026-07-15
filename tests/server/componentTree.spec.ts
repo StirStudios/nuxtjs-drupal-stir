@@ -229,6 +229,27 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-tabs',
+        props: {},
+        slots: {
+          tab: [{
+            element: 'paragraph-tab',
+            props: {
+              title: 'Overview',
+              headerTag: 'h2',
+            },
+            slots: {
+              tabContent: [{
+                element: 'paragraph-text',
+                props: {
+                  text: '<p>Visible tab content.</p>',
+                },
+              }],
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
