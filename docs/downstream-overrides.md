@@ -70,5 +70,8 @@ export default defineAppConfig({
 - One inner Drupal CE route loads.
 - Header/menu links render correctly.
 - Drupal views with filters, sort, and pagination work.
+- View Paragraph payloads should include `paragraphId`; interactive controls
+  then refresh only `/api/view/{paragraphId}`. Full-page refresh remains a
+  compatibility fallback for older Drupal payloads.
 - App-context edit links appear when authenticated.
 - Webform submit proxy still works.

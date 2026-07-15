@@ -27,6 +27,8 @@ export interface DrupalViewProps {
   container?: boolean
   viewId?: string
   displayId?: string
+  paragraphId?: number | string
+  paragraphUuid?: string
   parentUuid?: string
   pager?: ViewPager | unknown
   randomize?: boolean | string

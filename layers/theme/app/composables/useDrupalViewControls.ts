@@ -38,6 +38,7 @@ import type { ViewStateSnapshot } from '~/utils/drupalViewState'
 export type { ExposedFilter, ExposedSort } from '~/types/View'
 
 interface UseDrupalViewControlsProps {
+  paragraphId?: number | string
   viewId?: string
   displayId?: string
   parentUuid?: string
@@ -416,14 +417,24 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     try {
       const query = buildQueryParams(page)
-      const params = buildDrupalViewSearchParams(query)
-      const queryString = params.toString()
-      const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
+      let pageResponse: unknown
+      const paragraphId = Number(props.paragraphId)
 
-      const api = $ceApi()
-      const pageResponse = await api(requestPath, {
-        signal: activeAbortController.signal,
-      })
+      if (Number.isInteger(paragraphId) && paragraphId > 0) {
+        pageResponse = await $fetch(`/api/view/${paragraphId}`, {
+          query,
+          signal: activeAbortController.signal,
+        })
+      } else {
+        const params = buildDrupalViewSearchParams(query)
+        const queryString = params.toString()
+        const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
+        const api = $ceApi()
+
+        pageResponse = await api(requestPath, {
+          signal: activeAbortController.signal,
+        })
+      }
       const viewNode = findDrupalViewNodeInResponse(pageResponse, props)
 
       if (requestId !== activeRequestId) return
