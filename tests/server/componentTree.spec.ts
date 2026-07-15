@@ -24,6 +24,17 @@ describe('componentTree', () => {
         element: 'paragraph-icon',
         props: { iconName: 'i-lucide-star', iconSize: 7 },
       },
+      {
+        element: 'paragraph-enzuzo',
+        props: { embedUrl: 'https://example.invalid/enzuzo.js' },
+      },
+      {
+        element: 'paragraph-calculator',
+        props: {
+          embedUrl: 'https://example.invalid/calculator.js',
+          venueId: 'example-venue',
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])

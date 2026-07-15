@@ -22,6 +22,21 @@
           "iconSize": 7
         },
         "slots": {}
+      },
+      {
+        "element": "paragraph-enzuzo",
+        "props": {
+          "embedUrl": "https://example.invalid/enzuzo.js"
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-calculator",
+        "props": {
+          "embedUrl": "https://example.invalid/calculator.js",
+          "venueId": "example-venue"
+        },
+        "slots": {}
       }
     ],
     "media": [
