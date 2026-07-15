@@ -6,7 +6,7 @@ Included in this layer:
 - Nuxt app theme config (`app/app.config.ts`)
 - UI variant helpers (`app/utils/uiVariants.ts`)
 - Theme/shell components (`App/*`, `Site/*`, `Icons/*`, `Wrap/*`)
-- Presentation components (`Drupal/*`, `Edit/*`, `Field/*`, `StirPdfViewer.client.vue`)
+- Presentation components (`Drupal/*`, `Field/*`, `StirPdfViewer.client.vue`)
 - Default app rendering shell (`app/layouts/*`, `app/pages/[...slug].vue`, `app/error.vue`)
 - Reusable visual CE components (`global/*`, `global/Media/*`, most `global/Paragraph/*`)
 - Theme assets and client plugins (`app/assets/*`, `app/plugins/*`, `app/middleware/colorMode.global.ts`)
@@ -15,7 +15,7 @@ Included in this layer:
 The base repository enables this layer from root `nuxt.config.ts`:
 
 ```ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['./layers/platform', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
 ```
 
 ## Boundary guidance
@@ -48,5 +48,6 @@ Keep in `layers/theme`:
 
 Keep outside `layers/theme`:
 - Auth/session and protected-route behavior (`layers/auth`)
+- Drupal tabs, edit controls, and inline editing (`layers/editorial`)
 - Server proxy/runtime behavior (`layers/core`)
 - Highly project-specific business logic or workflow-specific forms

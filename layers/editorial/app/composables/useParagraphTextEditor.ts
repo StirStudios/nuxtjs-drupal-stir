@@ -5,6 +5,7 @@ import Heading from '@tiptap/extension-heading'
 import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
+import type {} from '@tiptap/extension-link'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
   const adminTooltipUi = {
