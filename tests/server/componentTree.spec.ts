@@ -189,6 +189,46 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-webform',
+        props: {
+          webform: {
+            webformId: 'contact',
+            webformTitle: 'Contact',
+            fields: {},
+            actions: [],
+          },
+        },
+      },
+      {
+        element: 'paragraph-popup',
+        props: {
+          alert: '<p>Limited availability.</p>',
+          popupDelay: 2500,
+          popupOnce: true,
+          popupThreshold: 0.5,
+          popupTrigger: 'scroll',
+          text: '<p>Request more information.</p>',
+          webform: {
+            webformId: 'contact',
+            webformTitle: 'Contact',
+            fields: {},
+            actions: [],
+          },
+        },
+        slots: {
+          media: [{
+            element: 'media-image',
+            props: {
+              src: '/sites/default/files/popup.jpg',
+              alt: 'Contact our team',
+              width: 1200,
+              height: 800,
+              responsiveStyle: 'container',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
