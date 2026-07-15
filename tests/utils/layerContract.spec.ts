@@ -212,6 +212,25 @@ describe('layer contract', () => {
     expect(mediaVideo).toContain('registerIframe(iframeElement.value)')
   })
 
+  it('keeps production icons on demand and component-test icons bundled', () => {
+    const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+
+    expect(nuxtConfig).toContain('...(isTestEnv ? { provider: \'none\' as const } : {})')
+    expect(nuxtConfig).toContain('clientBundle: isTestEnv')
+    expect(nuxtConfig).toContain('scan: false')
+  })
+
+  it('enforces stable initial and deferred bundle budgets', () => {
+    const budget = JSON.parse(readFileSync(
+      resolve(rootDir, 'docs/perf-budget.json'),
+      'utf8',
+    )) as Record<string, number>
+
+    expect(budget.maxInitialJavascriptGzipKb).toBeLessThan(160)
+    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36)
+    expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
+  })
+
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
     const userwayPlugin = readFileSync(
       resolve(rootDir, 'layers/theme/app/plugins/userway.client.ts'),

@@ -16,10 +16,12 @@ The layer boundaries remain useful:
 
 - The production build completes at 9.96 MB (2.68 MB gzip) of Nitro output,
   compared with approximately 10.10 MB (2.69 MB gzip) before the review.
-- Initial static client assets are 196.65 kB gzip: 161.56 kB JavaScript and
-  35.09 kB CSS. The prior measurement was approximately 196.06 kB gzip:
-  160.99 kB JavaScript and 35.07 kB CSS. This 0.59 kB increase is effectively
-  flat and should not be presented as a performance improvement.
+- Initial static client assets are now 191.24 kB gzip: 156.15 kB JavaScript
+  and 35.09 kB CSS. The pre-review measurement was approximately 196.06 kB
+  gzip: 160.99 kB JavaScript and 35.07 kB CSS. Production now serves icons
+  from SSR payloads and the local on-demand endpoint while component tests keep
+  their complete client bundle. This removed 5.41 kB gzip from the reviewed
+  baseline without changing the CSS entry.
 - The rich-text editor remains deferred and decreased from approximately
   169.73 kB to 167.29 kB gzip. It is not part of the anonymous initial bundle.
 - Reveal motion remains async and decreased from approximately 27.80 kB to
@@ -31,6 +33,12 @@ The layer boundaries remain useful:
 
 The machine-readable figures are in `docs/perf-report.latest.json`; the public
 compatibility surface is recorded in `docs/public-contracts.json`.
+
+Three mobile Lighthouse runs against the local production build produced a
+median score of 92, FCP of 2.12 seconds, LCP of 3.03 seconds, TBT of 26 ms, and
+total transfer of 0.56 MB. Media transfer was 0.20 MB with zero video requests.
+This is the first route-level median for the new ratchet, not a before/after
+claim.
 
 ## Changes made during the review
 
@@ -49,7 +57,7 @@ compatibility surface is recorded in `docs/public-contracts.json`.
 
 ## Next optimization targets
 
-The largest opportunity is the 161.56 kB gzip app entry. Before splitting it,
+The largest opportunity is the 156.15 kB gzip app entry. Before splitting it,
 use route-level Lighthouse medians against representative Drupal payloads to
 identify execution cost, not just transfer size. The 35.09 kB CSS entry and
 generated Drupal utility safelist should be reduced only after real consumer

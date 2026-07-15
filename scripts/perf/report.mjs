@@ -3,12 +3,14 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { basename } from 'node:path'
 
 const outputPath = 'docs/perf-report.latest.json'
+const budgetPath = 'docs/perf-budget.json'
 const clientManifestPath = '.output/server/chunks/build/client.precomputed.mjs'
+const moduleAnalysisPath = '.audit/client-entry-modules.json'
 
-function run(command, args) {
+function run(command, args, environment = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      env: process.env,
+      env: { ...process.env, ...environment },
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     let output = ''
@@ -26,6 +28,35 @@ function run(command, args) {
       else reject(new Error(`${command} ${args.join(' ')} failed with exit code ${String(code)}`))
     })
   })
+}
+
+function assertBudget(report, budget) {
+  const initialJs = report.initialClient.assets
+    .filter(asset => asset.file.endsWith('.js'))
+    .reduce((total, asset) => total + asset.gzipKb, 0)
+  const initialCss = report.initialClient.assets
+    .filter(asset => asset.file.endsWith('.css'))
+    .reduce((total, asset) => total + asset.gzipKb, 0)
+  const adminEditor = report.topClientChunks.find(chunk => chunk.role === 'admin-deferred')
+  const revealMotion = report.topClientChunks.find(chunk =>
+    chunk.label === 'theme:app/components/RevealMotion',
+  )
+  const checks = [
+    ['initial client', report.initialClient.gzipKb, budget.maxInitialGzipKb],
+    ['initial JavaScript', initialJs, budget.maxInitialJavascriptGzipKb],
+    ['initial CSS', initialCss, budget.maxInitialCssGzipKb],
+    ['deferred editor', adminEditor?.gzipKb, budget.maxAdminDeferredGzipKb],
+    ['reveal motion', revealMotion?.gzipKb, budget.maxRevealMotionGzipKb],
+  ]
+  const failures = checks
+    .filter(([, actual, maximum]) =>
+      typeof actual !== 'number' || actual > maximum,
+    )
+    .map(([label, actual, maximum]) => `${label}: ${String(actual)} kB > ${maximum} kB`)
+
+  if (failures.length) {
+    throw new Error(`Performance budget failed:\n- ${failures.join('\n- ')}`)
+  }
 }
 
 function parseChunkLines(output) {
@@ -87,7 +118,7 @@ function classifyChunk(file, owner) {
 }
 
 async function main() {
-  const output = await run('pnpm', ['build'])
+  const output = await run('pnpm', ['build'], { STIR_PERF_ANALYZE: 'true' })
   const chunks = parseChunkLines(output)
   const manifest = await readFile(clientManifestPath, 'utf8').catch(() => '')
   const owners = parseChunkOwners(manifest)
@@ -103,6 +134,12 @@ async function main() {
     })
     .sort((a, b) => b.gzipKb - a.gzipKb)
   const initialAssets = labeledChunks.filter(chunk => chunk.role === 'initial')
+  const moduleAnalysis = JSON.parse(
+    await readFile(moduleAnalysisPath, 'utf8').catch(() => '{"entries":[]}'),
+  )
+  const entryModules = moduleAnalysis.entries?.find(entry =>
+    initialAssets.some(asset => asset.file.endsWith(entry.fileName)),
+  )?.modules?.slice(0, 30) || []
   const report = {
     schemaVersion: 2,
     generatedAt: new Date().toISOString(),
@@ -110,12 +147,16 @@ async function main() {
       sizeKb: Number(initialAssets.reduce((total, chunk) => total + chunk.sizeKb, 0).toFixed(2)),
       gzipKb: Number(initialAssets.reduce((total, chunk) => total + chunk.gzipKb, 0).toFixed(2)),
       assets: initialAssets,
+      entryModules,
     },
     topClientChunks: labeledChunks.slice(0, 15),
     totalOutputSize: parseTotalSize(output),
   }
 
   await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`)
+  const budget = JSON.parse(await readFile(budgetPath, 'utf8'))
+
+  assertBudget(report, budget)
 
   console.log('\n=== Stable client bundle report ===')
   console.log(`Initial static assets: ${report.initialClient.gzipKb.toFixed(2)} kB gzip`)

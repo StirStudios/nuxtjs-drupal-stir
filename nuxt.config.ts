@@ -1,7 +1,9 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { SitemapRenderCtx } from '@nuxtjs/sitemap'
+import type { OutputBundle, OutputChunk, OutputOptions } from 'rollup'
 import {
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
@@ -103,6 +105,37 @@ export default defineNuxtConfig({
           }
         },
       },
+      ...(process.env.STIR_PERF_ANALYZE === 'true'
+        ? [{
+            apply: 'build' as const,
+            name: 'stir-client-entry-analysis',
+            generateBundle(_options: OutputOptions, bundle: OutputBundle) {
+              if (!String(_options.dir || '').includes('/client')) return
+
+              const entries = Object.values(bundle)
+                .filter((asset): asset is OutputChunk =>
+                  asset.type === 'chunk' && asset.isEntry,
+                )
+                .map((chunk) => ({
+                  fileName: chunk.fileName,
+                  modules: Object.entries(chunk.modules)
+                    .map(([id, details]) => ({
+                      id,
+                      renderedBytes: details.renderedLength,
+                    }))
+                    .sort((left, right) => right.renderedBytes - left.renderedBytes),
+                }))
+
+              if (!entries.length) return
+
+              mkdirSync(resolveLayerPath('./.audit'), { recursive: true })
+              writeFileSync(
+                resolveLayerPath('./.audit/client-entry-modules.json'),
+                `${JSON.stringify({ entries }, null, 2)}\n`,
+              )
+            },
+          }]
+        : []),
     ],
   },
 
@@ -135,11 +168,18 @@ export default defineNuxtConfig({
   } as RouteRules,
 
   icon: {
-    clientBundle: {
-      scan: true,
-      includeCustomCollections: true,
-      sizeLimitKb: 256,
-    },
+    ...(isTestEnv ? { provider: 'none' as const } : {}),
+    clientBundle: isTestEnv
+      ? {
+          scan: true,
+          includeCustomCollections: true,
+          sizeLimitKb: 256,
+        }
+      : {
+          scan: false,
+          includeCustomCollections: false,
+          sizeLimitKb: 256,
+        },
     customCollections: [
       {
         prefix: 'social',
