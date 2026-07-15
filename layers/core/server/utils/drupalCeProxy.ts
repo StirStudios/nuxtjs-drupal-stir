@@ -12,7 +12,7 @@ import {
   getStirForwardedCookie,
   markStirPrivateResponse,
   replaceStirDrupalSetCookies,
-} from '../../../../server/utils/stirDrupalApi'
+} from './stirDrupalApi'
 
 interface StirDrupalCeProxyTargets {
   ceBaseUrl: string

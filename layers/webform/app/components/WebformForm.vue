@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { flattenWebformFields } from '../../../theme/app/utils/flattenWebformFields'
-import { webformState } from '../composables/useWebformState'
 import { evaluateContainerVisibility } from '../../../theme/app/composables/useContainerVisibility'
 import { transformPayloadToSnakeCase } from '../../../theme/app/utils/transformUtils'
 import { getHiddenDefaults } from '../../../theme/app/utils/getHiddenDefaults'
@@ -62,9 +61,6 @@ const {
 const fields = flattenWebformFields(rawFields)
 const state = reactive<WebformState>({})
 const orderedFieldNames = computed(() => Object.keys(fields))
-
-webformState.fields = fields
-webformState.state = state
 
 const turnstileToken = ref('')
 const isFormSubmitted = ref(false)

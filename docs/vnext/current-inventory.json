@@ -274,8 +274,7 @@
       "layers/theme/app/composables/useTeaserPost.ts",
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useValidation.ts",
-      "layers/theme/app/composables/useVideoPlayers.ts",
-      "layers/webform/app/composables/useWebformState.ts"
+      "layers/theme/app/composables/useVideoPlayers.ts"
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",
@@ -357,7 +356,7 @@
   },
   "counts": {
     "components": 97,
-    "composables": 59,
+    "composables": 58,
     "utils": 37,
     "plugins": 5,
     "middleware": 4,
@@ -457,6 +456,13 @@
       "core",
       "theme",
       "auth"
+    ],
+    "packageExports": [
+      ".",
+      "./presets/minimal",
+      "./presets/full",
+      "./layers/theme/app/assets/css/main",
+      "./*"
     ],
     "aliases": [
       "~/utils",

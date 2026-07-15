@@ -9,8 +9,8 @@ import {
   type H3Event,
 } from 'h3'
 
-const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 const DEFAULT_DRUPAL_REQUEST_TIMEOUT_MS = 10_000
+const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 const DRUPAL_SESSION_COOKIE_NAME = /^S?SESS[A-Za-z0-9_-]{32}$/
 const SAFE_CUSTOM_COOKIE_NAME = /^[A-Za-z0-9_-]{1,128}$/
 const SAFE_UPSTREAM_STATUS_CODES = new Set([

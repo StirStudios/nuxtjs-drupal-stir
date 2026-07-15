@@ -5,7 +5,7 @@ import {
   getStirDrupalApiConfig,
   stirDrupalApiRequest,
   throwStirDrupalApiError,
-} from '../../server/utils/stirDrupalApi'
+} from '../../layers/core/server/utils/stirDrupalApi'
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 

@@ -9,6 +9,7 @@ const props = defineProps<{
   field: WebformFieldProps
   fieldName: string
   state: WebformState
+  fields: Record<string, WebformFieldProps>
 }>()
 
 const tabBus = useEventBus<string>('tab-changed')
@@ -130,7 +131,7 @@ const handleModelUpdate = (val: unknown) => {
     props.field['#group'],
     props.field['#groupMaxSelected'],
     props.state,
-    webformState,
+    { fields: props.fields },
   )
   updated = enforceMaxSelected(updated, props.field['#maxSelected'])
 

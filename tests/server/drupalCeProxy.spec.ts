@@ -8,7 +8,7 @@ import {
   isStirDrupalProxyPathSafe,
   proxyStirDrupalMenuRequest,
 } from '../../layers/core/server/utils/drupalCeProxy'
-import { replaceStirDrupalSetCookies } from '../../server/utils/stirDrupalApi'
+import { replaceStirDrupalSetCookies } from '../../layers/core/server/utils/stirDrupalApi'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),

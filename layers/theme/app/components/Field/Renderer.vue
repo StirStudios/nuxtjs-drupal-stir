@@ -90,6 +90,11 @@ const resolvedFieldType = computed(() => {
 const resolvedComponent = computed(
   () => componentMap[resolvedFieldType.value] || null,
 )
+const resolvedComponentProps = computed(() =>
+  resolvedFieldType.value === 'checkboxes'
+    ? { fields: props.fields }
+    : {},
+)
 
 const shouldShowLabel = computed(
   () =>
@@ -164,6 +169,7 @@ const fieldUi = computed(() => {
     <component
       :is="resolvedComponent"
       v-if="resolvedComponent"
+      v-bind="resolvedComponentProps"
       :field="field"
       :field-name="fieldName"
       :floating-label="

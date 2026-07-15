@@ -1,4 +1,9 @@
-import { defineEventHandler, getRequestURL, parseCookies, setResponseHeader } from 'h3'
+import {
+  defineEventHandler,
+  getRequestURL,
+  parseCookies,
+  setResponseHeader,
+} from 'h3'
 import {
   getStirDrupalSessionCookieNames,
   isStirDrupalSessionCookieName,

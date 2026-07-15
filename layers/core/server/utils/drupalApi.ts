@@ -10,7 +10,7 @@ import {
   stirDrupalApiRequest,
   throwStirDrupalApiError,
   type StirDrupalRequestOptions,
-} from '../../../../server/utils/stirDrupalApi'
+} from './stirDrupalApi'
 
 export function getDrupalApiConfig() {
   return getStirDrupalApiConfig()

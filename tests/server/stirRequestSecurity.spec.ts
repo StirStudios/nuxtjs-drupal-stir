@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { assertStirSameOrigin } from '../../server/utils/stirRequestSecurity'
+import { assertStirSameOrigin } from '../../layers/core/server/utils/stirRequestSecurity'
 
 const createEvent = (headers: Record<string, string>) => ({
   context: {},

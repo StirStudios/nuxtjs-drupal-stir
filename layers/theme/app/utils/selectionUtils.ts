@@ -16,12 +16,12 @@ export const enforceGroupLimit = (
   group: string | undefined,
   groupLimit: number | undefined,
   state: WebformState,
-  webformState: { fields: Record<string, WebformFieldProps> },
+  formContext: { fields: Record<string, WebformFieldProps> },
 ): string[] => {
   if (!group || !groupLimit) return val
 
-  const groupFields = Object.keys(webformState.fields).filter((key) => {
-    const field = webformState.fields[key]
+  const groupFields = Object.keys(formContext.fields).filter((key) => {
+    const field = formContext.fields[key]
 
     return field && field['#group'] === group
   })
@@ -33,7 +33,7 @@ export const enforceGroupLimit = (
   })
 
   const fieldMaxLimit =
-    webformState.fields[fieldName]?.['#maxSelected'] ?? Infinity
+    formContext.fields[fieldName]?.['#maxSelected'] ?? Infinity
 
   return enforceMaxSelected(val, fieldMaxLimit)
 }
