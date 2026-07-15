@@ -3,6 +3,13 @@
   "compatibilityPolicy": "preserve-within-major",
   "layers": ["core", "theme", "auth"],
   "layerOrder": ["core", "theme", "auth"],
+  "packageExports": [
+    ".",
+    "./presets/minimal",
+    "./presets/full",
+    "./layers/theme/app/assets/css/main",
+    "./*"
+  ],
   "aliases": ["~/utils", "~/composables", "~/components", "~/types"],
   "componentConventions": {
     "customElements": "kebab-case 1:1 filenames under components/global",

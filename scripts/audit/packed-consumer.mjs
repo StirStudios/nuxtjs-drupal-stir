@@ -6,6 +6,7 @@ import process from 'node:process'
 
 const rootDir = resolve('.')
 const fixtureDir = resolve('tests/fixtures/consumer-app/app')
+const presets = ['minimal', 'full']
 const keepTemporary = process.argv.includes('--keep-temporary')
 
 function run(command, args, cwd) {
@@ -44,10 +45,6 @@ async function main() {
     await mkdir(consumerDir)
     await cp(fixtureDir, join(consumerDir, 'app'), { recursive: true })
     await writeFile(
-      join(consumerDir, 'nuxt.config.ts'),
-      "export default defineNuxtConfig({ extends: ['@stir/base'] })\n",
-    )
-    await writeFile(
       join(consumerDir, 'tsconfig.json'),
       `${JSON.stringify({ extends: './.nuxt/tsconfig.json' }, null, 2)}\n`,
     )
@@ -74,9 +71,15 @@ async function main() {
     )
 
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
-    await run('pnpm', ['typecheck'], consumerDir)
-    await run('pnpm', ['build'], consumerDir)
-    console.log('Packed consumer validation passed.')
+    for (const preset of presets) {
+      await writeFile(
+        join(consumerDir, 'nuxt.config.ts'),
+        `export default defineNuxtConfig({ extends: ['@stir/base/presets/${preset}'] })\n`,
+      )
+      await run('pnpm', ['typecheck'], consumerDir)
+      await run('pnpm', ['build'], consumerDir)
+      console.log(`Packed ${preset} consumer validation passed.`)
+    }
   } finally {
     if (keepTemporary) console.log(`Temporary consumer retained at ${temporaryRoot}`)
     else await rm(temporaryRoot, { recursive: true, force: true })

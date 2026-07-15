@@ -2,6 +2,13 @@
   "name": "nuxtjs-drupal-stir",
   "version": "4.3.8",
   "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./presets/minimal": "./presets/minimal/nuxt.config.ts",
+    "./presets/full": "./presets/full/nuxt.config.ts",
+    "./layers/theme/app/assets/css/main": "./layers/theme/app/assets/css/main.css",
+    "./*": "./*"
+  },
   "packageManager": "pnpm@10.33.1",
   "engines": {
     "node": "^22.13.0 || ^24.11.0 || >=26.0.0"

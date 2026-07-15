@@ -14,7 +14,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - N0 inventory generation is implemented by `pnpm audit:vnext-inventory`.
 - The checked artifact is `docs/vnext/current-inventory.json` and intentionally excludes machine-specific paths.
 - Current measured surface: 97 components, 59 composables, 35 utilities, 5 plugins, 4 middleware files, 23 server routes, 25 production dependencies, 23 development dependencies, and 67 test files.
-- Remaining N0 work: enforce initialization-error failure, deterministic homepage SSR/hydration, and packed-consumer CI before N1 begins.
+- N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
 - The optional `layers/webform` boundary now owns Webform rendering, submission, limits, and Turnstile registration. The minimal preset excludes both the Webform route and Turnstile module.
