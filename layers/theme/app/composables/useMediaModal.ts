@@ -99,6 +99,7 @@ export function useMediaModal(
 
   return {
     open,
+    activeIndex,
     startIndex,
     itemsOrdered,
     activeItem,

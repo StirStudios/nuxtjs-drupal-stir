@@ -1,16 +1,16 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-15T04:37:35.756Z",
+  "generatedAt": "2026-07-15T05:55:50.781Z",
   "initialClient": {
-    "sizeKb": 720.14,
-    "gzipKb": 191.24,
+    "sizeKb": 720.33,
+    "gzipKb": 191.27,
     "assets": [
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/pLwfQyWV.js",
-        "sizeKb": 448.42,
-        "gzipKb": 156.15
+        "file": "_nuxt/BIZJWXFp.js",
+        "sizeKb": 448.61,
+        "gzipKb": 156.18
       },
       {
         "label": "entry.persTTv4.css",
@@ -147,16 +147,16 @@
     {
       "label": "theme:app/components/Edit/Text",
       "role": "admin-deferred",
-      "file": "_nuxt/GnM1Kg5Y.js",
+      "file": "_nuxt/DQcIBFOX.js",
       "sizeKb": 540.44,
       "gzipKb": 167.3
     },
     {
       "label": "app-entry",
       "role": "initial",
-      "file": "_nuxt/pLwfQyWV.js",
-      "sizeKb": 448.42,
-      "gzipKb": 156.15
+      "file": "_nuxt/BIZJWXFp.js",
+      "sizeKb": 448.61,
+      "gzipKb": 156.18
     },
     {
       "label": "entry.persTTv4.css",
@@ -168,21 +168,21 @@
     {
       "label": "theme:app/components/RevealMotion",
       "role": "async",
-      "file": "_nuxt/BmY5_mkY.js",
+      "file": "_nuxt/DY4bm9Mu.js",
       "sizeKb": 77.78,
       "gzipKb": 26.88
     },
     {
-      "label": "_X9-SkhbB",
+      "label": "_CXpe_aUf",
       "role": "async",
-      "file": "_nuxt/X9-SkhbB.js",
+      "file": "_nuxt/CXpe_aUf.js",
       "sizeKb": 144.84,
       "gzipKb": 26.2
     },
     {
-      "label": "_CWxIX_14",
+      "label": "_uVgYh_aG",
       "role": "async",
-      "file": "_nuxt/CWxIX_14.js",
+      "file": "_nuxt/uVgYh_aG.js",
       "sizeKb": 53.29,
       "gzipKb": 14.63
     },
@@ -194,64 +194,64 @@
       "gzipKb": 14.03
     },
     {
-      "label": "auth:app/layouts/account",
-      "role": "async",
-      "file": "_nuxt/D40Lell6.js",
-      "sizeKb": 41.46,
-      "gzipKb": 11.99
-    },
-    {
       "label": "theme:app/components/global/drupal-view--default",
       "role": "async",
-      "file": "_nuxt/BWJAw1Fz.js",
-      "sizeKb": 39.02,
-      "gzipKb": 11.89
+      "file": "_nuxt/BoE_vK2A.js",
+      "sizeKb": 39.79,
+      "gzipKb": 12.08
     },
     {
-      "label": "_CT-5TCB3",
+      "label": "auth:app/layouts/account",
       "role": "async",
-      "file": "_nuxt/CT-5TCB3.js",
+      "file": "_nuxt/DdnJKguY.js",
+      "sizeKb": 41.46,
+      "gzipKb": 11.98
+    },
+    {
+      "label": "_cw4b5VO8",
+      "role": "async",
+      "file": "_nuxt/cw4b5VO8.js",
       "sizeKb": 31.72,
       "gzipKb": 11.86
     },
     {
-      "label": "_B4TlnqYM",
+      "label": "_jHtQFg2B",
       "role": "async",
-      "file": "_nuxt/B4TlnqYM.js",
+      "file": "_nuxt/jHtQFg2B.js",
       "sizeKb": 40.25,
       "gzipKb": 11.31
     },
     {
       "label": "vendor:@nuxt/ui",
       "role": "async",
-      "file": "_nuxt/vvp6RJqf.js",
+      "file": "_nuxt/Bv_5uS5b.js",
       "sizeKb": 27.8,
       "gzipKb": 10.56
     },
     {
-      "label": "_btghIK71",
+      "label": "_C-KHNGIh",
       "role": "async",
-      "file": "_nuxt/btghIK71.js",
+      "file": "_nuxt/C-KHNGIh.js",
       "sizeKb": 30.77,
       "gzipKb": 10.48
     },
     {
       "label": "vendor:@nuxt/ui",
       "role": "async",
-      "file": "_nuxt/COktXcpa.js",
+      "file": "_nuxt/BemAeXV6.js",
       "sizeKb": 40.73,
       "gzipKb": 10.26
     },
     {
       "label": "theme:app/components/Field/Input/Number",
       "role": "async",
-      "file": "_nuxt/CX4MhlTY.js",
+      "file": "_nuxt/4CXdjDge.js",
       "sizeKb": 27.3,
       "gzipKb": 8.2
     }
   ],
   "totalOutputSize": {
     "total": "9.94 MB",
-    "gzip": "2.67 MB gzip"
+    "gzip": "2.68 MB gzip"
   }
 }
