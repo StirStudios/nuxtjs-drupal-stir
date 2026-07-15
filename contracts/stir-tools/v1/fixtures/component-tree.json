@@ -331,6 +331,17 @@
         },
         "slots": {}
       }
+    ],
+    "resources": [
+      {
+        "element": "field-link",
+        "props": {
+          "url": "https://example.com/guide",
+          "label": "Read the guide",
+          "external": true
+        },
+        "slots": {}
+      }
     ]
   }
 }
