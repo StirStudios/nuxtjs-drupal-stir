@@ -18,6 +18,13 @@ describe('componentTree', () => {
 
     expect(parsed).toEqual(fixture)
     expect(parsed.slots.body).toBe('<p>Rendered body text.</p>')
+    expect(parsed.slots.section).toMatchObject([
+      { element: 'paragraph-text' },
+      {
+        element: 'paragraph-icon',
+        props: { iconName: 'i-lucide-star', iconSize: 7 },
+      },
+    ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
   })

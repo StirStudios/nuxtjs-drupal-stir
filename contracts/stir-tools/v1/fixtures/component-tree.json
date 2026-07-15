@@ -13,6 +13,15 @@
           "text": "<p>Reusable component content.</p>"
         },
         "slots": {}
+      },
+      {
+        "element": "paragraph-icon",
+        "props": {
+          "align": "center",
+          "iconName": "i-lucide-star",
+          "iconSize": 7
+        },
+        "slots": {}
       }
     ],
     "media": [
