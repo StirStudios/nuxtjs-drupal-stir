@@ -54,6 +54,24 @@ describe('componentTree', () => {
           calendlyTextColor: '#222222',
         },
       },
+      {
+        element: 'paragraph-faq',
+        props: {
+          header: 'Frequently asked questions',
+          headerTag: 'h2',
+          text: '<p>Helpful booking information.</p>',
+        },
+        slots: {
+          items: [{
+            element: 'paragraph-faq-item',
+            props: {
+              question: 'Can I change my booking?',
+              headerTag: 'h3',
+              answer: '<p>Yes, contact the venue.</p>',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])

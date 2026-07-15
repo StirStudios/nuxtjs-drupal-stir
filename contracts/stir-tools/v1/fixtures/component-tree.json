@@ -52,6 +52,27 @@
           "calendlyTextColor": "#222222"
         },
         "slots": {}
+      },
+      {
+        "element": "paragraph-faq",
+        "props": {
+          "header": "Frequently asked questions",
+          "headerTag": "h2",
+          "text": "<p>Helpful booking information.</p>"
+        },
+        "slots": {
+          "items": [
+            {
+              "element": "paragraph-faq-item",
+              "props": {
+                "question": "Can I change my booking?",
+                "headerTag": "h3",
+                "answer": "<p>Yes, contact the venue.</p>"
+              },
+              "slots": {}
+            }
+          ]
+        }
       }
     ],
     "media": [
