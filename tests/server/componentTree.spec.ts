@@ -88,6 +88,28 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-media',
+        props: {
+          direction: 'up',
+          header: 'Project gallery',
+          headerTag: 'h2',
+          overlay: true,
+          randomize: false,
+        },
+        slots: {
+          media: [{
+            element: 'media-image',
+            props: {
+              src: '/sites/default/files/gallery.jpg',
+              alt: 'Project gallery image',
+              width: 1600,
+              height: 1067,
+              responsiveStyle: 'container',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
