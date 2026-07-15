@@ -1,10 +1,40 @@
 import { describe, expect, it } from 'vitest'
 import {
   cloneViewControlValues,
+  createDefaultDrupalViewState,
   createViewStateSnapshot,
   createViewStateStorageKey,
+  defaultDrupalViewFilterValue,
+  firstViewControlString,
   parseStoredViewState,
+  sanitizeDrupalViewStoredFilters,
+  sanitizeDrupalViewStoredSorts,
 } from '../../layers/theme/app/utils/drupalViewState'
+
+const filters = [{
+  label: 'Category',
+  queryParamName: 'category',
+  multiple: true,
+  options: [
+    { label: 'News', value: 'news' },
+    { label: 'Events', value: 'events' },
+  ],
+}]
+
+const exposedFilters = [{
+  label: 'Category',
+  queryParamName: 'category',
+  submittedValues: ['news'],
+}]
+
+const sort = {
+  label: 'Newest',
+  sortByValue: 'created',
+  submittedOrder: 'DESC',
+  queryParamSortBy: 'sort_by',
+  queryParamSortOrder: 'sort_order',
+  sortOrderOptions: { ASC: 'Oldest', DESC: 'Newest' },
+}
 
 describe('Drupal view state', () => {
   it('builds a view-specific storage key', () => {
@@ -14,6 +44,7 @@ describe('Drupal view state', () => {
       displayId: 'page_1',
       parentUuid: 'parent',
     })).toBe('stir:view-controls:/articles:articles:page_1:parent')
+    expect(createViewStateStorageKey({ path: '/' })).toBe('stir:view-controls:/:::')
   })
 
   it('clones array values when taking a snapshot', () => {
@@ -44,6 +75,100 @@ describe('Drupal view state', () => {
     expect(parseStoredViewState(null, 1000, 200)).toBeNull()
     expect(parseStoredViewState('{', 1000, 200)).toBeNull()
     expect(parseStoredViewState('{}', 1000, 200)).toBeNull()
+    expect(parseStoredViewState(JSON.stringify({
+      filters: null,
+      sorts: {},
+      savedAt: 900,
+    }), 1000, 200)).toBeNull()
+    expect(parseStoredViewState(JSON.stringify({
+      filters: {},
+      sorts: null,
+      savedAt: 900,
+    }), 1000, 200)).toBeNull()
     expect(parseStoredViewState(fresh, 1200, 200)).toBeNull()
+  })
+
+  it('normalizes scalar, array, missing, single, and multiple values', () => {
+    expect(firstViewControlString(['first', 'second'])).toBe('first')
+    expect(firstViewControlString([])).toBe('')
+    expect(firstViewControlString('value')).toBe('value')
+    expect(firstViewControlString(undefined)).toBe('')
+    expect(defaultDrupalViewFilterValue({ multiple: false }, {
+      label: 'Search',
+      queryParamName: 'search',
+      submittedValues: [42],
+    })).toBe('42')
+    expect(defaultDrupalViewFilterValue({ multiple: true })).toEqual([])
+  })
+
+  it('creates defaults from Drupal submitted filter and sort state', () => {
+    expect(createDefaultDrupalViewState({
+      filters,
+      exposedFilters,
+      sort,
+      savedAt: 100,
+    })).toEqual({
+      filters: { category: ['news'] },
+      sorts: { sort_by: 'created', sort_order: 'DESC' },
+      page: 0,
+      savedAt: 100,
+    })
+
+    expect(createDefaultDrupalViewState({
+      filters: [],
+      exposedFilters: [],
+      sort: null,
+      savedAt: 101,
+    })).toEqual({ filters: {}, sorts: {}, page: 0, savedAt: 101 })
+  })
+
+  it('sanitizes stored controls against the current Drupal definitions', () => {
+    expect(sanitizeDrupalViewStoredFilters({
+      filters: { category: ['events'] },
+      definitions: filters,
+      exposedFilters,
+    })).toEqual({ category: ['events'] })
+    expect(sanitizeDrupalViewStoredFilters({
+      definitions: filters,
+      exposedFilters,
+    })).toEqual({ category: ['news'] })
+
+    expect(sanitizeDrupalViewStoredSorts({
+      sorts: { sort_by: 'created', sort_order: 'ASC' },
+      sort,
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+    })).toEqual({ sort_by: 'created', sort_order: 'ASC' })
+    expect(sanitizeDrupalViewStoredSorts({
+      sort,
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+    })).toEqual({ sort_by: 'created', sort_order: 'DESC' })
+    expect(sanitizeDrupalViewStoredSorts({
+      sort: null,
+      sortByOptions: [],
+      sortOrderOptions: [],
+    })).toEqual({})
+  })
+
+  it('rejects stale or query-injection-shaped stored controls', () => {
+    expect(sanitizeDrupalViewStoredFilters({
+      filters: { category: ['archived'] },
+      definitions: filters,
+      exposedFilters,
+    })).toBeNull()
+
+    expect(sanitizeDrupalViewStoredSorts({
+      sorts: { sort_by: 'created&category=events', sort_order: 'DESC' },
+      sort,
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+    })).toBeNull()
+    expect(sanitizeDrupalViewStoredSorts({
+      sorts: { sort_by: 'created', sort_order: 'sideways' },
+      sort,
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+    })).toBeNull()
   })
 })

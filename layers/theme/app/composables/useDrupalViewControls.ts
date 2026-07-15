@@ -24,9 +24,14 @@ import {
 } from '~/composables/useDrupalViewNode'
 import type { ExposedFilter, ExposedSort } from '~/types/View'
 import {
+  createDefaultDrupalViewState,
   createViewStateSnapshot,
   createViewStateStorageKey,
+  defaultDrupalViewFilterValue,
+  firstViewControlString,
   parseStoredViewState,
+  sanitizeDrupalViewStoredFilters,
+  sanitizeDrupalViewStoredSorts,
 } from '~/utils/drupalViewState'
 import type { ViewStateSnapshot } from '~/utils/drupalViewState'
 
@@ -40,12 +45,6 @@ interface UseDrupalViewControlsProps {
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
   noResults?: string
-}
-
-function firstStringValue(value: string | string[] | undefined): string {
-  if (Array.isArray(value)) return String(value[0] ?? '')
-
-  return String(value ?? '')
 }
 
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
@@ -182,43 +181,15 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function defaultViewStateSnapshot(): ViewStateSnapshot {
-    const filtersSnapshot: Record<string, string | string[]> = {}
-
-    for (const filter of normalizedFilters.value) {
-      const source = effectiveFilters.value.find(
-        (item) => item.queryParamName === filter.queryParamName,
-      )
-
-      filtersSnapshot[filter.queryParamName] = defaultValueForFilter(filter, source)
-    }
-
-    const sortsSnapshot: Record<string, string | string[]> = {}
-    const sort = primarySort.value
-
-    if (sort?.queryParamSortBy) {
-      sortsSnapshot[sort.queryParamSortBy] = sort.sortByValue || ''
-    }
-
-    if (sort?.queryParamSortOrder) {
-      sortsSnapshot[sort.queryParamSortOrder] = sort.submittedOrder || ''
-    }
-
-    return {
-      filters: filtersSnapshot,
-      sorts: sortsSnapshot,
-      page: 0,
-      savedAt: Date.now(),
-    }
+    return createDefaultDrupalViewState({
+      filters: normalizedFilters.value,
+      exposedFilters: effectiveFilters.value,
+      sort: primarySort.value,
+    })
   }
 
   function defaultValueForFilter(filter: { queryParamName: string, multiple?: boolean }, source?: ExposedFilter): string | string[] {
-    const submitted = source?.submittedValues ?? []
-
-    if (filter.multiple) {
-      return submitted.map((value) => String(value))
-    }
-
-    return String(submitted[0] ?? '')
+    return defaultDrupalViewFilterValue(filter, source)
   }
 
   function validFilterValue(filter: NormalizedViewFilter, value: string | string[]): boolean {
@@ -247,7 +218,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     if (!key) return fallback
 
-    const value = firstStringValue(routeQueryValue(key))
+    const value = firstViewControlString(routeQueryValue(key))
 
     return validSortByValue(sort, value) ? value : fallback
   }
@@ -258,7 +229,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     if (!key) return fallback
 
-    const value = firstStringValue(routeQueryValue(key))
+    const value = firstViewControlString(routeQueryValue(key))
 
     return validSortOrderValue(sort, value) ? value : fallback
   }
@@ -266,63 +237,22 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function sanitizeStoredSorts(
     sorts: ViewStateSnapshot['sorts'] | undefined,
   ): ViewStateSnapshot['sorts'] | null {
-    const sort = primarySort.value
-
-    if (!sort) return {}
-
-    const sanitized: ViewStateSnapshot['sorts'] = {}
-
-    if (sort.queryParamSortBy) {
-      const value = Object.prototype.hasOwnProperty.call(
-        sorts ?? {},
-        sort.queryParamSortBy,
-      )
-        ? firstStringValue(sorts?.[sort.queryParamSortBy])
-        : defaultSortByValue(sort)
-
-      if (!validSortByValue(sort, value)) return null
-
-      sanitized[sort.queryParamSortBy] = value
-    }
-
-    if (sort.queryParamSortOrder) {
-      const value = Object.prototype.hasOwnProperty.call(
-        sorts ?? {},
-        sort.queryParamSortOrder,
-      )
-        ? firstStringValue(sorts?.[sort.queryParamSortOrder])
-        : defaultSortOrderValue(sort)
-
-      if (!validSortOrderValue(sort, value)) return null
-
-      sanitized[sort.queryParamSortOrder] = value
-    }
-
-    return sanitized
+    return sanitizeDrupalViewStoredSorts({
+      sorts,
+      sort: primarySort.value,
+      sortByOptions: sortByOptions.value,
+      sortOrderOptions: sortOrderOptions.value,
+    })
   }
 
   function sanitizeStoredFilters(
     filters: ViewStateSnapshot['filters'] | undefined,
   ): ViewStateSnapshot['filters'] | null {
-    const sanitized: ViewStateSnapshot['filters'] = {}
-
-    for (const filter of normalizedFilters.value) {
-      const source = effectiveFilters.value.find(
-        (item) => item.queryParamName === filter.queryParamName,
-      )
-      const value = Object.prototype.hasOwnProperty.call(
-        filters ?? {},
-        filter.queryParamName,
-      )
-        ? filters?.[filter.queryParamName] ?? defaultValueForFilter(filter, source)
-        : defaultValueForFilter(filter, source)
-
-      if (!validFilterValue(filter, value)) return null
-
-      sanitized[filter.queryParamName] = value
-    }
-
-    return sanitized
+    return sanitizeDrupalViewStoredFilters({
+      filters,
+      definitions: normalizedFilters.value,
+      exposedFilters: effectiveFilters.value,
+    })
   }
 
   function saveViewState(page = currentPage.value): void {
