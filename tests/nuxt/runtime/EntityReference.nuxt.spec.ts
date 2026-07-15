@@ -31,4 +31,27 @@ describe('entity-reference (Nuxt runtime)', () => {
 
     expect(wrapper.get('span').text()).toBe('taxonomy_term 7')
   })
+
+  it('forwards presentation attributes and exposes normalized slot values', async () => {
+    const wrapper = await mountSuspended(EntityReference, {
+      attrs: { class: 'project-reference', 'data-card': 'level' },
+      props: {
+        id: '7',
+        entityType: 'taxonomy_term',
+        label: 'Intermediate',
+        url: '/levels/intermediate',
+      },
+      slots: {
+        default: `<template #default="{ label, entityType }">
+          {{ label }} ({{ entityType }})
+        </template>`,
+      },
+    })
+
+    const link = wrapper.get('a')
+
+    expect(link.classes()).toContain('project-reference')
+    expect(link.attributes('data-card')).toBe('level')
+    expect(link.text()).toContain('Intermediate (taxonomy_term)')
+  })
 })

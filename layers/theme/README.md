@@ -65,3 +65,8 @@ Custom Elements slot output and can also render Drupal-filtered `content`,
 `processed`, `value`, or `summary` props. Its scoped slot exposes the original
 values for project-specific card presentation without a global passthrough
 override.
+
+`entity-reference` forwards presentation attributes to its rendered link or
+text element and exposes normalized identity, label, type, and URL values to a
+scoped default slot. Styling a reference therefore does not require replacing
+the shared contract renderer.
