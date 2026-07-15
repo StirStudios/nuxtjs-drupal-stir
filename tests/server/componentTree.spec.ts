@@ -72,6 +72,22 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-timeline',
+        props: { color: 'primary' },
+        slots: {
+          timeline: [{
+            element: 'paragraph-timeline-item',
+            props: {
+              date: '2026',
+              header: 'vNext architecture',
+              headerTag: 'h3',
+              icon: 'i-lucide-rocket',
+              text: '<p>Explicit component contracts introduced.</p>',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
