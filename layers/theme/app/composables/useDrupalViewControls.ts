@@ -3,11 +3,14 @@ import {
   buildDrupalViewSearchParams,
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
-  mapDrupalViewFilterOptions,
+  mapDrupalViewSortByOptions,
+  mapDrupalViewSortOrderOptions,
+  normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
+  primaryDrupalViewSort,
 } from '~/composables/useDrupalViewQuery'
-import type { ViewPager } from '~/composables/useDrupalViewQuery'
+import type { NormalizedViewFilter, ViewPager } from '~/composables/useDrupalViewQuery'
 import {
   drupalViewLoadErrorMessage,
   isDrupalViewAbortError,
@@ -26,14 +29,6 @@ import {
 import type { ViewStateSnapshot } from '~/utils/drupalViewState'
 
 export type { ExposedFilter, ExposedSort } from '~/types/View'
-
-interface NormalizedFilter {
-  label: string
-  queryParamName: string
-  multiple?: boolean
-  disabled?: boolean
-  options: Array<{ label: string, value: string }>
-}
 
 interface UseDrupalViewControlsProps {
   viewId?: string
@@ -107,48 +102,14 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   })
 
   const normalizedFilters = computed(() =>
-    effectiveFilters.value
-      .map((filter) => filter as ExposedFilter)
-      .filter(
-        (filter) =>
-          !!filter.queryParamName &&
-          !!filter.label &&
-          filter.options &&
-          typeof filter.options === 'object',
-      )
-      .map((filter) => ({
-        label: filter.label,
-        queryParamName: filter.queryParamName,
-        multiple: filter.multiple,
-        disabled: filter.disabled,
-        options: mapDrupalViewFilterOptions(filter.options),
-      })),
+    normalizeDrupalViewFilters(effectiveFilters.value),
   )
 
-  const primarySort = computed<ExposedSort | null>(() => {
-    const [firstSort] = effectiveSorts.value
-
-    if (!firstSort?.queryParamSortBy || !firstSort?.queryParamSortOrder) {
-      return null
-    }
-
-    return firstSort
-  })
-
-  const sortByOptions = computed(() => {
-    if (!primarySort.value?.sortByValue) return []
-    return [
-      {
-        label: primarySort.value.label || primarySort.value.sortByValue,
-        value: primarySort.value.sortByValue,
-      },
-    ]
-  })
+  const primarySort = computed(() => primaryDrupalViewSort(effectiveSorts.value))
+  const sortByOptions = computed(() => mapDrupalViewSortByOptions(primarySort.value))
 
   const sortOrderOptions = computed(() =>
-    Object.entries(primarySort.value?.sortOrderOptions ?? {}).map(
-      ([value, label]) => ({ label, value }),
-    ),
+    mapDrupalViewSortOrderOptions(primarySort.value),
   )
 
   const hasControls = computed(
@@ -258,7 +219,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return String(submitted[0] ?? '')
   }
 
-  function validFilterValue(filter: NormalizedFilter, value: string | string[]): boolean {
+  function validFilterValue(filter: NormalizedViewFilter, value: string | string[]): boolean {
     return isValidDrupalViewFilterValue(filter, value)
   }
 
@@ -491,7 +452,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return routeControls.routeHasQuery(managedQueryKeys(), fullPath)
   }
 
-  function routeValueForFilter(filter: NormalizedFilter, source?: ExposedFilter): string | string[] {
+  function routeValueForFilter(filter: NormalizedViewFilter, source?: ExposedFilter): string | string[] {
     const routeValue = routeQueryValue(filter.queryParamName)
     const defaultValue = defaultValueForFilter(filter, source)
     let value: string | string[]

@@ -5,8 +5,12 @@ import {
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
+  mapDrupalViewSortByOptions,
+  mapDrupalViewSortOrderOptions,
+  normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
+  primaryDrupalViewSort,
 } from '../../layers/theme/app/composables/useDrupalViewQuery'
 import {
   findDrupalViewNode,
@@ -29,6 +33,42 @@ describe('useDrupalViewControls helpers', () => {
       { label: 'News', value: 'news' },
       { label: 'Events', value: 'events' },
     ])
+  })
+
+  it('normalizes exposed filter and sort metadata', () => {
+    expect(normalizeDrupalViewFilters([
+      null,
+      { label: '', queryParamName: 'ignored', options: {} },
+      {
+        label: 'Category',
+        queryParamName: 'category',
+        multiple: true,
+        options: { news: 'News' },
+      },
+    ])).toEqual([{
+      label: 'Category',
+      queryParamName: 'category',
+      multiple: true,
+      disabled: undefined,
+      options: [{ label: 'News', value: 'news' }],
+    }])
+
+    const sort = primaryDrupalViewSort([{
+      label: 'Newest',
+      sortByValue: 'created',
+      queryParamSortBy: 'sort_by',
+      queryParamSortOrder: 'sort_order',
+      sortOrderOptions: { ASC: 'Ascending', DESC: 'Descending' },
+    }])
+
+    expect(mapDrupalViewSortByOptions(sort)).toEqual([
+      { label: 'Newest', value: 'created' },
+    ])
+    expect(mapDrupalViewSortOrderOptions(sort)).toEqual([
+      { label: 'Ascending', value: 'ASC' },
+      { label: 'Descending', value: 'DESC' },
+    ])
+    expect(primaryDrupalViewSort([{}])).toBeNull()
   })
 
   it('serializes view query params with repeated values for arrays', () => {

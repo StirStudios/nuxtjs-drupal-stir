@@ -1,6 +1,16 @@
+import type { ExposedFilter, ExposedSort } from '~/types/View'
+
 export interface ViewPager {
   current: number
   totalPages: number
+}
+
+export interface NormalizedViewFilter {
+  label: string
+  queryParamName: string
+  multiple?: boolean
+  disabled?: boolean
+  options: Array<{ label: string, value: string }>
 }
 
 interface RawViewPager {
@@ -26,6 +36,46 @@ export function mapDrupalViewFilterOptions(
   }
 
   return Object.entries(options).map(([value, label]) => ({ label, value }))
+}
+
+export function normalizeDrupalViewFilters(
+  filters: readonly unknown[],
+): NormalizedViewFilter[] {
+  return filters
+    .filter((filter): filter is ExposedFilter => {
+      if (!filter || typeof filter !== 'object') return false
+
+      const candidate = filter as ExposedFilter
+
+      return Boolean(candidate.queryParamName && candidate.label && candidate.options)
+    })
+    .map(filter => ({
+      label: filter.label,
+      queryParamName: filter.queryParamName,
+      multiple: filter.multiple,
+      disabled: filter.disabled,
+      options: mapDrupalViewFilterOptions(filter.options),
+    }))
+}
+
+export function primaryDrupalViewSort(
+  sorts: readonly unknown[],
+): ExposedSort | null {
+  const [sort] = sorts as ExposedSort[]
+
+  return sort?.queryParamSortBy && sort.queryParamSortOrder ? sort : null
+}
+
+export function mapDrupalViewSortByOptions(sort: ExposedSort | null) {
+  if (!sort?.sortByValue) return []
+
+  return [{ label: sort.label || sort.sortByValue, value: sort.sortByValue }]
+}
+
+export function mapDrupalViewSortOrderOptions(sort: ExposedSort | null) {
+  return Object.entries(sort?.sortOrderOptions ?? {}).map(
+    ([value, label]) => ({ label, value }),
+  )
 }
 
 export function normalizeDrupalViewSortOrderValue(value: string): string {
@@ -88,4 +138,3 @@ export function isValidDrupalViewFilterValue(
     (allowed.size === 0 || allowed.has(item))
   ))
 }
-
