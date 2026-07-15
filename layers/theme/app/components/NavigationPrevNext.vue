@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 
 type NodeLink = {

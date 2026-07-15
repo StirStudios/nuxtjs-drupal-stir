@@ -178,7 +178,7 @@ function booleanSetting(...values: unknown[]): boolean | undefined {
 }
 
 export const usePopupData = () => {
-  const { getPage } = useDrupalCe()
+  const { getPage } = useStirDrupalCe()
   const page = getPage()
   const route = useRoute()
   const popup = ref<PopupNode | null>(null)

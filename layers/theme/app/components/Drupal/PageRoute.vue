@@ -3,7 +3,7 @@ const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, renderCustomElements, usePageHead, getPage } = useDrupalCe()
+const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
 const { pageLayout, isAdministrator, isFront } = usePageContext()
 const pageState = getPage()
 const route = useRoute()

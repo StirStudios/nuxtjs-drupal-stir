@@ -48,7 +48,7 @@ interface UseDrupalViewControlsProps {
 }
 
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
-  const { $ceApi } = useDrupalCe()
+  const { $ceApi } = useStirDrupalCe()
   const route = useRoute()
   const routeControls = useRouteListControls()
 

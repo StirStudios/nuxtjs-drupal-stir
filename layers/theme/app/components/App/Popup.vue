@@ -3,7 +3,7 @@ import { defineAsyncComponent, resolveComponent } from 'vue'
 import type { PopupMedia, PopupNode, PopupProps } from '~/types'
 
 const appConfig = useAppConfig()
-const { renderCustomElements } = useDrupalCe()
+const { renderCustomElements } = useStirDrupalCe()
 const { popup, config } = usePopupData()
 const LazyParagraphPopup = defineAsyncComponent(
   () => import('~/components/global/Paragraph/Popup.vue'),

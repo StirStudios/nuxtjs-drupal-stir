@@ -13,7 +13,7 @@ const props = defineProps<{
   editLink?: string
 }>()
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 
 const toPascalCase = (value: string) =>

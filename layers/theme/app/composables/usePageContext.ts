@@ -1,5 +1,5 @@
 export function usePageContext() {
-  const { getPage } = useDrupalCe()
+  const { getPage } = useStirDrupalCe()
   const page = getPage()
   const route = useRoute()
   const isFront = computed(() => {

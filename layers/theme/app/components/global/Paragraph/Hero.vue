@@ -28,7 +28,7 @@ defineSlots<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { observeVideos } = useIntersectionObserver()
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { isFront } = usePageContext()
 const { hero: heroTheme } = useAppConfig().stirTheme

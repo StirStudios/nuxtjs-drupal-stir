@@ -33,6 +33,14 @@ normal application code. Keep explicit imports for external packages, types,
 shared utilities, and isolated test components where Nuxt auto-import context is
 not guaranteed.
 
+### Drupal Custom Elements
+
+Theme code consumes `useStirDrupalCe()` rather than `useDrupalCe()` directly.
+The Stir facade delegates the upstream Lupus/Custom Elements API unchanged and
+owns Stir-specific rendering policy. In development it turns unresolved Custom
+Elements and unknown `field-*` elements into visible diagnostics; production
+keeps the upstream rendering path without traversing the component tree.
+
 Keep in `layers/theme`:
 - Presentation and layout components
 - Theme-level UI wrappers and CE display components

@@ -3,7 +3,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
 import { adminUiTheme } from '~/utils/adminUiTheme'
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const route = useRoute()
 const config = useRuntimeConfig()

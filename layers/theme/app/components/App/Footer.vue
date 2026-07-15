@@ -12,7 +12,7 @@ import {
   type FooterSections,
 } from '~/utils/footer'
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { iconsSocialConfig } = useSocialIcons()
 const currentYear = new Date().getFullYear()

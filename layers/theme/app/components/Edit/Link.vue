@@ -22,7 +22,7 @@ const emit = defineEmits<{
   (e: 'quick-edit'): void
 }>()
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 
 function findLayoutEditLinkByUuid(value: unknown, uuid: string): string {

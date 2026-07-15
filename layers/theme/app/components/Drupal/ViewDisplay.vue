@@ -8,7 +8,7 @@ import { useDrupalViewScrollRestore } from '~/composables/useDrupalViewScrollRes
 
 const props = defineProps<DrupalViewProps>()
 
-const { renderCustomElements } = useDrupalCe()
+const { renderCustomElements } = useStirDrupalCe()
 
 defineSlots<{
   rows?(): unknown

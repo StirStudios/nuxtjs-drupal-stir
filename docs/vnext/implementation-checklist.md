@@ -20,6 +20,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - The optional `layers/webform` boundary now owns Webform rendering, submission, limits, and Turnstile registration. The minimal preset excludes both the Webform route and Turnstile module.
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
 - Validation now uses one Valibot/Nuxt UI Standard Schema foundation across auth, account, dynamic Drupal Webforms, and server contract parsing; Yup is no longer a direct dependency or layer import.
+- N4 has started with all theme consumers routed through a Stir-owned Drupal CE facade. It delegates the upstream API while development builds surface unresolved components, unknown field elements, and malformed component nodes instead of silently dropping them; production retains the direct upstream rendering path.
 
 ## Delivery slices
 
