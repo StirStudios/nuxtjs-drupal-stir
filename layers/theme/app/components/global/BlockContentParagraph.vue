@@ -13,11 +13,12 @@ defineProps<{
   created?: number | string
 }>()
 
-defineSlots<{
-  paragraphBlock?: () => unknown
-}>()
+const slots = useSlots()
+const slotNames = computed(() => Object.keys(slots))
 </script>
 
 <template>
-  <slot name="paragraphBlock" />
+  <template v-for="slotName in slotNames" :key="slotName">
+    <slot :name="slotName" />
+  </template>
 </template>

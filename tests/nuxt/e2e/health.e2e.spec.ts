@@ -11,9 +11,41 @@ const pageFixture = {
     element: 'node--default',
     props: { title: 'Fixture page' },
     slots: {
-      section: [{
-        element: 'paragraph-text',
-        props: { text: '<p>Fixture text</p>' },
+      body: [{
+        element: 'drupal-markup',
+        props: { content: '<p>Direct node body</p>' },
+        slots: {},
+      }],
+      website: [{
+        element: 'field-link',
+        props: {
+          url: '/contact',
+          label: 'Contact this page',
+          external: false,
+        },
+        slots: {},
+      }],
+      published: [{
+        element: 'date-time-value',
+        props: { datetime: '2026-07-15', dateOnly: true },
+        slots: {},
+      }],
+      level: [{
+        element: 'entity-reference',
+        props: {
+          id: '7',
+          entityType: 'taxonomy_term',
+          label: 'Intermediate',
+        },
+        slots: {},
+      }],
+      location: [{
+        element: 'address-value',
+        props: {
+          locality: 'Los Angeles',
+          countryCode: 'US',
+          lines: ['Los Angeles, CA', 'US'],
+        },
         slots: {},
       }],
     },
@@ -126,7 +158,10 @@ describe('Nuxt E2E smoke', async () => {
     const secondHtml = await $fetch<string>('/')
 
     expect(firstHtml).toContain('Fixture page')
-    expect(firstHtml).toContain('Fixture text')
+    expect(firstHtml).toContain('Direct node body')
+    expect(firstHtml).toContain('Contact this page')
+    expect(firstHtml).toContain('Intermediate')
+    expect(firstHtml).toContain('Los Angeles, CA')
     expect(secondHtml).toBe(firstHtml)
   })
 
@@ -144,7 +179,10 @@ describe('Nuxt E2E smoke', async () => {
 
     expect(response?.status()).toBe(200)
     expect(bodyText).toContain('Fixture page')
-    expect(bodyText).toContain('Fixture text')
+    expect(bodyText).toContain('Direct node body')
+    expect(bodyText).toContain('Contact this page')
+    expect(bodyText).toContain('Intermediate')
+    expect(bodyText).toContain('Los Angeles, CA')
     expect(clientErrors).toEqual([])
 
     await page.close()

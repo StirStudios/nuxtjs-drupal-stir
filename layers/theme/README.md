@@ -70,3 +70,13 @@ override.
 text element and exposes normalized identity, label, type, and URL values to a
 scoped default slot. Styling a reference therefore does not require replacing
 the shared contract renderer.
+
+The default node renderer forwards every named Drupal field slot and renders
+all non-reserved slots in producer order. A content type made from ordinary
+fields therefore does not need Layout Paragraphs or a Nuxt node override merely
+to display its exposed fields; a project override is only needed for deliberate
+page composition or product behavior.
+
+The block-content parent follows the same rule and renders all exposed named
+slots in producer order. Parent renderers must not discard a field merely
+because its machine name was unknown when the shared layer was built.
