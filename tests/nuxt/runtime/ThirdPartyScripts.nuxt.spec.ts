@@ -6,6 +6,16 @@ import { useThirdPartyScript } from '../../../layers/theme/app/composables/useTh
 
 const consentCookie = ref<boolean | string | null>(null)
 const appConfig = ref({
+  colorMode: {
+    forced: false,
+    preference: 'system',
+    showToggle: true,
+    lightRoutes: [],
+    darkRoutes: [],
+  },
+  icon: {
+    provider: 'none',
+  },
   privacyNotice: {
     enabled: true,
     mode: 'consent' as 'consent' | 'notice',

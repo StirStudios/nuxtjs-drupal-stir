@@ -38,6 +38,9 @@ const appConfig = ref({
     showToggle: true,
     preference: 'dark',
   },
+  icon: {
+    provider: 'none',
+  },
 })
 let appFooterContextExecuteCalls = 0
 
