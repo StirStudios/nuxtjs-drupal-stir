@@ -75,3 +75,28 @@ export default defineAppConfig({
   compatibility fallback for older Drupal payloads.
 - App-context edit links appear when authenticated.
 - Webform submit proxy still works.
+
+## CMS presentation manifest
+
+The default `compatibility` mode keeps the complete finite Drupal utility
+safelist while a project is migrated. Set these build variables to compile the
+smaller project-specific source:
+
+- `STIR_PRESENTATION_MANIFEST_MODE=hybrid` uses the CMS `used` set plus a small
+  editorial reserve. `strict` uses only used values plus structural layout
+  recipes.
+- `STIR_PRESENTATION_MANIFEST` is an authenticated Drupal endpoint URL or a
+  local JSON file exported with `drush stir-layout:presentation-manifest`.
+- `STIR_PRESENTATION_MANIFEST_API_KEY` is sent only for an HTTP source.
+- `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
+  approved local fallback when the primary source is unavailable.
+
+Hybrid and strict builds fail when the manifest is missing, invalid, uses an
+unknown semantic value, contains a rejected legacy utility, or has a mismatched
+revision. The verified revision is recorded in public runtime config as
+`stirPresentationManifestRevision`.
+
+The checked fixture build reduces the main CSS artifact from approximately
+35.15 kB gzip in compatibility mode to 30.03 kB in strict mode (about 14.6%).
+Each project's result depends on its actual manifest; this fixture is a
+regression measurement, not a promised production size.

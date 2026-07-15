@@ -3,7 +3,7 @@
 
 @import './base';
 @import './utilities';
-@import './safelist.inline';
+@import '#stir-presentation-source';
 
 @theme static {
   --font-sans: 'InterVariable', system-ui, sans-serif;
