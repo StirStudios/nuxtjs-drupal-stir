@@ -16,6 +16,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - Current measured surface: 97 components, 59 composables, 35 utilities, 5 plugins, 4 middleware files, 23 server routes, 25 production dependencies, 23 development dependencies, and 67 test files.
 - Remaining N0 work: enforce initialization-error failure, deterministic homepage SSR/hydration, and packed-consumer CI before N1 begins.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects.
+- N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
 
 ## Delivery slices
 

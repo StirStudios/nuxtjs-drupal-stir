@@ -1,0 +1,6 @@
+@source '@stir/base';
+@import '@stir/base/layers/theme/app/assets/css/main';
+
+:root {
+  --consumer-layer-css: loaded;
+}

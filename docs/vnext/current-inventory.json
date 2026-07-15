@@ -11,6 +11,7 @@
   "layers": [
     "auth",
     "core",
+    "platform",
     "theme"
   ],
   "dependencies": {
@@ -70,6 +71,7 @@
   },
   "scripts": [
     "audit:consumers",
+    "audit:preset-matrix",
     "audit:vnext-inventory",
     "build",
     "contracts:sync",
@@ -101,6 +103,11 @@
     "test:e2e",
     "test:nuxt",
     "test:nuxt:runtime",
+    "test:preset:full:build",
+    "test:preset:full:typecheck",
+    "test:preset:minimal:build",
+    "test:preset:minimal:typecheck",
+    "test:presets",
     "test:watch",
     "typecheck",
     "verify:ci",

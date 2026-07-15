@@ -5,14 +5,24 @@ import { describe, expect, it } from 'vitest'
 const rootDir = resolve(__dirname, '../..')
 
 describe('layer contract', () => {
-  it('keeps required layer extends order in nuxt config', () => {
+  it('composes the compatibility root from platform and auth layers', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
 
-    expect(nuxtConfig).toContain('extends: [\'./layers/core\', \'./layers/theme\', \'./layers/auth\']')
+    expect(nuxtConfig).toContain(
+      'extends: [\'./layers/platform\', \'./layers/auth\']',
+    )
+    expect(platformConfig).toContain('extends: [\'../core\', \'../theme\']')
   })
 
   it('keeps the established public layer aliases available', () => {
-    const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const nuxtConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
     const tsConfig = readFileSync(resolve(rootDir, 'tsconfig.json'), 'utf8')
 
     expect(nuxtConfig).toContain('\'~/utils\':')
@@ -131,6 +141,28 @@ describe('layer contract', () => {
     )
   })
 
+  it('publishes distinct minimal and full preset fixtures', () => {
+    const minimalPreset = readFileSync(
+      resolve(rootDir, 'presets/minimal/nuxt.config.ts'),
+      'utf8',
+    )
+    const fullPreset = readFileSync(
+      resolve(rootDir, 'presets/full/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(minimalPreset).toContain('../../layers/platform')
+    expect(fullPreset).toContain('new URL(\'../..\', import.meta.url)')
+    expect(existsSync(resolve(
+      rootDir,
+      'tests/fixtures/minimal-consumer/nuxt.config.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'tests/fixtures/full-consumer/nuxt.config.ts',
+    ))).toBe(true)
+  })
+
   it('exposes auth config and validation helpers from public layer paths', () => {
     expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
 
@@ -213,7 +245,10 @@ describe('layer contract', () => {
   })
 
   it('keeps production icons on demand and component-test icons bundled', () => {
-    const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const nuxtConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
 
     expect(nuxtConfig).toContain('...(isTestEnv ? { provider: \'none\' as const } : {})')
     expect(nuxtConfig).toContain('clientBundle: isTestEnv')
