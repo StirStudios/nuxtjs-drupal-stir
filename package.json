@@ -85,7 +85,7 @@
     "nuxt-vitalizer": "^2.0.0",
     "nuxtjs-drupal-ce": "^2.7.0",
     "tailwindcss": "^4.3.2",
-    "yup": "^1.7.1"
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",

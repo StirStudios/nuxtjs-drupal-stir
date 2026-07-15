@@ -3,7 +3,7 @@ import { useAccountSettings } from '../../composables/account/useAccountSettings
 import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
 import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 
 definePageMeta({
   layout: false,
@@ -102,22 +102,15 @@ const onSubmitSettings = async () => {
 }
 
 const onChangePassword = async () => {
-  const validationErrors = (() => {
-    try {
-      createAccountPasswordChangeValidationSchema(
+  const validationErrors = validateForm(
+    createAccountPasswordChangeValidationSchema(
         auth.value.passwordPolicy,
-      ).validateSync(
-        {
-          currentPassword: currentPassword.value,
-          newPassword: newPassword.value,
-        },
-        { abortEarly: false },
-      )
-      return []
-    } catch (error: unknown) {
-      return mapYupValidationErrors(error)
-    }
-  })()
+    ),
+    {
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value,
+    },
+  )
 
   if (validationErrors.length > 0) {
     toast.add({

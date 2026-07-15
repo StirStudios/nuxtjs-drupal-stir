@@ -22,9 +22,9 @@ import type {
   WebformProps,
   WebformState,
 } from '../../../theme/app/types'
-import type { ObjectSchema } from 'yup'
+import type { WebformValidationSchema } from '../../../theme/app/utils/buildValidationSchema'
 
-type BuildYupSchema = typeof import('../../../theme/app/utils/buildYupSchema')['buildYupSchema']
+type BuildValidationSchema = typeof import('../../../theme/app/utils/buildValidationSchema')['buildValidationSchema']
 
 const props = defineProps<WebformProps>()
 const webform = computed<WebformDefinition>(() => {
@@ -66,9 +66,9 @@ const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
-const schema = shallowRef<ObjectSchema<Record<string, unknown>>>()
+const schema = shallowRef<WebformValidationSchema>()
 const isSchemaReady = ref(false)
-let buildSchema: BuildYupSchema | undefined
+let buildSchema: BuildValidationSchema | undefined
 let schemaLoadPromise: Promise<void> | undefined
 const visibilitySignature = computed(() =>
   orderedFieldNames.value
@@ -97,9 +97,9 @@ function requestSchema(): void {
 async function ensureSchemaReady(): Promise<void> {
   if (isSchemaReady.value) return
 
-  schemaLoadPromise ??= import('../../../theme/app/utils/buildYupSchema')
+  schemaLoadPromise ??= import('../../../theme/app/utils/buildValidationSchema')
     .then((module) => {
-      buildSchema = module.buildYupSchema
+      buildSchema = module.buildValidationSchema
       schema.value = buildSchema(fields, state)
       isSchemaReady.value = true
     })

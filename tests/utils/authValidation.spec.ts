@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { parse } from 'valibot'
 import {
   createRegisterValidationSchema,
   createPasswordResetValidationSchema,
@@ -12,9 +13,21 @@ describe('auth validation', () => {
     })
     const password = ' Password1 '
 
-    expect(schema.validateSync({ password, confirmPassword: password })).toEqual({
+    expect(parse(schema, { password, confirmPassword: password })).toEqual({
       password,
       confirmPassword: password,
+    })
+  })
+
+  it('does not trim valid whitespace-only passwords before Drupal policy checks', () => {
+    const schema = createPasswordResetValidationSchema({ minLength: 3 })
+
+    expect(parse(schema, {
+      password: '   ',
+      confirmPassword: '   ',
+    })).toEqual({
+      password: '   ',
+      confirmPassword: '   ',
     })
   })
 
@@ -34,13 +47,13 @@ describe('auth validation', () => {
       },
     )
 
-    expect(() => schema.validateSync({
+    expect(() => parse(schema, {
       display_name: '',
       email: 'demo@example.test',
       password: 'abc!',
     })).not.toThrow()
 
-    expect(() => schema.validateSync({
+    expect(() => parse(schema, {
       display_name: '',
       email: 'demo@example.test',
       password: 'abc1A',
@@ -52,7 +65,7 @@ describe('auth validation', () => {
       requirements: [],
     })
 
-    expect(() => schema.validateSync({
+    expect(() => parse(schema, {
       password: 'abcdefgh',
       confirmPassword: 'abcdefgh',
     })).not.toThrow()

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildYupSchema } from '../../layers/theme/app/utils/buildYupSchema'
+import { parse, parseAsync } from 'valibot'
+import { buildValidationSchema } from '../../layers/theme/app/utils/buildValidationSchema'
 import type { WebformFieldProps, WebformState } from '../../layers/theme/app/types'
 
 function createDateTimeField(
@@ -13,7 +14,7 @@ function createDateTimeField(
   }
 }
 
-describe('buildYupSchema', () => {
+describe('buildValidationSchema', () => {
   it('enforces required multiple datetime count from API', async () => {
     const fields: Record<string, WebformFieldProps> = {
       eventDate: createDateTimeField({
@@ -22,10 +23,10 @@ describe('buildYupSchema', () => {
       }),
     }
     const state: WebformState = {}
-    const schema = buildYupSchema(fields, state)
+    const schema = buildValidationSchema(fields, state)
 
     await expect(
-      schema.validate({
+      parseAsync(schema, {
         eventDate: [
           '2026-02-19T10:30:00-0800',
           '2026-02-20T10:30:00-0800',
@@ -34,7 +35,7 @@ describe('buildYupSchema', () => {
     ).rejects.toBeTruthy()
 
     await expect(
-      schema.validate({
+      parseAsync(schema, {
         eventDate: [
           '2026-02-19T10:30:00-0800',
           '2026-02-20T10:30:00-0800',
@@ -55,10 +56,10 @@ describe('buildYupSchema', () => {
     }
     const state: WebformState = {}
 
-    const schemaOne = buildYupSchema(fields, state)
+    const schemaOne = buildValidationSchema(fields, state)
 
     state.unrelated = 'changed'
-    const schemaTwo = buildYupSchema(fields, state)
+    const schemaTwo = buildValidationSchema(fields, state)
 
     expect(schemaTwo).toBe(schemaOne)
   })
@@ -84,18 +85,18 @@ describe('buildYupSchema', () => {
     }
     const state: WebformState = { mode: 'none' }
 
-    const hiddenSchema = buildYupSchema(fields, state)
+    const hiddenSchema = buildValidationSchema(fields, state)
 
-    await expect(hiddenSchema.validate({ mode: 'none' })).resolves.toBeTruthy()
+    await expect(parseAsync(hiddenSchema, { mode: 'none' })).resolves.toBeTruthy()
 
     state.mode = 'email'
-    const visibleSchema = buildYupSchema(fields, state)
+    const visibleSchema = buildValidationSchema(fields, state)
 
     expect(visibleSchema).not.toBe(hiddenSchema)
 
-    await expect(visibleSchema.validate({ mode: 'email' })).rejects.toBeTruthy()
+    await expect(parseAsync(visibleSchema, { mode: 'email' })).rejects.toBeTruthy()
     await expect(
-      visibleSchema.validate({
+      parseAsync(visibleSchema, {
         mode: 'email',
         contactEmail: 'team@example.com',
       }),
@@ -121,17 +122,17 @@ describe('buildYupSchema', () => {
     }
     const state: WebformState = { showDates: 'no' }
 
-    const hiddenSchema = buildYupSchema(fields, state)
+    const hiddenSchema = buildValidationSchema(fields, state)
 
-    await expect(hiddenSchema.validate({ showDates: 'no' })).resolves.toBeTruthy()
+    await expect(parseAsync(hiddenSchema, { showDates: 'no' })).resolves.toBeTruthy()
 
     state.showDates = 'yes'
-    const visibleSchema = buildYupSchema(fields, state)
+    const visibleSchema = buildValidationSchema(fields, state)
 
-    await expect(visibleSchema.validate({ showDates: 'yes' })).rejects.toBeTruthy()
+    await expect(parseAsync(visibleSchema, { showDates: 'yes' })).rejects.toBeTruthy()
 
     await expect(
-      visibleSchema.validate({
+      parseAsync(visibleSchema, {
         showDates: 'yes',
         eventDate: [
           '2026-02-19T10:30:00-0800',
@@ -151,16 +152,16 @@ describe('buildYupSchema', () => {
         '#required': true,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
     await expect(
-      schema.validate({
+      parseAsync(schema, {
         contactPhone: '(555) 111-2222',
       }),
     ).resolves.toBeTruthy()
 
     await expect(
-      schema.validate({
+      parseAsync(schema, {
         contactPhone: '555-ABC-2222',
       }),
     ).rejects.toBeTruthy()
@@ -175,10 +176,10 @@ describe('buildYupSchema', () => {
         '#required': false,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
     await expect(
-      schema.validate({
+      parseAsync(schema, {
         contactPhone: '',
       }),
     ).resolves.toBeTruthy()
@@ -195,11 +196,11 @@ describe('buildYupSchema', () => {
         '#max': 4,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
-    await expect(schema.validate({ guestCount: 1 })).rejects.toBeTruthy()
-    await expect(schema.validate({ guestCount: 5 })).rejects.toBeTruthy()
-    await expect(schema.validate({ guestCount: 3 })).resolves.toBeTruthy()
+    expect(() => parse(schema, { guestCount: 1 })).toThrow()
+    expect(() => parse(schema, { guestCount: 5 })).toThrow()
+    expect(parse(schema, { guestCount: 3 })).toBeTruthy()
   })
 
   it('allows optional number fields to be submitted empty', async () => {
@@ -213,9 +214,9 @@ describe('buildYupSchema', () => {
         '#max': 4,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
-    await expect(schema.validate({ guestCount: '' })).resolves.toBeTruthy()
+    expect(parse(schema, { guestCount: '' })).toBeTruthy()
   })
 
   it('requires checkbox fields to be true when required', async () => {
@@ -227,10 +228,10 @@ describe('buildYupSchema', () => {
         '#required': true,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
-    await expect(schema.validate({ terms: false })).rejects.toBeTruthy()
-    await expect(schema.validate({ terms: true })).resolves.toBeTruthy()
+    expect(() => parse(schema, { terms: false })).toThrow()
+    expect(parse(schema, { terms: true })).toBeTruthy()
   })
 
   it('enforces checkboxes min and max selection', async () => {
@@ -244,10 +245,10 @@ describe('buildYupSchema', () => {
         '#maxSelected': 3,
       },
     }
-    const schema = buildYupSchema(fields, {})
+    const schema = buildValidationSchema(fields, {})
 
-    await expect(schema.validate({ interests: ['a'] })).rejects.toBeTruthy()
-    await expect(schema.validate({ interests: ['a', 'b', 'c', 'd'] })).rejects.toBeTruthy()
-    await expect(schema.validate({ interests: ['a', 'b'] })).resolves.toBeTruthy()
+    expect(() => parse(schema, { interests: ['a'] })).toThrow()
+    expect(() => parse(schema, { interests: ['a', 'b', 'c', 'd'] })).toThrow()
+    expect(parse(schema, { interests: ['a', 'b'] })).toBeTruthy()
   })
 })

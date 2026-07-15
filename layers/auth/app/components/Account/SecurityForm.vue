@@ -2,7 +2,7 @@
 import type { FormError } from '@nuxt/ui'
 import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 
 const props = defineProps<{
   currentPassword: string
@@ -41,14 +41,12 @@ const validate = (state: {
   currentPassword?: string
   newPassword?: string
 }): FormError[] => {
-  try {
+  return validateForm(
     createAccountPasswordChangeValidationSchema(
       auth.value.passwordPolicy,
-    ).validateSync(state, { abortEarly: false })
-    return []
-  } catch (error: unknown) {
-    return mapYupValidationErrors(error)
-  }
+    ),
+    state,
+  )
 }
 
 const openCancelModal = () => {

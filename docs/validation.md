@@ -1,14 +1,14 @@
 # Validation Architecture
 
-This layer uses Yup for client-side validation with two intentionally different flows.
+This layer uses one Valibot and Nuxt UI Standard Schema foundation with two domain-specific schema flows.
 
 ## 1) Dynamic Drupal Webforms
 
 - Entry points:
   - `layers/webform/app/components/global/Paragraph/Webform.vue`
-  - `layers/theme/app/utils/buildYupSchema.ts`
+  - `layers/theme/app/utils/buildValidationSchema.ts`
 - Purpose:
-  - Build Yup schemas at runtime from Drupal webform metadata and field states.
+  - Build Valibot schemas at runtime from Drupal webform metadata and field states.
 - Notes:
   - Handles visibility/conditional logic from Drupal definitions.
   - Optimized for reusable content-driven forms where fields vary per webform.
@@ -23,16 +23,16 @@ This layer uses Yup for client-side validation with two intentionally different 
   - `layers/auth/app/composables/auth/*`
   - `layers/auth/app/pages/account/settings.vue`
 - Purpose:
-  - Use explicit, stable Yup schemas for login, register, password reset, and account password change.
+  - Use explicit, stable Valibot schemas for login, register, password reset, and account password change.
 - Notes:
   - Password policy is centralized in `authValidation.ts`.
-  - Route-token checks (for reset links) are validated in composables in addition to Yup field checks.
+  - Route-token checks (for reset links) are validated in composables in addition to Valibot field checks.
 
-## Shared Yup Error Mapping
+## Shared Validation Error Mapping
 
-- Utility: `layers/auth/app/utils/yupValidation.ts`
+- Utility: `layers/auth/app/utils/validationErrors.ts`
 - Purpose:
-  - Normalize `ValidationError` objects into Nuxt UI field errors (`{ name, message }[]`).
+  - Normalize Valibot issues into Nuxt UI field errors (`{ name, message }[]`).
   - Reused by auth and account flows to keep error behavior consistent.
 
 ## Source of Truth

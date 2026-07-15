@@ -80,9 +80,9 @@ importers:
       tailwindcss:
         specifier: ^4.3.2
         version: 4.3.2
-      yup:
-        specifier: ^1.7.1
-        version: 1.7.1
+      valibot:
+        specifier: ^1.4.2
+        version: 1.4.2(typescript@5.9.3)
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1

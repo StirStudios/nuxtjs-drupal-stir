@@ -1,104 +1,108 @@
 import {
   array,
-  mixed,
+  getDotPath,
+  integer,
+  isValiError,
+  literal,
+  minLength,
+  minValue,
   number,
-  object,
+  parse,
+  picklist,
+  pipe,
+  strictObject,
   string,
-  ValidationError,
-} from 'yup'
-import type {
-  AuthIdentifierMode,
-  AuthUiConfig,
-} from '../../app/types/auth'
+} from 'valibot'
+import type { InferOutput } from 'valibot'
+import type { AuthUiConfig } from '../../app/types/auth'
 import { layerAuthDrupalApiRequest } from './drupalApi'
 
-const text = () => string().defined()
-const identifierMode = () => mixed<AuthIdentifierMode>()
-  .oneOf(['email', 'username', 'email_or_username'])
-  .defined()
-const basicField = () => object({
+const text = () => string()
+const requiredText = () => pipe(string(), minLength(1))
+const identifierMode = () => picklist(['email', 'username', 'email_or_username'])
+const basicField = () => strictObject({
   label: text(),
   placeholder: text(),
-}).exact().defined()
-const requiredField = () => object({
+})
+const requiredField = () => strictObject({
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
-}).exact().defined()
-const validatedField = () => object({
+})
+const validatedField = () => strictObject({
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
   invalidMessage: text(),
-}).exact().defined()
-const identifierField = () => object({
+})
+const identifierField = () => strictObject({
   mode: identifierMode(),
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
   invalidMessage: text(),
-}).exact().defined()
-const message = () => object({
+})
+const message = () => strictObject({
   title: text(),
   description: text(),
-}).exact().defined()
+})
 
-const authUiConfigSchema = object({
-  version: number().oneOf([2]).defined(),
-  loginRedirectPath: string().required(),
-  logoutRedirectPath: string().required(),
-  identifierModes: object({
+const authUiConfigSchema = strictObject({
+  version: literal(2),
+  loginRedirectPath: requiredText(),
+  logoutRedirectPath: requiredText(),
+  identifierModes: strictObject({
     login: identifierMode(),
     passwordRequest: identifierMode(),
-  }).exact().defined(),
-  login: object({
+  }),
+  login: strictObject({
     title: text(),
     description: text(),
     submitLabel: text(),
     identifier: identifierField(),
     password: requiredField(),
     successToast: message(),
-  }).exact().defined(),
-  register: object({
+  }),
+  register: strictObject({
     title: text(),
     description: text(),
     submitLabel: text(),
     email: validatedField(),
     password: basicField(),
-    complete: object({
+    complete: strictObject({
       verificationTitle: text(),
       createdTitle: text(),
       verificationSentDescription: text(),
       verificationRequiredDescription: text(),
       createdDescription: text(),
-    }).exact().defined(),
-  }).exact().defined(),
-  passwordRequest: object({
+    }),
+  }),
+  passwordRequest: strictObject({
     title: text(),
     description: text(),
     submitLabel: text(),
     identifier: identifierField(),
     sentTitle: text(),
     sentDescription: text(),
-  }).exact().defined(),
-  passwordReset: object({
+  }),
+  passwordReset: strictObject({
     title: text(),
     description: text(),
     submitLabel: text(),
     password: basicField(),
-    confirmPassword: object({
+    confirmPassword: strictObject({
       label: text(),
       placeholder: text(),
       requiredMessage: text(),
       mismatchMessage: text(),
-    }).exact().defined(),
+    }),
     checkingTitle: text(),
     unavailableTitle: text(),
     invalidLinkMessage: text(),
     expiredLinkMessage: text(),
     successToast: message(),
-  }).exact().defined(),
-  verify: object({
+  }),
+  verify: strictObject({
     loadingTitle: text(),
     successTitle: text(),
     failedTitle: text(),
@@ -106,11 +110,11 @@ const authUiConfigSchema = object({
     invalidDescription: text(),
     successDescription: text(),
     failedDescription: text(),
-  }).exact().defined(),
+  }),
   protectedPage: message(),
-  passwordPolicy: object({
-    minLength: number().integer().min(1).defined(),
-    maxLength: number().integer().min(1).defined(),
+  passwordPolicy: strictObject({
+    minLength: pipe(number(), integer(), minValue(1)),
+    maxLength: pipe(number(), integer(), minValue(1)),
     requiredMessage: text(),
     minLengthMessage: text(),
     maxLengthMessage: text(),
@@ -118,41 +122,34 @@ const authUiConfigSchema = object({
     uppercaseMessage: text(),
     numberMessage: text(),
     notSameAsCurrentMessage: text(),
-    requirements: array().of(object({
-      key: string().required(),
-      pattern: string().required(),
+    requirements: pipe(array(strictObject({
+      key: requiredText(),
+      pattern: requiredText(),
       label: text(),
-    }).exact().defined()).min(1).defined(),
-    strengthLabels: object({
+    })), minLength(1)),
+    strengthLabels: strictObject({
       empty: text(),
       weak: text(),
       medium: text(),
       strong: text(),
       mustContain: text(),
-    }).exact().defined(),
-  }).exact().defined(),
-}).exact().defined()
+    }),
+  }),
+})
 
 function contractError(path: string): TypeError {
   return new TypeError(`Invalid Drupal auth UI config contract at ${path}`)
 }
 
-function normalizeValidationPath(path = 'root'): string {
-  return path.replaceAll(/\[(\d+)\]/g, '.$1')
-}
-
 export function parseAuthUiConfigResponse(value: unknown): AuthUiConfig {
-  let config: ReturnType<typeof authUiConfigSchema['validateSync']>
+  let config: InferOutput<typeof authUiConfigSchema>
 
   try {
-    config = authUiConfigSchema.validateSync(value, {
-      abortEarly: true,
-      strict: true,
-    })
+    config = parse(authUiConfigSchema, value)
   }
   catch (error) {
-    if (error instanceof ValidationError) {
-      throw contractError(normalizeValidationPath(error.path))
+    if (isValiError(error)) {
+      throw contractError(getDotPath(error.issues[0]) ?? 'root')
     }
     throw error
   }

@@ -80,7 +80,7 @@ export default defineNuxtConfig({
         '@vue/devtools-core',
         '@vue/devtools-kit',
         '@vueuse/core',
-        'yup',
+        'valibot',
       ],
     },
     server: {
@@ -202,7 +202,7 @@ export default defineNuxtConfig({
   },
 
   alias: {
-    yup: require.resolve('yup'),
+    valibot: require.resolve('valibot'),
     '~/utils': resolveLayerPath('./layers/theme/app/utils'),
     '~/composables': resolveLayerPath('./layers/theme/app/composables'),
     '~/components': resolveLayerPath('./layers/theme/app/components'),

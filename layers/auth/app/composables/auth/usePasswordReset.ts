@@ -2,7 +2,7 @@ import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createPasswordResetValidationSchema } from '../../utils/authValidation'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 
 export function usePasswordReset() {
   const route = useRoute()
@@ -47,17 +47,16 @@ export function usePasswordReset() {
   const validate = (formState: { password?: string; confirmPassword?: string }) => {
     const errors: Array<{ name: string; message: string }> = []
 
-    try {
+    errors.push(...validateForm(
       createPasswordResetValidationSchema(
         auth.value.passwordPolicy,
         auth.value.passwordReset?.confirmPassword?.requiredMessage ||
           'Confirm password is required',
         auth.value.passwordReset?.confirmPassword?.mismatchMessage ||
           'Passwords do not match',
-      ).validateSync(formState, { abortEarly: false })
-    } catch (error: unknown) {
-      errors.push(...mapYupValidationErrors(error))
-    }
+      ),
+      formState,
+    ))
 
     if (!Number.isInteger(uid.value) || !Number.isInteger(timestamp.value) || !hash.value) {
       errors.push({

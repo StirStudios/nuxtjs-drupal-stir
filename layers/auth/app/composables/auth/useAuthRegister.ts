@@ -3,7 +3,7 @@ import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createRegisterValidationSchema } from '../../utils/authValidation'
 import { registrationRequirement } from '../../utils/registrationCompletion'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 
 export function useAuthRegister() {
   const toast = useToast()
@@ -38,15 +38,13 @@ export function useAuthRegister() {
     email?: string
     password?: string
   }) => {
-    try {
+    return validateForm(
       createRegisterValidationSchema(
         auth.value.register?.email,
         auth.value.passwordPolicy,
-      ).validateSync(formState, { abortEarly: false })
-      return []
-    } catch (error: unknown) {
-      return mapYupValidationErrors(error)
-    }
+      ),
+      formState,
+    )
   }
 
   const onSubmit = async (

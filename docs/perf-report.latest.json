@@ -1,22 +1,22 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-15T05:55:50.781Z",
+  "generatedAt": "2026-07-15T17:42:42.330Z",
   "initialClient": {
-    "sizeKb": 720.33,
-    "gzipKb": 191.27,
+    "sizeKb": 720.36,
+    "gzipKb": 191.48,
     "assets": [
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/BIZJWXFp.js",
+        "file": "_nuxt/CQA1H6SE.js",
         "sizeKb": 448.61,
-        "gzipKb": 156.18
+        "gzipKb": 156.39
       },
       {
-        "label": "entry.persTTv4.css",
+        "label": "entry.DE0xY6v8.css",
         "role": "initial",
-        "file": "_nuxt/entry.persTTv4.css",
-        "sizeKb": 271.72,
+        "file": "_nuxt/entry.DE0xY6v8.css",
+        "sizeKb": 271.75,
         "gzipKb": 35.09
       }
     ],
@@ -135,7 +135,7 @@
       },
       {
         "id": "virtual:nuxt:%2FUsers%2Fgg%2FClients%2FStir%20GIT%2Fnuxtjs-drupal-stir%2Fnode_modules%2F.cache%2Fnuxt%2F.nuxt%2Fapp.config.mjs",
-        "renderedBytes": 6598
+        "renderedBytes": 6614
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/unhead@2.1.15/node_modules/unhead/dist/shared/unhead.B3VbJo7Y.mjs",
@@ -147,111 +147,111 @@
     {
       "label": "theme:app/components/Edit/Text",
       "role": "admin-deferred",
-      "file": "_nuxt/DQcIBFOX.js",
+      "file": "_nuxt/BqUmHMVz.js",
       "sizeKb": 540.44,
       "gzipKb": 167.3
     },
     {
       "label": "app-entry",
       "role": "initial",
-      "file": "_nuxt/BIZJWXFp.js",
+      "file": "_nuxt/CQA1H6SE.js",
       "sizeKb": 448.61,
-      "gzipKb": 156.18
+      "gzipKb": 156.39
     },
     {
-      "label": "entry.persTTv4.css",
+      "label": "entry.DE0xY6v8.css",
       "role": "initial",
-      "file": "_nuxt/entry.persTTv4.css",
-      "sizeKb": 271.72,
+      "file": "_nuxt/entry.DE0xY6v8.css",
+      "sizeKb": 271.75,
       "gzipKb": 35.09
     },
     {
       "label": "theme:app/components/RevealMotion",
       "role": "async",
-      "file": "_nuxt/DY4bm9Mu.js",
+      "file": "_nuxt/Dl392GSD.js",
       "sizeKb": 77.78,
-      "gzipKb": 26.88
+      "gzipKb": 26.89
     },
     {
-      "label": "_CXpe_aUf",
+      "label": "_LSPoxAz3",
       "role": "async",
-      "file": "_nuxt/CXpe_aUf.js",
+      "file": "_nuxt/LSPoxAz3.js",
       "sizeKb": 144.84,
       "gzipKb": 26.2
     },
     {
-      "label": "_uVgYh_aG",
+      "label": "_BVPVYLj_",
       "role": "async",
-      "file": "_nuxt/uVgYh_aG.js",
+      "file": "_nuxt/BVPVYLj_.js",
+      "sizeKb": 85.85,
+      "gzipKb": 15.29
+    },
+    {
+      "label": "_4jOv3gd4",
+      "role": "async",
+      "file": "_nuxt/4jOv3gd4.js",
       "sizeKb": 53.29,
       "gzipKb": 14.63
     },
     {
-      "label": "_3P3VHtK8",
-      "role": "async",
-      "file": "_nuxt/3P3VHtK8.js",
-      "sizeKb": 44.39,
-      "gzipKb": 14.03
-    },
-    {
       "label": "theme:app/components/global/drupal-view--default",
       "role": "async",
-      "file": "_nuxt/BoE_vK2A.js",
+      "file": "_nuxt/0u20Z1Ic.js",
       "sizeKb": 39.79,
       "gzipKb": 12.08
     },
     {
       "label": "auth:app/layouts/account",
       "role": "async",
-      "file": "_nuxt/DdnJKguY.js",
+      "file": "_nuxt/Coy-y9Ja.js",
       "sizeKb": 41.46,
-      "gzipKb": 11.98
+      "gzipKb": 11.99
     },
     {
-      "label": "_cw4b5VO8",
+      "label": "_DOg6IpsZ",
       "role": "async",
-      "file": "_nuxt/cw4b5VO8.js",
+      "file": "_nuxt/DOg6IpsZ.js",
       "sizeKb": 31.72,
       "gzipKb": 11.86
     },
     {
-      "label": "_jHtQFg2B",
+      "label": "_Mk5Xc2X6",
       "role": "async",
-      "file": "_nuxt/jHtQFg2B.js",
+      "file": "_nuxt/Mk5Xc2X6.js",
       "sizeKb": 40.25,
       "gzipKb": 11.31
     },
     {
       "label": "vendor:@nuxt/ui",
       "role": "async",
-      "file": "_nuxt/Bv_5uS5b.js",
+      "file": "_nuxt/D-eN9Z5a.js",
       "sizeKb": 27.8,
       "gzipKb": 10.56
     },
     {
-      "label": "_C-KHNGIh",
+      "label": "_DhdyhLBH",
       "role": "async",
-      "file": "_nuxt/C-KHNGIh.js",
+      "file": "_nuxt/DhdyhLBH.js",
       "sizeKb": 30.77,
       "gzipKb": 10.48
     },
     {
       "label": "vendor:@nuxt/ui",
       "role": "async",
-      "file": "_nuxt/BemAeXV6.js",
+      "file": "_nuxt/Cv57cYR0.js",
       "sizeKb": 40.73,
-      "gzipKb": 10.26
+      "gzipKb": 10.27
     },
     {
       "label": "theme:app/components/Field/Input/Number",
       "role": "async",
-      "file": "_nuxt/4CXdjDge.js",
+      "file": "_nuxt/BoA3M3wt.js",
       "sizeKb": 27.3,
       "gzipKb": 8.2
     }
   ],
   "totalOutputSize": {
-    "total": "9.94 MB",
+    "total": "10 MB",
     "gzip": "2.68 MB gzip"
   }
 }

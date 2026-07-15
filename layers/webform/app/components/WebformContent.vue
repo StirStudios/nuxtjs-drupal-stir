@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformState } from '../../../theme/app/types'
-import type { ObjectSchema } from 'yup'
+import type { WebformValidationSchema } from '../../../theme/app/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '../../../theme/app/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '../../../theme/app/utils/nuxtUiProps'
 
@@ -21,7 +21,7 @@ type WebformThemeConfig = {
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>
   state: WebformState
-  schema?: ObjectSchema<Record<string, unknown>>
+  schema?: WebformValidationSchema
   isFormSubmitted: boolean
   isLoading: boolean
   isSchemaReady: boolean
