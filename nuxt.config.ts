@@ -17,7 +17,7 @@ import {
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
   fileURLToPath(new URL(path, import.meta.url))
-const isLayerWorkspace = resolve(process.cwd()) === resolveLayerPath('.')
+const isLayerWorkspace = resolve(process.cwd()) === resolve(resolveLayerPath('.'))
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 const isProductionEnv = process.env.NUXT_ENV === 'production'

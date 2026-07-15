@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  mapDrupalMenuItem,
   menuItemTo,
   normalizeInternalMenuPath,
+  splitMenuAtMarker,
 } from '../../layers/theme/app/utils/navigation'
 
 describe('normalizeInternalMenuPath', () => {
@@ -39,5 +41,65 @@ describe('menuItemTo', () => {
     expect(menuItemTo({ external: true, absolute: 'https://example.com' })).toBe('https://example.com')
     expect(menuItemTo({ url: 'mailto:hello@example.com' })).toBe('mailto:hello@example.com')
     expect(menuItemTo({ url: 'tel:+15555555555' })).toBe('tel:+15555555555')
+  })
+})
+
+describe('mapDrupalMenuItem', () => {
+  it('maps nested Drupal menu aliases and suppresses parent navigation', () => {
+    expect(mapDrupalMenuItem({
+      title: 'About',
+      alias: '/about',
+      below: [{ title: 'Team', alias: '/about/team' }],
+    })).toEqual({
+      label: 'About',
+      to: undefined,
+      exact: false,
+      exactHash: false,
+      target: undefined,
+      children: [{
+        label: 'Team',
+        to: '/about/team',
+        exact: true,
+        exactHash: false,
+        target: undefined,
+        children: undefined,
+      }],
+    })
+  })
+
+  it('preserves external targets and hash matching', () => {
+    expect(mapDrupalMenuItem({
+      title: 'Details',
+      alias: '/events#details',
+    })).toMatchObject({ exact: true, exactHash: true })
+    expect(mapDrupalMenuItem({
+      title: 'Partner',
+      external: true,
+      absolute: 'https://example.com',
+      options: { attributes: { target: '_self' } },
+    })).toMatchObject({
+      to: 'https://example.com',
+      target: '_self',
+    })
+  })
+})
+
+describe('splitMenuAtMarker', () => {
+  const items = [{ label: 'Work' }, { label: '--logo--' }, { label: 'Contact' }]
+
+  it('partitions navigation around the marker', () => {
+    expect(splitMenuAtMarker(items, '--logo--')).toEqual({
+      before: [{ label: 'Work' }],
+      after: [{ label: 'Contact' }],
+      markerIndex: 1,
+    })
+  })
+
+  it('returns the original navigation when the marker is absent', () => {
+    expect(splitMenuAtMarker(items, 'missing')).toEqual({
+      before: items,
+      after: [],
+      markerIndex: -1,
+    })
   })
 })

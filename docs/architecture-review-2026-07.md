@@ -68,3 +68,19 @@ Header/footer decomposition and further view-control extraction are worthwhile
 maintainability work, but should remain behavior-preserving changes backed by
 the new consumer and contract gates. They do not require a framework or layer
 rewrite.
+
+## CSS and Nuxt UI follow-up
+
+The generated Drupal utility safelist accounts for approximately 47.90 kB
+minified and 5.16 kB gzip of the production CSS. It remains a deliberate CMS
+rendering contract: consumer source scans cannot observe classes stored in
+Drupal payloads, so removing locally unused entries would be unsafe without
+capturing representative production content first.
+
+Nuxt UI 4.9's global `theme.unstyled` option was measured as an experimental
+upper bound. It reduced total CSS from 35.09 kB to approximately 20.97 kB gzip,
+but removes structural classes from overlays, forms, navigation, calendars, and
+other primitives. It is therefore unsuitable as a layer default. Existing
+`app.config.ts` slot settings predominantly extend Nuxt UI defaults; converting
+them to function-based replacement would either preserve the same output or
+remove required structure, so no replacements were adopted in this pass.

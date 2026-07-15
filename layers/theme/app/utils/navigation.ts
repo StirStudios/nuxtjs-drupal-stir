@@ -1,3 +1,5 @@
+import type { NavigationMenuItem } from '@nuxt/ui'
+
 export type DrupalMenuItemLink = {
   external?: boolean
   absolute?: string
@@ -7,6 +9,18 @@ export type DrupalMenuItemLink = {
   uri?: string
   options?: {
     fragment?: string
+  }
+}
+
+export type DrupalMenuTreeItem = DrupalMenuItemLink & {
+  title?: string
+  children?: DrupalMenuTreeItem[]
+  below?: DrupalMenuTreeItem[]
+  items?: DrupalMenuTreeItem[]
+  options?: DrupalMenuItemLink['options'] & {
+    attributes?: {
+      target?: string
+    }
   }
 }
 
@@ -52,4 +66,45 @@ export function menuItemTo(item: DrupalMenuItemLink): string {
   }
 
   return normalizeInternalMenuPath(value, item.options?.fragment)
+}
+
+function menuChildren(item: DrupalMenuTreeItem): DrupalMenuTreeItem[] {
+  if (Array.isArray(item.children)) return item.children
+  if (Array.isArray(item.below)) return item.below
+  if (Array.isArray(item.items)) return item.items
+
+  return []
+}
+
+export function mapDrupalMenuItem(item: DrupalMenuTreeItem): NavigationMenuItem {
+  const children = menuChildren(item).map(mapDrupalMenuItem)
+  const to = menuItemTo(item)
+  const hasChildren = children.length > 0
+  const hasHash = typeof to === 'string' && to.includes('#')
+
+  return {
+    label: item.title ?? '',
+    to: hasChildren ? undefined : to,
+    exact: !hasChildren,
+    exactHash: !hasChildren && hasHash,
+    target: !hasChildren && item.external
+      ? item.options?.attributes?.target || '_blank'
+      : undefined,
+    children: hasChildren ? children : undefined,
+  }
+}
+
+export function splitMenuAtMarker(
+  items: NavigationMenuItem[],
+  marker?: string,
+): { before: NavigationMenuItem[], after: NavigationMenuItem[], markerIndex: number } {
+  const markerIndex = marker
+    ? items.findIndex(item => item.label === marker)
+    : -1
+
+  return {
+    before: markerIndex > -1 ? items.slice(0, markerIndex) : items,
+    after: markerIndex > -1 ? items.slice(markerIndex + 1) : [],
+    markerIndex,
+  }
 }
