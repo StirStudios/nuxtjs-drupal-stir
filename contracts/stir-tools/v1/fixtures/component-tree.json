@@ -37,6 +37,16 @@
           "venueId": "example-venue"
         },
         "slots": {}
+      },
+      {
+        "element": "paragraph-calendly",
+        "props": {
+          "calendlyUrl": "https://calendly.com/stir/example?hide_event_type_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=222222&primary_color=0055aa",
+          "calendlyBg": "#ffffff",
+          "calendlyPrimary": "#0055aa",
+          "calendlyTextColor": "#222222"
+        },
+        "slots": {}
       }
     ],
     "media": [

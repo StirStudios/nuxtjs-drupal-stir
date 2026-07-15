@@ -35,6 +35,15 @@ describe('componentTree', () => {
           venueId: 'example-venue',
         },
       },
+      {
+        element: 'paragraph-calendly',
+        props: {
+          calendlyUrl: expect.stringContaining('hide_event_type_details=1'),
+          calendlyBg: '#ffffff',
+          calendlyPrimary: '#0055aa',
+          calendlyTextColor: '#222222',
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
