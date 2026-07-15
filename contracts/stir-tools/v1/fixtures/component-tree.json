@@ -352,6 +352,27 @@
         },
         "slots": {}
       }
+    ],
+    "location": [
+      {
+        "element": "address-value",
+        "props": {
+          "organization": "Royal Festival Hall",
+          "addressLine1": "Southbank Centre",
+          "locality": "London",
+          "postalCode": "SE1 8XX",
+          "countryCode": "GB",
+          "lines": [
+            "Royal Festival Hall",
+            "Southbank Centre",
+            "London SE1 8XX",
+            "GB"
+          ],
+          "label": "Royal Festival Hall, Southbank Centre, London SE1 8XX, GB",
+          "searchQuery": "Royal Festival Hall, Southbank Centre, London, SE1 8XX, GB"
+        },
+        "slots": {}
+      }
     ]
   }
 }

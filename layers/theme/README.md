@@ -51,3 +51,11 @@ Keep outside `layers/theme`:
 - Drupal tabs, edit controls, and inline editing (`layers/editorial`)
 - Server proxy/runtime behavior (`layers/core`)
 - Highly project-specific business logic or workflow-specific forms
+
+### Standard Drupal field values
+
+Global components render producer-owned standard field contracts without
+project adapters. `address-value` renders structured Address-module values as a
+semantic `<address>` and exposes all postal parts, `displayLines`, and the
+provider-neutral `searchQuery` through its default scoped slot. Projects may
+choose a maps provider or compact card presentation without reparsing text.
