@@ -116,6 +116,9 @@ const prevButton = computed(() =>
 const nextButton = computed(() =>
   resolveCarouselArrowButton(theme.carousel.arrows?.next),
 )
+const carouselLabel = computed(() =>
+  `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
+)
 </script>
 
 <template>
@@ -123,6 +126,7 @@ const nextButton = computed(() =>
     <UCarousel
       v-if="slides.length"
       v-slot="{ item }"
+      :aria-label="carouselLabel"
       :arrows="mounted ? carouselArrows : false"
       :auto-height="carouselAutoheight"
       :auto-scroll="autoScrollOptions"
