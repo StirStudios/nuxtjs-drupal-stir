@@ -55,6 +55,35 @@ describe('MediaVideo (Nuxt runtime)', () => {
     load.mockRestore()
   })
 
+  it('renders a deferred remote hero as a muted background iframe', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        loadMinWidth: 0,
+        mediaEmbed: 'https://www.youtube.com/embed/abcdefghijk',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+        title: 'Hero film',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('img').attributes('src')).toBe('/hero-poster.webp')
+    const iframe = wrapper.get('iframe')
+    const iframeSrc = iframe.attributes('src')
+
+    expect(iframeSrc).toBeTruthy()
+    const iframeUrl = new URL(iframeSrc || '')
+
+    expect(iframe.attributes('tabindex')).toBe('-1')
+    expect(iframe.attributes('title')).toBe('Hero film')
+    expect(iframeUrl.searchParams.get('autoplay')).toBe('1')
+    expect(iframeUrl.searchParams.get('mute')).toBe('1')
+    expect(iframeUrl.searchParams.get('loop')).toBe('1')
+  })
+
   it('does not load bare video below the configured viewport width', async () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue({
       matches: false,

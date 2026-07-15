@@ -309,6 +309,7 @@
       "layers/theme/app/utils/formInputUtils.ts",
       "layers/theme/app/utils/formatUtils.ts",
       "layers/theme/app/utils/getHiddenDefaults.ts",
+      "layers/theme/app/utils/heroVideoSource.ts",
       "layers/theme/app/utils/mediaPreviewClasses.ts",
       "layers/theme/app/utils/navigation.ts",
       "layers/theme/app/utils/nuxtUiProps.ts",
@@ -372,19 +373,19 @@
   "counts": {
     "components": 104,
     "composables": 60,
-    "utils": 39,
+    "utils": 40,
     "plugins": 5,
     "middleware": 4,
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 90,
+    "tests": 91,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 30,
       "server": 21,
-      "utils": 28
+      "utils": 29
     }
   },
   "tests": [
@@ -461,6 +462,7 @@
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
+    "tests/utils/heroVideoSource.spec.ts",
     "tests/utils/layerContract.spec.ts",
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",

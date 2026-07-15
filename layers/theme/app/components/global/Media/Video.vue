@@ -3,6 +3,7 @@ import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
 import { useDeferredVideoSource } from '~/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
+import { resolveHeroVideoSource } from '../../../utils/heroVideoSource'
 
 defineOptions({
   inheritAttrs: false,
@@ -67,6 +68,15 @@ const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
 const iframeElement = ref<HTMLIFrameElement | null>(null)
+const heroVideoSource = computed(() =>
+  isBare.value ? resolveHeroVideoSource(props.mediaEmbed) : undefined,
+)
+const directHeroVideoSrc = computed(() =>
+  heroVideoSource.value?.kind === 'direct' ? heroVideoSource.value.src : undefined,
+)
+const remoteHeroVideoSrc = computed(() =>
+  heroVideoSource.value?.kind === 'embed' ? heroVideoSource.value.src : undefined,
+)
 const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
   const strategy = props.loadStrategy ?? mediaTheme.video?.loadStrategy
 
@@ -78,7 +88,7 @@ const bareVideoLoadMinWidth = computed(
 const { isActive: isBareVideoSourceActive } = useDeferredVideoSource({
   enabled: isBare,
   minWidth: bareVideoLoadMinWidth,
-  source: () => props.mediaEmbed,
+  source: () => heroVideoSource.value?.src,
   strategy: bareVideoLoadStrategy,
   videoElement,
 })
@@ -198,7 +208,7 @@ watch(
   />
 
   <video
-    v-if="isBare"
+    v-if="isBare && directHeroVideoSrc"
     ref="videoElement"
     v-bind="attrs"
     aria-hidden="true"
@@ -211,10 +221,20 @@ watch(
   >
     <source
       v-if="isBareVideoSourceActive"
-      :src="mediaEmbed"
+      :src="directHeroVideoSrc"
       type="video/mp4"
     />
   </video>
+
+  <iframe
+    v-if="isBare && remoteHeroVideoSrc && isBareVideoSourceActive"
+    allow="autoplay; encrypted-media; picture-in-picture"
+    aria-hidden="true"
+    class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+    :src="remoteHeroVideoSrc"
+    tabindex="-1"
+    :title="title || 'Background video'"
+  />
 
   <div
     v-else
