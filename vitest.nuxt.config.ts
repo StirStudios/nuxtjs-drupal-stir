@@ -4,6 +4,7 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 const rootDir = fileURLToPath(new URL('./', import.meta.url))
 const fatalNuxtLogPatterns = [
   /\[nuxt\] Error in `vue:setup`/i,
+  /\[nuxt\] error caught during app initialization/i,
   /Unhandled error during execution of setup function/i,
   /Hydration (?:completed but contains mismatches|node mismatch|children mismatch)/i,
 ]
@@ -26,9 +27,6 @@ export default defineVitestConfig({
     environmentOptions: {
       nuxt: {
         rootDir,
-        overrides: {
-          modules: [],
-        },
       },
     },
   },

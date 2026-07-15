@@ -1,6 +1,6 @@
 import { createServer } from 'node:http'
 import { afterAll, describe, expect, it } from 'vitest'
-import { $fetch, createPage, setup } from '@nuxt/test-utils/e2e'
+import { $fetch, createPage, setup, url } from '@nuxt/test-utils/e2e'
 
 const pageFixture = {
   title: 'Fixture page',
@@ -126,7 +126,7 @@ describe('Nuxt E2E smoke', async () => {
     })
     page.on('pageerror', error => clientErrors.push(error.message))
 
-    const response = await page.goto('/', { waitUntil: 'hydration' })
+    const response = await page.goto(url('/'), { waitUntil: 'hydration' })
     const bodyText = await page.locator('body').textContent()
 
     expect(response?.status()).toBe(200)
