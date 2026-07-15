@@ -19,4 +19,18 @@ describe('BlockContentParagraph (Nuxt runtime)', () => {
       wrapper.html().indexOf('Direct block body'),
     )
   })
+
+  it('renders mixed direct fields and composed content exactly once', async () => {
+    const wrapper = await mountSuspended(BlockContentParagraph, {
+      slots: {
+        heading: '<h2>Reusable promotion</h2>',
+        body: '<p>Direct block body</p>',
+        paragraphBlock: '<section>Composed block content</section>',
+      },
+    })
+
+    expect(wrapper.text().match(/Reusable promotion/g)).toHaveLength(1)
+    expect(wrapper.text().match(/Direct block body/g)).toHaveLength(1)
+    expect(wrapper.text().match(/Composed block content/g)).toHaveLength(1)
+  })
 })

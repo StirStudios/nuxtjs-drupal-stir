@@ -36,7 +36,21 @@ describe('appContextApi', () => {
 
     const parsed = parseAppContextResponse(fixture)
 
-    expect(parsed.blocks.after_main?.[0]?.element).toBe('block-content-basic')
+    expect(parsed.blocks.after_main?.[0]).toMatchObject({
+      element: 'block-content-paragraph',
+      slots: {
+        heading: '<h2>Reusable promotion</h2>',
+        body: '<p>Direct block body.</p>',
+        action: [{
+          element: 'link',
+          props: { href: '/contact', label: 'Contact us' },
+        }],
+        paragraphBlock: [{
+          element: 'paragraph-layout',
+          props: { layout: 'two_column', container: true },
+        }],
+      },
+    })
     expect(parsed.footer_menu).toEqual([{ title: 'Privacy', url: '/privacy' }])
     expect(parsed.site_info.name).toBe('Fixture site')
   })

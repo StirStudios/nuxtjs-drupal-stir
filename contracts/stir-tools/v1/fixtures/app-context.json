@@ -2,7 +2,7 @@
   "blocks": {
     "after_main": [
       {
-        "element": "block-content-basic",
+        "element": "block-content-paragraph",
         "props": {
           "id": "newsletter",
           "visibility": {
@@ -13,13 +13,36 @@
           }
         },
         "slots": {
-          "content": [
+          "heading": "<h2>Reusable promotion</h2>",
+          "body": "<p>Direct block body.</p>",
+          "action": [
             {
-              "element": "paragraph-text",
+              "element": "link",
               "props": {
-                "text": "<p>Sanitized fixture content.</p>"
+                "href": "/contact",
+                "label": "Contact us"
               },
               "slots": {}
+            }
+          ],
+          "paragraphBlock": [
+            {
+              "element": "paragraph-layout",
+              "props": {
+                "layout": "two_column",
+                "container": true
+              },
+              "slots": {
+                "first": [
+                  {
+                    "element": "paragraph-text",
+                    "props": {
+                      "text": "<p>Composed block content.</p>"
+                    },
+                    "slots": {}
+                  }
+                ]
+              }
             }
           ]
         }
