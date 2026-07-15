@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.7.0",
+  "contractVersion": "1.8.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -32,6 +32,10 @@
       "providerModules": ["stir_layout_builder"],
       "optional": true
     },
+    "listing.response": {
+      "providerModules": ["stir_listing"],
+      "optional": true
+    },
     "seo.global": {
       "providerModules": ["stir_seo"],
       "optional": true
@@ -51,6 +55,11 @@
       "capability": "component.tree",
       "schema": "schemas/component-tree.schema.json",
       "fixtures": ["fixtures/component-tree.json"]
+    },
+    "listing.response": {
+      "capability": "listing.response",
+      "schema": "schemas/listing-response.schema.json",
+      "fixtures": ["fixtures/listing-response.json"]
     },
     "auth.register.response": {
       "capability": "account.registration",
