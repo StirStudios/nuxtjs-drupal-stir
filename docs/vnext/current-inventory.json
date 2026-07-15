@@ -313,6 +313,7 @@
       "layers/theme/app/utils/navigation.ts",
       "layers/theme/app/utils/nuxtUiProps.ts",
       "layers/theme/app/utils/pageRequest.ts",
+      "layers/theme/app/utils/responsiveGrid.ts",
       "layers/theme/app/utils/schedule.ts",
       "layers/theme/app/utils/selectionUtils.ts",
       "layers/theme/app/utils/stateUtils.ts",
@@ -371,19 +372,19 @@
   "counts": {
     "components": 104,
     "composables": 60,
-    "utils": 38,
+    "utils": 39,
     "plugins": 5,
     "middleware": 4,
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 89,
+    "tests": 90,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 30,
       "server": 21,
-      "utils": 27
+      "utils": 28
     }
   },
   "tests": [
@@ -468,6 +469,7 @@
     "tests/utils/presentationManifest.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
     "tests/utils/registrationCompletion.spec.ts",
+    "tests/utils/responsiveGrid.spec.ts",
     "tests/utils/runtimeConfig.spec.ts",
     "tests/utils/schedule.spec.ts",
     "tests/utils/thirdPartyScripts.spec.ts",
