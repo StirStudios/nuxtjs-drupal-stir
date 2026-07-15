@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.3.0",
+  "contractVersion": "1.4.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -41,6 +41,14 @@
       "fixtures": [
         "fixtures/auth-register-admin-approval.json",
         "fixtures/auth-register-error.json"
+      ]
+    },
+    "auth.register.policy": {
+      "capability": "account.registration",
+      "schema": "schemas/auth-register-policy.schema.json",
+      "fixtures": [
+        "fixtures/auth-register-policy-open.json",
+        "fixtures/auth-register-policy-closed.json"
       ]
     },
     "layout.webform": {

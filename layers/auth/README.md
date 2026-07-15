@@ -30,15 +30,20 @@ The root configuration includes:
 extends: ['./layers/core', './layers/theme', './layers/auth']
 ```
 
-There is currently no separate auth-free preset. Leave
-`authIntegration.drupalAccounts` disabled when Drupal account UI is not used;
-the local `/auth/protected` route remains available.
+The full preset includes this layer; the minimal preset excludes it. Within the
+full preset, leave `authIntegration.drupalAccounts` disabled when Drupal account
+UI is not used; the local `/auth/protected` route remains available.
 
 ## Configuration
 
 Drupal owns account-auth redirects, UI copy, field labels, and password policy
 through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
 integration is installed.
+
+Drupal's public `/api/auth/register-policy` response is contract-validated
+before Nuxt decides whether `/auth/register` is available. Unknown,
+contradictory, malformed, or unavailable policy responses fail closed, and the
+public request does not forward visitor cookies.
 
 ```ts
 export default defineAppConfig({
