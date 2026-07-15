@@ -206,7 +206,9 @@
       "layers/theme/app/components/global/Paragraph/Tabs.vue",
       "layers/theme/app/components/global/Paragraph/Text.vue",
       "layers/theme/app/components/global/Paragraph/Timeline.vue",
+      "layers/theme/app/components/global/Paragraph/TimelineItem.vue",
       "layers/theme/app/components/global/Paragraph/View.vue",
+      "layers/theme/app/components/global/Stir/MissingComponent.vue",
       "layers/theme/app/components/global/drupal-markup.vue",
       "layers/theme/app/components/global/drupal-view--default.vue",
       "layers/theme/app/components/global/node--default.vue",
@@ -271,6 +273,8 @@
       "layers/theme/app/composables/useShareLinks.ts",
       "layers/theme/app/composables/useSlotsToolkit.ts",
       "layers/theme/app/composables/useSocialIcons.ts",
+      "layers/theme/app/composables/useStirDrupalCe.ts",
+      "layers/theme/app/composables/useStirListing.ts",
       "layers/theme/app/composables/useTeaserPost.ts",
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useValidation.ts",
@@ -287,6 +291,7 @@
       "layers/theme/app/utils/adminUiTheme.ts",
       "layers/theme/app/utils/buildValidationSchema.ts",
       "layers/theme/app/utils/colorMode.ts",
+      "layers/theme/app/utils/componentTreeDiagnostics.ts",
       "layers/theme/app/utils/dateUtils.ts",
       "layers/theme/app/utils/drupalMediaTypes.ts",
       "layers/theme/app/utils/drupalUrl.ts",
@@ -348,28 +353,31 @@
       "/api/drupal-ce",
       "/api/drupal-ce/**",
       "/api/health",
+      "/api/listings/:listing",
       "/api/menu/**",
       "/api/paragraph/:paragraphId/text",
       "/api/seo/global",
+      "/api/sitemap",
+      "/api/view/:paragraphId",
       "/api/webform/submit"
     ]
   },
   "counts": {
-    "components": 97,
-    "composables": 58,
-    "utils": 37,
+    "components": 99,
+    "composables": 60,
+    "utils": 38,
     "plugins": 5,
     "middleware": 4,
-    "serverRoutes": 23,
+    "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 74,
+    "tests": 83,
     "testsByArea": {
-      "composables": 9,
+      "composables": 10,
       "contracts": 1,
-      "nuxt": 22,
-      "server": 17,
-      "utils": 25
+      "nuxt": 24,
+      "server": 21,
+      "utils": 27
     }
   },
   "tests": [
@@ -380,6 +388,7 @@
     "tests/composables/useMediaModal.spec.ts",
     "tests/composables/useNode.spec.ts",
     "tests/composables/useSlotsToolkit.spec.ts",
+    "tests/composables/useStirListing.spec.ts",
     "tests/composables/useTeaserPost.spec.ts",
     "tests/composables/useValidation.spec.ts",
     "tests/contracts/stirToolsContract.spec.ts",
@@ -397,6 +406,7 @@
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",
+    "tests/nuxt/runtime/StirMissingComponent.nuxt.spec.ts",
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
     "tests/nuxt/runtime/Webform.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapDiv.nuxt.spec.ts",
@@ -405,19 +415,24 @@
     "tests/nuxt/runtime/useAuthSession.nuxt.spec.ts",
     "tests/nuxt/runtime/useDrupalViewControls.nuxt.spec.ts",
     "tests/nuxt/runtime/useNavLock.nuxt.spec.ts",
+    "tests/nuxt/runtime/useStirDrupalCe.nuxt.spec.ts",
     "tests/server/appContextApi.spec.ts",
     "tests/server/authCacheControl.spec.ts",
     "tests/server/authLogin.spec.ts",
     "tests/server/authSession.spec.ts",
     "tests/server/authUiConfigApi.spec.ts",
+    "tests/server/componentTree.spec.ts",
     "tests/server/drupalCeProxy.spec.ts",
     "tests/server/drupalSessionNoSsr.spec.ts",
     "tests/server/globalSeoApi.spec.ts",
+    "tests/server/listingApi.spec.ts",
+    "tests/server/paragraphViewApi.spec.ts",
     "tests/server/protectedAccessToken.spec.ts",
     "tests/server/protectedLogin.spec.ts",
     "tests/server/protectedRateLimit.spec.ts",
     "tests/server/protectedSession.spec.ts",
     "tests/server/registerPolicyApi.spec.ts",
+    "tests/server/sitemapApi.spec.ts",
     "tests/server/stirDrupalApi.spec.ts",
     "tests/server/stirRequestSecurity.spec.ts",
     "tests/server/webformLimits.spec.ts",
@@ -426,6 +441,7 @@
     "tests/utils/buildValidationSchema.spec.ts",
     "tests/utils/calendlyWidget.spec.ts",
     "tests/utils/colorMode.spec.ts",
+    "tests/utils/componentTreeDiagnostics.spec.ts",
     "tests/utils/drupalContractFixtures.spec.ts",
     "tests/utils/drupalHeaders.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
@@ -437,6 +453,7 @@
     "tests/utils/nodeOverrideContract.spec.ts",
     "tests/utils/nuxtUiProps.spec.ts",
     "tests/utils/pageRequest.spec.ts",
+    "tests/utils/presentationManifest.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
     "tests/utils/registrationCompletion.spec.ts",
     "tests/utils/runtimeConfig.spec.ts",
@@ -481,12 +498,16 @@
     "serverRoutes": [
       "/api/app-context",
       "/api/drupal-ce/**",
+      "/api/listings/:listing",
       "/api/menu/**",
       "/api/paragraph/:paragraphId/text",
       "/api/seo/global",
       "/api/webform/submit",
       "/api/auth/**",
       "/api/account/**"
+    ],
+    "publicComposables": [
+      "useStirListing"
     ],
     "runtimeConfigEnvironment": [
       "DRUPAL_URL",
@@ -509,22 +530,22 @@
   "performanceBaseline": {
     "schemaVersion": 2,
     "initialClient": {
-      "sizeKb": 720.36,
-      "gzipKb": 191.48,
+      "sizeKb": 720.59,
+      "gzipKb": 191.55,
       "assets": [
         {
           "label": "app-entry",
           "role": "initial",
-          "file": "_nuxt/CQA1H6SE.js",
-          "sizeKb": 448.61,
-          "gzipKb": 156.39
+          "file": "_nuxt/DLZ8IjmE.js",
+          "sizeKb": 448.79,
+          "gzipKb": 156.45
         },
         {
-          "label": "entry.DE0xY6v8.css",
+          "label": "entry.D5U7kjsm.css",
           "role": "initial",
-          "file": "_nuxt/entry.DE0xY6v8.css",
-          "sizeKb": 271.75,
-          "gzipKb": 35.09
+          "file": "_nuxt/entry.D5U7kjsm.css",
+          "sizeKb": 271.8,
+          "gzipKb": 35.1
         }
       ]
     },
@@ -536,35 +557,35 @@
       {
         "label": "theme:app/components/Edit/Text",
         "role": "admin-deferred",
-        "file": "_nuxt/BqUmHMVz.js",
+        "file": "_nuxt/C8KdmasA.js",
         "sizeKb": 540.44,
         "gzipKb": 167.3
       },
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/CQA1H6SE.js",
-        "sizeKb": 448.61,
-        "gzipKb": 156.39
+        "file": "_nuxt/DLZ8IjmE.js",
+        "sizeKb": 448.79,
+        "gzipKb": 156.45
       },
       {
-        "label": "entry.DE0xY6v8.css",
+        "label": "entry.D5U7kjsm.css",
         "role": "initial",
-        "file": "_nuxt/entry.DE0xY6v8.css",
-        "sizeKb": 271.75,
-        "gzipKb": 35.09
+        "file": "_nuxt/entry.D5U7kjsm.css",
+        "sizeKb": 271.8,
+        "gzipKb": 35.1
       },
       {
         "label": "theme:app/components/RevealMotion",
         "role": "async",
-        "file": "_nuxt/Dl392GSD.js",
+        "file": "_nuxt/D9H4F8W6.js",
         "sizeKb": 77.78,
         "gzipKb": 26.89
       },
       {
-        "label": "_LSPoxAz3",
+        "label": "_Ct9nMFF0",
         "role": "async",
-        "file": "_nuxt/LSPoxAz3.js",
+        "file": "_nuxt/Ct9nMFF0.js",
         "sizeKb": 144.84,
         "gzipKb": 26.2
       },
@@ -576,65 +597,65 @@
         "gzipKb": 15.29
       },
       {
-        "label": "_4jOv3gd4",
+        "label": "_CWxt3nk_",
         "role": "async",
-        "file": "_nuxt/4jOv3gd4.js",
+        "file": "_nuxt/CWxt3nk_.js",
         "sizeKb": 53.29,
         "gzipKb": 14.63
       },
       {
         "label": "theme:app/components/global/drupal-view--default",
         "role": "async",
-        "file": "_nuxt/0u20Z1Ic.js",
+        "file": "_nuxt/B-xzXvwE.js",
         "sizeKb": 39.79,
         "gzipKb": 12.08
       },
       {
         "label": "auth:app/layouts/account",
         "role": "async",
-        "file": "_nuxt/Coy-y9Ja.js",
+        "file": "_nuxt/eOmZC3qh.js",
         "sizeKb": 41.46,
         "gzipKb": 11.99
       },
       {
-        "label": "_DOg6IpsZ",
+        "label": "_BtTFZzYs",
         "role": "async",
-        "file": "_nuxt/DOg6IpsZ.js",
+        "file": "_nuxt/BtTFZzYs.js",
         "sizeKb": 31.72,
         "gzipKb": 11.86
       },
       {
-        "label": "_Mk5Xc2X6",
+        "label": "_CcX75bTy",
         "role": "async",
-        "file": "_nuxt/Mk5Xc2X6.js",
+        "file": "_nuxt/CcX75bTy.js",
         "sizeKb": 40.25,
         "gzipKb": 11.31
       },
       {
         "label": "vendor:@nuxt/ui",
         "role": "async",
-        "file": "_nuxt/D-eN9Z5a.js",
+        "file": "_nuxt/DkunjvDF.js",
         "sizeKb": 27.8,
         "gzipKb": 10.56
       },
       {
-        "label": "_DhdyhLBH",
+        "label": "_DKKglIz3",
         "role": "async",
-        "file": "_nuxt/DhdyhLBH.js",
+        "file": "_nuxt/DKKglIz3.js",
         "sizeKb": 30.77,
         "gzipKb": 10.48
       },
       {
         "label": "vendor:@nuxt/ui",
         "role": "async",
-        "file": "_nuxt/Cv57cYR0.js",
+        "file": "_nuxt/CS-ZuFkI.js",
         "sizeKb": 40.73,
         "gzipKb": 10.27
       },
       {
         "label": "theme:app/components/Field/Input/Number",
         "role": "async",
-        "file": "_nuxt/BoA3M3wt.js",
+        "file": "_nuxt/BZphmA9E.js",
         "sizeKb": 27.3,
         "gzipKb": 8.2
       }

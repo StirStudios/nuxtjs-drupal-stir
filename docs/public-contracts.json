@@ -18,12 +18,16 @@
   "serverRoutes": [
     "/api/app-context",
     "/api/drupal-ce/**",
+    "/api/listings/:listing",
     "/api/menu/**",
     "/api/paragraph/:paragraphId/text",
     "/api/seo/global",
     "/api/webform/submit",
     "/api/auth/**",
     "/api/account/**"
+  ],
+  "publicComposables": [
+    "useStirListing"
   ],
   "runtimeConfigEnvironment": [
     "DRUPAL_URL",

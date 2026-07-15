@@ -43,6 +43,7 @@ describe('layer contract', () => {
       compatibilityPolicy: string
       aliases: string[]
       serverRoutes: string[]
+      publicComposables: string[]
       runtimeConfigEnvironment: string[]
     }
 
@@ -54,7 +55,9 @@ describe('layer contract', () => {
       '~/types',
     ])
     expect(contract.serverRoutes).toContain('/api/drupal-ce/**')
+    expect(contract.serverRoutes).toContain('/api/listings/:listing')
     expect(contract.serverRoutes).toContain('/api/auth/**')
+    expect(contract.publicComposables).toContain('useStirListing')
     expect(contract.runtimeConfigEnvironment).toContain('DRUPAL_URL')
     expect(contract.runtimeConfigEnvironment).toContain('TURNSTILE_SECRET')
   })

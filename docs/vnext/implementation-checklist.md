@@ -13,7 +13,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 
 - N0 inventory generation is implemented by `pnpm audit:vnext-inventory`.
 - The checked artifact is `docs/vnext/current-inventory.json` and intentionally excludes machine-specific paths.
-- Current measured surface: 97 components, 59 composables, 35 utilities, 5 plugins, 4 middleware files, 23 server routes, 25 production dependencies, 23 development dependencies, and 74 test files.
+- Current measured surface: 99 components, 60 composables, 38 utilities, 5 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 83 test files.
 - N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects. The synchronized compatibility manifest validates Drupal/PHP requirements, optional provider-capability ownership, and independent Nuxt/Stir Tools releases. Registration policy and versioned auth UI configuration now validate before routing/composables; app-context normalizes Drupal's empty-array compatibility shapes and recursively validates its component trees; global SEO and the runtime-fresh sitemap validate before reaching their Nuxt consumers. The shared source-independent tree contract covers direct rendered fields, media, entity references, and nested components.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
@@ -21,6 +21,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
 - Validation now uses one Valibot/Nuxt UI Standard Schema foundation across auth, account, dynamic Drupal Webforms, and server contract parsing; Yup is no longer a direct dependency or layer import.
 - N4 has started with all theme consumers routed through a Stir-owned Drupal CE facade. It delegates the upstream API while development builds surface unresolved components, unknown field elements, and malformed component nodes instead of silently dropping them; production retains the direct upstream rendering path.
+- N5 has started with a validated build-time presentation-usage manifest and compatibility reserve, plus a public typed listing composable and Nuxt server boundary that validate the producer-owned response, preserve safe Drupal sessions, and forward public cache metadata without downstream proxy overrides.
 
 ## Delivery slices
 
