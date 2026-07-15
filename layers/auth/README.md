@@ -40,6 +40,12 @@ Drupal owns account-auth redirects, UI copy, field labels, and password policy
 through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
 integration is installed.
 
+The version-2 response is validated against Drupal's producer-owned auth UI
+contract before it reaches composables. Unknown structure, invalid identifier
+modes or password patterns, and unavailable providers retain the existing empty
+local fallback. Because the endpoint is public and site-wide, visitor cookies
+are not forwarded.
+
 Drupal's public `/api/auth/register-policy` response is contract-validated
 before Nuxt decides whether `/auth/register` is available. Unknown,
 contradictory, malformed, or unavailable policy responses fail closed, and the

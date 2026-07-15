@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.4.0",
+  "contractVersion": "1.5.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -13,6 +13,10 @@
   },
   "capabilities": {
     "account.registration": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.ui": {
       "providerModules": ["stir_account"],
       "optional": true
     },
@@ -50,6 +54,11 @@
         "fixtures/auth-register-policy-open.json",
         "fixtures/auth-register-policy-closed.json"
       ]
+    },
+    "auth.ui.config": {
+      "capability": "account.ui",
+      "schema": "schemas/auth-ui-config.schema.json",
+      "fixtures": ["fixtures/auth-ui-config.json"]
     },
     "layout.webform": {
       "capability": "layout.webform",

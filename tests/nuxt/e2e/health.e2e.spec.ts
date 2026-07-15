@@ -1,4 +1,6 @@
 import { createServer } from 'node:http'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { $fetch, createPage, setup, url } from '@nuxt/test-utils/e2e'
 
@@ -18,6 +20,11 @@ const pageFixture = {
   },
 }
 
+const authUiConfigFixture = JSON.parse(readFileSync(resolve(
+  __dirname,
+  '../../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
+), 'utf8'))
+
 const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
   const payload = path === '/api/app-context'
@@ -26,6 +33,8 @@ const drupalFixtureServer = createServer((request, response) => {
         footer_menu: [],
         site_info: { name: 'Fixture site', mail: '', slogan: '' },
       }
+    : path === '/api/auth/config'
+      ? authUiConfigFixture
     : path === '/api/seo/global'
       ? { lang: 'en', meta: [], link: [] }
       : path.includes('/api/menu_items/')
@@ -108,7 +117,7 @@ describe('Nuxt E2E smoke', async () => {
     ])
 
     expect(authConfig).toBeTypeOf('object')
-    if ('version' in authConfig) expect(authConfig.version).toBeTypeOf('number')
+    expect(authConfig.version).toBe(2)
     expect(seo).toEqual({ lang: 'en', meta: [], link: [] })
   })
 
