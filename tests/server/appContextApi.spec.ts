@@ -51,7 +51,23 @@ describe('appContextApi', () => {
 
   it('rejects malformed producer payloads before they reach UI code', () => {
     expect(() => parseAppContextResponse({
-      blocks: { after_main: [{ element: 'block-content-basic' }] },
+      blocks: { after_main: [{ element: '' }] },
+      footer_menu: [],
+      site_info: { name: '', mail: '', slogan: '' },
+    })).toThrow('Invalid Drupal app-context contract at blocks.after_main.0')
+  })
+
+  it('rejects malformed nested component content', () => {
+    expect(() => parseAppContextResponse({
+      blocks: {
+        after_main: [{
+          element: 'block-content-basic',
+          props: {},
+          slots: {
+            section: [{ element: '', props: {}, slots: {} }],
+          },
+        }],
+      },
       footer_menu: [],
       site_info: { name: '', mail: '', slogan: '' },
     })).toThrow('Invalid Drupal app-context contract at blocks.after_main.0')

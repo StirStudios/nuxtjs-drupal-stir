@@ -1,0 +1,44 @@
+{
+  "element": "node-page",
+  "props": {
+    "id": "42",
+    "title": "Example page"
+  },
+  "slots": {
+    "body": "<p>Rendered body text.</p>",
+    "section": [
+      {
+        "element": "paragraph-text",
+        "props": {
+          "text": "<p>Reusable component content.</p>"
+        },
+        "slots": {}
+      }
+    ],
+    "media": [
+      {
+        "element": "media-image",
+        "props": {
+          "src": "/sites/default/files/example.jpg",
+          "alt": "Example image",
+          "width": 1200,
+          "height": 800
+        },
+        "slots": {}
+      }
+    ],
+    "level": [
+      {
+        "element": "entity-reference",
+        "props": {
+          "id": "7",
+          "uuid": "00000000-0000-4000-8000-000000000007",
+          "type": "taxonomy_term",
+          "bundle": "level",
+          "label": "Intermediate"
+        },
+        "slots": {}
+      }
+    ]
+  }
+}

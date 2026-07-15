@@ -5,6 +5,7 @@ import type {
   AppContextPayload,
   AppContextSiteInfo,
 } from '../../shared/types/appContext'
+import { parseComponentTreeNode } from './componentTree'
 
 export type { AppContextPayload as AppContextResponse } from '../../shared/types/appContext'
 
@@ -27,20 +28,11 @@ function contractError(path: string): TypeError {
 }
 
 function parseBlock(value: unknown, path: string): AppContextBlock {
-  if (
-    !isRecord(value)
-    || typeof value.element !== 'string'
-    || !value.element
-    || !isRecord(value.props)
-    || !isRecord(value.slots)
-  ) {
-    throw contractError(path)
+  try {
+    return parseComponentTreeNode(value)
   }
-
-  return {
-    element: value.element,
-    props: value.props,
-    slots: value.slots,
+  catch {
+    throw contractError(path)
   }
 }
 

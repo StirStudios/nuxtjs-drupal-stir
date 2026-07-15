@@ -1,8 +1,6 @@
-export type AppContextBlock = {
-  element: string
-  props: Record<string, unknown>
-  slots: Record<string, unknown>
-}
+import type { ComponentTreeNode } from './componentTree'
+
+export type AppContextBlock = ComponentTreeNode
 
 export type AppContextRegions = Record<string, AppContextBlock[]>
 
