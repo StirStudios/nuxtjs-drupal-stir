@@ -59,3 +59,9 @@ project adapters. `address-value` renders structured Address-module values as a
 semantic `<address>` and exposes all postal parts, `displayLines`, and the
 provider-neutral `searchQuery` through its default scoped slot. Projects may
 choose a maps provider or compact card presentation without reparsing text.
+
+The `field-text-with-summary` compatibility component preserves upstream
+Custom Elements slot output and can also render Drupal-filtered `content`,
+`processed`, `value`, or `summary` props. Its scoped slot exposes the original
+values for project-specific card presentation without a global passthrough
+override.
