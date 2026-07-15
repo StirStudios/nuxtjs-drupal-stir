@@ -9,9 +9,11 @@
     }
   },
   "layers": [
+    "analytics",
     "auth",
     "core",
     "platform",
+    "scripts",
     "theme",
     "webform"
   ],
@@ -315,11 +317,11 @@
       "layers/theme/app/utils/webformScrollToTop.ts"
     ],
     "plugins": [
+      "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
+      "layers/scripts/app/plugins/userway.client.ts",
       "layers/theme/app/plugins/cms-global-seo.ts",
       "layers/theme/app/plugins/color-mode-lock.client.ts",
-      "layers/theme/app/plugins/nav-lock.client.ts",
-      "layers/theme/app/plugins/plausible-config-bridge.client.ts",
-      "layers/theme/app/plugins/userway.client.ts"
+      "layers/theme/app/plugins/nav-lock.client.ts"
     ],
     "middleware": [
       "layers/auth/app/middleware/auth-account.global.ts",

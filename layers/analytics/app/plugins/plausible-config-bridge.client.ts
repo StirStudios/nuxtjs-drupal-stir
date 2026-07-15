@@ -5,7 +5,7 @@ import {
   useAppConfig,
   useRuntimeConfig,
 } from '#app'
-import { usePrivacyConsent } from '../composables/usePrivacyConsent'
+import { usePrivacyConsent } from '../../../theme/app/composables/usePrivacyConsent'
 
 type PlausibleEventOptions = Parameters<typeof track>[1]
 type PlausibleRuntimeConfig = {

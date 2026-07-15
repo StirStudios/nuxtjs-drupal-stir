@@ -5,16 +5,16 @@ import { describe, expect, it } from 'vitest'
 const rootDir = resolve(__dirname, '../..')
 
 describe('layer contract', () => {
-  it('composes the compatibility root from platform and auth layers', () => {
+  it('composes the compatibility root from explicit capability layers', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
     const platformConfig = readFileSync(
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),
       'utf8',
     )
 
-    expect(nuxtConfig).toContain(
-      'extends: [\'./layers/platform\', \'./layers/webform\', \'./layers/auth\']',
-    )
+    for (const layer of ['platform', 'analytics', 'scripts', 'webform', 'auth']) {
+      expect(nuxtConfig).toContain(`'./layers/${layer}'`)
+    }
     expect(platformConfig).toContain('extends: [\'../core\', \'../theme\']')
   })
 
@@ -268,7 +268,7 @@ describe('layer contract', () => {
 
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
     const userwayPlugin = readFileSync(
-      resolve(rootDir, 'layers/theme/app/plugins/userway.client.ts'),
+      resolve(rootDir, 'layers/scripts/app/plugins/userway.client.ts'),
       'utf8',
     )
 

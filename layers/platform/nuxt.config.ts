@@ -212,8 +212,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     ...(isLayerWorkspace ? ['@nuxt/eslint'] : []),
-    '@nuxt/scripts',
-    ...(!isTestEnv ? ['@nuxtjs/plausible'] : []),
     [
       'nuxt-vitalizer',
       {
@@ -278,17 +276,6 @@ export default defineNuxtConfig({
     },
     public: {
       api: drupalUrl,
-      plausible: {
-        enabled: isIndexable,
-        domain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
-        apiHost:
-          process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || 'https://plausible.io',
-        autoPageviews: true,
-        proxy: false,
-        proxyBaseEndpoint: '/_plausible',
-        ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
-        ignoreSubDomains: true,
-      },
     },
   },
 })

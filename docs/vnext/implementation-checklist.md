@@ -18,6 +18,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
 - The optional `layers/webform` boundary now owns Webform rendering, submission, limits, and Turnstile registration. The minimal preset excludes both the Webform route and Turnstile module.
+- Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
 
 ## Delivery slices
 

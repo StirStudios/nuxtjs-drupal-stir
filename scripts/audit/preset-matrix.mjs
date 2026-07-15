@@ -15,11 +15,15 @@ async function inspectPreset(name) {
     const layers = nuxt.options._layers.map(layer => layer.cwd.replaceAll('\\', '/'))
     const hasAuth = layers.some(layer => layer.endsWith('/layers/auth'))
     const hasWebform = layers.some(layer => layer.endsWith('/layers/webform'))
+    const hasAnalytics = layers.some(layer => layer.endsWith('/layers/analytics'))
+    const hasScripts = layers.some(layer => layer.endsWith('/layers/scripts'))
 
     return {
       name,
       hasAuth,
       hasWebform,
+      hasAnalytics,
+      hasScripts,
       layers: layers.map(layer => layer.replace(`${rootDir}/`, '')),
     }
   } finally {
@@ -38,12 +42,20 @@ if (minimal.hasWebform) {
   throw new Error('The minimal preset must not load the Webform layer.')
 }
 
+if (minimal.hasAnalytics || minimal.hasScripts) {
+  throw new Error('The minimal preset must not load analytics or scripts layers.')
+}
+
 if (!full.hasAuth) {
   throw new Error('The full preset must preserve the authentication layer.')
 }
 
 if (!full.hasWebform) {
   throw new Error('The full preset must preserve the Webform layer.')
+}
+
+if (!full.hasAnalytics || !full.hasScripts) {
+  throw new Error('The full preset must preserve analytics and scripts layers.')
 }
 
 process.stdout.write(`${JSON.stringify({ minimal, full }, null, 2)}\n`)
