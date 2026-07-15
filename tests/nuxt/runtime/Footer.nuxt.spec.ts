@@ -41,6 +41,13 @@ const appConfig = ref({
   icon: {
     provider: 'none',
   },
+  ui: {
+    colors: {
+      neutral: 'slate',
+      primary: 'green',
+    },
+    prefix: 'ui',
+  },
 })
 let appFooterContextExecuteCalls = 0
 

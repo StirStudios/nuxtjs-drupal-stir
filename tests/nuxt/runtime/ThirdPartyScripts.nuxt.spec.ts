@@ -16,6 +16,13 @@ const appConfig = ref({
   icon: {
     provider: 'none',
   },
+  ui: {
+    colors: {
+      neutral: 'slate',
+      primary: 'green',
+    },
+    prefix: 'ui',
+  },
   privacyNotice: {
     enabled: true,
     mode: 'consent' as 'consent' | 'notice',
