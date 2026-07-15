@@ -22,7 +22,7 @@ describe('root configuration helpers', () => {
   it('builds sitemap sources only when Drupal is configured', () => {
     expect(buildSitemapModuleOptions('').sources).toEqual([])
     expect(buildSitemapModuleOptions('https://drupal.example').sources).toEqual([
-      'https://drupal.example/api/sitemap',
+      '/api/sitemap',
     ])
   })
 

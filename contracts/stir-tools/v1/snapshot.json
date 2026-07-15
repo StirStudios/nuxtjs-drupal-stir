@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.5.0",
+  "contractVersion": "1.6.0",
   "files": {
     "fixtures/app-context.json": "5c7348829336106f8cfb19351f99f76abac5ae0ebf81cb79c196a098676fb700",
     "fixtures/auth-register-admin-approval.json": "8d6a29215bd78a3b866b1e0b53afaabb16ce41a69e061bc7a6a8935384e93e86",
@@ -10,14 +10,16 @@
     "fixtures/auth-register-policy-open.json": "f37e0c5cecc61ecc82543a503f63c92034dcf838136fd6e406aa8a1258543677",
     "fixtures/auth-ui-config.json": "beb3aba3b3a71aec5195d869fd735dc6aac0a24433c38c066d397b4b4fbe7194",
     "fixtures/global-seo.json": "8aa3de4b22ee0725c4f29d341726b7c2b57a3d958003bbb983d94a71bd6c34ea",
+    "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
     "fixtures/webform-contact.json": "a3119636626089bc7129785dc5c253d351b648a6a2283291aca8e0e74eb59fcc",
-    "manifest.json": "f93b857aacce1fb1beeaf06aeb2b9d05eee52ca277ed991db6aa9927edd58b05",
+    "manifest.json": "83a675045d1c3e29724d3fa926839074653e1f238ee4aa1b4e25530df695d30d",
     "schemas/app-context.schema.json": "dbc3f728a29467abb0c6f6f749066d46b88e51e42f4f8ff94e33a3108b345f66",
     "schemas/auth-register-policy.schema.json": "b3b9c3b4830580f0507e92784e9616c1ed8cabb4f4bbf4d384d45aacaeb4a2e2",
     "schemas/auth-register-response.schema.json": "5a1856aae50df5a5f755110612cd849ca7dd73298884f5ffef5557782955d827",
     "schemas/auth-ui-config.schema.json": "a58e70eb019789a7a5726e6e4a918ba67c7f4fd64c38ca7277662ec8240bb338",
     "schemas/contract-manifest.schema.json": "3f0be56ce6463c29c46e94a4604668d97c813485942c21371a552927c014e3e5",
     "schemas/global-seo.schema.json": "d83acc5e72dc716161ee53df60e6738bd39260b30bdf9ad11e30403fa1f058a8",
+    "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform.schema.json": "bdc9c3d321bb2b23bebe7aeb884583a01a7d1162e58c6ff2ee024c0ef8faab14"
   }
 }

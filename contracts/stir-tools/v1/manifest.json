@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.5.0",
+  "contractVersion": "1.6.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -30,6 +30,10 @@
     },
     "seo.global": {
       "providerModules": ["stir_seo"],
+      "optional": true
+    },
+    "seo.sitemap": {
+      "providerModules": ["stir_sitemap"],
       "optional": true
     }
   },
@@ -69,6 +73,11 @@
       "capability": "seo.global",
       "schema": "schemas/global-seo.schema.json",
       "fixtures": ["fixtures/global-seo.json"]
+    },
+    "seo.sitemap": {
+      "capability": "seo.sitemap",
+      "schema": "schemas/sitemap.schema.json",
+      "fixtures": ["fixtures/sitemap.json"]
     }
   }
 }
