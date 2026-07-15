@@ -3,7 +3,6 @@ import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { SitemapRenderCtx } from '@nuxtjs/sitemap'
-import type { OutputBundle, OutputChunk, OutputOptions } from 'rollup'
 import {
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
@@ -27,6 +26,18 @@ const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = buildSitemapModuleOptions(drupalUrl)
 
 type RouteRules = Record<string, Record<string, unknown>>
+type AnalysisOutputOptions = { dir?: string }
+type AnalysisOutputChunk = {
+  type: 'chunk'
+  isEntry: boolean
+  fileName: string
+  modules: Record<string, { renderedLength: number }>
+}
+type AnalysisOutputAsset = { type: 'asset' }
+type AnalysisOutputBundle = Record<
+  string,
+  AnalysisOutputChunk | AnalysisOutputAsset
+>
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
@@ -109,11 +120,14 @@ export default defineNuxtConfig({
         ? [{
             apply: 'build' as const,
             name: 'stir-client-entry-analysis',
-            generateBundle(_options: OutputOptions, bundle: OutputBundle) {
+            generateBundle(
+              _options: AnalysisOutputOptions,
+              bundle: AnalysisOutputBundle,
+            ) {
               if (!String(_options.dir || '').includes('/client')) return
 
               const entries = Object.values(bundle)
-                .filter((asset): asset is OutputChunk =>
+                .filter((asset): asset is AnalysisOutputChunk =>
                   asset.type === 'chunk' && asset.isEntry,
                 )
                 .map((chunk) => ({
