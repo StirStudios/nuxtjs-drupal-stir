@@ -15,6 +15,9 @@ export default defineVitestConfig({
     environment: 'nuxt',
     include: ['tests/nuxt/runtime/**/*.spec.ts'],
     setupFiles: ['tests/nuxt/runtime/setup.ts'],
+    // Each file boots the complete Nuxt application. Serializing those boots
+    // avoids cross-worker app-config initialization races in a cold CI runner.
+    fileParallelism: false,
     testTimeout: 10000,
     onConsoleLog(log, type) {
       if (
