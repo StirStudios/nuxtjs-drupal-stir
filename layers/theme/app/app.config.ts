@@ -231,7 +231,7 @@ export default defineAppConfig({
         floating: false,
         base: [
           'pointer-events-none absolute -top-1.5 left-0 text-xs font-medium text-default/80 transition-all',
-          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-default/70',
+          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-default/80',
           'peer-focus:-top-1.5 peer-focus:text-xs peer-focus:font-medium peer-focus:text-highlighted',
         ],
       },
