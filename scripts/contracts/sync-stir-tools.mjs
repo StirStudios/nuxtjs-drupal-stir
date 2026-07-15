@@ -10,6 +10,7 @@ import {
 } from 'node:fs'
 import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import Ajv from 'ajv'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const source = resolve(
@@ -25,18 +26,37 @@ if (!process.argv[2] && !process.env.STIR_TOOLS_CONTRACTS_DIR) {
 }
 
 const manifestPath = resolve(source, 'manifest.json')
+const manifestSchemaPath = resolve(
+  source,
+  'schemas/contract-manifest.schema.json',
+)
 
 if (!existsSync(manifestPath)) {
   throw new Error(`Missing contract manifest: ${manifestPath}`)
 }
 
-const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+if (!existsSync(manifestSchemaPath)) {
+  throw new Error(`Missing contract manifest schema: ${manifestSchemaPath}`)
+}
 
-if (manifest.schemaVersion !== 1 || typeof manifest.contractVersion !== 'string') {
-  throw new Error('Unsupported Stir Tools contract manifest.')
+const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+const manifestSchema = JSON.parse(readFileSync(manifestSchemaPath, 'utf8'))
+const ajv = new Ajv({ allErrors: true, schemaId: 'auto' })
+const validateManifest = ajv.compile(manifestSchema)
+
+if (!validateManifest(manifest)) {
+  throw new Error(
+    `Invalid Stir Tools contract manifest: ${ajv.errorsText(validateManifest.errors)}`,
+  )
 }
 
 for (const [id, contract] of Object.entries(manifest.contracts ?? {})) {
+  if (!Object.hasOwn(manifest.capabilities, contract.capability)) {
+    throw new Error(
+      `Contract ${id} references unknown capability: ${String(contract.capability)}`,
+    )
+  }
+
   const referenced = [contract.schema, ...(contract.fixtures ?? [])]
 
   for (const path of referenced) {

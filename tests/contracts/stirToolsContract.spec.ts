@@ -10,7 +10,21 @@ const manifest = JSON.parse(
 ) as {
   schemaVersion: number
   contractVersion: string
-  contracts: Record<string, { schema: string, fixtures: string[] }>
+  producer: string
+  platformRequirements: { drupalCore: string, php: string }
+  compatibility: {
+    additiveChanges: string
+    breakingChanges: string
+    consumerReleaseLockstep: boolean
+  }
+  capabilities: Record<
+    string,
+    { providerModules: string[], optional: boolean }
+  >
+  contracts: Record<
+    string,
+    { capability: string, schema: string, fixtures: string[] }
+  >
 }
 const snapshot = JSON.parse(
   readFileSync(resolve(root, 'snapshot.json'), 'utf8'),
@@ -35,6 +49,43 @@ describe('Stir Tools contract snapshot', () => {
         .digest('hex')
 
       expect(actual, path).toBe(expected)
+    }
+  })
+
+  it('declares independently releasable platform capabilities', () => {
+    const ajv = new Ajv({ allErrors: true, schemaId: 'auto' })
+    const schema = JSON.parse(readFileSync(
+      resolve(root, 'schemas/contract-manifest.schema.json'),
+      'utf8',
+    ))
+    const validate = ajv.compile(schema)
+
+    expect(
+      validate(manifest),
+      ajv.errorsText(validate.errors),
+    ).toBe(true)
+    expect(manifest.platformRequirements).toEqual({
+      drupalCore: '^11',
+      php: '>=8.4',
+    })
+    expect(manifest.compatibility).toEqual({
+      additiveChanges: 'same-major',
+      breakingChanges: 'new-major',
+      consumerReleaseLockstep: false,
+    })
+
+    const usedCapabilities = new Set(
+      Object.values(manifest.contracts).map(contract => contract.capability),
+    )
+
+    expect([...usedCapabilities].sort()).toEqual(
+      Object.keys(manifest.capabilities).sort(),
+    )
+    for (const [id, contract] of Object.entries(manifest.contracts)) {
+      expect(
+        manifest.capabilities,
+        `${id} capability ${contract.capability}`,
+      ).toHaveProperty(contract.capability)
     }
   })
 

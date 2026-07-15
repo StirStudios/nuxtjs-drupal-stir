@@ -1,9 +1,29 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.0.0",
+  "contractVersion": "1.1.0",
   "producer": "stirstudios/stir_tools",
+  "platformRequirements": {
+    "drupalCore": "^11",
+    "php": ">=8.4"
+  },
+  "compatibility": {
+    "additiveChanges": "same-major",
+    "breakingChanges": "new-major",
+    "consumerReleaseLockstep": false
+  },
+  "capabilities": {
+    "account.registration": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "layout.webform": {
+      "providerModules": ["stir_layout_builder_paragraph_webform"],
+      "optional": true
+    }
+  },
   "contracts": {
     "auth.register.response": {
+      "capability": "account.registration",
       "schema": "schemas/auth-register-response.schema.json",
       "fixtures": [
         "fixtures/auth-register-admin-approval.json",
@@ -11,6 +31,7 @@
       ]
     },
     "layout.webform": {
+      "capability": "layout.webform",
       "schema": "schemas/webform.schema.json",
       "fixtures": ["fixtures/webform-contact.json"]
     }
