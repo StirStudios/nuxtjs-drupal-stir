@@ -5,7 +5,7 @@ This layer uses Yup for client-side validation with two intentionally different 
 ## 1) Dynamic Drupal Webforms
 
 - Entry points:
-  - `layers/theme/app/components/global/Paragraph/Webform.vue`
+  - `layers/webform/app/components/global/Paragraph/Webform.vue`
   - `layers/theme/app/utils/buildYupSchema.ts`
 - Purpose:
   - Build Yup schemas at runtime from Drupal webform metadata and field states.

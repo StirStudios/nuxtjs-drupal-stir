@@ -1,4 +1,4 @@
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '../../../theme/app/types'
 
 export const webformState = reactive<{
   state: WebformState

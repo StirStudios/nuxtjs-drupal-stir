@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '../../../theme/app/types'
 import type { ObjectSchema } from 'yup'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
-import { resolveUiSize, type UiSize } from '~/utils/nuxtUiProps'
+import { trustedDrupalHtml } from '../../../theme/app/utils/trustedDrupalHtml'
+import { resolveUiSize, type UiSize } from '../../../theme/app/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
   buttonClass?: string

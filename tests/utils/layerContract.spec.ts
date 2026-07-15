@@ -13,7 +13,7 @@ describe('layer contract', () => {
     )
 
     expect(nuxtConfig).toContain(
-      'extends: [\'./layers/platform\', \'./layers/auth\']',
+      'extends: [\'./layers/platform\', \'./layers/webform\', \'./layers/auth\']',
     )
     expect(platformConfig).toContain('extends: [\'../core\', \'../theme\']')
   })

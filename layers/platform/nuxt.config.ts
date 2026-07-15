@@ -22,7 +22,6 @@ const isTestEnv =
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
-const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 const sitemapModuleOptions = buildSitemapModuleOptions(drupalUrl)
 
 type RouteRules = Record<string, Record<string, unknown>>
@@ -224,13 +223,6 @@ export default defineNuxtConfig({
     ],
 
     [
-      '@nuxtjs/turnstile',
-      {
-        siteKey: turnstileSiteKey,
-      },
-    ],
-
-    [
       '@nuxtjs/robots',
       {
         // disallow: ['/secret', '/admin'],
@@ -283,21 +275,6 @@ export default defineNuxtConfig({
     drupalClientIpForwarding: {
       enabled: process.env.DRUPAL_FORWARD_CLIENT_IP === 'true',
       trustProxy: process.env.DRUPAL_TRUST_PROXY === 'true',
-    },
-    webformSubmissionLimits: {
-      maxRequestBytes: positiveIntegerEnvironment(
-        process.env.WEBFORM_MAX_REQUEST_BYTES,
-        10 * 1024 * 1024,
-      ),
-      maxFileBytes: positiveIntegerEnvironment(
-        process.env.WEBFORM_MAX_FILE_BYTES,
-        5 * 1024 * 1024,
-      ),
-      maxFiles: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FILES, 5),
-      maxFields: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FIELDS, 100),
-    },
-    turnstile: {
-      secretKey: process.env.TURNSTILE_SECRET,
     },
     public: {
       api: drupalUrl,

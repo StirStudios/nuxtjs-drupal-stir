@@ -12,8 +12,8 @@ import {
   fetchDrupalCsrfToken,
   getDrupalApiConfig,
   getForwardedCookie,
-} from '../../utils/drupalApi'
-import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+} from '../../../../core/server/utils/drupalApi'
+import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
 import {
   assertWebformContentLength,
   assertWebformMultipartLimits,

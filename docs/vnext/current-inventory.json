@@ -12,7 +12,8 @@
     "auth",
     "core",
     "platform",
-    "theme"
+    "theme",
+    "webform"
   ],
   "dependencies": {
     "production": [
@@ -161,7 +162,6 @@
       "layers/theme/app/components/Field/Select.vue",
       "layers/theme/app/components/Field/SelectMenu.vue",
       "layers/theme/app/components/Field/Textarea.vue",
-      "layers/theme/app/components/Field/Turnstile.vue",
       "layers/theme/app/components/HeroContent.vue",
       "layers/theme/app/components/Icons/ColorMode.vue",
       "layers/theme/app/components/Icons/Social.vue",
@@ -174,8 +174,6 @@
       "layers/theme/app/components/Site/Messages.vue",
       "layers/theme/app/components/StirPdfViewer.client.vue",
       "layers/theme/app/components/TabContent.vue",
-      "layers/theme/app/components/WebformContent.vue",
-      "layers/theme/app/components/WebformForm.vue",
       "layers/theme/app/components/Wrap/Article.vue",
       "layers/theme/app/components/Wrap/Div.vue",
       "layers/theme/app/components/Wrap/Grid.vue",
@@ -207,11 +205,14 @@
       "layers/theme/app/components/global/Paragraph/Text.vue",
       "layers/theme/app/components/global/Paragraph/Timeline.vue",
       "layers/theme/app/components/global/Paragraph/View.vue",
-      "layers/theme/app/components/global/Paragraph/Webform.vue",
       "layers/theme/app/components/global/drupal-markup.vue",
       "layers/theme/app/components/global/drupal-view--default.vue",
       "layers/theme/app/components/global/node--default.vue",
-      "layers/theme/app/components/global/user--default.vue"
+      "layers/theme/app/components/global/user--default.vue",
+      "layers/webform/app/components/Field/Turnstile.vue",
+      "layers/webform/app/components/WebformContent.vue",
+      "layers/webform/app/components/WebformForm.vue",
+      "layers/webform/app/components/global/Paragraph/Webform.vue"
     ],
     "composables": [
       "layers/auth/app/composables/account/useAccountNav.ts",
@@ -272,7 +273,7 @@
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useValidation.ts",
       "layers/theme/app/composables/useVideoPlayers.ts",
-      "layers/theme/app/composables/useWebformState.ts"
+      "layers/webform/app/composables/useWebformState.ts"
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebformProps } from '~/types'
+import type { WebformProps } from '../../../../../theme/app/types'
 
 const props = defineProps<WebformProps>()
 </script>

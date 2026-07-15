@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { flattenWebformFields } from '~/utils/flattenWebformFields'
-import { webformState } from '~/composables/useWebformState'
-import { evaluateContainerVisibility } from '~/composables/useContainerVisibility'
-import { transformPayloadToSnakeCase } from '~/utils/transformUtils'
-import { getHiddenDefaults } from '~/utils/getHiddenDefaults'
-import { useValidation } from '~/composables/useValidation'
+import { flattenWebformFields } from '../../../theme/app/utils/flattenWebformFields'
+import { webformState } from '../composables/useWebformState'
+import { evaluateContainerVisibility } from '../../../theme/app/composables/useContainerVisibility'
+import { transformPayloadToSnakeCase } from '../../../theme/app/utils/transformUtils'
+import { getHiddenDefaults } from '../../../theme/app/utils/getHiddenDefaults'
+import { useValidation } from '../../../theme/app/composables/useValidation'
 import { useWindowScroll } from '@vueuse/core'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '~/utils/webformScrollToTop'
-import { resolveWebformRedirect } from '~/utils/webformRedirect'
-import { evaluateCondition } from '~/utils/evaluateUtils'
+} from '../../../theme/app/utils/webformScrollToTop'
+import { resolveWebformRedirect } from '../../../theme/app/utils/webformRedirect'
+import { evaluateCondition } from '../../../theme/app/utils/evaluateUtils'
 import {
   buildWebformFormData,
   hasFileValue,
   isWebformFileField,
-} from '~/utils/webformFileUtils'
+} from '../../../theme/app/utils/webformFileUtils'
 import type {
   WebformDefinition,
   WebformFieldProps,
   WebformProps,
   WebformState,
-} from '~/types'
+} from '../../../theme/app/types'
 import type { ObjectSchema } from 'yup'
 
-type BuildYupSchema = typeof import('~/utils/buildYupSchema')['buildYupSchema']
+type BuildYupSchema = typeof import('../../../theme/app/utils/buildYupSchema')['buildYupSchema']
 
 const props = defineProps<WebformProps>()
 const webform = computed<WebformDefinition>(() => {
@@ -101,7 +101,7 @@ function requestSchema(): void {
 async function ensureSchemaReady(): Promise<void> {
   if (isSchemaReady.value) return
 
-  schemaLoadPromise ??= import('~/utils/buildYupSchema')
+  schemaLoadPromise ??= import('../../../theme/app/utils/buildYupSchema')
     .then((module) => {
       buildSchema = module.buildYupSchema
       schema.value = buildSchema(fields, state)

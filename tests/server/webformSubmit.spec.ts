@@ -1,6 +1,6 @@
 import { readRawBody } from 'h3'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import webformSubmitHandler from '../../layers/core/server/api/webform/submit.post'
+import webformSubmitHandler from '../../layers/webform/server/api/webform/submit.post'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),
