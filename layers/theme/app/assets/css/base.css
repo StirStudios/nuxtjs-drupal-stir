@@ -33,10 +33,19 @@
   }
 
   :where(.prose, .admin-editor-prose) {
+    > :first-child {
+      @apply mt-0;
+    }
+
+    > :last-child {
+      @apply mb-0;
+    }
+
     :where(section + section) {
       @apply mt-12;
     }
 
+    > :where(h1, h2, h3, h4, h5, h6):first-child,
     :where(section > :where(h1, h2, h3, h4, h5, h6):first-child) {
       @apply mt-0;
     }
@@ -93,6 +102,10 @@
       @apply my-1.5 leading-7;
     }
 
+    :where(li > p) {
+      @apply my-0;
+    }
+
     :where(a) {
       @apply text-primary font-medium underline underline-offset-4 transition-colors;
     }
@@ -125,7 +138,12 @@
     }
 
     :where(img, video, iframe, audio, figure) {
-      @apply my-8 h-auto max-w-full;
+      @apply h-auto max-w-full;
+    }
+
+    > :where(img, video, iframe, audio, figure),
+    :where(section > :where(img, video, iframe, audio, figure)) {
+      @apply my-8;
     }
 
     :where(table) {
