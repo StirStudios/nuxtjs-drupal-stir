@@ -45,7 +45,9 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
         start: {
           default: 1,
           parseHTML: (element: Element) => {
-            return element.hasAttribute('start') ? Number.parseInt(element.getAttribute('start') || '', 10) : 1
+            return element.hasAttribute('start')
+              ? Number.parseInt(element.getAttribute('start') || '', 10)
+              : 1
           },
         },
         type: {
@@ -69,7 +71,8 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
         },
         'data-list-item-id': {
           default: null,
-          parseHTML: (element: Element) => element.getAttribute('data-list-item-id'),
+          parseHTML: (element: Element) =>
+            element.getAttribute('data-list-item-id'),
         },
       }
     },
@@ -89,7 +92,11 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
         },
       }
     },
-    renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+    renderHTML({
+      HTMLAttributes,
+    }: {
+      HTMLAttributes: Record<string, unknown>
+    }) {
       return ['section', mergeAttributes(HTMLAttributes), 0]
     },
   })
@@ -109,7 +116,11 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
         },
       }
     },
-    renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+    renderHTML({
+      HTMLAttributes,
+    }: {
+      HTMLAttributes: Record<string, unknown>
+    }) {
       return ['div', mergeAttributes(HTMLAttributes), 0]
     },
   })
@@ -133,7 +144,11 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
         },
       }
     },
-    renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+    renderHTML({
+      HTMLAttributes,
+    }: {
+      HTMLAttributes: Record<string, unknown>
+    }) {
       return ['drupal-media', mergeAttributes(HTMLAttributes), '\u00a0']
     },
   })
@@ -153,25 +168,79 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
   ]
 
   const headingToolbarItems = [
-    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: withTooltip('Heading 2') },
-    { kind: 'heading', level: 3, icon: 'i-lucide-heading-3', tooltip: withTooltip('Heading 3') },
-    { kind: 'paragraph', icon: 'i-lucide-pilcrow', tooltip: withTooltip('Paragraph') },
+    {
+      kind: 'heading',
+      level: 2,
+      icon: 'i-lucide-heading-2',
+      tooltip: withTooltip('Heading 2'),
+    },
+    {
+      kind: 'heading',
+      level: 3,
+      icon: 'i-lucide-heading-3',
+      tooltip: withTooltip('Heading 3'),
+    },
+    {
+      kind: 'paragraph',
+      icon: 'i-lucide-pilcrow',
+      tooltip: withTooltip('Paragraph'),
+    },
   ]
 
   const markToolbarItems = [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: withTooltip('Bold') },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: withTooltip('Italic') },
-    { kind: 'mark', mark: 'underline', icon: 'i-lucide-underline', tooltip: withTooltip('Underline') },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: withTooltip('Strike') },
+    {
+      kind: 'mark',
+      mark: 'bold',
+      icon: 'i-lucide-bold',
+      tooltip: withTooltip('Bold'),
+    },
+    {
+      kind: 'mark',
+      mark: 'italic',
+      icon: 'i-lucide-italic',
+      tooltip: withTooltip('Italic'),
+    },
+    {
+      kind: 'mark',
+      mark: 'underline',
+      icon: 'i-lucide-underline',
+      tooltip: withTooltip('Underline'),
+    },
+    {
+      kind: 'mark',
+      mark: 'strike',
+      icon: 'i-lucide-strikethrough',
+      tooltip: withTooltip('Strike'),
+    },
     { kind: 'linkEdit', icon: 'i-lucide-link', tooltip: withTooltip('Link') },
-    { kind: 'unlink', icon: 'i-lucide-link-2-off', tooltip: withTooltip('Remove link') },
+    {
+      kind: 'unlink',
+      icon: 'i-lucide-link-2-off',
+      tooltip: withTooltip('Remove link'),
+    },
   ]
 
   const listToolbarItems = [
-    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: withTooltip('Bulleted list') },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: withTooltip('Numbered list') },
-    { kind: 'blockquote', icon: 'i-lucide-text-quote', tooltip: withTooltip('Quote') },
-    { kind: 'horizontalRule', icon: 'i-lucide-minus', tooltip: withTooltip('Divider') },
+    {
+      kind: 'bulletList',
+      icon: 'i-lucide-list',
+      tooltip: withTooltip('Bulleted list'),
+    },
+    {
+      kind: 'orderedList',
+      icon: 'i-lucide-list-ordered',
+      tooltip: withTooltip('Numbered list'),
+    },
+    {
+      kind: 'blockquote',
+      icon: 'i-lucide-text-quote',
+      tooltip: withTooltip('Quote'),
+    },
+    {
+      kind: 'horizontalRule',
+      icon: 'i-lucide-minus',
+      tooltip: withTooltip('Divider'),
+    },
   ]
 
   const fixedToolbarItems = [
@@ -190,18 +259,36 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     [
       { type: 'label', label: 'Text' },
       { kind: 'paragraph', label: 'Paragraph', icon: 'i-lucide-pilcrow' },
-      { kind: 'heading', level: 2, label: 'Heading 2', icon: 'i-lucide-heading-2' },
-      { kind: 'heading', level: 3, label: 'Heading 3', icon: 'i-lucide-heading-3' },
+      {
+        kind: 'heading',
+        level: 2,
+        label: 'Heading 2',
+        icon: 'i-lucide-heading-2',
+      },
+      {
+        kind: 'heading',
+        level: 3,
+        label: 'Heading 3',
+        icon: 'i-lucide-heading-3',
+      },
     ],
     [
       { type: 'label', label: 'Lists' },
       { kind: 'bulletList', label: 'Bulleted List', icon: 'i-lucide-list' },
-      { kind: 'orderedList', label: 'Numbered List', icon: 'i-lucide-list-ordered' },
+      {
+        kind: 'orderedList',
+        label: 'Numbered List',
+        icon: 'i-lucide-list-ordered',
+      },
     ],
     [
       { type: 'label', label: 'Insert' },
       { kind: 'blockquote', label: 'Quote', icon: 'i-lucide-text-quote' },
-      { kind: 'horizontalRule', label: 'Divider', icon: 'i-lucide-separator-horizontal' },
+      {
+        kind: 'horizontalRule',
+        label: 'Divider',
+        icon: 'i-lucide-separator-horizontal',
+      },
     ],
   ]
 
@@ -243,8 +330,10 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
       isDisabled: undefined,
     },
     unlink: {
-      canExecute: (editor: Editor) => editor.can().chain().focus().extendMarkRange('link').unsetLink().run(),
-      execute: (editor: Editor) => editor.chain().focus().extendMarkRange('link').unsetLink(),
+      canExecute: (editor: Editor) =>
+        editor.can().chain().focus().extendMarkRange('link').unsetLink().run(),
+      execute: (editor: Editor) =>
+        editor.chain().focus().extendMarkRange('link').unsetLink(),
       isActive: () => false,
       isDisabled: (editor: Editor) => editor.isActive('link') === false,
     },

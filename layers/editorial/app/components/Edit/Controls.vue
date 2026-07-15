@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { EditAction, EditActionKey } from '~/types/EditControls'
-import { adminUiTheme } from '~/utils/adminUiTheme'
+import type { EditAction, EditActionKey } from '../../../../theme/app/types/EditControls'
+import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const props = defineProps<{
   actions: EditAction[]
@@ -62,7 +62,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
   <UTheme :ui="adminUiTheme">
     <UFieldGroup
       :class="[
-        'admin-ui admin-ui-scope admin-ui-controls top-2 right-2 rounded-md shadow-lg transition-opacity absolute z-100',
+        'admin-ui admin-ui-scope admin-ui-controls absolute top-2 right-2 z-100 rounded-md shadow-lg transition-opacity',
         props.containerClass,
       ]"
       data-admin-ui-controls

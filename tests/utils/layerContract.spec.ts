@@ -15,7 +15,17 @@ describe('layer contract', () => {
     for (const layer of ['platform', 'analytics', 'scripts', 'webform', 'auth']) {
       expect(nuxtConfig).toContain(`'./layers/${layer}'`)
     }
-    expect(platformConfig).toContain('extends: [\'../core\', \'../theme\']')
+    expect(platformConfig).toContain(
+      'extends: [\'../core\', \'../theme\', \'../editorial\']',
+    )
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/app/components/Drupal/Tabs.vue',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/app/components/Edit/Link.vue',
+    ))).toBe(true)
   })
 
   it('keeps the established public layer aliases available', () => {

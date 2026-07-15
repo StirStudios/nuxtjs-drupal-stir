@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useEventListener, useWindowScroll } from '@vueuse/core'
-import { useParagraphTextEditor } from '~/composables/useParagraphTextEditor'
-import { adminUiTheme } from '~/utils/adminUiTheme'
-import { normalizeEditorHtmlForSave } from '~/utils/normalizeEditorHtmlForSave'
+import { useParagraphTextEditor } from '../../composables/useParagraphTextEditor'
+import { adminUiTheme } from '../../utils/adminUiTheme'
+import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSave'
 
 const props = defineProps<{
   paragraphId: number
@@ -23,7 +23,10 @@ const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
 const toolbarClass = 'admin-ui-toolbar sticky top-0 z-10 mb-2 px-2 py-2'
-const shouldShowBubbleToolbar = (payload: { view: { hasFocus: () => boolean }; state: { selection: { empty: boolean } } }) => {
+const shouldShowBubbleToolbar = (payload: {
+  view: { hasFocus: () => boolean }
+  state: { selection: { empty: boolean } }
+}) => {
   return payload.view.hasFocus() && payload.state.selection.empty === false
 }
 const {
@@ -85,7 +88,8 @@ async function saveInline() {
 
     closeEditor('saved', valueToSave)
   } catch (error) {
-    saveError.value = error instanceof Error ? error.message : 'Failed to save paragraph text.'
+    saveError.value =
+      error instanceof Error ? error.message : 'Failed to save paragraph text.'
   } finally {
     isSaving.value = false
   }
@@ -103,20 +107,25 @@ function cancelEditing(): void {
 function scrollEditorIntoViewIfNeeded(): void {
   if (import.meta.client === false || editPanelRef.value === null) return
 
-  const headerHeightRaw = window.getComputedStyle(document.documentElement)
+  const headerHeightRaw = window
+    .getComputedStyle(document.documentElement)
     .getPropertyValue('--ui-header-height')
     .trim()
   const headerHeight = Number.parseFloat(headerHeightRaw) || 0
-  const rootFontSizeRaw = window.getComputedStyle(document.documentElement).fontSize
+  const rootFontSizeRaw = window.getComputedStyle(
+    document.documentElement,
+  ).fontSize
   const rootFontSize = Number.parseFloat(rootFontSizeRaw) || 16
   const extraTopOffset = 10 * rootFontSize
   const topSafeArea = headerHeight + extraTopOffset
   const panelRect = editPanelRef.value.getBoundingClientRect()
-  const isOutsideViewport = panelRect.top < topSafeArea || panelRect.bottom > window.innerHeight - 12
+  const isOutsideViewport =
+    panelRect.top < topSafeArea || panelRect.bottom > window.innerHeight - 12
 
   if (isOutsideViewport === false) return
 
-  const panelTop = window.scrollY + editPanelRef.value.getBoundingClientRect().top
+  const panelTop =
+    window.scrollY + editPanelRef.value.getBoundingClientRect().top
   const targetTop = Math.max(0, panelTop - topSafeArea)
 
   if (Math.abs(window.scrollY - targetTop) > 8) {
@@ -145,7 +154,9 @@ onMounted(async () => {
     }
 
     if (editPanelRef.value) {
-      useEventListener(editPanelRef, 'keydown', handleKeydown, { capture: true })
+      useEventListener(editPanelRef, 'keydown', handleKeydown, {
+        capture: true,
+      })
     } else {
       useEventListener(window, 'keydown', handleKeydown, { capture: true })
     }
@@ -162,7 +173,7 @@ onMounted(async () => {
       <UEditor
         v-slot="{ editor }"
         v-model="editorValue"
-        class="w-full min-h-32 max-h-[60vh] overflow-y-auto rounded-lg"
+        class="max-h-[60vh] min-h-32 w-full overflow-y-auto rounded-lg"
         content-type="html"
         :extensions="extensions"
         :handlers="customHandlers"
@@ -192,12 +203,19 @@ onMounted(async () => {
           :should-show="shouldShowBubbleToolbar"
         />
 
-        <UEditorSuggestionMenu :editor="editor" :items="suggestionItems as never" />
+        <UEditorSuggestionMenu
+          :editor="editor"
+          :items="suggestionItems as never"
+        />
       </UEditor>
 
-      <div class="mt-4 p-4 flex items-center justify-between gap-3">
-        <span v-if="isSaving" class="admin-ui-status-saving text-sm">Saving...</span>
-        <span v-else-if="saveError" class="admin-ui-status-error text-sm">{{ saveError }}</span>
+      <div class="mt-4 flex items-center justify-between gap-3 p-4">
+        <span v-if="isSaving" class="admin-ui-status-saving text-sm"
+          >Saving...</span
+        >
+        <span v-else-if="saveError" class="admin-ui-status-error text-sm">{{
+          saveError
+        }}</span>
         <span v-else class="text-sm text-transparent">Status</span>
         <div class="flex items-center gap-2">
           <UButton
@@ -206,7 +224,9 @@ onMounted(async () => {
             color="neutral"
             icon="i-lucide-x"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-soft' }"
+            :ui="{
+              base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-soft',
+            }"
             variant="soft"
             @click="cancelEditing"
           >
@@ -220,7 +240,9 @@ onMounted(async () => {
             icon="i-lucide-save"
             :loading="isSaving"
             size="sm"
-            :ui="{ base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-solid' }"
+            :ui="{
+              base: 'admin-ui-btn-base rounded-sm admin-ui-btn-neutral admin-ui-btn-solid',
+            }"
             variant="solid"
             @click="saveInline"
           >

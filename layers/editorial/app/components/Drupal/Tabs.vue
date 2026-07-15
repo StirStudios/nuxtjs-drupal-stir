@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
-import { getDrupalOrigin, toDrupalUrl } from '~/utils/drupalUrl'
-import { adminUiTheme } from '~/utils/adminUiTheme'
+import { getDrupalOrigin, toDrupalUrl } from '../../../../theme/app/utils/drupalUrl'
+import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
@@ -265,7 +265,6 @@ const links = computed(() => {
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
-
 </script>
 
 <template>

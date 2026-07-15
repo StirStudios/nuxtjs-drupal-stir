@@ -1,4 +1,4 @@
-@reference './main.css';
+@reference '../../../../theme/app/assets/css/main.css';
 
 @layer base {
   :root {
