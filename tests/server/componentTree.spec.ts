@@ -19,7 +19,17 @@ describe('componentTree', () => {
     expect(parsed).toEqual(fixture)
     expect(parsed.slots.body).toBe('<p>Rendered body text.</p>')
     expect(parsed.slots.section).toMatchObject([
-      { element: 'paragraph-text' },
+      {
+        element: 'paragraph-text',
+        props: {
+          text: '<p>Reusable component content.</p>',
+          classes: 'lead',
+          direction: 'up',
+          align: 'center',
+          width: 'w-lg',
+          spacing: 'py-8',
+        },
+      },
       {
         element: 'paragraph-icon',
         props: { iconName: 'i-lucide-star', iconSize: 7 },
