@@ -324,6 +324,7 @@
         "props": {
           "id": "7",
           "uuid": "00000000-0000-4000-8000-000000000007",
+          "entityType": "taxonomy_term",
           "type": "taxonomy_term",
           "bundle": "level",
           "label": "Intermediate"

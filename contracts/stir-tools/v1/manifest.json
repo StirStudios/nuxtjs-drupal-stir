@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.8.0",
+  "contractVersion": "1.9.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",

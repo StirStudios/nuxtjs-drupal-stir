@@ -211,6 +211,7 @@
       "layers/theme/app/components/global/Stir/MissingComponent.vue",
       "layers/theme/app/components/global/drupal-markup.vue",
       "layers/theme/app/components/global/drupal-view--default.vue",
+      "layers/theme/app/components/global/entity-reference.vue",
       "layers/theme/app/components/global/node--default.vue",
       "layers/theme/app/components/global/user--default.vue",
       "layers/webform/app/components/Field/Turnstile.vue",
@@ -363,7 +364,7 @@
     ]
   },
   "counts": {
-    "components": 99,
+    "components": 100,
     "composables": 60,
     "utils": 38,
     "plugins": 5,
@@ -371,11 +372,11 @@
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 83,
+    "tests": 84,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
-      "nuxt": 24,
+      "nuxt": 25,
       "server": 21,
       "utils": 27
     }
@@ -397,6 +398,7 @@
     "tests/nuxt/runtime/AdminUiTheme.nuxt.spec.ts",
     "tests/nuxt/runtime/AuthPage.nuxt.spec.ts",
     "tests/nuxt/runtime/AuthPasswordField.nuxt.spec.ts",
+    "tests/nuxt/runtime/EntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldRenderer.nuxt.spec.ts",
     "tests/nuxt/runtime/Footer.nuxt.spec.ts",
     "tests/nuxt/runtime/MediaImage.nuxt.spec.ts",
