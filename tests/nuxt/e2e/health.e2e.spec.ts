@@ -21,7 +21,11 @@ const pageFixture = {
 const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
   const payload = path === '/api/app-context'
-    ? { blocks: {}, footer_menu: [], site_info: { name: 'Fixture site' } }
+    ? {
+        blocks: {},
+        footer_menu: [],
+        site_info: { name: 'Fixture site', mail: '', slogan: '' },
+      }
     : path === '/api/seo/global'
       ? { meta: [], link: [] }
       : path.includes('/api/menu_items/')

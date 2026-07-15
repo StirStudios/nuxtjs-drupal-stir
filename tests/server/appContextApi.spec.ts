@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { drupalApiRequest } from '../../layers/core/server/utils/drupalApi'
 import {
   appContextQuery,
   buildAppContextEndpoint,
   fetchAppContext,
+  parseAppContextResponse,
 } from '../../layers/core/server/utils/appContextApi'
 
 vi.mock('../../layers/core/server/utils/drupalApi', () => ({
@@ -25,8 +28,41 @@ describe('appContextApi', () => {
     expect(buildAppContextEndpoint('')).toBe('/api/app-context')
   })
 
+  it('parses the producer fixture through the production boundary', () => {
+    const fixture = JSON.parse(readFileSync(resolve(
+      __dirname,
+      '../../contracts/stir-tools/v1/fixtures/app-context.json',
+    ), 'utf8'))
+
+    const parsed = parseAppContextResponse(fixture)
+
+    expect(parsed.blocks.after_main?.[0]?.element).toBe('block-content-basic')
+    expect(parsed.footer_menu).toEqual([{ title: 'Privacy', url: '/privacy' }])
+    expect(parsed.site_info.name).toBe('Fixture site')
+  })
+
+  it('normalizes Drupal empty-array blocks to an empty region map', () => {
+    expect(parseAppContextResponse({
+      blocks: [],
+      footer_menu: [],
+      site_info: { name: '', mail: '', slogan: '' },
+    }).blocks).toEqual({})
+  })
+
+  it('rejects malformed producer payloads before they reach UI code', () => {
+    expect(() => parseAppContextResponse({
+      blocks: { after_main: [{ element: 'block-content-basic' }] },
+      footer_menu: [],
+      site_info: { name: '', mail: '', slogan: '' },
+    })).toThrow('Invalid Drupal app-context contract at blocks.after_main.0')
+  })
+
   it('forwards cookies so Drupal can include authenticated app context edit links', async () => {
-    vi.mocked(drupalApiRequest).mockResolvedValue({ blocks: {} })
+    vi.mocked(drupalApiRequest).mockResolvedValue({
+      blocks: {},
+      footer_menu: [],
+      site_info: { name: '', mail: '', slogan: '' },
+    })
 
     const event = {} as Parameters<typeof fetchAppContext>[0]
 
@@ -58,7 +94,11 @@ describe('appContextApi', () => {
 
     const event = {} as Parameters<typeof fetchAppContext>[0]
 
-    await expect(fetchAppContext(event, '/broken')).resolves.toEqual({ blocks: {} })
+    await expect(fetchAppContext(event, '/broken')).resolves.toEqual({
+      blocks: {},
+      footer_menu: [],
+      site_info: { name: '', mail: '', slogan: '' },
+    })
     expect(consoleError).toHaveBeenCalledWith('Failed to fetch Drupal app context', {
       path: '/broken',
       message: 'Drupal unavailable',

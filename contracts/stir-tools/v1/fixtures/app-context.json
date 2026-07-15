@@ -1,0 +1,40 @@
+{
+  "blocks": {
+    "after_main": [
+      {
+        "element": "block-content-basic",
+        "props": {
+          "id": "newsletter",
+          "visibility": {
+            "requestPath": {
+              "mode": "hide",
+              "paths": ["/account/*"]
+            }
+          }
+        },
+        "slots": {
+          "content": [
+            {
+              "element": "paragraph-text",
+              "props": {
+                "text": "<p>Sanitized fixture content.</p>"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "footer_menu": [
+    {
+      "title": "Privacy",
+      "url": "/privacy"
+    }
+  ],
+  "site_info": {
+    "name": "Fixture site",
+    "slogan": "",
+    "mail": "hello@example.com"
+  }
+}

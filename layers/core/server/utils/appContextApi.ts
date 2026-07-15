@@ -1,16 +1,106 @@
 import { drupalApiRequest } from './drupalApi'
+import type {
+  AppContextBlock,
+  AppContextFooterMenuItem,
+  AppContextPayload,
+  AppContextSiteInfo,
+} from '../../shared/types/appContext'
 
-export type AppContextResponse = {
-  blocks?: Record<string, unknown>
-  footer_menu?: Array<{
-    title?: string
-    url?: string
-  }>
-  site_info?: {
-    name?: string
-    mail?: string
-    slogan?: string
-    [key: string]: unknown
+export type { AppContextPayload as AppContextResponse } from '../../shared/types/appContext'
+
+const emptyAppContext = (): AppContextPayload => ({
+  blocks: {},
+  footer_menu: [],
+  site_info: {
+    name: '',
+    mail: '',
+    slogan: '',
+  },
+})
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function contractError(path: string): TypeError {
+  return new TypeError(`Invalid Drupal app-context contract at ${path}`)
+}
+
+function parseBlock(value: unknown, path: string): AppContextBlock {
+  if (
+    !isRecord(value)
+    || typeof value.element !== 'string'
+    || !value.element
+    || !isRecord(value.props)
+    || !isRecord(value.slots)
+  ) {
+    throw contractError(path)
+  }
+
+  return {
+    element: value.element,
+    props: value.props,
+    slots: value.slots,
+  }
+}
+
+function parseBlocks(value: unknown): AppContextPayload['blocks'] {
+  if (Array.isArray(value)) {
+    if (value.length === 0) return {}
+    throw contractError('blocks')
+  }
+  if (!isRecord(value)) throw contractError('blocks')
+
+  return Object.fromEntries(Object.entries(value).map(([region, blocks]) => {
+    if (!Array.isArray(blocks)) throw contractError(`blocks.${region}`)
+
+    return [
+      region,
+      blocks.map((block, index) => parseBlock(block, `blocks.${region}.${index}`)),
+    ]
+  }))
+}
+
+function parseFooterMenu(value: unknown): AppContextFooterMenuItem[] {
+  if (!Array.isArray(value)) throw contractError('footer_menu')
+
+  return value.map((item, index) => {
+    if (
+      !isRecord(item)
+      || typeof item.title !== 'string'
+      || typeof item.url !== 'string'
+    ) {
+      throw contractError(`footer_menu.${index}`)
+    }
+
+    return { title: item.title, url: item.url }
+  })
+}
+
+function parseSiteInfo(value: unknown): AppContextSiteInfo {
+  if (
+    !isRecord(value)
+    || typeof value.name !== 'string'
+    || typeof value.mail !== 'string'
+    || typeof value.slogan !== 'string'
+  ) {
+    throw contractError('site_info')
+  }
+
+  return {
+    name: value.name,
+    mail: value.mail,
+    slogan: value.slogan,
+  }
+}
+
+export function parseAppContextResponse(value: unknown): AppContextPayload {
+  if (!isRecord(value)) throw contractError('root')
+
+  return {
+    blocks: parseBlocks(value.blocks),
+    footer_menu: parseFooterMenu(value.footer_menu),
+    site_info: parseSiteInfo(value.site_info),
   }
 }
 
@@ -53,14 +143,16 @@ export function logAppContextFetchError(path: string, error: unknown) {
 
 export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>[0], path = '') {
   try {
-    return await drupalApiRequest<AppContextResponse>(event, buildAppContextEndpoint(path), {
+    const response = await drupalApiRequest<unknown>(event, buildAppContextEndpoint(path), {
       method: 'GET',
       forwardCookies: true,
     })
+
+    return parseAppContextResponse(response)
   }
   catch (error) {
     logAppContextFetchError(path, error)
 
-    return { blocks: {} }
+    return emptyAppContext()
   }
 }

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/app-context.schema.json",
+  "title": "Stir app context response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["blocks", "footer_menu", "site_info"],
+  "properties": {
+    "blocks": {
+      "oneOf": [
+        {
+          "type": "array",
+          "maxItems": 0
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/customElement" }
+          }
+        }
+      ]
+    },
+    "footer_menu": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "url"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "site_info": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "slogan", "mail"],
+      "properties": {
+        "name": { "type": "string" },
+        "slogan": { "type": "string" },
+        "mail": { "type": "string" }
+      }
+    }
+  },
+  "definitions": {
+    "customElement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element", "props", "slots"],
+      "properties": {
+        "element": {
+          "type": "string",
+          "minLength": 1
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "slots": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

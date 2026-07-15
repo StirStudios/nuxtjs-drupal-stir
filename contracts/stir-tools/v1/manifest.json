@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.1.0",
+  "contractVersion": "1.2.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -19,9 +19,18 @@
     "layout.webform": {
       "providerModules": ["stir_layout_builder_paragraph_webform"],
       "optional": true
+    },
+    "app.context": {
+      "providerModules": ["stir_layout_block"],
+      "optional": true
     }
   },
   "contracts": {
+    "app.context": {
+      "capability": "app.context",
+      "schema": "schemas/app-context.schema.json",
+      "fixtures": ["fixtures/app-context.json"]
+    },
     "auth.register.response": {
       "capability": "account.registration",
       "schema": "schemas/auth-register-response.schema.json",
