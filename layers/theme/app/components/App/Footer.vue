@@ -5,179 +5,26 @@ import type {
   AppContextSiteInfo,
 } from '~/composables/useAppContext'
 import type { SocialIcon } from '~/types'
-
-type FooterAtom = 'logo' | 'menu' | 'socials' | 'slogan' | 'email' | 'legal' | 'copyright' | 'poweredBy'
-type FooterLayout = 'default' | 'columns' | 'stacked'
-type FooterSections = Record<'left' | 'center' | 'right', FooterAtom[]>
-type FooterAtomVisibility = Record<FooterAtom, boolean>
-
-type FooterConfig = {
-  layout: FooterLayout
-  requireSiteName: boolean
-  showLogo: boolean
-  showMenu: boolean
-  showSocials: boolean
-  showSlogan: boolean
-  showEmail: boolean
-  showCopyright: boolean
-  showPoweredBy: boolean
-  showFooterRegion: boolean
-  showSubFooterRegion: boolean
-  base: string
-  container: string
-  content: string
-  left: string
-  right: string
-  center: string
-  footerLinks: string
-  logo: string
-  logoFromTheme: string
-  menu: string
-  menuItem: string
-  menuList: string
-  socials: string
-  socialIcon: string
-  slogan: string
-  email: string
-  copyright: string
-  poweredBy: string
-  rights: string
-  sections: FooterSections
-}
-
-type ThemeRecord = Record<string, unknown>
-
-const DEFAULT_FOOTER_SECTIONS: FooterSections = {
-  left: ['logo'],
-  center: ['menu', 'legal'],
-  right: ['socials', 'email'],
-}
-
-const DEFAULT_FOOTER: FooterConfig = {
-  layout: 'default',
-  requireSiteName: false,
-  showLogo: true,
-  showMenu: true,
-  showSocials: true,
-  showSlogan: false,
-  showEmail: true,
-  showCopyright: true,
-  showPoweredBy: true,
-  showFooterRegion: true,
-  showSubFooterRegion: true,
-  base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
-  container: '',
-  content: 'flex flex-col items-center justify-center gap-4 text-center',
-  left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
-  right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
-  center: '',
-  footerLinks: 'transition-colors text-primary hover:text-primary/90',
-  logo: '',
-  logoFromTheme: '',
-  menu: 'mb-3',
-  menuItem: 'min-w-0 py-0',
-  menuList: 'flex flex-wrap justify-center',
-  socials: 'flex gap-1',
-  socialIcon: 'me-1',
-  slogan: 'mb-2',
-  email: '',
-  copyright: 'mb-0',
-  poweredBy: 'mb-0',
-  rights: '',
-  sections: DEFAULT_FOOTER_SECTIONS,
-}
-
-const toRecord = (value: unknown): ThemeRecord =>
-  value && typeof value === 'object' ? (value as ThemeRecord) : {}
-
-const toString = (value: unknown, fallback = ''): string =>
-  typeof value === 'string' ? value.trim() : fallback
-
-const toBool = (value: unknown, fallback: boolean): boolean =>
-  typeof value === 'boolean' ? value : fallback
-
-const toLayout = (value: unknown): FooterLayout =>
-  value === 'columns' || value === 'stacked' ? value : 'default'
-
-const toAtomList = (value: unknown, fallback: FooterAtom[]): FooterAtom[] => {
-  if (!Array.isArray(value)) {
-    return fallback.slice()
-  }
-
-  return value
-    .filter((entry): entry is FooterAtom =>
-      typeof entry === 'string'
-      && [
-        'logo',
-        'menu',
-        'socials',
-        'slogan',
-        'email',
-        'legal',
-        'copyright',
-        'poweredBy',
-      ].includes(entry),
-    )
-    .filter((entry, index, list) => list.indexOf(entry) === index)
-}
+import {
+  resolveFooterConfig,
+  toThemeRecord,
+  type FooterAtomVisibility,
+  type FooterSections,
+} from '~/utils/footer'
 
 const { getPage } = useDrupalCe()
 const page = getPage()
 const { iconsSocialConfig } = useSocialIcons()
 const currentYear = new Date().getFullYear()
 
-const theme = computed(() => toRecord(useAppConfig().stirTheme))
-const themeFooter = computed(() => toRecord(theme.value.footer))
-const themeNavigation = computed(() => toRecord(theme.value.navigation))
-const themeContainer = computed(() => toString(theme.value.container))
-
-const footerConfig = computed<FooterConfig>(() => {
-  const next = { ...DEFAULT_FOOTER, ...themeFooter.value } as ThemeRecord
-  const sections = toRecord(next.sections)
-
-  return {
-    ...DEFAULT_FOOTER,
-    ...next,
-    layout: toLayout(next.layout),
-    requireSiteName: toBool(next.requireSiteName, DEFAULT_FOOTER.requireSiteName),
-    showLogo: toBool(next.showLogo, DEFAULT_FOOTER.showLogo),
-    showMenu: toBool(next.showMenu, DEFAULT_FOOTER.showMenu),
-    showSocials: toBool(next.showSocials, DEFAULT_FOOTER.showSocials),
-    showSlogan: toBool(next.showSlogan, DEFAULT_FOOTER.showSlogan),
-    showEmail: toBool(next.showEmail, DEFAULT_FOOTER.showEmail),
-    showCopyright: toBool(next.showCopyright, DEFAULT_FOOTER.showCopyright),
-    showPoweredBy: toBool(next.showPoweredBy, DEFAULT_FOOTER.showPoweredBy),
-    showFooterRegion: toBool(next.showFooterRegion, DEFAULT_FOOTER.showFooterRegion),
-    showSubFooterRegion: toBool(next.showSubFooterRegion, DEFAULT_FOOTER.showSubFooterRegion),
-    base: toString(next.base, DEFAULT_FOOTER.base),
-    container: toString(next.container, DEFAULT_FOOTER.container),
-    content: toString(next.content, DEFAULT_FOOTER.content),
-    left: toString(next.left, DEFAULT_FOOTER.left),
-    right: toString(next.right, DEFAULT_FOOTER.right),
-    center: toString(next.center, DEFAULT_FOOTER.center),
-    footerLinks: toString(next.footerLinks, DEFAULT_FOOTER.footerLinks),
-    logo: toString(next.logo, DEFAULT_FOOTER.logo),
-    menu: toString(next.menu, DEFAULT_FOOTER.menu),
-    menuItem: toString(next.menuItem, DEFAULT_FOOTER.menuItem),
-    menuList: toString(next.menuList, DEFAULT_FOOTER.menuList),
-    socials: toString(next.socials, DEFAULT_FOOTER.socials),
-    socialIcon: toString(next.socialIcon, DEFAULT_FOOTER.socialIcon),
-    slogan: toString(next.slogan, DEFAULT_FOOTER.slogan),
-    email: toString(next.email, DEFAULT_FOOTER.email),
-    copyright: toString(next.copyright, DEFAULT_FOOTER.copyright),
-    poweredBy: toString(next.poweredBy, DEFAULT_FOOTER.poweredBy),
-    rights: toString(next.rights, DEFAULT_FOOTER.rights),
-    logoFromTheme: toString(
-      themeNavigation.value.logoScrolledClass || themeNavigation.value.logoClass,
-      DEFAULT_FOOTER.logoFromTheme,
-    ),
-    sections: {
-      left: toAtomList(sections.left, DEFAULT_FOOTER_SECTIONS.left),
-      center: toAtomList(sections.center, DEFAULT_FOOTER_SECTIONS.center),
-      right: toAtomList(sections.right, DEFAULT_FOOTER_SECTIONS.right),
-    },
-  }
-})
+const theme = computed(() => toThemeRecord(useAppConfig().stirTheme))
+const themeNavigation = computed(() => toThemeRecord(theme.value.navigation))
+const themeContainer = computed(() =>
+  typeof theme.value.container === 'string' ? theme.value.container.trim() : '',
+)
+const footerConfig = computed(() =>
+  resolveFooterConfig(theme.value.footer, themeNavigation.value),
+)
 
 const {
   data: appContext,

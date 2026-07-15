@@ -1,34 +1,9 @@
 <script setup lang="ts">
 import type { SocialIcon } from '~/types'
 import type { AppContextSiteInfo } from '~/composables/useAppContext'
+import type { FooterAtom, FooterConfig } from '~/utils/footer'
 
 const STIR_STUDIOS_WEBSITE = 'https://www.stirstudiosdesign.com'
-
-type FooterAtom =
-  | 'logo'
-  | 'menu'
-  | 'socials'
-  | 'slogan'
-  | 'email'
-  | 'legal'
-  | 'copyright'
-  | 'poweredBy'
-
-type FooterConfig = {
-  logo: string
-  logoFromTheme: string
-  menu: string
-  menuItem: string
-  menuList: string
-  socials: string
-  socialIcon: string
-  slogan: string
-  email: string
-  copyright: string
-  poweredBy: string
-  rights: string
-  footerLinks: string
-}
 
 defineProps<{
   atoms: FooterAtom[]
