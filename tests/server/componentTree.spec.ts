@@ -135,6 +135,39 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-hero',
+        props: {
+          direction: 'fade-up',
+          header: 'Built for performance',
+          headerTag: 'h2',
+          text: '<p>A Drupal-powered Nuxt experience.</p>',
+        },
+        slots: {
+          button: [{
+            element: 'paragraph-button',
+            props: {
+              link: {
+                title: 'Learn more',
+                url: '/about',
+              },
+            },
+          }],
+          media: [{
+            element: 'media-video',
+            props: {
+              src: '/sites/default/files/hero-poster.jpg',
+              alt: 'Hero video',
+              width: 1920,
+              height: 1080,
+              responsiveStyle: 'full',
+              loading: 'eager',
+              fetchpriority: 'high',
+              mediaEmbed: 'https://video.example/hero.mp4',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])
