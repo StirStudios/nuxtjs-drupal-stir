@@ -27,7 +27,7 @@ const drupalFixtureServer = createServer((request, response) => {
         site_info: { name: 'Fixture site', mail: '', slogan: '' },
       }
     : path === '/api/seo/global'
-      ? { meta: [], link: [] }
+      ? { lang: 'en', meta: [], link: [] }
       : path.includes('/api/menu_items/')
         ? []
         : pageFixture
@@ -104,12 +104,12 @@ describe('Nuxt E2E smoke', async () => {
   it('keeps public configuration endpoints available', async () => {
     const [authConfig, seo] = await Promise.all([
       $fetch<Record<string, unknown>>('/api/auth/config'),
-      $fetch<{ meta: unknown[], link: unknown[] }>('/api/seo/global'),
+      $fetch<{ lang?: string, meta: unknown[], link: unknown[] }>('/api/seo/global'),
     ])
 
     expect(authConfig).toBeTypeOf('object')
     if ('version' in authConfig) expect(authConfig.version).toBeTypeOf('number')
-    expect(seo).toEqual({ meta: [], link: [] })
+    expect(seo).toEqual({ lang: 'en', meta: [], link: [] })
   })
 
   it('renders the deterministic homepage twice without SSR drift', async () => {

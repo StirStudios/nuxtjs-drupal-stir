@@ -1,8 +1,4 @@
-type CmsGlobalSeo = {
-  lang?: string
-  meta?: Array<Record<string, string>>
-  link?: Array<Record<string, string>>
-}
+import type { GlobalSeoResponse } from '../../../core/shared/types/globalSeo'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -77,7 +73,7 @@ export default defineNuxtPlugin(async () => {
   const route = useRoute()
   const appConfig = useAppConfig()
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
-  const defaults = useState<CmsGlobalSeo | null>('cms-global-seo', () => null)
+  const defaults = useState<GlobalSeoResponse | null>('cms-global-seo', () => null)
   const lang = computed(() => defaults.value?.lang || config.lang)
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
@@ -108,7 +104,7 @@ export default defineNuxtPlugin(async () => {
   )
 
   if (config.enabled && defaults.value === null) {
-    defaults.value = await $fetch<CmsGlobalSeo>('/api/seo/global').catch(() => ({
+    defaults.value = await $fetch<GlobalSeoResponse>('/api/seo/global').catch(() => ({
       meta: [],
       link: [],
     }))

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.2.0",
+  "contractVersion": "1.3.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -23,6 +23,10 @@
     "app.context": {
       "providerModules": ["stir_layout_block"],
       "optional": true
+    },
+    "seo.global": {
+      "providerModules": ["stir_seo"],
+      "optional": true
     }
   },
   "contracts": {
@@ -43,6 +47,11 @@
       "capability": "layout.webform",
       "schema": "schemas/webform.schema.json",
       "fixtures": ["fixtures/webform-contact.json"]
+    },
+    "seo.global": {
+      "capability": "seo.global",
+      "schema": "schemas/global-seo.schema.json",
+      "fixtures": ["fixtures/global-seo.json"]
     }
   }
 }
