@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "laamada": {
+      "pathEnvironment": "STIR_CONSUMER_LAAMADA",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "piper": {
+      "pathEnvironment": "STIR_CONSUMER_PIPER",
+      "routes": ["/", "discover:/venues/*"]
+    },
+    "danceplug": {
+      "pathEnvironment": "STIR_CONSUMER_DANCEPLUG",
+      "routes": ["/", "/videos", "/auth/login"]
+    },
+    "stir": {
+      "pathEnvironment": "STIR_CONSUMER_STIR",
+      "routes": ["/", "/work"]
+    }
+  }
+}

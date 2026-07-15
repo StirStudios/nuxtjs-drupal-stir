@@ -61,10 +61,11 @@ const props = withDefaults(
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
 const attrs = useAttrs()
-const { initializePlayers } = useVideoPlayers()
+const { initializePlayers, registerIframe } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
+const iframeElement = ref<HTMLIFrameElement | null>(null)
 const isBareVideoSourceActive = ref(false)
 const bareVideoLoadStrategy = computed(
   () => props.loadStrategy ?? mediaTheme.video?.loadStrategy ?? 'after-load',
@@ -126,6 +127,12 @@ const emit = defineEmits<{
 
 async function scheduleInitializePlayers(): Promise<void> {
   await nextTick()
+
+  if (iframeElement.value) {
+    await registerIframe(iframeElement.value)
+    return
+  }
+
   await initializePlayers()
 }
 
@@ -272,6 +279,7 @@ watch(
 
     <iframe
       v-if="shouldShowIframe"
+      ref="iframeElement"
       allow="
         accelerometer;
         autoplay;

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "tolerancePercentagePoints": 0.5,
+  "totals": {
+    "lines": 76.34,
+    "statements": 72.98,
+    "functions": 74.73,
+    "branches": 62.31
+  },
+  "criticalModules": {
+    "config/runtime.ts": {
+      "branches": 80
+    },
+    "config/sitemap.ts": {
+      "branches": 80
+    },
+    "layers/theme/app/utils/drupalViewState.ts": {
+      "branches": 80
+    }
+  }
+}

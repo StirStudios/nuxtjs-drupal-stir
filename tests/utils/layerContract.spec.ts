@@ -25,6 +25,60 @@ describe('layer contract', () => {
     expect(tsConfig).toContain('"~/types/*"')
   })
 
+  it('publishes a machine-readable compatibility contract', () => {
+    const contract = JSON.parse(readFileSync(
+      resolve(rootDir, 'docs/public-contracts.json'),
+      'utf8',
+    )) as {
+      compatibilityPolicy: string
+      aliases: string[]
+      serverRoutes: string[]
+      runtimeConfigEnvironment: string[]
+    }
+
+    expect(contract.compatibilityPolicy).toBe('preserve-within-major')
+    expect(contract.aliases).toEqual([
+      '~/utils',
+      '~/composables',
+      '~/components',
+      '~/types',
+    ])
+    expect(contract.serverRoutes).toContain('/api/drupal-ce/**')
+    expect(contract.serverRoutes).toContain('/api/auth/**')
+    expect(contract.runtimeConfigEnvironment).toContain('DRUPAL_URL')
+    expect(contract.runtimeConfigEnvironment).toContain('TURNSTILE_SECRET')
+  })
+
+  it('exposes the root Nuxt config as the package entry point', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as { main?: string }
+
+    expect(packageJson.main).toBe('./nuxt.config.ts')
+  })
+
+  it('keeps the consumer audit matrix outside downstream repositories', () => {
+    const targets = JSON.parse(readFileSync(
+      resolve(rootDir, 'scripts/audit/consumer-targets.json'),
+      'utf8',
+    )) as { targets: Record<string, { routes: string[] }> }
+    const consumerScript = readFileSync(
+      resolve(rootDir, 'scripts/audit/consumers.mjs'),
+      'utf8',
+    )
+
+    expect(Object.keys(targets.targets)).toEqual([
+      'laamada',
+      'piper',
+      'danceplug',
+      'stir',
+    ])
+    expect(targets.targets.danceplug?.routes).toContain('/videos')
+    expect(consumerScript).toContain('\'archive\'')
+    expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
+  })
+
   it('uses the consumer CSS entry once when one is present', () => {
     const themeConfig = readFileSync(
       resolve(rootDir, 'layers/theme/nuxt.config.ts'),
@@ -127,6 +181,35 @@ describe('layer contract', () => {
       expect(component).toContain('from \'@nuxt/ui/composables/useFormField\'')
       expect(component).not.toContain('from \'@nuxt/ui/composables\'')
     }
+  })
+
+  it('does not load the reveal renderer for static paragraph text', () => {
+    const paragraphText = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/Paragraph/Text.vue'),
+      'utf8',
+    )
+
+    expect(paragraphText).toContain('const hasRevealMotion = computed')
+    expect(paragraphText).toContain('<LazyRevealMotion')
+    expect(paragraphText).toContain('v-if="hasRevealMotion"')
+    expect(paragraphText).toContain('v-else')
+  })
+
+  it('registers video iframes explicitly without subscriber polling', () => {
+    const videoPlayers = readFileSync(
+      resolve(rootDir, 'layers/theme/app/composables/useVideoPlayers.ts'),
+      'utf8',
+    )
+    const mediaVideo = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/Media/Video.vue'),
+      'utf8',
+    )
+
+    expect(videoPlayers).toContain('async function registerIframe')
+    expect(videoPlayers).toContain('registryVersion')
+    expect(videoPlayers).not.toContain('setInterval(bind')
+    expect(mediaVideo).toContain('ref="iframeElement"')
+    expect(mediaVideo).toContain('registerIframe(iframeElement.value)')
   })
 
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {

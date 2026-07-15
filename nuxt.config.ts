@@ -1,112 +1,30 @@
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { ResolvedSitemapUrl, SitemapRenderCtx } from '@nuxtjs/sitemap'
+import type { SitemapRenderCtx } from '@nuxtjs/sitemap'
+import {
+  commaSeparatedEnvironment,
+  normalizeEnvironmentUrl,
+  positiveIntegerEnvironment,
+} from './config/runtime'
+import {
+  buildSitemapModuleOptions,
+  dedupeResolvedSitemapUrls,
+} from './config/sitemap'
 
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
   fileURLToPath(new URL(path, import.meta.url))
+const isLayerWorkspace = resolve(process.cwd()) === resolveLayerPath('.')
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
-const drupalUrl = (process.env.DRUPAL_URL || '').replace(/\/+$/, '')
-const sitemapSources = drupalUrl ? [`${drupalUrl}/api/sitemap`] : []
-const sitemapExcludedRoutes = [
-  '/account/**',
-  '/auth/**',
-  '/login',
-]
+const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
-
-const positiveIntegerEnv = (value: string | undefined, fallback: number) => {
-  const parsed = Number(value)
-
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
-}
-
-const sitemapModuleOptions = {
-  sources: sitemapSources,
-  excludeAppSources: ['nuxt:route-rules'],
-  exclude: sitemapExcludedRoutes,
-  runtimeCacheStorage: { driver: 'memory' },
-  cacheMaxAgeSeconds: 0,
-  xslColumns: [
-    { label: 'URL', width: '50%' },
-    {
-      label: 'Last Modified',
-      select: 'sitemap:lastmod',
-      width: '25%',
-    },
-    {
-      label: 'Priority',
-      select: 'sitemap:priority',
-      width: '12.5%',
-    },
-    {
-      label: 'Change Frequency',
-      select: 'sitemap:changefreq',
-      width: '12.5%',
-    },
-  ],
-}
+const sitemapModuleOptions = buildSitemapModuleOptions(drupalUrl)
 
 type RouteRules = Record<string, Record<string, unknown>>
-
-function sitemapCanonicalKey(loc: string): string | null {
-  try {
-    const url = new URL(
-      loc.replaceAll('&amp;', '&'),
-      process.env.NUXT_URL || 'https://example.com',
-    )
-    const pathname =
-      url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
-
-    return url.search ? pathname + url.search : pathname
-  } catch {
-    return null
-  }
-}
-
-function sitemapMetadataScore(entry: ResolvedSitemapUrl): number {
-  return Number(Boolean(entry.lastmod)) +
-    Number(Boolean(entry.changefreq)) +
-    Number(entry.priority !== undefined)
-}
-
-function dedupeResolvedSitemapUrls(
-  urls: ResolvedSitemapUrl[],
-): ResolvedSitemapUrl[] {
-  const deduped: ResolvedSitemapUrl[] = []
-  const indexes = new Map<string, number>()
-
-  for (const entry of urls) {
-    const key = sitemapCanonicalKey(entry.loc)
-
-    if (key === null) {
-      deduped.push(entry)
-      continue
-    }
-
-    const existingIndex = indexes.get(key)
-
-    if (existingIndex === undefined) {
-      indexes.set(key, deduped.length)
-      deduped.push(entry)
-      continue
-    }
-
-    const existingEntry = deduped[existingIndex]
-
-    if (
-      existingEntry &&
-      sitemapMetadataScore(entry) > sitemapMetadataScore(existingEntry)
-    ) {
-      deduped[existingIndex] = entry
-    }
-  }
-
-  return deduped
-}
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
@@ -240,7 +158,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/ui',
-    '@nuxt/eslint',
+    ...(isLayerWorkspace ? ['@nuxt/eslint'] : []),
     '@nuxt/scripts',
     ...(!isTestEnv ? ['@nuxtjs/plausible'] : []),
     [
@@ -291,39 +209,38 @@ export default defineNuxtConfig({
     protectedCookieSecret: process.env.PROTECTED_COOKIE_SECRET || '',
     protectedRateLimit: {
       enabled: process.env.PROTECTED_RATE_LIMIT_ENABLED !== 'false',
-      maxAttempts: positiveIntegerEnv(
+      maxAttempts: positiveIntegerEnvironment(
         process.env.PROTECTED_RATE_LIMIT_MAX_ATTEMPTS,
         5,
       ),
-      windowSeconds: positiveIntegerEnv(
+      windowSeconds: positiveIntegerEnvironment(
         process.env.PROTECTED_RATE_LIMIT_WINDOW_SECONDS,
         15 * 60,
       ),
       trustProxy: process.env.PROTECTED_RATE_LIMIT_TRUST_PROXY === 'true',
     },
-    drupalRequestTimeoutMs: positiveIntegerEnv(
+    drupalRequestTimeoutMs: positiveIntegerEnvironment(
       process.env.DRUPAL_REQUEST_TIMEOUT_MS,
       10_000,
     ),
-    drupalSessionCookieNames: (process.env.DRUPAL_SESSION_COOKIE_NAMES || '')
-      .split(',')
-      .map(name => name.trim())
-      .filter(Boolean),
+    drupalSessionCookieNames: commaSeparatedEnvironment(
+      process.env.DRUPAL_SESSION_COOKIE_NAMES,
+    ),
     drupalClientIpForwarding: {
       enabled: process.env.DRUPAL_FORWARD_CLIENT_IP === 'true',
       trustProxy: process.env.DRUPAL_TRUST_PROXY === 'true',
     },
     webformSubmissionLimits: {
-      maxRequestBytes: positiveIntegerEnv(
+      maxRequestBytes: positiveIntegerEnvironment(
         process.env.WEBFORM_MAX_REQUEST_BYTES,
         10 * 1024 * 1024,
       ),
-      maxFileBytes: positiveIntegerEnv(
+      maxFileBytes: positiveIntegerEnvironment(
         process.env.WEBFORM_MAX_FILE_BYTES,
         5 * 1024 * 1024,
       ),
-      maxFiles: positiveIntegerEnv(process.env.WEBFORM_MAX_FILES, 5),
-      maxFields: positiveIntegerEnv(process.env.WEBFORM_MAX_FIELDS, 100),
+      maxFiles: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FILES, 5),
+      maxFields: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FIELDS, 100),
     },
     turnstile: {
       secretKey: process.env.TURNSTILE_SECRET,

@@ -35,8 +35,7 @@ declare global {
 }
 
 const videoPlayers = ref<Map<string, VideoPlayer>>(new Map())
-const DEFAULT_EVENT_POLL_INTERVAL_MS = 1000
-const MIN_EVENT_POLL_INTERVAL_MS = 250
+const registryVersion = ref(0)
 const PLAYER_SCRIPT_ORIGIN = 'https://assets.mediadelivery.net'
 const PLAYER_SCRIPT_URL =
   `${PLAYER_SCRIPT_ORIGIN}/playerjs/playerjs-latest.min.js`
@@ -106,57 +105,68 @@ export function useVideoPlayers() {
       'iframe[data-mid]',
     )
 
-    iframes.forEach((iframe) => {
-      const iframeKey = iframe.getAttribute('data-mid')
+    await Promise.all(Array.from(iframes, iframe => registerIframe(iframe)))
+  }
 
-      if (!iframeKey) return
+  async function registerIframe(iframe: HTMLIFrameElement): Promise<void> {
+    if (!import.meta.client) return
 
-      if (!isBunnyIframe(iframe)) {
-        debugVideoPlayer('skipping non-bunny iframe', {
-          iframeKey,
-          src: iframe.src,
-        })
+    requestLoad()
+    await nextTick()
+
+    const Player = window.playerjs?.Player
+
+    if (typeof Player !== 'function') return
+
+    const iframeKey = iframe.getAttribute('data-mid')
+
+    if (!iframeKey) return
+
+    if (!isBunnyIframe(iframe)) {
+      debugVideoPlayer('skipping non-bunny iframe', {
+        iframeKey,
+        src: iframe.src,
+      })
+      return
+    }
+
+    const existingPlayer = videoPlayers.value.get(iframeKey)
+
+    if (existingPlayer) {
+      if (isLivePlayer(iframeKey, existingPlayer)) {
+        debugVideoPlayer('using existing player', { iframeKey })
         return
       }
 
-      const existingPlayer = videoPlayers.value.get(iframeKey)
+      debugVideoPlayer('forgetting stale player', { iframeKey })
+      forgetPlayer(iframeKey)
+    }
 
-      if (existingPlayer) {
-        if (isLivePlayer(iframeKey, existingPlayer)) {
-          debugVideoPlayer('using existing player', { iframeKey })
-          return
-        }
+    const pendingIframe = pendingIframes.get(iframeKey)
 
-        debugVideoPlayer('forgetting stale player', { iframeKey })
-        forgetPlayer(iframeKey)
-      }
+    if (pendingIframe === iframe) {
+      debugVideoPlayer('iframe already pending', { iframeKey })
+      return
+    }
 
-      const pendingIframe = pendingIframes.get(iframeKey)
+    if (pendingIframe) {
+      debugVideoPlayer('replacing pending iframe', { iframeKey })
+      pendingIframes.delete(iframeKey)
+    }
 
-      if (pendingIframe === iframe) {
-        debugVideoPlayer('iframe already pending', { iframeKey })
-        return
-      }
+    const initializingIframe = initializingIframes.get(iframeKey)
 
-      if (pendingIframe) {
-        debugVideoPlayer('replacing pending iframe', { iframeKey })
-        pendingIframes.delete(iframeKey)
-      }
+    if (initializingIframe === iframe) {
+      debugVideoPlayer('player initialization already active', { iframeKey })
+      return
+    }
 
-      const initializingIframe = initializingIframes.get(iframeKey)
+    if (initializingIframe) {
+      debugVideoPlayer('replacing initializing iframe', { iframeKey })
+      initializingIframes.delete(iframeKey)
+    }
 
-      if (initializingIframe === iframe) {
-        debugVideoPlayer('player initialization already active', { iframeKey })
-        return
-      }
-
-      if (initializingIframe) {
-        debugVideoPlayer('replacing initializing iframe', { iframeKey })
-        initializingIframes.delete(iframeKey)
-      }
-
-      queuePlayerInitialization(iframeKey, iframe, Player)
-    })
+    queuePlayerInitialization(iframeKey, iframe, Player)
   }
 
   function isBunnyIframe(iframe: HTMLIFrameElement): boolean {
@@ -193,7 +203,7 @@ export function useVideoPlayers() {
 
     if (!iframeKey) return
 
-    videoPlayers.value.delete(iframeKey)
+    if (videoPlayers.value.delete(iframeKey)) registryVersion.value += 1
     pendingIframes.delete(iframeKey)
     initializingIframes.delete(iframeKey)
     endedBoundPlayers.delete(iframeKey)
@@ -305,6 +315,7 @@ export function useVideoPlayers() {
       })
       initializingIframes.delete(iframeKey)
       videoPlayers.value.set(iframeKey, player)
+      registryVersion.value += 1
       resetOnEnd(iframeKey, player)
     }
 
@@ -416,17 +427,11 @@ export function useVideoPlayers() {
     enabled = true,
     event,
     handler,
-    pollIntervalMs = 1000,
     playerKey,
   }: PlayerEventOptions): void {
     let activePlayer: VideoPlayer | null = null
     let activePlayerKey = ''
     let activeCallback: ((payload?: unknown) => void) | null = null
-    let poll: ReturnType<typeof setInterval> | null = null
-    const safePollIntervalMs = Math.max(
-      MIN_EVENT_POLL_INTERVAL_MS,
-      Number.isFinite(pollIntervalMs) ? pollIntervalMs : DEFAULT_EVENT_POLL_INTERVAL_MS,
-    )
 
     const normalizedPlayerKey = computed(() => {
       return normalizePlayerKey(toValue(playerKey))
@@ -479,41 +484,23 @@ export function useVideoPlayers() {
       })
     }
 
-    function startPolling(): void {
-      if (poll || !isEnabled.value) return
-
-      poll = setInterval(bind, safePollIntervalMs)
-      bind()
-    }
-
-    function stopPolling(): void {
-      if (!poll) return
-
-      clearInterval(poll)
-      poll = null
-    }
-
-    onMounted(startPolling)
-
-    watch([isEnabled, normalizedPlayerKey], () => {
+    watch([isEnabled, normalizedPlayerKey, registryVersion], () => {
       if (isEnabled.value) {
-        startPolling()
         bind()
         return
       }
 
-      stopPolling()
       unbind()
-    })
+    }, { immediate: true })
 
     onBeforeUnmount(() => {
-      stopPolling()
       unbind()
     })
   }
 
   return {
     initializePlayers,
+    registerIframe,
     playersReady,
     forgetPlayer,
     onPlayerEvent,

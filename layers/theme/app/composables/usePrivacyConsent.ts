@@ -57,7 +57,10 @@ export function usePrivacyConsent() {
   )
   const hasDecision = computed(() => status.value !== 'undecided')
   const allowsNonEssential = computed(() =>
-    allowsNonEssentialScripts(config.value, status.value),
+    allowsNonEssentialScripts(
+      { enabled: config.value?.enabled, mode: mode.value },
+      status.value,
+    ),
   )
 
   function setStatus(value: Exclude<PrivacyConsentStatus, 'undecided'>) {

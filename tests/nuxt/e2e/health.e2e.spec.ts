@@ -25,4 +25,15 @@ describe('Nuxt E2E smoke', async () => {
       service: 'nuxtjs-drupal-stir',
     })
   })
+
+  it('keeps public configuration endpoints available', async () => {
+    const [authConfig, seo] = await Promise.all([
+      $fetch<Record<string, unknown>>('/api/auth/config'),
+      $fetch<{ meta: unknown[], link: unknown[] }>('/api/seo/global'),
+    ])
+
+    expect(authConfig).toBeTypeOf('object')
+    if ('version' in authConfig) expect(authConfig.version).toBeTypeOf('number')
+    expect(seo).toEqual({ meta: [], link: [] })
+  })
 })
