@@ -249,20 +249,6 @@ export default defineNuxtConfig({
     siteUrl: process.env.NUXT_URL || '',
     api: drupalUrl,
     apiKey: process.env.DRUPAL_API_KEY || '',
-    protectedPassword: process.env.PROTECTED_PASSWORD || '',
-    protectedCookieSecret: process.env.PROTECTED_COOKIE_SECRET || '',
-    protectedRateLimit: {
-      enabled: process.env.PROTECTED_RATE_LIMIT_ENABLED !== 'false',
-      maxAttempts: positiveIntegerEnvironment(
-        process.env.PROTECTED_RATE_LIMIT_MAX_ATTEMPTS,
-        5,
-      ),
-      windowSeconds: positiveIntegerEnvironment(
-        process.env.PROTECTED_RATE_LIMIT_WINDOW_SECONDS,
-        15 * 60,
-      ),
-      trustProxy: process.env.PROTECTED_RATE_LIMIT_TRUST_PROXY === 'true',
-    },
     drupalRequestTimeoutMs: positiveIntegerEnvironment(
       process.env.DRUPAL_REQUEST_TIMEOUT_MS,
       10_000,

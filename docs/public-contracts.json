@@ -32,7 +32,6 @@
   "candidateDeprecations": [
     "useApiListing",
     "useDynamicListingControls",
-    "layers/core/server/utils/protectedAccess",
     "layers/auth/server/utils/drupalHeaders"
   ],
   "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."

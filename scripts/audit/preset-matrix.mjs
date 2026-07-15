@@ -17,6 +17,10 @@ async function inspectPreset(name) {
     const hasWebform = layers.some(layer => layer.endsWith('/layers/webform'))
     const hasAnalytics = layers.some(layer => layer.endsWith('/layers/analytics'))
     const hasScripts = layers.some(layer => layer.endsWith('/layers/scripts'))
+    const hasProtectedAccessConfig = Object.hasOwn(
+      nuxt.options.runtimeConfig,
+      'protectedPassword',
+    )
 
     return {
       name,
@@ -24,6 +28,7 @@ async function inspectPreset(name) {
       hasWebform,
       hasAnalytics,
       hasScripts,
+      hasProtectedAccessConfig,
       layers: layers.map(layer => layer.replace(`${rootDir}/`, '')),
     }
   } finally {
@@ -38,6 +43,10 @@ if (minimal.hasAuth) {
   throw new Error('The minimal preset must not load the authentication layer.')
 }
 
+if (minimal.hasProtectedAccessConfig) {
+  throw new Error('The minimal preset must not load protected-access configuration.')
+}
+
 if (minimal.hasWebform) {
   throw new Error('The minimal preset must not load the Webform layer.')
 }
@@ -48,6 +57,10 @@ if (minimal.hasAnalytics || minimal.hasScripts) {
 
 if (!full.hasAuth) {
   throw new Error('The full preset must preserve the authentication layer.')
+}
+
+if (!full.hasProtectedAccessConfig) {
+  throw new Error('The full preset must preserve protected-access configuration.')
 }
 
 if (!full.hasWebform) {
