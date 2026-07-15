@@ -110,6 +110,31 @@ describe('componentTree', () => {
           }],
         },
       },
+      {
+        element: 'paragraph-carousel',
+        props: {
+          header: 'Featured media',
+          headerTag: 'h2',
+          carouselArrows: true,
+          carouselAutoheight: false,
+          carouselAutoscroll: false,
+          carouselFade: false,
+          carouselIndicators: true,
+          carouselInterval: 5000,
+        },
+        slots: {
+          media: [{
+            element: 'media-image',
+            props: {
+              src: '/sites/default/files/featured.jpg',
+              alt: 'Featured image',
+              width: 1200,
+              height: 800,
+              responsiveStyle: 'container',
+            },
+          }],
+        },
+      },
     ])
     expect(parsed.slots.media).toMatchObject([{ element: 'media-image' }])
     expect(parsed.slots.level).toMatchObject([{ element: 'entity-reference' }])

@@ -17,6 +17,9 @@ const props = defineProps<{
   width?: string
   spacing?: string
 
+  header?: string
+  headerTag?: string
+
   carouselIndicators?: boolean
   carouselArrows?: boolean
   carouselFade?: boolean
@@ -96,6 +99,10 @@ const carouselLabel = computed(() =>
 
 <template>
   <div class="relative z-10" :class="[theme.carousel.padding, width, spacing]">
+    <component :is="headerTag || 'h2'" v-if="header">
+      {{ header }}
+    </component>
+
     <UCarousel
       v-if="slides.length"
       v-slot="{ item }"
