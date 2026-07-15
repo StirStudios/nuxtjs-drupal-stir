@@ -2,6 +2,7 @@ import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createRegisterValidationSchema } from '../../utils/authValidation'
+import { registrationRequirement } from '../../utils/registrationCompletion'
 import { mapYupValidationErrors } from '../../utils/yupValidation'
 
 export function useAuthRegister() {
@@ -10,6 +11,7 @@ export function useAuthRegister() {
   const registrationComplete = ref(false)
   const registrationMessage = ref('')
   const requiresVerification = ref(false)
+  const requiresApproval = ref(false)
   const turnstileToken = ref('')
   const { register, getFetchErrorMessage } = useAuthActions()
   const { auth } = useAuthConfig()
@@ -62,12 +64,22 @@ export function useAuthRegister() {
         turnstile_response: turnstileToken.value,
       })
 
-      const isVerificationRequired = Boolean(response?.verification_required)
+      const requirement = registrationRequirement(response)
       const isVerificationSent = Boolean(response?.verification_sent)
 
-      if (isVerificationRequired) {
-        registrationComplete.value = true
-        requiresVerification.value = true
+      registrationComplete.value = true
+      requiresApproval.value = requirement === 'approval'
+      requiresVerification.value = requirement === 'verification'
+
+      if (requirement === 'approval') {
+        registrationMessage.value =
+          'Your account has been created and is awaiting administrator approval before you can sign in.'
+        toast.add({
+          title: 'Account awaiting approval',
+          description: registrationMessage.value,
+          color: 'warning',
+        })
+      } else if (requirement === 'verification') {
         registrationMessage.value = isVerificationSent
           ? auth.value.register?.complete?.verificationSentDescription ||
             'Check your inbox to verify your account before signing in.'
@@ -82,8 +94,6 @@ export function useAuthRegister() {
           color: isVerificationSent ? 'success' : 'warning',
         })
       } else {
-        registrationComplete.value = true
-        requiresVerification.value = false
         registrationMessage.value =
           auth.value.register?.complete?.createdDescription ||
           'Your account has been created. You can now sign in.'
@@ -111,6 +121,7 @@ export function useAuthRegister() {
     isLoading,
     registrationComplete,
     registrationMessage,
+    requiresApproval,
     requiresVerification,
     turnstileToken,
   }

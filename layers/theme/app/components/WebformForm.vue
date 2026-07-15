@@ -10,6 +10,7 @@ import {
   createScrollToTopRunner,
   getWebformScrollConfig,
 } from '~/utils/webformScrollToTop'
+import { resolveWebformRedirect } from '~/utils/webformRedirect'
 import { evaluateCondition } from '~/utils/evaluateUtils'
 import {
   buildWebformFormData,
@@ -53,6 +54,8 @@ const {
   webformId = '',
   webformSubmissions = '',
   webformConfirmation = '',
+  webformConfirmationType = '',
+  webformRedirect = null,
   actions = [],
 } = webform.value
 
@@ -285,6 +288,16 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     }
     props.onClose?.()
 
+    const redirectTarget = resolveWebformRedirect(
+      webformConfirmationType,
+      webformRedirect,
+    )
+
+    if (redirectTarget) {
+      await navigateTo(redirectTarget.to, { external: redirectTarget.external })
+      return
+    }
+
     resetFormState({ bumpKey: false })
     errors.value = {}
     turnstileToken.value = ''
@@ -323,7 +336,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     <WebformContent
       :key="formResetKey"
       v-model:turnstile-token="turnstileToken"
-      :edit-link="webformSubmissions"
+      :edit-link="webformSubmissions || undefined"
       :fields="fields"
       :get-group-fields="getGroupFields"
       :grouped-fields="groupedFields"

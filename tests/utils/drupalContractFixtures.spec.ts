@@ -26,7 +26,12 @@ describe('sanitized Drupal contract fixtures', () => {
         props: { width: expect.any(Number), height: expect.any(Number) },
       },
       menu: expect.any(Array),
-      webform: { id: expect.any(String), elements: expect.any(Object) },
+      webform: {
+        webformId: expect.any(String),
+        fields: expect.any(Object),
+        actions: expect.any(Array),
+        webformConfirmationType: expect.any(String),
+      },
     })
   })
 

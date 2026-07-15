@@ -1,0 +1,9 @@
+{
+  "created": true,
+  "uid": 42,
+  "name": "approval",
+  "mail": "approval@example.com",
+  "verification_required": false,
+  "verification_sent": false,
+  "approval_required": true
+}

@@ -108,6 +108,9 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.39(vue@3.5.39(typescript@5.9.3)))(vue@3.5.39(typescript@5.9.3))
+      ajv:
+        specifier: 6.15.0
+        version: 6.15.0
       chrome-launcher:
         specifier: ^1.2.1
         version: 1.2.1

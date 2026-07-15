@@ -35,6 +35,7 @@ export type RegisterResponse = {
   mail?: string
   verification_required?: boolean
   verification_sent?: boolean
+  approval_required?: boolean
 }
 
 export type PasswordRequestPayload = {

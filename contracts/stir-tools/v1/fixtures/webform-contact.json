@@ -1,0 +1,21 @@
+{
+  "webformId": "contact",
+  "webformTitle": "Contact",
+  "fields": {
+    "email": {
+      "#type": "textfield",
+      "#title": "Email",
+      "#name": "email"
+    }
+  },
+  "actions": [
+    {
+      "#type": "webform_actions",
+      "#title": "Submit"
+    }
+  ],
+  "webformConfirmation": "Thanks contact",
+  "webformConfirmationType": "url_message",
+  "webformRedirect": "<front>",
+  "webformSubmissions": null
+}

@@ -53,7 +53,9 @@ export interface WebformDefinition {
   webformId: string
   webformTitle: string
   webformConfirmation: string
-  webformSubmissions: string
+  webformConfirmationType?: string
+  webformRedirect?: string | null
+  webformSubmissions?: string | null
   fields: Record<string, WebformFieldProps>
   actions: WebformActionProps[]
 }

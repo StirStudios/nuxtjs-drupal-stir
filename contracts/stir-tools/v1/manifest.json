@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0.0",
+  "producer": "stirstudios/stir_tools",
+  "contracts": {
+    "auth.register.response": {
+      "schema": "schemas/auth-register-response.schema.json",
+      "fixtures": [
+        "fixtures/auth-register-admin-approval.json",
+        "fixtures/auth-register-error.json"
+      ]
+    },
+    "layout.webform": {
+      "schema": "schemas/webform.schema.json",
+      "fixtures": ["fixtures/webform-contact.json"]
+    }
+  }
+}

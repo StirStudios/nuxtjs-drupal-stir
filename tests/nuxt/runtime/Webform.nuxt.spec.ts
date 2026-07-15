@@ -16,8 +16,10 @@ const webform = {
     },
   },
   webformConfirmation: 'Thank you',
+  webformConfirmationType: 'message',
   webformId: 'contact',
-  webformSubmissions: '',
+  webformRedirect: null,
+  webformSubmissions: null,
   webformTitle: 'Contact',
 } satisfies WebformDefinition
 

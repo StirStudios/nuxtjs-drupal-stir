@@ -41,8 +41,13 @@
     { "title": "Home", "url": "/", "below": [] }
   ],
   "webform": {
-    "id": "fixture_form",
-    "title": "Fixture form",
-    "elements": {}
+    "webformId": "fixture_form",
+    "webformTitle": "Fixture form",
+    "fields": {},
+    "actions": [],
+    "webformConfirmation": "Thank you",
+    "webformConfirmationType": "message",
+    "webformRedirect": null,
+    "webformSubmissions": null
   }
 }

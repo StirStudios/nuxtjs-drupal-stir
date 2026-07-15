@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "producer": "stirstudios/stir_tools",
+  "contractVersion": "1.0.0",
+  "files": {
+    "fixtures/auth-register-admin-approval.json": "8d6a29215bd78a3b866b1e0b53afaabb16ce41a69e061bc7a6a8935384e93e86",
+    "fixtures/auth-register-error.json": "39d5b1dbf59ff60588ffffb5941058328a37c420b52cd2113538b8e6c3899cc7",
+    "fixtures/webform-contact.json": "a3119636626089bc7129785dc5c253d351b648a6a2283291aca8e0e74eb59fcc",
+    "manifest.json": "d5f09c61b752661ab9c9923ae2d8909096bdb279b9e972a50498f2b7c67aaf6d",
+    "schemas/auth-register-response.schema.json": "5a1856aae50df5a5f755110612cd849ca7dd73298884f5ffef5557782955d827",
+    "schemas/webform.schema.json": "bdc9c3d321bb2b23bebe7aeb884583a01a7d1162e58c6ff2ee024c0ef8faab14"
+  }
+}
