@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.21.0",
+  "contractVersion": "1.22.0",
   "files": {
     "fixtures/account-snapshot-anonymous.json": "a5437539f3ebe09c50718441ccaea9e98e6f0ec0554c85a3d022aa3b834e1fd6",
     "fixtures/account-snapshot-authenticated.json": "606cd27719db7dc990dab547d212abc8b8c4695d2ef12079bfe1b71151ed29ac",
@@ -22,7 +22,9 @@
     "fixtures/presentation-usage-manifest.json": "baf3adef0038562e12bf58dc68ff8cc1aabb0cc369a53c6c1487262c73a57990",
     "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
     "fixtures/webform-contact.json": "a3119636626089bc7129785dc5c253d351b648a6a2283291aca8e0e74eb59fcc",
-    "manifest.json": "bc0970103a114307f0e2e24a6b6876412739b2b8a0c14eb98ff2049fce251ca0",
+    "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
+    "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
+    "manifest.json": "f577d7018a5a13a77eccbd992d68263602bbca2eb84765e1babd72a45874f0cf",
     "schemas/account-snapshot.schema.json": "05b5d141c97761acb5e8c607ce244d300dad30315e5900d5bd2d91ce8d70d81e",
     "schemas/app-context.schema.json": "dbc3f728a29467abb0c6f6f749066d46b88e51e42f4f8ff94e33a3108b345f66",
     "schemas/auth-register-policy.schema.json": "b3b9c3b4830580f0507e92784e9616c1ed8cabb4f4bbf4d384d45aacaeb4a2e2",
@@ -38,6 +40,7 @@
     "schemas/media-video-local.schema.json": "a9d0c730bde851aa06ad96ac989c5dcf5d572e6e18b16edd7324e30741826a6a",
     "schemas/presentation-usage-manifest.schema.json": "379c99e28f9bde97c442e8a29d903cb31ecc376cb0dfcc2f8862ca963822e828",
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
+    "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform.schema.json": "bdc9c3d321bb2b23bebe7aeb884583a01a7d1162e58c6ff2ee024c0ef8faab14"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "error": {
+    "message": "Submitted data contains validation errors.",
+    "details": {
+      "email": ["Email is required."]
+    },
+    "flat": ["Email is required."]
+  }
+}

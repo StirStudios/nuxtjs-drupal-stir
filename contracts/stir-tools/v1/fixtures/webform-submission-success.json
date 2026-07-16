@@ -1,0 +1,15 @@
+{
+  "sid": "6f7379aa-62b8-4f67-8a43-0ca29df681f4",
+  "confirmation_type": "message",
+  "confirmation_url": "",
+  "confirmation_message": "Thank you for contacting us.",
+  "confirmation_title": "Submission received",
+  "confirmation_attributes": {
+    "class": ["webform-confirmation"]
+  },
+  "confirmation_back": true,
+  "confirmation_back_label": "Back to form",
+  "confirmation_back_attributes": {
+    "class": ["button"]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/webform-submission-response.schema.json",
+  "title": "Stir Webform submission response",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["sid"],
+      "properties": {
+        "sid": { "type": "string", "minLength": 1 },
+        "confirmation_type": { "type": ["string", "null"] },
+        "confirmation_url": { "type": ["string", "null"] },
+        "confirmation_message": { "type": ["string", "null"] },
+        "confirmation_title": { "type": ["string", "null"] },
+        "confirmation_attributes": { "type": ["object", "array", "null"] },
+        "confirmation_back": { "type": ["boolean", "null"] },
+        "confirmation_back_label": { "type": ["string", "null"] },
+        "confirmation_back_attributes": { "type": ["object", "array", "null"] }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["error"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["message", "details", "flat"],
+          "properties": {
+            "message": { "type": "string", "minLength": 1 },
+            "details": { "type": ["object", "array"] },
+            "flat": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

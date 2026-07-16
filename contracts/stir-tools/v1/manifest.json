@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.21.0",
+  "contractVersion": "1.22.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -26,6 +26,10 @@
     },
     "layout.webform": {
       "providerModules": ["stir_layout_builder_paragraph_webform"],
+      "optional": true
+    },
+    "webform.submission": {
+      "providerModules": ["stir_webform_rest"],
       "optional": true
     },
     "app.context": {
@@ -142,6 +146,14 @@
       "capability": "layout.webform",
       "schema": "schemas/webform.schema.json",
       "fixtures": ["fixtures/webform-contact.json"]
+    },
+    "webform.submission.response": {
+      "capability": "webform.submission",
+      "schema": "schemas/webform-submission-response.schema.json",
+      "fixtures": [
+        "fixtures/webform-submission-success.json",
+        "fixtures/webform-submission-error.json"
+      ]
     },
     "seo.global": {
       "capability": "seo.global",

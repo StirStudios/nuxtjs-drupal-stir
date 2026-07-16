@@ -111,6 +111,70 @@ describe('POST /api/webform/submit', () => {
     expect(readRawBody).not.toHaveBeenCalled()
   })
 
+  it('preserves safe Drupal validation details and status', async () => {
+    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+      webform_id: 'contact',
+      turnstile_response: 'token',
+    })))
+    const validation = {
+      error: {
+        message: 'Submitted data contains validation errors.',
+        details: { email: ['Email is required.'] },
+        flat: ['Email is required.'],
+      },
+    }
+    const raw = vi.fn()
+      .mockResolvedValueOnce({
+        _data: 'csrf-token',
+        headers: { getSetCookie: () => [] },
+        status: 200,
+      })
+      .mockResolvedValueOnce({
+        _data: validation,
+        headers: { getSetCookie: () => [] },
+        status: 400,
+      })
+
+    vi.stubGlobal('$fetch', { raw })
+    const event = createEvent({ 'content-type': 'application/json' })
+
+    await expect(webformSubmitHandler(event)).resolves.toEqual(validation)
+    expect((event as { node: { res: { statusCode: number } } }).node.res.statusCode)
+      .toBe(400)
+    expect(raw).toHaveBeenNthCalledWith(
+      2,
+      'https://cms.example.test/api/stir_webform_rest/submit',
+      expect.objectContaining({ ignoreResponseError: true }),
+    )
+  })
+
+  it('sanitizes resolved upstream server failures', async () => {
+    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+      webform_id: 'contact',
+      turnstile_response: 'token',
+    })))
+    const raw = vi.fn()
+      .mockResolvedValueOnce({
+        _data: 'csrf-token',
+        headers: { getSetCookie: () => [] },
+        status: 200,
+      })
+      .mockResolvedValueOnce({
+        _data: { error: { message: 'Database password leaked' } },
+        headers: { getSetCookie: () => [] },
+        status: 500,
+      })
+
+    vi.stubGlobal('$fetch', { raw })
+
+    await expect(webformSubmitHandler(createEvent({
+      'content-type': 'application/json',
+    }))).rejects.toMatchObject({
+      statusCode: 502,
+      statusMessage: 'Form submission failed. Please try again later.',
+    })
+  })
+
   it('sanitizes upstream failures', async () => {
     vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',

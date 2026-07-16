@@ -4,6 +4,7 @@ import {
   readRawBody,
   createError,
   getHeader,
+  setResponseStatus,
   type H3Event,
 } from 'h3'
 import {
@@ -21,6 +22,7 @@ import {
   getWebformSubmissionLimits,
   type WebformSubmissionLimits,
 } from '../../utils/webformLimits'
+import type { WebformSubmissionResponse } from '../../../shared/types/webformSubmission'
 
 type SubmissionBody = Record<string, unknown>
 type ParsedSubmission = {
@@ -176,7 +178,7 @@ export default defineEventHandler(async (event) => {
     const referer = getHeader(event, 'referer')
     const userAgent = getHeader(event, 'user-agent')
 
-    const response = await $fetch.raw<Record<string, unknown>>(drupalApiUrl, {
+    const response = await $fetch.raw<WebformSubmissionResponse>(drupalApiUrl, {
       method: 'POST',
       headers: {
         ...(submission.contentType
@@ -191,9 +193,19 @@ export default defineEventHandler(async (event) => {
       body: submission.forwardBody,
       redirect: 'manual',
       timeout: requestTimeoutMs,
+      ignoreResponseError: true,
     })
 
     assertDrupalResponseNotRedirect(response)
+
+    if (response.status >= 400 && response.status < 500) {
+      setResponseStatus(event, response.status)
+      return response._data
+    }
+
+    if (response.status >= 500) {
+      throw createError({ statusCode: 502 })
+    }
 
     return response._data
   } catch (error) {
