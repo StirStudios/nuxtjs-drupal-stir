@@ -114,7 +114,6 @@
     "@tiptap/y-tiptap": "3.0.7",
     "@vueuse/core": "^14.3.0",
     "motion-v": "^2.3.0",
-    "nuxt": "^4.4.8",
     "nuxt-vitalizer": "^2.0.0",
     "nuxtjs-drupal-ce": "^2.7.0",
     "tailwindcss": "^4.3.2",
@@ -123,7 +122,8 @@
   "peerDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@nuxt/image": "^2.0.0",
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.61.1",
+    "nuxt": "^4.4.8"
   },
   "peerDependenciesMeta": {
     "@axe-core/playwright": {
@@ -155,6 +155,7 @@
     "h3": "^1.15.11",
     "happy-dom": "^20.10.6",
     "lighthouse": "^13.4.0",
+    "nuxt": "^4.4.8",
     "prettier": "^3.9.5",
     "prettier-plugin-tailwindcss": "^0.7.4",
     "release-it": "^20.2.1",

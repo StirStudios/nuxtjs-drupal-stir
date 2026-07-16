@@ -137,6 +137,21 @@ describe('layer contract', () => {
     expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
   })
 
+  it('requires consumers to own their Nuxt runtime directly', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      dependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
+      peerDependencies?: Record<string, string>
+    }
+
+    expect(packageJson.dependencies?.nuxt).toBeUndefined()
+    expect(packageJson.peerDependencies?.nuxt).toBe('^4.4.8')
+    expect(packageJson.devDependencies?.nuxt).toBe('^4.4.8')
+  })
+
   it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),

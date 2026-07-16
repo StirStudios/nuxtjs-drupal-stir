@@ -51,7 +51,8 @@ GitHub source in `nuxt.config.ts`.
 ```json
 {
   "dependencies": {
-    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext"
+    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext",
+    "nuxt": "^4.4.8"
   }
 }
 ```
@@ -64,6 +65,9 @@ export default defineNuxtConfig({
 
 Pin production projects to a reviewed tag or commit. A branch reference is
 appropriate while testing vNext, but it should not be the production lock.
+Nuxt is an intentional required peer: every application owns its Nuxt runtime
+version directly, while this repository keeps the same range as a development
+dependency for layer builds and tests.
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.
