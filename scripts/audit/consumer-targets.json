@@ -9,6 +9,10 @@
       "pathEnvironment": "STIR_CONSUMER_PIPER",
       "routes": ["/", "discover:/venues/*"]
     },
+    "rsf": {
+      "pathEnvironment": "STIR_CONSUMER_RSF",
+      "routes": ["/", "discover:first-inner"]
+    },
     "danceplug": {
       "pathEnvironment": "STIR_CONSUMER_DANCEPLUG",
       "routes": ["/", "/videos", "/auth/login"]

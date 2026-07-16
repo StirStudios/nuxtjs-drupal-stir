@@ -242,12 +242,16 @@ describe('layer contract', () => {
     expect(Object.keys(targets.targets)).toEqual([
       'laamada',
       'piper',
+      'rsf',
       'danceplug',
       'stir',
     ])
+    expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
     expect(targets.targets.danceplug?.routes).toContain('/videos')
     expect(consumerScript).toContain('\'archive\'')
     expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
+    expect(consumerScript).toContain('packageJson.peerDependencies.nuxt')
+    expect(consumerScript).toContain('adaptations')
   })
 
   it('uses the consumer CSS entry once when one is present', () => {

@@ -112,6 +112,7 @@ resolve different revisions of the same layer.
 - Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
 - E2E smoke testing: `pnpm test:e2e` (built Nuxt health/runtime smoke)
 - Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
+- Real consumer pilots: `STIR_CONSUMER_RSF=/path/to/rsf-nuxt pnpm audit:consumers rsf --verify` (archives committed source into a disposable directory, installs the packed layer and its declared Nuxt peer, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`

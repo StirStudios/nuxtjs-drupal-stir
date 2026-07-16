@@ -111,6 +111,11 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   Tailwind 4 responsive `@apply` migration. RSF's production build succeeds on
   the pinned checkpoint; its project lint/typecheck dependency cleanup remains
   downstream work before cutover.
+- The disposable consumer audit now includes RSF explicitly, records each
+  project's direct Nuxt declaration, installs the packed layer with its declared
+  Nuxt peer when adapting an older committed checkout, and reports that
+  adaptation in its result. Consumer verification no longer mutates or relies
+  on the working checkout to prove a pilot build.
 
 ## Delivery slices
 
