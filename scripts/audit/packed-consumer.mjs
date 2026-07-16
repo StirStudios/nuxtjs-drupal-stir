@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { access, cp, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { access, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
@@ -30,7 +30,7 @@ function run(command, args, cwd, environment = {}) {
     child.on('exit', (code) => {
       if (output.includes('Cannot extend config from')) {
         reject(new Error('Packed layer could not be resolved by the consumer'))
-      } else if (code === 0) resolvePromise()
+      } else if (code === 0) resolvePromise(output)
       else reject(new Error(`${command} ${args.join(' ')} failed with exit code ${String(code)}`))
     })
   })
@@ -47,6 +47,48 @@ async function main() {
     await run('pnpm', ['pack', '--pack-destination', temporaryRoot], rootDir)
     const archives = (await readdir(temporaryRoot)).filter(file => file.endsWith('.tgz'))
     if (archives.length !== 1) throw new Error('Expected one packed layer archive')
+
+    const archivePath = join(temporaryRoot, archives[0])
+    const archiveSize = (await stat(archivePath)).size
+    const archiveEntries = String(
+      await run('tar', ['-tzf', archivePath], rootDir),
+    ).trim().split('\n')
+
+    if (archiveSize > 300_000) {
+      throw new Error(
+        `Packed layer is ${archiveSize} bytes; the published budget is 300000 bytes.`,
+      )
+    }
+
+    if (archiveEntries.length > 400) {
+      throw new Error(
+        `Packed layer contains ${archiveEntries.length} files; the published budget is 400.`,
+      )
+    }
+
+    for (const excludedPath of [
+      'package/.github/',
+      'package/docs/',
+      'package/scripts/',
+      'package/tests/',
+    ]) {
+      if (archiveEntries.some(entry => entry.startsWith(excludedPath))) {
+        throw new Error(`Packed layer includes repository-only path ${excludedPath}.`)
+      }
+    }
+
+    for (const requiredPath of [
+      'package/contracts/stir-tools/v1/manifest.json',
+      'package/layers/platform/nuxt.config.ts',
+      'package/layers/theme/nuxt.config.ts',
+      'package/presets/minimal/nuxt.config.ts',
+      'package/presets/full/nuxt.config.ts',
+      'package/nuxt.config.ts',
+    ]) {
+      if (!archiveEntries.includes(requiredPath)) {
+        throw new Error(`Packed layer is missing required path ${requiredPath}.`)
+      }
+    }
 
     const rootPackage = JSON.parse(await readFile(resolve('package.json'), 'utf8'))
     const consumerDir = join(temporaryRoot, 'consumer')
@@ -68,7 +110,7 @@ async function main() {
           typecheck: 'nuxi typecheck',
         },
         dependencies: {
-          '@stir/base': `file:${join(temporaryRoot, archives[0])}`,
+          '@stir/base': `file:${archivePath}`,
           nuxt: rootPackage.dependencies.nuxt,
         },
         devDependencies: {

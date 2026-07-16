@@ -41,6 +41,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - Repository-only client-entry analysis now lives in `layers/diagnostics` and
   is selected only for explicit performance builds launched from this checkout.
   Published platform and installed preset consumers contain no report writer.
+- The package allowlist ships runtime layers, presets, shared configuration,
+  and the versioned Drupal contract—not repository tests, CI, audit scripts, or
+  internal review documents. The archive fell from 357 kB/551 files to
+  212 kB/386 files; packed-consumer CI enforces 300 kB/400-file caps.
 - Stir-owned app contracts now use explicit `#stir/utils`,
   `#stir/composables`, `#stir/components`, and `#stir/types` aliases. The
   historical `~/...` mappings remain available only as compatibility aliases

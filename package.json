@@ -13,9 +13,16 @@
   "engines": {
     "node": "^22.13.0 || ^24.11.0 || >=26.0.0"
   },
-  "bin": {
-    "stir-a11y": "./scripts/a11y/run.mjs"
-  },
+  "files": [
+    "config",
+    "contracts/stir-tools/README.md",
+    "contracts/stir-tools/v1",
+    "layers",
+    "presets",
+    "server",
+    "nuxt.config.ts",
+    "readme.md"
+  ],
   "scripts": {
     "build": "nuxi build",
     "dev": "nuxi dev",
