@@ -133,6 +133,18 @@ describe('Nuxt E2E smoke', async () => {
           fallbackRedirectPath: '/',
         } as never,
       },
+      runtimeConfig: {
+        public: {
+          stirPresentationBuild: {
+            manifestRevision: 'a'.repeat(64),
+            sourceRevision: 'b'.repeat(64),
+            mode: 'strict',
+            schemaVersion: 1,
+            siteUuid: 'fixture-site',
+            theme: 'stir_decoupled',
+          },
+        },
+      },
       sourcemap: {
         client: false,
         server: false,
@@ -146,11 +158,19 @@ describe('Nuxt E2E smoke', async () => {
   })
 
   it('returns health endpoint payload', async () => {
-    const response = await $fetch<{ ok: boolean, service: string }>('/api/health')
+    const response = await $fetch('/api/health')
 
     expect(response).toEqual({
       ok: true,
       service: 'nuxtjs-drupal-stir',
+      presentation: {
+        manifestRevision: 'a'.repeat(64),
+        sourceRevision: 'b'.repeat(64),
+        mode: 'strict',
+        schemaVersion: 1,
+        siteUuid: 'fixture-site',
+        theme: 'stir_decoupled',
+      },
     })
   })
 
