@@ -65,9 +65,9 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   Published platform and installed preset consumers contain no report writer.
 - The package allowlist ships runtime layers, presets, shared configuration,
   and the versioned Drupal contract—not repository tests, CI, audit scripts, or
-  internal review documents. The current archive is 231 kB/419 files after the
+  internal review documents. The current archive is 233 kB/427 files after the
   expanded producer-owned contracts and capability layers; packed-consumer CI
-  enforces tight 300 kB/428-entry caps. The prior 400-entry ratchet had become
+  enforces tight 300 kB/427-entry caps. The prior 400-entry ratchet had become
   stale before the SEO extraction (committed HEAD already packed 416 entries),
   while the byte budget remained healthy.
 - Stir-owned app contracts now use explicit `#stir/utils`,

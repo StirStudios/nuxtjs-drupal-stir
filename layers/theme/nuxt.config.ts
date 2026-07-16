@@ -19,12 +19,12 @@ const compatibilitySafelistCss = resolvePath(
 const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'nuxt'
   ? 'nuxt'
   : 'drupal'
-const imageProviderComponent = resolvePath(
-  themeLayerDir,
-  stirImageDelivery === 'nuxt'
-    ? 'app/providers/NuxtImageProvider.vue'
-    : 'app/providers/NativeImageProvider.vue',
-)
+const imageProviderComponent = stirImageDelivery === 'nuxt'
+  ? resolvePath(
+      dirname(fileURLToPath(import.meta.resolve('@nuxt/image'))),
+      'runtime/components/NuxtImg.vue',
+    )
+  : resolvePath(themeLayerDir, 'app/providers/NativeImageProvider.vue')
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
