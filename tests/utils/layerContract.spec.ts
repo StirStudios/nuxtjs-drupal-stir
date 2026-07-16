@@ -404,6 +404,8 @@ describe('layer contract', () => {
 
     expect(platformConfig).not.toContain('@nuxtjs/sitemap')
     expect(seoConfig).toContain('@nuxtjs/sitemap')
+    expect(seoConfig).toContain('\'X-Robots-Tag\': \'noindex, nofollow\'')
+    expect(seoConfig).not.toContain('robots: false')
     expect(themeConfig).not.toContain('cmsGlobalSeo:')
     expect(seoAppConfig).toContain('cmsGlobalSeo:')
     expect(existsSync(resolve(

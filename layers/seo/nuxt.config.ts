@@ -9,9 +9,15 @@ const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
   routeRules: {
-    '/account/**': { robots: false },
-    '/auth/**': { robots: false },
-    '/login': { robots: false },
+    '/account/**': {
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    },
+    '/auth/**': {
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    },
+    '/login': {
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    },
   },
 
   nitro: {
