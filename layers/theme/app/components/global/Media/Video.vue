@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
-import { useDeferredVideoSource } from '~/composables/useDeferredVideoSource'
-import { useVideoPlayers } from '~/composables/useVideoPlayers'
-import type { EditAction, EditActionKey } from '~/types/EditControls'
+import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
+import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
+import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import { resolveHeroVideoSource } from '../../../utils/heroVideoSource'
 
 defineOptions({

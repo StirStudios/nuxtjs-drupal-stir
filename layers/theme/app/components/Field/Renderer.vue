@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import type { WebformFieldProps, WebformState } from '~/types'
-import { useEvaluateState } from '~/composables/useEvaluateState'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import type { WebformFieldProps, WebformState } from '#stir/types'
+import { useEvaluateState } from '#stir/composables/useEvaluateState'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 import {
   LazyFieldInput,

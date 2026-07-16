@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NodeDefaultProps } from '~/types'
+import type { NodeDefaultProps } from '#stir/types'
 
 const props = defineProps<NodeDefaultProps>()
 const attrs = useAttrs()

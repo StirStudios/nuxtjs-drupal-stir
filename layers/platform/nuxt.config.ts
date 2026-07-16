@@ -207,6 +207,10 @@ export default defineNuxtConfig({
     '~/composables': resolveLayerPath('./layers/theme/app/composables'),
     '~/components': resolveLayerPath('./layers/theme/app/components'),
     '~/types': resolveLayerPath('./layers/theme/app/types'),
+    '#stir/utils': resolveLayerPath('./layers/theme/app/utils'),
+    '#stir/composables': resolveLayerPath('./layers/theme/app/composables'),
+    '#stir/components': resolveLayerPath('./layers/theme/app/components'),
+    '#stir/types': resolveLayerPath('./layers/theme/app/types'),
   },
 
   modules: [

@@ -497,11 +497,21 @@
     "layers": [
       "core",
       "theme",
+      "platform",
+      "editorial",
+      "analytics",
+      "scripts",
+      "webform",
       "auth"
     ],
     "layerOrder": [
       "core",
       "theme",
+      "platform",
+      "editorial",
+      "analytics",
+      "scripts",
+      "webform",
       "auth"
     ],
     "packageExports": [
@@ -512,6 +522,22 @@
       "./*"
     ],
     "aliases": [
+      "#stir/utils",
+      "#stir/composables",
+      "#stir/components",
+      "#stir/types",
+      "~/utils",
+      "~/composables",
+      "~/components",
+      "~/types"
+    ],
+    "preferredAliases": [
+      "#stir/utils",
+      "#stir/composables",
+      "#stir/components",
+      "#stir/types"
+    ],
+    "compatibilityAliases": [
       "~/utils",
       "~/composables",
       "~/components",

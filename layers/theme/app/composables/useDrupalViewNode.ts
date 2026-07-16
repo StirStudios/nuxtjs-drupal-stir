@@ -1,4 +1,4 @@
-import type { CustomElementNode } from '~/types'
+import type { CustomElementNode } from '#stir/types'
 
 interface DrupalViewNodeCriteria {
   displayId?: string

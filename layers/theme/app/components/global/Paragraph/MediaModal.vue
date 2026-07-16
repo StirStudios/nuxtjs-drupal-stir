@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import type { ModalMediaItem } from '~/composables/useMediaModal'
-import { resolveCarouselArrowButton } from '~/utils/nuxtUiProps'
+import { useModalMediaPlayback } from '#stir/composables/useModalMediaPlayback'
+import type { ModalMediaItem } from '#stir/composables/useMediaModal'
+import { resolveCarouselArrowButton } from '#stir/utils/nuxtUiProps'
 import { drupalMediaComponentName } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{

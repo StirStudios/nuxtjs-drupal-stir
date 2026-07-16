@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { SocialIcon } from '~/types'
-import type { AppContextSiteInfo } from '~/composables/useAppContext'
-import type { FooterAtom, FooterConfig } from '~/utils/footer'
+import type { SocialIcon } from '#stir/types'
+import type { AppContextSiteInfo } from '#stir/composables/useAppContext'
+import type { FooterAtom, FooterConfig } from '#stir/utils/footer'
 
 const STIR_STUDIOS_WEBSITE = 'https://www.stirstudiosdesign.com'
 

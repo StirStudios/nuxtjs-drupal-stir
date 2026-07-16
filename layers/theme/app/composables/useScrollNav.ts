@@ -1,5 +1,5 @@
 import { useWindowScroll, useThrottleFn } from '@vueuse/core'
-import { usePageContext } from '~/composables/usePageContext'
+import { usePageContext } from '#stir/composables/usePageContext'
 
 export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
   if (!import.meta.client) {

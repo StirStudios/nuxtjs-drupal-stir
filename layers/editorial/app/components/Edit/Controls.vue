@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EditAction, EditActionKey } from '../../../../theme/app/types/EditControls'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const props = defineProps<{

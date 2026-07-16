@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { flattenWebformFields } from '../../../theme/app/utils/flattenWebformFields'
-import { evaluateContainerVisibility } from '../../../theme/app/composables/useContainerVisibility'
-import { transformPayloadToSnakeCase } from '../../../theme/app/utils/transformUtils'
-import { getHiddenDefaults } from '../../../theme/app/utils/getHiddenDefaults'
-import { useValidation } from '../../../theme/app/composables/useValidation'
+import { flattenWebformFields } from '#stir/utils/flattenWebformFields'
+import { evaluateContainerVisibility } from '#stir/composables/useContainerVisibility'
+import { transformPayloadToSnakeCase } from '#stir/utils/transformUtils'
+import { getHiddenDefaults } from '#stir/utils/getHiddenDefaults'
+import { useValidation } from '#stir/composables/useValidation'
 import { useWindowScroll } from '@vueuse/core'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '../../../theme/app/utils/webformScrollToTop'
-import { resolveWebformRedirect } from '../../../theme/app/utils/webformRedirect'
-import { evaluateCondition } from '../../../theme/app/utils/evaluateUtils'
+} from '#stir/utils/webformScrollToTop'
+import { resolveWebformRedirect } from '#stir/utils/webformRedirect'
+import { evaluateCondition } from '#stir/utils/evaluateUtils'
 import {
   buildWebformFormData,
   hasFileValue,
   isWebformFileField,
-} from '../../../theme/app/utils/webformFileUtils'
+} from '#stir/utils/webformFileUtils'
 import type {
   WebformDefinition,
   WebformFieldProps,
   WebformProps,
   WebformState,
-} from '../../../theme/app/types'
-import type { WebformValidationSchema } from '../../../theme/app/utils/buildValidationSchema'
+} from '#stir/types'
+import type { WebformValidationSchema } from '#stir/utils/buildValidationSchema'
 
-type BuildValidationSchema = typeof import('../../../theme/app/utils/buildValidationSchema')['buildValidationSchema']
+type BuildValidationSchema = typeof import('#stir/utils/buildValidationSchema')['buildValidationSchema']
 
 const props = defineProps<WebformProps>()
 const webform = computed<WebformDefinition>(() => {
@@ -97,7 +97,7 @@ function requestSchema(): void {
 async function ensureSchemaReady(): Promise<void> {
   if (isSchemaReady.value) return
 
-  schemaLoadPromise ??= import('../../../theme/app/utils/buildValidationSchema')
+  schemaLoadPromise ??= import('#stir/utils/buildValidationSchema')
     .then((module) => {
       buildSchema = module.buildValidationSchema
       schema.value = buildSchema(fields, state)

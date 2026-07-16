@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useTeaserPost } from '~/composables/useTeaserPost'
-import { resolveDrupalTeaserLink } from '~/composables/useDrupalTeaserLink'
+import { useTeaserPost } from '#stir/composables/useTeaserPost'
+import { resolveDrupalTeaserLink } from '#stir/composables/useDrupalTeaserLink'
 
 defineOptions({
   inheritAttrs: false,

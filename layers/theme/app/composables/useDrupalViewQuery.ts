@@ -1,4 +1,4 @@
-import type { ExposedFilter, ExposedSort } from '~/types/View'
+import type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 export interface ViewPager {
   current: number

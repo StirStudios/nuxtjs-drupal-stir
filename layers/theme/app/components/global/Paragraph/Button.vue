@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import {
   resolveUiButtonVariant,
   resolveUiColor,
   resolveUiSize,
-} from '~/utils/nuxtUiProps'
+} from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   id?: number | string

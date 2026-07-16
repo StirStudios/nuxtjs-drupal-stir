@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
   allowsMultipleFiles,
   getFileAccept,
   getFileMaxSize,
   isFileValue,
-} from '~/utils/webformFileUtils'
+} from '#stir/utils/webformFileUtils'
 
 const props = defineProps<{
   field: WebformFieldProps

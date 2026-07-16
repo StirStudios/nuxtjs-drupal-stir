@@ -1,4 +1,4 @@
-import type { WebformFieldProps } from '~/types'
+import type { WebformFieldProps } from '#stir/types'
 
 export const WEBFORM_FILE_FIELD_TYPES = [
   'file',

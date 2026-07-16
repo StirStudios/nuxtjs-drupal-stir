@@ -1,4 +1,4 @@
-import type { WebformState } from '~/types'
+import type { WebformState } from '#stir/types'
 import { normalizeValue } from './stringUtils'
 
 export const getNestedStateValue = (

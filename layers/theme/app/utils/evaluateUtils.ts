@@ -1,4 +1,4 @@
-import type { ConditionType, ConditionEntry, WebformState } from '~/types'
+import type { ConditionType, ConditionEntry, WebformState } from '#stir/types'
 import { getNestedStateValue, matchesCondition } from './stateUtils'
 import { extractFieldName } from './stringUtils'
 

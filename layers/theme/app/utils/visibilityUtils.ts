@@ -1,4 +1,4 @@
-import type { ConditionEntry, WebformState } from '~/types'
+import type { ConditionEntry, WebformState } from '#stir/types'
 
 export const isVisibleForTab = (
   visibility: ConditionEntry[] | ConditionEntry | undefined,

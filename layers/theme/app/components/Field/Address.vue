@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
-import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
+import type { WebformFieldProps } from '#stir/types'
+import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps

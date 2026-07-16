@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
+import type { WebformFieldProps } from '#stir/types'
 import { useEventBus } from '@vueuse/core'
-import { transformOptions } from '~/utils/transformUtils'
+import { transformOptions } from '#stir/utils/transformUtils'
 import {
   resolveUiButtonVariant,
   resolveUiFieldVariant,
-} from '~/utils/nuxtUiProps'
+} from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   field?: WebformFieldProps

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import type { WebformFieldProps } from '#stir/types'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   field: WebformFieldProps

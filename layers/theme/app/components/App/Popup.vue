@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { defineAsyncComponent, resolveComponent } from 'vue'
-import type { PopupMedia, PopupNode, PopupProps } from '~/types'
+import type { PopupMedia, PopupNode, PopupProps } from '#stir/types'
 
 const appConfig = useAppConfig()
 const { renderCustomElements } = useStirDrupalCe()
 const { popup, config } = usePopupData()
 const LazyParagraphPopup = defineAsyncComponent(
-  () => import('~/components/global/Paragraph/Popup.vue'),
+  () => import('#stir/components/global/Paragraph/Popup.vue'),
 )
 
 function getPopupProps(node: PopupNode | null): PopupProps {

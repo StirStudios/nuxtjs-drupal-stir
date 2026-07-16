@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { resolveComponent } from 'vue'
 import type { Component, VNode } from 'vue'
-import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
-import type { EditAction, EditActionKey } from '~/types/EditControls'
-import type { NormalizedDrupalMediaNodeProps } from '~/types'
+import type { SlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import type { NormalizedDrupalMediaNodeProps } from '#stir/types'
 import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
 } from '../../../utils/drupalMediaTypes'
-import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
+import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 
 type RevealMode = 'default' | 'gallery'
 

@@ -1,4 +1,4 @@
-import type { PopupNode } from '~/types'
+import type { PopupNode } from '#stir/types'
 
 type UnknownRecord = Record<string, unknown>
 

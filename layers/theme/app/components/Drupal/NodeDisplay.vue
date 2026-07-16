@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { NodeDefaultProps } from '~/types'
-import { usePageContext } from '~/composables/usePageContext'
+import type { NodeDefaultProps } from '#stir/types'
+import { usePageContext } from '#stir/composables/usePageContext'
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {

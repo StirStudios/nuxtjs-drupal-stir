@@ -11,18 +11,18 @@ import {
   normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
   primaryDrupalViewSort,
-} from '~/composables/useDrupalViewQuery'
-import type { NormalizedViewFilter, ViewPager } from '~/composables/useDrupalViewQuery'
+} from '#stir/composables/useDrupalViewQuery'
+import type { NormalizedViewFilter, ViewPager } from '#stir/composables/useDrupalViewQuery'
 import {
   drupalViewLoadErrorMessage,
   isDrupalViewAbortError,
-} from '~/composables/useDrupalViewErrors'
+} from '#stir/composables/useDrupalViewErrors'
 import {
   findDrupalViewNodeInResponse,
   getDrupalViewNodeProps,
   getDrupalViewNodeRows,
-} from '~/composables/useDrupalViewNode'
-import type { ExposedFilter, ExposedSort } from '~/types/View'
+} from '#stir/composables/useDrupalViewNode'
+import type { ExposedFilter, ExposedSort } from '#stir/types/View'
 import {
   createDefaultDrupalViewState,
   createViewStateSnapshot,
@@ -32,10 +32,10 @@ import {
   parseStoredViewState,
   sanitizeDrupalViewStoredFilters,
   sanitizeDrupalViewStoredSorts,
-} from '~/utils/drupalViewState'
-import type { ViewStateSnapshot } from '~/utils/drupalViewState'
+} from '#stir/utils/drupalViewState'
+import type { ViewStateSnapshot } from '#stir/utils/drupalViewState'
 
-export type { ExposedFilter, ExposedSort } from '~/types/View'
+export type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 interface UseDrupalViewControlsProps {
   paragraphId?: number | string

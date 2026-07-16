@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
+import type { WebformFieldProps } from '#stir/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
-import { clampNumberToBounds, normalizeNumberBounds } from '~/utils/formInputUtils'
+import { clampNumberToBounds, normalizeNumberBounds } from '#stir/utils/formInputUtils'
 
 const props = defineProps<{
   field: WebformFieldProps

@@ -2,7 +2,7 @@ declare global {
   interface Window {
     initVenueCalculatorWidget?: () => void
     playerjs?: {
-      Player?: new (iframe: HTMLIFrameElement) => import('~/composables/useVideoPlayers').VideoPlayer
+      Player?: new (iframe: HTMLIFrameElement) => import('#stir/composables/useVideoPlayers').VideoPlayer
     }
   }
 }

@@ -1,10 +1,10 @@
 import type { Ref, VNode } from 'vue'
 import { computed, ref } from 'vue'
-import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
+import type { SlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type {
   DrupalMediaNodeProps,
   NormalizedDrupalMediaNodeProps,
-} from '~/types'
+} from '#stir/types'
 import { normalizeDrupalMediaType } from '../utils/drupalMediaTypes'
 
 export type ModalMediaItem = NormalizedDrupalMediaNodeProps & {

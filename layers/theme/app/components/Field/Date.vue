@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
   CalendarDate,
   DateFormatter,
   getLocalTimeZone,
 } from '@internationalized/date'
-import { resolveUiButtonVariant } from '~/utils/nuxtUiProps'
+import { resolveUiButtonVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps

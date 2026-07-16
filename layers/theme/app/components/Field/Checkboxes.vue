@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformOptionProperties, WebformState } from '~/types'
+import type { WebformFieldProps, WebformOptionProperties, WebformState } from '#stir/types'
 import { useEventBus } from '@vueuse/core'
-import { enforceGroupLimit, enforceMaxSelected } from '~/utils/selectionUtils'
-import { normalizeValue } from '~/utils/stringUtils'
-import { handleTabChange } from '~/utils/visibilityUtils'
+import { enforceGroupLimit, enforceMaxSelected } from '#stir/utils/selectionUtils'
+import { normalizeValue } from '#stir/utils/stringUtils'
+import { handleTabChange } from '#stir/utils/visibilityUtils'
 
 const props = defineProps<{
   field: WebformFieldProps

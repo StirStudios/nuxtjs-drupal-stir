@@ -8,7 +8,7 @@ import {
   mapDrupalMenuItem,
   splitMenuAtMarker,
   type DrupalMenuTreeItem,
-} from '~/utils/navigation'
+} from '#stir/utils/navigation'
 
 defineOptions({
   inheritAttrs: false,

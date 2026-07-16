@@ -29,6 +29,7 @@ This repository is structured into three Nuxt layers with clear ownership:
 - Keep external packages such as `@vueuse/core`, Valibot, and Nuxt UI utilities explicit. This makes dependency and bundle ownership clear; installing another auto-import module merely to hide these imports is not worthwhile.
 - Keep imports explicit in server code, Nuxt configuration, build/audit scripts, and isolated tests because those files do not share the application auto-import context.
 - Keep cross-layer imports explicit. Auto-imports are a public app surface, not a way to hide a dependency on another layer's internals.
+- Use the explicit `#stir/utils`, `#stir/composables`, `#stir/components`, and `#stir/types` aliases for supported Stir-owned app contracts. The historical `~/...` aliases remain available only to preserve existing consumers during the compatibility window; new layer and consumer code should not use them.
 
 ## Override Guidance (Consuming Apps)
 

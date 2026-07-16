@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomElementNode, EditAction } from '../../../../theme/app/types'
+import type { CustomElementNode, EditAction } from '#stir/types'
 
 defineOptions({
   inheritAttrs: false,

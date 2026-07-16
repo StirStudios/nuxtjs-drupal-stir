@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
-import { getDrupalOrigin, toDrupalUrl } from '../../../../theme/app/utils/drupalUrl'
+import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const { getPage } = useStirDrupalCe()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AppContextBlock } from '~/composables/useAppContext'
+import type { AppContextBlock } from '#stir/composables/useAppContext'
 
 const { renderCustomElements, getPage } = useStirDrupalCe()
 const page = getPage()

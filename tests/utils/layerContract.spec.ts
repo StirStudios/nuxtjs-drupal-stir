@@ -36,21 +36,19 @@ describe('layer contract', () => {
     ))).toBe(true)
   })
 
-  it('keeps the established public layer aliases available', () => {
+  it('prefers Stir-owned aliases while keeping compatibility aliases available', () => {
     const nuxtConfig = readFileSync(
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),
       'utf8',
     )
     const tsConfig = readFileSync(resolve(rootDir, 'tsconfig.json'), 'utf8')
 
-    expect(nuxtConfig).toContain('\'~/utils\':')
-    expect(nuxtConfig).toContain('\'~/composables\':')
-    expect(nuxtConfig).toContain('\'~/components\':')
-    expect(nuxtConfig).toContain('\'~/types\':')
-    expect(tsConfig).toContain('"~/utils/*"')
-    expect(tsConfig).toContain('"~/composables/*"')
-    expect(tsConfig).toContain('"~/components/*"')
-    expect(tsConfig).toContain('"~/types/*"')
+    for (const alias of ['utils', 'composables', 'components', 'types']) {
+      expect(nuxtConfig).toContain(`'#stir/${alias}':`)
+      expect(nuxtConfig).toContain(`'~/${alias}':`)
+      expect(tsConfig).toContain(`"#stir/${alias}/*"`)
+      expect(tsConfig).toContain(`"~/${alias}/*"`)
+    }
   })
 
   it('publishes a machine-readable compatibility contract', () => {
@@ -60,6 +58,8 @@ describe('layer contract', () => {
     )) as {
       compatibilityPolicy: string
       aliases: string[]
+      preferredAliases: string[]
+      compatibilityAliases: string[]
       serverRoutes: string[]
       publicComposables: string[]
       runtimeConfigEnvironment: string[]
@@ -67,6 +67,22 @@ describe('layer contract', () => {
 
     expect(contract.compatibilityPolicy).toBe('preserve-within-major')
     expect(contract.aliases).toEqual([
+      '#stir/utils',
+      '#stir/composables',
+      '#stir/components',
+      '#stir/types',
+      '~/utils',
+      '~/composables',
+      '~/components',
+      '~/types',
+    ])
+    expect(contract.preferredAliases).toEqual([
+      '#stir/utils',
+      '#stir/composables',
+      '#stir/components',
+      '#stir/types',
+    ])
+    expect(contract.compatibilityAliases).toEqual([
       '~/utils',
       '~/composables',
       '~/components',

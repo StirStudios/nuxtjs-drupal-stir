@@ -1,6 +1,6 @@
 import type { VNode } from 'vue'
 import { cloneVNode, computed } from 'vue'
-import type { CustomElementNode } from '~/types'
+import type { CustomElementNode } from '#stir/types'
 
 export type RenderedDrupalViewRow =
   | {

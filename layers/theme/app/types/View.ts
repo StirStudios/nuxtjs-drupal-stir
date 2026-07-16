@@ -1,4 +1,4 @@
-import type { ViewPager } from '~/composables/useDrupalViewQuery'
+import type { ViewPager } from '#stir/composables/useDrupalViewQuery'
 
 export interface ExposedFilter {
   label: string

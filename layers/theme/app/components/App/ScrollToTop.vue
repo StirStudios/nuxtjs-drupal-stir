@@ -3,7 +3,7 @@ import { useWindowScroll } from '@vueuse/core'
 import {
   resolveUiButtonVariant,
   type UiButtonVariant,
-} from '~/utils/nuxtUiProps'
+} from '#stir/utils/nuxtUiProps'
 
 type ScrollButtonTheme = {
   showAtScrollY?: number

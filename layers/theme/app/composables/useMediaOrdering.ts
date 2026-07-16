@@ -1,4 +1,4 @@
-import type { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import type { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 
 export function useMediaOrdering(
   slotMedia: Ref<unknown[]>,

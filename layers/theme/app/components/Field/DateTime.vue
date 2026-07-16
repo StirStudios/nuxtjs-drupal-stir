@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { DateTimeBlock, DateTimeDate, WebformFieldProps, WebformState } from '~/types'
+import type { DateTimeBlock, DateTimeDate, WebformFieldProps, WebformState } from '#stir/types'
 import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
-import { generateTimeOptions, getOffsetString } from '~/utils/dateUtils'
-import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
+import { generateTimeOptions, getOffsetString } from '#stir/utils/dateUtils'
+import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps

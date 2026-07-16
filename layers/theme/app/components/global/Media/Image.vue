@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
-import type { EditAction, EditActionKey } from '~/types/EditControls'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 
 defineOptions({ inheritAttrs: false })
 

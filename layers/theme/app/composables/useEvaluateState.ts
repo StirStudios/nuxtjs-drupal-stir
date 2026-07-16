@@ -1,5 +1,5 @@
-import type { WebformState } from '~/types'
-import { evaluateCondition } from '~/utils/evaluateUtils'
+import type { WebformState } from '#stir/types'
+import { evaluateCondition } from '#stir/utils/evaluateUtils'
 
 interface VisibilityCondition {
   [selector: string]: { value: string }

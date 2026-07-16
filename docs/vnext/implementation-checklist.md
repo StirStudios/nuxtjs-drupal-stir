@@ -23,6 +23,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   edit actions, inline text editing, and admin CSS. The minimal preset uses
   shell-free theme fallbacks and does not load the editorial layer; the full
   preset preserves the existing tools.
+- Stir-owned app contracts now use explicit `#stir/utils`,
+  `#stir/composables`, `#stir/components`, and `#stir/types` aliases. The
+  historical `~/...` mappings remain available only as compatibility aliases
+  for downstream projects and are no longer used by layer implementation code.
 - Validation now uses one Valibot/Nuxt UI Standard Schema foundation across auth, account, dynamic Drupal Webforms, and server contract parsing; Yup is no longer a direct dependency or layer import.
 - N4 has started with all theme consumers routed through a Stir-owned Drupal CE facade. It delegates the upstream API while development builds surface unresolved components, unknown field elements, and malformed component nodes instead of silently dropping them; production retains the direct upstream rendering path.
 - The synchronized v1.15 component-tree fixture now mirrors the direct Layout

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { slugify } from '~/utils/stringUtils'
+import { slugify } from '#stir/utils/stringUtils'
 
 defineOptions({
   inheritAttrs: false,

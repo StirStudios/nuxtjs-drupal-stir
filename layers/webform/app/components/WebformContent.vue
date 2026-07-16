@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { WebformFieldProps, WebformState } from '../../../theme/app/types'
-import type { WebformValidationSchema } from '../../../theme/app/utils/buildValidationSchema'
-import { trustedDrupalHtml } from '../../../theme/app/utils/trustedDrupalHtml'
-import { resolveUiSize, type UiSize } from '../../../theme/app/utils/nuxtUiProps'
+import type { WebformFieldProps, WebformState } from '#stir/types'
+import type { WebformValidationSchema } from '#stir/utils/buildValidationSchema'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
   buttonClass?: string

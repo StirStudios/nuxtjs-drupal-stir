@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
-import type { WebformDefinition } from '~/types'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import type { WebformDefinition } from '#stir/types'
 
 const props = defineProps<{
   id: number | string

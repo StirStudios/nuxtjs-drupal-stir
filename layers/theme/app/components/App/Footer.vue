@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import FooterAtomList from '~/components/App/Footer/AtomList.vue'
+import FooterAtomList from '#stir/components/App/Footer/AtomList.vue'
 import type {
   AppContextFooterMenuItem,
   AppContextSiteInfo,
-} from '~/composables/useAppContext'
-import type { SocialIcon } from '~/types'
+} from '#stir/composables/useAppContext'
+import type { SocialIcon } from '#stir/types'
 import {
   resolveFooterConfig,
   toThemeRecord,
   type FooterAtomVisibility,
   type FooterSections,
-} from '~/utils/footer'
+} from '#stir/utils/footer'
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()

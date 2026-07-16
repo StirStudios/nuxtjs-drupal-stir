@@ -2,7 +2,7 @@
 import type { VNode } from 'vue'
 import {
   resolveCarouselArrowButton,
-} from '~/utils/nuxtUiProps'
+} from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   id?: number | string

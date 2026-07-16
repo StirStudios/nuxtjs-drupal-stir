@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EditAction, EditActionKey } from '~/types'
+import type { EditAction, EditActionKey } from '#stir/types'
 
 defineOptions({
   inheritAttrs: false,

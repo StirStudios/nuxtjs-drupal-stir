@@ -1,6 +1,6 @@
 import type { PlausibleRequestPayload } from '@plausible-analytics/tracker'
 import { init, track } from '@plausible-analytics/tracker/plausible.js'
-import { usePrivacyConsent } from '../../../theme/app/composables/usePrivacyConsent'
+import { usePrivacyConsent } from '#stir/composables/usePrivacyConsent'
 
 type PlausibleEventOptions = Parameters<typeof track>[1]
 type PlausibleRuntimeConfig = {

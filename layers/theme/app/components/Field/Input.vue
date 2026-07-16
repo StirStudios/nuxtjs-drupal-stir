@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '~/types'
+import type { WebformFieldProps } from '#stir/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import {
   formatTelDisplayValue,
   shouldPreventTelBeforeInput,
   shouldPreventTelKeydown,
   telPattern,
-} from '~/utils/formInputUtils'
-import { resolveUiFieldVariant } from '~/utils/nuxtUiProps'
+} from '#stir/utils/formInputUtils'
+import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   field: WebformFieldProps

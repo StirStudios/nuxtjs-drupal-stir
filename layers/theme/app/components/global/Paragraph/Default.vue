@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomElementNode } from '~/types'
+import type { CustomElementNode } from '#stir/types'
 
 const isDev = import.meta.dev
 

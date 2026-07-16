@@ -1,4 +1,4 @@
-import type { WebformFieldProps, WebformState } from '~/types'
+import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
   custom,
   object,

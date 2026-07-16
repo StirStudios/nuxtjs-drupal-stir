@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import { useMediaOrdering } from '~/composables/useMediaOrdering'
-import { useMediaModal } from '~/composables/useMediaModal'
-import type { DrupalMediaNodeProps } from '~/types'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { useMediaOrdering } from '#stir/composables/useMediaOrdering'
+import { useMediaModal } from '#stir/composables/useMediaModal'
+import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
