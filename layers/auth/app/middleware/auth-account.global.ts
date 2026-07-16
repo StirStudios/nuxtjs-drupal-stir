@@ -1,4 +1,3 @@
-import { defineNuxtRouteMiddleware, navigateTo, useAppConfig } from '#app'
 import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
 
 const ACCOUNT_AUTH_ROUTES = new Set([

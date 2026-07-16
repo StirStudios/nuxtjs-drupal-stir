@@ -37,11 +37,35 @@ export default withNuxt(
     },
   },
   {
+    files: ['layers/*/app/**/*.{js,ts,vue}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '#app',
+              allowTypeImports: true,
+              message: 'Use Nuxt auto-imports for runtime APIs in app code; keep type imports explicit.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['layers/theme/**/*.{js,ts,vue}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: '#app',
+              allowTypeImports: true,
+              message: 'Use Nuxt auto-imports for runtime APIs in app code; keep type imports explicit.',
+            },
+          ],
           patterns: [
             {
               group: ['../../types', '../../../types', '../../../../types'],

@@ -1,4 +1,3 @@
-import { defineNuxtPlugin, useAppConfig } from '#app'
 import {
   resolveColorModeState,
 } from '~/utils/colorMode'

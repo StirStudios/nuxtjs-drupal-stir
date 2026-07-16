@@ -1,16 +1,7 @@
-type SettingsValuesResponse = {
-  fields?: Record<string, {
-    editable?: boolean
-    requires_current_password?: boolean
-  }>
-  values?: Record<string, unknown>
-}
-
-type SettingsUpdateResponse = {
-  updated?: boolean
-  updated_fields?: string[]
-  no_changes?: boolean
-}
+import type {
+  AccountSettingsUpdateResponse,
+  AccountSettingsValuesResponse,
+} from '../../../shared/types/accountSettings'
 
 const SETTINGS_FIELDS = ['account_email'] as const
 
@@ -60,7 +51,7 @@ export function useAccountSettings() {
   const load = async () => {
     loading.value = true
     try {
-      const response = await $fetch<SettingsValuesResponse>('/api/account/settings/values')
+      const response = await $fetch<AccountSettingsValuesResponse>('/api/account/settings/values')
       const sourceValues =
         response && typeof response.values === 'object' && response.values !== null
           ? response.values
@@ -126,7 +117,7 @@ export function useAccountSettings() {
         changedValues.current_password = currentPassword
       }
 
-      const response = await $fetch<SettingsUpdateResponse>(
+      const response = await $fetch<AccountSettingsUpdateResponse>(
         '/api/account/settings/values',
         {
           method: 'PATCH',

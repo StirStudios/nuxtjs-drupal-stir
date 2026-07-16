@@ -16,9 +16,19 @@ This repository is structured into three Nuxt layers with clear ownership:
 
 ## Type Placement
 
-- Webform/form contracts owned by the theme layer live in `layers/theme/app/types/*` and are imported through `~/types`.
-- Layer-private types stay in that layer (for example `layers/theme/app/types/*`, `layers/auth/app/types/*`).
-- Cross-layer server contracts should live near the shared server utility or endpoint that owns them.
+- Keep a type beside the component, composable, route, or utility when it describes only that implementation.
+- Put browser-only public contracts and declaration augmentation in the owning layer's `app/types/*` directory. Theme contracts are imported through `~/types` inside the theme layer.
+- Put contracts used by both app and server code in the owning layer's `shared/types/*` directory. Import these explicitly from both sides so ownership stays visible and the browser never reaches into `server/*`.
+- Keep server-only request, storage, and upstream response shapes beside the server code that owns them unless several server files share the contract.
+- Do not create a global type folder for unrelated convenience types, and do not move a one-use props or rendering shape away from its implementation.
+
+## Import Policy
+
+- Use Nuxt auto-imports for Nuxt and Vue runtime APIs in normal files under `app/*` (for example `ref`, `computed`, `useRoute`, `useAppConfig`, and `defineNuxtPlugin`).
+- Keep type imports explicit, including Vue and Nuxt types.
+- Keep external packages such as `@vueuse/core`, Valibot, and Nuxt UI utilities explicit. This makes dependency and bundle ownership clear; installing another auto-import module merely to hide these imports is not worthwhile.
+- Keep imports explicit in server code, Nuxt configuration, build/audit scripts, and isolated tests because those files do not share the application auto-import context.
+- Keep cross-layer imports explicit. Auto-imports are a public app surface, not a way to hide a dependency on another layer's internals.
 
 ## Override Guidance (Consuming Apps)
 

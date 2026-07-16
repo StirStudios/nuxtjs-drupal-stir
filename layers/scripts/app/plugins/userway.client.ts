@@ -1,5 +1,3 @@
-import { defineNuxtPlugin, useAppConfig } from '#app'
-
 declare global {
   interface Window {
     _userway_config?: {

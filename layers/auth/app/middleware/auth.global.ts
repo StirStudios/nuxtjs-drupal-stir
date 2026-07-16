@@ -1,9 +1,3 @@
-import {
-  defineNuxtRouteMiddleware,
-  navigateTo,
-  useAppConfig,
-  useResponseHeader,
-} from '#app'
 import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'

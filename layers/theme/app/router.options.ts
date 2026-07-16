@@ -1,5 +1,4 @@
 import type { RouterOptions } from '@nuxt/schema'
-import { useNuxtApp } from '#app'
 
 const SAVED_POSITION_ATTEMPTS = 60
 const HASH_TARGET_ATTEMPTS = 60
