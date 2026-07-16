@@ -4,7 +4,7 @@ defineOptions({
 })
 
 const props = defineProps<{
-  id: string | number
+  id?: string | number
   uuid?: string
   entityType?: string
   type?: string
@@ -15,7 +15,7 @@ const props = defineProps<{
 
 defineSlots<{
   default?(props: {
-    id: string | number
+    id?: string | number
     label: string
     entityType: string
     url?: string
@@ -25,15 +25,17 @@ defineSlots<{
 const normalizedEntityType = computed(() => props.entityType || props.type || '')
 const referenceLabel = computed(() => {
   const label = props.label?.trim()
+  const url = props.url?.trim()
 
-  return label || [normalizedEntityType.value, props.id].filter(Boolean).join(' ')
+  return label || url || [normalizedEntityType.value, props.id].filter(Boolean).join(' ')
 })
 </script>
 
 <template>
-  <NuxtLink
+  <ULink
     v-if="url"
     v-bind="$attrs"
+    class="text-primary font-medium underline-offset-4 hover:underline"
     :to="url"
   >
     <slot
@@ -44,7 +46,7 @@ const referenceLabel = computed(() => {
     >
       {{ referenceLabel }}
     </slot>
-  </NuxtLink>
+  </ULink>
   <span v-else v-bind="$attrs">
     <slot
       :id="id"

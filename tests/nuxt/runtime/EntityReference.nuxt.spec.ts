@@ -32,6 +32,22 @@ describe('entity-reference (Nuxt runtime)', () => {
     expect(wrapper.get('span').text()).toBe('taxonomy_term 7')
   })
 
+  it('supports references without an ID and uses their URL as a visible fallback', async () => {
+    const wrapper = await mountSuspended(EntityReference, {
+      props: {
+        url: '/unlabelled-reference',
+      },
+    })
+
+    const link = wrapper.get('a')
+
+    expect(link.text()).toBe('/unlabelled-reference')
+    expect(link.attributes('href')).toBe('/unlabelled-reference')
+    expect(link.classes()).toEqual(
+      expect.arrayContaining(['text-primary', 'font-medium', 'hover:underline']),
+    )
+  })
+
   it('forwards presentation attributes and exposes normalized slot values', async () => {
     const wrapper = await mountSuspended(EntityReference, {
       attrs: { class: 'project-reference', 'data-card': 'level' },
