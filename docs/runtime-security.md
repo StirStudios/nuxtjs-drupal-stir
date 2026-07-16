@@ -77,6 +77,11 @@ that fallback. Cookie signatures are bound to both values, so rotating either
 `PROTECTED_PASSWORD` or `PROTECTED_COOKIE_SECRET` immediately invalidates
 existing protected-access cookies.
 
+Configured protected routes and authentication pages emit
+`Cache-Control: private, no-store, max-age=0` during SSR. CDN, reverse-proxy,
+and browser caches must honor that header; protected HTML must never be cached
+or served from a shared Varnish/edge object.
+
 Failed protected-login attempts use Nitro's `cache` storage with these defaults:
 
 | Variable | Default | Purpose |
