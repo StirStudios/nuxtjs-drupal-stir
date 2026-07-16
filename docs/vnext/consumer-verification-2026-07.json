@@ -1,10 +1,24 @@
 {
-  "generatedAt": "2026-07-16T20:21:00.000Z",
+  "generatedAt": "2026-07-16T23:38:49.747Z",
   "revisions": {
-    "nuxtLayer": "e0ba8e26",
-    "stirTools": "9eda569",
-    "rsfLayerPin": "e0ba8e26f7dfae58e3bb3705001c1ba7585f28b8",
-    "danceplugVideoFix": "d68a7a1"
+    "nuxtLayer": "b6d40399",
+    "stirTools": "7941fb2",
+    "rsfRemoteDev": "1238410e808fc9021ca3bcbef1c6a53fd368a087",
+    "danceplugNuxt": "706e20a",
+    "danceplugRoot": "be260de"
+  },
+  "packedConsumerVerification": {
+    "rsf": {
+      "source": "fresh remote dev clone",
+      "node": "22.22.0",
+      "typecheck": "passed",
+      "productionBuild": "passed",
+      "adaptations": [
+        "declared Nuxt peer ^4.4.8",
+        "extended installed @stir/base package"
+      ],
+      "note": "The dirty local RSF checkout was not modified. Remote dev still needs these two package/config changes when an explicit consumer cutover is approved."
+    }
   },
   "functionalReview": {
     "rsf": {
