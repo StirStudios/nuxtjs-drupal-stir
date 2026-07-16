@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformOptionProperties, WebformState } from '#stir/types'
 import { useEventBus } from '@vueuse/core'
-import { enforceGroupLimit, enforceMaxSelected } from '#stir/utils/selectionUtils'
+import {
+  enforceGroupLimit,
+  enforceMaxSelected,
+  syncLinkedSelections,
+} from '#stir/utils/selectionUtils'
 import { normalizeValue } from '#stir/utils/stringUtils'
 import { handleTabChange } from '#stir/utils/visibilityUtils'
 
@@ -112,18 +116,12 @@ const handleModelUpdate = (val: unknown) => {
     ]),
   )
 
-  for (const selectedKey of updated) {
-    const meta = props.field['#optionProperties']?.[
-      selectedKey
-    ] as WebformOptionProperties | undefined
-    const linked = [...(meta?.linked_to ?? []), ...(meta?.linkedTo ?? [])]
-
-    for (const linkedKey of linked) {
-      if (!updated.includes(linkedKey) && !disabledKeys.has(linkedKey)) {
-        updated.push(linkedKey)
-      }
-    }
-  }
+  updated = syncLinkedSelections(
+    selectedValues,
+    updated,
+    props.field['#optionProperties'] ?? {},
+    disabledKeys,
+  )
 
   updated = enforceGroupLimit(
     updated,
