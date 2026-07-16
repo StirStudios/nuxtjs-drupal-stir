@@ -1,9 +1,5 @@
 import type { AppConfigInput } from 'nuxt/schema'
-import {
-  materialVariant,
-  materialVariantWithPB,
-  materialVariantMuted,
-} from './utils/uiVariants'
+import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
   cmsGlobalSeo: {
@@ -97,7 +93,8 @@ export default defineAppConfig({
         container: 'relative',
         desktopNav: 'hidden lg:flex',
         leftNav: 'app-nav app-nav-left',
-        logoLink: 'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
+        logoLink:
+          'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
         mobileLogo: 'lg:hidden',
         mobileLeft: 'lg:hidden flex items-center gap-1.5',
         right: 'lg:absolute lg:right-4',
@@ -112,8 +109,7 @@ export default defineAppConfig({
         angle: false,
         angleDeg: 35,
         angleOffsetX: '1.5rem',
-        link:
-          'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
+        link: 'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
         list: 'w-full space-y-1.5',
         body: 'flex flex-col',
       },
@@ -299,112 +295,5 @@ export default defineAppConfig({
     },
   },
 
-  ui: {
-    colors: {
-      primary: 'lime',
-      neutral: 'zinc',
-    },
-
-    button: {
-      slots: {
-        base: 'transition-all duration-300',
-      },
-      variants: {
-        size: {
-          '2xl': {
-            base: 'px-10 py-3 text-md gap-2',
-          },
-        },
-        variant: {
-          material: materialVariantMuted,
-        },
-      },
-    },
-
-    modal: {
-      slots: {
-        title: 'mb-0',
-      },
-    },
-
-    carousel: {
-      slots: {
-        root: 'group relative focus:outline-none',
-      },
-      variants: {
-        orientation: {
-          horizontal: {
-            container: 'flex-row -ms-0',
-            item: 'ps-0',
-            prev: 'start-5 sm:start-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-            next: 'end-5 sm:end-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-          },
-        },
-      },
-    },
-
-    formField: {
-      slots: {
-        label: 'block font-medium text-default/80',
-        container: 'mt-1',
-        error: 'mt-1 text-error',
-      },
-    },
-
-    input: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    select: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    selectMenu: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    inputNumber: {
-      variants: {
-        size: {
-          md: 'px-2.5 py-1.5 text-base gap-1.5',
-        },
-        variant: {
-          material: materialVariant,
-        },
-      },
-    },
-
-    textarea: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-        variant: 'material',
-      },
-    },
-  } as unknown as NonNullable<AppConfigInput['ui']>,
+  ui: nuxtUiTheme as unknown as NonNullable<AppConfigInput['ui']>,
 })

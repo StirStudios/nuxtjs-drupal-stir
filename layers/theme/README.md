@@ -3,8 +3,10 @@
 `layers/theme` contains reusable visual and design-system defaults for `nuxtjs-drupal-stir`.
 
 Included in this layer:
+
 - Nuxt app theme config (`app/app.config.ts`)
-- UI variant helpers (`app/utils/uiVariants.ts`)
+- Private Nuxt UI theme defaults (`app/theme/nuxtUi.ts`)
+- Deprecated UI variant aliases for downstream compatibility (`app/utils/uiVariants.ts`)
 - Theme/shell components (`App/*`, `Site/*`, `Icons/*`, `Wrap/*`)
 - Presentation components (`Drupal/*`, `Field/*`, `StirPdfViewer.client.vue`)
 - Default app rendering shell (`app/layouts/*`, `app/pages/[...slug].vue`, `app/error.vue`)
@@ -33,6 +35,15 @@ normal application code. Keep explicit imports for external packages, types,
 shared utilities, and isolated test components where Nuxt auto-import context is
 not guaranteed.
 
+### Nuxt UI theme ownership
+
+Shared Nuxt UI component defaults and the Stir Material field variant live in
+`app/theme/nuxtUi.ts`. `app.config.ts` composes that preset with the public Stir
+configuration, while downstream projects may continue to override any `ui`
+key through normal Nuxt app-config merging. Keep implementation class strings
+private to the theme layer; select the Material presentation through
+`stirTheme.webform.fieldVariant` instead of importing class helpers.
+
 ### Drupal Custom Elements
 
 Theme code consumes `useStirDrupalCe()` rather than `useDrupalCe()` directly.
@@ -42,11 +53,13 @@ Elements and unknown `field-*` elements into visible diagnostics; production
 keeps the upstream rendering path without traversing the component tree.
 
 Keep in `layers/theme`:
+
 - Presentation and layout components
 - Theme-level UI wrappers and CE display components
 - Visual helpers that are reusable across projects
 
 Keep outside `layers/theme`:
+
 - Auth/session and protected-route behavior (`layers/auth`)
 - Drupal tabs, edit controls, and inline editing (`layers/editorial`)
 - Server proxy/runtime behavior (`layers/core`)

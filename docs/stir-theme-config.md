@@ -800,6 +800,11 @@ navigationMenu: {
 },
 ```
 
+The base layer owns its Nuxt UI defaults in `layers/theme/app/theme/nuxtUi.ts`
+and composes that preset from `app.config.ts`. Consumer projects should override
+only the Nuxt UI keys they need through `defineAppConfig`; they do not need to
+import the Material implementation classes.
+
 ### 🔘 Buttons
 
 ```ts
@@ -814,18 +819,15 @@ button: {
 		trailingIcon: 'size-6'
 	  },
 	  md: {
-		base: 'px-6 py-3 text-md gap-2',
+		base: 'px-6 py-3 text-base gap-2',
 		leadingIcon: 'size-8',
 		trailingIcon: 'size-8'
 	  },
 	  '2xl': {
-		  base: 'px-10 py-4 text-md gap-2',
+		  base: 'px-10 py-4 text-base gap-2',
 		  leadingIcon: 'size-10',
 		  trailingIcon: 'size-10'
 	  },
-	},
-	variant: {
-	  material: materialVariantMuted,
 	},
   },
   defaultVariants: {
@@ -853,9 +855,6 @@ formField: {
 ```ts
 input: {
   variants: {
-	variant: {
-	  material: materialVariant,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -873,9 +872,6 @@ input: {
 ```ts
 select: {
   variants: {
-	variant: {
-	  material: materialVariantWithPB,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -888,9 +884,6 @@ select: {
 },
 selectMenu: {
   variants: {
-	variant: {
-	  material: materialVariantWithPB,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -908,9 +901,6 @@ selectMenu: {
 ```ts
 textarea: {
   variants: {
-	variant: {
-	  material: materialVariant,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',

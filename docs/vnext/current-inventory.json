@@ -634,13 +634,13 @@
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 96,
+    "tests": 97,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 35,
       "server": 21,
-      "utils": 29
+      "utils": 30
     }
   },
   "tests": [
@@ -727,6 +727,7 @@
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",
     "tests/utils/nuxtUiProps.spec.ts",
+    "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
     "tests/utils/presentationManifest.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
