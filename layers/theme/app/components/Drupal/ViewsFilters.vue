@@ -88,6 +88,12 @@ function isDateRangeFilter(filter: ExposedFilter): boolean {
   return filter.type === 'date_range'
 }
 
+function isSearchFilter(filter: ExposedFilter): boolean {
+  return filter.type === 'search'
+    || filter.queryParamName.toLowerCase().includes('search')
+    || filter.label.toLowerCase() === 'search'
+}
+
 function getItems(filter: ExposedFilter): SelectItem[] {
   if (filter.multiple) return filter.options
 
@@ -164,6 +170,7 @@ onBeforeUnmount(() => {
           :aria-label="filter.label"
           class="min-w-64"
           :disabled="filter.disabled"
+          :icon="isSearchFilter(filter) ? 'i-lucide-search' : undefined"
           :model-value="getTextValue(filter)"
           :placeholder="filter.label"
           type="search"
