@@ -277,6 +277,7 @@
       "layers/auth/app/composables/useAuthConfig.ts",
       "layers/auth/app/composables/useAuthSession.ts",
       "layers/editorial/app/composables/useParagraphTextEditor.ts",
+      "layers/foundation/app/composables/useValidation.ts",
       "layers/integrations/app/composables/usePopupBehavior.ts",
       "layers/integrations/app/composables/usePopupData.ts",
       "layers/integrations/app/composables/usePrivacyConsent.ts",
@@ -319,7 +320,6 @@
       "layers/theme/app/composables/useStirWebformTheme.ts",
       "layers/theme/app/composables/useTeaserPost.ts",
       "layers/theme/app/composables/useThirdPartyScript.ts",
-      "layers/theme/app/composables/useValidation.ts",
       "layers/theme/app/composables/useVideoPlayers.ts"
     ],
     "utils": [
@@ -567,6 +567,7 @@
         "layers/auth/app/composables/useAuthConfig.ts",
         "layers/auth/app/composables/useAuthSession.ts",
         "layers/editorial/app/composables/useParagraphTextEditor.ts",
+        "layers/foundation/app/composables/useValidation.ts",
         "layers/integrations/app/composables/usePopupBehavior.ts",
         "layers/integrations/app/composables/usePopupData.ts",
         "layers/integrations/app/composables/usePrivacyConsent.ts",
@@ -609,7 +610,6 @@
         "layers/theme/app/composables/useStirWebformTheme.ts",
         "layers/theme/app/composables/useTeaserPost.ts",
         "layers/theme/app/composables/useThirdPartyScript.ts",
-        "layers/theme/app/composables/useValidation.ts",
         "layers/theme/app/composables/useVideoPlayers.ts"
       ],
       "autoImportedUtils": [

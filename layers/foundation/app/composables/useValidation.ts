@@ -10,6 +10,10 @@ type ToastLike = {
   }) => void
 }
 
+type ValidationOptions = {
+  showToast?: boolean
+}
+
 export function handleValidationError(
   event: FormErrorEvent,
   validationContext: {
@@ -22,8 +26,7 @@ export function handleValidationError(
     } | null
   },
 ) {
-  if (!validationContext.isClient) return
-  if (!event?.errors?.length) return
+  if (!validationContext.isClient || !event?.errors?.length) return
 
   const firstError = event.errors[0]
 
@@ -43,16 +46,15 @@ export function handleValidationError(
   })
 }
 
-export const useValidation = () => {
+export function useValidation(options: ValidationOptions = {}) {
   const toast = useToast()
-  const webform = useStirWebformTheme()
 
   const onError = (event: FormErrorEvent) => {
     handleValidationError(event, {
       isClient: import.meta.client,
-      showToast: webform.showToasts !== false,
+      showToast: options.showToast,
       toast,
-      getElementById: (id) => document.getElementById(id),
+      getElementById: id => document.getElementById(id),
     })
   }
 

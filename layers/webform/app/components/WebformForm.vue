@@ -3,7 +3,6 @@ import { flattenWebformFields } from '#stir/utils/flattenWebformFields'
 import { evaluateContainerVisibility } from '#stir/composables/useContainerVisibility'
 import { transformPayloadToSnakeCase } from '#stir/utils/transformUtils'
 import { getHiddenDefaults } from '#stir/utils/getHiddenDefaults'
-import { useValidation } from '#stir/composables/useValidation'
 import { useWindowScroll } from '@vueuse/core'
 import {
   createScrollToTopRunner,
@@ -31,10 +30,12 @@ const webform = computed<WebformDefinition>(() => {
   return props.webform || ({} as WebformDefinition)
 })
 
-const { onError } = useValidation()
 const { y } = useWindowScroll()
 const toast = useToast()
 const { webform: themeWebform } = useAppConfig().stirTheme
+const { onError } = useValidation({
+  showToast: themeWebform.showToasts !== false,
+})
 const shouldShowToasts = computed(() => themeWebform.showToasts !== false)
 
 const webformScrollConfig = computed(() => getWebformScrollConfig(themeWebform))
