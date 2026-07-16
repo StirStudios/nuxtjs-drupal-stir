@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.13.0",
+  "contractVersion": "1.14.0",
   "files": {
     "fixtures/app-context.json": "7110555940bfc4de0f807ae0b5cbfce1850522912267a4c0b82f916afcb8aa18",
     "fixtures/auth-register-admin-approval.json": "8d6a29215bd78a3b866b1e0b53afaabb16ce41a69e061bc7a6a8935384e93e86",
@@ -9,12 +9,12 @@
     "fixtures/auth-register-policy-closed.json": "03a8db4bf720eeedc956b37fc41b3e8d4c14245c777a65b3261e1bb075dc9fde",
     "fixtures/auth-register-policy-open.json": "f37e0c5cecc61ecc82543a503f63c92034dcf838136fd6e406aa8a1258543677",
     "fixtures/auth-ui-config.json": "beb3aba3b3a71aec5195d869fd735dc6aac0a24433c38c066d397b4b4fbe7194",
-    "fixtures/component-tree.json": "613da676f7be661dcd2a34e5a1736ca17ba8e5bb5ccbcbc7915ae029c562e6d9",
+    "fixtures/component-tree.json": "7104cd7fe6034b9f8a769343367a3b515adee228ea25292dfbbd6781d74af842",
     "fixtures/global-seo.json": "8aa3de4b22ee0725c4f29d341726b7c2b57a3d958003bbb983d94a71bd6c34ea",
     "fixtures/listing-response.json": "92751d4fd54c57d38f4df15ed64f97bbf6dde5b1fe893abf8fbb87ff196438a1",
     "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
     "fixtures/webform-contact.json": "a3119636626089bc7129785dc5c253d351b648a6a2283291aca8e0e74eb59fcc",
-    "manifest.json": "bd487a5e20efdc9daaf30f6f8ab54103434e023cf684ce7bb57bef009d713066",
+    "manifest.json": "082c9a62a6b3f4b641e20232805282b05891955aa73dd1723afc46b8d7d4f3b8",
     "schemas/app-context.schema.json": "dbc3f728a29467abb0c6f6f749066d46b88e51e42f4f8ff94e33a3108b345f66",
     "schemas/auth-register-policy.schema.json": "b3b9c3b4830580f0507e92784e9616c1ed8cabb4f4bbf4d384d45aacaeb4a2e2",
     "schemas/auth-register-response.schema.json": "5a1856aae50df5a5f755110612cd849ca7dd73298884f5ffef5557782955d827",

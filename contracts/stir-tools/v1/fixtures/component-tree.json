@@ -373,6 +373,36 @@
         },
         "slots": {}
       }
+    ],
+    "capacity": [
+      {
+        "element": "field-value",
+        "props": {
+          "value": 480,
+          "valueType": "integer"
+        },
+        "slots": {}
+      }
+    ],
+    "featured": [
+      {
+        "element": "field-value",
+        "props": {
+          "value": true,
+          "valueType": "boolean"
+        },
+        "slots": {}
+      }
+    ],
+    "audience": [
+      {
+        "element": "option-value",
+        "props": {
+          "value": "all_ages",
+          "label": "All ages"
+        },
+        "slots": {}
+      }
     ]
   }
 }

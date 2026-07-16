@@ -18,6 +18,21 @@ describe('componentTree', () => {
 
     expect(parsed).toEqual(fixture)
     expect(parsed.slots.body).toBe('<p>Rendered body text.</p>')
+    expect(parsed.slots.capacity).toEqual([{
+      element: 'field-value',
+      props: { value: 480, valueType: 'integer' },
+      slots: {},
+    }])
+    expect(parsed.slots.featured).toEqual([{
+      element: 'field-value',
+      props: { value: true, valueType: 'boolean' },
+      slots: {},
+    }])
+    expect(parsed.slots.audience).toEqual([{
+      element: 'option-value',
+      props: { value: 'all_ages', label: 'All ages' },
+      slots: {},
+    }])
     expect(parsed.slots.section).toMatchObject([
       {
         element: 'paragraph-text',
