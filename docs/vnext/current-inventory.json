@@ -177,6 +177,7 @@
       "layers/theme/app/components/Drupal/PageRoute.vue",
       "layers/theme/app/components/Drupal/Tabs.vue",
       "layers/theme/app/components/Drupal/ViewDisplay.vue",
+      "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
       "layers/theme/app/components/Drupal/ViewsFilters.vue",
       "layers/theme/app/components/Drupal/ViewsPagination.vue",
       "layers/theme/app/components/Drupal/ViewsSelectField.vue",
@@ -467,6 +468,7 @@
         "layers/theme/app/components/Drupal/PageRoute.vue",
         "layers/theme/app/components/Drupal/Tabs.vue",
         "layers/theme/app/components/Drupal/ViewDisplay.vue",
+        "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
         "layers/theme/app/components/Drupal/ViewsFilters.vue",
         "layers/theme/app/components/Drupal/ViewsPagination.vue",
         "layers/theme/app/components/Drupal/ViewsSelectField.vue",
@@ -667,7 +669,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 110,
+    "components": 111,
     "composables": 62,
     "utils": 43,
     "plugins": 6,
@@ -675,11 +677,11 @@
     "serverRoutes": 26,
     "productionDependencies": 38,
     "developmentDependencies": 26,
-    "tests": 103,
+    "tests": 104,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
-      "nuxt": 36,
+      "nuxt": 37,
       "server": 22,
       "unit": 2,
       "utils": 32
@@ -724,6 +726,7 @@
     "tests/nuxt/runtime/StirMissingComponent.nuxt.spec.ts",
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
     "tests/nuxt/runtime/TurnstileConfig.nuxt.spec.ts",
+    "tests/nuxt/runtime/ViewsDateRangeFilter.nuxt.spec.ts",
     "tests/nuxt/runtime/Webform.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapDiv.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapGrid.nuxt.spec.ts",

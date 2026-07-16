@@ -74,17 +74,39 @@ if (!address || typeof address === 'string') {
 }
 
 const packageManager = process.env.npm_execpath
-  ? { command: process.execPath, args: [process.env.npm_execpath, 'dev'] }
-  : { command: process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', args: ['dev'] }
-const nuxt = spawn(
+  ? { command: process.execPath, args: [process.env.npm_execpath] }
+  : { command: process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', args: [] }
+const nuxtEnvironment = {
+  ...process.env,
+  DRUPAL_URL: `http://${host}:${address.port}`,
+  NUXT_INDEXABLE: 'false',
+  NUXT_URL: `http://${host}:${nuxtPort}`,
+}
+const build = spawn(
   packageManager.command,
-  [...packageManager.args, '--host', host, '--port', nuxtPort],
+  [...packageManager.args, 'build'],
+  {
+    env: nuxtEnvironment,
+    stdio: 'inherit',
+  },
+)
+
+const [buildCode, buildSignal] = await once(build, 'exit')
+
+if (buildSignal || buildCode !== 0) {
+  await new Promise(resolvePromise => drupal.close(resolvePromise))
+  if (buildSignal) process.kill(process.pid, buildSignal)
+  else process.exit(buildCode ?? 1)
+}
+
+const nuxt = spawn(
+  process.execPath,
+  ['.output/server/index.mjs'],
   {
     env: {
-      ...process.env,
-      DRUPAL_URL: `http://${host}:${address.port}`,
-      NUXT_INDEXABLE: 'false',
-      NUXT_URL: `http://${host}:${nuxtPort}`,
+      ...nuxtEnvironment,
+      NITRO_HOST: host,
+      NITRO_PORT: nuxtPort,
     },
     stdio: 'inherit',
   },

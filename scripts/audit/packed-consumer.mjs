@@ -13,7 +13,7 @@ const consumerLayers = [
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
 const maxArchiveBytes = 300_000
-const maxArchiveEntries = 427
+const maxArchiveEntries = 428
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
