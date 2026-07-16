@@ -56,6 +56,9 @@ remain available without a pre-existing session token.
   are therefore required whenever `PROTECTED_PASSWORD` is enabled.
 - Production also requires a separate high-entropy `PROTECTED_COOKIE_SECRET`
   for signing the protected-access cookie.
+- SSR responses for configured protected routes and authentication pages are
+  marked `private, no-store`; do not override that policy in Varnish or at the
+  edge.
 
 ## Recommended rate limits (Drupal Flood)
 
