@@ -28,9 +28,6 @@ const props = withDefaults(
     height?: number
     srcset?: string
     sizes?: string
-    originalSrc?: string
-    originalRevision?: string
-    responsiveStyle?: string
     loading?: 'eager' | 'lazy'
     fetchpriority?: 'high' | 'low' | 'auto'
 
@@ -55,9 +52,6 @@ const props = withDefaults(
     height: undefined,
     srcset: undefined,
     sizes: undefined,
-    originalSrc: undefined,
-    originalRevision: undefined,
-    responsiveStyle: undefined,
     loading: 'lazy',
     fetchpriority: 'auto',
     noWrapper: false,
@@ -160,15 +154,6 @@ const previewSrc = computed(() => {
 const previewSrcset = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.srcset,
 )
-const previewOriginalSrc = computed(() =>
-  isAnimatedPreviewActive.value ? undefined : props.originalSrc,
-)
-const previewOriginalRevision = computed(() =>
-  isAnimatedPreviewActive.value ? undefined : props.originalRevision,
-)
-const previewResponsiveStyle = computed(() =>
-  isAnimatedPreviewActive.value ? undefined : props.responsiveStyle,
-)
 
 const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
@@ -225,19 +210,15 @@ watch(
 </script>
 
 <template>
-  <MediaImage
+  <img
     v-if="isBare && previewSrc"
     v-bind="attrs"
     :alt="alt || ''"
     aria-hidden="true"
+    class="absolute inset-0 h-full w-full object-cover"
     :fetchpriority="fetchpriority"
     :height="height"
-    image-class="absolute inset-0 h-full w-full object-cover"
     :loading="loading"
-    no-wrapper
-    :original-revision="previewOriginalRevision"
-    :original-src="previewOriginalSrc"
-    :responsive-style="previewResponsiveStyle"
     :sizes="sizes || '100vw'"
     :src="previewSrc"
     :srcset="previewSrcset"
@@ -347,16 +328,12 @@ watch(
           'group-focus-within:scale-105',
         ]"
       >
-        <MediaImage
+        <img
           :alt="alt || title || 'Video thumbnail'"
+          class="h-full w-full object-cover"
           :fetchpriority="fetchpriority"
           :height="height"
-          image-class="h-full w-full object-cover"
           :loading="loading"
-          no-wrapper
-          :original-revision="previewOriginalRevision"
-          :original-src="previewOriginalSrc"
-          :responsive-style="previewResponsiveStyle"
           :sizes="sizes || '100vw'"
           :src="previewSrc"
           :srcset="previewSrcset"
