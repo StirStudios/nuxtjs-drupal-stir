@@ -35,6 +35,13 @@ const portal = useOverlayPortal()
 
 const settingsFields = [
   {
+    name: 'account_name',
+    label: 'Username',
+    type: 'text',
+    required: true,
+    editable: false,
+  },
+  {
     name: 'account_email',
     label: 'Email',
     type: 'email',
@@ -75,7 +82,7 @@ const onSubmitSettings = async () => {
   try {
     const response = await save()
 
-    if (response?.no_changes) {
+    if ('no_changes' in response && response.no_changes) {
       toast.add({
         title: 'No changes',
         description: 'There is nothing new to save.',

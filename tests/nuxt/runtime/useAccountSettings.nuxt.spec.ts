@@ -109,6 +109,65 @@ describe('useAccountSettings', () => {
     )
   })
 
+  it('loads and updates a username only when Drupal marks it editable', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        fields: {
+          account_name: { editable: true },
+          account_email: { editable: true },
+        },
+        values: {
+          account_name: 'before-name',
+          account_email: 'before@example.test',
+        },
+      })
+      .mockResolvedValueOnce({
+        updated: true,
+        updated_fields: ['account_name'],
+      })
+
+    vi.stubGlobal('$fetch', fetchMock)
+    const settings = await mountComposable()
+
+    await settings.load()
+    expect(settings.values.value.account_name).toBe('before-name')
+    settings.values.value.account_name = 'after-name'
+    expect(settings.hasChanges.value).toBe(true)
+
+    await settings.save()
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/account/settings/values',
+      {
+        method: 'PATCH',
+        body: { values: { account_name: 'after-name' } },
+      },
+    )
+  })
+
+  it('does not submit a username Drupal marks read-only', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      fields: {
+        account_name: { editable: false },
+        account_email: { editable: true },
+      },
+      values: {
+        account_name: 'fixed-name',
+        account_email: 'before@example.test',
+      },
+    })
+
+    vi.stubGlobal('$fetch', fetchMock)
+    const settings = await mountComposable()
+
+    await settings.load()
+    settings.values.value.account_name = 'ignored-name'
+
+    expect(settings.hasChanges.value).toBe(false)
+    await expect(settings.save()).resolves.toMatchObject({ no_changes: true })
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
   it('rejects a protected email change without the current password', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce({
       fields: {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.22.0",
+  "contractVersion": "1.23.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -17,6 +17,10 @@
       "optional": true
     },
     "account.session": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.settings": {
       "providerModules": ["stir_account"],
       "optional": true
     },
@@ -82,6 +86,19 @@
       "capability": "account.session",
       "schema": "schemas/auth-session.schema.json",
       "fixtures": ["fixtures/auth-session-authenticated.json"]
+    },
+    "account.settings.values": {
+      "capability": "account.settings",
+      "schema": "schemas/account-settings-values.schema.json",
+      "fixtures": ["fixtures/account-settings-values.json"]
+    },
+    "account.settings.update": {
+      "capability": "account.settings",
+      "schema": "schemas/account-settings-update.schema.json",
+      "fixtures": [
+        "fixtures/account-settings-update-success.json",
+        "fixtures/account-settings-update-error.json"
+      ]
     },
     "app.context": {
       "capability": "app.context",
