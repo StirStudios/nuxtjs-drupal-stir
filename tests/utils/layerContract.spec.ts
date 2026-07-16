@@ -298,6 +298,7 @@ describe('layer contract', () => {
 
     expect(authConfig).toContain('extends: [\'../turnstile\']')
     expect(webformConfig).toContain('extends: [\'../turnstile\']')
+    expect(turnstileConfig).toContain('extends: [\'../platform\']')
     expect(turnstileConfig).toContain('\'@nuxtjs/turnstile\'')
     expect(existsSync(resolve(
       rootDir,

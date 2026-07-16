@@ -1,6 +1,8 @@
 const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
 
 export default defineNuxtConfig({
+  extends: ['../platform'],
+
   modules: [
     [
       '@nuxtjs/turnstile',
