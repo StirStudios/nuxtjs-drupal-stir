@@ -94,6 +94,15 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   modules, and generated server output falls from 10.1 MB to 5.56 MB. This is
   the intended compatibility tradeoff: existing consumers do not regress, and
   new capability-selected consumers avoid code they did not request.
+- The first live DancePlug strict-manifest build now proves the project path:
+  Drupal exported revision `43fcc34c` with seven used semantic values and zero
+  rejected legacy utilities. DancePlug's main CSS fell from 352.08 to 305.66 kB
+  raw (13.18%) and from 47.03 to 42.06 kB gzip (10.57%). The build identity is
+  serialized before Nitro compilation and `/api/health` reports the exact
+  manifest/source revisions, strict mode, schema, site UUID, and Drupal theme.
+  DancePlug still reports Gin as its frontend theme and requires visual
+  regression review plus explicit `stir_decoupled` adoption before strict mode
+  becomes a project default.
 
 ## Delivery slices
 
