@@ -164,13 +164,6 @@ export default defineNuxtConfig({
     ],
 
     [
-      '@nuxtjs/robots',
-      {
-        // disallow: ['/secret', '/admin'],
-      },
-    ],
-
-    [
       'nuxtjs-drupal-ce',
       {
         drupalBaseUrl: drupalUrl,

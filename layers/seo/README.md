@@ -19,6 +19,7 @@ export default defineNuxtConfig({
 ```
 
 `DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_URL`, `NUXT_NAME`,
-`NUXT_ENV`, and `NUXT_INDEXABLE` remain shared site/robots configuration.
+`NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration. The
+Robots module is registered only when this SEO capability is selected.
 Global metadata is disabled by default and can be enabled or scoped through
 `cmsGlobalSeo` app config.

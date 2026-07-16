@@ -32,6 +32,10 @@ async function inspectPreset(name) {
     )
     const hasSeo = layers.some((layer) => layer.endsWith('/layers/seo'))
     const hasListing = layers.some((layer) => layer.endsWith('/layers/listing'))
+    const installedModules = nuxt.options._installedModules
+      .map(module => module.meta?.name)
+      .filter(name => typeof name === 'string')
+    const hasRobots = installedModules.includes('@nuxtjs/robots')
     const hasProtectedAccessConfig = Object.hasOwn(
       nuxt.options.runtimeConfig,
       'protectedPassword',
@@ -47,6 +51,7 @@ async function inspectPreset(name) {
       hasIntegrations,
       hasSeo,
       hasListing,
+      hasRobots,
       hasProtectedAccessConfig,
       layers: layers.map((layer) => layer.replace(`${rootDir}/`, '')),
     }
@@ -92,8 +97,8 @@ if (minimal.hasIntegrations) {
   throw new Error('The minimal preset must not load the integrations layer.')
 }
 
-if (minimal.hasSeo) {
-  throw new Error('The minimal preset must not load the SEO layer.')
+if (minimal.hasSeo || minimal.hasRobots) {
+  throw new Error('The minimal preset must not load SEO or Robots.')
 }
 
 if (minimal.hasListing) {
@@ -130,8 +135,8 @@ if (!full.hasIntegrations) {
   throw new Error('The full preset must preserve the integrations layer.')
 }
 
-if (!full.hasSeo) {
-  throw new Error('The full preset must preserve the SEO layer.')
+if (!full.hasSeo || !full.hasRobots) {
+  throw new Error('The full preset must preserve SEO and Robots.')
 }
 
 if (!full.hasListing) {
@@ -144,9 +149,16 @@ if (!auth.hasAuth || auth.hasWebform || !auth.hasTurnstile) {
   )
 }
 
-if (auth.hasSeo || webform.hasSeo || auth.hasListing || webform.hasListing) {
+if (
+  auth.hasSeo
+  || webform.hasSeo
+  || auth.hasListing
+  || webform.hasListing
+  || auth.hasRobots
+  || webform.hasRobots
+) {
   throw new Error(
-    'Auth and Webform fixtures must not load SEO or listing layers.',
+    'Auth and Webform fixtures must not load SEO, Robots, or listing layers.',
   )
 }
 

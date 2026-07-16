@@ -17,6 +17,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    '@nuxtjs/robots',
     [
       '@nuxtjs/sitemap',
       buildSitemapModuleOptions(drupalUrl),

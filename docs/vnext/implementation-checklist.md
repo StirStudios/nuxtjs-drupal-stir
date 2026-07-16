@@ -39,7 +39,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   none of the three integration components, three implementation composables,
   or the consent plugin; the full preset preserves all of them.
 - The optional `layers/seo` boundary now owns the sitemap module, Drupal global
-  metadata plugin, and both SEO proxy routes. Minimal, auth-only, and
+  metadata plugin, Robots module, and both SEO proxy routes. Minimal, auth-only, and
   Webform-only consumers do not initialize or ship that capability; the root
   and full preset preserve existing website behavior.
 - The optional `layers/listing` boundary now owns the provider-neutral listing
