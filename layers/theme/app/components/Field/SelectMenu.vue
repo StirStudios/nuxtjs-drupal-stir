@@ -9,7 +9,7 @@ const props = defineProps<{
   state: Record<string, string>
 }>()
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const selectItems = computed(() => transformOptions(props.field['#options'] || {}) as Array<Record<string, unknown>>)

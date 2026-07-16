@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const { emitFormInput, emitFormChange } = useFormField()
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))

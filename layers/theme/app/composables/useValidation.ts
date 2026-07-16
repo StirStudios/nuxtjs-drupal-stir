@@ -45,7 +45,7 @@ export function handleValidationError(
 
 export const useValidation = () => {
   const toast = useToast()
-  const { webform } = useAppConfig().stirTheme
+  const webform = useStirWebformTheme()
 
   const onError = (event: FormErrorEvent) => {
     handleValidationError(event, {

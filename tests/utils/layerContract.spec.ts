@@ -200,6 +200,33 @@ describe('layer contract', () => {
     ))).toBe(true)
   })
 
+  it('shares Turnstile without coupling auth to Webforms', () => {
+    const authConfig = readFileSync(
+      resolve(rootDir, 'layers/auth/nuxt.config.ts'),
+      'utf8',
+    )
+    const webformConfig = readFileSync(
+      resolve(rootDir, 'layers/webform/nuxt.config.ts'),
+      'utf8',
+    )
+    const turnstileConfig = readFileSync(
+      resolve(rootDir, 'layers/turnstile/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(authConfig).toContain('extends: [\'../turnstile\']')
+    expect(webformConfig).toContain('extends: [\'../turnstile\']')
+    expect(turnstileConfig).toContain('\'@nuxtjs/turnstile\'')
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/turnstile/app/components/Field/Turnstile.vue',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/webform/app/components/Field/Turnstile.vue',
+    ))).toBe(false)
+  })
+
   it('exposes auth config and validation helpers from public layer paths', () => {
     expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
 

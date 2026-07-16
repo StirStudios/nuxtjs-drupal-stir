@@ -1,16 +1,7 @@
 import { positiveIntegerEnvironment } from '../../config/runtime'
 
-const turnstileSiteKey = process.env.TURNSTILE_KEY || ''
-
 export default defineNuxtConfig({
-  modules: [
-    [
-      '@nuxtjs/turnstile',
-      {
-        siteKey: turnstileSiteKey,
-      },
-    ],
-  ],
+  extends: ['../turnstile'],
 
   runtimeConfig: {
     webformSubmissionLimits: {
@@ -23,10 +14,10 @@ export default defineNuxtConfig({
         5 * 1024 * 1024,
       ),
       maxFiles: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FILES, 5),
-      maxFields: positiveIntegerEnvironment(process.env.WEBFORM_MAX_FIELDS, 100),
-    },
-    turnstile: {
-      secretKey: process.env.TURNSTILE_SECRET,
+      maxFields: positiveIntegerEnvironment(
+        process.env.WEBFORM_MAX_FIELDS,
+        100,
+      ),
     },
   },
 })

@@ -16,6 +16,7 @@
     "platform",
     "scripts",
     "theme",
+    "turnstile",
     "webform"
   ],
   "dependencies": {
@@ -226,7 +227,7 @@
       "layers/theme/app/components/global/node--default.vue",
       "layers/theme/app/components/global/option-value.vue",
       "layers/theme/app/components/global/user--default.vue",
-      "layers/webform/app/components/Field/Turnstile.vue",
+      "layers/turnstile/app/components/Field/Turnstile.vue",
       "layers/webform/app/components/WebformContent.vue",
       "layers/webform/app/components/WebformForm.vue",
       "layers/webform/app/components/global/Paragraph/Webform.vue"
@@ -288,6 +289,7 @@
       "layers/theme/app/composables/useSocialIcons.ts",
       "layers/theme/app/composables/useStirDrupalCe.ts",
       "layers/theme/app/composables/useStirListing.ts",
+      "layers/theme/app/composables/useStirWebformTheme.ts",
       "layers/theme/app/composables/useTeaserPost.ts",
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useValidation.ts",
@@ -508,7 +510,7 @@
         "layers/theme/app/components/global/node--default.vue",
         "layers/theme/app/components/global/option-value.vue",
         "layers/theme/app/components/global/user--default.vue",
-        "layers/webform/app/components/Field/Turnstile.vue",
+        "layers/turnstile/app/components/Field/Turnstile.vue",
         "layers/webform/app/components/WebformContent.vue",
         "layers/webform/app/components/WebformForm.vue",
         "layers/webform/app/components/global/Paragraph/Webform.vue"
@@ -570,6 +572,7 @@
         "layers/theme/app/composables/useSocialIcons.ts",
         "layers/theme/app/composables/useStirDrupalCe.ts",
         "layers/theme/app/composables/useStirListing.ts",
+        "layers/theme/app/composables/useStirWebformTheme.ts",
         "layers/theme/app/composables/useTeaserPost.ts",
         "layers/theme/app/composables/useThirdPartyScript.ts",
         "layers/theme/app/composables/useValidation.ts",
@@ -627,7 +630,7 @@
   },
   "counts": {
     "components": 108,
-    "composables": 60,
+    "composables": 61,
     "utils": 40,
     "plugins": 5,
     "middleware": 4,

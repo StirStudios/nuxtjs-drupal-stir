@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 const { emitFormInput, emitFormChange } = useFormField()
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const multiple = Number(props.field['#multiple']) || 1
 const minTime = String(props.field['#dateTimeMin'] ?? '10:00:00')

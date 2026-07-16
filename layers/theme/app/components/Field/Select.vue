@@ -15,7 +15,7 @@ const props = defineProps<{
   placeholder?: string
 }>()
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))

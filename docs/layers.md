@@ -1,10 +1,15 @@
 # Layers Guide
 
-This repository is structured into three Nuxt layers with clear ownership:
+This repository is structured into focused Nuxt layers with clear ownership:
 
 - `layers/core`: server/runtime integration concerns (Drupal API proxy utilities, secure API middleware, shared backend endpoints).
 - `layers/theme`: UI/theming concerns (components, layouts, styles, app-facing composables, UI helpers).
 - `layers/auth`: authentication and account flows (auth pages, auth/account composables, auth/account API routes, auth middleware).
+- `layers/webform`: Drupal Webform rendering, validation, and submission.
+- `layers/turnstile`: shared Cloudflare Turnstile registration, runtime configuration, and interaction-only field used independently by auth and Webforms.
+- `layers/editorial`: authenticated Drupal editing controls and local tasks.
+- `layers/analytics`: optional Plausible integration.
+- `layers/scripts`: optional third-party script integrations.
 - `server/utils`: shared Nitro utilities used by multiple layers when behavior must stay identical across boundaries.
 
 ## Ownership Rules
@@ -50,3 +55,4 @@ Common override order for downstream projects:
 
 - Theme CSS is registered in `layers/theme/nuxt.config.ts` using a resolved file path. When a consumer provides `app/assets/css/main.css`, that file is the single entry and should import `@stir/base/layers/theme/app/assets/css/main` before its local partials.
 - Core webform submission fetches Drupal CSRF tokens through shared server utilities and does not require `layers/auth`.
+- Auth and Webforms both extend `layers/turnstile`; neither capability must load the other to render mandatory bot protection.

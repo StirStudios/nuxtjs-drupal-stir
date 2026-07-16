@@ -9,7 +9,7 @@ const props = defineProps<{
   floatingLabel?: boolean
 }>()
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))

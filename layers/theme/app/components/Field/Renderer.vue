@@ -35,7 +35,7 @@ const props = withDefaults(
   },
 )
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const componentMap: Record<string, Component> = {
   textfield: LazyFieldInput,
   email: LazyFieldInput,

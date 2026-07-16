@@ -11,7 +11,7 @@ const props = defineProps<{
   floatingLabel?: boolean
 }>()
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)

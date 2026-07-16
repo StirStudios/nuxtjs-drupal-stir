@@ -10,7 +10,7 @@ const props = defineProps<{
   floatingLabel?: boolean
 }>()
 
-const { webform } = useAppConfig().stirTheme
+const webform = useStirWebformTheme()
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
