@@ -7,6 +7,15 @@ export type CustomElementNode = {
 
 export type DrupalMediaType = 'audio' | 'document' | 'image' | 'link' | 'video'
 
+export type DrupalMediaSummary = {
+  hasAudio: boolean
+  hasVideo: boolean
+  hasImage: boolean
+  hasLink: boolean
+  hasDocument: boolean
+  count: number
+}
+
 export type DrupalMediaNodeProps = {
   type?: DrupalMediaType
   alt?: string

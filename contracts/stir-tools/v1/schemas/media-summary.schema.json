@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/media-summary.schema.json",
+  "title": "Media summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hasAudio",
+    "hasVideo",
+    "hasImage",
+    "hasLink",
+    "hasDocument",
+    "count"
+  ],
+  "properties": {
+    "hasAudio": { "type": "boolean" },
+    "hasVideo": { "type": "boolean" },
+    "hasImage": { "type": "boolean" },
+    "hasLink": { "type": "boolean" },
+    "hasDocument": { "type": "boolean" },
+    "count": { "type": "integer", "minimum": 0 }
+  }
+}
