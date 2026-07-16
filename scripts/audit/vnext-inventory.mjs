@@ -78,13 +78,16 @@ const layers = existsSync(resolve(root, 'layers'))
       .sort()
   : []
 const publicContractsPath = resolve(root, 'docs/public-contracts.json')
+const publicContract = existsSync(publicContractsPath)
+  ? JSON.parse(readFileSync(publicContractsPath, 'utf8'))
+  : null
 const perfPath = resolve(root, 'docs/perf-report.latest.json')
 const performanceReport = existsSync(perfPath)
   ? JSON.parse(readFileSync(perfPath, 'utf8'))
   : null
 
 const inventory = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   package: {
     name: packageJson.name,
     version: packageJson.version,
@@ -105,6 +108,21 @@ const inventory = {
     middleware,
     serverRoutes: routes,
   },
+  publicApiSurface: {
+    stable: {
+      aliases: publicContract?.preferredAliases ?? [],
+      packageExports: publicContract?.packageExports ?? [],
+      composables: publicContract?.publicComposables ?? [],
+    },
+    compatibility: {
+      aliases: publicContract?.compatibilityAliases ?? [],
+      autoRegisteredComponents: components,
+      autoImportedComposables: composables,
+      autoImportedUtils: utils,
+    },
+    candidateDeprecations: publicContract?.candidateDeprecations ?? [],
+    removalPolicy: publicContract?.removalPolicy ?? null,
+  },
   counts: {
     components: components.length,
     composables: composables.length,
@@ -118,9 +136,7 @@ const inventory = {
     testsByArea: countByPrefix(tests, /^tests\/([^/]+)/),
   },
   tests,
-  documentedPublicContract: existsSync(publicContractsPath)
-    ? JSON.parse(readFileSync(publicContractsPath, 'utf8'))
-    : null,
+  documentedPublicContract: publicContract,
   performanceBaseline: performanceReport
     ? {
         schemaVersion: performanceReport.schemaVersion,
@@ -135,5 +151,18 @@ const inventory = {
     : null,
 }
 
-writeFileSync(output, `${JSON.stringify(inventory, null, 2)}\n`)
-console.log(`Wrote ${normalize(relative(root, output))}`)
+const serialized = `${JSON.stringify(inventory, null, 2)}\n`
+
+if (process.argv.includes('--check')) {
+  const current = existsSync(output) ? readFileSync(output, 'utf8') : ''
+
+  if (current !== serialized) {
+    console.error(`${normalize(relative(root, output))} is stale. Run pnpm audit:vnext-inventory.`)
+    process.exit(1)
+  }
+
+  console.log(`${normalize(relative(root, output))} is current.`)
+} else {
+  writeFileSync(output, serialized)
+  console.log(`Wrote ${normalize(relative(root, output))}`)
+}

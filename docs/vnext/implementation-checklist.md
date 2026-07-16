@@ -13,6 +13,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 
 - N0 inventory generation is implemented by `pnpm audit:vnext-inventory`.
 - The checked artifact is `docs/vnext/current-inventory.json` and intentionally excludes machine-specific paths.
+- `pnpm verify:ci` now fails when that inventory is stale. Its API-surface
+  section distinguishes the small intentional stable surface from the larger
+  auto-scanned compatibility surface and records candidate deprecations without
+  removing them ahead of consumer evidence.
 - Current measured surface: 99 components, 60 composables, 38 utilities, 5 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 83 test files.
 - N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects. The synchronized compatibility manifest validates Drupal/PHP requirements, optional provider-capability ownership, and independent Nuxt/Stir Tools releases. Registration policy and versioned auth UI configuration now validate before routing/composables; app-context normalizes Drupal's empty-array compatibility shapes and recursively validates its component trees; global SEO and the runtime-fresh sitemap validate before reaching their Nuxt consumers. The shared source-independent tree contract covers direct rendered fields, media, entity references, and nested components.
