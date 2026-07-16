@@ -126,6 +126,28 @@ describe('layer contract', () => {
     expect(packageJson.main).toBe('./nuxt.config.ts')
   })
 
+  it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      dependencies?: Record<string, string>
+      peerDependencies?: Record<string, string>
+      peerDependenciesMeta?: Record<string, { optional?: boolean }>
+    }
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(packageJson.dependencies?.['@nuxt/image']).toBeUndefined()
+    expect(packageJson.peerDependencies?.['@nuxt/image']).toBe('^2.0.0')
+    expect(packageJson.peerDependenciesMeta?.['@nuxt/image']?.optional).toBe(true)
+    expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'nuxt\'')
+    expect(themeConfig).toContain('[\'@nuxt/image\']')
+    expect(themeConfig).toContain('stirImageDelivery')
+  })
+
   it('keeps the consumer audit matrix outside downstream repositories', () => {
     const targets = JSON.parse(readFileSync(
       resolve(rootDir, 'scripts/audit/consumer-targets.json'),

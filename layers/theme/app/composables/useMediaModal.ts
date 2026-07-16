@@ -34,6 +34,9 @@ export function useMediaModal(
         const modalSrc = typeof item.modalSrc === 'string' ? item.modalSrc : ''
         const modalSrcset = typeof item.modalSrcset === 'string' ? item.modalSrcset : ''
         const modalSizes = typeof item.modalSizes === 'string' ? item.modalSizes : ''
+        const modalResponsiveStyle = typeof item.modalResponsiveStyle === 'string'
+          ? item.modalResponsiveStyle
+          : ''
 
         if (modalSrc !== '') {
           item.src = modalSrc
@@ -43,6 +46,9 @@ export function useMediaModal(
         }
         if (modalSizes !== '') {
           item.sizes = modalSizes
+        }
+        if (modalResponsiveStyle !== '') {
+          item.responsiveStyle = modalResponsiveStyle
         }
       }
 

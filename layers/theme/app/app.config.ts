@@ -135,6 +135,17 @@ export default defineAppConfig({
 
     media: {
       base: 'relative h-full w-full overflow-hidden object-cover',
+      image: {
+        format: 'webp',
+        quality: 75,
+        profiles: {
+          hero: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          container: 'sm:100vw md:90vw xl:1200px',
+          split: 'sm:100vw md:50vw xl:600px',
+          card: 'sm:100vw md:50vw lg:33vw xl:400px',
+        },
+      },
       rounded: 'rounded-xl',
       video: {
         loadMinWidth: 768,

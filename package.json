@@ -99,9 +99,18 @@
     "tailwindcss": "^4.3.2",
     "valibot": "^1.4.2"
   },
+  "peerDependencies": {
+    "@nuxt/image": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nuxt/image": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@nuxt/eslint": "^1.16.0",
+    "@nuxt/image": "^2.0.0",
     "@nuxt/schema": "^4.4.8",
     "@nuxt/test-utils": "^4.0.3",
     "@playwright/test": "^1.61.1",

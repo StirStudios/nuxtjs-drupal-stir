@@ -220,6 +220,11 @@ type StirThemeFooterConfig = {
 type StirThemeMediaConfig = {
   base?: ClassValue
   rounded?: ClassValue
+  image?: {
+    format?: 'avif' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
+    quality?: number
+    profiles?: Record<string, string>
+  } & LooseRecord
   video?: {
     loadMinWidth?: number
     loadStrategy?: 'after-load' | 'immediate'
@@ -385,6 +390,9 @@ type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
+  image: NonNullable<StirThemeMediaConfig['image']> & {
+    profiles: Record<string, string>
+  }
   video: NonNullable<StirThemeMediaConfig['video']>
   transitions: Record<string, ClassValue>
   effects: Record<string, ClassValue>
@@ -433,6 +441,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
 
 declare module 'nuxt/schema' {
   interface AppConfigInput {
+    stirImageDelivery?: 'drupal' | 'nuxt'
     protectedRoutes?: ProtectedRoutesConfig
     authIntegration?: AuthIntegrationConfig
     analytics?: AnalyticsConfig
@@ -446,6 +455,7 @@ declare module 'nuxt/schema' {
   }
 
   interface AppConfig {
+    stirImageDelivery: 'drupal' | 'nuxt'
     protectedRoutes: ProtectedRoutesConfig
     authIntegration: AuthIntegrationConfig
     analytics: AnalyticsConfig

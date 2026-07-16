@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import {
+  resolveImageDeliveryProfile,
+  versionImageSource,
+} from '#stir/utils/imageDelivery'
 
 defineOptions({ inheritAttrs: false })
 
@@ -42,7 +47,8 @@ const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
 }>()
 
-const theme = useAppConfig().stirTheme
+const appConfig = useAppConfig()
+const theme = appConfig.stirTheme
 const attrs = useAttrs()
 const { isFront } = usePageContext()
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
@@ -55,12 +61,40 @@ const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
+const providerSizes = computed(() => resolveImageDeliveryProfile(
+  props.responsiveStyle,
+  isHero.value,
+  theme.media.image.profiles,
+))
+const providerSource = computed(() => versionImageSource(
+  props.originalSrc,
+  props.originalRevision,
+))
+const isNuxtImage = computed(() =>
+  appConfig.stirImageDelivery === 'nuxt'
+  && Boolean(providerSource.value && providerSizes.value),
+)
+const imageComponent = computed(() =>
+  isNuxtImage.value ? 'NuxtImg' : 'img',
+)
 const fallbackSizes = computed(() => props.sizes?.trim() || '100vw')
 const wrappedSizes = computed(() => {
   const sizes = fallbackSizes.value.replace(/^auto(?:\s*,\s*)?/i, '')
 
   return sizes || '100vw'
 })
+const renderedSrc = computed(() =>
+  isNuxtImage.value ? providerSource.value : props.src,
+)
+const renderedSrcset = computed(() =>
+  isNuxtImage.value ? undefined : props.srcset,
+)
+const bareRenderedSizes = computed(() =>
+  isNuxtImage.value ? providerSizes.value : fallbackSizes.value,
+)
+const wrappedRenderedSizes = computed(() =>
+  isNuxtImage.value ? providerSizes.value : wrappedSizes.value,
+)
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
 )
@@ -99,6 +133,19 @@ const deferredFrameStyle = computed(() => {
   return { aspectRatio: `${width} / ${height}` }
 })
 const imageElement = ref<HTMLImageElement | null>(null)
+
+function setImageElementRef(
+  value: Element | ComponentPublicInstance | null,
+): void {
+  if (value instanceof HTMLImageElement) {
+    imageElement.value = value
+    return
+  }
+
+  const element = value && '$el' in value ? value.$el : null
+
+  imageElement.value = element instanceof HTMLImageElement ? element : null
+}
 
 const { isSupported, stop } = useIntersectionObserver(
   imageRoot,
@@ -157,9 +204,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <img
+  <component
+    :is="imageComponent"
     v-if="isBare"
-    ref="imageElement"
+    :ref="setImageElementRef"
     v-bind="attrs"
     :alt="alt || ''"
     :class="
@@ -172,11 +220,13 @@ onMounted(() => {
         : [theme.media.base, theme.media.rounded, 'm-auto !object-contain', imageClass]
     "
     :fetchpriority="fetchpriority || undefined"
+    :format="isNuxtImage ? theme.media.image.format : undefined"
     :height="height"
     :loading="normalizedLoading"
-    :sizes="fallbackSizes"
-    :src="src"
-    :srcset="srcset"
+    :quality="isNuxtImage ? theme.media.image.quality : undefined"
+    :sizes="bareRenderedSizes"
+    :src="renderedSrc"
+    :srcset="renderedSrcset"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -201,9 +251,10 @@ onMounted(() => {
       class="absolute inset-0 z-0 h-full w-full rounded-none"
     />
 
-    <img
+    <component
+      :is="imageComponent"
       v-if="!isSourceDeferred && !isEager"
-      ref="imageElement"
+      :ref="setImageElementRef"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -212,19 +263,22 @@ onMounted(() => {
         !isLoaded && 'opacity-0',
         imageClass,
       ]"
+      :format="isNuxtImage ? theme.media.image.format : undefined"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="wrappedSizes"
-      :src="src"
-      :srcset="srcset"
+      :quality="isNuxtImage ? theme.media.image.quality : undefined"
+      :sizes="wrappedRenderedSizes"
+      :src="renderedSrc"
+      :srcset="renderedSrcset"
       :width="width"
       @error="handleError"
       @load="handleLoad"
     />
 
-    <img
+    <component
+      :is="imageComponent"
       v-else-if="!isSourceDeferred"
-      ref="imageElement"
+      :ref="setImageElementRef"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -233,11 +287,13 @@ onMounted(() => {
         imageClass,
       ]"
       fetchpriority="high"
+      :format="isNuxtImage ? theme.media.image.format : undefined"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="wrappedSizes"
-      :src="src"
-      :srcset="srcset"
+      :quality="isNuxtImage ? theme.media.image.quality : undefined"
+      :sizes="wrappedRenderedSizes"
+      :src="renderedSrc"
+      :srcset="renderedSrcset"
       :width="width"
       @error="handleError"
       @load="handleLoad"

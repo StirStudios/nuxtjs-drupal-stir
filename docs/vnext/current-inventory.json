@@ -53,6 +53,7 @@
     "development": [
       "@axe-core/playwright",
       "@nuxt/eslint",
+      "@nuxt/image",
       "@nuxt/schema",
       "@nuxt/test-utils",
       "@playwright/test",
@@ -326,6 +327,7 @@
       "layers/theme/app/utils/formatUtils.ts",
       "layers/theme/app/utils/getHiddenDefaults.ts",
       "layers/theme/app/utils/heroVideoSource.ts",
+      "layers/theme/app/utils/imageDelivery.ts",
       "layers/theme/app/utils/mediaPreviewClasses.ts",
       "layers/theme/app/utils/navigation.ts",
       "layers/theme/app/utils/nuxtUiProps.ts",
@@ -613,6 +615,7 @@
         "layers/theme/app/utils/formatUtils.ts",
         "layers/theme/app/utils/getHiddenDefaults.ts",
         "layers/theme/app/utils/heroVideoSource.ts",
+        "layers/theme/app/utils/imageDelivery.ts",
         "layers/theme/app/utils/mediaPreviewClasses.ts",
         "layers/theme/app/utils/navigation.ts",
         "layers/theme/app/utils/nuxtUiProps.ts",
@@ -642,19 +645,19 @@
   "counts": {
     "components": 110,
     "composables": 62,
-    "utils": 40,
+    "utils": 41,
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 26,
     "productionDependencies": 26,
-    "developmentDependencies": 24,
-    "tests": 98,
+    "developmentDependencies": 25,
+    "tests": 99,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 36,
       "server": 21,
-      "utils": 30
+      "utils": 31
     }
   },
   "tests": [
@@ -738,6 +741,7 @@
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/heroVideoSource.spec.ts",
+    "tests/utils/imageDelivery.spec.ts",
     "tests/utils/layerContract.spec.ts",
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",

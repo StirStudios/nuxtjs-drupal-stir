@@ -16,6 +16,9 @@ const compatibilitySafelistCss = resolvePath(
   themeLayerDir,
   'app/assets/css/safelist.inline.css',
 )
+const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'nuxt'
+  ? 'nuxt'
+  : 'drupal'
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
@@ -29,6 +32,7 @@ function hasCssEntry(entries: unknown[], path: string): boolean {
 
 export default defineNuxtConfig({
   modules: [
+    ...(stirImageDelivery === 'nuxt' ? ['@nuxt/image'] : []),
     function registerStirAppConfigTypes() {
       addTypeTemplate({
         filename: 'types/stir-app-config.d.ts',
@@ -36,6 +40,9 @@ export default defineNuxtConfig({
       })
     },
   ],
+  appConfig: {
+    stirImageDelivery,
+  },
   hooks: {
     async 'ready'(nuxt) {
       const appThemeCss = resolvePath(

@@ -1,6 +1,7 @@
 # Image delivery evaluation
 
-Status: evidence checkpoint; no default delivery change is approved or enabled.
+Status: opt-in implementation checkpoint; no default delivery change is
+approved or enabled.
 
 ## Goal
 
@@ -114,11 +115,18 @@ Production design still needs to confirm:
 - cache retention limits and cleanup for superseded revisions;
 - whether a managed image CDN is operationally preferable to self-hosted IPX.
 
+The opt-in macOS build increased the Nitro server artifact from approximately
+10.1 MB to 30.6 MB because IPX included Sharp's native binary; it did not imply
+the same increase in browser JavaScript. Native binaries must be built for the
+deployment architecture. An external provider may avoid this self-hosted image
+processing cost and must be included in the production comparison.
+
 ## Recommended staged decision
 
 1. Keep Drupal responsive image rendering as the default during the rebuild.
-2. Add an opt-in Nuxt Image delivery path behind `MediaImage`, using the
-   versioned original source and semantic profiles.
+2. Use the opt-in Nuxt Image delivery path behind `MediaImage`, which consumes
+   the versioned original source and semantic profiles and falls back to Drupal
+   for incomplete or unknown payloads.
 3. Enable it first in DancePlug development for representative heroes, grids,
    cards, avatars, modal images, video posters, and user uploads.
 4. Compare Lighthouse/LCP, transferred bytes, cache hit ratios, first-hit
