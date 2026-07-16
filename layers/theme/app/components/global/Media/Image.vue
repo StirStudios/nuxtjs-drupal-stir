@@ -11,6 +11,8 @@ const props = defineProps<{
   type?: string
   platform?: string
 
+  originalRevision?: string
+  originalSrc?: string
   srcset?: string
   sizes?: string
   responsiveStyle?: string

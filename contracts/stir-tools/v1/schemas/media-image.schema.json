@@ -28,6 +28,8 @@
     },
     "title": { "type": "string" },
     "src": { "type": "string", "minLength": 1 },
+    "original_src": { "type": "string", "minLength": 1 },
+    "original_revision": { "type": "string", "pattern": "^[0-9]+-[0-9]+-[0-9]+$" },
     "alt": { "type": "string" },
     "width": { "type": "integer", "minimum": 0 },
     "height": { "type": "integer", "minimum": 0 },

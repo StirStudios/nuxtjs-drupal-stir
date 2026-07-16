@@ -31,6 +31,8 @@ export type DrupalMediaNodeProps = {
   modalSrc?: string
   modalSrcset?: string
   modalResponsiveStyle?: string
+  originalRevision?: string
+  originalSrc?: string
   link?: string
   rel?: 'noopener'
   responsiveStyle?: string

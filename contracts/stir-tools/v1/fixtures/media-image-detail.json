@@ -3,6 +3,8 @@
   "mid": 42,
   "title": "Example image",
   "src": "https://www.example.com/sites/default/files/styles/card/public/example.jpg.webp",
+  "original_src": "https://www.example.com/sites/default/files/example.jpg",
+  "original_revision": "42-1710000000-293400",
   "alt": "Two people reviewing a design together",
   "width": 1600,
   "height": 900,

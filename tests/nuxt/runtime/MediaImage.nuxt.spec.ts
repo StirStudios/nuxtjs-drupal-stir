@@ -3,6 +3,22 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
 
 describe('MediaImage (Nuxt runtime)', () => {
+  it('accepts a canonical provider source without leaking it into markup', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Example image',
+        noWrapper: true,
+        originalRevision: '42-1710000000-293400',
+        originalSrc: '/media/original.jpg',
+        src: '/styles/card/example.webp',
+      },
+    })
+
+    expect(wrapper.get('img').attributes('src')).toBe('/styles/card/example.webp')
+    expect(wrapper.get('img').attributes('originalrevision')).toBeUndefined()
+    expect(wrapper.get('img').attributes('originalsrc')).toBeUndefined()
+  })
+
   it('avoids native auto-sizing for responsive wrapped images', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
