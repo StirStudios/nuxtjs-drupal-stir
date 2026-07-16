@@ -549,7 +549,16 @@ Add `--assert` to enforce the default budgets, or override them with
 2 MB total, 1 MB images, and no initial video transfer. Use
 `--max-media-bytes` only when a project intentionally needs an additional
 combined image/video cap. Set `LIGHTHOUSE_CHROME_PATH` when Chrome is not installed
-in a standard system location. Reports are written to the ignored
+in a standard system location. On macOS, a reproducible isolated browser can be
+installed without changing the repository or the system browser:
+
+```bash
+pnpm dlx @puppeteer/browsers install chrome@stable \
+  --path ~/Library/Caches/stir-lighthouse
+```
+
+The runner discovers the newest Chrome for Testing installation in that cache
+automatically. Reports are written to the ignored
 `.lighthouse/` directory. The summary includes separate image and video
 transfer, combined media transfer, CSS and JavaScript transfer, estimated
 unused bytes, render-blocking savings, script execution, and total main-thread

@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-07-16T20:21:00.000Z",
+  "revisions": {
+    "nuxtLayer": "3060cb43",
+    "stirTools": "44daed3",
+    "rsfLayerPin": "72e3a1246317b91318ba666929b45c8d6db70c28"
+  },
+  "functionalReview": {
+    "rsf": {
+      "routes": ["/", "/about", "/contact"],
+      "desktop": "passed",
+      "mobile": "passed",
+      "mobileNavigation": "passed",
+      "contactWebformRender": "passed",
+      "brokenImagesObserved": 0,
+      "browserErrorsObserved": 0
+    },
+    "piper": {
+      "routes": ["/", "/venues"],
+      "protectedLoginRender": "passed",
+      "anonymousRoot": "current 403/not-found response",
+      "drupalRuntime": "10",
+      "note": "Drupal 11+ migration readiness remains required before vNext cutover."
+    },
+    "danceplug": {
+      "routes": ["/", "/class/tov-012"],
+      "authenticatedDashboard": "passed",
+      "editorialAdminLinks": "passed",
+      "classBunnyIframePlayer": "passed"
+    }
+  },
+  "productionLighthouse": {
+    "environment": {
+      "lighthouse": "13.4.0",
+      "chrome": "151.0.0.0",
+      "formFactor": "mobile",
+      "runsPerRoute": 3
+    },
+    "rsf": {
+      "homepage": {
+        "score": 75,
+        "fcpMs": 2567.9913749999996,
+        "lcpMs": 5768.480799999996,
+        "tbtMs": 47.000000000000455,
+        "cls": 0,
+        "totalBytes": 653060,
+        "requestCount": 90,
+        "cssBytes": 27929,
+        "jsBytes": 344835,
+        "imageBytes": 115530,
+        "videoBytes": 0
+      },
+      "contactWebform": {
+        "score": 95,
+        "fcpMs": 1960.917625,
+        "lcpMs": 2719.50115,
+        "tbtMs": 25,
+        "cls": 0.00483366367381918,
+        "totalBytes": 556844,
+        "requestCount": 76,
+        "cssBytes": 27203,
+        "jsBytes": 338584,
+        "imageBytes": 44473,
+        "videoBytes": 0
+      }
+    }
+  },
+  "excludedMeasurements": [
+    {
+      "consumer": "danceplug",
+      "reason": "Development-server run included Nuxt development code, DevTools, and source maps; it is not production evidence."
+    }
+  ]
+}
