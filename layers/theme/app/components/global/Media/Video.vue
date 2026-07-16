@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useElementVisibility, useMediaQuery } from '@vueuse/core'
 import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
 import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
@@ -18,6 +19,8 @@ const props = withDefaults(
     platform?: string
     mediaEmbed?: string
     previewMode?: 'static' | 'animated'
+    previewActivation?: 'hover' | 'visible'
+    previewMinWidth?: number
     animatedPreviewSrc?: string
     thumbnailStatus?: 'ready' | 'processing' | 'missing'
     thumbnailIsDefault?: boolean
@@ -43,6 +46,8 @@ const props = withDefaults(
     platform: undefined,
     mediaEmbed: undefined,
     previewMode: undefined,
+    previewActivation: 'hover',
+    previewMinWidth: 768,
     animatedPreviewSrc: undefined,
     thumbnailStatus: undefined,
     thumbnailIsDefault: false,
@@ -110,7 +115,31 @@ const isProcessing = computed(() => {
   return props.width === 180
 })
 const isEmbedActive = ref(false)
-const isAnimatedPreviewActive = ref(false)
+const isAnimatedPreviewHovered = ref(false)
+const previewRoot = ref<HTMLElement | null>(null)
+const isPreviewVisible = useElementVisibility(previewRoot, {
+  rootMargin: '200px 0px',
+})
+const isPreviewViewport = useMediaQuery(
+  () => `(min-width: ${props.previewMinWidth}px)`,
+)
+const animatedPreviewIsVideo = computed(() =>
+  isDirectVideoFile(props.animatedPreviewSrc),
+)
+const isAnimatedPreviewActive = computed(() => {
+  if (props.previewMode !== 'animated' || !props.animatedPreviewSrc) {
+    return false
+  }
+
+  if (props.previewActivation === 'visible') {
+    return isPreviewViewport.value && isPreviewVisible.value
+  }
+
+  return isAnimatedPreviewHovered.value
+})
+const shouldShowAnimatedVideo = computed(() =>
+  isAnimatedPreviewActive.value && animatedPreviewIsVideo.value,
+)
 const ratioConfig = {
   portrait: 'aspect-[9/16]',
   landscape: 'aspect-[16/9]',
@@ -145,6 +174,7 @@ const previewSrc = computed(() => {
     isAnimatedPreviewActive.value
     && props.previewMode === 'animated'
     && props.animatedPreviewSrc
+    && !animatedPreviewIsVideo.value
   ) {
     return props.animatedPreviewSrc
   }
@@ -180,12 +210,12 @@ function activateEmbed() {
 
 function activateAnimatedPreview(): void {
   if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
-    isAnimatedPreviewActive.value = true
+    isAnimatedPreviewHovered.value = true
   }
 }
 
 function deactivateAnimatedPreview(): void {
-  isAnimatedPreviewActive.value = false
+  isAnimatedPreviewHovered.value = false
 }
 
 onMounted(() => {
@@ -255,6 +285,7 @@ watch(
 
   <div
     v-else
+    ref="previewRoot"
     v-bind="attrs"
     :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
   >
@@ -328,7 +359,20 @@ watch(
           'group-focus-within:scale-105',
         ]"
       >
+        <video
+          v-if="shouldShowAnimatedVideo"
+          aria-hidden="true"
+          autoplay
+          class="h-full w-full object-cover"
+          loop
+          muted
+          playsinline
+          preload="none"
+        >
+          <source :src="animatedPreviewSrc" type="video/mp4" />
+        </video>
         <img
+          v-else
           :alt="alt || title || 'Video thumbnail'"
           class="h-full w-full object-cover"
           :fetchpriority="fetchpriority"

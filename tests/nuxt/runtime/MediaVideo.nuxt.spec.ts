@@ -241,4 +241,38 @@ describe('MediaVideo (Nuxt runtime)', () => {
       '/static-320.webp 320w, /static-640.webp 640w',
     )
   })
+
+  it('renders animated MP4 previews as deferred muted video', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        animatedPreviewSrc: '/animated-preview.mp4',
+        previewMode: 'animated',
+        src: '/static-preview.webp',
+      },
+    })
+    const button = wrapper.get('button')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+
+    await button.trigger('mouseenter')
+
+    expect(button.find('img').exists()).toBe(false)
+    expect(button.get('video').attributes()).toMatchObject({
+      autoplay: '',
+      loop: '',
+      muted: '',
+      playsinline: '',
+      preload: 'none',
+    })
+    expect(button.get('source').attributes()).toMatchObject({
+      src: '/animated-preview.mp4',
+      type: 'video/mp4',
+    })
+
+    await button.trigger('mouseleave')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+  })
 })
