@@ -169,6 +169,18 @@ describe('layer contract', () => {
 
     expect(packageJson.bin?.['stir-a11y']).toBe('./scripts/a11y/run.mjs')
     expect(packageJson.files).toContain('scripts/a11y')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/run.mjs'),
+      'utf8',
+    )).toContain('STIR_A11Y_SERVER_SCRIPT')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/run.mjs'),
+      'utf8',
+    )).toContain('STIR_A11Y_USE_FIXTURE')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/server.mjs'),
+      'utf8',
+    )).toContain('new URL(\n  \'../../contracts/stir-tools/v1/fixtures/auth-ui-config.json\'')
     for (const dependency of ['@axe-core/playwright', '@playwright/test']) {
       expect(packageJson.peerDependencies?.[dependency]).toBeDefined()
       expect(packageJson.peerDependenciesMeta?.[dependency]?.optional).toBe(true)

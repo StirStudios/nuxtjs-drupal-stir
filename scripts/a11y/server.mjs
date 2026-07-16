@@ -2,13 +2,14 @@ import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const host = '127.0.0.1'
 const nuxtPort = process.env.A11Y_SERVER_PORT || '4173'
-const authUiConfig = JSON.parse(await readFile(resolve(
-  'contracts/stir-tools/v1/fixtures/auth-ui-config.json',
-), 'utf8'))
+const authUiConfig = JSON.parse(await readFile(fileURLToPath(new URL(
+  '../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
+  import.meta.url,
+)), 'utf8'))
 const pageFixture = {
   title: 'Accessibility fixture',
   metatags: { meta: [], link: [], jsonld: null },

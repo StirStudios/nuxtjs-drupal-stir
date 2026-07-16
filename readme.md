@@ -125,6 +125,7 @@ Supported audit configuration:
 - `A11Y_ROUTES`: comma-separated route list; defaults to `/`.
 - `A11Y_SERVER_URL`: managed local server URL; defaults to `http://127.0.0.1:4173`.
 - `A11Y_SERVER_COMMAND`: managed server command; defaults to `pnpm dev --host 127.0.0.1 --port 4173`.
+- `A11Y_USE_FIXTURE`: set to `true` only when the packaged deterministic Drupal fixture should replace the downstream backend; enabled automatically when auditing this base repository.
 - `A11Y_HOVER_SELECTOR`: controls whose completed hover states are scanned; defaults to `[data-a11y-scan-hover]`.
 - `A11Y_OPAQUE_SELECTOR`: controls that must expose an opaque resting background; defaults to `[data-a11y-scan-opaque]`.
 - `A11Y_STATE_SETTLE_MS`: interaction settling time; defaults to `350`.

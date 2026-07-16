@@ -3,6 +3,10 @@ import { defineConfig, devices } from '@playwright/test'
 const externalBaseUrl = process.env.A11Y_BASE_URL
 const localBaseUrl = process.env.A11Y_SERVER_URL ?? 'http://127.0.0.1:4173'
 const projectRoot = process.cwd()
+const managedServerCommand = process.env.A11Y_SERVER_COMMAND
+  ?? (process.env.STIR_A11Y_USE_FIXTURE === 'true'
+    ? `"${process.execPath}" "${process.env.STIR_A11Y_SERVER_SCRIPT}"`
+    : 'pnpm dev --host 127.0.0.1 --port 4173')
 const playwrightConfig = defineConfig({
   testDir: import.meta.dirname,
   fullyParallel: true,
@@ -30,9 +34,7 @@ const playwrightConfig = defineConfig({
   webServer: externalBaseUrl
     ? void 0
     : {
-        command:
-          process.env.A11Y_SERVER_COMMAND ??
-          'node scripts/a11y/server.mjs',
+        command: managedServerCommand,
         cwd: projectRoot,
         url: localBaseUrl,
         reuseExistingServer: !process.env.CI,
