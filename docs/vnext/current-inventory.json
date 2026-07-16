@@ -381,11 +381,11 @@
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 93,
+    "tests": 94,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
-      "nuxt": 32,
+      "nuxt": 33,
       "server": 21,
       "utils": 29
     }
@@ -428,6 +428,7 @@
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
     "tests/nuxt/runtime/Webform.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapDiv.nuxt.spec.ts",
+    "tests/nuxt/runtime/WrapGrid.nuxt.spec.ts",
     "tests/nuxt/runtime/useAccountSettings.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthConfig.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthSession.nuxt.spec.ts",

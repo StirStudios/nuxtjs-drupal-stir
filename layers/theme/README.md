@@ -52,6 +52,19 @@ Keep outside `layers/theme`:
 - Server proxy/runtime behavior (`layers/core`)
 - Highly project-specific business logic or workflow-specific forms
 
+### Clean wrapper markup
+
+`WrapDiv` is an optional element boundary: it renders its slot directly when no
+non-empty alignment or class value is present. `WrapGrid` follows the same rule
+and combines layout, width, spacing, and grid classes on one element for normal
+grids. Card grids deliberately retain separate outer and content layers because
+the gradient is a sibling behind the grid content. Do not add unconditional
+wrapper elements around these components merely to make styling convenient.
+
+Editorial `EditLink` controls also render beside their slot without adding a
+shell. The editorial stylesheet positions the existing parent only when it has
+a direct controls child, keeping anonymous production markup unchanged.
+
 ### Standard Drupal field values
 
 Global components render producer-owned standard field contracts without
