@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import listingHandler from '../../layers/core/server/api/listings/[listing].get'
+import listingHandler from '../../layers/listing/server/api/listings/[listing].get'
 import {
   isPrivateStirListingResponse,
   parseStirListingId,
   parseStirListingResponse,
-} from '../../layers/core/server/utils/listingApi'
+} from '../../layers/listing/server/utils/listingApi'
 
 const producerFixture = () => JSON.parse(readFileSync(resolve(
   __dirname,

@@ -15,6 +15,7 @@ describe('layer contract', () => {
     for (const layer of [
       'platform',
       'seo',
+      'listing',
       'editorial',
       'integrations',
       'analytics',
@@ -345,6 +346,25 @@ describe('layer contract', () => {
     expect(existsSync(resolve(
       rootDir,
       'layers/core/server/api/sitemap.get.ts',
+    ))).toBe(false)
+  })
+
+  it('keeps provider-neutral listings in an optional capability layer', () => {
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/listing/server/api/listings/[listing].get.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/listing/app/composables/useStirListing.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/listings/[listing].get.ts',
+    ))).toBe(false)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/theme/app/composables/useStirListing.ts',
     ))).toBe(false)
   })
 

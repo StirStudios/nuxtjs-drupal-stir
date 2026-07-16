@@ -144,6 +144,7 @@ attributes above; the harness does not depend on project-specific components.
 - `layers/core` — Server/runtime Drupal integration and backend proxy endpoints
 - `layers/theme` — UI components, layouts, composables, utilities, app config, and CSS
 - `layers/seo` — Optional sitemap and Drupal-owned global metadata
+- `layers/listing` — Optional provider-neutral configured listings
 - `layers/auth` — Optional Drupal auth/account UI, middleware, and proxy endpoints
 - `layers/webform` — Optional Drupal Webform rendering and submission
 - `server/utils` — Shared Nitro utilities reused by multiple layers

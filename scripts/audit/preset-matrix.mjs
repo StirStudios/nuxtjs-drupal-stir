@@ -31,6 +31,7 @@ async function inspectPreset(name) {
       layer.endsWith('/layers/integrations'),
     )
     const hasSeo = layers.some((layer) => layer.endsWith('/layers/seo'))
+    const hasListing = layers.some((layer) => layer.endsWith('/layers/listing'))
     const hasProtectedAccessConfig = Object.hasOwn(
       nuxt.options.runtimeConfig,
       'protectedPassword',
@@ -45,6 +46,7 @@ async function inspectPreset(name) {
       hasEditorial,
       hasIntegrations,
       hasSeo,
+      hasListing,
       hasProtectedAccessConfig,
       layers: layers.map((layer) => layer.replace(`${rootDir}/`, '')),
     }
@@ -94,6 +96,10 @@ if (minimal.hasSeo) {
   throw new Error('The minimal preset must not load the SEO layer.')
 }
 
+if (minimal.hasListing) {
+  throw new Error('The minimal preset must not load the listing layer.')
+}
+
 if (!full.hasAuth) {
   throw new Error('The full preset must preserve the authentication layer.')
 }
@@ -128,14 +134,20 @@ if (!full.hasSeo) {
   throw new Error('The full preset must preserve the SEO layer.')
 }
 
+if (!full.hasListing) {
+  throw new Error('The full preset must preserve the listing layer.')
+}
+
 if (!auth.hasAuth || auth.hasWebform || !auth.hasTurnstile) {
   throw new Error(
     'The auth fixture must load Turnstile without loading Webforms.',
   )
 }
 
-if (auth.hasSeo || webform.hasSeo) {
-  throw new Error('Auth and Webform fixtures must not load the SEO layer.')
+if (auth.hasSeo || webform.hasSeo || auth.hasListing || webform.hasListing) {
+  throw new Error(
+    'Auth and Webform fixtures must not load SEO or listing layers.',
+  )
 }
 
 if (!webform.hasWebform || webform.hasAuth || !webform.hasTurnstile) {

@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   extends: [
     './layers/platform',
     './layers/seo',
+    './layers/listing',
     ...(enableWorkspaceDiagnostics ? ['./layers/diagnostics'] : []),
     './layers/editorial',
     './layers/integrations',

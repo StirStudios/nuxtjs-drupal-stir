@@ -1,4 +1,4 @@
-import type { StirListingResponse } from '../../../core/shared/types/listing'
+import type { StirListingResponse } from '../../shared/types/listing'
 import {
   normalizeApiListingQuery,
   type ApiListingQuery,

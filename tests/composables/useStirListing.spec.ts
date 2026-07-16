@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { useStirListing } from '../../layers/theme/app/composables/useStirListing'
+import { useStirListing } from '../../layers/listing/app/composables/useStirListing'
 
 describe('useStirListing', () => {
   afterEach(() => {

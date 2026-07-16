@@ -42,6 +42,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   metadata plugin, and both SEO proxy routes. Minimal, auth-only, and
   Webform-only consumers do not initialize or ship that capability; the root
   and full preset preserve existing website behavior.
+- The optional `layers/listing` boundary now owns the provider-neutral listing
+  route, contract types, and public composables. Minimal, auth-only, and
+  Webform-only consumers no longer ship `/api/listings/:listing`; full/root
+  consumers preserve the public API.
 - Repository-only client-entry analysis now lives in `layers/diagnostics` and
   is selected only for explicit performance builds launched from this checkout.
   Published platform and installed preset consumers contain no report writer.

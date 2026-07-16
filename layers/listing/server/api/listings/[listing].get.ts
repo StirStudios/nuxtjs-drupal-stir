@@ -11,8 +11,8 @@ import {
   getDrupalApiConfig,
   getForwardedCookie,
   markPrivateResponse,
-} from '../../utils/drupalApi'
-import { buildDrupalHeaders } from '../../utils/drupalHeaders'
+} from '../../../../core/server/utils/drupalApi'
+import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
 import {
   isPrivateStirListingResponse,
   parseStirListingId,
@@ -21,7 +21,7 @@ import {
 import {
   filterStirDrupalSetCookies,
   getStirDrupalSetCookies,
-} from '../../utils/stirDrupalApi'
+} from '../../../../core/server/utils/stirDrupalApi'
 
 const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
 

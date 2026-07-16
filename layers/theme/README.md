@@ -17,7 +17,7 @@ Included in this layer:
 The base repository enables this layer from root `nuxt.config.ts`:
 
 ```ts
-  extends: ['./layers/platform', './layers/seo', './layers/editorial', './layers/integrations', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
+  extends: ['./layers/platform', './layers/seo', './layers/listing', './layers/editorial', './layers/integrations', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
 ```
 
 ## Boundary guidance
@@ -62,6 +62,7 @@ Keep outside `layers/theme`:
 
 - Auth/session and protected-route behavior (`layers/auth`)
 - Sitemap and Drupal-owned global metadata (`layers/seo`)
+- Provider-neutral configured listings (`layers/listing`)
 - Drupal tabs, edit controls, and inline editing (`layers/editorial`)
 - Server proxy/runtime behavior (`layers/core`)
 - Highly project-specific business logic or workflow-specific forms
