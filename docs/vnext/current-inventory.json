@@ -881,21 +881,21 @@
   "performanceBaseline": {
     "schemaVersion": 2,
     "initialClient": {
-      "sizeKb": 721.42,
-      "gzipKb": 191.66,
+      "sizeKb": 721.86,
+      "gzipKb": 191.8,
       "assets": [
         {
           "label": "app-entry",
           "role": "initial",
-          "file": "_nuxt/CFakssGy.js",
-          "sizeKb": 448.82,
-          "gzipKb": 156.39
+          "file": "_nuxt/Dk9yEEoZ.js",
+          "sizeKb": 449.2,
+          "gzipKb": 156.53
         },
         {
-          "label": "entry.DWGACoxI.css",
+          "label": "entry.DsOGJlBq.css",
           "role": "initial",
-          "file": "_nuxt/entry.DWGACoxI.css",
-          "sizeKb": 272.6,
+          "file": "_nuxt/entry.DsOGJlBq.css",
+          "sizeKb": 272.66,
           "gzipKb": 35.27
         }
       ]
@@ -908,36 +908,36 @@
       {
         "label": "Text",
         "role": "admin-deferred",
-        "file": "_nuxt/v0qxyeAS.js",
-        "sizeKb": 540.44,
-        "gzipKb": 167.3
+        "file": "_nuxt/CM8CPd7N.js",
+        "sizeKb": 540.34,
+        "gzipKb": 167.27
       },
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/CFakssGy.js",
-        "sizeKb": 448.82,
-        "gzipKb": 156.39
+        "file": "_nuxt/Dk9yEEoZ.js",
+        "sizeKb": 449.2,
+        "gzipKb": 156.53
       },
       {
-        "label": "entry.DWGACoxI.css",
+        "label": "entry.DsOGJlBq.css",
         "role": "initial",
-        "file": "_nuxt/entry.DWGACoxI.css",
-        "sizeKb": 272.6,
+        "file": "_nuxt/entry.DsOGJlBq.css",
+        "sizeKb": 272.66,
         "gzipKb": 35.27
       },
       {
         "label": "theme:app/components/RevealMotion",
         "role": "async",
-        "file": "_nuxt/BWmvE-fy.js",
+        "file": "_nuxt/DYXVEyFI.js",
         "sizeKb": 77.78,
         "gzipKb": 26.88
       },
       {
-        "label": "_Bq5KBQ3Q",
+        "label": "_DIS3NMR_",
         "role": "async",
-        "file": "_nuxt/Bq5KBQ3Q.js",
-        "sizeKb": 144.84,
+        "file": "_nuxt/DIS3NMR_.js",
+        "sizeKb": 144.85,
         "gzipKb": 26.19
       },
       {
@@ -948,67 +948,67 @@
         "gzipKb": 15.29
       },
       {
-        "label": "_CG_guyAf",
+        "label": "_Dys0LZIP",
         "role": "async",
-        "file": "_nuxt/CG_guyAf.js",
+        "file": "_nuxt/Dys0LZIP.js",
         "sizeKb": 53.28,
-        "gzipKb": 14.61
+        "gzipKb": 14.62
       },
       {
         "label": "theme:app/components/global/drupal-view--default",
         "role": "async",
-        "file": "_nuxt/zCvWawGr.js",
+        "file": "_nuxt/Caz6s6h3.js",
         "sizeKb": 39.99,
-        "gzipKb": 12.15
+        "gzipKb": 12.16
       },
       {
         "label": "auth:app/layouts/account",
         "role": "async",
-        "file": "_nuxt/D9vjWSzY.js",
+        "file": "_nuxt/BfJJ3FSp.js",
         "sizeKb": 41.46,
-        "gzipKb": 11.99
+        "gzipKb": 11.98
       },
       {
-        "label": "_DNHkARlN",
+        "label": "_C5PZP20O",
         "role": "async",
-        "file": "_nuxt/DNHkARlN.js",
+        "file": "_nuxt/C5PZP20O.js",
         "sizeKb": 31.72,
-        "gzipKb": 11.86
+        "gzipKb": 11.87
       },
       {
-        "label": "_CkOF1P67",
+        "label": "_zfD8k3fL",
         "role": "async",
-        "file": "_nuxt/CkOF1P67.js",
+        "file": "_nuxt/zfD8k3fL.js",
         "sizeKb": 40.24,
         "gzipKb": 11.3
       },
       {
         "label": "vendor:@nuxt/ui",
         "role": "async",
-        "file": "_nuxt/D25ICYAe.js",
+        "file": "_nuxt/YhJzdp-0.js",
         "sizeKb": 27.8,
         "gzipKb": 10.56
       },
       {
-        "label": "_CcWBHc-W",
+        "label": "_CSROAryW",
         "role": "async",
-        "file": "_nuxt/CcWBHc-W.js",
+        "file": "_nuxt/CSROAryW.js",
         "sizeKb": 30.77,
         "gzipKb": 10.48
       },
       {
         "label": "vendor:@nuxt/ui",
         "role": "async",
-        "file": "_nuxt/CyLptMiu.js",
+        "file": "_nuxt/BRjXguxV.js",
         "sizeKb": 40.73,
         "gzipKb": 10.26
       },
       {
-        "label": "theme:app/components/Field/Input/Number",
+        "label": "Number",
         "role": "async",
-        "file": "_nuxt/BB4AGoCM.js",
-        "sizeKb": 27.32,
-        "gzipKb": 8.2
+        "file": "_nuxt/CECiAG7y.js",
+        "sizeKb": 27.54,
+        "gzipKb": 8.29
       }
     ]
   }

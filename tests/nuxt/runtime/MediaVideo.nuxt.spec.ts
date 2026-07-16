@@ -121,6 +121,27 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(iframeUrl.searchParams.get('loop')).toBe('1')
   })
 
+  it('renders a signed Bunny player URL as an iframe', async () => {
+    const embed = 'https://player.mediadelivery.net/embed/348346/video-id?responsive=true&token=signed-token&expires=1784223559'
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        deferEmbed: false,
+        mediaEmbed: embed,
+        mid: 'video-id',
+        title: 'Subscriber class',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('iframe').attributes()).toMatchObject({
+      'data-mid': 'video-id',
+      'src': embed,
+      'title': 'Subscriber class',
+    })
+  })
+
   it('does not load bare video below the configured viewport width', async () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue({
       matches: false,

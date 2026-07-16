@@ -56,6 +56,15 @@ describe('resolveHeroVideoSource', () => {
     })
   })
 
+  it('preserves signed Bunny player embeds as iframe sources', () => {
+    const embed = 'https://player.mediadelivery.net/embed/348346/video-id?responsive=true&token=signed-token&expires=1784223559'
+
+    expect(resolveHeroVideoSource(embed)).toEqual({
+      kind: 'embed',
+      src: embed,
+    })
+  })
+
   it('returns no source for empty input', () => {
     expect(resolveHeroVideoSource(undefined)).toBeUndefined()
     expect(resolveHeroVideoSource('  ')).toBeUndefined()

@@ -17,6 +17,11 @@ const VIMEO_HOSTS = new Set([
   'www.vimeo.com',
 ])
 
+const BUNNY_EMBED_HOSTS = new Set([
+  'iframe.mediadelivery.net',
+  'player.mediadelivery.net',
+])
+
 function normalizedUrl(value: string): URL | undefined {
   try {
     return new URL(value)
@@ -40,6 +45,10 @@ export function isDirectVideoFile(value: string | undefined): boolean {
 }
 
 function backgroundEmbedUrl(url: URL): string | undefined {
+  if (BUNNY_EMBED_HOSTS.has(url.hostname) && url.pathname.startsWith('/embed/')) {
+    return url.toString()
+  }
+
   if (YOUTUBE_HOSTS.has(url.hostname)) {
     const videoId = url.pathname.match(/\/(?:embed|shorts)\/([^/]+)/)?.[1]
 
