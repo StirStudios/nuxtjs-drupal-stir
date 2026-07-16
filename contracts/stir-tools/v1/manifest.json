@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.20.0",
+  "contractVersion": "1.21.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -13,6 +13,10 @@
   },
   "capabilities": {
     "account.registration": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.session": {
       "providerModules": ["stir_account"],
       "optional": true
     },
@@ -62,6 +66,19 @@
     }
   },
   "contracts": {
+    "account.snapshot": {
+      "capability": "account.session",
+      "schema": "schemas/account-snapshot.schema.json",
+      "fixtures": [
+        "fixtures/account-snapshot-anonymous.json",
+        "fixtures/account-snapshot-authenticated.json"
+      ]
+    },
+    "auth.session": {
+      "capability": "account.session",
+      "schema": "schemas/auth-session.schema.json",
+      "fixtures": ["fixtures/auth-session-authenticated.json"]
+    },
     "app.context": {
       "capability": "app.context",
       "schema": "schemas/app-context.schema.json",

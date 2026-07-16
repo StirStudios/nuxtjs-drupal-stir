@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/auth-session.schema.json",
+  "title": "Stir auth session response",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "authenticated",
+    "uid",
+    "name",
+    "mail",
+    "roles",
+    "csrf_token",
+    "logout_token"
+  ],
+  "properties": {
+    "authenticated": { "type": "boolean" },
+    "uid": { "type": "integer", "minimum": 0 },
+    "name": { "type": "string" },
+    "account_name": { "type": "string" },
+    "mail": { "type": "string" },
+    "roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "csrf_token": { "type": "string", "minLength": 1 },
+    "logout_token": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "authenticated": { "const": false } },
+        "required": ["authenticated"]
+      },
+      "then": {
+        "properties": {
+          "uid": { "const": 0 },
+          "roles": { "maxItems": 0 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "authenticated": { "const": true } },
+        "required": ["authenticated"]
+      },
+      "then": {
+        "required": ["account_name"],
+        "properties": { "uid": { "minimum": 1 } }
+      }
+    }
+  ]
+}

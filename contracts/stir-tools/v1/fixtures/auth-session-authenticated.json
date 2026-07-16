@@ -1,0 +1,11 @@
+{
+  "authenticated": true,
+  "uid": 7,
+  "name": "Demo Dancer",
+  "account_name": "demo",
+  "mail": "demo@example.com",
+  "roles": ["authenticated"],
+  "csrf_token": "request-header-token",
+  "logout_token": "logout-token",
+  "profile_complete": true
+}
