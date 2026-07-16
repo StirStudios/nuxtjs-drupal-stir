@@ -159,6 +159,12 @@ const aspectClass = computed(() => {
   if (ratio < 1) return ratioConfig.portrait
   return ratioConfig.square
 })
+const wrapperStyle = computed(() => ({
+  aspectRatio: props.width && props.height
+    ? `${props.width} / ${props.height}`
+    : '16 / 9',
+  height: 'auto',
+}))
 
 const shouldShowIframe = computed(
   () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
@@ -287,7 +293,8 @@ watch(
     v-else
     ref="previewRoot"
     v-bind="attrs"
-    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass, '!h-auto']"
+    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
+    :style="wrapperStyle"
   >
     <div
       v-if="isProcessing"

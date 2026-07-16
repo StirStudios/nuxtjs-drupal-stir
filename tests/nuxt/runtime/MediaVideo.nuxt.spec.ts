@@ -286,8 +286,9 @@ describe('MediaVideo (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('div').classes()).toEqual(
-      expect.arrayContaining(['aspect-[16/9]', '!h-auto']),
+    expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toContain(
+      'aspect-ratio: 1920 / 1080; height: auto;',
     )
   })
 })
