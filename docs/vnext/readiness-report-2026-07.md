@@ -1,8 +1,8 @@
 # vNext rebuild readiness report
 
 Status date: 2026-07-16  
-Nuxt checkpoint: `e0ba8e26`  
-Stir Tools checkpoint: `9eda569`
+Nuxt checkpoint: `9a86b6aa`
+Stir Tools checkpoint: `7941fb2`
 
 ## Executive status
 
@@ -105,6 +105,11 @@ checks.
 - The homepage LCP image is eager, high-priority, discoverable in initial HTML,
   and fast to transfer. Remaining local delay is dominated by Drupal SSR and
   render-blocking CSS rather than an image-priority defect.
+- The final same-name component audit retained four deliberate product
+  overrides: inline CTA markup, interactive Views presentation, editorial node
+  variants, and public user profiles. The generic entity-reference override was
+  removed after its fallback behavior moved upstream. DancePlug checkpoints
+  `706e20a` (Nuxt) and `be260de` (root) verify the resulting boundary.
 
 ### Piper
 
