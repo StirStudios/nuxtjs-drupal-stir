@@ -495,6 +495,16 @@ describe('layer contract', () => {
     }
   })
 
+  it('renders auth form titles as the page heading', () => {
+    const authFormPanel = readFileSync(
+      resolve(rootDir, 'layers/auth/app/components/Auth/AuthFormPanel.vue'),
+      'utf8',
+    )
+
+    expect(authFormPanel).toContain('<template #title>')
+    expect(authFormPanel).toContain('<h1>{{ title }}</h1>')
+  })
+
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
     const fieldComponents = [
       'DateTime/Select.vue',
