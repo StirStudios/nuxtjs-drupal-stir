@@ -287,7 +287,7 @@ watch(
     v-else
     ref="previewRoot"
     v-bind="attrs"
-    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
+    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass, '!h-auto']"
   >
     <div
       v-if="isProcessing"

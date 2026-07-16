@@ -275,4 +275,19 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(button.find('video').exists()).toBe(false)
     expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
   })
+
+  it('preserves the declared aspect ratio inside stretching layouts', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://example.com/embed/video',
+        src: '/static-preview.webp',
+        width: 1920,
+      },
+    })
+
+    expect(wrapper.get('div').classes()).toEqual(
+      expect.arrayContaining(['aspect-[16/9]', '!h-auto']),
+    )
+  })
 })
