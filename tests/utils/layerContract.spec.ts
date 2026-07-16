@@ -150,6 +150,26 @@ describe('layer contract', () => {
     expect(packageJson.dependencies?.nuxt).toBeUndefined()
     expect(packageJson.peerDependencies?.nuxt).toBe('^4.4.8')
     expect(packageJson.devDependencies?.nuxt).toBe('^4.4.8')
+
+    const packedConsumer = readFileSync(
+      resolve(rootDir, 'scripts/audit/packed-consumer.mjs'),
+      'utf8',
+    )
+
+    expect(packedConsumer).toContain('nuxt: rootPackage.peerDependencies.nuxt')
+    expect(packedConsumer).toContain(
+      'Packed consumer must own the layer Nuxt peer directly.',
+    )
+  })
+
+  it('does not require dependency-time layer builds', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as { scripts?: Record<string, string> }
+
+    expect(packageJson.scripts?.postinstall).toBeUndefined()
+    expect(packageJson.scripts?.['dev:prepare']).toBe('nuxi prepare')
   })
 
   it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
@@ -240,6 +260,13 @@ describe('layer contract', () => {
       'existsSync(appThemeCss) ? appThemeCss : upstreamThemeCss',
     )
     expect(themeConfig).toContain('nuxt.options.css.push(themeCss)')
+
+    const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
+
+    expect(readme).toContain(
+      '@import \'@stir/base/layers/theme/app/assets/css/main\';',
+    )
+    expect(readme).toContain('do not reach into a relative `node_modules` path')
   })
 
   it('owns the Drupal CE proxy boundary without changing its routes', () => {

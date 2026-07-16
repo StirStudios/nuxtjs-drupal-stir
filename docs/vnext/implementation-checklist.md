@@ -103,6 +103,14 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   DancePlug still reports Gin as its frontend theme and requires visual
   regression review plus explicit `stir_decoupled` adoption before strict mode
   becomes a project default.
+- The RSF consumer pilot exposed and closed the pnpm-isolation packaging seam:
+  applications now own the required Nuxt peer directly, the layer no longer
+  requests a dependency-time lifecycle build, and the packed-consumer gate
+  proves the declared Nuxt runtime rather than relying on peer auto-install.
+  The downstream CSS contract also uses the stable package export and documents
+  Tailwind 4 responsive `@apply` migration. RSF's production build succeeds on
+  the pinned checkpoint; its project lint/typecheck dependency cleanup remains
+  downstream work before cutover.
 
 ## Delivery slices
 

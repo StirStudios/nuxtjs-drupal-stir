@@ -127,7 +127,7 @@ async function main() {
         },
         dependencies: {
           '@stir/base': `file:${archivePath}`,
-          nuxt: rootPackage.dependencies.nuxt,
+          nuxt: rootPackage.peerDependencies.nuxt,
         },
         devDependencies: {
           typescript: rootPackage.devDependencies.typescript,
@@ -137,6 +137,12 @@ async function main() {
     )
 
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
+    const installedConsumerPackage = JSON.parse(
+      await readFile(join(consumerDir, 'package.json'), 'utf8'),
+    )
+    if (installedConsumerPackage.dependencies?.nuxt !== rootPackage.peerDependencies.nuxt) {
+      throw new Error('Packed consumer must own the layer Nuxt peer directly.')
+    }
     if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
       throw new Error('Packed layer did not expose the stir-a11y executable.')
     }

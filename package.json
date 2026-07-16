@@ -33,7 +33,7 @@
     "generate": "nuxi generate",
     "preview": "nuxi preview",
     "css:generate-safelist": "node scripts/generate-safelist.mjs",
-    "postinstall": "nuxi prepare",
+    "dev:prepare": "nuxi prepare",
     "lint": "eslint . --no-warn-ignored",
     "lint:fix": "eslint . --fix --no-warn-ignored",
     "perf:report": "node scripts/perf/report.mjs",

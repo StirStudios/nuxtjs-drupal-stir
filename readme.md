@@ -63,11 +63,33 @@ export default defineNuxtConfig({
 })
 ```
 
+When an application owns `app/assets/css/main.css`, that file intentionally
+replaces the layer CSS entry. Import the stable package export before project
+styles; do not reach into a relative `node_modules` path:
+
+```css
+@source '@stir/base';
+@import '@stir/base/layers/theme/app/assets/css/main';
+
+@import './base';
+@import './utilities';
+```
+
+Tailwind CSS 4 does not support responsive variants inside `@apply`. Put the
+responsive declaration in its media query instead of using, for example,
+`@apply text-3xl sm:text-5xl`.
+
 Pin production projects to a reviewed tag or commit. A branch reference is
 appropriate while testing vNext, but it should not be the production lock.
 Nuxt is an intentional required peer: every application owns its Nuxt runtime
 version directly, while this repository keeps the same range as a development
 dependency for layer builds and tests.
+The package uses Nuxt's `dev:prepare` convention and does not run a lifecycle
+build when installed as a dependency. pnpm 11 applications must still keep
+their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
+dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
+manager security policy belongs to the consuming application and is not
+inherited from a layer.
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.
