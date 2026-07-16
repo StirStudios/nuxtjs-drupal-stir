@@ -24,6 +24,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - The optional `layers/webform` boundary now owns Webform rendering, submission, and limits. The minimal preset excludes the Webform route.
 - Turnstile registration, runtime secrets, interaction-only presentation, and the shared field now live in an independent `layers/turnstile` capability. Auth-only and Webform-only fixtures prove that both consume mandatory bot protection without loading one another; the minimal preset loads neither.
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
+- Plausible and UserWay app-config defaults are also owned by their optional layers. Layer contracts prove theme ownership stays clean, while the preset matrix and full runtime test prove optional registration and merged defaults.
 - The optional `layers/editorial` boundary now owns real Drupal local-task tabs,
   edit actions, inline text editing, and admin CSS. The minimal preset uses
   shell-free theme fallbacks and does not load the editorial layer; the full

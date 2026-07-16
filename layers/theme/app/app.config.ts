@@ -35,25 +35,9 @@ export default defineAppConfig({
     declineButtonLabel: 'Decline',
   },
 
-  userway: {
-    enabled: false,
-    account: '',
-    loadDelayMs: 5000,
-    position: 3,
-    size: 'small',
-    color: '#ffffff',
-    type: '1',
-  },
-
   popup: {
     enabled: false,
     component: '',
-  },
-
-  analytics: {
-    plausible: {
-      domain: '',
-    },
   },
 
   thirdPartyScripts: {

@@ -15,6 +15,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 ## Ownership Rules
 
 - Put code in the layer that owns the behavior.
+- Keep capability-specific app-config defaults with that layer; the theme layer must not make disabled integrations appear installed.
 - Keep layer-internal logic inside that layer.
 - Keep root-level config focused on orchestration (`extends`, shared modules/runtime config).
 - Put cross-layer server behavior in `server/utils` and keep layer-local files as stable wrappers when downstream imports may exist.

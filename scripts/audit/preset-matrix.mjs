@@ -31,7 +31,6 @@ async function inspectPreset(name) {
       nuxt.options.runtimeConfig,
       'protectedPassword',
     )
-
     return {
       name,
       hasAuth,

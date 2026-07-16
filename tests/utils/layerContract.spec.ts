@@ -340,4 +340,24 @@ describe('layer contract', () => {
     expect(userwayPlugin).toContain('warmupStrategy: false')
     expect(userwayPlugin).not.toContain('requestIdleCallback')
   })
+
+  it('keeps optional integration defaults in their capability layers', () => {
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+    const analyticsConfig = readFileSync(
+      resolve(rootDir, 'layers/analytics/app/app.config.ts'),
+      'utf8',
+    )
+    const scriptsConfig = readFileSync(
+      resolve(rootDir, 'layers/scripts/app/app.config.ts'),
+      'utf8',
+    )
+
+    expect(themeConfig).not.toContain('analytics:')
+    expect(themeConfig).not.toContain('userway:')
+    expect(analyticsConfig).toContain('plausible:')
+    expect(scriptsConfig).toContain('userway:')
+  })
 })
