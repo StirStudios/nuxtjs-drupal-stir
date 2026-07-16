@@ -89,6 +89,10 @@ describe('CMS presentation manifest', () => {
     expect(strict.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
     expect(hybrid.sourceRevision).not.toBe(strict.sourceRevision)
     expect(hybrid.utilityCount).toBeGreaterThan(strict.utilityCount)
+    expect(strict.manifestUsageCount).toBe(9)
+    expect(strict.legacyUtilityCount).toBe(1)
+    expect(strict.rejectedLegacyUtilityCount).toBe(0)
+    expect(strict.sourceBytes).toBe(Buffer.byteLength(strict.source, 'utf8'))
   })
 
   it('uses a last-known file only under the explicit availability policy', async () => {

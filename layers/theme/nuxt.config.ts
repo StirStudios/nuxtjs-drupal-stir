@@ -58,6 +58,7 @@ export default defineNuxtConfig({
         return
       }
 
+      const generationStartedAt = performance.now()
       const manifest = await loadPresentationManifest({
         source: process.env.STIR_PRESENTATION_MANIFEST,
         apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY,
@@ -82,6 +83,11 @@ export default defineNuxtConfig({
         sourceRevision: presentationSource.sourceRevision,
         mode,
         utilityCount: presentationSource.utilityCount,
+        manifestUsageCount: presentationSource.manifestUsageCount,
+        legacyUtilityCount: presentationSource.legacyUtilityCount,
+        rejectedLegacyUtilityCount: presentationSource.rejectedLegacyUtilityCount,
+        sourceBytes: presentationSource.sourceBytes,
+        generationDurationMs: Math.round((performance.now() - generationStartedAt) * 100) / 100,
         schemaVersion: manifest.schemaVersion,
         siteUuid: manifest.site.uuid,
         theme: manifest.site.theme,

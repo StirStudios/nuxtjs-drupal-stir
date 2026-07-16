@@ -232,6 +232,10 @@ export function buildPresentationSource(
   source: string
   sourceRevision: string
   utilityCount: number
+  manifestUsageCount: number
+  legacyUtilityCount: number
+  rejectedLegacyUtilityCount: number
+  sourceBytes: number
 } {
   const utilities = presentationUtilities(manifest, mode)
   const source = inlinePresentationSource(utilities)
@@ -240,6 +244,24 @@ export function buildPresentationSource(
     .update('\0')
     .update(source)
     .digest('hex')
+  const gridUsageCount = Object.values(manifest.used.grid.columns)
+    .reduce((count, values) => count + values.length, 0)
+    + Object.values(manifest.used.grid.gap)
+      .reduce((count, values) => count + values.length, 0)
+  const manifestUsageCount = gridUsageCount
+    + manifest.used.spacing.length
+    + manifest.used.width.length
+    + manifest.used.alignment.length
+    + manifest.legacyClasses.length
+    + (manifest.used.grid.matrix ? 1 : 0)
 
-  return { source, sourceRevision, utilityCount: utilities.length }
+  return {
+    source,
+    sourceRevision,
+    utilityCount: utilities.length,
+    manifestUsageCount,
+    legacyUtilityCount: manifest.legacyClasses.length,
+    rejectedLegacyUtilityCount: manifest.diagnostics.rejectedLegacyClassCount,
+    sourceBytes: Buffer.byteLength(source, 'utf8'),
+  }
 }
