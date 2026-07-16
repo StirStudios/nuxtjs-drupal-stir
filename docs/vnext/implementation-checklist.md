@@ -82,6 +82,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   component runtime both prove recursive named-slot rendering without a
   project adapter.
 - N5 has started with a validated build-time presentation-usage manifest and compatibility reserve, plus a public typed listing composable and Nuxt server boundary that validate the producer-owned response, preserve safe Drupal sessions, and forward public cache metadata without downstream proxy overrides.
+- `pnpm perf:presentation` now builds the same minimal consumer in compatibility
+  and strict-manifest modes and fails unless the validated Drupal source reduces
+  both raw and compressed CSS. The current recorded fixture drops 48,844 bytes
+  raw (18.54%) and 5,309 bytes gzip (15.70%) without changing application code.
 
 ## Delivery slices
 

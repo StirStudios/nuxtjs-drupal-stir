@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "fixture": "tests/fixtures/minimal-consumer",
+  "manifest": "contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json",
+  "compatibility": {
+    "mode": "compatibility",
+    "bytes": 263425,
+    "gzipBytes": 33806,
+    "assets": [
+      {
+        "file": "MediaModal.DFKcV8R0.css",
+        "bytes": 213,
+        "gzipBytes": 148
+      },
+      {
+        "file": "entry.dLD-JFox.css",
+        "bytes": 263212,
+        "gzipBytes": 33658
+      }
+    ]
+  },
+  "strict": {
+    "mode": "strict",
+    "bytes": 214581,
+    "gzipBytes": 28497,
+    "assets": [
+      {
+        "file": "MediaModal.DFKcV8R0.css",
+        "bytes": 213,
+        "gzipBytes": 148
+      },
+      {
+        "file": "entry.CZvtBDUZ.css",
+        "bytes": 214368,
+        "gzipBytes": 28349
+      }
+    ]
+  },
+  "reduction": {
+    "bytes": 48844,
+    "gzipBytes": 5309,
+    "percent": 18.54,
+    "gzipPercent": 15.7
+  }
+}

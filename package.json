@@ -37,6 +37,7 @@
     "lint": "eslint . --no-warn-ignored",
     "lint:fix": "eslint . --fix --no-warn-ignored",
     "perf:report": "node scripts/perf/report.mjs",
+    "perf:presentation": "node scripts/perf/presentation-css.mjs",
     "perf:lighthouse": "node scripts/perf/lighthouse.mjs",
     "perf:lighthouse:local": "node scripts/perf/lighthouse-local.mjs",
     "audit:consumers": "node scripts/audit/consumers.mjs",
