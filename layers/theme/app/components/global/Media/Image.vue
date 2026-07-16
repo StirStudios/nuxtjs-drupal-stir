@@ -90,6 +90,13 @@ const renderedSrc = computed(() =>
 const renderedSrcset = computed(() =>
   isNuxtImage.value ? undefined : props.srcset,
 )
+const nativeSrcsetAttrs = computed(() =>
+  isNuxtImage.value ? {} : { srcset: renderedSrcset.value },
+)
+const bareImageAttrs = computed(() => ({
+  ...attrs,
+  ...nativeSrcsetAttrs.value,
+}))
 const bareRenderedSizes = computed(() =>
   isNuxtImage.value ? providerSizes.value : fallbackSizes.value,
 )
@@ -209,7 +216,7 @@ onMounted(() => {
     :is="imageComponent"
     v-if="isBare"
     :ref="setImageElementRef"
-    v-bind="attrs"
+    v-bind="bareImageAttrs"
     :alt="alt || ''"
     :class="
       isHero
@@ -227,7 +234,6 @@ onMounted(() => {
     :quality="isNuxtImage ? theme.media.image.quality : undefined"
     :sizes="bareRenderedSizes"
     :src="renderedSrc"
-    :srcset="renderedSrcset"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -256,6 +262,7 @@ onMounted(() => {
       :is="imageComponent"
       v-if="!isSourceDeferred && !isEager"
       :ref="setImageElementRef"
+      v-bind="nativeSrcsetAttrs"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -270,7 +277,6 @@ onMounted(() => {
       :quality="isNuxtImage ? theme.media.image.quality : undefined"
       :sizes="wrappedRenderedSizes"
       :src="renderedSrc"
-      :srcset="renderedSrcset"
       :width="width"
       @error="handleError"
       @load="handleLoad"
@@ -280,6 +286,7 @@ onMounted(() => {
       :is="imageComponent"
       v-else-if="!isSourceDeferred"
       :ref="setImageElementRef"
+      v-bind="nativeSrcsetAttrs"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -294,7 +301,6 @@ onMounted(() => {
       :quality="isNuxtImage ? theme.media.image.quality : undefined"
       :sizes="wrappedRenderedSizes"
       :src="renderedSrc"
-      :srcset="renderedSrcset"
       :width="width"
       @error="handleError"
       @load="handleLoad"
