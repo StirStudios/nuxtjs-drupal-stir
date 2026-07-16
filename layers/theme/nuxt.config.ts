@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addTypeTemplate } from '@nuxt/kit'
+import { addTypeTemplate, useNuxt } from '@nuxt/kit'
 import {
   buildPresentationSource,
   loadPresentationManifest,
@@ -44,7 +44,8 @@ export default defineNuxtConfig({
     stirImageDelivery,
   },
   hooks: {
-    async 'ready'(nuxt) {
+    async 'modules:done'() {
+      const nuxt = useNuxt()
       const appThemeCss = resolvePath(
         nuxt.options.srcDir,
         'assets/css/main.css',

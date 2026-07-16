@@ -514,6 +514,19 @@ describe('layer contract', () => {
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
   })
 
+  it('records presentation identity before Nitro serializes runtime config', () => {
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(themeConfig).toContain('async \'modules:done\'()')
+    expect(themeConfig).toContain('const nuxt = useNuxt()')
+    expect(themeConfig).not.toContain('async \'ready\'(nuxt)')
+    expect(themeConfig).toContain('stirPresentationManifestRevision = manifest.revision')
+    expect(themeConfig).toContain('stirPresentationBuild = {')
+  })
+
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
     const userwayPlugin = readFileSync(
       resolve(rootDir, 'layers/scripts/app/plugins/userway.client.ts'),
