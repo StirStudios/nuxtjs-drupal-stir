@@ -681,10 +681,13 @@ scrollButton: {
 
 ```ts
 turnstile: {
-  appearance: 'always',
-  label: 'Let us know you’re human',
+  appearance: 'interaction-only',
 },
 ```
+
+`interaction-only` is the layer default so protection remains active without
+showing every visitor a challenge. Use `always` only when a project explicitly
+requires a permanently visible widget.
 
 ### 🧊 Webform
 

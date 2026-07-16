@@ -634,11 +634,11 @@
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 95,
+    "tests": 96,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
-      "nuxt": 34,
+      "nuxt": 35,
       "server": 21,
       "utils": 29
     }
@@ -680,6 +680,7 @@
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",
     "tests/nuxt/runtime/StirMissingComponent.nuxt.spec.ts",
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
+    "tests/nuxt/runtime/TurnstileConfig.nuxt.spec.ts",
     "tests/nuxt/runtime/Webform.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapDiv.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapGrid.nuxt.spec.ts",

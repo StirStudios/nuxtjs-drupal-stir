@@ -250,7 +250,7 @@ export default defineAppConfig({
     },
 
     turnstile: {
-      appearance: 'always',
+      appearance: 'interaction-only',
     },
 
     card: {
