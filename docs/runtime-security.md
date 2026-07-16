@@ -67,15 +67,17 @@ configured. The raw inbound `X-Forwarded-For` header is never copied directly.
 Production protected-page access requires all of:
 
 - `PROTECTED_PASSWORD`
-- `PROTECTED_COOKIE_SECRET`, set to a separate high-entropy random secret
 - `TURNSTILE_KEY`
 - `TURNSTILE_SECRET`
 
-Do not reuse `PROTECTED_PASSWORD` as the cookie-signing secret. Development can
-fall back to the password for convenience, but production intentionally refuses
-that fallback. Cookie signatures are bound to both values, so rotating either
-`PROTECTED_PASSWORD` or `PROTECTED_COOKIE_SECRET` immediately invalidates
-existing protected-access cookies.
+The password signs the short-lived protected-access cookie and is never exposed
+to the browser. Rotating `PROTECTED_PASSWORD` immediately invalidates existing
+protected-access cookies.
+
+Configured protected routes and authentication pages emit
+`Cache-Control: private, no-store, max-age=0` during SSR. CDN, reverse-proxy,
+and browser caches must honor that header; protected HTML must never be cached
+or served from a shared Varnish/edge object.
 
 Failed protected-login attempts use Nitro's `cache` storage with these defaults:
 

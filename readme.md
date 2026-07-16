@@ -123,7 +123,6 @@ attributes above; the harness does not depend on project-specific components.
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
 - `DRUPAL_TRUST_PROXY`: Set to `'true'` only when a trusted ingress replaces `X-Forwarded-For` and `DRUPAL_FORWARD_CLIENT_IP` is enabled (default: `false`)
 - `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate; requires the Turnstile keys below
-- `PROTECTED_COOKIE_SECRET`: High-entropy server-only HMAC secret for protected-access cookies; required with `PROTECTED_PASSWORD` in production
 - `PROTECTED_RATE_LIMIT_ENABLED`: Set to `'false'` to disable the protected-login limiter (default: enabled)
 - `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)
 - `PROTECTED_RATE_LIMIT_WINDOW_SECONDS`: Protected-login window in seconds (default: `900`)
@@ -149,6 +148,7 @@ Notes:
 - Deployed runtime overrides supported by `nuxtjs-drupal-ce` include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 - The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its Nitro limiter is best-effort and non-atomic; production must independently enforce a persistent, atomic or provider-native edge rule for `POST /api/auth/protected` using a trusted client-IP boundary.
+- Protected-access cookies are signed with `PROTECTED_PASSWORD`; rotating the password immediately invalidates every existing protected session.
 - H3 buffers multipart bodies before application-level file checks. The Nuxt limits are validation, not a pre-buffer memory cap; production must reject fixed-length and chunked multipart bodies at or below `WEBFORM_MAX_REQUEST_BYTES` before they reach Nitro.
 - Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
 - When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.

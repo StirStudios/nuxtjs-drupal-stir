@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { $fetch, createPage, setup, url } from '@nuxt/test-utils/e2e'
+import { layerAuthCreateProtectedAccessToken } from '../../../layers/auth/server/utils/protectedAccessToken'
 
 const pageFixture = {
   title: 'Fixture page',
@@ -95,11 +96,13 @@ const originalEnvironment = {
   DRUPAL_URL: process.env.DRUPAL_URL,
   NUXT_URL: process.env.NUXT_URL,
   NUXT_INDEXABLE: process.env.NUXT_INDEXABLE,
+  PROTECTED_PASSWORD: process.env.PROTECTED_PASSWORD,
 }
 
 process.env.DRUPAL_URL = drupalFixtureUrl
 process.env.NUXT_URL = 'http://127.0.0.1'
 process.env.NUXT_INDEXABLE = 'false'
+process.env.PROTECTED_PASSWORD = 'fixture-protected-password'
 
 afterAll(async () => {
   await new Promise<void>((resolve, reject) => {
@@ -119,8 +122,17 @@ describe('Nuxt E2E smoke', async () => {
       DRUPAL_URL: drupalFixtureUrl,
       NUXT_URL: 'http://127.0.0.1',
       NUXT_INDEXABLE: 'false',
+      PROTECTED_PASSWORD: 'fixture-protected-password',
     },
     nuxtConfig: {
+      appConfig: {
+        protectedRoutes: {
+          requireLoginPaths: ['/protected-fixture'],
+          loginPath: '/auth/protected',
+          allowAuthenticatedUserBypass: false,
+          fallbackRedirectPath: '/',
+        } as never,
+      },
       sourcemap: {
         client: false,
         server: false,
@@ -163,6 +175,29 @@ describe('Nuxt E2E smoke', async () => {
     expect(firstHtml).toContain('Intermediate')
     expect(firstHtml).toContain('Los Angeles, CA')
     expect(secondHtml).toBe(firstHtml)
+  })
+
+  it('prevents shared caching of authenticated protected HTML', async () => {
+    const token = await layerAuthCreateProtectedAccessToken(
+      'fixture-protected-password',
+      60,
+    )
+    const protectedResponse = await fetch(url('/protected-fixture'), {
+      headers: {
+        cookie: `protected_access=${token}`,
+      },
+    })
+    const publicResponse = await fetch(url('/'))
+    const protectedHtml = await protectedResponse.text()
+
+    expect(protectedResponse.status).toBe(200)
+    expect(protectedHtml).toContain('Fixture page')
+    expect(protectedResponse.headers.get('cache-control')).toBe(
+      'private, no-store, max-age=0',
+    )
+    expect(publicResponse.headers.get('cache-control')).not.toBe(
+      'private, no-store, max-age=0',
+    )
   })
 
   it.runIf(browserEnabled)('hydrates the deterministic homepage without client errors', async () => {

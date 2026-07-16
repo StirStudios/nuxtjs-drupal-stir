@@ -30,7 +30,6 @@ describe('POST /api/auth/protected', () => {
   beforeEach(() => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       protectedPassword: 'secret',
-      protectedCookieSecret: 'cookie-secret',
       protectedRateLimit: { enabled: false },
     }))
   })

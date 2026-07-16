@@ -3,7 +3,6 @@ import { positiveIntegerEnvironment } from '../../config/runtime'
 export default defineNuxtConfig({
   runtimeConfig: {
     protectedPassword: process.env.PROTECTED_PASSWORD || '',
-    protectedCookieSecret: process.env.PROTECTED_COOKIE_SECRET || '',
     protectedRateLimit: {
       enabled: process.env.PROTECTED_RATE_LIMIT_ENABLED !== 'false',
       maxAttempts: positiveIntegerEnvironment(

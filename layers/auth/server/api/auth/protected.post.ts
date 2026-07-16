@@ -87,13 +87,6 @@ export default defineEventHandler(async (event) => {
 
   const secret = layerAuthGetProtectedAccessSecret()
 
-  if (!secret) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Protected cookie secret is not configured',
-    })
-  }
-
   await layerAuthSetProtectedAccessCookie(event, secret)
   await layerAuthResetProtectedLoginRateLimit(event)
 
