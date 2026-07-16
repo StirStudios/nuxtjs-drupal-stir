@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import {
+  buildPresentationSource,
   inlinePresentationSource,
   loadPresentationManifest,
   parsePresentationManifest,
@@ -76,6 +77,18 @@ describe('CMS presentation manifest', () => {
     const source = inlinePresentationSource(['gap-4', 'grid-cols-2'])
 
     expect(source).toBe('@source inline("gap-4 grid-cols-2");\n')
+  })
+
+  it('gives generated sources a deterministic mode-aware identity', () => {
+    const manifest = parsePresentationManifest(fixture())
+    const strict = buildPresentationSource(manifest, 'strict')
+    const repeated = buildPresentationSource(manifest, 'strict')
+    const hybrid = buildPresentationSource(manifest, 'hybrid')
+
+    expect(repeated).toEqual(strict)
+    expect(strict.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
+    expect(hybrid.sourceRevision).not.toBe(strict.sourceRevision)
+    expect(hybrid.utilityCount).toBeGreaterThan(strict.utilityCount)
   })
 
   it('uses a last-known file only under the explicit availability policy', async () => {

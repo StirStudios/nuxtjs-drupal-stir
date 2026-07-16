@@ -3,9 +3,8 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
-  inlinePresentationSource,
+  buildPresentationSource,
   loadPresentationManifest,
-  presentationUtilities,
   type PresentationManifestMode,
 } from './build/presentationManifest'
 
@@ -58,18 +57,25 @@ export default defineNuxtConfig({
         nuxt.options.rootDir,
         'node_modules/.cache/stir-presentation',
       )
+      const presentationSource = buildPresentationSource(manifest, mode)
       const generatedCss = resolvePath(
         generatedDir,
-        `${manifest.revision}.inline.css`,
+        `${manifest.revision}.${mode}.${presentationSource.sourceRevision}.inline.css`,
       )
 
       await mkdir(generatedDir, { recursive: true })
-      await writeFile(
-        generatedCss,
-        inlinePresentationSource(presentationUtilities(manifest, mode)),
-      )
+      await writeFile(generatedCss, presentationSource.source)
       nuxt.options.alias['#stir-presentation-source'] = generatedCss
       nuxt.options.runtimeConfig.public.stirPresentationManifestRevision = manifest.revision
+      nuxt.options.runtimeConfig.public.stirPresentationBuild = {
+        manifestRevision: manifest.revision,
+        sourceRevision: presentationSource.sourceRevision,
+        mode,
+        utilityCount: presentationSource.utilityCount,
+        schemaVersion: manifest.schemaVersion,
+        siteUuid: manifest.site.uuid,
+        theme: manifest.site.theme,
+      }
     },
   },
 })

@@ -217,3 +217,29 @@ export function inlinePresentationSource(classes: string[]): string {
   }
   return `${lines.join('\n')}\n`
 }
+
+/**
+ * Builds the exact Tailwind source artifact and its mode-aware identity.
+ *
+ * The upstream manifest revision identifies Drupal content usage. The source
+ * revision additionally identifies the generation policy, preventing strict
+ * and hybrid builds from sharing a cache artifact accidentally.
+ */
+export function buildPresentationSource(
+  manifest: PresentationManifest,
+  mode: Exclude<PresentationManifestMode, 'compatibility'>,
+): {
+  source: string
+  sourceRevision: string
+  utilityCount: number
+} {
+  const utilities = presentationUtilities(manifest, mode)
+  const source = inlinePresentationSource(utilities)
+  const sourceRevision = createHash('sha256')
+    .update(mode)
+    .update('\0')
+    .update(source)
+    .digest('hex')
+
+  return { source, sourceRevision, utilityCount: utilities.length }
+}

@@ -93,8 +93,12 @@ smaller project-specific source:
 
 Hybrid and strict builds fail when the manifest is missing, invalid, uses an
 unknown semantic value, contains a rejected legacy utility, or has a mismatched
-revision. The verified revision is recorded in public runtime config as
-`stirPresentationManifestRevision`.
+revision. The verified Drupal revision remains available in public runtime
+config as `stirPresentationManifestRevision`. `stirPresentationBuild` records
+the manifest and generated-source revisions, generation mode, utility count,
+schema version, site UUID, and Drupal theme. The source revision includes the
+generation mode, so concurrent strict and hybrid builds cannot collide in the
+shared build cache.
 
 The checked fixture build reduces the main CSS artifact from approximately
 35.15 kB gzip in compatibility mode to 30.03 kB in strict mode (about 14.6%).
