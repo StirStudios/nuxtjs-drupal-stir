@@ -21,13 +21,14 @@ manage Drupal tokens directly.
 
 ## Consumption
 
-Downstream applications should extend the repository's root layer. Extending
-this internal sub-layer alone is not a supported distribution contract.
+Downstream applications that only need auth/account and shared rendering may
+extend this capability directly. It composes Turnstile, which in turn composes
+the shared platform.
 
 The root configuration includes:
 
 ```ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
 The full preset includes this layer; the minimal preset excludes it. Within the

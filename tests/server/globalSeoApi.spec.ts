@@ -5,7 +5,7 @@ import { drupalApiRequest } from '../../layers/core/server/utils/drupalApi'
 import {
   fetchGlobalSeo,
   parseGlobalSeoResponse,
-} from '../../layers/core/server/utils/globalSeoApi'
+} from '../../layers/seo/server/utils/globalSeoApi'
 
 vi.mock('../../layers/core/server/utils/drupalApi', () => ({
   drupalApiRequest: vi.fn(),

@@ -2,13 +2,6 @@ import type { AppConfigInput } from 'nuxt/schema'
 import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
-  cmsGlobalSeo: {
-    enabled: false,
-    ignoredPathPrefixes: ['/account', '/auth'],
-    ignoredPaths: [],
-    drupalRouteNames: ['slug'],
-  },
-
   colorMode: {
     forced: false,
     preference: 'dark',

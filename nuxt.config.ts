@@ -9,6 +9,7 @@ const enableWorkspaceDiagnostics =
 export default defineNuxtConfig({
   extends: [
     './layers/platform',
+    './layers/seo',
     ...(enableWorkspaceDiagnostics ? ['./layers/diagnostics'] : []),
     './layers/editorial',
     './layers/integrations',

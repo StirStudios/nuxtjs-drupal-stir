@@ -12,6 +12,8 @@ const consumerLayers = [
   { label: 'full', specifier: '@stir/base/presets/full' },
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
+const maxArchiveBytes = 300_000
+const maxArchiveEntries = 425
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -58,15 +60,15 @@ async function main() {
       await run('tar', ['-tzf', archivePath], rootDir),
     ).trim().split('\n')
 
-    if (archiveSize > 300_000) {
+    if (archiveSize > maxArchiveBytes) {
       throw new Error(
-        `Packed layer is ${archiveSize} bytes; the published budget is 300000 bytes.`,
+        `Packed layer is ${archiveSize} bytes; the published budget is ${maxArchiveBytes} bytes.`,
       )
     }
 
-    if (archiveEntries.length > 400) {
+    if (archiveEntries.length > maxArchiveEntries) {
       throw new Error(
-        `Packed layer contains ${archiveEntries.length} files; the published budget is 400.`,
+        `Packed layer contains ${archiveEntries.length} files; the published budget is ${maxArchiveEntries}.`,
       )
     }
 

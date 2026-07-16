@@ -38,13 +38,20 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   contract. Generated preset declarations prove the minimal preset registers
   none of the three integration components, three implementation composables,
   or the consent plugin; the full preset preserves all of them.
+- The optional `layers/seo` boundary now owns the sitemap module, Drupal global
+  metadata plugin, and both SEO proxy routes. Minimal, auth-only, and
+  Webform-only consumers do not initialize or ship that capability; the root
+  and full preset preserve existing website behavior.
 - Repository-only client-entry analysis now lives in `layers/diagnostics` and
   is selected only for explicit performance builds launched from this checkout.
   Published platform and installed preset consumers contain no report writer.
 - The package allowlist ships runtime layers, presets, shared configuration,
   and the versioned Drupal contract—not repository tests, CI, audit scripts, or
-  internal review documents. The archive fell from 357 kB/551 files to
-  212 kB/386 files; packed-consumer CI enforces 300 kB/400-file caps.
+  internal review documents. The current archive is 231 kB/419 files after the
+  expanded producer-owned contracts and capability layers; packed-consumer CI
+  enforces tight 300 kB/425-entry caps. The prior 400-entry ratchet had become
+  stale before the SEO extraction (committed HEAD already packed 416 entries),
+  while the byte budget remained healthy.
 - Stir-owned app contracts now use explicit `#stir/utils`,
   `#stir/composables`, `#stir/components`, and `#stir/types` aliases. The
   historical `~/...` mappings remain available only as compatibility aliases

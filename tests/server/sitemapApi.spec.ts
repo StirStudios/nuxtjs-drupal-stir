@@ -5,7 +5,7 @@ import { drupalApiRequest } from '../../layers/core/server/utils/drupalApi'
 import {
   fetchSitemap,
   parseSitemapResponse,
-} from '../../layers/core/server/utils/sitemapApi'
+} from '../../layers/seo/server/utils/sitemapApi'
 
 vi.mock('../../layers/core/server/utils/drupalApi', () => ({
   drupalApiRequest: vi.fn(),

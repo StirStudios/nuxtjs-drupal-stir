@@ -11,7 +11,7 @@ import {
   string,
 } from 'valibot'
 import type { SitemapProducerPayload } from '../../shared/types/sitemap'
-import { drupalApiRequest } from './drupalApi'
+import { drupalApiRequest } from '../../../core/server/utils/drupalApi'
 
 const sitemapSchema = array(strictObject({
   loc: pipe(string(), minLength(1)),

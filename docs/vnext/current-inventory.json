@@ -17,6 +17,7 @@
     "integrations",
     "platform",
     "scripts",
+    "seo",
     "theme",
     "turnstile",
     "webform"
@@ -365,7 +366,7 @@
       "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
       "layers/integrations/app/plugins/privacy-consent.ts",
       "layers/scripts/app/plugins/userway.client.ts",
-      "layers/theme/app/plugins/cms-global-seo.ts",
+      "layers/seo/app/plugins/cms-global-seo.ts",
       "layers/theme/app/plugins/color-mode-lock.client.ts",
       "layers/theme/app/plugins/nav-lock.client.ts"
     ],

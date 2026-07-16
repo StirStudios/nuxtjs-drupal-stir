@@ -3,7 +3,7 @@ import type {
   GlobalSeoProducerPayload,
   GlobalSeoResponse,
 } from '../../shared/types/globalSeo'
-import { drupalApiRequest } from './drupalApi'
+import { drupalApiRequest } from '../../../core/server/utils/drupalApi'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)

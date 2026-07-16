@@ -14,6 +14,7 @@ describe('layer contract', () => {
 
     for (const layer of [
       'platform',
+      'seo',
       'editorial',
       'integrations',
       'analytics',
@@ -27,6 +28,7 @@ describe('layer contract', () => {
       'extends: [\'../core\', \'../theme\']',
     )
     expect(platformConfig).not.toContain('../editorial')
+    expect(platformConfig).not.toContain('@nuxtjs/sitemap')
     expect(existsSync(resolve(
       rootDir,
       'layers/editorial/app/components/Drupal/Tabs.vue',
@@ -307,6 +309,42 @@ describe('layer contract', () => {
     expect(existsSync(resolve(
       rootDir,
       'layers/webform/app/components/Field/Turnstile.vue',
+    ))).toBe(false)
+  })
+
+  it('keeps sitemap and global metadata in the optional SEO layer', () => {
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
+    const seoConfig = readFileSync(
+      resolve(rootDir, 'layers/seo/nuxt.config.ts'),
+      'utf8',
+    )
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+    const seoAppConfig = readFileSync(
+      resolve(rootDir, 'layers/seo/app/app.config.ts'),
+      'utf8',
+    )
+
+    expect(platformConfig).not.toContain('@nuxtjs/sitemap')
+    expect(seoConfig).toContain('@nuxtjs/sitemap')
+    expect(themeConfig).not.toContain('cmsGlobalSeo:')
+    expect(seoAppConfig).toContain('cmsGlobalSeo:')
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/seo/app/plugins/cms-global-seo.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/seo/global.get.ts',
+    ))).toBe(false)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/sitemap.get.ts',
     ))).toBe(false)
   })
 

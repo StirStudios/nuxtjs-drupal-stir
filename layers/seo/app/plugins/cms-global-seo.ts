@@ -1,4 +1,4 @@
-import type { GlobalSeoResponse } from '../../../core/shared/types/globalSeo'
+import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean

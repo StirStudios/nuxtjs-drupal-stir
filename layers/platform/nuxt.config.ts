@@ -1,16 +1,11 @@
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { SitemapRenderCtx } from '@nuxtjs/sitemap'
 import {
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
 } from '../../config/runtime'
-import {
-  buildSitemapModuleOptions,
-  dedupeResolvedSitemapUrls,
-} from '../../config/sitemap'
 
 const require = createRequire(import.meta.url)
 const resolveLayerPath = (path: string) =>
@@ -21,7 +16,6 @@ const isTestEnv =
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
-const sitemapModuleOptions = buildSitemapModuleOptions(drupalUrl)
 
 type RouteRules = Record<string, Record<string, unknown>>
 export default defineNuxtConfig({
@@ -42,11 +36,6 @@ export default defineNuxtConfig({
     experimental: {
       asyncContext: true,
     },
-    hooks: {
-      'sitemap:resolved'(ctx: SitemapRenderCtx) {
-        ctx.urls = dedupeResolvedSitemapUrls(ctx.urls)
-      },
-    } as Record<string, (ctx: SitemapRenderCtx) => void>,
   },
 
   devServer: {
@@ -179,11 +168,6 @@ export default defineNuxtConfig({
       {
         // disallow: ['/secret', '/admin'],
       },
-    ],
-
-    [
-      '@nuxtjs/sitemap',
-      sitemapModuleOptions,
     ],
 
     [

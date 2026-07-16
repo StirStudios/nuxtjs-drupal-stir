@@ -143,7 +143,9 @@ attributes above; the harness does not depend on project-specific components.
 - `nuxt.config.ts` — Root orchestration for layers, modules, runtime config, routing, and build
 - `layers/core` — Server/runtime Drupal integration and backend proxy endpoints
 - `layers/theme` — UI components, layouts, composables, utilities, app config, and CSS
+- `layers/seo` — Optional sitemap and Drupal-owned global metadata
 - `layers/auth` — Optional Drupal auth/account UI, middleware, and proxy endpoints
+- `layers/webform` — Optional Drupal Webform rendering and submission
 - `server/utils` — Shared Nitro utilities reused by multiple layers
 
 ## 🔐 Environment Variables
@@ -184,27 +186,29 @@ Notes:
 - Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
 - When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.
 - `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
-- Sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
+- When the SEO capability is selected, sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 - Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_URL`.
 
 ## Auth + Account Integration (stir_account)
 
 Auth/account and password-protected page features live in `layers/auth`. The
-published root layer includes it by default so all downstream projects receive
-one stable contract.
+published root and full preset include it for compatibility. Capability-focused
+applications may consume the auth layer directly; it brings the shared
+platform and mandatory Turnstile capability with it.
 
 In this repository, auth is enabled by default through:
 
 ```ts
 // nuxt.config.ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-Drupal account auth is disabled by default through app config. There is not a
-separate auth-free distribution preset; extending individual internal layers is
-not a supported substitute for extending the root layer. Core webform
-submission and Drupal CSRF forwarding remain independent of account auth.
+Drupal account auth is disabled by default through app config. Use
+`@stir/base/presets/minimal` for the shared renderer without optional auth,
+Webform, SEO, editorial, analytics, scripts, or integration capabilities. Core
+Webform submission and Drupal CSRF forwarding remain independent of account
+auth.
 If it only needs password-protected Nuxt pages, keep the layer and leave
 `authIntegration.drupalAccounts` unset or set it to `false` in app config.
 Set `authIntegration.drupalAccounts: true` only for projects that provide the
