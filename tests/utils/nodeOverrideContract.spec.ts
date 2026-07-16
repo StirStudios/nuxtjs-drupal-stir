@@ -16,6 +16,11 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('name="hero"')
     expect(nodeDisplay).toContain('contentSlotNames')
     expect(nodeDisplay).toContain(':name="slotName"')
+    expect(nodeDisplay).toContain(':url="props.url || props.path?.alias"')
+
+    const nodeTypes = source('layers/theme/app/types/Node.ts')
+
+    expect(nodeTypes).toContain('url?: string')
   })
 
   it('uses the accessible default layout when Drupal omits page_layout', () => {

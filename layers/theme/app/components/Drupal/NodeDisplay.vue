@@ -58,7 +58,7 @@ provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
     orientation="vertical"
     :teaser="teaser"
     :title="props.title"
-    :url="props.path?.alias"
+    :url="props.url || props.path?.alias"
   />
 
   <slot
