@@ -6,7 +6,11 @@ import process from 'node:process'
 
 const rootDir = resolve('.')
 const fixtureDir = resolve('tests/fixtures/consumer-app/app')
-const presets = ['minimal', 'full']
+const consumerLayers = [
+  { label: 'root', specifier: '@stir/base' },
+  { label: 'minimal', specifier: '@stir/base/presets/minimal' },
+  { label: 'full', specifier: '@stir/base/presets/full' },
+]
 const keepTemporary = process.argv.includes('--keep-temporary')
 
 function run(command, args, cwd, environment = {}) {
@@ -121,14 +125,14 @@ async function main() {
     )
 
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
-    for (const preset of presets) {
-      // Each preset is an independent consumer contract. Do not let Nuxt's
+    for (const layer of consumerLayers) {
+      // Each entry point is an independent consumer contract. Do not let Nuxt's
       // generated component, import, or app-config types leak across them.
       await rm(join(consumerDir, '.nuxt'), { recursive: true, force: true })
       await rm(join(consumerDir, '.output'), { recursive: true, force: true })
       await writeFile(
         join(consumerDir, 'nuxt.config.ts'),
-        `export default defineNuxtConfig({ extends: ['@stir/base/presets/${preset}'] })\n`,
+        `export default defineNuxtConfig({ extends: ['${layer.specifier}'] })\n`,
       )
       await run('pnpm', ['typecheck'], consumerDir)
       await run('pnpm', ['build'], consumerDir, { STIR_PERF_ANALYZE: 'true' })
@@ -138,10 +142,10 @@ async function main() {
       )
       if (await pathExists(installedReport)) {
         throw new Error(
-          `Packed ${preset} consumer registered the repository diagnostics writer.`,
+          `Packed ${layer.label} consumer registered the repository diagnostics writer.`,
         )
       }
-      console.log(`Packed ${preset} consumer validation passed.`)
+      console.log(`Packed ${layer.label} consumer validation passed.`)
     }
   } finally {
     if (keepTemporary) console.log(`Temporary consumer retained at ${temporaryRoot}`)

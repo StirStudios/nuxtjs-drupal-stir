@@ -126,6 +126,14 @@ describe('layer contract', () => {
     expect(packageJson.main).toBe('./nuxt.config.ts')
   })
 
+  it('documents one installed package as the downstream layer source', () => {
+    const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
+
+    expect(readme).toContain('"@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext"')
+    expect(readme).toContain('extends: [\'@stir/base\']')
+    expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
+  })
+
   it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),

@@ -42,6 +42,32 @@ pnpm dev
 
 Then configure environment variables (see `## 🔐 Environment Variables`) and app-level options in `app/app.config.ts`.
 
+### Downstream projects
+
+Install the layer once under its package name, then extend that installed
+package. Keep the Git branch, tag, or commit in `package.json`; do not repeat a
+GitHub source in `nuxt.config.ts`.
+
+```json
+{
+  "dependencies": {
+    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext"
+  }
+}
+```
+
+```ts
+export default defineNuxtConfig({
+  extends: ['@stir/base'],
+})
+```
+
+Pin production projects to a reviewed tag or commit. A branch reference is
+appropriate while testing vNext, but it should not be the production lock.
+Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
+installing `@stir/base` is unsupported because Nuxt and the package manager can
+resolve different revisions of the same layer.
+
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->

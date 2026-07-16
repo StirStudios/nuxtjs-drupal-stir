@@ -62,11 +62,17 @@ const singleVideoFrameStyle = computed(() => {
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: index => String(props.items[index]?.mid ?? ''),
-  onSelect: index => emit('select', index),
+  onSelect: (index) => {
+    emit('select', index)
+  },
 })
 
 function mediaComponentFor(type: unknown) {
   return drupalMediaComponentName(type)
+}
+
+function closeModal(): void {
+  open.value = false
 }
 </script>
 
@@ -92,7 +98,7 @@ function mediaComponentFor(type: unknown) {
         icon="i-lucide-x"
         size="lg"
         variant="soft"
-        @click="open = false"
+        @click="closeModal"
       />
 
       <div
