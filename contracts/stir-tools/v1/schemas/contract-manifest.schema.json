@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/contract-manifest.schema.json",
+  "title": "Stir Tools contract manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractVersion",
+    "producer",
+    "platformRequirements",
+    "compatibility",
+    "capabilities",
+    "contracts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "contractVersion": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$"
+    },
+    "producer": {
+      "const": "stirstudios/stir_tools"
+    },
+    "platformRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["drupalCore", "php"],
+      "properties": {
+        "drupalCore": { "const": "^11" },
+        "php": { "const": ">=8.4" }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "additiveChanges",
+        "breakingChanges",
+        "consumerReleaseLockstep"
+      ],
+      "properties": {
+        "additiveChanges": { "const": "same-major" },
+        "breakingChanges": { "const": "new-major" },
+        "consumerReleaseLockstep": { "const": false }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/capability" },
+      "propertyNames": { "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$" }
+    },
+    "contracts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/contract" },
+      "propertyNames": { "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$" }
+    }
+  },
+  "definitions": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerModules", "optional"],
+      "properties": {
+        "providerModules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^stir_[a-z0-9_]+$"
+          }
+        },
+        "optional": { "type": "boolean" }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "schema", "fixtures"],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$"
+        },
+        "schema": {
+          "type": "string",
+          "pattern": "^schemas/[a-z0-9-]+\\.schema\\.json$"
+        },
+        "fixtures": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^fixtures/[a-z0-9-]+\\.json$"
+          }
+        }
+      }
+    }
+  }
+}

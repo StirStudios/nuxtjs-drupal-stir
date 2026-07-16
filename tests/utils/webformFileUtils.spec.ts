@@ -4,7 +4,7 @@ import {
   getFileAccept,
   getFileMaxSize,
   hasFileValue,
-} from '../../layers/theme/app/utils/webformFileUtils'
+} from '../../layers/webform/app/utils/webformFileUtils'
 import type { WebformFieldProps } from '../../layers/theme/app/types'
 
 describe('webformFileUtils', () => {

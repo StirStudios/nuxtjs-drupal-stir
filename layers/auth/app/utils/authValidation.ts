@@ -1,4 +1,10 @@
-import { object, ref as yupRef, string } from 'yup'
+import {
+  check,
+  custom,
+  forward,
+  object,
+  pipe,
+} from 'valibot'
 import type {
   AuthIdentifierMode,
   AuthPasswordPolicy,
@@ -6,59 +12,78 @@ import type {
   AuthUiIdentifierField,
 } from '../types/auth'
 
-const identifier = string().trim().required('Email or username is required')
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const email = string()
-  .trim()
-  .email('Enter a valid email address')
-  .required('Email is required')
+function requiredString(message: string) {
+  return custom<string>(
+    value => typeof value === 'string' && value.trim().length > 0,
+    message,
+  )
+}
 
-const password = string()
-  .required('Password is required')
+function requiredPassword(message: string) {
+  return custom<string>(
+    value => typeof value === 'string' && value.length > 0,
+    message,
+  )
+}
 
-const currentPassword = string().required('Current password is required')
+function emailString(requiredMessage: string, invalidMessage: string) {
+  return custom<string>(
+    value => typeof value === 'string'
+      && value.trim().length > 0
+      && emailPattern.test(value.trim()),
+    issue => typeof issue.input !== 'string' || issue.input.trim().length === 0
+      ? requiredMessage
+      : invalidMessage,
+  )
+}
 
-const newPassword = password.test(
-  'not-same-as-current',
-  'New password must be different from current password',
-  function (value) {
-    const current = String(this.parent.currentPassword ?? '')
-    const next = String(value ?? '')
+const identifier = requiredString('Email or username is required')
+const email = emailString('Email is required', 'Enter a valid email address')
+const password = requiredPassword('Password is required')
+const currentPassword = requiredPassword('Current password is required')
 
-    if (!current || !next) {
-      return true
-    }
-
-    return current !== next
-  },
-)
-
-export const loginValidationSchema = object({
-  identifier,
-  password: string().required('Password is required'),
-})
+export const loginValidationSchema = object({ identifier, password })
 
 export const registerValidationSchema = object({
-  display_name: string().trim().max(80, 'Display name must be 80 characters or less'),
+  display_name: custom<string | undefined>(
+    value => value === undefined
+      || (typeof value === 'string' && value.trim().length <= 80),
+    'Display name must be 80 characters or less',
+  ),
   email,
   password,
 })
 
-export const passwordRequestValidationSchema = object({
-  identifier,
-})
+export const passwordRequestValidationSchema = object({ identifier })
 
-export const passwordResetValidationSchema = object({
-  password,
-  confirmPassword: string()
-    .required('Confirm password is required')
-    .oneOf([yupRef('password')], 'Passwords do not match'),
-})
+export const passwordResetValidationSchema = pipe(
+  object({
+    password,
+    confirmPassword: requiredPassword('Confirm password is required'),
+  }),
+  forward(
+    check(
+      input => input.password === input.confirmPassword,
+      'Passwords do not match',
+    ),
+    ['confirmPassword'],
+  ),
+)
 
-export const accountPasswordChangeValidationSchema = object({
-  currentPassword,
-  newPassword,
-})
+export const accountPasswordChangeValidationSchema = pipe(
+  object({ currentPassword, newPassword: password }),
+  forward(
+    check(
+      input => !input.currentPassword
+        || !input.newPassword
+        || input.currentPassword !== input.newPassword,
+      'New password must be different from current password',
+    ),
+    ['newPassword'],
+  ),
+)
 
 export function createIdentifierValidationSchema(
   field: AuthUiIdentifierField = {},
@@ -66,13 +91,10 @@ export function createIdentifierValidationSchema(
   const mode: AuthIdentifierMode = field.mode || 'email_or_username'
   const requiredMessage = field.requiredMessage || requiredIdentifierMessage(mode)
   const invalidMessage = field.invalidMessage || 'Enter a valid email address'
-  const base = string().trim().required(requiredMessage)
 
-  if (mode === 'email') {
-    return base.email(invalidMessage)
-  }
-
-  return base
+  return mode === 'email'
+    ? emailString(requiredMessage, invalidMessage)
+    : requiredString(requiredMessage)
 }
 
 export function createLoginValidationSchema(
@@ -81,31 +103,30 @@ export function createLoginValidationSchema(
 ) {
   return object({
     identifier: createIdentifierValidationSchema(identifierField),
-    password: string().required(passwordRequiredMessage),
+    password: requiredPassword(passwordRequiredMessage),
   })
 }
 
 export function createPasswordRequestValidationSchema(
   identifierField: AuthUiIdentifierField = {},
 ) {
-  return object({
-    identifier: createIdentifierValidationSchema(identifierField),
-  })
+  return object({ identifier: createIdentifierValidationSchema(identifierField) })
 }
 
 export function createRegisterValidationSchema(
-  emailField: {
-    requiredMessage?: string
-    invalidMessage?: string
-  } = {},
+  emailField: { requiredMessage?: string; invalidMessage?: string } = {},
   passwordPolicy: AuthPasswordPolicy = {},
 ) {
   return object({
-    display_name: string().trim().max(80, 'Display name must be 80 characters or less'),
-    email: string()
-      .trim()
-      .email(emailField.invalidMessage || 'Enter a valid email address')
-      .required(emailField.requiredMessage || 'Email is required'),
+    display_name: custom<string | undefined>(
+      value => value === undefined
+        || (typeof value === 'string' && value.trim().length <= 80),
+      'Display name must be 80 characters or less',
+    ),
+    email: emailString(
+      emailField.requiredMessage || 'Email is required',
+      emailField.invalidMessage || 'Enter a valid email address',
+    ),
     password: createPasswordValidationSchema(passwordPolicy),
   })
 }
@@ -115,86 +136,96 @@ export function createPasswordResetValidationSchema(
   confirmPasswordRequiredMessage = 'Confirm password is required',
   confirmPasswordMismatchMessage = 'Passwords do not match',
 ) {
-  const policyPassword = createPasswordValidationSchema(passwordPolicy)
-
-  return object({
-    password: policyPassword,
-    confirmPassword: string()
-      .required(confirmPasswordRequiredMessage)
-      .oneOf([yupRef('password')], confirmPasswordMismatchMessage),
-  })
+  return pipe(
+    object({
+      password: createPasswordValidationSchema(passwordPolicy),
+      confirmPassword: requiredPassword(confirmPasswordRequiredMessage),
+    }),
+    forward(
+      check(
+        input => input.password === input.confirmPassword,
+        confirmPasswordMismatchMessage,
+      ),
+      ['confirmPassword'],
+    ),
+  )
 }
 
 export function createAccountPasswordChangeValidationSchema(
   passwordPolicy: AuthPasswordPolicy = {},
 ) {
-  return object({
-    currentPassword,
-    newPassword: createPasswordValidationSchema(passwordPolicy).test(
-      'not-same-as-current',
-      passwordPolicy.notSameAsCurrentMessage ||
-        'New password must be different from current password',
-      function (value) {
-        const current = String(this.parent.currentPassword ?? '')
-        const next = String(value ?? '')
-
-        if (!current || !next) {
-          return true
-        }
-
-        return current !== next
-      },
+  return pipe(
+    object({
+      currentPassword,
+      newPassword: createPasswordValidationSchema(passwordPolicy),
+    }),
+    forward(
+      check(
+        input => !input.currentPassword
+          || !input.newPassword
+          || input.currentPassword !== input.newPassword,
+        passwordPolicy.notSameAsCurrentMessage
+          || 'New password must be different from current password',
+      ),
+      ['newPassword'],
     ),
-  })
+  )
 }
 
 export function createPasswordValidationSchema(policy: AuthPasswordPolicy = {}) {
   const requirements = validPasswordRequirements(policy)
-  let schema = string().required(policy.requiredMessage || 'Password is required')
 
-  if (typeof policy.minLength === 'number') {
-    schema = schema.min(
-      policy.minLength,
-      policy.minLengthMessage || `Password must be at least ${policy.minLength} characters`,
-    )
+  return custom<string>(
+    value => passwordValidationMessage(value, policy, requirements) === null,
+    issue => passwordValidationMessage(issue.input, policy, requirements)
+      || policy.requiredMessage
+      || 'Password is required',
+  )
+}
+
+function passwordValidationMessage(
+  value: unknown,
+  policy: AuthPasswordPolicy,
+  requirements: AuthPasswordRequirement[],
+): string | null {
+  if (typeof value !== 'string' || value.length === 0) {
+    return policy.requiredMessage || 'Password is required'
   }
 
-  if (typeof policy.maxLength === 'number') {
-    schema = schema.max(
-      policy.maxLength,
-      policy.maxLengthMessage || `Password must be ${policy.maxLength} characters or less`,
-    )
+  if (typeof policy.minLength === 'number' && value.length < policy.minLength) {
+    return policy.minLengthMessage
+      || `Password must be at least ${policy.minLength} characters`
   }
 
-  if (requirements.length > 0) {
-    for (const requirement of requirements) {
-      const regex = passwordRequirementRegex(requirement)
+  if (typeof policy.maxLength === 'number' && value.length > policy.maxLength) {
+    return policy.maxLengthMessage
+      || `Password must be ${policy.maxLength} characters or less`
+  }
 
-      if (!regex || requirement.key === 'minLength' || requirement.key === 'maxLength') {
-        continue
-      }
+  for (const requirement of requirements) {
+    const regex = passwordRequirementRegex(requirement)
 
-      schema = schema.matches(regex, passwordRequirementMessage(policy, requirement))
+    if (regex && !regex.test(value)) {
+      return passwordRequirementMessage(policy, requirement)
     }
-
-    return schema
   }
 
-  return schema
+  return null
 }
 
 function validPasswordRequirements(policy: AuthPasswordPolicy) {
-  return (policy.requirements || []).filter(requirement => Boolean(passwordRequirementRegex(requirement)))
+  return (policy.requirements || []).filter(
+    requirement => Boolean(passwordRequirementRegex(requirement)),
+  )
 }
 
 function passwordRequirementRegex(requirement: AuthPasswordRequirement) {
-  if (!requirement.pattern) {
-    return null
-  }
+  if (!requirement.pattern) return null
 
   try {
     return new RegExp(requirement.pattern)
-  } catch {
+  }
+  catch {
     return null
   }
 }
@@ -203,18 +234,13 @@ function passwordRequirementMessage(
   policy: AuthPasswordPolicy,
   requirement: AuthPasswordRequirement,
 ) {
-  if (requirement.message) {
-    return requirement.message
-  }
-
+  if (requirement.message) return requirement.message
   if (requirement.key === 'lowercase') {
     return policy.lowercaseMessage || requirement.label || 'Password must include a lowercase letter'
   }
-
   if (requirement.key === 'uppercase') {
     return policy.uppercaseMessage || requirement.label || 'Password must include an uppercase letter'
   }
-
   if (requirement.key === 'number') {
     return policy.numberMessage || requirement.label || 'Password must include a number'
   }
@@ -223,13 +249,7 @@ function passwordRequirementMessage(
 }
 
 function requiredIdentifierMessage(mode: AuthIdentifierMode) {
-  if (mode === 'email') {
-    return 'Email is required'
-  }
-
-  if (mode === 'username') {
-    return 'Username is required'
-  }
-
+  if (mode === 'email') return 'Email is required'
+  if (mode === 'username') return 'Username is required'
   return 'Email or username is required'
 }

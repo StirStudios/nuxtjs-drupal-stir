@@ -1,11 +1,20 @@
 import { spawn } from 'node:child_process'
 import { readFile, writeFile } from 'node:fs/promises'
-import { basename } from 'node:path'
+import { basename, resolve } from 'node:path'
 
-const outputPath = 'docs/perf-report.latest.json'
+const arguments_ = process.argv.slice(2)
+const readArgument = name => arguments_
+  .find(argument => argument.startsWith(`--${name}=`))
+  ?.slice(name.length + 3)
+const buildCwd = readArgument('cwd') || '.'
+const outputPath = readArgument('output') || 'docs/perf-report.latest.json'
+const skipBudget = arguments_.includes('--no-budget')
 const budgetPath = 'docs/perf-budget.json'
-const clientManifestPath = '.output/server/chunks/build/client.precomputed.mjs'
-const moduleAnalysisPath = '.audit/client-entry-modules.json'
+const clientManifestPath = resolve(
+  buildCwd,
+  '.output/server/chunks/build/client.precomputed.mjs',
+)
+const moduleAnalysisPath = resolve(buildCwd, '.audit/client-entry-modules.json')
 
 function run(command, args, environment = {}) {
   return new Promise((resolve, reject) => {
@@ -118,7 +127,10 @@ function classifyChunk(file, owner) {
 }
 
 async function main() {
-  const output = await run('pnpm', ['build'], { STIR_PERF_ANALYZE: 'true' })
+  const buildArguments = buildCwd === '.'
+    ? ['build']
+    : ['exec', 'nuxi', 'build', '--cwd', buildCwd]
+  const output = await run('pnpm', buildArguments, { STIR_PERF_ANALYZE: 'true' })
   const chunks = parseChunkLines(output)
   const manifest = await readFile(clientManifestPath, 'utf8').catch(() => '')
   const owners = parseChunkOwners(manifest)
@@ -154,9 +166,10 @@ async function main() {
   }
 
   await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`)
-  const budget = JSON.parse(await readFile(budgetPath, 'utf8'))
-
-  assertBudget(report, budget)
+  if (!skipBudget) {
+    const budget = JSON.parse(await readFile(budgetPath, 'utf8'))
+    assertBudget(report, budget)
+  }
 
   console.log('\n=== Stable client bundle report ===')
   console.log(`Initial static assets: ${report.initialClient.gzipKb.toFixed(2)} kB gzip`)

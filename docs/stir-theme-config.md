@@ -549,7 +549,16 @@ Add `--assert` to enforce the default budgets, or override them with
 2 MB total, 1 MB images, and no initial video transfer. Use
 `--max-media-bytes` only when a project intentionally needs an additional
 combined image/video cap. Set `LIGHTHOUSE_CHROME_PATH` when Chrome is not installed
-in a standard system location. Reports are written to the ignored
+in a standard system location. On macOS, a reproducible isolated browser can be
+installed without changing the repository or the system browser:
+
+```bash
+pnpm dlx @puppeteer/browsers install chrome@stable \
+  --path ~/Library/Caches/stir-lighthouse
+```
+
+The runner discovers the newest Chrome for Testing installation in that cache
+automatically. Reports are written to the ignored
 `.lighthouse/` directory. The summary includes separate image and video
 transfer, combined media transfer, CSS and JavaScript transfer, estimated
 unused bytes, render-blocking savings, script execution, and total main-thread
@@ -681,10 +690,13 @@ scrollButton: {
 
 ```ts
 turnstile: {
-  appearance: 'always',
-  label: 'Let us know you’re human',
+  appearance: 'interaction-only',
 },
 ```
+
+`interaction-only` is the layer default so protection remains active without
+showing every visitor a challenge. Use `always` only when a project explicitly
+requires a permanently visible widget.
 
 ### 🧊 Webform
 
@@ -797,6 +809,11 @@ navigationMenu: {
 },
 ```
 
+The base layer owns its Nuxt UI defaults in `layers/theme/app/theme/nuxtUi.ts`
+and composes that preset from `app.config.ts`. Consumer projects should override
+only the Nuxt UI keys they need through `defineAppConfig`; they do not need to
+import the Material implementation classes.
+
 ### 🔘 Buttons
 
 ```ts
@@ -811,18 +828,15 @@ button: {
 		trailingIcon: 'size-6'
 	  },
 	  md: {
-		base: 'px-6 py-3 text-md gap-2',
+		base: 'px-6 py-3 text-base gap-2',
 		leadingIcon: 'size-8',
 		trailingIcon: 'size-8'
 	  },
 	  '2xl': {
-		  base: 'px-10 py-4 text-md gap-2',
+		  base: 'px-10 py-4 text-base gap-2',
 		  leadingIcon: 'size-10',
 		  trailingIcon: 'size-10'
 	  },
-	},
-	variant: {
-	  material: materialVariantMuted,
 	},
   },
   defaultVariants: {
@@ -850,9 +864,6 @@ formField: {
 ```ts
 input: {
   variants: {
-	variant: {
-	  material: materialVariant,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -870,9 +881,6 @@ input: {
 ```ts
 select: {
   variants: {
-	variant: {
-	  material: materialVariantWithPB,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -885,9 +893,6 @@ select: {
 },
 selectMenu: {
   variants: {
-	variant: {
-	  material: materialVariantWithPB,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',
@@ -905,9 +910,6 @@ selectMenu: {
 ```ts
 textarea: {
   variants: {
-	variant: {
-	  material: materialVariant,
-	},
 	size: {
 	  xl: {
 		base: 'pt-4',

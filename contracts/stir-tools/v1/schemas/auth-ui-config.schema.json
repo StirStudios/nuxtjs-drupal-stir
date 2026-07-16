@@ -1,0 +1,234 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/auth-ui-config.schema.json",
+  "title": "Stir account auth UI configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "loginRedirectPath",
+    "logoutRedirectPath",
+    "identifierModes",
+    "login",
+    "register",
+    "passwordRequest",
+    "passwordReset",
+    "verify",
+    "protectedPage",
+    "passwordPolicy"
+  ],
+  "properties": {
+    "version": { "const": 2 },
+    "loginRedirectPath": { "type": "string", "minLength": 1 },
+    "logoutRedirectPath": { "type": "string", "minLength": 1 },
+    "identifierModes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["login", "passwordRequest"],
+      "properties": {
+        "login": { "$ref": "#/definitions/identifierMode" },
+        "passwordRequest": { "$ref": "#/definitions/identifierMode" }
+      }
+    },
+    "login": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "submitLabel", "identifier", "password", "successToast"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "submitLabel": { "type": "string" },
+        "identifier": { "$ref": "#/definitions/identifierField" },
+        "password": { "$ref": "#/definitions/requiredField" },
+        "successToast": { "$ref": "#/definitions/message" }
+      }
+    },
+    "register": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "submitLabel", "email", "password", "complete"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "submitLabel": { "type": "string" },
+        "email": { "$ref": "#/definitions/validatedField" },
+        "password": { "$ref": "#/definitions/basicField" },
+        "complete": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verificationTitle", "createdTitle", "verificationSentDescription", "verificationRequiredDescription", "createdDescription"],
+          "properties": {
+            "verificationTitle": { "type": "string" },
+            "createdTitle": { "type": "string" },
+            "verificationSentDescription": { "type": "string" },
+            "verificationRequiredDescription": { "type": "string" },
+            "createdDescription": { "type": "string" }
+          }
+        }
+      }
+    },
+    "passwordRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "submitLabel", "identifier", "sentTitle", "sentDescription"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "submitLabel": { "type": "string" },
+        "identifier": { "$ref": "#/definitions/identifierField" },
+        "sentTitle": { "type": "string" },
+        "sentDescription": { "type": "string" }
+      }
+    },
+    "passwordReset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "submitLabel", "password", "confirmPassword", "checkingTitle", "unavailableTitle", "invalidLinkMessage", "expiredLinkMessage", "successToast"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "submitLabel": { "type": "string" },
+        "password": { "$ref": "#/definitions/basicField" },
+        "confirmPassword": { "$ref": "#/definitions/confirmField" },
+        "checkingTitle": { "type": "string" },
+        "unavailableTitle": { "type": "string" },
+        "invalidLinkMessage": { "type": "string" },
+        "expiredLinkMessage": { "type": "string" },
+        "successToast": { "$ref": "#/definitions/message" }
+      }
+    },
+    "verify": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loadingTitle", "successTitle", "failedTitle", "loadingDescription", "invalidDescription", "successDescription", "failedDescription"],
+      "properties": {
+        "loadingTitle": { "type": "string" },
+        "successTitle": { "type": "string" },
+        "failedTitle": { "type": "string" },
+        "loadingDescription": { "type": "string" },
+        "invalidDescription": { "type": "string" },
+        "successDescription": { "type": "string" },
+        "failedDescription": { "type": "string" }
+      }
+    },
+    "protectedPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "passwordPolicy": { "$ref": "#/definitions/passwordPolicy" }
+  },
+  "definitions": {
+    "identifierMode": {
+      "enum": ["email", "username", "email_or_username"]
+    },
+    "basicField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "placeholder"],
+      "properties": {
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" }
+      }
+    },
+    "requiredField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "placeholder", "requiredMessage"],
+      "properties": {
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "requiredMessage": { "type": "string" }
+      }
+    },
+    "validatedField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "placeholder", "requiredMessage", "invalidMessage"],
+      "properties": {
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "requiredMessage": { "type": "string" },
+        "invalidMessage": { "type": "string" }
+      }
+    },
+    "identifierField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "label", "placeholder", "requiredMessage", "invalidMessage"],
+      "properties": {
+        "mode": { "$ref": "#/definitions/identifierMode" },
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "requiredMessage": { "type": "string" },
+        "invalidMessage": { "type": "string" }
+      }
+    },
+    "confirmField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "placeholder", "requiredMessage", "mismatchMessage"],
+      "properties": {
+        "label": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "requiredMessage": { "type": "string" },
+        "mismatchMessage": { "type": "string" }
+      }
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "passwordPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minLength", "maxLength", "requiredMessage", "minLengthMessage", "maxLengthMessage", "lowercaseMessage", "uppercaseMessage", "numberMessage", "notSameAsCurrentMessage", "requirements", "strengthLabels"],
+      "properties": {
+        "minLength": { "type": "integer", "minimum": 1 },
+        "maxLength": { "type": "integer", "minimum": 1 },
+        "requiredMessage": { "type": "string" },
+        "minLengthMessage": { "type": "string" },
+        "maxLengthMessage": { "type": "string" },
+        "lowercaseMessage": { "type": "string" },
+        "uppercaseMessage": { "type": "string" },
+        "numberMessage": { "type": "string" },
+        "notSameAsCurrentMessage": { "type": "string" },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "pattern", "label"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1 },
+              "pattern": { "type": "string", "minLength": 1 },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "strengthLabels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["empty", "weak", "medium", "strong", "mustContain"],
+          "properties": {
+            "empty": { "type": "string" },
+            "weak": { "type": "string" },
+            "medium": { "type": "string" },
+            "strong": { "type": "string" },
+            "mustContain": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,13 +1,10 @@
 import { defineEventHandler } from 'h3'
+import type { AccountSettingsValuesResponse } from '../../../../shared/types/accountSettings'
 import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
-
-type SettingsValuesResponse = {
-  values?: Record<string, unknown>
-}
 
 export default defineEventHandler(async (event) => {
   try {
-    return await layerAuthDrupalApiRequest<SettingsValuesResponse>(
+    return await layerAuthDrupalApiRequest<AccountSettingsValuesResponse>(
       event,
       '/api/account/settings/values',
       {

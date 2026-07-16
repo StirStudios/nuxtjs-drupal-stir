@@ -10,6 +10,7 @@ const {
   isLoading,
   registrationComplete,
   registrationMessage,
+  requiresApproval,
   requiresVerification,
 } =
   useAuthRegister()
@@ -28,6 +29,21 @@ const verificationTitle = computed(
 const createdTitle = computed(
   () => auth.value.register?.complete?.createdTitle || 'Account created',
 )
+const statusTitle = computed(() => {
+  if (requiresApproval.value) return 'Account awaiting approval'
+  if (requiresVerification.value) return verificationTitle.value
+
+  return createdTitle.value
+})
+const statusIcon = computed(() => {
+  if (requiresApproval.value) return 'i-lucide-user-round-check'
+  if (requiresVerification.value) return 'i-lucide-mail-check'
+
+  return 'i-lucide-circle-check'
+})
+const statusTone = computed<'warning' | 'success'>(() =>
+  requiresApproval.value || requiresVerification.value ? 'warning' : 'success',
+)
 
 useSeoMeta({
   title: () => title.value,
@@ -45,9 +61,9 @@ useSeoMeta({
     >
       <AuthStatusPanel
         :description="registrationMessage"
-        :icon="requiresVerification ? 'i-lucide-mail-check' : 'i-lucide-circle-check'"
-        :title="requiresVerification ? verificationTitle : createdTitle"
-        :tone="requiresVerification ? 'warning' : 'success'"
+        :icon="statusIcon"
+        :title="statusTitle"
+        :tone="statusTone"
       />
       <template #footer>
         <ULink class="text-primary" to="/auth/login">Back to login</ULink>

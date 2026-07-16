@@ -1,0 +1,13 @@
+{
+  "fields": {
+    "account_name": { "editable": false },
+    "account_email": {
+      "editable": true,
+      "requires_current_password": true
+    }
+  },
+  "values": {
+    "account_name": "demo",
+    "account_email": "demo@example.com"
+  }
+}

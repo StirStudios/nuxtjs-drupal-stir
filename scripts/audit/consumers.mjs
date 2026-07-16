@@ -53,6 +53,7 @@ async function consumerStatus(name, target) {
     revision,
     packageName: packageJson.name,
     baseDependency: packageJson.dependencies?.['@stir/base'] || null,
+    nuxtDependency: packageJson.dependencies?.nuxt || null,
     routes: target.routes,
   }
 }
@@ -61,10 +62,13 @@ async function packLayer(directory) {
   await run('pnpm', ['pack', '--pack-destination', directory], { cwd: rootDir })
   const packageJson = JSON.parse(await readFile(join(rootDir, 'package.json'), 'utf8'))
 
-  return join(directory, `${packageJson.name.replace(/^@/, '').replace('/', '-')}-${packageJson.version}.tgz`)
+  return {
+    path: join(directory, `${packageJson.name.replace(/^@/, '').replace('/', '-')}-${packageJson.version}.tgz`),
+    nuxtPeer: packageJson.peerDependencies.nuxt,
+  }
 }
 
-async function prepareConsumer(sourcePath, destination, archivePath, packagePath) {
+async function prepareConsumer(sourcePath, destination, archivePath, layerPackage) {
   await run('git', ['-C', sourcePath, 'archive', '--format=tar', '-o', archivePath, 'HEAD'])
   await mkdir(destination, { recursive: true })
   await run('tar', ['-xf', archivePath, '-C', destination])
@@ -72,26 +76,50 @@ async function prepareConsumer(sourcePath, destination, archivePath, packagePath
   const packageFile = join(destination, 'package.json')
   const packageJson = JSON.parse(await readFile(packageFile, 'utf8'))
   packageJson.dependencies ||= {}
-  packageJson.dependencies['@stir/base'] = `file:${packagePath}`
+  const adaptations = []
+  packageJson.dependencies['@stir/base'] = `file:${layerPackage.path}`
+  if (!packageJson.dependencies.nuxt) {
+    packageJson.dependencies.nuxt = layerPackage.nuxtPeer
+    adaptations.push(`declared Nuxt peer ${layerPackage.nuxtPeer}`)
+  }
   await writeFile(packageFile, `${JSON.stringify(packageJson, null, 2)}\n`)
 
   const nuxtConfigPath = join(destination, 'nuxt.config.ts')
   const nuxtConfig = await readFile(nuxtConfigPath, 'utf8')
+  const adaptedNuxtConfig = nuxtConfig.replace(
+    /github:StirStudios\/nuxtjs-drupal-stir(?:#[^'"\s,\]]+)?/g,
+    '@stir/base',
+  )
+  if (adaptedNuxtConfig !== nuxtConfig) {
+    adaptations.push('extended installed @stir/base package')
+  }
   await writeFile(
     nuxtConfigPath,
-    nuxtConfig.replace(/github:StirStudios\/nuxtjs-drupal-stir(?:#dev)?/g, '@stir/base'),
+    adaptedNuxtConfig,
   )
+
+  return adaptations
 }
 
-async function verifyConsumer(consumer, temporaryRoot, packagePath) {
+async function verifyConsumer(consumer, temporaryRoot, layerPackage) {
   const destination = join(temporaryRoot, consumer.name)
   const archivePath = join(temporaryRoot, `${consumer.name}.tar`)
-  await prepareConsumer(consumer.path, destination, archivePath, packagePath)
+  const adaptations = await prepareConsumer(
+    consumer.path,
+    destination,
+    archivePath,
+    layerPackage,
+  )
   await run('pnpm', ['install', '--no-frozen-lockfile'], { cwd: destination })
   await run('pnpm', ['typecheck'], { cwd: destination })
   await run('pnpm', ['build'], { cwd: destination })
 
-  return { ...consumer, status: 'passed', temporaryPath: keepTemporary ? destination : undefined }
+  return {
+    ...consumer,
+    status: 'passed',
+    adaptations,
+    temporaryPath: keepTemporary ? destination : undefined,
+  }
 }
 
 async function main() {
@@ -113,12 +141,12 @@ async function main() {
     const temporaryRoot = await mkdtemp(join(tmpdir(), 'stir-consumers-'))
 
     try {
-      const packagePath = await packLayer(temporaryRoot)
+      const layerPackage = await packLayer(temporaryRoot)
       report.consumers = []
       for (const consumer of consumers) {
         report.consumers.push(
           consumer.status === 'available'
-            ? await verifyConsumer(consumer, temporaryRoot, packagePath)
+            ? await verifyConsumer(consumer, temporaryRoot, layerPackage)
             : consumer,
         )
       }

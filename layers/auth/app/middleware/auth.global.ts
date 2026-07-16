@@ -1,9 +1,3 @@
-import {
-  defineNuxtRouteMiddleware,
-  navigateTo,
-  useAppConfig,
-  useResponseHeader,
-} from '#app'
 import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
@@ -11,9 +5,9 @@ import { useProtectedSession } from '../composables/auth/useProtectedSession'
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 
 function markPrivateResponse(): void {
-  if (!import.meta.server) return
-
-  useResponseHeader('Cache-Control').value = PRIVATE_NO_STORE
+  if (import.meta.server) {
+    useResponseHeader('Cache-Control').value = PRIVATE_NO_STORE
+  }
 }
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {

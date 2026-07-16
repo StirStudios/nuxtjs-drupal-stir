@@ -74,7 +74,7 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'
   content: 'flex flex-col items-center justify-center gap-4 text-center',
   left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
   right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
-  footerLinks: 'transition-colors text-primary hover:text-primary/90',
+  footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
   logo: '',
   menu: 'mb-3',
   menuItem: 'min-w-0 py-0',

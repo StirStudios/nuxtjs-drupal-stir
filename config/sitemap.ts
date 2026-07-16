@@ -6,7 +6,8 @@ const sitemapExcludedRoutes = [
 
 export function buildSitemapModuleOptions(drupalUrl: string) {
   return {
-    sources: drupalUrl ? [`${drupalUrl}/api/sitemap`] : [],
+    // Keep Drupal dynamic while validating its payload at the Nuxt boundary.
+    sources: drupalUrl ? ['/api/sitemap'] : [],
     excludeAppSources: ['nuxt:route-rules'],
     exclude: sitemapExcludedRoutes,
     runtimeCacheStorage: { driver: 'memory' },

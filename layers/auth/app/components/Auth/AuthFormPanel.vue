@@ -39,6 +39,9 @@ defineSlots<{
     @error="$emit('error', $event)"
     @submit="$emit('submit', $event)"
   >
+    <template #title>
+      <h1>{{ title }}</h1>
+    </template>
     <!-- @vue-ignore UAuthForm exposes scoped field slots that are not typed upstream. -->
     <template #password-field="{ state, field }">
       <slot :field="field" name="password-field" :state="state" />

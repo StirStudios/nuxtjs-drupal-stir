@@ -15,6 +15,8 @@ defineProps<{
 
   viewId?: string
   displayId?: string
+  paragraphId?: number | string
+  paragraphUuid?: string
   view?: unknown
 
   carousel?: boolean

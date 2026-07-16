@@ -1,4 +1,4 @@
-import type { DrupalMediaType } from '~/types'
+import type { DrupalMediaType } from '#stir/types'
 
 export const drupalMediaTypes = [
   'audio',

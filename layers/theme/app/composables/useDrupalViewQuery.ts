@@ -1,4 +1,4 @@
-import type { ExposedFilter, ExposedSort } from '~/types/View'
+import type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 export interface ViewPager {
   current: number
@@ -8,6 +8,7 @@ export interface ViewPager {
 export interface NormalizedViewFilter {
   label: string
   queryParamName: string
+  type?: string
   multiple?: boolean
   disabled?: boolean
   options: Array<{ label: string, value: string }>
@@ -52,6 +53,7 @@ export function normalizeDrupalViewFilters(
     .map(filter => ({
       label: filter.label,
       queryParamName: filter.queryParamName,
+      type: filter.type,
       multiple: filter.multiple,
       disabled: filter.disabled,
       options: mapDrupalViewFilterOptions(filter.options),

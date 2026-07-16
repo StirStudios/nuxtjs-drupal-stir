@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomElementNode } from '~/types'
+import type { CustomElementNode } from '#stir/types'
 
 const isDev = import.meta.dev
 
@@ -13,7 +13,7 @@ const props = defineProps<{
   editLink?: string
 }>()
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 
 const toPascalCase = (value: string) =>

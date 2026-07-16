@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import type { ModalMediaItem } from '~/composables/useMediaModal'
-import { resolveCarouselArrowButton } from '~/utils/nuxtUiProps'
+import { useModalMediaPlayback } from '#stir/composables/useModalMediaPlayback'
+import type { ModalMediaItem } from '#stir/composables/useMediaModal'
+import { resolveCarouselArrowButton } from '#stir/utils/nuxtUiProps'
 import { drupalMediaComponentName } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
@@ -62,11 +62,17 @@ const singleVideoFrameStyle = computed(() => {
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: index => String(props.items[index]?.mid ?? ''),
-  onSelect: index => emit('select', index),
+  onSelect: (index) => {
+    emit('select', index)
+  },
 })
 
 function mediaComponentFor(type: unknown) {
   return drupalMediaComponentName(type)
+}
+
+function closeModal(): void {
+  open.value = false
 }
 </script>
 
@@ -92,7 +98,7 @@ function mediaComponentFor(type: unknown) {
         icon="i-lucide-x"
         size="lg"
         variant="soft"
-        @click="open = false"
+        @click="closeModal"
       />
 
       <div

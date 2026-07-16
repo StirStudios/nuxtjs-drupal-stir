@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   id?: number | string

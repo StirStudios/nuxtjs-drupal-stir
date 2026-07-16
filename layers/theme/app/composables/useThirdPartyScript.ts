@@ -1,4 +1,5 @@
 import type { MaybeRefOrGetter } from 'vue'
+import { useOptionalScriptConsent } from './useOptionalScriptConsent'
 
 export type ThirdPartyScriptKind = 'calculator' | 'enzuzo'
 
@@ -108,7 +109,7 @@ export function useThirdPartyScript(
   options: ThirdPartyScriptOptions = {},
 ) {
   const appConfig = useAppConfig()
-  const { allowsNonEssential } = usePrivacyConsent()
+  const { allowsNonEssential } = useOptionalScriptConsent()
   const isMounted = ref(false)
   const isRequested = ref(options.immediate !== false)
   const isLoaded = ref(false)

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/global-seo.schema.json",
+  "title": "Stir global SEO response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lang", "meta", "link"],
+  "properties": {
+    "lang": { "type": "string", "minLength": 1 },
+    "meta": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/attributes" }
+    },
+    "link": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/attributes" }
+    }
+  },
+  "definitions": {
+    "attributes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

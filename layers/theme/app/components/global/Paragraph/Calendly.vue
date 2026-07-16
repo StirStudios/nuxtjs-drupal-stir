@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCalendlyWidget } from '~/composables/useCalendlyWidget'
+import { useCalendlyWidget } from '#stir/composables/useCalendlyWidget'
 
 defineOptions({
   inheritAttrs: false,

@@ -1,0 +1,14 @@
+[
+  {
+    "loc": "https://example.com/",
+    "lastmod": "2026-02-08",
+    "changefreq": "daily",
+    "priority": 1
+  },
+  {
+    "loc": "https://example.com/articles/example",
+    "lastmod": null,
+    "changefreq": null,
+    "priority": null
+  }
+]

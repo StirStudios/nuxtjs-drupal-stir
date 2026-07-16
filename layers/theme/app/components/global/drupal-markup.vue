@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,

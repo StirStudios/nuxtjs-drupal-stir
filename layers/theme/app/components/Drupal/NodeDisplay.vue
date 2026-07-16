@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { NodeDefaultProps } from '~/types'
-import { usePageContext } from '~/composables/usePageContext'
-
-type NodeTeaserData = ReturnType<typeof useNodeTeaser>['value']
+import type { NodeDefaultProps } from '#stir/types'
+import { usePageContext } from '#stir/composables/usePageContext'
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
@@ -19,26 +17,26 @@ defineOptions({
   inheritAttrs: false,
 })
 
-defineSlots<{
-  hero?(): unknown
-  section?(): unknown
-  teaser?(props: { node: NodeDefaultProps, teaser: NodeTeaserData }): unknown
-  article?(props: { node: NodeDefaultProps }): unknown
-  default?(props: { node: NodeDefaultProps }): unknown
-}>()
-
 const { pageLayout } = usePageContext()
 const slots = useSlots()
 const teaser = useNodeTeaser(slots)
-const isTeaser = computed(() => {
+const renderMode = computed<'teaser' | 'article' | 'default'>(() => {
   const type = props.type || ''
 
-  return props.teaserModes.some((mode) => type.includes(mode))
-})
-const isArticle = computed(() => !!props.isArticle)
-const showHero = computed(() => pageLayout.value !== 'clear' && !isTeaser.value)
+  if (props.teaserModes.some((mode) => type.includes(mode))) return 'teaser'
+  if (props.isArticle) return 'article'
 
-provide('renderMode', isTeaser.value ? 'teaser' : 'full')
+  return 'default'
+})
+const showHero = computed(() =>
+  pageLayout.value !== 'clear' && renderMode.value !== 'teaser',
+)
+const reservedSlotNames = new Set(['hero', 'teaser', 'article', 'default'])
+const contentSlotNames = computed(() =>
+  Object.keys(slots).filter((name) => !reservedSlotNames.has(name)),
+)
+
+provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
 </script>
 
 <template>
@@ -47,30 +45,32 @@ provide('renderMode', isTeaser.value ? 'teaser' : 'full')
   <LazyRegionArea v-if="props.showBeforeMain" area="before_main" />
 
   <slot
-    v-if="isTeaser && slots.teaser"
+    v-if="renderMode === 'teaser' && slots.teaser"
     name="teaser"
     :node="props"
     :teaser="teaser"
   />
 
   <LazyNodeTeaser
-    v-else-if="isTeaser"
+    v-else-if="renderMode === 'teaser'"
     :created="props.created"
     :edit-link="props.editLink"
     orientation="vertical"
     :teaser="teaser"
     :title="props.title"
-    :url="props.path?.alias"
+    :url="props.url || props.path?.alias"
   />
 
   <slot
-    v-else-if="isArticle && slots.article"
+    v-else-if="renderMode === 'article' && slots.article"
     name="article"
     :node="props"
   />
 
-  <article v-else-if="isArticle">
-    <slot name="section" />
+  <article v-else-if="renderMode === 'article'">
+    <template v-for="slotName in contentSlotNames" :key="slotName">
+      <slot :name="slotName" />
+    </template>
   </article>
 
   <slot
@@ -78,5 +78,9 @@ provide('renderMode', isTeaser.value ? 'teaser' : 'full')
     :node="props"
   />
 
-  <slot v-else name="section" />
+  <template v-else>
+    <template v-for="slotName in contentSlotNames" :key="slotName">
+      <slot :name="slotName" />
+    </template>
+  </template>
 </template>

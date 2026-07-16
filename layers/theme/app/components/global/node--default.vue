@@ -1,31 +1,29 @@
 <script setup lang="ts">
-import type { NodeDefaultProps } from '~/types'
+import type { NodeDefaultProps } from '#stir/types'
 
 const props = defineProps<NodeDefaultProps>()
 const attrs = useAttrs()
+const slots = useSlots()
 const nodeProps = computed(() => ({
   ...props,
   ...attrs,
 }))
+const forwardedSlotNames = computed(() => Object.keys(slots))
 
 defineOptions({
   inheritAttrs: false,
 })
 
-defineSlots<{
-  hero?(): unknown
-  section?(): unknown
-}>()
 </script>
 
 <template>
   <DrupalNodeDisplay v-bind="nodeProps">
-    <template #hero>
-      <slot name="hero" />
-    </template>
-
-    <template #section>
-      <slot name="section" />
+    <template
+      v-for="slotName in forwardedSlotNames"
+      :key="slotName"
+      #[slotName]="slotProps"
+    >
+      <slot :name="slotName" v-bind="slotProps || {}" />
     </template>
   </DrupalNodeDisplay>
 </template>

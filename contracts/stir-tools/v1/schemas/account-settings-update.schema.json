@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/account-settings-update.schema.json",
+  "title": "Stir account settings update response",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["updated", "updated_fields"],
+      "properties": {
+        "updated": { "const": true },
+        "updated_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["updated", "no_changes", "updated_fields"],
+      "properties": {
+        "updated": { "const": false },
+        "no_changes": { "const": true },
+        "updated_fields": { "type": "array", "maxItems": 0 }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["updated", "error"],
+      "properties": {
+        "updated": { "const": false },
+        "error": { "type": "string", "minLength": 1 },
+        "errors": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ]
+}

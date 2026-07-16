@@ -1,0 +1,19 @@
+{
+  "lang": "en",
+  "meta": [
+    {
+      "name": "robots",
+      "content": "index, follow"
+    },
+    {
+      "property": "og:site_name",
+      "content": "Example site"
+    }
+  ],
+  "link": [
+    {
+      "rel": "icon",
+      "href": "/favicon.ico"
+    }
+  ]
+}

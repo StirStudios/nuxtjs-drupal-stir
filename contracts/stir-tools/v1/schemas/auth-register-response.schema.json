@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/auth-register-response.schema.json",
+  "title": "Stir account registration response",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created",
+        "uid",
+        "name",
+        "mail",
+        "verification_required",
+        "verification_sent",
+        "approval_required"
+      ],
+      "properties": {
+        "created": { "const": true },
+        "uid": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "mail": { "type": "string", "minLength": 3 },
+        "verification_required": { "type": "boolean" },
+        "verification_sent": { "type": "boolean" },
+        "approval_required": { "type": "boolean" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error"],
+      "properties": {
+        "created": { "const": false },
+        "error": { "type": "string", "minLength": 1 }
+      }
+    }
+  ]
+}

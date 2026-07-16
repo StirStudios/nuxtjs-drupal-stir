@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-07-16T19:04:30.779Z",
+  "baselineGeneratedAt": "2026-07-16T19:03:20.642Z",
+  "route": "/",
+  "formFactor": "mobile",
+  "runsPerMode": 3,
+  "environment": {
+    "lighthouse": "13.4.0",
+    "chrome": "149.0.0.0",
+    "origin": "local production builds",
+    "drupal": "Drupal 11 DancePlug development content"
+  },
+  "drupalResponsive": {
+    "score": 66,
+    "fcpMs": 4075.6918000000005,
+    "lcpMs": 6584.820275000002,
+    "tbtMs": 131.5957499999995,
+    "cls": 0,
+    "totalBytes": 943062,
+    "requestCount": 110,
+    "imageBytes": 251952
+  },
+  "nuxtImage": {
+    "score": 72,
+    "fcpMs": 4065.794,
+    "lcpMs": 4828.904250000001,
+    "tbtMs": 97.63429999999971,
+    "cls": 0,
+    "totalBytes": 923773,
+    "requestCount": 109,
+    "imageBytes": 231141
+  },
+  "nuxtImageDelta": {
+    "score": 6,
+    "fcpMs": -9.897800000000416,
+    "lcpMs": -1755.9160250000004,
+    "tbtMs": -33.961449999999786,
+    "cls": 0,
+    "totalBytes": -19289,
+    "requestCount": -1,
+    "imageBytes": -20811
+  }
+}

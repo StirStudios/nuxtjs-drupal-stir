@@ -1,0 +1,63 @@
+{
+  "blocks": {
+    "after_main": [
+      {
+        "element": "block-content-paragraph",
+        "props": {
+          "id": "newsletter",
+          "visibility": {
+            "requestPath": {
+              "mode": "hide",
+              "paths": ["/account/*"]
+            }
+          }
+        },
+        "slots": {
+          "heading": "<h2>Reusable promotion</h2>",
+          "body": "<p>Direct block body.</p>",
+          "action": [
+            {
+              "element": "link",
+              "props": {
+                "href": "/contact",
+                "label": "Contact us"
+              },
+              "slots": {}
+            }
+          ],
+          "paragraphBlock": [
+            {
+              "element": "paragraph-layout",
+              "props": {
+                "layout": "two_column",
+                "container": true
+              },
+              "slots": {
+                "first": [
+                  {
+                    "element": "paragraph-text",
+                    "props": {
+                      "text": "<p>Composed block content.</p>"
+                    },
+                    "slots": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "footer_menu": [
+    {
+      "title": "Privacy",
+      "url": "/privacy"
+    }
+  ],
+  "site_info": {
+    "name": "Fixture site",
+    "slogan": "",
+    "mail": "hello@example.com"
+  }
+}

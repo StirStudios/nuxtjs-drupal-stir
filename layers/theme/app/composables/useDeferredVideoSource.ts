@@ -5,7 +5,7 @@ interface DeferredVideoSourceOptions {
   minWidth: MaybeRefOrGetter<number>
   source: MaybeRefOrGetter<string | undefined>
   strategy: MaybeRefOrGetter<'after-load' | 'immediate'>
-  videoElement: Ref<HTMLVideoElement | null>
+  videoElement?: Ref<HTMLVideoElement | null>
 }
 
 export function useDeferredVideoSource(options: DeferredVideoSourceOptions) {
@@ -24,7 +24,7 @@ export function useDeferredVideoSource(options: DeferredVideoSourceOptions) {
 
     isActive.value = true
     await nextTick()
-    options.videoElement.value?.load()
+    options.videoElement?.value?.load()
   }
 
   function activateOnAnimationFrame(): void {

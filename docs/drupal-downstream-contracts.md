@@ -58,6 +58,22 @@ Downstream requirements:
 - Exposed filter option values should be stable machine values, not labels that may change.
 - Sort order values should use Drupal-compatible values such as `ASC` and `DESC`.
 
+## Performance-critical listings
+
+Use `useStirListing('listing_machine_name')` for a configured Stir Listing API
+definition. The composable always calls the shared Nuxt
+`/api/listings/:listing` boundary; projects should not recreate Drupal URL,
+API-key, cookie, redirect, response-validation, cache, or privacy handling.
+
+Downstream projects continue to own their listing definition, card component,
+and genuinely project-specific query or access semantics. Stir owns bounded
+request forwarding, the versioned response envelope, ordered paging metadata,
+session safety, and public-cache propagation. A listing machine name such as
+`articles` in a fixture is illustrative, not a required content type.
+Validated anonymous responses retain Drupal's public validators and cache
+policy. Personalized, session-bearing, session-setting, upstream-error, and
+invalid-contract responses are always private and `no-store` at the Nuxt edge.
+
 ## Media discovery and rendering
 
 Media helpers normalize supported Drupal media types before consumers inspect or render media nodes.

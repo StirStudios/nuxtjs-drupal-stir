@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AccordionItem } from '@nuxt/ui'
 import type { VNode } from 'vue'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,

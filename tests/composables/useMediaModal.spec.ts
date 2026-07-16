@@ -16,6 +16,7 @@ describe('useMediaModal', () => {
       modalSrc: '/large.jpg',
       modalSrcset: '/large.jpg 1200w',
       modalSizes: '100vw',
+      modalResponsiveStyle: 'container',
       title: 'Image',
     })
     const video = h('div', {
@@ -35,6 +36,7 @@ describe('useMediaModal', () => {
         src: '/large.jpg',
         srcset: '/large.jpg 1200w',
         sizes: '100vw',
+        responsiveStyle: 'container',
       },
       {
         key: '2',
@@ -60,6 +62,7 @@ describe('useMediaModal', () => {
     expect(normalizeDrupalMediaType('audio')).toBe('audio')
     expect(normalizeDrupalMediaType('document')).toBe('document')
     expect(normalizeDrupalMediaType('image')).toBe('image')
+    expect(normalizeDrupalMediaType('basic-image')).toBe('image')
     expect(normalizeDrupalMediaType('link')).toBe('link')
     expect(normalizeDrupalMediaType('video')).toBe('video')
     expect(normalizeDrupalMediaType('unknown')).toBe('image')

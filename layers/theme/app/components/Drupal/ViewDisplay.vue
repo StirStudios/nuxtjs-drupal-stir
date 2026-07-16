@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { DrupalViewProps } from '~/types'
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import type { RenderedDrupalViewRow } from '~/composables/useDrupalViewRows'
-import { useDrupalViewRenderedRows } from '~/composables/useDrupalViewRows'
-import { useDrupalViewScrollRestore } from '~/composables/useDrupalViewScrollRestore'
+import type { DrupalViewProps } from '#stir/types'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import type { RenderedDrupalViewRow } from '#stir/composables/useDrupalViewRows'
+import { useDrupalViewRenderedRows } from '#stir/composables/useDrupalViewRows'
+import { useDrupalViewScrollRestore } from '#stir/composables/useDrupalViewScrollRestore'
 
 const props = defineProps<DrupalViewProps>()
 
-const { renderCustomElements } = useDrupalCe()
+const { renderCustomElements } = useStirDrupalCe()
 
 defineSlots<{
   rows?(): unknown

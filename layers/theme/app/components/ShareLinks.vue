@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ShareNetwork } from '~/composables/useShareLinks'
+import type { ShareNetwork } from '#stir/composables/useShareLinks'
 
 type ShareLinksVariant = 'icons' | 'buttons' | 'menu'
 

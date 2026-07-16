@@ -1,29 +1,15 @@
 import type { MaybeRefOrGetter } from 'vue'
+import type {
+  AppContextBlock,
+  AppContextPayload,
+} from '../../../core/shared/types/appContext'
 
-export type AppContextBlock = {
-  element?: string
-  props?: Record<string, unknown>
-  slots?: Record<string, unknown>
-  [key: string]: unknown
-}
-
-export type AppContextFooterMenuItem = {
-  title?: string
-  url?: string
-}
-
-export type AppContextSiteInfo = {
-  name?: string
-  mail?: string
-  slogan?: string
-  [key: string]: unknown
-}
-
-export type AppContextPayload = {
-  blocks?: Record<string, unknown>
-  footer_menu?: AppContextFooterMenuItem[]
-  site_info?: AppContextSiteInfo
-}
+export type {
+  AppContextBlock,
+  AppContextFooterMenuItem,
+  AppContextPayload,
+  AppContextSiteInfo,
+} from '../../../core/shared/types/appContext'
 
 export type AppContextOptions = {
   immediate?: boolean
@@ -42,15 +28,6 @@ const appContextRequests = new Map<string, Promise<AppContextPayload>>()
 
 export function appContextQuery(path = '/') {
   return { path: path || '/' }
-}
-
-function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
-  if (Array.isArray(raw)) return raw as AppContextBlock[]
-  if (raw && typeof raw === 'object') {
-    return Object.values(raw as Record<string, AppContextBlock>)
-  }
-
-  return []
 }
 
 export function useAppContext(options: AppContextOptions = {}) {
@@ -147,7 +124,7 @@ export function useAppRegionBlocks(area: MaybeRefOrGetter<string>, options: AppC
     async () => {
       const payload = await fetchSharedAppContext(path.value)
 
-      return normalizeRegionBlocks(payload.blocks?.[regionArea.value])
+      return payload.blocks[regionArea.value] ?? []
     },
     {
       dedupe: 'defer',

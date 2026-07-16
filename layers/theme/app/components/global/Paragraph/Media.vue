@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ComponentPublicInstance } from 'vue'
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import { useMediaOrdering } from '~/composables/useMediaOrdering'
-import { useMediaModal } from '~/composables/useMediaModal'
-import type { DrupalMediaNodeProps } from '~/types'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { useMediaOrdering } from '#stir/composables/useMediaOrdering'
+import { useMediaModal } from '#stir/composables/useMediaModal'
+import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
-import { unrefElement, useElementSize, useWindowSize } from '@vueuse/core'
+import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
+import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   id?: number | string
@@ -75,31 +75,11 @@ const {
 } = useMediaModal(slotMediaOrdered, tk)
 
 const { width: viewportWidth } = useWindowSize()
-const masonryLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(
-  null,
-)
-const gridLayoutRoot = ref<ComponentPublicInstance | HTMLElement | null>(null)
-const { width: mediaLayoutWidth } = useElementSize(() => {
-  if (!import.meta.client) return null
-
-  const masonryElement = unrefElement(masonryLayoutRoot as never) as unknown
-  const gridElement = unrefElement(gridLayoutRoot as never) as unknown
-  const element = masonryElement ?? gridElement
-
-  return element instanceof HTMLElement || element instanceof SVGElement
-    ? element
-    : null
-})
-const resolveLaneCount = (width: number) => {
-  const config = props.masonry?.lanes
-
-  if (!config) return 1
-  if (width >= 768 && config.md) return config.md
-  if (width >= 640 && config.sm) return config.sm
-  return config.default ?? 1
-}
-
-const gap = computed(() => props.masonry?.gap?.default ?? 16)
+const gap = computed(() => resolveResponsiveGridValue(
+  props.masonry?.gap,
+  viewportWidth.value,
+  16,
+))
 const isImageGallery = computed(
   () =>
     slotMediaOrdered.value.length > 1 &&
@@ -121,17 +101,11 @@ const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
-const lanes = computed(() =>
-  resolveLaneCount(
-    mediaLayoutWidth.value > 0
-      ? mediaLayoutWidth.value
-      : viewportWidth.value > 0
-        ? viewportWidth.value
-        : import.meta.client
-          ? window.innerWidth
-          : 0,
-  ),
-)
+const lanes = computed(() => resolveResponsiveGridValue(
+  props.masonry?.lanes,
+  viewportWidth.value,
+  1,
+))
 
 onMounted(() => {
   hydrated.value = true
@@ -152,7 +126,6 @@ onMounted(() => {
 
       <LazyUScrollArea
         v-if="props.masonry && hydrated"
-        ref="masonryLayoutRoot"
         v-slot="{ item: node, index: i }"
         class="w-full overflow-hidden"
         :items="slotMediaOrdered"
@@ -181,7 +154,6 @@ onMounted(() => {
 
       <WrapGrid
         v-else
-        ref="gridLayoutRoot"
         :grid-items="gridItems"
         :spacing="spacing"
         :width="resolvedWidth"

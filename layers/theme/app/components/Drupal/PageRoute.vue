@@ -1,11 +1,22 @@
 <script setup lang="ts">
+import {
+  buildLayoutEditLinkIndex,
+  layoutEditLinksKey,
+} from '../../utils/layoutEditLinks'
+
 const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, renderCustomElements, usePageHead, getPage } = useDrupalCe()
-const { pageLayout, isAdministrator, isFront } = usePageContext()
+const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
+const { pageLayout, isAuthenticated, isFront } = usePageContext()
 const pageState = getPage()
+
+provide(
+  layoutEditLinksKey,
+  computed(() => buildLayoutEditLinkIndex(pageState.value)),
+)
+
 const route = useRoute()
 const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
@@ -15,7 +26,7 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
-const layout = computed(() => props.forcedLayout || pageLayout.value)
+const layout = computed(() => props.forcedLayout || pageLayout.value || 'default')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
   return typeof route.params.slug === 'string' ? route.params.slug : ''
@@ -28,7 +39,7 @@ const bodyClasses = computed(() =>
   [
     routeSlugClass.value,
     isFront.value ? 'front' : '',
-    isAdministrator.value ? 'logged-in' : '',
+    isAuthenticated.value ? 'logged-in' : '',
     pageState.value?.content?.element || '',
   ]
     .filter(Boolean)

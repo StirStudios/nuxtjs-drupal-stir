@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "listing": "articles",
+  "items": [
+    {
+      "id": 42,
+      "uuid": "0fca58ee-8809-4b3f-af20-27a65c4a39f7",
+      "entityType": "node",
+      "bundle": "article",
+      "label": "A bounded listing item",
+      "url": "/articles/bounded-listing-item"
+    }
+  ],
+  "pager": {
+    "page": 0,
+    "pageSize": 12,
+    "total": 1,
+    "totalPages": 1,
+    "hasNext": false
+  },
+  "filters": {
+    "active": {
+      "category": ["news"]
+    },
+    "options": {
+      "category": [
+        { "value": "news", "label": "News" }
+      ]
+    }
+  },
+  "sort": {
+    "by": "created",
+    "order": "desc"
+  },
+  "meta": {
+    "provider": "views",
+    "summaryEntityType": "node",
+    "summaryViewMode": "card",
+    "personalized": false
+  }
+}

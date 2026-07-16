@@ -2,7 +2,7 @@
 import type { VNode } from 'vue'
 import {
   resolveCarouselArrowButton,
-} from '~/utils/nuxtUiProps'
+} from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   id?: number | string
@@ -16,6 +16,9 @@ const props = defineProps<{
   gridItems?: string
   width?: string
   spacing?: string
+
+  header?: string
+  headerTag?: string
 
   carouselIndicators?: boolean
   carouselArrows?: boolean
@@ -96,6 +99,10 @@ const carouselLabel = computed(() =>
 
 <template>
   <div class="relative z-10" :class="[theme.carousel.padding, width, spacing]">
+    <component :is="headerTag || 'h2'" v-if="header">
+      {{ header }}
+    </component>
+
     <UCarousel
       v-if="slides.length"
       v-slot="{ item }"

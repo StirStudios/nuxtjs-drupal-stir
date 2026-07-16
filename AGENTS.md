@@ -48,6 +48,8 @@ Use these rules for all changes.
 ## Coding conventions
 
 - TypeScript-first: prefer typed params, return types, and narrow interfaces near usage.
+- Keep one-use implementation types inline, app-only public contracts in the owning layer's `app/types`, and app/server contracts in its `shared/types`.
+- Prefer Nuxt auto-imports for Nuxt/Vue runtime APIs in normal `app/*` code. Keep types, external packages, cross-layer dependencies, server code, configuration, scripts, and isolated tests explicitly imported.
 - Use Nuxt/Vue idioms: composables for shared logic, focused components, minimal cross-layer coupling.
 - Prefer Nuxt UI tokens/variants and Tailwind utilities before writing custom CSS.
 - Prefer nested CSS for readability when using Tailwind v4 CSS features.

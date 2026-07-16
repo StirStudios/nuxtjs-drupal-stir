@@ -21,24 +21,36 @@ manage Drupal tokens directly.
 
 ## Consumption
 
-Downstream applications should extend the repository's root layer. Extending
-this internal sub-layer alone is not a supported distribution contract.
+Downstream applications that only need auth/account may extend this capability
+directly. It composes Turnstile and the shared foundation without loading the
+Drupal CE website platform, theme, menus, app context, or View/Paragraph routes.
 
 The root configuration includes:
 
 ```ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-There is currently no separate auth-free preset. Leave
-`authIntegration.drupalAccounts` disabled when Drupal account UI is not used;
-the local `/auth/protected` route remains available.
+The full preset includes this layer; the minimal preset excludes it. Within the
+full preset, leave `authIntegration.drupalAccounts` disabled when Drupal account
+UI is not used; the local `/auth/protected` route remains available.
 
 ## Configuration
 
 Drupal owns account-auth redirects, UI copy, field labels, and password policy
 through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
 integration is installed.
+
+The version-2 response is validated against Drupal's producer-owned auth UI
+contract before it reaches composables. Unknown structure, invalid identifier
+modes or password patterns, and unavailable providers retain the existing empty
+local fallback. Because the endpoint is public and site-wide, visitor cookies
+are not forwarded.
+
+Drupal's public `/api/auth/register-policy` response is contract-validated
+before Nuxt decides whether `/auth/register` is available. Unknown,
+contradictory, malformed, or unavailable policy responses fail closed, and the
+public request does not forward visitor cookies.
 
 ```ts
 export default defineAppConfig({

@@ -8,15 +8,17 @@ type RouteQuery = Record<string, string | string[] | undefined>
 
 const state = vi.hoisted(() => ({
   api: vi.fn(),
+  legacyApi: vi.fn(),
 }))
 
 mockNuxtImport('useDrupalCe', () => {
   return () => ({
-    $ceApi: () => state.api,
+    $ceApi: () => state.legacyApi,
   })
 })
 
 const viewProps = {
+  paragraphId: 42,
   viewId: 'testimonials',
   displayId: 'block_1',
   exposedFilters: [
@@ -52,6 +54,15 @@ const viewProps = {
 const ViewControlsHarness = defineComponent({
   setup() {
     return useDrupalViewControls(viewProps)
+  },
+  template: '<div />',
+})
+
+const LegacyViewControlsHarness = defineComponent({
+  setup() {
+    const { paragraphId: _paragraphId, ...legacyProps } = viewProps
+
+    return useDrupalViewControls(legacyProps)
   },
   template: '<div />',
 })
@@ -95,6 +106,8 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
   beforeEach(async () => {
     vi.useRealTimers()
     state.api.mockReset()
+    state.legacyApi.mockReset()
+    vi.stubGlobal('$fetch', state.api)
     sessionStorage.clear()
     await resetRoute()
   })
@@ -158,8 +171,13 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
       sort_order: 'ASC',
     })
     expect(state.api).toHaveBeenCalledWith(
-      '/?category=news&sort_by=created&sort_order=ASC',
+      '/api/view/42',
       expect.objectContaining({
+        query: {
+          category: 'news',
+          sort_by: 'created',
+          sort_order: 'ASC',
+        },
         signal: expect.any(AbortSignal),
       }),
     )
@@ -187,6 +205,19 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
       totalPages: 1,
     })
     expect(wrapper.vm.loadError).toBe('')
+  })
+
+  it('keeps full-page refresh only for older payloads without a paragraph id', async () => {
+    state.legacyApi.mockResolvedValue(viewResponse(1, 'legacy-row'))
+    const wrapper = await mountSuspended(LegacyViewControlsHarness)
+
+    await wrapper.vm.refreshView(1)
+
+    expect(state.legacyApi).toHaveBeenCalledWith(
+      '/?category=events&sort_by=created&sort_order=ASC&page=1',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
+    expect(state.api).not.toHaveBeenCalled()
   })
 
   it('aborts stale refreshes and ignores late stale responses', async () => {

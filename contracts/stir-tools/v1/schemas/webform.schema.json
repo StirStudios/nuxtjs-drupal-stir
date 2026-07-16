@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/webform.schema.json",
+  "title": "Stir Layout Builder Webform payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "webformId",
+    "webformTitle",
+    "fields",
+    "actions",
+    "webformConfirmation",
+    "webformConfirmationType",
+    "webformRedirect",
+    "webformSubmissions"
+  ],
+  "properties": {
+    "webformId": { "type": "string", "minLength": 1 },
+    "webformTitle": { "type": "string" },
+    "fields": {
+      "type": "object",
+      "additionalProperties": { "type": "object" }
+    },
+    "actions": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "webformConfirmation": { "type": "string" },
+    "webformConfirmationType": { "type": "string", "minLength": 1 },
+    "webformRedirect": { "type": ["string", "null"] },
+    "webformSubmissions": { "type": ["string", "null"] }
+  }
+}

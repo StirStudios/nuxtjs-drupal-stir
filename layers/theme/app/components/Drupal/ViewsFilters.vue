@@ -9,6 +9,7 @@ interface ExposedFilterOption {
 interface ExposedFilter {
   label: string
   queryParamName: string
+  type?: string
   multiple?: boolean
   disabled?: boolean
   options: ExposedFilterOption[]
@@ -83,6 +84,16 @@ function hasOptions(filter: ExposedFilter): boolean {
   return filter.options.length > 0
 }
 
+function isDateRangeFilter(filter: ExposedFilter): boolean {
+  return filter.type === 'date_range'
+}
+
+function isSearchFilter(filter: ExposedFilter): boolean {
+  return filter.type === 'search'
+    || filter.queryParamName.toLowerCase().includes('search')
+    || filter.label.toLowerCase() === 'search'
+}
+
 function getItems(filter: ExposedFilter): SelectItem[] {
   if (filter.multiple) return filter.options
 
@@ -151,7 +162,7 @@ onBeforeUnmount(() => {
       />
 
       <UFormField
-        v-else
+        v-else-if="!isDateRangeFilter(filter)"
         :label="filter.label"
         :ui="{ label: 'sr-only' }"
       >
@@ -159,12 +170,21 @@ onBeforeUnmount(() => {
           :aria-label="filter.label"
           class="min-w-64"
           :disabled="filter.disabled"
+          :icon="isSearchFilter(filter) ? 'i-lucide-search' : undefined"
           :model-value="getTextValue(filter)"
           :placeholder="filter.label"
           type="search"
           @update:model-value="onTextChange(filter.queryParamName, $event)"
         />
       </UFormField>
+
+      <DrupalViewsDateRangeFilter
+        v-else
+        :disabled="filter.disabled"
+        :label="filter.label"
+        :model-value="values[filter.queryParamName] ?? []"
+        @update:model-value="onChange(filter.queryParamName, $event)"
+      />
     </template>
   </div>
 </template>

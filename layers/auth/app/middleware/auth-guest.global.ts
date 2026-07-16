@@ -1,4 +1,3 @@
-import { defineNuxtRouteMiddleware, navigateTo } from '#app'
 import { useAuthConfig } from '../composables/auth/useAuthConfig'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 

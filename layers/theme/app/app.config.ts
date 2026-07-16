@@ -1,63 +1,13 @@
 import type { AppConfigInput } from 'nuxt/schema'
-import {
-  materialVariant,
-  materialVariantWithPB,
-  materialVariantMuted,
-} from './utils/uiVariants'
+import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
-  cmsGlobalSeo: {
-    enabled: false,
-    ignoredPathPrefixes: ['/account', '/auth'],
-    ignoredPaths: [],
-    drupalRouteNames: ['slug'],
-  },
-
   colorMode: {
     forced: false,
     preference: 'dark',
     showToggle: false,
     lightRoutes: [],
     darkRoutes: [],
-  },
-
-  privacyNotice: {
-    enabled: false,
-    mode: 'notice',
-    position: 'center',
-    dismissible: true,
-    title: '',
-    message: '',
-    messageLinks: 'For more information please review our',
-    termsUrl: '',
-    privacyUrl: '',
-    cookiePolicyUrl: '',
-    cookieConsentUrl: '',
-    links: [],
-    legalLinks: [],
-    buttonLabel: 'Got it',
-    declineButtonLabel: 'Decline',
-  },
-
-  userway: {
-    enabled: false,
-    account: '',
-    loadDelayMs: 5000,
-    position: 3,
-    size: 'small',
-    color: '#ffffff',
-    type: '1',
-  },
-
-  popup: {
-    enabled: false,
-    component: '',
-  },
-
-  analytics: {
-    plausible: {
-      domain: '',
-    },
   },
 
   thirdPartyScripts: {
@@ -97,7 +47,8 @@ export default defineAppConfig({
         container: 'relative',
         desktopNav: 'hidden lg:flex',
         leftNav: 'app-nav app-nav-left',
-        logoLink: 'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
+        logoLink:
+          'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
         mobileLogo: 'lg:hidden',
         mobileLeft: 'lg:hidden flex items-center gap-1.5',
         right: 'lg:absolute lg:right-4',
@@ -112,8 +63,7 @@ export default defineAppConfig({
         angle: false,
         angleDeg: 35,
         angleOffsetX: '1.5rem',
-        link:
-          'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
+        link: 'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
         list: 'w-full space-y-1.5',
         body: 'flex flex-col',
       },
@@ -156,7 +106,7 @@ export default defineAppConfig({
       right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
       copyright: 'mb-0',
       email: '',
-      footerLinks: 'transition-colors text-primary hover:text-primary/90',
+      footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
       logo: '',
       menu: 'mb-3',
       menuItem: 'min-w-0 py-0',
@@ -178,6 +128,17 @@ export default defineAppConfig({
 
     media: {
       base: 'relative h-full w-full overflow-hidden object-cover',
+      image: {
+        format: 'webp',
+        quality: 75,
+        profiles: {
+          hero: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          container: 'sm:100vw md:90vw xl:1200px',
+          split: 'sm:100vw md:50vw xl:600px',
+          card: 'sm:100vw md:50vw lg:33vw xl:400px',
+        },
+      },
       rounded: 'rounded-xl',
       video: {
         loadMinWidth: 768,
@@ -216,41 +177,6 @@ export default defineAppConfig({
 
     overlay: {
       portal: true,
-    },
-
-    webform: {
-      showToasts: true,
-      scrollToTopOnSuccess: true,
-      scrollToTopOnReset: true,
-      scrollToTopDelayMs: 0,
-      scrollToTopFallbackDelayMs: 180,
-      spacing: 'space-y-5',
-      spacingLarge: 'space-y-10',
-      formClass: '',
-      labels: {
-        floating: false,
-        base: [
-          'pointer-events-none absolute -top-1.5 left-0 text-xs font-medium text-default/80 transition-all',
-          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-default/80',
-          'peer-focus:-top-1.5 peer-focus:text-xs peer-focus:font-medium peer-focus:text-highlighted',
-        ],
-      },
-      fieldGroupHeader: 'mb-6 text-xl font-semibold',
-      fieldGroup: 'space-y-10',
-      fieldInput: 'w-full',
-      fieldText: '!text-sm !leading-normal',
-      response: 'rounded-lg bg-muted px-6 py-3 italic',
-      description: 'desc mb-3 text-muted',
-      help: 'desc my-3 text-muted',
-      submitAlign: '',
-      submitComponent: '',
-      buttonClass: '',
-      submitButtonSize: '2xl',
-      fieldVariant: 'outline',
-    },
-
-    turnstile: {
-      appearance: 'always',
     },
 
     card: {
@@ -299,112 +225,5 @@ export default defineAppConfig({
     },
   },
 
-  ui: {
-    colors: {
-      primary: 'lime',
-      neutral: 'zinc',
-    },
-
-    button: {
-      slots: {
-        base: 'transition-all duration-300',
-      },
-      variants: {
-        size: {
-          '2xl': {
-            base: 'px-10 py-3 text-md gap-2',
-          },
-        },
-        variant: {
-          material: materialVariantMuted,
-        },
-      },
-    },
-
-    modal: {
-      slots: {
-        title: 'mb-0',
-      },
-    },
-
-    carousel: {
-      slots: {
-        root: 'group relative focus:outline-none',
-      },
-      variants: {
-        orientation: {
-          horizontal: {
-            container: 'flex-row -ms-0',
-            item: 'ps-0',
-            prev: 'start-5 sm:start-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-            next: 'end-5 sm:end-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-          },
-        },
-      },
-    },
-
-    formField: {
-      slots: {
-        label: 'block font-medium text-default/80',
-        container: 'mt-1',
-        error: 'mt-1 text-error',
-      },
-    },
-
-    input: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    select: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    selectMenu: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    inputNumber: {
-      variants: {
-        size: {
-          md: 'px-2.5 py-1.5 text-base gap-1.5',
-        },
-        variant: {
-          material: materialVariant,
-        },
-      },
-    },
-
-    textarea: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-        variant: 'material',
-      },
-    },
-  } as unknown as NonNullable<AppConfigInput['ui']>,
+  ui: nuxtUiTheme as unknown as NonNullable<AppConfigInput['ui']>,
 })

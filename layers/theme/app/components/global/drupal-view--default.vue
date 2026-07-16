@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DrupalViewProps } from '~/types'
+import type { DrupalViewProps } from '#stir/types'
 
 const props = defineProps<DrupalViewProps>()
 const attrs = useAttrs()

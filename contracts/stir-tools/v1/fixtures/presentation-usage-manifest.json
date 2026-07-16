@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "site": {
+    "uuid": "fixture-site",
+    "name": "Fixture",
+    "theme": "stir"
+  },
+  "capabilities": [
+    "layout",
+    "semantic-presentation"
+  ],
+  "used": {
+    "grid": {
+      "columns": {
+        "default": [2],
+        "lg": [3]
+      },
+      "gap": {
+        "default": [4],
+        "lg": [6]
+      },
+      "matrix": false
+    },
+    "spacing": ["py-20"],
+    "width": ["w-md"],
+    "alignment": ["justify_center"]
+  },
+  "legacyClasses": ["md:gap-4"],
+  "diagnostics": {
+    "rejectedLegacyClassCount": 0
+  },
+  "revision": "a32d3af365ea11501dbf136f5a93d414cf7e82f6990a66c191250757a2fe0ec8"
+}

@@ -1,0 +1,141 @@
+{
+  "generatedAt": "2026-07-16T23:38:49.747Z",
+  "revisions": {
+    "nuxtLayer": "b6d40399",
+    "stirTools": "7941fb2",
+    "rsfRemoteDev": "1238410e808fc9021ca3bcbef1c6a53fd368a087",
+    "danceplugNuxt": "706e20a",
+    "danceplugRoot": "be260de"
+  },
+  "packedConsumerVerification": {
+    "rsf": {
+      "source": "fresh remote dev clone",
+      "node": "22.22.0",
+      "typecheck": "passed",
+      "productionBuild": "passed",
+      "adaptations": [
+        "declared Nuxt peer ^4.4.8",
+        "extended installed @stir/base package"
+      ],
+      "note": "The dirty local RSF checkout was not modified. Remote dev still needs these two package/config changes when an explicit consumer cutover is approved."
+    }
+  },
+  "functionalReview": {
+    "rsf": {
+      "routes": ["/", "/about", "/contact"],
+      "desktop": "passed",
+      "mobile": "passed",
+      "mobileNavigation": "passed",
+      "contactWebformRender": "passed",
+      "brokenImagesObserved": 0,
+      "browserErrorsObserved": 0
+    },
+    "piper": {
+      "routes": ["/", "/venues"],
+      "protectedLoginRender": "passed",
+      "anonymousRoot": "current 403/not-found response",
+      "drupalRuntime": "10",
+      "note": "Application-only auth shell; excluded from public-website score comparisons. Drupal 11+ migration readiness remains required before vNext cutover."
+    },
+    "danceplug": {
+      "routes": ["/", "/class/tov-012"],
+      "authenticatedDashboard": "passed",
+      "editorialAdminLinks": "passed",
+      "classBunnyIframePlayer": "passed"
+    }
+  },
+  "productionLighthouse": {
+    "environment": {
+      "lighthouse": "13.4.0",
+      "chrome": "151.0.0.0",
+      "formFactor": "mobile",
+      "runsPerRoute": 3
+    },
+    "rsf": {
+      "homepage": {
+        "score": 75,
+        "fcpMs": 2567.9913749999996,
+        "lcpMs": 5768.480799999996,
+        "tbtMs": 47.000000000000455,
+        "cls": 0,
+        "totalBytes": 653060,
+        "requestCount": 90,
+        "cssBytes": 27929,
+        "jsBytes": 344835,
+        "imageBytes": 115530,
+        "videoBytes": 0
+      },
+      "contactWebform": {
+        "score": 95,
+        "fcpMs": 1960.917625,
+        "lcpMs": 2719.50115,
+        "tbtMs": 25,
+        "cls": 0.00483366367381918,
+        "totalBytes": 556844,
+        "requestCount": 76,
+        "cssBytes": 27203,
+        "jsBytes": 338584,
+        "imageBytes": 44473,
+        "videoBytes": 0
+      }
+    },
+    "piper": {
+      "protectedVenuesLogin": {
+        "score": 89,
+        "fcpMs": 1966.8715,
+        "lcpMs": 3485.428400000003,
+        "tbtMs": 64,
+        "cls": 0.01217374579851323,
+        "totalBytes": 413192,
+        "requestCount": 57,
+        "cssBytes": 33998,
+        "jsBytes": 265936,
+        "imageBytes": 0,
+        "videoBytes": 0
+      }
+    },
+    "danceplug": {
+      "homepage": {
+        "score": 72,
+        "fcpMs": 4065.6699999999987,
+        "lcpMs": 4828.421249999998,
+        "tbtMs": 76.793275,
+        "cls": 0,
+        "totalBytes": 923773,
+        "requestCount": 109,
+        "cssBytes": 37975,
+        "jsBytes": 364507,
+        "imageBytes": 231141,
+        "videoBytes": 0
+      },
+      "classBeforeDeferredEmbed": {
+        "score": 72,
+        "fcpMs": 3290,
+        "lcpMs": 5140,
+        "tbtMs": 76,
+        "totalBytes": 7040000,
+        "note": "Bunny iframe eagerly loaded scripts, thumbnail, and video segments; most segment bytes were classified as XHR rather than Media."
+      },
+      "classAfterDeferredEmbed": {
+        "score": 92,
+        "fcpMs": 2013.6040000000003,
+        "lcpMs": 3150.515,
+        "tbtMs": 54.00000000000023,
+        "cls": 0,
+        "totalBytes": 416311,
+        "requestCount": 105,
+        "cssBytes": 35123,
+        "jsBytes": 313192,
+        "imageBytes": 38024,
+        "videoBytes": 0,
+        "initialVideoRequestCount": 0
+      }
+    }
+  },
+  "excludedMeasurements": [
+    {
+      "consumer": "danceplug",
+      "reason": "Development-server run included Nuxt development code, DevTools, and source maps; it is not production evidence."
+    }
+  ]
+}

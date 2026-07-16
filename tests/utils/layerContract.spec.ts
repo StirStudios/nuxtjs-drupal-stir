@@ -5,24 +5,74 @@ import { describe, expect, it } from 'vitest'
 const rootDir = resolve(__dirname, '../..')
 
 describe('layer contract', () => {
-  it('keeps required layer extends order in nuxt config', () => {
+  it('composes the compatibility root from explicit capability layers', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
 
-    expect(nuxtConfig).toContain('extends: [\'./layers/core\', \'./layers/theme\', \'./layers/auth\']')
+    for (const layer of [
+      'platform',
+      'seo',
+      'listing',
+      'editorial',
+      'integrations',
+      'analytics',
+      'scripts',
+      'webform',
+      'auth',
+    ]) {
+      expect(nuxtConfig).toContain(`'./layers/${layer}'`)
+    }
+    expect(platformConfig).toContain(
+      'extends: [\'../foundation\', \'../core\', \'../theme\']',
+    )
+    expect(platformConfig).not.toContain('../editorial')
+    expect(platformConfig).not.toContain('@nuxtjs/sitemap')
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/app/components/Drupal/Tabs.vue',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/app/components/Edit/Link.vue',
+    ))).toBe(true)
   })
 
-  it('keeps the established public layer aliases available', () => {
-    const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+  it('keeps repository report writers out of published consumer layers', () => {
+    const rootConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
+    const diagnosticsConfig = readFileSync(
+      resolve(rootDir, 'layers/diagnostics/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(platformConfig).not.toContain('stir-client-entry-analysis')
+    expect(platformConfig).not.toContain('client-entry-modules.json')
+    expect(diagnosticsConfig).toContain('stir-client-entry-analysis')
+    expect(diagnosticsConfig).toContain('client-entry-modules.json')
+    expect(rootConfig).toContain('process.env.STIR_PERF_ANALYZE === \'true\'')
+    expect(rootConfig).toContain('resolve(process.cwd()) === resolve(rootDir)')
+    expect(rootConfig).toContain('\'./layers/diagnostics\'')
+  })
+
+  it('prefers Stir-owned aliases while keeping compatibility aliases available', () => {
+    const nuxtConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
     const tsConfig = readFileSync(resolve(rootDir, 'tsconfig.json'), 'utf8')
 
-    expect(nuxtConfig).toContain('\'~/utils\':')
-    expect(nuxtConfig).toContain('\'~/composables\':')
-    expect(nuxtConfig).toContain('\'~/components\':')
-    expect(nuxtConfig).toContain('\'~/types\':')
-    expect(tsConfig).toContain('"~/utils/*"')
-    expect(tsConfig).toContain('"~/composables/*"')
-    expect(tsConfig).toContain('"~/components/*"')
-    expect(tsConfig).toContain('"~/types/*"')
+    for (const alias of ['utils', 'composables', 'components', 'types']) {
+      expect(nuxtConfig).toContain(`'#stir/${alias}':`)
+      expect(nuxtConfig).toContain(`'~/${alias}':`)
+      expect(tsConfig).toContain(`"#stir/${alias}/*"`)
+      expect(tsConfig).toContain(`"~/${alias}/*"`)
+    }
   })
 
   it('publishes a machine-readable compatibility contract', () => {
@@ -32,19 +82,40 @@ describe('layer contract', () => {
     )) as {
       compatibilityPolicy: string
       aliases: string[]
+      preferredAliases: string[]
+      compatibilityAliases: string[]
       serverRoutes: string[]
+      publicComposables: string[]
       runtimeConfigEnvironment: string[]
     }
 
     expect(contract.compatibilityPolicy).toBe('preserve-within-major')
     expect(contract.aliases).toEqual([
+      '#stir/utils',
+      '#stir/composables',
+      '#stir/components',
+      '#stir/types',
+      '~/utils',
+      '~/composables',
+      '~/components',
+      '~/types',
+    ])
+    expect(contract.preferredAliases).toEqual([
+      '#stir/utils',
+      '#stir/composables',
+      '#stir/components',
+      '#stir/types',
+    ])
+    expect(contract.compatibilityAliases).toEqual([
       '~/utils',
       '~/composables',
       '~/components',
       '~/types',
     ])
     expect(contract.serverRoutes).toContain('/api/drupal-ce/**')
+    expect(contract.serverRoutes).toContain('/api/listings/:listing')
     expect(contract.serverRoutes).toContain('/api/auth/**')
+    expect(contract.publicComposables).toContain('useStirListing')
     expect(contract.runtimeConfigEnvironment).toContain('DRUPAL_URL')
     expect(contract.runtimeConfigEnvironment).toContain('TURNSTILE_SECRET')
   })
@@ -56,6 +127,106 @@ describe('layer contract', () => {
     )) as { main?: string }
 
     expect(packageJson.main).toBe('./nuxt.config.ts')
+  })
+
+  it('documents one installed package as the downstream layer source', () => {
+    const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
+
+    expect(readme).toContain('"@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext"')
+    expect(readme).toContain('extends: [\'@stir/base\']')
+    expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
+  })
+
+  it('requires consumers to own their Nuxt runtime directly', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      dependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
+      peerDependencies?: Record<string, string>
+    }
+
+    expect(packageJson.dependencies?.nuxt).toBeUndefined()
+    expect(packageJson.peerDependencies?.nuxt).toBe('^4.4.8')
+    expect(packageJson.devDependencies?.nuxt).toBe('^4.4.8')
+
+    const packedConsumer = readFileSync(
+      resolve(rootDir, 'scripts/audit/packed-consumer.mjs'),
+      'utf8',
+    )
+
+    expect(packedConsumer).toContain('nuxt: rootPackage.peerDependencies.nuxt')
+    expect(packedConsumer).toContain(
+      'Packed consumer must own the layer Nuxt peer directly.',
+    )
+  })
+
+  it('does not require dependency-time layer builds', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as { scripts?: Record<string, string> }
+
+    expect(packageJson.scripts?.postinstall).toBeUndefined()
+    expect(packageJson.scripts?.['dev:prepare']).toBe('nuxi prepare')
+  })
+
+  it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      dependencies?: Record<string, string>
+      peerDependencies?: Record<string, string>
+      peerDependenciesMeta?: Record<string, { optional?: boolean }>
+    }
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(packageJson.dependencies?.['@nuxt/image']).toBeUndefined()
+    expect(packageJson.peerDependencies?.['@nuxt/image']).toBe('^2.0.0')
+    expect(packageJson.peerDependenciesMeta?.['@nuxt/image']?.optional).toBe(true)
+    expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'nuxt\'')
+    expect(themeConfig).toContain('[\'@nuxt/image\']')
+    expect(themeConfig).toContain('stirImageDelivery')
+    expect(themeConfig).toContain('\'#stir-image-provider\': imageProviderComponent')
+    expect(themeConfig).toContain('\'app/providers/NativeImageProvider.vue\'')
+    expect(themeConfig).toContain('import.meta.resolve(\'@nuxt/image\')')
+    expect(themeConfig).toContain('\'runtime/components/NuxtImg.vue\'')
+  })
+
+  it('ships accessibility auditing as opt-in downstream development tooling', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      bin?: Record<string, string>
+      files?: string[]
+      peerDependencies?: Record<string, string>
+      peerDependenciesMeta?: Record<string, { optional?: boolean }>
+    }
+
+    expect(packageJson.bin?.['stir-a11y']).toBe('./scripts/a11y/run.mjs')
+    expect(packageJson.files).toContain('scripts/a11y')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/run.mjs'),
+      'utf8',
+    )).toContain('STIR_A11Y_SERVER_SCRIPT')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/run.mjs'),
+      'utf8',
+    )).toContain('STIR_A11Y_USE_FIXTURE')
+    expect(readFileSync(
+      resolve(rootDir, 'scripts/a11y/server.mjs'),
+      'utf8',
+    )).toContain('new URL(\n  \'../../contracts/stir-tools/v1/fixtures/auth-ui-config.json\'')
+    for (const dependency of ['@axe-core/playwright', '@playwright/test']) {
+      expect(packageJson.peerDependencies?.[dependency]).toBeDefined()
+      expect(packageJson.peerDependenciesMeta?.[dependency]?.optional).toBe(true)
+    }
   })
 
   it('keeps the consumer audit matrix outside downstream repositories', () => {
@@ -71,12 +242,16 @@ describe('layer contract', () => {
     expect(Object.keys(targets.targets)).toEqual([
       'laamada',
       'piper',
+      'rsf',
       'danceplug',
       'stir',
     ])
+    expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
     expect(targets.targets.danceplug?.routes).toContain('/videos')
     expect(consumerScript).toContain('\'archive\'')
     expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
+    expect(consumerScript).toContain('packageJson.peerDependencies.nuxt')
+    expect(consumerScript).toContain('adaptations')
   })
 
   it('uses the consumer CSS entry once when one is present', () => {
@@ -89,6 +264,13 @@ describe('layer contract', () => {
       'existsSync(appThemeCss) ? appThemeCss : upstreamThemeCss',
     )
     expect(themeConfig).toContain('nuxt.options.css.push(themeCss)')
+
+    const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
+
+    expect(readme).toContain(
+      '@import \'@stir/base/layers/theme/app/assets/css/main\';',
+    )
+    expect(readme).toContain('do not reach into a relative `node_modules` path')
   })
 
   it('owns the Drupal CE proxy boundary without changing its routes', () => {
@@ -131,6 +313,156 @@ describe('layer contract', () => {
     )
   })
 
+  it('publishes distinct minimal and full preset fixtures', () => {
+    const minimalPreset = readFileSync(
+      resolve(rootDir, 'presets/minimal/nuxt.config.ts'),
+      'utf8',
+    )
+    const fullPreset = readFileSync(
+      resolve(rootDir, 'presets/full/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(minimalPreset).toContain('../../layers/platform')
+    expect(fullPreset).toContain('new URL(\'../..\', import.meta.url)')
+    expect(existsSync(resolve(
+      rootDir,
+      'tests/fixtures/minimal-consumer/nuxt.config.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'tests/fixtures/full-consumer/nuxt.config.ts',
+    ))).toBe(true)
+  })
+
+  it('shares Turnstile without coupling auth to Webforms', () => {
+    const authConfig = readFileSync(
+      resolve(rootDir, 'layers/auth/nuxt.config.ts'),
+      'utf8',
+    )
+    const webformConfig = readFileSync(
+      resolve(rootDir, 'layers/webform/nuxt.config.ts'),
+      'utf8',
+    )
+    const turnstileConfig = readFileSync(
+      resolve(rootDir, 'layers/turnstile/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(authConfig).toContain('extends: [\'../turnstile\']')
+    expect(webformConfig).toContain(
+      'extends: [\'../platform\', \'../turnstile\']',
+    )
+    expect(turnstileConfig).toContain('extends: [\'../foundation\']')
+    expect(turnstileConfig).toContain('\'@nuxtjs/turnstile\'')
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/turnstile/app/components/Field/Turnstile.vue',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/webform/app/components/Field/Turnstile.vue',
+    ))).toBe(false)
+  })
+
+  it('keeps shared request security in the foundation layer', () => {
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/utils/stirDrupalApi.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/utils/stirRequestSecurity.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/middleware/drupal-session-no-ssr.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/utils/stirDrupalApi.ts',
+    ))).toBe(false)
+  })
+
+  it('keeps sitemap and global metadata in the optional SEO layer', () => {
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
+    const seoConfig = readFileSync(
+      resolve(rootDir, 'layers/seo/nuxt.config.ts'),
+      'utf8',
+    )
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+    const seoAppConfig = readFileSync(
+      resolve(rootDir, 'layers/seo/app/app.config.ts'),
+      'utf8',
+    )
+
+    expect(platformConfig).not.toContain('@nuxtjs/sitemap')
+    expect(seoConfig).toContain('@nuxtjs/sitemap')
+    expect(seoConfig).toContain('\'X-Robots-Tag\': \'noindex, nofollow\'')
+    expect(seoConfig).not.toContain('robots: false')
+    expect(themeConfig).not.toContain('cmsGlobalSeo:')
+    expect(seoAppConfig).toContain('cmsGlobalSeo:')
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/seo/app/plugins/cms-global-seo.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/seo/global.get.ts',
+    ))).toBe(false)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/sitemap.get.ts',
+    ))).toBe(false)
+  })
+
+  it('keeps provider-neutral listings in an optional capability layer', () => {
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/listing/server/api/listings/[listing].get.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/listing/app/composables/useStirListing.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/api/listings/[listing].get.ts',
+    ))).toBe(false)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/theme/app/composables/useStirListing.ts',
+    ))).toBe(false)
+  })
+
+  it('keeps inline paragraph editing in the editorial capability', () => {
+    for (const method of ['get', 'post']) {
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/editorial/server/api/paragraph/[paragraphId]/text.${method}.ts`,
+      ))).toBe(true)
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/core/server/api/paragraph/[paragraphId]/text.${method}.ts`,
+      ))).toBe(false)
+    }
+
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/server/utils/paragraphTextApi.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/utils/paragraphTextApi.ts',
+    ))).toBe(false)
+  })
+
   it('exposes auth config and validation helpers from public layer paths', () => {
     expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
 
@@ -165,6 +497,16 @@ describe('layer contract', () => {
     }
   })
 
+  it('renders auth form titles as the page heading', () => {
+    const authFormPanel = readFileSync(
+      resolve(rootDir, 'layers/auth/app/components/Auth/AuthFormPanel.vue'),
+      'utf8',
+    )
+
+    expect(authFormPanel).toContain('<template #title>')
+    expect(authFormPanel).toContain('<h1>{{ title }}</h1>')
+  })
+
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
     const fieldComponents = [
       'DateTime/Select.vue',
@@ -173,7 +515,7 @@ describe('layer contract', () => {
       'Input/Slider.vue',
       'Textarea.vue',
     ].map((file) => readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/Field', file),
+      resolve(rootDir, 'layers/webform/app/components/Field', file),
       'utf8',
     ))
 
@@ -213,7 +555,10 @@ describe('layer contract', () => {
   })
 
   it('keeps production icons on demand and component-test icons bundled', () => {
-    const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const nuxtConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
 
     expect(nuxtConfig).toContain('...(isTestEnv ? { provider: \'none\' as const } : {})')
     expect(nuxtConfig).toContain('clientBundle: isTestEnv')
@@ -231,14 +576,55 @@ describe('layer contract', () => {
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
   })
 
+  it('records presentation identity before Nitro serializes runtime config', () => {
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(themeConfig).toContain('async \'modules:done\'()')
+    expect(themeConfig).toContain('const nuxt = useNuxt()')
+    expect(themeConfig).not.toContain('async \'ready\'(nuxt)')
+    expect(themeConfig).toContain('stirPresentationManifestRevision = manifest.revision')
+    expect(themeConfig).toContain('stirPresentationBuild = {')
+  })
+
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
     const userwayPlugin = readFileSync(
-      resolve(rootDir, 'layers/theme/app/plugins/userway.client.ts'),
+      resolve(rootDir, 'layers/scripts/app/plugins/userway.client.ts'),
       'utf8',
     )
 
     expect(userwayPlugin).toContain('useScriptTriggerIdleTimeout')
     expect(userwayPlugin).toContain('warmupStrategy: false')
     expect(userwayPlugin).not.toContain('requestIdleCallback')
+  })
+
+  it('keeps optional integration defaults in their capability layers', () => {
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+    const analyticsConfig = readFileSync(
+      resolve(rootDir, 'layers/analytics/app/app.config.ts'),
+      'utf8',
+    )
+    const scriptsConfig = readFileSync(
+      resolve(rootDir, 'layers/scripts/app/app.config.ts'),
+      'utf8',
+    )
+    const integrationsConfig = readFileSync(
+      resolve(rootDir, 'layers/integrations/app/app.config.ts'),
+      'utf8',
+    )
+
+    expect(themeConfig).not.toContain('analytics:')
+    expect(themeConfig).not.toContain('userway:')
+    expect(themeConfig).not.toContain('privacyNotice:')
+    expect(themeConfig).not.toContain('popup:')
+    expect(analyticsConfig).toContain('plausible:')
+    expect(scriptsConfig).toContain('userway:')
+    expect(integrationsConfig).toContain('privacyNotice:')
+    expect(integrationsConfig).toContain('popup:')
   })
 })

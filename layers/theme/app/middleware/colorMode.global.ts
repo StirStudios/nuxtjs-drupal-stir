@@ -1,7 +1,6 @@
-import { defineNuxtRouteMiddleware, useAppConfig } from '#app'
 import {
   resolveColorModeState,
-} from '~/utils/colorMode'
+} from '#stir/utils/colorMode'
 
 export default defineNuxtRouteMiddleware((to) => {
   const colorMode = useColorMode()

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
-import { useDeferredVideoSource } from '~/composables/useDeferredVideoSource'
-import { useVideoPlayers } from '~/composables/useVideoPlayers'
-import type { EditAction, EditActionKey } from '~/types/EditControls'
+import { useElementVisibility, useMediaQuery } from '@vueuse/core'
+import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
+import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
+import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import { isDirectVideoFile, resolveHeroVideoSource } from '../../../utils/heroVideoSource'
 
 defineOptions({
   inheritAttrs: false,
@@ -17,6 +19,8 @@ const props = withDefaults(
     platform?: string
     mediaEmbed?: string
     previewMode?: 'static' | 'animated'
+    previewActivation?: 'hover' | 'visible'
+    previewMinWidth?: number
     animatedPreviewSrc?: string
     thumbnailStatus?: 'ready' | 'processing' | 'missing'
     thumbnailIsDefault?: boolean
@@ -42,6 +46,8 @@ const props = withDefaults(
     platform: undefined,
     mediaEmbed: undefined,
     previewMode: undefined,
+    previewActivation: 'hover',
+    previewMinWidth: 768,
     animatedPreviewSrc: undefined,
     thumbnailStatus: undefined,
     thumbnailIsDefault: false,
@@ -67,6 +73,25 @@ const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
 const iframeElement = ref<HTMLIFrameElement | null>(null)
+const localVideoSrc = computed(() => {
+  if (props.mediaEmbed || !isDirectVideoFile(props.src)) return undefined
+
+  const source = resolveHeroVideoSource(props.src)
+
+  return source?.kind === 'direct' ? source.src : undefined
+})
+const playbackSource = computed(() =>
+  resolveHeroVideoSource(props.mediaEmbed || localVideoSrc.value),
+)
+const heroVideoSource = computed(() =>
+  isBare.value ? playbackSource.value : undefined,
+)
+const directHeroVideoSrc = computed(() =>
+  heroVideoSource.value?.kind === 'direct' ? heroVideoSource.value.src : undefined,
+)
+const remoteHeroVideoSrc = computed(() =>
+  heroVideoSource.value?.kind === 'embed' ? heroVideoSource.value.src : undefined,
+)
 const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
   const strategy = props.loadStrategy ?? mediaTheme.video?.loadStrategy
 
@@ -78,7 +103,7 @@ const bareVideoLoadMinWidth = computed(
 const { isActive: isBareVideoSourceActive } = useDeferredVideoSource({
   enabled: isBare,
   minWidth: bareVideoLoadMinWidth,
-  source: () => props.mediaEmbed,
+  source: () => heroVideoSource.value?.src,
   strategy: bareVideoLoadStrategy,
   videoElement,
 })
@@ -90,7 +115,31 @@ const isProcessing = computed(() => {
   return props.width === 180
 })
 const isEmbedActive = ref(false)
-const isAnimatedPreviewActive = ref(false)
+const isAnimatedPreviewHovered = ref(false)
+const previewRoot = ref<HTMLElement | null>(null)
+const isPreviewVisible = useElementVisibility(previewRoot, {
+  rootMargin: '200px 0px',
+})
+const isPreviewViewport = useMediaQuery(
+  () => `(min-width: ${props.previewMinWidth}px)`,
+)
+const animatedPreviewIsVideo = computed(() =>
+  isDirectVideoFile(props.animatedPreviewSrc),
+)
+const isAnimatedPreviewActive = computed(() => {
+  if (props.previewMode !== 'animated' || !props.animatedPreviewSrc) {
+    return false
+  }
+
+  if (props.previewActivation === 'visible') {
+    return isPreviewViewport.value && isPreviewVisible.value
+  }
+
+  return isAnimatedPreviewHovered.value
+})
+const shouldShowAnimatedVideo = computed(() =>
+  isAnimatedPreviewActive.value && animatedPreviewIsVideo.value,
+)
 const ratioConfig = {
   portrait: 'aspect-[9/16]',
   landscape: 'aspect-[16/9]',
@@ -110,20 +159,33 @@ const aspectClass = computed(() => {
   if (ratio < 1) return ratioConfig.portrait
   return ratioConfig.square
 })
+const wrapperStyle = computed(() => ({
+  aspectRatio: props.width && props.height
+    ? `${props.width} / ${props.height}`
+    : '16 / 9',
+  height: 'auto',
+}))
 
 const shouldShowIframe = computed(
-  () => !!props.mediaEmbed && !isProcessing.value && isEmbedActive.value,
+  () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
+)
+const shouldShowDirectVideo = computed(
+  () => !isBare.value
+    && playbackSource.value?.kind === 'direct'
+    && !isProcessing.value
+    && isEmbedActive.value,
 )
 const previewSrc = computed(() => {
   if (
     isAnimatedPreviewActive.value
     && props.previewMode === 'animated'
     && props.animatedPreviewSrc
+    && !animatedPreviewIsVideo.value
   ) {
     return props.animatedPreviewSrc
   }
 
-  return props.src
+  return localVideoSrc.value ? undefined : props.src
 })
 const previewSrcset = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.srcset,
@@ -145,19 +207,21 @@ async function scheduleInitializePlayers(): Promise<void> {
 }
 
 function activateEmbed() {
-  if (shouldShowIframe.value) return
+  if (shouldShowIframe.value || shouldShowDirectVideo.value) return
   isEmbedActive.value = true
-  void scheduleInitializePlayers()
+  if (playbackSource.value?.kind === 'embed') {
+    void scheduleInitializePlayers()
+  }
 }
 
 function activateAnimatedPreview(): void {
   if (props.previewMode === 'animated' && props.animatedPreviewSrc) {
-    isAnimatedPreviewActive.value = true
+    isAnimatedPreviewHovered.value = true
   }
 }
 
 function deactivateAnimatedPreview(): void {
-  isAnimatedPreviewActive.value = false
+  isAnimatedPreviewHovered.value = false
 }
 
 onMounted(() => {
@@ -183,7 +247,7 @@ watch(
 
 <template>
   <img
-    v-if="isBare && src"
+    v-if="isBare && previewSrc"
     v-bind="attrs"
     :alt="alt || ''"
     aria-hidden="true"
@@ -192,13 +256,13 @@ watch(
     :height="height"
     :loading="loading"
     :sizes="sizes || '100vw'"
-    :src="src"
-    :srcset="srcset"
+    :src="previewSrc"
+    :srcset="previewSrcset"
     :width="width"
   />
 
   <video
-    v-if="isBare"
+    v-if="isBare && directHeroVideoSrc"
     ref="videoElement"
     v-bind="attrs"
     aria-hidden="true"
@@ -211,15 +275,26 @@ watch(
   >
     <source
       v-if="isBareVideoSourceActive"
-      :src="mediaEmbed"
-      type="video/mp4"
+      :src="directHeroVideoSrc"
     />
   </video>
 
+  <iframe
+    v-if="isBare && remoteHeroVideoSrc && isBareVideoSourceActive"
+    allow="autoplay; encrypted-media; picture-in-picture"
+    aria-hidden="true"
+    class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+    :src="remoteHeroVideoSrc"
+    tabindex="-1"
+    :title="title || 'Background video'"
+  />
+
   <div
     v-else
+    ref="previewRoot"
     v-bind="attrs"
     :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
+    :style="wrapperStyle"
   >
     <div
       v-if="isProcessing"
@@ -254,8 +329,22 @@ watch(
       @load="scheduleInitializePlayers()"
     />
 
+    <video
+      v-else-if="shouldShowDirectVideo"
+      ref="videoElement"
+      :class="[
+        'absolute inset-0 h-full w-full bg-black object-contain',
+        theme.media.rounded,
+      ]"
+      controls
+      playsinline
+      preload="metadata"
+    >
+      <source :src="playbackSource?.src" />
+    </video>
+
     <button
-      v-if="!shouldShowIframe && !isProcessing"
+      v-if="!shouldShowIframe && !shouldShowDirectVideo && !isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
         'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',
@@ -277,7 +366,20 @@ watch(
           'group-focus-within:scale-105',
         ]"
       >
+        <video
+          v-if="shouldShowAnimatedVideo"
+          aria-hidden="true"
+          autoplay
+          class="h-full w-full object-cover"
+          loop
+          muted
+          playsinline
+          preload="none"
+        >
+          <source :src="animatedPreviewSrc" type="video/mp4" />
+        </video>
         <img
+          v-else
           :alt="alt || title || 'Video thumbnail'"
           class="h-full w-full object-cover"
           :fetchpriority="fetchpriority"

@@ -3,7 +3,7 @@ import { useAccountSettings } from '../../composables/account/useAccountSettings
 import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
 import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 
 definePageMeta({
   layout: false,
@@ -34,6 +34,13 @@ const cancelModalOpen = ref(false)
 const portal = useOverlayPortal()
 
 const settingsFields = [
+  {
+    name: 'account_name',
+    label: 'Username',
+    type: 'text',
+    required: true,
+    editable: false,
+  },
   {
     name: 'account_email',
     label: 'Email',
@@ -75,7 +82,7 @@ const onSubmitSettings = async () => {
   try {
     const response = await save()
 
-    if (response?.no_changes) {
+    if ('no_changes' in response && response.no_changes) {
       toast.add({
         title: 'No changes',
         description: 'There is nothing new to save.',
@@ -102,22 +109,15 @@ const onSubmitSettings = async () => {
 }
 
 const onChangePassword = async () => {
-  const validationErrors = (() => {
-    try {
-      createAccountPasswordChangeValidationSchema(
+  const validationErrors = validateForm(
+    createAccountPasswordChangeValidationSchema(
         auth.value.passwordPolicy,
-      ).validateSync(
-        {
-          currentPassword: currentPassword.value,
-          newPassword: newPassword.value,
-        },
-        { abortEarly: false },
-      )
-      return []
-    } catch (error: unknown) {
-      return mapYupValidationErrors(error)
-    }
-  })()
+    ),
+    {
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value,
+    },
+  )
 
   if (validationErrors.length > 0) {
     toast.add({

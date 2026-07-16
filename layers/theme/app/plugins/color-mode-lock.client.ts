@@ -1,7 +1,6 @@
-import { defineNuxtPlugin, useAppConfig } from '#app'
 import {
   resolveColorModeState,
-} from '~/utils/colorMode'
+} from '#stir/utils/colorMode'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const colorMode = useColorMode()

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import Webform from '../../../layers/theme/app/components/WebformForm.vue'
-import ParagraphWebform from '../../../layers/theme/app/components/global/Paragraph/Webform.vue'
+import Webform from '../../../layers/webform/app/components/WebformForm.vue'
+import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
 
 const webform = {
@@ -16,8 +16,10 @@ const webform = {
     },
   },
   webformConfirmation: 'Thank you',
+  webformConfirmationType: 'message',
   webformId: 'contact',
-  webformSubmissions: '',
+  webformRedirect: null,
+  webformSubmissions: null,
   webformTitle: 'Contact',
 } satisfies WebformDefinition
 

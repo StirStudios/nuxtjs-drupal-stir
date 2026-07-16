@@ -42,6 +42,58 @@ pnpm dev
 
 Then configure environment variables (see `## 🔐 Environment Variables`) and app-level options in `app/app.config.ts`.
 
+### Downstream projects
+
+Install the layer once under its package name, then extend that installed
+package. Keep the Git branch, tag, or commit in `package.json`; do not repeat a
+GitHub source in `nuxt.config.ts`.
+
+```json
+{
+  "dependencies": {
+    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext",
+    "nuxt": "^4.4.8"
+  }
+}
+```
+
+```ts
+export default defineNuxtConfig({
+  extends: ['@stir/base'],
+})
+```
+
+When an application owns `app/assets/css/main.css`, that file intentionally
+replaces the layer CSS entry. Import the stable package export before project
+styles; do not reach into a relative `node_modules` path:
+
+```css
+@source '@stir/base';
+@import '@stir/base/layers/theme/app/assets/css/main';
+
+@import './base';
+@import './utilities';
+```
+
+Tailwind CSS 4 does not support responsive variants inside `@apply`. Put the
+responsive declaration in its media query instead of using, for example,
+`@apply text-3xl sm:text-5xl`.
+
+Pin production projects to a reviewed tag or commit. A branch reference is
+appropriate while testing vNext, but it should not be the production lock.
+Nuxt is an intentional required peer: every application owns its Nuxt runtime
+version directly, while this repository keeps the same range as a development
+dependency for layer builds and tests.
+The package uses Nuxt's `dev:prepare` convention and does not run a lifecycle
+build when installed as a dependency. pnpm 11 applications must still keep
+their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
+dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
+manager security policy belongs to the consuming application and is not
+inherited from a layer.
+Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
+installing `@stir/base` is unsupported because Nuxt and the package manager can
+resolve different revisions of the same layer.
+
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
@@ -60,6 +112,7 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 - Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
 - E2E smoke testing: `pnpm test:e2e` (built Nuxt health/runtime smoke)
 - Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
+- Real consumer pilots: `STIR_CONSUMER_RSF=/path/to/rsf-nuxt pnpm audit:consumers rsf --verify` (archives committed source into a disposable directory, installs the packed layer and its declared Nuxt peer, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`
@@ -69,6 +122,10 @@ Then configure environment variables (see `## 🔐 Environment Variables`) and a
 The package exposes the reusable `stir-a11y` command. Add these scripts to a
 downstream project's `package.json` (package scripts are not inherited through
 Nuxt layers):
+
+```bash
+pnpm add -D @axe-core/playwright@^4.12.1 @playwright/test@^1.61.1
+```
 
 ```json
 {
@@ -95,6 +152,7 @@ Supported audit configuration:
 - `A11Y_ROUTES`: comma-separated route list; defaults to `/`.
 - `A11Y_SERVER_URL`: managed local server URL; defaults to `http://127.0.0.1:4173`.
 - `A11Y_SERVER_COMMAND`: managed server command; defaults to `pnpm dev --host 127.0.0.1 --port 4173`.
+- `A11Y_USE_FIXTURE`: set to `true` only when the packaged deterministic Drupal fixture should replace the downstream backend; enabled automatically when auditing this base repository.
 - `A11Y_HOVER_SELECTOR`: controls whose completed hover states are scanned; defaults to `[data-a11y-scan-hover]`.
 - `A11Y_OPAQUE_SELECTOR`: controls that must expose an opaque resting background; defaults to `[data-a11y-scan-opaque]`.
 - `A11Y_STATE_SETTLE_MS`: interaction settling time; defaults to `350`.
@@ -110,9 +168,14 @@ attributes above; the harness does not depend on project-specific components.
 ## 📦 Project Structure
 
 - `nuxt.config.ts` — Root orchestration for layers, modules, runtime config, routing, and build
+- `layers/foundation` — Shared Nuxt UI, validation, Drupal request security, session privacy, and baseline CSS
+- `layers/platform` — Drupal CE website renderer composed from foundation, core, and theme
 - `layers/core` — Server/runtime Drupal integration and backend proxy endpoints
 - `layers/theme` — UI components, layouts, composables, utilities, app config, and CSS
+- `layers/seo` — Optional sitemap and Drupal-owned global metadata
+- `layers/listing` — Optional provider-neutral configured listings
 - `layers/auth` — Optional Drupal auth/account UI, middleware, and proxy endpoints
+- `layers/webform` — Optional Drupal Webform rendering and submission
 - `server/utils` — Shared Nitro utilities reused by multiple layers
 
 ## 🔐 Environment Variables
@@ -123,7 +186,6 @@ attributes above; the harness does not depend on project-specific components.
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
 - `DRUPAL_TRUST_PROXY`: Set to `'true'` only when a trusted ingress replaces `X-Forwarded-For` and `DRUPAL_FORWARD_CLIENT_IP` is enabled (default: `false`)
 - `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate; requires the Turnstile keys below
-- `PROTECTED_COOKIE_SECRET`: High-entropy server-only HMAC secret for protected-access cookies; required with `PROTECTED_PASSWORD` in production
 - `PROTECTED_RATE_LIMIT_ENABLED`: Set to `'false'` to disable the protected-login limiter (default: enabled)
 - `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)
 - `PROTECTED_RATE_LIMIT_WINDOW_SECONDS`: Protected-login window in seconds (default: `900`)
@@ -149,31 +211,34 @@ Notes:
 - Deployed runtime overrides supported by `nuxtjs-drupal-ce` include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 - The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its Nitro limiter is best-effort and non-atomic; production must independently enforce a persistent, atomic or provider-native edge rule for `POST /api/auth/protected` using a trusted client-IP boundary.
+- Protected-access cookies are signed with `PROTECTED_PASSWORD`; rotating the password immediately invalidates every existing protected session.
 - H3 buffers multipart bodies before application-level file checks. The Nuxt limits are validation, not a pre-buffer memory cap; production must reject fixed-length and chunked multipart bodies at or below `WEBFORM_MAX_REQUEST_BYTES` before they reach Nitro.
 - Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
 - When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.
 - `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
-- Sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
+- When the SEO capability is selected, sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 - Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_URL`.
 
 ## Auth + Account Integration (stir_account)
 
 Auth/account and password-protected page features live in `layers/auth`. The
-published root layer includes it by default so all downstream projects receive
-one stable contract.
+published root and full preset include it for compatibility. Capability-focused
+applications may consume the auth layer directly; it brings the shared
+platform and mandatory Turnstile capability with it.
 
 In this repository, auth is enabled by default through:
 
 ```ts
 // nuxt.config.ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-Drupal account auth is disabled by default through app config. There is not a
-separate auth-free distribution preset; extending individual internal layers is
-not a supported substitute for extending the root layer. Core webform
-submission and Drupal CSRF forwarding remain independent of account auth.
+Drupal account auth is disabled by default through app config. Use
+`@stir/base/presets/minimal` for the shared renderer without optional auth,
+Webform, SEO, editorial, analytics, scripts, or integration capabilities. Core
+Webform submission and Drupal CSRF forwarding remain independent of account
+auth.
 If it only needs password-protected Nuxt pages, keep the layer and leave
 `authIntegration.drupalAccounts` unset or set it to `false` in app config.
 Set `authIntegration.drupalAccounts: true` only for projects that provide the
@@ -200,7 +265,7 @@ Behavior notes:
 - Turnstile tokens are required in auth form submissions when enabled by backend policy.
 
 See [Auth Integration Guide](./docs/auth-integration.md) for endpoint contracts, deployment notes, and rate-limit recommendations.
-See [Validation Architecture](./docs/validation.md) for Yup validation flow across webforms and auth/account forms.
+See [Validation Architecture](./docs/validation.md) for Valibot validation flow across webforms and auth/account forms.
 See [Drupal Downstream Contracts](./docs/drupal-downstream-contracts.md) for app-context, Drupal view, media, and theme override expectations.
 
 ## 🎨 Styling Conventions

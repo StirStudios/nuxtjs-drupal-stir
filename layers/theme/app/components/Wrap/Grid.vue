@@ -28,13 +28,20 @@ const wrapperClasses = computed(() => {
     props.spacing || null,
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
+const combinedClasses = computed(() => [
+  ...wrapperClasses.value,
+  ...gridStyles.value,
+])
 </script>
 
 <template>
-  <WrapDiv :styles="wrapperClasses">
+  <WrapDiv v-if="props.card" :styles="wrapperClasses">
     <WrapDiv :styles="gridStyles">
       <slot />
     </WrapDiv>
-    <LazyCardGradient v-if="props.card" :layout="props" />
+    <LazyCardGradient :layout="props" />
+  </WrapDiv>
+  <WrapDiv v-else :styles="combinedClasses">
+    <slot />
   </WrapDiv>
 </template>

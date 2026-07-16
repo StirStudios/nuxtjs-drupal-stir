@@ -50,13 +50,8 @@ const getCookieSecureFlag = (event: H3Event): boolean => {
 
 export const layerAuthGetProtectedAccessSecret = (): string => {
   const config = useRuntimeConfig()
-  const explicitSecret = String(config.protectedCookieSecret || '').trim()
-  const password = String(config.protectedPassword || '')
 
-  if (!password) return ''
-  if (explicitSecret) return `${explicitSecret}\u0000${password}`
-
-  return import.meta.dev ? password : ''
+  return String(config.protectedPassword || '')
 }
 
 

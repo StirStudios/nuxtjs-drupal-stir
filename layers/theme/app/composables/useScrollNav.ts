@@ -1,5 +1,5 @@
 import { useWindowScroll, useThrottleFn } from '@vueuse/core'
-import { usePageContext } from '~/composables/usePageContext'
+import { usePageContext } from '#stir/composables/usePageContext'
 
 export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
   if (!import.meta.client) {
@@ -14,9 +14,9 @@ export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
     behavior: 'smooth',
   })
 
-  const { isAdministrator } = usePageContext()
+  const { hasEditorialAccess } = usePageContext()
   const adjustedScrollThreshold = computed(() =>
-    isAdministrator.value ? baseScrollThreshold + 40 : baseScrollThreshold,
+    hasEditorialAccess.value ? baseScrollThreshold + 40 : baseScrollThreshold,
   )
 
   const lastScrollPosition = ref(0)

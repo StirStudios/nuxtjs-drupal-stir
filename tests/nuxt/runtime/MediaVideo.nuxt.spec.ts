@@ -55,6 +55,93 @@ describe('MediaVideo (Nuxt runtime)', () => {
     load.mockRestore()
   })
 
+  it('plays a Drupal local-video src without treating the MP4 as a poster', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        src: '/media/example.mp4',
+        title: 'Example local video',
+      },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('video').exists()).toBe(false)
+
+    await wrapper.get('button').trigger('click')
+
+    expect(wrapper.get('video').attributes('controls')).toBeDefined()
+    expect(wrapper.get('source').attributes('src')).toBe('/media/example.mp4')
+  })
+
+  it('uses a Drupal local-video src directly for bare hero video', async () => {
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadMinWidth: 0,
+        loadStrategy: 'immediate',
+        noWrapper: true,
+        src: '/media/background.mp4',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.get('source').attributes('src')).toBe('/media/background.mp4')
+    load.mockRestore()
+  })
+
+  it('renders a deferred remote hero as a muted background iframe', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        loadMinWidth: 0,
+        mediaEmbed: 'https://www.youtube.com/embed/abcdefghijk',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+        title: 'Hero film',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('img').attributes('src')).toBe('/hero-poster.webp')
+    const iframe = wrapper.get('iframe')
+    const iframeSrc = iframe.attributes('src')
+
+    expect(iframeSrc).toBeTruthy()
+    const iframeUrl = new URL(iframeSrc || '')
+
+    expect(iframe.attributes('tabindex')).toBe('-1')
+    expect(iframe.attributes('title')).toBe('Hero film')
+    expect(iframeUrl.searchParams.get('autoplay')).toBe('1')
+    expect(iframeUrl.searchParams.get('mute')).toBe('1')
+    expect(iframeUrl.searchParams.get('loop')).toBe('1')
+  })
+
+  it('renders a signed Bunny player URL as an iframe', async () => {
+    const embed = 'https://player.mediadelivery.net/embed/348346/video-id?responsive=true&token=signed-token&expires=1784223559'
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        deferEmbed: false,
+        mediaEmbed: embed,
+        mid: 'video-id',
+        title: 'Subscriber class',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('iframe').attributes()).toMatchObject({
+      'data-mid': 'video-id',
+      'src': embed,
+      'title': 'Subscriber class',
+    })
+  })
+
   it('does not load bare video below the configured viewport width', async () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue({
       matches: false,
@@ -152,6 +239,56 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
     expect(button.get('img').attributes('srcset')).toBe(
       '/static-320.webp 320w, /static-640.webp 640w',
+    )
+  })
+
+  it('renders animated MP4 previews as deferred muted video', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        animatedPreviewSrc: '/animated-preview.mp4',
+        previewMode: 'animated',
+        src: '/static-preview.webp',
+      },
+    })
+    const button = wrapper.get('button')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+
+    await button.trigger('mouseenter')
+
+    expect(button.find('img').exists()).toBe(false)
+    expect(button.get('video').attributes()).toMatchObject({
+      autoplay: '',
+      loop: '',
+      muted: '',
+      playsinline: '',
+      preload: 'none',
+    })
+    expect(button.get('source').attributes()).toMatchObject({
+      src: '/animated-preview.mp4',
+      type: 'video/mp4',
+    })
+
+    await button.trigger('mouseleave')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+  })
+
+  it('preserves the declared aspect ratio inside stretching layouts', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://example.com/embed/video',
+        src: '/static-preview.webp',
+        width: 1920,
+      },
+    })
+
+    expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toContain(
+      'aspect-ratio: 1920 / 1080; height: auto;',
     )
   })
 })

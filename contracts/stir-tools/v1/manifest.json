@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.23.0",
+  "producer": "stirstudios/stir_tools",
+  "platformRequirements": {
+    "drupalCore": "^11",
+    "php": ">=8.4"
+  },
+  "compatibility": {
+    "additiveChanges": "same-major",
+    "breakingChanges": "new-major",
+    "consumerReleaseLockstep": false
+  },
+  "capabilities": {
+    "account.registration": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.session": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.settings": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.ui": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "layout.webform": {
+      "providerModules": ["stir_layout_builder_paragraph_webform"],
+      "optional": true
+    },
+    "webform.submission": {
+      "providerModules": ["stir_webform_rest"],
+      "optional": true
+    },
+    "app.context": {
+      "providerModules": ["stir_layout_block"],
+      "optional": true
+    },
+    "component.tree": {
+      "providerModules": ["stir_layout_builder", "stir_layout_paragraphs"],
+      "optional": true
+    },
+    "listing.response": {
+      "providerModules": ["stir_listing"],
+      "optional": true
+    },
+    "media.summary": {
+      "providerModules": ["stir_layout_builder"],
+      "optional": true
+    },
+    "media.video.local": {
+      "providerModules": ["stir_tools"],
+      "optional": false
+    },
+    "media.image": {
+      "providerModules": ["stir_tools"],
+      "optional": false
+    },
+    "presentation.usage": {
+      "providerModules": ["stir_layout_builder"],
+      "optional": true
+    },
+    "seo.global": {
+      "providerModules": ["stir_seo"],
+      "optional": true
+    },
+    "seo.sitemap": {
+      "providerModules": ["stir_sitemap"],
+      "optional": true
+    }
+  },
+  "contracts": {
+    "account.snapshot": {
+      "capability": "account.session",
+      "schema": "schemas/account-snapshot.schema.json",
+      "fixtures": [
+        "fixtures/account-snapshot-anonymous.json",
+        "fixtures/account-snapshot-authenticated.json"
+      ]
+    },
+    "auth.session": {
+      "capability": "account.session",
+      "schema": "schemas/auth-session.schema.json",
+      "fixtures": ["fixtures/auth-session-authenticated.json"]
+    },
+    "account.settings.values": {
+      "capability": "account.settings",
+      "schema": "schemas/account-settings-values.schema.json",
+      "fixtures": ["fixtures/account-settings-values.json"]
+    },
+    "account.settings.update": {
+      "capability": "account.settings",
+      "schema": "schemas/account-settings-update.schema.json",
+      "fixtures": [
+        "fixtures/account-settings-update-success.json",
+        "fixtures/account-settings-update-error.json"
+      ]
+    },
+    "app.context": {
+      "capability": "app.context",
+      "schema": "schemas/app-context.schema.json",
+      "fixtures": ["fixtures/app-context.json"]
+    },
+    "component.tree": {
+      "capability": "component.tree",
+      "schema": "schemas/component-tree.schema.json",
+      "fixtures": ["fixtures/component-tree.json"]
+    },
+    "listing.response": {
+      "capability": "listing.response",
+      "schema": "schemas/listing-response.schema.json",
+      "fixtures": ["fixtures/listing-response.json"]
+    },
+    "media.summary": {
+      "capability": "media.summary",
+      "schema": "schemas/media-summary.schema.json",
+      "fixtures": ["fixtures/media-summary.json"]
+    },
+    "media.video.local": {
+      "capability": "media.video.local",
+      "schema": "schemas/media-video-local.schema.json",
+      "fixtures": ["fixtures/media-video-local.json"]
+    },
+    "media.image": {
+      "capability": "media.image",
+      "schema": "schemas/media-image.schema.json",
+      "fixtures": [
+        "fixtures/media-image-detail.json",
+        "fixtures/media-image-lightweight.json"
+      ]
+    },
+    "presentation.usage": {
+      "capability": "presentation.usage",
+      "schema": "schemas/presentation-usage-manifest.schema.json",
+      "fixtures": ["fixtures/presentation-usage-manifest.json"]
+    },
+    "auth.register.response": {
+      "capability": "account.registration",
+      "schema": "schemas/auth-register-response.schema.json",
+      "fixtures": [
+        "fixtures/auth-register-admin-approval.json",
+        "fixtures/auth-register-error.json"
+      ]
+    },
+    "auth.register.policy": {
+      "capability": "account.registration",
+      "schema": "schemas/auth-register-policy.schema.json",
+      "fixtures": [
+        "fixtures/auth-register-policy-open.json",
+        "fixtures/auth-register-policy-closed.json"
+      ]
+    },
+    "auth.ui.config": {
+      "capability": "account.ui",
+      "schema": "schemas/auth-ui-config.schema.json",
+      "fixtures": ["fixtures/auth-ui-config.json"]
+    },
+    "layout.webform": {
+      "capability": "layout.webform",
+      "schema": "schemas/webform.schema.json",
+      "fixtures": ["fixtures/webform-contact.json"]
+    },
+    "webform.submission.response": {
+      "capability": "webform.submission",
+      "schema": "schemas/webform-submission-response.schema.json",
+      "fixtures": [
+        "fixtures/webform-submission-success.json",
+        "fixtures/webform-submission-error.json"
+      ]
+    },
+    "seo.global": {
+      "capability": "seo.global",
+      "schema": "schemas/global-seo.schema.json",
+      "fixtures": ["fixtures/global-seo.json"]
+    },
+    "seo.sitemap": {
+      "capability": "seo.sitemap",
+      "schema": "schemas/sitemap.schema.json",
+      "fixtures": ["fixtures/sitemap.json"]
+    }
+  }
+}

@@ -192,6 +192,12 @@ test.describe('automated accessibility', () => {
       )
       await page.locator('#__nuxt').waitFor({ state: 'attached' })
       await page.waitForLoadState('load')
+      // Nuxt can replace the hydrated page subtree after the root container is
+      // attached. These are baseline document requirements, so wait for the
+      // final landmarks before Axe observes the page. A genuinely missing
+      // landmark or heading still fails deterministically at this boundary.
+      await page.locator('main').first().waitFor({ state: 'attached' })
+      await page.locator('h1').first().waitFor({ state: 'attached' })
       await revealFullPage(page)
       await page.waitForTimeout(motionSettleMs)
       const results = await analyzePage(page)

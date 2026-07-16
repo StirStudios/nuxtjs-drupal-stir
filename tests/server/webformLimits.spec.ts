@@ -5,7 +5,7 @@ import {
   assertWebformRawBodySize,
   getWebformSubmissionLimits,
   type WebformSubmissionLimits,
-} from '../../layers/core/server/utils/webformLimits'
+} from '../../layers/webform/server/utils/webformLimits'
 
 const limits: WebformSubmissionLimits = {
   maxRequestBytes: 100,
