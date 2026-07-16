@@ -8,6 +8,12 @@ import {
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
+  routeRules: {
+    '/account/**': { robots: false },
+    '/auth/**': { robots: false },
+    '/login': { robots: false },
+  },
+
   nitro: {
     hooks: {
       'sitemap:resolved'(ctx: SitemapRenderCtx) {

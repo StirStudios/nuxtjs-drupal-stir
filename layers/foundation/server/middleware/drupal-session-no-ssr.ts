@@ -9,6 +9,7 @@ import {
   isStirDrupalSessionCookieName,
 } from '../utils/stirDrupalApi'
 
+// Cookie-authenticated HTML must never enter a shared response cache.
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 const SKIP_PATH = /^(?:\/__(?:\/|$)|\/_ipx(?:\/|$)|\/_nuxt(?:\/|$)|\/api(?:\/|$)|\/favicon)|\.(?:avif|css|gif|ico|jpe?g|js|json|map|png|svg|txt|webmanifest|webp|woff2?)$/i
 

@@ -14,8 +14,10 @@ export default defineNuxtConfig({
 })
 ```
 
-The layer composes mandatory Turnstile protection and the shared platform; it
-does not load auth, SEO, editorial, analytics, scripts, or integrations.
+The layer composes the shared website platform plus mandatory Turnstile
+protection; it does not load auth, SEO, editorial, analytics, scripts, or
+integrations. A later form/field boundary will allow Webform-only consumers to
+use the foundation without the complete website renderer.
 
 The shared widget default is `appearance: 'interaction-only'`: validation stays
 enabled, while Cloudflare requests visible interaction only when needed.

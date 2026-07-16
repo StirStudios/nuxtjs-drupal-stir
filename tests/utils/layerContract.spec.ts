@@ -26,7 +26,7 @@ describe('layer contract', () => {
       expect(nuxtConfig).toContain(`'./layers/${layer}'`)
     }
     expect(platformConfig).toContain(
-      'extends: [\'../core\', \'../theme\']',
+      'extends: [\'../foundation\', \'../core\', \'../theme\']',
     )
     expect(platformConfig).not.toContain('../editorial')
     expect(platformConfig).not.toContain('@nuxtjs/sitemap')
@@ -300,8 +300,10 @@ describe('layer contract', () => {
     )
 
     expect(authConfig).toContain('extends: [\'../turnstile\']')
-    expect(webformConfig).toContain('extends: [\'../turnstile\']')
-    expect(turnstileConfig).toContain('extends: [\'../platform\']')
+    expect(webformConfig).toContain(
+      'extends: [\'../platform\', \'../turnstile\']',
+    )
+    expect(turnstileConfig).toContain('extends: [\'../foundation\']')
     expect(turnstileConfig).toContain('\'@nuxtjs/turnstile\'')
     expect(existsSync(resolve(
       rootDir,
@@ -310,6 +312,25 @@ describe('layer contract', () => {
     expect(existsSync(resolve(
       rootDir,
       'layers/webform/app/components/Field/Turnstile.vue',
+    ))).toBe(false)
+  })
+
+  it('keeps shared request security in the foundation layer', () => {
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/utils/stirDrupalApi.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/utils/stirRequestSecurity.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/middleware/drupal-session-no-ssr.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/utils/stirDrupalApi.ts',
     ))).toBe(false)
   })
 

@@ -141,6 +141,8 @@ attributes above; the harness does not depend on project-specific components.
 ## 📦 Project Structure
 
 - `nuxt.config.ts` — Root orchestration for layers, modules, runtime config, routing, and build
+- `layers/foundation` — Shared Nuxt UI, validation, Drupal request security, session privacy, and baseline CSS
+- `layers/platform` — Drupal CE website renderer composed from foundation, core, and theme
 - `layers/core` — Server/runtime Drupal integration and backend proxy endpoints
 - `layers/theme` — UI components, layouts, composables, utilities, app config, and CSS
 - `layers/seo` — Optional sitemap and Drupal-owned global metadata

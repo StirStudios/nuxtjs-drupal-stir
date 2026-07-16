@@ -9,6 +9,7 @@ import {
   type H3Event,
 } from 'h3'
 
+// Shared by focused server capabilities and the full Drupal CE platform.
 const DEFAULT_DRUPAL_REQUEST_TIMEOUT_MS = 10_000
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 const DRUPAL_SESSION_COOKIE_NAME = /^S?SESS[A-Za-z0-9_-]{32}$/

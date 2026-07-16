@@ -1,5 +1,6 @@
 import { createError, getHeader, getRequestURL, type H3Event } from 'h3'
 
+// Shared mutation policy for every independently consumable capability.
 const toOrigin = (value: unknown): string => {
   if (typeof value !== 'string' || !value.trim()) return ''
 

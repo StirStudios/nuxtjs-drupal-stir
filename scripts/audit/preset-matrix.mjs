@@ -16,6 +16,12 @@ async function inspectPreset(name) {
       layer.cwd.replaceAll('\\', '/'),
     )
     const hasAuth = layers.some((layer) => layer.endsWith('/layers/auth'))
+    const hasFoundation = layers.some((layer) =>
+      layer.endsWith('/layers/foundation'),
+    )
+    const hasPlatform = layers.some((layer) => layer.endsWith('/layers/platform'))
+    const hasCore = layers.some((layer) => layer.endsWith('/layers/core'))
+    const hasTheme = layers.some((layer) => layer.endsWith('/layers/theme'))
     const hasWebform = layers.some((layer) => layer.endsWith('/layers/webform'))
     const hasTurnstile = layers.some((layer) =>
       layer.endsWith('/layers/turnstile'),
@@ -43,6 +49,10 @@ async function inspectPreset(name) {
     return {
       name,
       hasAuth,
+      hasFoundation,
+      hasPlatform,
+      hasCore,
+      hasTheme,
       hasWebform,
       hasTurnstile,
       hasAnalytics,
@@ -146,6 +156,17 @@ if (!full.hasListing) {
 if (!auth.hasAuth || auth.hasWebform || !auth.hasTurnstile) {
   throw new Error(
     'The auth fixture must load Turnstile without loading Webforms.',
+  )
+}
+
+if (
+  !auth.hasFoundation
+  || auth.hasPlatform
+  || auth.hasCore
+  || auth.hasTheme
+) {
+  throw new Error(
+    'The auth fixture must use foundation without website platform, core, or theme.',
   )
 }
 

@@ -24,6 +24,12 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   and axe best-practice rules; it never inherits a developer's project URL.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects. The synchronized compatibility manifest validates Drupal/PHP requirements, optional provider-capability ownership, and independent Nuxt/Stir Tools releases. Registration policy and versioned auth UI configuration now validate before routing/composables; app-context normalizes Drupal's empty-array compatibility shapes and recursively validates its component trees; global SEO and the runtime-fresh sitemap validate before reaching their Nuxt consumers. The shared source-independent tree contract covers direct rendered fields, media, entity references, and nested components.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
+- `layers/foundation` now owns shared Nuxt UI, validation, baseline CSS, Drupal
+  request/security policy, runtime API configuration, and session privacy.
+  Auth-only consumers compose Turnstile plus this foundation and no longer load
+  Drupal CE website routes, core, theme, menus, app context, or embedded Views.
+  The website platform composes foundation, core, and theme; Webform remains on
+  that platform until its shared field-renderer boundary is extracted.
 - The optional `layers/webform` boundary now owns Webform rendering, submission, and limits. The minimal preset excludes the Webform route.
 - Turnstile registration, runtime secrets, interaction-only presentation, and the shared field now live in an independent `layers/turnstile` capability. Auth-only and Webform-only fixtures prove that both consume mandatory bot protection without loading one another; the minimal preset loads neither.
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.

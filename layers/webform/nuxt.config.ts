@@ -1,7 +1,7 @@
 import { positiveIntegerEnvironment } from '../../config/runtime'
 
 export default defineNuxtConfig({
-  extends: ['../turnstile'],
+  extends: ['../platform', '../turnstile'],
 
   runtimeConfig: {
     webformSubmissionLimits: {

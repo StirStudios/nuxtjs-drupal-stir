@@ -21,7 +21,7 @@ import {
 import {
   filterStirDrupalSetCookies,
   getStirDrupalSetCookies,
-} from '../../../../core/server/utils/stirDrupalApi'
+} from '../../../../foundation/server/utils/stirDrupalApi'
 
 const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
 

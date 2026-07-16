@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import drupalSessionNoSsr from '../../layers/core/server/middleware/drupal-session-no-ssr'
+import drupalSessionNoSsr from '../../layers/foundation/server/middleware/drupal-session-no-ssr'
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 

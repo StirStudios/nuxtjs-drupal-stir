@@ -1,7 +1,7 @@
 import { readBody } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import loginHandler from '../../layers/auth/server/api/auth/login.post'
-import { assertStirSameOrigin } from '../../layers/core/server/utils/stirRequestSecurity'
+import { assertStirSameOrigin } from '../../layers/foundation/server/utils/stirRequestSecurity'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),

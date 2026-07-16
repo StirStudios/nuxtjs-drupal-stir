@@ -1,7 +1,7 @@
 import {
   buildStirDrupalHeaders,
   type StirDrupalHeaderOptions,
-} from './stirDrupalApi'
+} from '../../../foundation/server/utils/stirDrupalApi'
 
 export function buildDrupalHeaders(
   options: StirDrupalHeaderOptions = {},

@@ -21,9 +21,9 @@ manage Drupal tokens directly.
 
 ## Consumption
 
-Downstream applications that only need auth/account and shared rendering may
-extend this capability directly. It composes Turnstile, which in turn composes
-the shared platform.
+Downstream applications that only need auth/account may extend this capability
+directly. It composes Turnstile and the shared foundation without loading the
+Drupal CE website platform, theme, menus, app context, or View/Paragraph routes.
 
 The root configuration includes:
 

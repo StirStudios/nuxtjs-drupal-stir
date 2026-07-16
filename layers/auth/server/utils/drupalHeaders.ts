@@ -1,7 +1,7 @@
 import {
   buildStirDrupalHeaders,
   type StirDrupalHeaderOptions,
-} from '../../../core/server/utils/stirDrupalApi'
+} from '../../../foundation/server/utils/stirDrupalApi'
 
 export function layerAuthBuildDrupalHeaders(
   options: StirDrupalHeaderOptions = {},

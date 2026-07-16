@@ -1,8 +1,12 @@
 # Stir platform layer
 
-This is the vNext shared Drupal rendering platform. It owns the Nuxt, Nitro,
-Nuxt UI, Tailwind, Drupal Custom Elements, proxy, theme, and runtime defaults
-needed by every Stir application.
+This is the vNext Drupal website rendering platform. It composes the shared
+foundation with Drupal Custom Elements proxy routes, page/app context, theme,
+and website-shell defaults.
+
+Focused applications do not need this layer merely to use Stir server policy
+or Nuxt UI. Auth and Turnstile compose `layers/foundation` directly; Webform
+currently composes this platform until its shared field renderer is extracted.
 
 Authentication, Webform, SEO, configured listings, editorial tools, analytics,
 scripts, and provider integrations are composed by explicit capability layers.
