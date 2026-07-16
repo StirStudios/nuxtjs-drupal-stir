@@ -40,7 +40,7 @@ type AnalysisOutputBundle = Record<
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
-  extends: ['../core', '../theme', '../editorial'],
+  extends: ['../core', '../theme'],
 
   app: {
     head: {

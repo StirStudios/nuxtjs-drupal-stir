@@ -12,12 +12,20 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    for (const layer of ['platform', 'analytics', 'scripts', 'webform', 'auth']) {
+    for (const layer of [
+      'platform',
+      'editorial',
+      'analytics',
+      'scripts',
+      'webform',
+      'auth',
+    ]) {
       expect(nuxtConfig).toContain(`'./layers/${layer}'`)
     }
     expect(platformConfig).toContain(
-      'extends: [\'../core\', \'../theme\', \'../editorial\']',
+      'extends: [\'../core\', \'../theme\']',
     )
+    expect(platformConfig).not.toContain('../editorial')
     expect(existsSync(resolve(
       rootDir,
       'layers/editorial/app/components/Drupal/Tabs.vue',

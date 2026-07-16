@@ -19,6 +19,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
 - The optional `layers/webform` boundary now owns Webform rendering, submission, limits, and Turnstile registration. The minimal preset excludes both the Webform route and Turnstile module.
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
+- The optional `layers/editorial` boundary now owns real Drupal local-task tabs,
+  edit actions, inline text editing, and admin CSS. The minimal preset uses
+  shell-free theme fallbacks and does not load the editorial layer; the full
+  preset preserves the existing tools.
 - Validation now uses one Valibot/Nuxt UI Standard Schema foundation across auth, account, dynamic Drupal Webforms, and server contract parsing; Yup is no longer a direct dependency or layer import.
 - N4 has started with all theme consumers routed through a Stir-owned Drupal CE facade. It delegates the upstream API while development builds surface unresolved components, unknown field elements, and malformed component nodes instead of silently dropping them; production retains the direct upstream rendering path.
 - The synchronized v1.15 component-tree fixture now mirrors the direct Layout

@@ -5,7 +5,7 @@ navigation, entity and paragraph edit actions, and inline paragraph text
 editing. Drupal remains authoritative for authentication, access checks, and
 the links or tasks exposed to Nuxt.
 
-The platform layer includes this capability by default so established projects
-retain their editorial tools. Keeping it isolated prevents editor UI concerns
-from spreading further through the public theme and provides a future boundary
-for deployments that intentionally omit frontend editorial tooling.
+The full compatibility preset includes this capability so established projects
+retain their editorial tools. The minimal preset omits it; shell-free theme
+fallbacks preserve public rendering for shared components without loading edit
+controls, local-task tabs, inline-edit behavior, or admin CSS.

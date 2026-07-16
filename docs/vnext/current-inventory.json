@@ -75,6 +75,8 @@
   },
   "scripts": [
     "audit:consumers",
+    "audit:preset-components",
+    "audit:preset-editorial-output",
     "audit:preset-matrix",
     "audit:vnext-inventory",
     "build",
@@ -142,11 +144,13 @@
       "layers/theme/app/components/CardGradient.vue",
       "layers/theme/app/components/Drupal/NodeDisplay.vue",
       "layers/theme/app/components/Drupal/PageRoute.vue",
+      "layers/theme/app/components/Drupal/Tabs.vue",
       "layers/theme/app/components/Drupal/ViewDisplay.vue",
       "layers/theme/app/components/Drupal/ViewsFilters.vue",
       "layers/theme/app/components/Drupal/ViewsPagination.vue",
       "layers/theme/app/components/Drupal/ViewsSelectField.vue",
       "layers/theme/app/components/Drupal/ViewsSort.vue",
+      "layers/theme/app/components/Edit/Link.vue",
       "layers/theme/app/components/Field/Address.vue",
       "layers/theme/app/components/Field/Checkbox.vue",
       "layers/theme/app/components/Field/Checkboxes.vue",
@@ -373,7 +377,7 @@
     ]
   },
   "counts": {
-    "components": 106,
+    "components": 108,
     "composables": 60,
     "utils": 40,
     "plugins": 5,
@@ -381,11 +385,11 @@
     "serverRoutes": 26,
     "productionDependencies": 25,
     "developmentDependencies": 24,
-    "tests": 94,
+    "tests": 95,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
-      "nuxt": 33,
+      "nuxt": 34,
       "server": 21,
       "utils": 29
     }
@@ -410,6 +414,7 @@
     "tests/nuxt/runtime/AuthPasswordField.nuxt.spec.ts",
     "tests/nuxt/runtime/BlockContentParagraph.nuxt.spec.ts",
     "tests/nuxt/runtime/DateTimeValue.nuxt.spec.ts",
+    "tests/nuxt/runtime/EditorialFallback.nuxt.spec.ts",
     "tests/nuxt/runtime/EntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldLink.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldRenderer.nuxt.spec.ts",

@@ -17,6 +17,7 @@ async function inspectPreset(name) {
     const hasWebform = layers.some(layer => layer.endsWith('/layers/webform'))
     const hasAnalytics = layers.some(layer => layer.endsWith('/layers/analytics'))
     const hasScripts = layers.some(layer => layer.endsWith('/layers/scripts'))
+    const hasEditorial = layers.some(layer => layer.endsWith('/layers/editorial'))
     const hasProtectedAccessConfig = Object.hasOwn(
       nuxt.options.runtimeConfig,
       'protectedPassword',
@@ -28,6 +29,7 @@ async function inspectPreset(name) {
       hasWebform,
       hasAnalytics,
       hasScripts,
+      hasEditorial,
       hasProtectedAccessConfig,
       layers: layers.map(layer => layer.replace(`${rootDir}/`, '')),
     }
@@ -55,6 +57,11 @@ if (minimal.hasAnalytics || minimal.hasScripts) {
   throw new Error('The minimal preset must not load analytics or scripts layers.')
 }
 
+if (minimal.hasEditorial) {
+  throw new Error('The minimal preset must not load the editorial layer.')
+}
+
+
 if (!full.hasAuth) {
   throw new Error('The full preset must preserve the authentication layer.')
 }
@@ -70,5 +77,11 @@ if (!full.hasWebform) {
 if (!full.hasAnalytics || !full.hasScripts) {
   throw new Error('The full preset must preserve analytics and scripts layers.')
 }
+
+
+if (!full.hasEditorial) {
+  throw new Error('The full preset must preserve the editorial layer.')
+}
+
 
 process.stdout.write(`${JSON.stringify({ minimal, full }, null, 2)}\n`)
