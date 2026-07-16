@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.14.0",
+  "contractVersion": "1.15.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -29,7 +29,7 @@
       "optional": true
     },
     "component.tree": {
-      "providerModules": ["stir_layout_builder"],
+      "providerModules": ["stir_layout_builder", "stir_layout_paragraphs"],
       "optional": true
     },
     "listing.response": {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { h } from 'vue'
 import ParagraphLayout from '../../../layers/theme/app/components/global/Paragraph/Layout.vue'
 
 describe('ParagraphLayout (Nuxt runtime)', () => {
@@ -25,18 +26,24 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     expect(wrapper.find('.region.items').exists()).toBe(false)
   })
 
-  it('wraps named regions for non-grid layouts', async () => {
+  it('renders direct producer named regions recursively', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: {
         id: 'default',
         layout: 'two_column',
       },
       slots: {
-        items: '<article class="region-item">Wrapped</article>',
+        first: '<article class="first-item">First</article>',
+        second: () => h(ParagraphLayout, {
+          id: 'nested',
+          layout: 'one_column',
+        }, {
+          first: () => h('article', { class: 'nested-item' }, 'Nested'),
+        }),
       },
     })
 
-    expect(wrapper.find('.region.items').exists()).toBe(true)
-    expect(wrapper.find('.region-item').exists()).toBe(true)
+    expect(wrapper.find('.region.first > .first-item').exists()).toBe(true)
+    expect(wrapper.find('.region.second .region.first > .nested-item').exists()).toBe(true)
   })
 })

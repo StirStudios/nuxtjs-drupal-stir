@@ -58,9 +58,35 @@ describe('componentTree', () => {
           gridClass: 'lg:grid-cols-2 lg:gap-6',
         },
         slots: {
-          left: [{
+          first: [{
             element: 'paragraph-text',
-            props: { text: '<p>Left region content.</p>' },
+            props: {
+              uuid: '00000000-0000-4000-8000-000000000043',
+              parentUuid: '00000000-0000-4000-8000-000000000042',
+              region: 'first',
+              text: '<p>Left region content.</p>',
+            },
+          }],
+          second: [{
+            element: 'paragraph-layout',
+            props: {
+              uuid: '00000000-0000-4000-8000-000000000044',
+              parentUuid: '00000000-0000-4000-8000-000000000042',
+              region: 'second',
+              layout: 'one_column',
+              gridClass: 'grid-cols-1 gap-4',
+            },
+            slots: {
+              first: [{
+                element: 'paragraph-text',
+                props: {
+                  uuid: '00000000-0000-4000-8000-000000000045',
+                  parentUuid: '00000000-0000-4000-8000-000000000044',
+                  region: 'first',
+                  text: '<p>Nested region content.</p>',
+                },
+              }],
+            },
           }],
         },
       },
