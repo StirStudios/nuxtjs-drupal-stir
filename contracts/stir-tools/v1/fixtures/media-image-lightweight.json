@@ -1,0 +1,14 @@
+{
+  "type": "image",
+  "mid": 42,
+  "title": "Example card image",
+  "src": "https://www.example.com/sites/default/files/styles/card/public/example.jpg.webp",
+  "alt": "Two people reviewing a design together",
+  "width": 640,
+  "height": 360,
+  "srcset": "https://www.example.com/sites/default/files/styles/480/public/example.jpg.webp 480w, https://www.example.com/sites/default/files/styles/640/public/example.jpg.webp 640w",
+  "sizes": "auto, (min-width: 768px) 50vw, 100vw",
+  "responsive_style": "card",
+  "loading": "lazy",
+  "fetchpriority": "auto"
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/media-image.schema.json",
+  "title": "Image media payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "mid",
+    "title",
+    "src",
+    "alt",
+    "width",
+    "height",
+    "srcset",
+    "sizes",
+    "responsive_style",
+    "loading",
+    "fetchpriority"
+  ],
+  "properties": {
+    "type": { "enum": ["image", "basic-image"] },
+    "mid": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "title": { "type": "string" },
+    "src": { "type": "string", "minLength": 1 },
+    "alt": { "type": "string" },
+    "width": { "type": "integer", "minimum": 0 },
+    "height": { "type": "integer", "minimum": 0 },
+    "srcset": { "type": "string" },
+    "sizes": { "type": "string", "minLength": 1 },
+    "responsive_style": { "type": "string", "minLength": 1 },
+    "loading": { "enum": ["lazy", "eager"] },
+    "fetchpriority": { "enum": ["low", "auto", "high"] },
+    "modal_src": { "type": "string", "minLength": 1 },
+    "modal_srcset": { "type": "string" },
+    "modal_sizes": { "type": "string", "minLength": 1 },
+    "modal_responsive_style": { "type": "string", "minLength": 1 },
+    "credit": { "type": "string", "minLength": 1 },
+    "link": { "type": "string", "minLength": 1 },
+    "rel": { "const": "noopener" },
+    "category": { "type": "string", "minLength": 1 }
+  },
+  "dependencies": {
+    "modal_src": ["modal_srcset", "modal_sizes", "modal_responsive_style"],
+    "modal_srcset": ["modal_src", "modal_sizes", "modal_responsive_style"],
+    "modal_sizes": ["modal_src", "modal_srcset", "modal_responsive_style"],
+    "modal_responsive_style": ["modal_src", "modal_srcset", "modal_sizes"],
+    "link": ["rel"],
+    "rel": ["link"]
+  }
+}

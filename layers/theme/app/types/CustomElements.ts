@@ -6,6 +6,7 @@ export type CustomElementNode = {
 }
 
 export type DrupalMediaType = 'audio' | 'document' | 'image' | 'link' | 'video'
+export type DrupalMediaPayloadType = DrupalMediaType | 'basic-image'
 
 export type DrupalMediaSummary = {
   hasAudio: boolean
@@ -17,8 +18,9 @@ export type DrupalMediaSummary = {
 }
 
 export type DrupalMediaNodeProps = {
-  type?: DrupalMediaType
+  type?: DrupalMediaPayloadType
   alt?: string
+  category?: string
   credit?: string
   fetchpriority?: 'auto' | 'high' | 'low'
   height?: number
@@ -28,6 +30,10 @@ export type DrupalMediaNodeProps = {
   modalSizes?: string
   modalSrc?: string
   modalSrcset?: string
+  modalResponsiveStyle?: string
+  link?: string
+  rel?: 'noopener'
+  responsiveStyle?: string
   sizes?: string
   src?: string
   srcset?: string

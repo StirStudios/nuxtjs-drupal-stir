@@ -60,6 +60,7 @@ describe('useMediaModal', () => {
     expect(normalizeDrupalMediaType('audio')).toBe('audio')
     expect(normalizeDrupalMediaType('document')).toBe('document')
     expect(normalizeDrupalMediaType('image')).toBe('image')
+    expect(normalizeDrupalMediaType('basic-image')).toBe('image')
     expect(normalizeDrupalMediaType('link')).toBe('link')
     expect(normalizeDrupalMediaType('video')).toBe('video')
     expect(normalizeDrupalMediaType('unknown')).toBe('image')
