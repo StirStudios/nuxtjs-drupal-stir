@@ -1,28 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { defineComponent, h } from 'vue'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-
-const NuxtImgStub = defineComponent({
-  inheritAttrs: false,
-  props: {
-    alt: String,
-    format: String,
-    height: Number,
-    loading: String,
-    quality: Number,
-    sizes: String,
-    src: String,
-    width: Number,
-  },
-  setup(props, { attrs }) {
-    return () => h('img', {
-      ...attrs,
-      ...props,
-      'data-nuxt-img': '',
-    })
-  },
-})
 
 describe('MediaImage (Nuxt runtime)', () => {
   it('accepts a canonical provider source without leaking it into markup', async () => {
@@ -49,9 +27,6 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     try {
       const wrapper = await mountSuspended(MediaImage, {
-        global: {
-          components: { NuxtImg: NuxtImgStub },
-        },
         props: {
           alt: 'Provider image',
           height: 900,
@@ -67,7 +42,6 @@ describe('MediaImage (Nuxt runtime)', () => {
       })
 
       expect(wrapper.get('img').attributes()).toMatchObject({
-        'data-nuxt-img': '',
         format: 'webp',
         quality: '75',
         sizes: 'sm:100vw md:50vw lg:33vw xl:400px',
@@ -88,9 +62,6 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     try {
       const wrapper = await mountSuspended(MediaImage, {
-        global: {
-          components: { NuxtImg: NuxtImgStub },
-        },
         props: {
           alt: 'Fallback image',
           noWrapper: true,

@@ -157,6 +157,13 @@ describe('layer contract', () => {
     expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'nuxt\'')
     expect(themeConfig).toContain('[\'@nuxt/image\']')
     expect(themeConfig).toContain('stirImageDelivery')
+    expect(themeConfig).toContain("'#stir-image-provider': imageProviderComponent")
+    expect(themeConfig).toContain("'app/providers/NuxtImageProvider.vue'")
+    expect(themeConfig).toContain("'app/providers/NativeImageProvider.vue'")
+    expect(readFileSync(
+      resolve(rootDir, 'layers/theme/app/providers/NuxtImageProvider.vue'),
+      'utf8',
+    )).toContain('<NuxtImg v-bind="definedAttrs" />')
   })
 
   it('ships accessibility auditing as opt-in downstream development tooling', () => {

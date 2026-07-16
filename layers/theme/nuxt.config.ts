@@ -19,6 +19,12 @@ const compatibilitySafelistCss = resolvePath(
 const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'nuxt'
   ? 'nuxt'
   : 'drupal'
+const imageProviderComponent = resolvePath(
+  themeLayerDir,
+  stirImageDelivery === 'nuxt'
+    ? 'app/providers/NuxtImageProvider.vue'
+    : 'app/providers/NativeImageProvider.vue',
+)
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
@@ -31,6 +37,9 @@ function hasCssEntry(entries: unknown[], path: string): boolean {
 }
 
 export default defineNuxtConfig({
+  alias: {
+    '#stir-image-provider': imageProviderComponent,
+  },
   modules: [
     ...(stirImageDelivery === 'nuxt' ? ['@nuxt/image'] : []),
     function registerStirAppConfigTypes() {

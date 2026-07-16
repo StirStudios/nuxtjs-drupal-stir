@@ -67,7 +67,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   and the versioned Drupal contract—not repository tests, CI, audit scripts, or
   internal review documents. The current archive is 231 kB/419 files after the
   expanded producer-owned contracts and capability layers; packed-consumer CI
-  enforces tight 300 kB/425-entry caps. The prior 400-entry ratchet had become
+  enforces tight 300 kB/428-entry caps. The prior 400-entry ratchet had become
   stale before the SEO extraction (committed HEAD already packed 416 entries),
   while the byte budget remained healthy.
 - Stir-owned app contracts now use explicit `#stir/utils`,

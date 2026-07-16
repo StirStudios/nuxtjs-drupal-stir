@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
+import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
   resolveImageDeliveryProfile,
@@ -75,7 +76,7 @@ const isNuxtImage = computed(() =>
   && Boolean(providerSource.value && providerSizes.value),
 )
 const imageComponent = computed(() =>
-  isNuxtImage.value ? 'NuxtImg' : 'img',
+  isNuxtImage.value ? ProviderImage : 'img',
 )
 const fallbackSizes = computed(() => props.sizes?.trim() || '100vw')
 const wrappedSizes = computed(() => {
