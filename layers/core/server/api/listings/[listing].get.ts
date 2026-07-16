@@ -79,6 +79,9 @@ export default defineEventHandler(async (event) => {
     setResponseHeader(event, 'X-Stir-Listing-Contract', '1')
     return payload
   } catch (error) {
+    // Upstream and contract failures are operational state, not cacheable
+    // listing representations. Never let a CDN retain them as public output.
+    markPrivateResponse(event)
     captureDrupalApiError(event, error)
     const upstreamStatus = Number(
       (error as { statusCode?: unknown; status?: unknown })?.statusCode

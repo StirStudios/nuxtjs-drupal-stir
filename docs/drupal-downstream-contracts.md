@@ -70,6 +70,9 @@ and genuinely project-specific query or access semantics. Stir owns bounded
 request forwarding, the versioned response envelope, ordered paging metadata,
 session safety, and public-cache propagation. A listing machine name such as
 `articles` in a fixture is illustrative, not a required content type.
+Validated anonymous responses retain Drupal's public validators and cache
+policy. Personalized, session-bearing, session-setting, upstream-error, and
+invalid-contract responses are always private and `no-store` at the Nuxt edge.
 
 ## Media discovery and rendering
 
