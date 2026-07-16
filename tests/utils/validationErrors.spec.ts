@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { custom } from 'valibot'
 import { createPasswordResetValidationSchema } from '../../layers/auth/app/utils/authValidation'
 import { validateForm } from '../../layers/auth/app/utils/validationErrors'
 
@@ -32,5 +33,16 @@ describe('validationErrors', () => {
       createPasswordResetValidationSchema({ minLength: 8 }),
       { password: 'Password1', confirmPassword: 'Password1' },
     )).toEqual([])
+  })
+
+  it('maps scalar schema issues to an explicit field name', () => {
+    expect(validateForm(
+      custom(value => value === 'valid', 'Value is invalid'),
+      'invalid',
+      'password',
+    )).toEqual([{
+      name: 'password',
+      message: 'Value is invalid',
+    }])
   })
 })

@@ -12,6 +12,7 @@ export type FieldValidationError = {
 export function validateForm(
   schema: GenericSchema,
   input: unknown,
+  defaultName = '',
 ): FieldValidationError[] {
   const result = safeParse(schema, input, { abortEarly: false })
 
@@ -21,7 +22,7 @@ export function validateForm(
   const errors: FieldValidationError[] = []
 
   for (const issue of result.issues) {
-    const name = getDotPath(issue)?.trim() ?? ''
+    const name = getDotPath(issue)?.trim() || defaultName.trim()
     const message = issue.message.trim()
 
     if (!name || !message) continue
