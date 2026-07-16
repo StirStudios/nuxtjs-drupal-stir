@@ -1,3 +1,5 @@
+import { resolveDrupalPageAccess } from '../utils/editorialAccess'
+
 export function usePageContext() {
   const { getPage } = useStirDrupalCe()
   const page = getPage()
@@ -10,15 +12,18 @@ export function usePageContext() {
 
     return page.value?.is_front_page === true
   })
-  const isAdministrator = computed(
-    () => page.value?.current_user?.roles?.includes('administrator') || false,
-  )
+  const access = computed(() => resolveDrupalPageAccess(page.value))
+  const isAdministrator = computed(() => access.value.isAdministrator)
+  const isAuthenticated = computed(() => access.value.isAuthenticated)
+  const hasEditorialAccess = computed(() => access.value.hasEditorialAccess)
 
   const pageLayout = computed(() => page.value?.page_layout || '')
 
   return {
     isFront,
     isAdministrator,
+    isAuthenticated,
+    hasEditorialAccess,
     pageLayout,
   }
 }

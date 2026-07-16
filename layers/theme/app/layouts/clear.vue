@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { isAdministrator } = usePageContext()
+const { hasEditorialAccess } = usePageContext()
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col">
-    <LazyDrupalTabs v-if="isAdministrator" />
+    <LazyDrupalTabs v-if="hasEditorialAccess" />
     <UMain id="main-content" as="main" class="flex-1" role="main">
       <slot />
     </UMain>

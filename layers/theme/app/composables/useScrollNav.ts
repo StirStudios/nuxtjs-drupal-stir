@@ -14,9 +14,9 @@ export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
     behavior: 'smooth',
   })
 
-  const { isAdministrator } = usePageContext()
+  const { hasEditorialAccess } = usePageContext()
   const adjustedScrollThreshold = computed(() =>
-    isAdministrator.value ? baseScrollThreshold + 40 : baseScrollThreshold,
+    hasEditorialAccess.value ? baseScrollThreshold + 40 : baseScrollThreshold,
   )
 
   const lastScrollPosition = ref(0)

@@ -21,7 +21,7 @@ const attrs = useAttrs()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
 const { fetchMenu, getPage } = useStirDrupalCe()
 const page = getPage()
-const { isFront, isAdministrator } = usePageContext()
+const { isFront, hasEditorialAccess } = usePageContext()
 const route = useRoute()
 const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
@@ -115,7 +115,7 @@ const headerPositionClasses = computed(() => {
   return [
     isFixed.value ? 'fixed' : 'sticky',
     'z-50 w-full',
-    isAdministrator.value && !shouldHide.value ? 'top-[3.1rem]' : 'top-0',
+    hasEditorialAccess.value && !shouldHide.value ? 'top-[3.1rem]' : 'top-0',
   ].join(' ')
 })
 const shouldHide = computed(() =>
@@ -316,7 +316,7 @@ watch(menuOpen, (val) => {
 
 <template>
   <LazyRegionArea area="top" />
-  <LazyDrupalTabs v-if="isAdministrator" />
+  <LazyDrupalTabs v-if="hasEditorialAccess" />
 
   <header
     v-bind="attrs"

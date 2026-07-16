@@ -8,9 +8,7 @@ const page = getPage()
 const route = useRoute()
 const config = useRuntimeConfig()
 const user = computed(() => page.value?.current_user || null)
-const isAdministrator = computed(
-  () => !!user.value?.roles?.includes('administrator'),
-)
+const { hasEditorialAccess, isAuthenticated } = usePageContext()
 
 const iconMap: Record<string, string> = {
   'Drupal CMS': 'i-lucide-layout-dashboard',
@@ -94,7 +92,9 @@ const accountMenuUserId = useState<string>(
   'drupal-tabs-account-menu-user-id',
   () => '',
 )
-const currentUserId = computed(() => String(user.value?.id ?? 'anon'))
+const currentUserId = computed(() =>
+  String(user.value?.id ?? user.value?.uid ?? 'anon'),
+)
 const drupalCeConfig = computed<DrupalCeConfig>(() => {
   return (config.public.drupalCe || {}) as DrupalCeConfig
 })
@@ -166,7 +166,7 @@ const loadAccountMenu = async () => {
     accountMenuUserId.value = currentUserId.value
   }
 
-  if (!isAdministrator.value || isAccountMenuLoaded.value) {
+  if (!hasEditorialAccess.value || !isAuthenticated.value || isAccountMenuLoaded.value) {
     return
   }
 
@@ -214,14 +214,14 @@ watch(
     accountMenu.value = []
     isAccountMenuLoaded.value = false
     accountMenuUserId.value = currentUserId.value
-    if (isAdministrator.value) {
+    if (hasEditorialAccess.value) {
       void loadAccountMenu()
     }
   },
 )
 
-watch(isAdministrator, (isAdmin) => {
-  if (isAdmin) {
+watch(hasEditorialAccess, (hasAccess) => {
+  if (hasAccess) {
     isAccountMenuLoaded.value = false
     void loadAccountMenu()
   }
@@ -230,7 +230,7 @@ watch(isAdministrator, (isAdmin) => {
 watch(
   () => route.fullPath,
   () => {
-    if (isAdministrator.value && !isAccountMenuLoaded.value) {
+    if (hasEditorialAccess.value && !isAccountMenuLoaded.value) {
       void loadAccountMenu()
     }
   },

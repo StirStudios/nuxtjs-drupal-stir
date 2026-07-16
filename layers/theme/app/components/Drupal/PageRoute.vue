@@ -4,7 +4,7 @@ const props = defineProps<{
 }>()
 
 const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
-const { pageLayout, isAdministrator, isFront } = usePageContext()
+const { pageLayout, isAuthenticated, isFront } = usePageContext()
 const pageState = getPage()
 const route = useRoute()
 const pageRequest = useResolvedPageRequest(route)
@@ -28,7 +28,7 @@ const bodyClasses = computed(() =>
   [
     routeSlugClass.value,
     isFront.value ? 'front' : '',
-    isAdministrator.value ? 'logged-in' : '',
+    isAuthenticated.value ? 'logged-in' : '',
     pageState.value?.content?.element || '',
   ]
     .filter(Boolean)
