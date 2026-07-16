@@ -73,12 +73,21 @@ async function main() {
     for (const excludedPath of [
       'package/.github/',
       'package/docs/',
-      'package/scripts/',
       'package/tests/',
     ]) {
       if (archiveEntries.some(entry => entry.startsWith(excludedPath))) {
         throw new Error(`Packed layer includes repository-only path ${excludedPath}.`)
       }
+    }
+
+    const unexpectedScripts = archiveEntries.filter(entry =>
+      entry.startsWith('package/scripts/')
+      && !entry.startsWith('package/scripts/a11y/'),
+    )
+    if (unexpectedScripts.length > 0) {
+      throw new Error(
+        `Packed layer includes repository-only script ${unexpectedScripts[0]}.`,
+      )
     }
 
     for (const requiredPath of [
@@ -87,6 +96,7 @@ async function main() {
       'package/layers/theme/nuxt.config.ts',
       'package/presets/minimal/nuxt.config.ts',
       'package/presets/full/nuxt.config.ts',
+      'package/scripts/a11y/run.mjs',
       'package/nuxt.config.ts',
     ]) {
       if (!archiveEntries.includes(requiredPath)) {
@@ -125,6 +135,9 @@ async function main() {
     )
 
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
+    if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
+      throw new Error('Packed layer did not expose the stir-a11y executable.')
+    }
     for (const layer of consumerLayers) {
       // Each entry point is an independent consumer contract. Do not let Nuxt's
       // generated component, import, or app-config types leak across them.

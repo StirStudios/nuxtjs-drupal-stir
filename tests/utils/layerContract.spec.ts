@@ -156,6 +156,25 @@ describe('layer contract', () => {
     expect(themeConfig).toContain('stirImageDelivery')
   })
 
+  it('ships accessibility auditing as opt-in downstream development tooling', () => {
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as {
+      bin?: Record<string, string>
+      files?: string[]
+      peerDependencies?: Record<string, string>
+      peerDependenciesMeta?: Record<string, { optional?: boolean }>
+    }
+
+    expect(packageJson.bin?.['stir-a11y']).toBe('./scripts/a11y/run.mjs')
+    expect(packageJson.files).toContain('scripts/a11y')
+    for (const dependency of ['@axe-core/playwright', '@playwright/test']) {
+      expect(packageJson.peerDependencies?.[dependency]).toBeDefined()
+      expect(packageJson.peerDependenciesMeta?.[dependency]?.optional).toBe(true)
+    }
+  })
+
   it('keeps the consumer audit matrix outside downstream repositories', () => {
     const targets = JSON.parse(readFileSync(
       resolve(rootDir, 'scripts/audit/consumer-targets.json'),

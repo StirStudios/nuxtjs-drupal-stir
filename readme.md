@@ -96,6 +96,10 @@ The package exposes the reusable `stir-a11y` command. Add these scripts to a
 downstream project's `package.json` (package scripts are not inherited through
 Nuxt layers):
 
+```bash
+pnpm add -D @axe-core/playwright@^4.12.1 @playwright/test@^1.61.1
+```
+
 ```json
 {
   "scripts": {

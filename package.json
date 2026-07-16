@@ -2,6 +2,9 @@
   "name": "nuxtjs-drupal-stir",
   "version": "4.3.8",
   "main": "./nuxt.config.ts",
+  "bin": {
+    "stir-a11y": "./scripts/a11y/run.mjs"
+  },
   "exports": {
     ".": "./nuxt.config.ts",
     "./presets/minimal": "./presets/minimal/nuxt.config.ts",
@@ -19,6 +22,7 @@
     "contracts/stir-tools/v1",
     "layers",
     "presets",
+    "scripts/a11y",
     "server",
     "nuxt.config.ts",
     "readme.md"
@@ -100,10 +104,18 @@
     "valibot": "^1.4.2"
   },
   "peerDependencies": {
-    "@nuxt/image": "^2.0.0"
+    "@axe-core/playwright": "^4.12.1",
+    "@nuxt/image": "^2.0.0",
+    "@playwright/test": "^1.61.1"
   },
   "peerDependenciesMeta": {
+    "@axe-core/playwright": {
+      "optional": true
+    },
     "@nuxt/image": {
+      "optional": true
+    },
+    "@playwright/test": {
       "optional": true
     }
   },
