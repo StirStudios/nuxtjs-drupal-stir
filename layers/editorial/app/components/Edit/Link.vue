@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { CustomElementNode, EditAction } from '#stir/types'
+import type { EditAction } from '#stir/types'
+import {
+  buildLayoutEditLinkIndex,
+  layoutEditLinksKey,
+} from '#stir/utils/layoutEditLinks'
 
 defineOptions({
   inheritAttrs: false,
@@ -24,40 +28,10 @@ const emit = defineEmits<{
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
-
-function findLayoutEditLinkByUuid(value: unknown, uuid: string): string {
-  if (!value) return ''
-
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findLayoutEditLinkByUuid(item, uuid)
-
-      if (found) return found
-    }
-    return ''
-  }
-
-  if (typeof value !== 'object') return ''
-
-  const node = value as CustomElementNode
-  const nodeProps = (node.props ?? {}) as Record<string, unknown>
-  const nodeUuid = typeof nodeProps.uuid === 'string' ? nodeProps.uuid : ''
-  const nodeElement = typeof node.element === 'string' ? node.element : ''
-  const nodeEditLink =
-    typeof nodeProps.editLink === 'string' ? nodeProps.editLink.trim() : ''
-
-  if (nodeUuid === uuid && nodeElement === 'paragraph-layout') {
-    return nodeEditLink
-  }
-
-  for (const child of Object.values(node)) {
-    const found = findLayoutEditLinkByUuid(child, uuid)
-
-    if (found) return found
-  }
-
-  return ''
-}
+const providedLayoutEditLinks = inject(layoutEditLinksKey, null)
+const fallbackLayoutEditLinks = providedLayoutEditLinks
+  ? null
+  : computed(() => buildLayoutEditLinkIndex(page.value))
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const fullEditLink = computed(() =>
@@ -77,7 +51,11 @@ const layoutEditLink = computed(() => {
 
   if (!parentUuid) return ''
 
-  return findLayoutEditLinkByUuid(page.value, parentUuid)
+  return (
+    providedLayoutEditLinks?.value.get(parentUuid)
+    ?? fallbackLayoutEditLinks?.value.get(parentUuid)
+    ?? ''
+  )
 })
 const hasLayoutLink = computed(
   () =>

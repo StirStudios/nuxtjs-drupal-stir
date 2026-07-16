@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  buildLayoutEditLinkIndex,
+  layoutEditLinksKey,
+} from '../../utils/layoutEditLinks'
+
 const props = defineProps<{
   forcedLayout?: string
 }>()
@@ -6,6 +11,12 @@ const props = defineProps<{
 const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
 const { pageLayout, isAuthenticated, isFront } = usePageContext()
 const pageState = getPage()
+
+provide(
+  layoutEditLinksKey,
+  computed(() => buildLayoutEditLinkIndex(pageState.value)),
+)
+
 const route = useRoute()
 const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
