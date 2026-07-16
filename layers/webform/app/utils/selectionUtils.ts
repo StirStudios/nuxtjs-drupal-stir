@@ -3,7 +3,7 @@ import type {
   WebformOptionProperties,
   WebformState,
 } from '#stir/types'
-import { normalizeValue } from './stringUtils'
+import { normalizeValue } from '#stir/utils/stringUtils'
 
 export const syncLinkedSelections = (
   selectedValues: string[],

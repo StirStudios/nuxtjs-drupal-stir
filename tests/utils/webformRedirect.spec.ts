@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveWebformRedirect } from '../../layers/theme/app/utils/webformRedirect'
+import { resolveWebformRedirect } from '../../layers/webform/app/utils/webformRedirect'
 
 describe('resolveWebformRedirect', () => {
   it('accepts a root-relative Drupal confirmation URL', () => {

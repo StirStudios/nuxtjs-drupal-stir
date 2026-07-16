@@ -5,7 +5,7 @@ import {
   getFileAccept,
   getFileMaxSize,
   isFileValue,
-} from '#stir/utils/webformFileUtils'
+} from '#stir-webform/utils/webformFileUtils'
 
 const props = defineProps<{
   field: WebformFieldProps

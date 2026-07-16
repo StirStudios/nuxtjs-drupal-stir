@@ -1,5 +1,5 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
-import { evaluateCondition } from '#stir/utils/evaluateUtils'
+import { evaluateCondition } from '#stir-webform/utils/evaluateUtils'
 
 export function evaluateContainerVisibility(
   containerName: string,

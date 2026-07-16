@@ -6,9 +6,16 @@ const componentDeclarations = async name => readFile(resolve(
   `${name}-consumer/.nuxt/components.d.ts`,
 ), 'utf8')
 
-const [minimal, full] = await Promise.all([
+const autoImportDeclarations = async name => readFile(resolve(
+  'tests/fixtures',
+  `${name}-consumer/.nuxt/imports.d.ts`,
+), 'utf8')
+
+const [minimal, full, minimalImports, fullImports] = await Promise.all([
   componentDeclarations('minimal'),
   componentDeclarations('full'),
+  autoImportDeclarations('minimal'),
+  autoImportDeclarations('full'),
 ])
 
 const expected = {
@@ -51,6 +58,22 @@ if (minimal.includes('layers/webform/app/components/Field/Renderer.vue')) {
   throw new Error(
     'minimal preset unexpectedly registered Webform field components',
   )
+}
+
+for (const webformImport of [
+  'useEvaluateState',
+  'useStirWebformTheme',
+  'buildValidationSchema',
+  'transformPayloadToSnakeCase',
+]) {
+  if (minimalImports.includes(webformImport)) {
+    throw new Error(
+      `minimal preset unexpectedly auto-imported ${webformImport}`,
+    )
+  }
+  if (!fullImports.includes(webformImport)) {
+    throw new Error(`full preset did not auto-import ${webformImport}`)
+  }
 }
 
 process.stdout.write('Preset optional component ownership passed.\n')

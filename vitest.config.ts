@@ -13,6 +13,15 @@ export default defineConfig({
     alias: {
       '~': rootDir,
       '~~': rootDir,
+      '#stir/utils': fileURLToPath(
+        new URL('./layers/theme/app/utils', import.meta.url),
+      ),
+      '#stir-webform/utils': fileURLToPath(
+        new URL('./layers/webform/app/utils', import.meta.url),
+      ),
+      '#stir-webform/composables': fileURLToPath(
+        new URL('./layers/webform/app/composables', import.meta.url),
+      ),
     },
   },
 })

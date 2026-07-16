@@ -1,7 +1,16 @@
+import { fileURLToPath } from 'node:url'
 import { positiveIntegerEnvironment } from '../../config/runtime'
+
+const resolveWebformPath = (path: string) =>
+  fileURLToPath(new URL(path, import.meta.url))
 
 export default defineNuxtConfig({
   extends: ['../platform', '../turnstile'],
+
+  alias: {
+    '#stir-webform/utils': resolveWebformPath('./app/utils'),
+    '#stir-webform/composables': resolveWebformPath('./app/composables'),
+  },
 
   runtimeConfig: {
     webformSubmissionLimits: {

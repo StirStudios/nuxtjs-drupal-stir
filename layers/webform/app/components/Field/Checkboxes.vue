@@ -5,9 +5,9 @@ import {
   enforceGroupLimit,
   enforceMaxSelected,
   syncLinkedSelections,
-} from '#stir/utils/selectionUtils'
+} from '#stir-webform/utils/selectionUtils'
 import { normalizeValue } from '#stir/utils/stringUtils'
-import { handleTabChange } from '#stir/utils/visibilityUtils'
+import { handleTabChange } from '#stir-webform/utils/visibilityUtils'
 
 const props = defineProps<{
   field: WebformFieldProps

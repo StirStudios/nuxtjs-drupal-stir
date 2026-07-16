@@ -1,6 +1,6 @@
 import type { ConditionType, ConditionEntry, WebformState } from '#stir/types'
 import { getNestedStateValue, matchesCondition } from './stateUtils'
-import { extractFieldName } from './stringUtils'
+import { extractFieldName } from '#stir/utils/stringUtils'
 
 export const evaluateCondition = (
   condition: ConditionType | undefined,

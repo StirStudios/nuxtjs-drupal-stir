@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformState } from '#stir/types'
-import type { WebformValidationSchema } from '#stir/utils/buildValidationSchema'
+import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
 

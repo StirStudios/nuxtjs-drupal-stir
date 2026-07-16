@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parse, parseAsync } from 'valibot'
-import { buildValidationSchema } from '../../layers/theme/app/utils/buildValidationSchema'
+import { buildValidationSchema } from '../../layers/webform/app/utils/buildValidationSchema'
 import type { WebformFieldProps, WebformState } from '../../layers/theme/app/types'
 
 function createDateTimeField(

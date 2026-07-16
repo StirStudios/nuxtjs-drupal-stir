@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '#stir/types'
 import { useEventBus } from '@vueuse/core'
-import { transformOptions } from '#stir/utils/transformUtils'
+import { transformOptions } from '#stir-webform/utils/transformUtils'
 import {
   resolveUiButtonVariant,
   resolveUiFieldVariant,

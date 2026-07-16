@@ -1,4 +1,4 @@
-import { toSnakeCase } from './stringUtils'
+import { toSnakeCase } from '#stir/utils/stringUtils'
 import { hasFileValue, isFileValue } from './webformFileUtils'
 
 type OptionObject = { label: string; description?: string }

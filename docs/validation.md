@@ -6,7 +6,7 @@ This layer uses one Valibot and Nuxt UI Standard Schema foundation with two doma
 
 - Entry points:
   - `layers/webform/app/components/global/Paragraph/Webform.vue`
-  - `layers/theme/app/utils/buildValidationSchema.ts`
+  - `layers/webform/app/utils/buildValidationSchema.ts`
 - Purpose:
   - Build Valibot schemas at runtime from Drupal webform metadata and field states.
 - Notes:

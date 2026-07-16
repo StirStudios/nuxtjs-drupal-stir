@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { flattenWebformFields } from '#stir/utils/flattenWebformFields'
-import { evaluateContainerVisibility } from '#stir/composables/useContainerVisibility'
-import { transformPayloadToSnakeCase } from '#stir/utils/transformUtils'
+import { flattenWebformFields } from '#stir-webform/utils/flattenWebformFields'
+import { evaluateContainerVisibility } from '#stir-webform/composables/useContainerVisibility'
+import { transformPayloadToSnakeCase } from '#stir-webform/utils/transformUtils'
 import { getHiddenDefaults } from '#stir/utils/getHiddenDefaults'
 import { useWindowScroll } from '@vueuse/core'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '#stir/utils/webformScrollToTop'
-import { resolveWebformRedirect } from '#stir/utils/webformRedirect'
-import { evaluateCondition } from '#stir/utils/evaluateUtils'
+} from '#stir-webform/utils/webformScrollToTop'
+import { resolveWebformRedirect } from '#stir-webform/utils/webformRedirect'
+import { evaluateCondition } from '#stir-webform/utils/evaluateUtils'
 import {
   buildWebformFormData,
   hasFileValue,
   isWebformFileField,
-} from '#stir/utils/webformFileUtils'
+} from '#stir-webform/utils/webformFileUtils'
 import type {
   WebformDefinition,
   WebformFieldProps,
   WebformProps,
   WebformState,
 } from '#stir/types'
-import type { WebformValidationSchema } from '#stir/utils/buildValidationSchema'
+import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 
-type BuildValidationSchema = typeof import('#stir/utils/buildValidationSchema')['buildValidationSchema']
+type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
 const props = defineProps<WebformProps>()
 const webform = computed<WebformDefinition>(() => {
@@ -98,7 +98,7 @@ function requestSchema(): void {
 async function ensureSchemaReady(): Promise<void> {
   if (isSchemaReady.value) return
 
-  schemaLoadPromise ??= import('#stir/utils/buildValidationSchema')
+  schemaLoadPromise ??= import('#stir-webform/utils/buildValidationSchema')
     .then((module) => {
       buildSchema = module.buildValidationSchema
       schema.value = buildSchema(fields, state)

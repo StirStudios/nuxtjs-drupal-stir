@@ -1,5 +1,5 @@
 import type { WebformState } from '#stir/types'
-import { evaluateCondition } from '#stir/utils/evaluateUtils'
+import { evaluateCondition } from '#stir-webform/utils/evaluateUtils'
 
 interface VisibilityCondition {
   [selector: string]: { value: string }

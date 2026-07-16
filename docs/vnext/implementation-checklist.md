@@ -35,6 +35,10 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   website consumers no longer register the 18 address, choice, date/time, file,
   numeric, text, and renderer components, while the full preset retains the
   same component names and downstream override seam.
+- Webform-owned validation-schema, conditional-state, field-flattening,
+  selection, payload, file, redirect, and scroll policy now lives behind an
+  explicit capability alias. Its three form composables are no longer part of
+  the minimal website auto-import surface; full consumers retain them.
 - Turnstile registration, runtime secrets, interaction-only presentation, and the shared field now live in an independent `layers/turnstile` capability. Auth-only and Webform-only fixtures prove that both consume mandatory bot protection without loading one another; the minimal preset loads neither.
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
 - Plausible and UserWay app-config defaults are also owned by their optional layers. Layer contracts prove theme ownership stays clean, while the preset matrix and full runtime test prove optional registration and merged defaults.

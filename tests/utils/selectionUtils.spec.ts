@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { syncLinkedSelections } from '../../layers/theme/app/utils/selectionUtils'
+import { syncLinkedSelections } from '../../layers/webform/app/utils/selectionUtils'
 
 describe('syncLinkedSelections', () => {
   it('adds linked options while tolerating normalized Drupal keys', () => {
