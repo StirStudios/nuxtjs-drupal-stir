@@ -47,12 +47,26 @@ describe('useDrupalViewControls helpers', () => {
         multiple: true,
         options: { news: 'News' },
       },
+      {
+        label: 'Date range',
+        queryParamName: 'date_range',
+        options: {},
+        type: 'date_range',
+      },
     ])).toEqual([{
       label: 'Category',
       queryParamName: 'category',
+      type: undefined,
       multiple: true,
       disabled: undefined,
       options: [{ label: 'News', value: 'news' }],
+    }, {
+      label: 'Date range',
+      queryParamName: 'date_range',
+      type: 'date_range',
+      multiple: undefined,
+      disabled: undefined,
+      options: [],
     }])
 
     const sort = primaryDrupalViewSort([{

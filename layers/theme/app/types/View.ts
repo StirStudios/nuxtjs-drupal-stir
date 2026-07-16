@@ -3,6 +3,7 @@ import type { ViewPager } from '#stir/composables/useDrupalViewQuery'
 export interface ExposedFilter {
   label: string
   queryParamName: string
+  type?: string
   multiple?: boolean
   disabled?: boolean
   options?: Record<string, string> | string[]
