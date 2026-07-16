@@ -25,6 +25,7 @@
     "production": [
       "@iconify-json/lucide",
       "@internationalized/date",
+      "@nuxt/kit",
       "@nuxt/scripts",
       "@nuxt/ui",
       "@nuxtjs/plausible",
@@ -645,7 +646,7 @@
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 26,
-    "productionDependencies": 25,
+    "productionDependencies": 26,
     "developmentDependencies": 24,
     "tests": 98,
     "testsByArea": {

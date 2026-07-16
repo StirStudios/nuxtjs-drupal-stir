@@ -63,8 +63,6 @@ export default defineNuxtConfig({
         '@nuxt/ui > prosemirror-view',
         '@nuxt/ui > prosemirror-gapcursor',
         '@plausible-analytics/tracker',
-        '@vue/devtools-core',
-        '@vue/devtools-kit',
         '@vueuse/core',
         'valibot',
       ],
