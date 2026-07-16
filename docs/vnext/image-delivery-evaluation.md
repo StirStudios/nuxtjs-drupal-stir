@@ -70,6 +70,33 @@ transparency, and user-uploaded images.
 AVIF at the tested setting was larger than WebP for this image. Format choice
 must therefore remain evidence-led rather than assuming AVIF is always smaller.
 
+## Integrated DancePlug Lighthouse comparison
+
+The opt-in implementation was then built twice from the same DancePlug Nuxt
+checkout and local Drupal 11 content: once with Drupal responsive-image
+delivery and once with `STIR_IMAGE_DELIVERY=nuxt`. Each production build served
+the homepage locally and ran three Lighthouse 13.4.0 mobile passes in Chrome
+149. The checked result is
+`docs/vnext/danceplug-image-lighthouse.latest.json`.
+
+| Mobile median | Drupal responsive | Nuxt Image | Difference |
+| ------------- | ----------------: | ---------: | ---------: |
+| Performance score | 66 | 72 | +6 |
+| FCP | 4,076 ms | 4,066 ms | -10 ms |
+| LCP | 6,585 ms | 4,829 ms | -1,756 ms (-26.7%) |
+| TBT | 132 ms | 98 ms | -34 ms (-25.8%) |
+| CLS | 0 | 0 | no change |
+| Total transfer | 943,062 B | 923,773 B | -19,289 B (-2.0%) |
+| Image transfer | 251,952 B | 231,141 B | -20,811 B (-8.3%) |
+| Requests | 110 | 109 | -1 |
+
+This is a real improvement in the tested local production path, especially for
+LCP. FCP remained flat because image delivery does not remove the homepage's
+render-blocking CSS. Local Lighthouse is still directional: it does not include
+Bunny edge latency/cache hits, production CPU contention, or internet origin
+latency. A staging Bunny pull-zone comparison remains required before enabling
+Nuxt Image as a production default.
+
 ## Candidate generation
 
 Generic Nuxt Image defaults are not sufficiently deliberate for this layer:
