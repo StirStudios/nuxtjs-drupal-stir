@@ -78,6 +78,47 @@ describe('MediaVideo (Nuxt runtime)', () => {
     matchMedia.mockRestore()
   })
 
+  it('activates a deferred bare video when the viewport becomes eligible', async () => {
+    let handleChange: ((event: MediaQueryListEvent) => void) | undefined
+    const mediaQuery = {
+      matches: false,
+      addEventListener: vi.fn((event, handler) => {
+        if (event === 'change') {
+          handleChange = handler as (event: MediaQueryListEvent) => void
+        }
+      }),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(() => {
+      return mediaQuery
+    })
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadMinWidth: 768,
+        loadStrategy: 'immediate',
+        mediaEmbed: '/hero.mp4',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+      },
+    })
+
+    Object.assign(mediaQuery, { matches: true })
+    handleChange?.({ matches: true } as MediaQueryListEvent)
+    await nextTick()
+
+    expect(wrapper.get('source').attributes('src')).toBe('/hero.mp4')
+    expect(load).toHaveBeenCalledOnce()
+    expect(mediaQuery.removeEventListener).toHaveBeenCalledWith(
+      'change',
+      handleChange,
+    )
+    load.mockRestore()
+    matchMedia.mockRestore()
+  })
+
   it('defers animated previews until hover and restores responsive thumbnails', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {

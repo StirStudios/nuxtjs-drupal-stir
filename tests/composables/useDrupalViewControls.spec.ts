@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import type { CustomElementNode } from '../../layers/theme/app/types'
 import {
+  buildDrupalViewControlQuery,
   buildDrupalViewSearchParams,
+  drupalViewManagedQueryKeys,
   isSafeDrupalViewControlValue,
   isValidDrupalViewFilterValue,
   mapDrupalViewFilterOptions,
+  mapDrupalViewSortByOptions,
+  mapDrupalViewSortOrderOptions,
+  normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
+  primaryDrupalViewSort,
 } from '../../layers/theme/app/composables/useDrupalViewQuery'
 import {
   findDrupalViewNode,
@@ -31,6 +37,42 @@ describe('useDrupalViewControls helpers', () => {
     ])
   })
 
+  it('normalizes exposed filter and sort metadata', () => {
+    expect(normalizeDrupalViewFilters([
+      null,
+      { label: '', queryParamName: 'ignored', options: {} },
+      {
+        label: 'Category',
+        queryParamName: 'category',
+        multiple: true,
+        options: { news: 'News' },
+      },
+    ])).toEqual([{
+      label: 'Category',
+      queryParamName: 'category',
+      multiple: true,
+      disabled: undefined,
+      options: [{ label: 'News', value: 'news' }],
+    }])
+
+    const sort = primaryDrupalViewSort([{
+      label: 'Newest',
+      sortByValue: 'created',
+      queryParamSortBy: 'sort_by',
+      queryParamSortOrder: 'sort_order',
+      sortOrderOptions: { ASC: 'Ascending', DESC: 'Descending' },
+    }])
+
+    expect(mapDrupalViewSortByOptions(sort)).toEqual([
+      { label: 'Newest', value: 'created' },
+    ])
+    expect(mapDrupalViewSortOrderOptions(sort)).toEqual([
+      { label: 'Ascending', value: 'ASC' },
+      { label: 'Descending', value: 'DESC' },
+    ])
+    expect(primaryDrupalViewSort([{}])).toBeNull()
+  })
+
   it('serializes view query params with repeated values for arrays', () => {
     const params = buildDrupalViewSearchParams({
       category: ['news', 'events'],
@@ -39,6 +81,65 @@ describe('useDrupalViewControls helpers', () => {
 
     expect(params.getAll('category')).toEqual(['news', 'events'])
     expect(params.get('page')).toBe('2')
+  })
+
+  it('builds managed keys and safe Drupal view control queries', () => {
+    const filters = normalizeDrupalViewFilters([{
+      label: 'Category',
+      queryParamName: 'category',
+      multiple: true,
+      options: { news: 'News', events: 'Events' },
+    }])
+    const sort = primaryDrupalViewSort([{
+      label: 'Newest',
+      sortByValue: 'created',
+      submittedOrder: 'ASC',
+      queryParamSortBy: 'sort_by',
+      queryParamSortOrder: 'sort_order',
+      sortOrderOptions: { ASC: 'Ascending', DESC: 'Descending' },
+    }])
+
+    expect(drupalViewManagedQueryKeys(filters, sort)).toEqual([
+      'page',
+      'category',
+      'category[]',
+      'sort_by',
+      'sort_by[]',
+      'sort_order',
+      'sort_order[]',
+    ])
+    expect(buildDrupalViewControlQuery({
+      filters,
+      filterValues: { category: ['news', 'events'] },
+      sort,
+      sortValues: { sort_by: 'created', sort_order: 'DESC' },
+      sortByOptions: [{ value: 'created' }],
+      sortOrderOptions: [{ value: 'ASC' }, { value: 'DESC' }],
+      page: 2,
+    })).toEqual({
+      'category[]': ['news', 'events'],
+      'sort_by': 'created',
+      'sort_order': 'DESC',
+      'page': '2',
+    })
+  })
+
+  it('omits unsafe and unknown values from Drupal view queries', () => {
+    const filters = normalizeDrupalViewFilters([{
+      label: 'Category',
+      queryParamName: 'category',
+      options: { news: 'News' },
+    }])
+
+    expect(buildDrupalViewControlQuery({
+      filters,
+      filterValues: { category: 'news?category=other' },
+      sort: null,
+      sortValues: {},
+      sortByOptions: [],
+      sortOrderOptions: [],
+      page: 0,
+    })).toEqual({})
   })
 
   it('normalizes sort order values for Drupal view requests', () => {

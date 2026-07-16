@@ -1,0 +1,201 @@
+<script setup lang="ts">
+import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
+import type { ModalMediaItem } from '~/composables/useMediaModal'
+import { resolveCarouselArrowButton } from '~/utils/nuxtUiProps'
+import { drupalMediaComponentName } from '../../../utils/drupalMediaTypes'
+
+const props = defineProps<{
+  activeIndex: number
+  items: ModalMediaItem[]
+  startIndex: number
+}>()
+
+const emit = defineEmits<{
+  select: [index: number]
+}>()
+
+const open = defineModel<boolean>('open', { required: true })
+const theme = useAppConfig().stirTheme
+const portal = useOverlayPortal()
+const activeItem = computed(() => props.items[props.activeIndex] ?? null)
+const firstItem = computed(() => props.items[0] ?? null)
+const modalTitle = computed(() => activeItem.value?.title || '')
+const modalDescription = computed(() => {
+  const description = activeItem.value?.alt || activeItem.value?.credit || ''
+
+  return description.trim() !== '' ? description : undefined
+})
+const modalCredit = computed(() => activeItem.value?.credit || '')
+const modalAccessibleTitle = computed(
+  () => modalTitle.value.trim() || 'Media preview',
+)
+const modalAccessibleDescription = computed(() => {
+  const description = modalDescription.value?.trim()
+
+  if (description) return description
+  const credit = modalCredit.value.trim()
+
+  if (credit) return credit
+  return `Preview of ${activeItem.value?.type || 'media'} content`
+})
+const prevCarouselButton = computed(() =>
+  resolveCarouselArrowButton(theme.carousel.arrows?.prev),
+)
+const nextCarouselButton = computed(() =>
+  resolveCarouselArrowButton(theme.carousel.arrows?.next),
+)
+const singleVideoFrameStyle = computed(() => {
+  if (firstItem.value?.type !== 'video') return undefined
+
+  const width = Number(firstItem.value.width)
+  const height = Number(firstItem.value.height)
+  const aspectRatio =
+    Number.isFinite(width) && Number.isFinite(height) && height > 0
+      ? width / height
+      : 16 / 9
+
+  return {
+    maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
+  }
+})
+
+const { handleCarouselSelect } = useModalMediaPlayback({
+  getCurrentMid: () => String(activeItem.value?.mid ?? ''),
+  getActiveMid: index => String(props.items[index]?.mid ?? ''),
+  onSelect: index => emit('select', index),
+})
+
+function mediaComponentFor(type: unknown) {
+  return drupalMediaComponentName(type)
+}
+</script>
+
+<template>
+  <LazyUModal
+    v-if="items.length > 0"
+    v-model:open="open"
+    class="media-modal"
+    :close="false"
+    :description="modalAccessibleDescription"
+    fullscreen
+    :portal="portal"
+    :title="modalAccessibleTitle"
+    :ui="{
+      content: 'bg-transparent divide-none p-0',
+      header: 'hidden',
+    }"
+  >
+    <template v-if="open" #body>
+      <UButton
+        class="absolute top-4 right-4 z-10"
+        color="neutral"
+        icon="i-lucide-x"
+        size="lg"
+        variant="soft"
+        @click="open = false"
+      />
+
+      <div
+        v-if="items.length === 1 && firstItem"
+        class="flex h-full w-full items-center justify-center p-4"
+      >
+        <div
+          :class="
+            firstItem.type === 'video'
+              ? ['w-full overflow-hidden', theme.media.rounded]
+              : 'contents'
+          "
+          :style="singleVideoFrameStyle"
+        >
+          <component
+            :is="mediaComponentFor(firstItem.type)"
+            v-bind="{
+              ...firstItem,
+              ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
+              ...(firstItem.type === 'image' ? { noWrapper: true } : {}),
+            }"
+          />
+        </div>
+      </div>
+
+      <LazyUCarousel
+        v-else
+        :arrows="items.length > 1"
+        :items="items"
+        loop
+        :next="nextCarouselButton"
+        :next-icon="theme.carousel.arrows?.nextIcon"
+        :prev="prevCarouselButton"
+        :prev-icon="theme.carousel.arrows?.prevIcon"
+        :start-index="startIndex"
+        :ui="{ container: 'items-center h-full' }"
+        @select="handleCarouselSelect"
+      >
+        <template #default="{ item }">
+          <div :class="['overflow-hidden', theme.media.rounded]">
+            <component
+              :is="mediaComponentFor(item.type)"
+              :key="item.key"
+              class="shadow-2xl"
+              v-bind="{
+                ...item,
+                ...(item.type === 'video' ? { deferEmbed: false } : {}),
+                ...(item.type === 'image' ? { noWrapper: true } : {}),
+              }"
+            />
+          </div>
+        </template>
+      </LazyUCarousel>
+
+      <Transition
+        appear
+        :enter-active-class="`
+          transform transition ease-out delay-150
+          ${theme.media.transitions.fast}
+        `"
+        enter-from-class="translate-y-20 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+      >
+        <div
+          v-if="
+            (theme.mediaModal.title && modalTitle) ||
+            (theme.mediaModal.description?.media && modalDescription) ||
+            modalCredit
+          "
+          class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/75 px-4 py-3 text-center text-white backdrop-blur-sm"
+        >
+          <div v-if="theme.mediaModal.title && modalTitle" class="font-semibold">
+            {{ modalTitle }}
+          </div>
+
+          <div
+            v-if="theme.mediaModal.description?.media && modalDescription"
+            class="text-sm text-neutral-100"
+          >
+            {{ modalDescription }}
+          </div>
+
+          <div v-if="modalCredit" class="text-xs text-neutral-200 italic">
+            {{ modalCredit }}
+          </div>
+        </div>
+      </Transition>
+    </template>
+  </LazyUModal>
+</template>
+
+<style>
+@layer components {
+  .media-modal [aria-roledescription='carousel'] {
+    @apply h-full;
+
+    .overflow-hidden {
+      @apply h-full;
+    }
+  }
+
+  .media-modal img {
+    @apply max-h-[80vh] object-contain;
+  }
+}
+</style>

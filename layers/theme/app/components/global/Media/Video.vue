@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { mediaPreviewClasses } from '~/utils/mediaPreviewClasses'
+import { useDeferredVideoSource } from '~/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '~/composables/useVideoPlayers'
 import type { EditAction, EditActionKey } from '~/types/EditControls'
 
@@ -61,18 +62,26 @@ const props = withDefaults(
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
 const attrs = useAttrs()
-const { initializePlayers } = useVideoPlayers()
+const { initializePlayers, registerIframe } = useVideoPlayers()
 const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
-const isBareVideoSourceActive = ref(false)
-const bareVideoLoadStrategy = computed(
-  () => props.loadStrategy ?? mediaTheme.video?.loadStrategy ?? 'after-load',
-)
+const iframeElement = ref<HTMLIFrameElement | null>(null)
+const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
+  const strategy = props.loadStrategy ?? mediaTheme.video?.loadStrategy
+
+  return strategy === 'immediate' ? 'immediate' : 'after-load'
+})
 const bareVideoLoadMinWidth = computed(
   () => props.loadMinWidth ?? mediaTheme.video?.loadMinWidth ?? 768,
 )
-let bareVideoMediaQuery: MediaQueryList | undefined
+const { isActive: isBareVideoSourceActive } = useDeferredVideoSource({
+  enabled: isBare,
+  minWidth: bareVideoLoadMinWidth,
+  source: () => props.mediaEmbed,
+  strategy: bareVideoLoadStrategy,
+  videoElement,
+})
 const isProcessing = computed(() => {
   if (props.thumbnailStatus) {
     return props.thumbnailStatus === 'processing'
@@ -126,6 +135,12 @@ const emit = defineEmits<{
 
 async function scheduleInitializePlayers(): Promise<void> {
   await nextTick()
+
+  if (iframeElement.value) {
+    await registerIframe(iframeElement.value)
+    return
+  }
+
   await initializePlayers()
 }
 
@@ -145,54 +160,7 @@ function deactivateAnimatedPreview(): void {
   isAnimatedPreviewActive.value = false
 }
 
-async function activateBareVideoSource(): Promise<void> {
-  if (!isBare.value || isBareVideoSourceActive.value || !props.mediaEmbed) return
-
-  isBareVideoSourceActive.value = true
-  await nextTick()
-  videoElement.value?.load()
-}
-
-function scheduleBareVideoSource(): void {
-  const minWidth = bareVideoLoadMinWidth.value
-
-  if (minWidth > 0) {
-    bareVideoMediaQuery = window.matchMedia(`(min-width: ${minWidth}px)`)
-
-    if (!bareVideoMediaQuery.matches) {
-      bareVideoMediaQuery.addEventListener(
-        'change',
-        handleBareVideoMediaQueryChange,
-        { once: true },
-      )
-      return
-    }
-  }
-
-  if (!isBare.value || bareVideoLoadStrategy.value === 'immediate') {
-    void activateBareVideoSource()
-    return
-  }
-
-  if (document.readyState === 'complete') {
-    requestAnimationFrame(() => void activateBareVideoSource())
-    return
-  }
-
-  window.addEventListener(
-    'load',
-    () => requestAnimationFrame(() => void activateBareVideoSource()),
-    { once: true },
-  )
-}
-
-function handleBareVideoMediaQueryChange(event: MediaQueryListEvent): void {
-  if (event.matches) scheduleBareVideoSource()
-}
-
 onMounted(() => {
-  scheduleBareVideoSource()
-
   if (!isBare.value && !props.deferEmbed) {
     isEmbedActive.value = true
   }
@@ -200,13 +168,6 @@ onMounted(() => {
   if (!isBare.value && shouldShowIframe.value) {
     void scheduleInitializePlayers()
   }
-})
-
-onBeforeUnmount(() => {
-  bareVideoMediaQuery?.removeEventListener(
-    'change',
-    handleBareVideoMediaQueryChange,
-  )
 })
 
 watch(
@@ -272,6 +233,7 @@ watch(
 
     <iframe
       v-if="shouldShowIframe"
+      ref="iframeElement"
       allow="
         accelerometer;
         autoplay;

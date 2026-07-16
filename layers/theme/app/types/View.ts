@@ -1,5 +1,22 @@
-import type { ExposedFilter, ExposedSort } from '~/composables/useDrupalViewControls'
 import type { ViewPager } from '~/composables/useDrupalViewQuery'
+
+export interface ExposedFilter {
+  label: string
+  queryParamName: string
+  multiple?: boolean
+  disabled?: boolean
+  options?: Record<string, string> | string[]
+  submittedValues?: unknown[]
+}
+
+export interface ExposedSort {
+  label?: string
+  sortByValue?: string
+  submittedOrder?: string
+  queryParamSortBy?: string
+  queryParamSortOrder?: string
+  sortOrderOptions?: Record<string, string>
+}
 
 export interface DrupalViewProps {
   title?: string

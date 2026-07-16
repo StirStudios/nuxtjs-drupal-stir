@@ -5,8 +5,9 @@ import type {
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import {
-  menuItemTo,
-  type DrupalMenuItemLink,
+  mapDrupalMenuItem,
+  splitMenuAtMarker,
+  type DrupalMenuTreeItem,
 } from '~/utils/navigation'
 
 defineOptions({
@@ -55,18 +56,6 @@ type SlideoverContentAttrs = SlideoverContent & {
   'aria-label'?: string
   id?: string
   style?: Record<`--${string}`, string>
-}
-
-type MainMenuItem = DrupalMenuItemLink & {
-  title?: string
-  children?: MainMenuItem[]
-  below?: MainMenuItem[]
-  items?: MainMenuItem[]
-  options?: DrupalMenuItemLink['options'] & {
-    attributes?: {
-      target?: string
-    }
-  }
 }
 
 const toToggleDirection = (value: unknown): ToggleDirection => {
@@ -275,48 +264,19 @@ const showSlideoverBrand = computed(() => theme.navigation.slideover?.logo !== f
 const slideoverLinkClasses = computed(() => toClassName(theme.navigation.slideover?.link))
 const slideoverListClasses = computed(() => toClassName(theme.navigation.slideover?.list))
 
-function menuChildren(item: MainMenuItem): MainMenuItem[] {
-  if (Array.isArray(item.children)) return item.children
-  if (Array.isArray(item.below)) return item.below
-  if (Array.isArray(item.items)) return item.items
-
-  return []
-}
-
-function mapMenuItem(item: MainMenuItem): NavigationMenuItem {
-  const children = menuChildren(item).map(mapMenuItem)
-  const to = menuItemTo(item)
-  const hasChildren = children.length > 0
-  const hasHash = typeof to === 'string' && to.includes('#')
-
-  return {
-    label: item.title ?? '',
-    to: hasChildren ? undefined : to,
-    exact: !hasChildren,
-    exactHash: !hasChildren && hasHash,
-    target: !hasChildren && item.external ? item.options?.attributes?.target || '_blank' : undefined,
-    children: hasChildren ? children : undefined,
-  }
-}
-
 const navLinks = computed<NavigationMenuItem[]>(() =>
-  mainMenu.value.map((item: MainMenuItem) => mapMenuItem(item)),
+  mainMenu.value.map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
 )
-const logoIndex = computed(() => {
-  if (!isSplitLogoLayout.value || !splitLogoMarker.value) return -1
-
-  return navLinks.value.findIndex((item) => item.label === splitLogoMarker.value)
-})
-const beforeLogo = computed(() =>
-  logoIndex.value > -1
-    ? navLinks.value.slice(0, logoIndex.value)
-    : navLinks.value,
-)
-const afterLogo = computed(() =>
-  logoIndex.value > -1 ? navLinks.value.slice(logoIndex.value + 1) : [],
-)
+const splitMenu = computed(() => splitMenuAtMarker(
+  navLinks.value,
+  isSplitLogoLayout.value ? splitLogoMarker.value : undefined,
+))
+const beforeLogo = computed(() => splitMenu.value.before)
+const afterLogo = computed(() => splitMenu.value.after)
 const mobileNavLinks = computed(() =>
-  logoIndex.value > -1 ? [...beforeLogo.value, ...afterLogo.value] : navLinks.value,
+  splitMenu.value.markerIndex > -1
+    ? [...beforeLogo.value, ...afterLogo.value]
+    : navLinks.value,
 )
 
 function toggleMenu() {

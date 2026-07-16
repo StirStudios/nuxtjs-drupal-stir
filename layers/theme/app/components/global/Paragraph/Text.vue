@@ -43,6 +43,7 @@ const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value 
 const richTextClass = 'prose max-w-none'
 const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
 const motionProps = useRevealMotionProps(() => props.direction)
+const hasRevealMotion = computed(() => 'whileInView' in motionProps.value)
 const wrapStyles = computed(() =>
   [props.width, props.spacing].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
@@ -110,7 +111,8 @@ watch(() => props.text, (value) => {
             container-class="sticky top-16 z-[500] col-start-1 row-start-1 self-start justify-self-end"
             @select="selectAction"
           />
-          <RevealMotion
+          <LazyRevealMotion
+            v-if="hasRevealMotion"
             :key="`text-${paragraphId}-${revealMotionKey}`"
             as-child
             v-bind="motionProps"
@@ -123,7 +125,16 @@ watch(() => props.text, (value) => {
               "
               v-html="trustedTextHtml"
             />
-          </RevealMotion>
+          </LazyRevealMotion>
+          <div
+            v-else
+            :class="
+              ['col-start-1 row-start-1', classes, richTextClass]
+                .filter(Boolean)
+                .join(' ')
+            "
+            v-html="trustedTextHtml"
+          />
         </div>
       </template>
 

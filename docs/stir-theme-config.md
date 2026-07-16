@@ -425,15 +425,16 @@ Set `portal: false` when the layer is rendered inside a Shadow DOM host and you 
 footer: {
   layout: 'default', // 'default', 'columns', or 'stacked'
   requireSiteName: false,
-  base: 'mt-20 bg-accented dark:bg-muted/50 py-10 text-default text-sm',
+  base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
   container: '',
   content: 'flex flex-col items-center justify-center gap-4 text-center',
-  left: 'text-sm leading-relaxed lg:text-left',
-  right: 'lg:items-end flex flex-col items-center gap-2 lg:text-right',
+  left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
+  center: '',
+  right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
   sections: {
-	left: ['logo'],
-	center: ['menu', 'legal'],
-	right: ['socials', 'email'],
+    left: ['logo'],
+    center: ['menu', 'legal'],
+    right: ['socials', 'email'],
   },
   copyright: 'mb-0',
   email: '',

@@ -20,6 +20,12 @@ export type UiFieldVariant = Extract<NonNullable<
 export type UiFieldNoMaterialVariant = Exclude<UiFieldVariant, 'material'>
 export type UiSize = Extract<NonNullable<ButtonProps['size']>, string>
 
+export type CarouselArrowButton = {
+  color: UiColor
+  variant: UiButtonVariant
+  size: UiSize
+}
+
 function resolveStringProp<T extends string>(
   value: unknown,
   fallback: T,
@@ -76,4 +82,16 @@ export function resolveUiSize(
   fallback = 'md' as UiSize,
 ): UiSize {
   return resolveStringProp(value, fallback)
+}
+
+export function resolveCarouselArrowButton(value?: {
+  color?: unknown
+  variant?: unknown
+  size?: unknown
+}): CarouselArrowButton {
+  return {
+    color: resolveUiColor(value?.color, 'neutral'),
+    variant: resolveUiButtonVariant(value?.variant, 'outline'),
+    size: resolveUiSize(value?.size, 'xl'),
+  }
 }

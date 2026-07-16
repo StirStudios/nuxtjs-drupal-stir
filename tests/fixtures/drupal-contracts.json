@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "page": {
+    "content": {
+      "element": "node--default",
+      "props": { "title": "Fixture page" },
+      "slots": {
+        "section": [
+          {
+            "element": "paragraph-text",
+            "props": { "text": "<p>Fixture text</p>" },
+            "slots": {}
+          }
+        ]
+      }
+    }
+  },
+  "view": {
+    "element": "drupal-view--default",
+    "props": {
+      "viewId": "fixture",
+      "displayId": "block_1",
+      "parentUuid": "fixture-parent",
+      "pager": { "current": 0, "totalPages": 1 },
+      "exposedFilters": [],
+      "exposedSorts": []
+    },
+    "slots": { "rows": [] }
+  },
+  "media": {
+    "element": "media-image",
+    "props": {
+      "src": "/sites/default/files/fixture.jpg",
+      "alt": "Fixture image",
+      "width": 1200,
+      "height": 800
+    },
+    "slots": {}
+  },
+  "menu": [
+    { "title": "Home", "url": "/", "below": [] }
+  ],
+  "webform": {
+    "id": "fixture_form",
+    "title": "Fixture form",
+    "elements": {}
+  }
+}
