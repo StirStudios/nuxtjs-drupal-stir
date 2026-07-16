@@ -232,7 +232,7 @@ watch(
     aria-hidden="true"
     :fetchpriority="fetchpriority"
     :height="height"
-    image-class="absolute inset-0 h-full w-full object-cover"
+    image-class="absolute inset-0 h-full w-full !object-cover"
     :loading="loading"
     no-wrapper
     :original-revision="previewOriginalRevision"
@@ -351,7 +351,7 @@ watch(
           :alt="alt || title || 'Video thumbnail'"
           :fetchpriority="fetchpriority"
           :height="height"
-          image-class="h-full w-full object-cover"
+          image-class="h-full w-full !object-cover"
           :loading="loading"
           no-wrapper
           :original-revision="previewOriginalRevision"
