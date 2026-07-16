@@ -17,7 +17,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   section distinguishes the small intentional stable surface from the larger
   auto-scanned compatibility surface and records candidate deprecations without
   removing them ahead of consumer evidence.
-- Current measured surface: 99 components, 60 composables, 38 utilities, 5 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 83 test files.
+- Current measured repository surface: 110 components, 62 composables, 40 utilities, 6 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 98 test files. Optional preset audits separately prove which of these are registered and shipped.
 - N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects. The synchronized compatibility manifest validates Drupal/PHP requirements, optional provider-capability ownership, and independent Nuxt/Stir Tools releases. Registration policy and versioned auth UI configuration now validate before routing/composables; app-context normalizes Drupal's empty-array compatibility shapes and recursively validates its component trees; global SEO and the runtime-fresh sitemap validate before reaching their Nuxt consumers. The shared source-independent tree contract covers direct rendered fields, media, entity references, and nested components.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
@@ -29,6 +29,12 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   edit actions, inline text editing, and admin CSS. The minimal preset uses
   shell-free theme fallbacks and does not load the editorial layer; the full
   preset preserves the existing tools.
+- The optional `layers/integrations` boundary now owns popup rendering, the
+  privacy notice, their app-config defaults, and persisted consent. Analytics
+  and trusted-script loading consume that policy through a Nuxt-provided
+  contract. Generated preset declarations prove the minimal preset registers
+  none of the three integration components, three implementation composables,
+  or the consent plugin; the full preset preserves all of them.
 - Stir-owned app contracts now use explicit `#stir/utils`,
   `#stir/composables`, `#stir/components`, and `#stir/types` aliases. The
   historical `~/...` mappings remain available only as compatibility aliases

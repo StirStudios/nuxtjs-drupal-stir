@@ -4,6 +4,8 @@ const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 
 export default defineNuxtConfig({
+  extends: ['../integrations'],
+
   modules: [...(!isTestEnv ? ['@nuxtjs/plausible'] : [])],
 
   runtimeConfig: {

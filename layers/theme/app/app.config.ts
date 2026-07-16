@@ -17,29 +17,6 @@ export default defineAppConfig({
     darkRoutes: [],
   },
 
-  privacyNotice: {
-    enabled: false,
-    mode: 'notice',
-    position: 'center',
-    dismissible: true,
-    title: '',
-    message: '',
-    messageLinks: 'For more information please review our',
-    termsUrl: '',
-    privacyUrl: '',
-    cookiePolicyUrl: '',
-    cookieConsentUrl: '',
-    links: [],
-    legalLinks: [],
-    buttonLabel: 'Got it',
-    declineButtonLabel: 'Decline',
-  },
-
-  popup: {
-    enabled: false,
-    component: '',
-  },
-
   thirdPartyScripts: {
     allowedOrigins: {
       calculator: ['https://piper.b-cdn.net'],

@@ -17,7 +17,7 @@ Included in this layer:
 The base repository enables this layer from root `nuxt.config.ts`:
 
 ```ts
-extends: ['./layers/platform', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
+  extends: ['./layers/platform', './layers/editorial', './layers/integrations', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
 ```
 
 ## Boundary guidance
@@ -64,6 +64,7 @@ Keep outside `layers/theme`:
 - Drupal tabs, edit controls, and inline editing (`layers/editorial`)
 - Server proxy/runtime behavior (`layers/core`)
 - Highly project-specific business logic or workflow-specific forms
+- Popup/privacy UI and persisted consent policy (`layers/integrations`)
 
 ### Clean wrapper markup
 

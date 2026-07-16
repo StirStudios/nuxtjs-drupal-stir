@@ -6,7 +6,7 @@ const appConfig = useAppConfig()
 const { renderCustomElements } = useStirDrupalCe()
 const { popup, config } = usePopupData()
 const LazyParagraphPopup = defineAsyncComponent(
-  () => import('#stir/components/global/Paragraph/Popup.vue'),
+  () => import('../global/Paragraph/Popup.vue'),
 )
 
 function getPopupProps(node: PopupNode | null): PopupProps {

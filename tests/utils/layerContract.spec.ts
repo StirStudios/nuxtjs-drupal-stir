@@ -15,6 +15,7 @@ describe('layer contract', () => {
     for (const layer of [
       'platform',
       'editorial',
+      'integrations',
       'analytics',
       'scripts',
       'webform',
@@ -354,10 +355,18 @@ describe('layer contract', () => {
       resolve(rootDir, 'layers/scripts/app/app.config.ts'),
       'utf8',
     )
+    const integrationsConfig = readFileSync(
+      resolve(rootDir, 'layers/integrations/app/app.config.ts'),
+      'utf8',
+    )
 
     expect(themeConfig).not.toContain('analytics:')
     expect(themeConfig).not.toContain('userway:')
+    expect(themeConfig).not.toContain('privacyNotice:')
+    expect(themeConfig).not.toContain('popup:')
     expect(analyticsConfig).toContain('plausible:')
     expect(scriptsConfig).toContain('userway:')
+    expect(integrationsConfig).toContain('privacyNotice:')
+    expect(integrationsConfig).toContain('popup:')
   })
 })

@@ -72,6 +72,10 @@ async function main() {
 
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
     for (const preset of presets) {
+      // Each preset is an independent consumer contract. Do not let Nuxt's
+      // generated component, import, or app-config types leak across them.
+      await rm(join(consumerDir, '.nuxt'), { recursive: true, force: true })
+      await rm(join(consumerDir, '.output'), { recursive: true, force: true })
       await writeFile(
         join(consumerDir, 'nuxt.config.ts'),
         `export default defineNuxtConfig({ extends: ['@stir/base/presets/${preset}'] })\n`,

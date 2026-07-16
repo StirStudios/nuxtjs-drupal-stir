@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, ref, toRef } from 'vue'
-import { usePrivacyConsent } from '../../../layers/theme/app/composables/usePrivacyConsent'
+import { usePrivacyConsent } from '../../../layers/integrations/app/composables/usePrivacyConsent'
 import { useThirdPartyScript } from '../../../layers/theme/app/composables/useThirdPartyScript'
 
 const consentCookie = ref<boolean | string | null>(null)

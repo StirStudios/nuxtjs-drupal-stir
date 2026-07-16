@@ -27,6 +27,9 @@ async function inspectPreset(name) {
     const hasEditorial = layers.some((layer) =>
       layer.endsWith('/layers/editorial'),
     )
+    const hasIntegrations = layers.some((layer) =>
+      layer.endsWith('/layers/integrations'),
+    )
     const hasProtectedAccessConfig = Object.hasOwn(
       nuxt.options.runtimeConfig,
       'protectedPassword',
@@ -39,6 +42,7 @@ async function inspectPreset(name) {
       hasAnalytics,
       hasScripts,
       hasEditorial,
+      hasIntegrations,
       hasProtectedAccessConfig,
       layers: layers.map((layer) => layer.replace(`${rootDir}/`, '')),
     }
@@ -80,6 +84,10 @@ if (minimal.hasEditorial) {
   throw new Error('The minimal preset must not load the editorial layer.')
 }
 
+if (minimal.hasIntegrations) {
+  throw new Error('The minimal preset must not load the integrations layer.')
+}
+
 if (!full.hasAuth) {
   throw new Error('The full preset must preserve the authentication layer.')
 }
@@ -104,6 +112,10 @@ if (!full.hasAnalytics || !full.hasScripts) {
 
 if (!full.hasEditorial) {
   throw new Error('The full preset must preserve the editorial layer.')
+}
+
+if (!full.hasIntegrations) {
+  throw new Error('The full preset must preserve the integrations layer.')
 }
 
 if (!auth.hasAuth || auth.hasWebform || !auth.hasTurnstile) {

@@ -7,6 +7,39 @@ type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | '
 type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
 type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+
+type PrivacyNoticeLink = {
+  label?: string
+  title?: string
+  text?: string
+  url?: string
+  href?: string
+  to?: string
+} & LooseRecord
+
+type PrivacyNoticeConfig = {
+  enabled?: boolean
+  mode?: 'consent' | 'notice'
+  position?: 'left' | 'center' | 'right'
+  dismissible?: boolean
+  title?: string
+  message?: string
+  messageLinks?: string
+  buttonLabel?: string
+  declineButtonLabel?: string
+  termsUrl?: string
+  privacyUrl?: string
+  cookieConsentUrl?: string
+  cookiePolicyUrl?: string
+  links?: PrivacyNoticeLink[]
+  legalLinks?: PrivacyNoticeLink[]
+} & LooseRecord
+
+type PopupConfig = {
+  enabled?: boolean
+  component?: string
+} & LooseRecord
+
 export type StirThemeButtonLikeConfig = {
   class?: ClassValue
   color?: UiColorName
@@ -52,38 +85,6 @@ type UserwayConfig = {
   size?: 'small' | 'medium' | 'large'
   color?: string
   type?: string
-} & LooseRecord
-
-type PrivacyNoticeLink = {
-  label?: string
-  title?: string
-  text?: string
-  url?: string
-  href?: string
-  to?: string
-} & LooseRecord
-
-type PrivacyNoticeConfig = {
-  enabled?: boolean
-  mode?: 'consent' | 'notice'
-  position?: 'left' | 'center' | 'right'
-  dismissible?: boolean
-  title?: string
-  message?: string
-  messageLinks?: string
-  buttonLabel?: string
-  declineButtonLabel?: string
-  termsUrl?: string
-  privacyUrl?: string
-  cookieConsentUrl?: string
-  cookiePolicyUrl?: string
-  links?: PrivacyNoticeLink[]
-  legalLinks?: PrivacyNoticeLink[]
-} & LooseRecord
-
-type PopupConfig = {
-  enabled?: boolean
-  component?: string
 } & LooseRecord
 
 type CmsGlobalSeoConfig = {
@@ -437,10 +438,10 @@ declare module 'nuxt/schema' {
     analytics?: AnalyticsConfig
     thirdPartyScripts?: ThirdPartyScriptsConfig
     userway?: UserwayConfig
-    privacyNotice?: PrivacyNoticeConfig
-    popup?: PopupConfig
     cmsGlobalSeo?: CmsGlobalSeoConfig
     colorMode?: ColorModeConfig
+    privacyNotice?: PrivacyNoticeConfig
+    popup?: PopupConfig
     stirTheme?: StirThemeConfig
   }
 
@@ -450,10 +451,10 @@ declare module 'nuxt/schema' {
     analytics: AnalyticsConfig
     thirdPartyScripts: ThirdPartyScriptsConfig
     userway: UserwayConfig
-    privacyNotice: PrivacyNoticeConfig
-    popup: PopupConfig
     cmsGlobalSeo: CmsGlobalSeoConfig
     colorMode: ColorModeConfig
+    privacyNotice: PrivacyNoticeConfig
+    popup: PopupConfig
     stirTheme: ResolvedStirThemeConfig
   }
 }

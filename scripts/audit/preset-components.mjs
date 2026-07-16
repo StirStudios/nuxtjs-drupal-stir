@@ -15,10 +15,14 @@ const expected = {
   minimal: [
     'layers/theme/app/components/Edit/Link.vue',
     'layers/theme/app/components/Drupal/Tabs.vue',
+    'layers/theme/app/components/App/Integrations.vue',
   ],
   full: [
     'layers/editorial/app/components/Edit/Link.vue',
     'layers/editorial/app/components/Drupal/Tabs.vue',
+    'layers/integrations/app/components/App/Integrations.vue',
+    'layers/integrations/app/components/App/Popup.vue',
+    'layers/integrations/app/components/PrivacyNotice.vue',
   ],
 }
 
@@ -30,4 +34,16 @@ for (const [name, declarations] of Object.entries({ minimal, full })) {
   }
 }
 
-process.stdout.write('Preset editorial component ownership passed.\n')
+for (const integrationComponent of [
+  'layers/integrations/app/components/App/Popup.vue',
+  'layers/integrations/app/components/PrivacyNotice.vue',
+  'layers/integrations/app/components/global/Paragraph/Popup.vue',
+]) {
+  if (minimal.includes(integrationComponent)) {
+    throw new Error(
+      `minimal preset unexpectedly registered ${integrationComponent}`,
+    )
+  }
+}
+
+process.stdout.write('Preset optional component ownership passed.\n')

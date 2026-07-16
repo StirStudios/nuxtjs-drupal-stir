@@ -1,7 +1,8 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { addTypeTemplate } from '@nuxt/kit'
 import {
   buildPresentationSource,
   loadPresentationManifest,
@@ -10,6 +11,7 @@ import {
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
+const appConfigTypes = resolvePath(themeLayerDir, 'app/types/app-config.d.ts')
 const compatibilitySafelistCss = resolvePath(
   themeLayerDir,
   'app/assets/css/safelist.inline.css',
@@ -26,6 +28,14 @@ function hasCssEntry(entries: unknown[], path: string): boolean {
 }
 
 export default defineNuxtConfig({
+  modules: [
+    function registerStirAppConfigTypes() {
+      addTypeTemplate({
+        filename: 'types/stir-app-config.d.ts',
+        getContents: () => readFileSync(appConfigTypes, 'utf8'),
+      })
+    },
+  ],
   hooks: {
     async 'ready'(nuxt) {
       const appThemeCss = resolvePath(
