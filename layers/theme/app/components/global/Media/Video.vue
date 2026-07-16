@@ -3,7 +3,7 @@ import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
 import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
-import { resolveHeroVideoSource } from '../../../utils/heroVideoSource'
+import { isDirectVideoFile, resolveHeroVideoSource } from '../../../utils/heroVideoSource'
 
 defineOptions({
   inheritAttrs: false,
@@ -68,8 +68,18 @@ const isHero = inject<boolean>('isHero', false)
 const isBare = computed(() => isHero || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
 const iframeElement = ref<HTMLIFrameElement | null>(null)
+const localVideoSrc = computed(() => {
+  if (props.mediaEmbed || !isDirectVideoFile(props.src)) return undefined
+
+  const source = resolveHeroVideoSource(props.src)
+
+  return source?.kind === 'direct' ? source.src : undefined
+})
+const playbackSource = computed(() =>
+  resolveHeroVideoSource(props.mediaEmbed || localVideoSrc.value),
+)
 const heroVideoSource = computed(() =>
-  isBare.value ? resolveHeroVideoSource(props.mediaEmbed) : undefined,
+  isBare.value ? playbackSource.value : undefined,
 )
 const directHeroVideoSrc = computed(() =>
   heroVideoSource.value?.kind === 'direct' ? heroVideoSource.value.src : undefined,
@@ -122,7 +132,13 @@ const aspectClass = computed(() => {
 })
 
 const shouldShowIframe = computed(
-  () => !!props.mediaEmbed && !isProcessing.value && isEmbedActive.value,
+  () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
+)
+const shouldShowDirectVideo = computed(
+  () => !isBare.value
+    && playbackSource.value?.kind === 'direct'
+    && !isProcessing.value
+    && isEmbedActive.value,
 )
 const previewSrc = computed(() => {
   if (
@@ -133,7 +149,7 @@ const previewSrc = computed(() => {
     return props.animatedPreviewSrc
   }
 
-  return props.src
+  return localVideoSrc.value ? undefined : props.src
 })
 const previewSrcset = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.srcset,
@@ -155,9 +171,11 @@ async function scheduleInitializePlayers(): Promise<void> {
 }
 
 function activateEmbed() {
-  if (shouldShowIframe.value) return
+  if (shouldShowIframe.value || shouldShowDirectVideo.value) return
   isEmbedActive.value = true
-  void scheduleInitializePlayers()
+  if (playbackSource.value?.kind === 'embed') {
+    void scheduleInitializePlayers()
+  }
 }
 
 function activateAnimatedPreview(): void {
@@ -193,7 +211,7 @@ watch(
 
 <template>
   <img
-    v-if="isBare && src"
+    v-if="isBare && previewSrc"
     v-bind="attrs"
     :alt="alt || ''"
     aria-hidden="true"
@@ -202,8 +220,8 @@ watch(
     :height="height"
     :loading="loading"
     :sizes="sizes || '100vw'"
-    :src="src"
-    :srcset="srcset"
+    :src="previewSrc"
+    :srcset="previewSrcset"
     :width="width"
   />
 
@@ -222,7 +240,6 @@ watch(
     <source
       v-if="isBareVideoSourceActive"
       :src="directHeroVideoSrc"
-      type="video/mp4"
     />
   </video>
 
@@ -274,8 +291,22 @@ watch(
       @load="scheduleInitializePlayers()"
     />
 
+    <video
+      v-else-if="shouldShowDirectVideo"
+      ref="videoElement"
+      :class="[
+        'absolute inset-0 h-full w-full bg-black object-contain',
+        theme.media.rounded,
+      ]"
+      controls
+      playsinline
+      preload="metadata"
+    >
+      <source :src="playbackSource?.src" />
+    </video>
+
     <button
-      v-if="!shouldShowIframe && !isProcessing"
+      v-if="!shouldShowIframe && !shouldShowDirectVideo && !isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
         'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',

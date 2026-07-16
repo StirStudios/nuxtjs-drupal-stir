@@ -55,6 +55,43 @@ describe('MediaVideo (Nuxt runtime)', () => {
     load.mockRestore()
   })
 
+  it('plays a Drupal local-video src without treating the MP4 as a poster', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        src: '/media/example.mp4',
+        title: 'Example local video',
+      },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('video').exists()).toBe(false)
+
+    await wrapper.get('button').trigger('click')
+
+    expect(wrapper.get('video').attributes('controls')).toBeDefined()
+    expect(wrapper.get('source').attributes('src')).toBe('/media/example.mp4')
+  })
+
+  it('uses a Drupal local-video src directly for bare hero video', async () => {
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadMinWidth: 0,
+        loadStrategy: 'immediate',
+        noWrapper: true,
+        src: '/media/background.mp4',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.get('source').attributes('src')).toBe('/media/background.mp4')
+    load.mockRestore()
+  })
+
   it('renders a deferred remote hero as a muted background iframe', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {

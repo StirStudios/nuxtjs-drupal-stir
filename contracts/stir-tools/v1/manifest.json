@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.18.0",
+  "contractVersion": "1.19.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -40,6 +40,10 @@
       "providerModules": ["stir_layout_builder"],
       "optional": true
     },
+    "media.video.local": {
+      "providerModules": ["stir_tools"],
+      "optional": false
+    },
     "media.image": {
       "providerModules": ["stir_tools"],
       "optional": false
@@ -77,6 +81,11 @@
       "capability": "media.summary",
       "schema": "schemas/media-summary.schema.json",
       "fixtures": ["fixtures/media-summary.json"]
+    },
+    "media.video.local": {
+      "capability": "media.video.local",
+      "schema": "schemas/media-video-local.schema.json",
+      "fixtures": ["fixtures/media-video-local.json"]
     },
     "media.image": {
       "capability": "media.image",

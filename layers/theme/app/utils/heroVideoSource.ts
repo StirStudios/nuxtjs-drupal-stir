@@ -2,6 +2,8 @@ export type HeroVideoSource =
   | { kind: 'direct', src: string }
   | { kind: 'embed', src: string }
 
+const DIRECT_VIDEO_EXTENSION = /\.(?:m3u8|m4v|mov|mp4|og[gv]|webm)$/i
+
 const YOUTUBE_HOSTS = new Set([
   'youtube.com',
   'www.youtube.com',
@@ -21,6 +23,19 @@ function normalizedUrl(value: string): URL | undefined {
   }
   catch {
     return undefined
+  }
+}
+
+export function isDirectVideoFile(value: string | undefined): boolean {
+  const source = value?.trim()
+
+  if (!source) return false
+
+  try {
+    return DIRECT_VIDEO_EXTENSION.test(new URL(source, 'https://local.invalid').pathname)
+  }
+  catch {
+    return DIRECT_VIDEO_EXTENSION.test(source.split(/[?#]/, 1)[0] ?? '')
   }
 }
 

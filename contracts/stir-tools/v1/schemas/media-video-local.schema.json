@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/media-video-local.schema.json",
+  "title": "Local video media payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "mid", "title", "src", "alt"],
+  "properties": {
+    "type": { "const": "video" },
+    "mid": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "title": { "type": "string" },
+    "src": { "type": "string", "minLength": 1 },
+    "alt": { "type": "string" }
+  }
+}

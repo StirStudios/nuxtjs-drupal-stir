@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { resolveHeroVideoSource } from '../../layers/theme/app/utils/heroVideoSource'
+import {
+  isDirectVideoFile,
+  resolveHeroVideoSource,
+} from '../../layers/theme/app/utils/heroVideoSource'
+
+describe('isDirectVideoFile', () => {
+  it('recognizes local and remote video file URLs', () => {
+    expect(isDirectVideoFile('/media/example.webm?version=2')).toBe(true)
+    expect(isDirectVideoFile('https://video.example/hero.mp4#background')).toBe(true)
+  })
+
+  it('does not mistake poster images for playable video', () => {
+    expect(isDirectVideoFile('/media/poster.webp')).toBe(false)
+    expect(isDirectVideoFile(undefined)).toBe(false)
+  })
+})
 
 describe('resolveHeroVideoSource', () => {
   it('keeps direct video sources unchanged', () => {
