@@ -2,8 +2,10 @@
 
 This layer owns editor-only presentation for Drupal local tasks, account-menu
 navigation, entity and paragraph edit actions, and inline paragraph text
-editing. Drupal remains authoritative for authentication, access checks, and
-the links or tasks exposed to Nuxt.
+editing. It also owns the authenticated paragraph text read/write proxy routes;
+consumers that omit this layer do not ship those mutation endpoints. Drupal
+remains authoritative for authentication, access checks, and the links or
+tasks exposed to Nuxt.
 
 The full compatibility preset includes this capability so established projects
 retain their editorial tools. The minimal preset omits it; shell-free theme

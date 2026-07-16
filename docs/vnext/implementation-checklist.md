@@ -29,9 +29,9 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 - Optional `layers/analytics` and `layers/scripts` boundaries now own Plausible and Nuxt Scripts/UserWay respectively; neither is loaded by the minimal preset.
 - Plausible and UserWay app-config defaults are also owned by their optional layers. Layer contracts prove theme ownership stays clean, while the preset matrix and full runtime test prove optional registration and merged defaults.
 - The optional `layers/editorial` boundary now owns real Drupal local-task tabs,
-  edit actions, inline text editing, and admin CSS. The minimal preset uses
-  shell-free theme fallbacks and does not load the editorial layer; the full
-  preset preserves the existing tools.
+  edit actions, inline text editing UI and server routes, and admin CSS. The
+  minimal preset uses shell-free theme fallbacks and neither loads nor ships
+  the editorial capability; the full preset preserves the existing tools.
 - The optional `layers/integrations` boundary now owns popup rendering, the
   privacy notice, their app-config defaults, and persisted consent. Analytics
   and trusted-script loading consume that policy through a Nuxt-provided

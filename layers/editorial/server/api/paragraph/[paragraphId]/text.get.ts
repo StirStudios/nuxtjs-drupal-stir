@@ -4,13 +4,13 @@ import {
   captureDrupalApiError,
   getForwardedCookie,
   markPrivateResponse,
-} from '../../../utils/drupalApi'
-import { buildDrupalHeaders } from '../../../utils/drupalHeaders'
+} from '../../../../../core/server/utils/drupalApi'
+import { resolveDrupalCeApiConfig } from '../../../../../core/server/utils/drupalCeApiConfig'
+import { buildDrupalHeaders } from '../../../../../core/server/utils/drupalHeaders'
 import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
   parseParagraphId,
-  resolveParagraphTextApiConfig,
 } from '../../../utils/paragraphTextApi'
 
 export default defineEventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     apiKey,
     ceApiEndpoint,
     requestTimeoutMs,
-  } = resolveParagraphTextApiConfig(config)
+  } = resolveDrupalCeApiConfig(config)
   const readPath = buildParagraphTextPath(ceApiEndpoint, paragraphId)
   const cookie = getForwardedCookie(event)
 

@@ -11,7 +11,7 @@ import {
   markPrivateResponse,
 } from '../../../../core/server/utils/drupalApi'
 import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
-import { resolveParagraphTextApiConfig } from '../../../../core/server/utils/paragraphTextApi'
+import { resolveDrupalCeApiConfig } from '../../../../core/server/utils/drupalCeApiConfig'
 import {
   buildParagraphViewPath,
   normalizeParagraphViewQuery,
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     apiKey,
     ceApiEndpoint,
     requestTimeoutMs,
-  } = resolveParagraphTextApiConfig(config)
+  } = resolveDrupalCeApiConfig(config)
   const requestPath = buildParagraphViewPath(ceApiEndpoint, paragraphId)
   const cookie = getForwardedCookie(event)
 

@@ -1,21 +1,4 @@
 import { createError } from 'h3'
-import { getDrupalApiConfig } from './drupalApi'
-
-function normalizeEndpoint(value: unknown): string {
-  const raw = typeof value === 'string' ? value.trim() : ''
-
-  if (!raw) return '/ce-api'
-
-  const withLeadingSlash = raw.startsWith('/') ? raw : `/${raw}`
-
-  return withLeadingSlash.replace(/\/+$/, '') || '/ce-api'
-}
-
-function normalizeBaseUrl(value: unknown): string {
-  const raw = typeof value === 'string' ? value.trim() : ''
-
-  return raw.replace(/\/+$/, '')
-}
 
 export function parseParagraphId(value: unknown): number {
   const paragraphId = Number(value)
@@ -28,25 +11,6 @@ export function parseParagraphId(value: unknown): number {
   }
 
   return paragraphId
-}
-
-export function resolveParagraphTextApiConfig(config: ReturnType<typeof useRuntimeConfig>) {
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
-  const drupalApi = getDrupalApiConfig()
-  const drupalBaseUrl = normalizeBaseUrl(drupalApi.baseUrl)
-  const ceApiEndpoint = normalizeEndpoint(drupalCeConfig.ceApiEndpoint)
-  const apiKey = drupalApi.apiKey
-  const requestTimeoutMs = drupalApi.requestTimeoutMs
-
-  return {
-    apiKey,
-    ceApiEndpoint,
-    drupalBaseUrl,
-    requestTimeoutMs,
-  }
 }
 
 export function buildParagraphTextPath(ceApiEndpoint: string, paragraphId: number): string {

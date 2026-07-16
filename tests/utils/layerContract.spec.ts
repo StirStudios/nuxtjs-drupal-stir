@@ -368,6 +368,28 @@ describe('layer contract', () => {
     ))).toBe(false)
   })
 
+  it('keeps inline paragraph editing in the editorial capability', () => {
+    for (const method of ['get', 'post']) {
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/editorial/server/api/paragraph/[paragraphId]/text.${method}.ts`,
+      ))).toBe(true)
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/core/server/api/paragraph/[paragraphId]/text.${method}.ts`,
+      ))).toBe(false)
+    }
+
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/editorial/server/utils/paragraphTextApi.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/core/server/utils/paragraphTextApi.ts',
+    ))).toBe(false)
+  })
+
   it('exposes auth config and validation helpers from public layer paths', () => {
     expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
 
