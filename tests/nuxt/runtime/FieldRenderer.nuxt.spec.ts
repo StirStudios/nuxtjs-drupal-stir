@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { WebformFieldProps, WebformState } from '../../../layers/theme/app/types'
-import FieldRenderer from '../../../layers/theme/app/components/Field/Renderer.vue'
+import FieldRenderer from '../../../layers/webform/app/components/Field/Renderer.vue'
 
 describe('FieldRenderer (Nuxt runtime)', () => {
   it('renders hidden fields as native hidden input', async () => {

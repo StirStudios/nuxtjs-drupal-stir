@@ -18,6 +18,7 @@ const expected = {
     'layers/theme/app/components/App/Integrations.vue',
   ],
   full: [
+    'layers/webform/app/components/Field/Renderer.vue',
     'layers/editorial/app/components/Edit/Link.vue',
     'layers/editorial/app/components/Drupal/Tabs.vue',
     'layers/integrations/app/components/App/Integrations.vue',
@@ -44,6 +45,12 @@ for (const integrationComponent of [
       `minimal preset unexpectedly registered ${integrationComponent}`,
     )
   }
+}
+
+if (minimal.includes('layers/webform/app/components/Field/Renderer.vue')) {
+  throw new Error(
+    'minimal preset unexpectedly registered Webform field components',
+  )
 }
 
 process.stdout.write('Preset optional component ownership passed.\n')

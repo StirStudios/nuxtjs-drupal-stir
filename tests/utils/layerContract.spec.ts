@@ -453,7 +453,7 @@ describe('layer contract', () => {
       'Input/Slider.vue',
       'Textarea.vue',
     ].map((file) => readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/Field', file),
+      resolve(rootDir, 'layers/webform/app/components/Field', file),
       'utf8',
     ))
 
