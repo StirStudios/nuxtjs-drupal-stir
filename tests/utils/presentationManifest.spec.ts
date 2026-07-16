@@ -94,7 +94,7 @@ describe('CMS presentation manifest', () => {
   it('uses a last-known file only under the explicit availability policy', async () => {
     const manifest = await loadPresentationManifest({
       source: 'tests/fixtures/missing-presentation-manifest.json',
-      lastKnownPath: 'tests/fixtures/presentation-manifest.json',
+      lastKnownPath: 'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
     })
 
     expect(manifest.site.uuid).toBe('fixture-site')
@@ -134,7 +134,7 @@ describe('CMS presentation manifest', () => {
   it('does not hide an invalid primary manifest behind the availability fallback', async () => {
     await expect(loadPresentationManifest({
       source: 'package.json',
-      lastKnownPath: 'tests/fixtures/presentation-manifest.json',
+      lastKnownPath: 'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
     })).rejects.toThrow(/Invalid CMS presentation manifest/u)
   })
 })
