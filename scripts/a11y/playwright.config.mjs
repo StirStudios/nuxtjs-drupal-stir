@@ -32,7 +32,7 @@ const playwrightConfig = defineConfig({
     : {
         command:
           process.env.A11Y_SERVER_COMMAND ??
-          'pnpm dev --host 127.0.0.1 --port 4173',
+          'node scripts/a11y/server.mjs',
         cwd: projectRoot,
         url: localBaseUrl,
         reuseExistingServer: !process.env.CI,

@@ -54,7 +54,7 @@
     "test:consumer:packed": "node scripts/audit/packed-consumer.mjs",
     "test:consumer": "pnpm test:consumer:typecheck && pnpm test:consumer:build && pnpm test:consumer:packed",
     "test:nuxt": "pnpm test:nuxt:runtime",
-    "test:all": "pnpm test:coverage && pnpm test:nuxt && pnpm test:e2e",
+    "test:all": "pnpm test:coverage && pnpm test:nuxt && pnpm test:e2e && pnpm test:a11y",
     "test:watch": "vitest",
     "verify:core": "pnpm audit:vnext-inventory:check && pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
     "verify:ci": "pnpm verify:core && pnpm test:consumer",

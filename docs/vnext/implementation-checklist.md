@@ -19,6 +19,9 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   removing them ahead of consumer evidence.
 - Current measured repository surface: 110 components, 62 composables, 40 utilities, 6 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 98 test files. Optional preset audits separately prove which of these are registered and shipped.
 - N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
+- The blocking accessibility gate now scans a deterministic mocked-Drupal page
+  in desktop/mobile and light/dark modes against WCAG 2 A/AA, WCAG 2.1/2.2 AA,
+  and axe best-practice rules; it never inherits a developer's project URL.
 - N1 has started with a checksum-protected Stir Tools v1 snapshot, schema validation, aligned registration/Webform types, administrator-approval handling, and safe Drupal Webform confirmation redirects. The synchronized compatibility manifest validates Drupal/PHP requirements, optional provider-capability ownership, and independent Nuxt/Stir Tools releases. Registration policy and versioned auth UI configuration now validate before routing/composables; app-context normalizes Drupal's empty-array compatibility shapes and recursively validates its component trees; global SEO and the runtime-fresh sitemap validate before reaching their Nuxt consumers. The shared source-independent tree contract covers direct rendered fields, media, entity references, and nested components.
 - N2 has started with a shared `layers/platform` boundary plus explicit `presets/minimal` and `presets/full` consumers. The minimal preset excludes the auth layer; the full preset preserves the existing root behaviour while the remaining capabilities are extracted.
 - The optional `layers/webform` boundary now owns Webform rendering, submission, and limits. The minimal preset excludes the Webform route.
@@ -35,6 +38,9 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   contract. Generated preset declarations prove the minimal preset registers
   none of the three integration components, three implementation composables,
   or the consent plugin; the full preset preserves all of them.
+- Repository-only client-entry analysis now lives in `layers/diagnostics` and
+  is selected only for explicit performance builds launched from this checkout.
+  Published platform and installed preset consumers contain no report writer.
 - Stir-owned app contracts now use explicit `#stir/utils`,
   `#stir/composables`, `#stir/components`, and `#stir/types` aliases. The
   historical `~/...` mappings remain available only as compatibility aliases

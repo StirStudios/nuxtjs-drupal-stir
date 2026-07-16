@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { cp, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { access, cp, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
@@ -9,9 +9,13 @@ const fixtureDir = resolve('tests/fixtures/consumer-app/app')
 const presets = ['minimal', 'full']
 const keepTemporary = process.argv.includes('--keep-temporary')
 
-function run(command, args, cwd) {
+function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(command, args, { cwd, env: process.env, stdio: ['inherit', 'pipe', 'pipe'] })
+    const child = spawn(command, args, {
+      cwd,
+      env: { ...process.env, ...environment },
+      stdio: ['inherit', 'pipe', 'pipe'],
+    })
     let output = ''
 
     for (const stream of [child.stdout, child.stderr]) {
@@ -30,6 +34,10 @@ function run(command, args, cwd) {
       else reject(new Error(`${command} ${args.join(' ')} failed with exit code ${String(code)}`))
     })
   })
+}
+
+async function pathExists(path) {
+  return access(path).then(() => true, () => false)
 }
 
 async function main() {
@@ -81,7 +89,16 @@ async function main() {
         `export default defineNuxtConfig({ extends: ['@stir/base/presets/${preset}'] })\n`,
       )
       await run('pnpm', ['typecheck'], consumerDir)
-      await run('pnpm', ['build'], consumerDir)
+      await run('pnpm', ['build'], consumerDir, { STIR_PERF_ANALYZE: 'true' })
+      const installedReport = join(
+        consumerDir,
+        'node_modules/@stir/base/.audit/client-entry-modules.json',
+      )
+      if (await pathExists(installedReport)) {
+        throw new Error(
+          `Packed ${preset} consumer registered the repository diagnostics writer.`,
+        )
+      }
       console.log(`Packed ${preset} consumer validation passed.`)
     }
   } finally {

@@ -18,6 +18,12 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain(':name="slotName"')
   })
 
+  it('uses the accessible default layout when Drupal omits page_layout', () => {
+    const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
+
+    expect(pageRoute).toContain('pageLayout.value || \'default\'')
+  })
+
   it('keeps the default node component forwarding every Drupal slot', () => {
     const nodeDefault = source('layers/theme/app/components/global/node--default.vue')
 

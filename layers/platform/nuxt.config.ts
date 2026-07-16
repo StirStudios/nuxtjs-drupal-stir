@@ -1,4 +1,3 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -25,19 +24,6 @@ const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 const sitemapModuleOptions = buildSitemapModuleOptions(drupalUrl)
 
 type RouteRules = Record<string, Record<string, unknown>>
-type AnalysisOutputOptions = { dir?: string }
-type AnalysisOutputChunk = {
-  type: 'chunk'
-  isEntry: boolean
-  fileName: string
-  modules: Record<string, { renderedLength: number }>
-}
-type AnalysisOutputAsset = { type: 'asset' }
-type AnalysisOutputBundle = Record<
-  string,
-  AnalysisOutputChunk | AnalysisOutputAsset
->
-
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
   extends: ['../core', '../theme'],
@@ -115,40 +101,6 @@ export default defineNuxtConfig({
           }
         },
       },
-      ...(process.env.STIR_PERF_ANALYZE === 'true'
-        ? [{
-            apply: 'build' as const,
-            name: 'stir-client-entry-analysis',
-            generateBundle(
-              _options: AnalysisOutputOptions,
-              bundle: AnalysisOutputBundle,
-            ) {
-              if (!String(_options.dir || '').includes('/client')) return
-
-              const entries = Object.values(bundle)
-                .filter((asset): asset is AnalysisOutputChunk =>
-                  asset.type === 'chunk' && asset.isEntry,
-                )
-                .map((chunk) => ({
-                  fileName: chunk.fileName,
-                  modules: Object.entries(chunk.modules)
-                    .map(([id, details]) => ({
-                      id,
-                      renderedBytes: details.renderedLength,
-                    }))
-                    .sort((left, right) => right.renderedBytes - left.renderedBytes),
-                }))
-
-              if (!entries.length) return
-
-              mkdirSync(resolveLayerPath('./.audit'), { recursive: true })
-              writeFileSync(
-                resolveLayerPath('./.audit/client-entry-modules.json'),
-                `${JSON.stringify({ entries }, null, 2)}\n`,
-              )
-            },
-          }]
-        : []),
     ],
   },
 

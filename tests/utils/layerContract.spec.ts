@@ -37,6 +37,26 @@ describe('layer contract', () => {
     ))).toBe(true)
   })
 
+  it('keeps repository report writers out of published consumer layers', () => {
+    const rootConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
+    const diagnosticsConfig = readFileSync(
+      resolve(rootDir, 'layers/diagnostics/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(platformConfig).not.toContain('stir-client-entry-analysis')
+    expect(platformConfig).not.toContain('client-entry-modules.json')
+    expect(diagnosticsConfig).toContain('stir-client-entry-analysis')
+    expect(diagnosticsConfig).toContain('client-entry-modules.json')
+    expect(rootConfig).toContain('process.env.STIR_PERF_ANALYZE === \'true\'')
+    expect(rootConfig).toContain('resolve(process.cwd()) === resolve(rootDir)')
+    expect(rootConfig).toContain('\'./layers/diagnostics\'')
+  })
+
   it('prefers Stir-owned aliases while keeping compatibility aliases available', () => {
     const nuxtConfig = readFileSync(
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),

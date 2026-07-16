@@ -107,11 +107,11 @@
     }
 
     :where(a) {
-      @apply text-primary font-medium underline underline-offset-4 transition-colors;
+      @apply text-primary-800 dark:text-primary-300 font-medium underline underline-offset-4 transition-colors;
     }
 
     :where(a:hover) {
-      @apply text-primary/90;
+      @apply text-primary-900 dark:text-primary-200;
     }
 
     :where(blockquote) {

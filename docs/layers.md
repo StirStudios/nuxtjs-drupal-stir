@@ -11,6 +11,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 - `layers/integrations`: optional popup/privacy UI and the shared consent policy used by analytics and trusted scripts.
 - `layers/analytics`: optional Plausible integration.
 - `layers/scripts`: optional third-party script integrations.
+- `layers/diagnostics`: repository-only performance analysis selected explicitly by maintainers; never registered by installed consumers.
 - `server/utils`: shared Nitro utilities used by multiple layers when behavior must stay identical across boundaries.
 
 ## Ownership Rules
@@ -59,3 +60,4 @@ Common override order for downstream projects:
 - Core webform submission fetches Drupal CSRF tokens through shared server utilities and does not require `layers/auth`.
 - Auth and Webforms both extend `layers/turnstile`; neither capability must load the other to render mandatory bot protection.
 - Analytics and Scripts extend `layers/integrations`; the minimal preset loads none of the popup/privacy components, composables, defaults, or consent plugin.
+- `STIR_PERF_ANALYZE=true` selects the diagnostics layer only for builds launched from this repository root. Installed minimal/full consumers never receive its filesystem report writer.

@@ -15,7 +15,7 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
-const layout = computed(() => props.forcedLayout || pageLayout.value)
+const layout = computed(() => props.forcedLayout || pageLayout.value || 'default')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
   return typeof route.params.slug === 'string' ? route.params.slug : ''
