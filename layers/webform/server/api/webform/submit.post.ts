@@ -4,6 +4,7 @@ import {
   readRawBody,
   createError,
   getHeader,
+  setHeader,
   setResponseStatus,
   type H3Event,
 } from 'h3'
@@ -146,6 +147,8 @@ async function parseSubmission(
 }
 
 export default defineEventHandler(async (event) => {
+  setHeader(event, 'Cache-Control', 'private, no-store, max-age=0')
+
   const limits = getWebformSubmissionLimits()
 
   assertWebformContentLength(event, limits)

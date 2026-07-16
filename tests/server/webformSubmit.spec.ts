@@ -1,4 +1,4 @@
-import { readRawBody } from 'h3'
+import { readRawBody, type H3Event } from 'h3'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import webformSubmitHandler from '../../layers/webform/server/api/webform/submit.post'
 
@@ -9,7 +9,17 @@ vi.mock('h3', async (importOriginal) => ({
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 
-const createEvent = (headers: Record<string, string> = {}) => {
+type TestEvent = H3Event & {
+  node: {
+    res: {
+      getHeader: (name: string) => string | string[] | undefined
+      setHeader: (name: string, value: string | string[]) => void
+      statusCode: number
+    }
+  }
+}
+
+const createEvent = (headers: Record<string, string> = {}): TestEvent => {
   const responseHeaders = new Map<string, string | string[]>()
 
   return {
@@ -22,7 +32,7 @@ const createEvent = (headers: Record<string, string> = {}) => {
         },
       },
     },
-  } as never
+  } as unknown as TestEvent
 }
 
 describe('POST /api/webform/submit', () => {
@@ -103,12 +113,16 @@ describe('POST /api/webform/submit', () => {
   })
 
   it('rejects an oversized declared request before reading its body', async () => {
-    await expect(webformSubmitHandler(createEvent({
+    const event = createEvent({
       'content-length': '1025',
       'content-type': 'application/json',
-    }))).rejects.toMatchObject({ statusCode: 413 })
+    })
+
+    await expect(webformSubmitHandler(event)).rejects.toMatchObject({ statusCode: 413 })
 
     expect(readRawBody).not.toHaveBeenCalled()
+    expect(event.node.res.getHeader('cache-control'))
+      .toBe('private, no-store, max-age=0')
   })
 
   it('preserves safe Drupal validation details and status', async () => {
@@ -141,6 +155,8 @@ describe('POST /api/webform/submit', () => {
     await expect(webformSubmitHandler(event)).resolves.toEqual(validation)
     expect((event as { node: { res: { statusCode: number } } }).node.res.statusCode)
       .toBe(400)
+    expect(event.node.res.getHeader('cache-control'))
+      .toBe('private, no-store, max-age=0')
     expect(raw).toHaveBeenNthCalledWith(
       2,
       'https://cms.example.test/api/stir_webform_rest/submit',
