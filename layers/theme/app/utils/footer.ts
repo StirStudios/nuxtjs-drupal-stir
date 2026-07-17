@@ -73,7 +73,7 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'
   showFooterRegion: true,
   showSubFooterRegion: true,
   base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
-  container: 'flex flex-col',
+  container: 'flex flex-col lg:flex-row',
   content: 'flex flex-col items-center justify-center gap-4 text-center',
   centerSlot: '',
   left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',

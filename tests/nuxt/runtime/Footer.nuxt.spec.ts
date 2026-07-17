@@ -167,7 +167,7 @@ describe('Footer (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="left"]').classes()).toEqual(expect.arrayContaining(['order-2', 'lg:order-1']))
     expect(wrapper.find('[data-slot="center"]').classes()).toEqual(expect.arrayContaining(['order-3', 'lg:order-2']))
     expect(wrapper.find('[data-slot="right"]').classes()).toEqual(expect.arrayContaining(['order-1', 'lg:order-3']))
-    expect(wrapper.find('[data-slot="container"]').classes()).toEqual(expect.arrayContaining(['flex', 'flex-col']))
+    expect(wrapper.find('[data-slot="container"]').classes()).toEqual(expect.arrayContaining(['flex', 'flex-col', 'lg:flex-row']))
 
     appConfig.value.stirTheme.footer.leftSlot = ''
     appConfig.value.stirTheme.footer.centerSlot = ''
