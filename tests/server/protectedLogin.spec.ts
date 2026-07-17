@@ -13,7 +13,10 @@ const createEvent = () => {
   return {
     event: {
       node: {
-        req: { headers: {}, socket: { remoteAddress: '192.0.2.1' } },
+        req: {
+          headers: { 'sec-fetch-site': 'same-origin' },
+          socket: { remoteAddress: '192.0.2.1' },
+        },
         res: {
           getHeader: (name: string) => headers.get(name.toLowerCase()),
           setHeader: (name: string, value: string | string[]) => {
@@ -28,6 +31,7 @@ const createEvent = () => {
 
 describe('POST /api/auth/protected', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       protectedPassword: 'secret',
       protectedRateLimit: { enabled: false },
@@ -45,6 +49,21 @@ describe('POST /api/auth/protected', () => {
     await expect(protectedLoginHandler(createEvent().event)).rejects.toMatchObject({
       statusCode: 422,
     })
+  })
+
+  it('rejects a cross-origin request before reading credentials', async () => {
+    const { event } = createEvent()
+    const requestHeaders = (
+      event as { node: { req: { headers: Record<string, string> } } }
+    ).node.req.headers
+
+    requestHeaders.origin = 'https://malicious.example.test'
+
+    await expect(protectedLoginHandler(event)).rejects.toMatchObject({
+      statusCode: 403,
+      statusMessage: 'Cross-origin request blocked',
+    })
+    expect(readBody).not.toHaveBeenCalled()
   })
 
   it('rejects a failed Turnstile challenge', async () => {

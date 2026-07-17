@@ -15,6 +15,7 @@ import {
   layerAuthRecordProtectedLoginFailure,
   layerAuthResetProtectedLoginRateLimit,
 } from '../../utils/protectedRateLimit'
+import { assertStirSameOrigin } from '../../../../foundation/server/utils/stirRequestSecurity'
 
 type ProtectedBody = {
   action?: unknown
@@ -23,6 +24,8 @@ type ProtectedBody = {
 }
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const body = await readBody<ProtectedBody>(event)
   const action =
     typeof body?.action === 'string' ? body.action.toLowerCase().trim() : ''
