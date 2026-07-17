@@ -173,6 +173,7 @@
       "layers/theme/app/components/App/ScrollToTop.vue",
       "layers/theme/app/components/ButtonModal.vue",
       "layers/theme/app/components/CardGradient.vue",
+      "layers/theme/app/components/Content/InteractiveCard.vue",
       "layers/theme/app/components/Drupal/NodeDisplay.vue",
       "layers/theme/app/components/Drupal/PageRoute.vue",
       "layers/theme/app/components/Drupal/Tabs.vue",
@@ -464,6 +465,7 @@
         "layers/theme/app/components/App/ScrollToTop.vue",
         "layers/theme/app/components/ButtonModal.vue",
         "layers/theme/app/components/CardGradient.vue",
+        "layers/theme/app/components/Content/InteractiveCard.vue",
         "layers/theme/app/components/Drupal/NodeDisplay.vue",
         "layers/theme/app/components/Drupal/PageRoute.vue",
         "layers/theme/app/components/Drupal/Tabs.vue",
@@ -669,7 +671,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 111,
+    "components": 112,
     "composables": 62,
     "utils": 43,
     "plugins": 6,
@@ -677,14 +679,14 @@
     "serverRoutes": 26,
     "productionDependencies": 39,
     "developmentDependencies": 25,
-    "tests": 105,
+    "tests": 106,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 37,
       "server": 22,
       "unit": 2,
-      "utils": 33
+      "utils": 34
     }
   },
   "tests": [
@@ -787,6 +789,7 @@
     "tests/utils/runtimeConfig.spec.ts",
     "tests/utils/schedule.spec.ts",
     "tests/utils/selectionUtils.spec.ts",
+    "tests/utils/spaLoadingTemplate.spec.ts",
     "tests/utils/thirdPartyScripts.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",
     "tests/utils/validationErrors.spec.ts",
