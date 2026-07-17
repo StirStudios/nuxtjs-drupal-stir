@@ -55,3 +55,22 @@ export function resolveDrupalPageAccess(
     hasEditorialAccess: isAdministrator || (isAuthenticated && hasLocalTasks),
   }
 }
+
+export type DrupalPageAccess = ReturnType<typeof resolveDrupalPageAccess>
+
+/**
+ * Combines route-specific tasks with a stable authenticated-user snapshot.
+ */
+export function mergeDrupalPageAccess(
+  routeAccess: DrupalPageAccess,
+  sessionAccess: DrupalPageAccess,
+): DrupalPageAccess {
+  const isAdministrator = routeAccess.isAdministrator || sessionAccess.isAdministrator
+  const isAuthenticated = routeAccess.isAuthenticated || sessionAccess.isAuthenticated
+
+  return {
+    isAdministrator,
+    isAuthenticated,
+    hasEditorialAccess: isAdministrator || routeAccess.hasEditorialAccess,
+  }
+}

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { resolveDrupalPageAccess } from '../../layers/theme/app/utils/editorialAccess'
+import {
+  mergeDrupalPageAccess,
+  resolveDrupalPageAccess,
+} from '../../layers/theme/app/utils/editorialAccess'
 
 describe('resolveDrupalPageAccess', () => {
   it('keeps administrators compatible even without local tasks', () => {
@@ -52,5 +55,41 @@ describe('resolveDrupalPageAccess', () => {
       current_user: { uid: 0, roles: ['anonymous'] },
       local_tasks: { primary: [{ label: 'View', url: '/node/1' }] },
     }).hasEditorialAccess).toBe(false)
+  })
+})
+
+describe('mergeDrupalPageAccess', () => {
+  it('keeps administrator controls available when a route has no Drupal page payload', () => {
+    const routeAccess = resolveDrupalPageAccess(undefined)
+    const sessionAccess = resolveDrupalPageAccess({
+      current_user: {
+        authenticated: true,
+        uid: 1,
+        roles: ['authenticated', 'administrator'],
+      },
+    })
+
+    expect(mergeDrupalPageAccess(routeAccess, sessionAccess)).toEqual({
+      isAdministrator: true,
+      isAuthenticated: true,
+      hasEditorialAccess: true,
+    })
+  })
+
+  it('does not give ordinary authenticated users global editorial controls', () => {
+    const routeAccess = resolveDrupalPageAccess(undefined)
+    const sessionAccess = resolveDrupalPageAccess({
+      current_user: {
+        authenticated: true,
+        uid: 42,
+        roles: ['authenticated'],
+      },
+    })
+
+    expect(mergeDrupalPageAccess(routeAccess, sessionAccess)).toEqual({
+      isAdministrator: false,
+      isAuthenticated: true,
+      hasEditorialAccess: false,
+    })
   })
 })
