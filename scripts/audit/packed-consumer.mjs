@@ -13,7 +13,10 @@ const consumerLayers = [
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
 const maxArchiveBytes = 300_000
-const maxArchiveEntries = 429
+// Ratchet updated only for four shared primitives that replaced larger
+// consumer implementations: InteractiveCard, CompactTagList, ViewsSearchField,
+// and AccountSection.
+const maxArchiveEntries = 433
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
