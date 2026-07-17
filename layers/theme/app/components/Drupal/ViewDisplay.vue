@@ -122,7 +122,7 @@ const getRowMotionProps = (index: number) =>
 </script>
 
 <template>
-  <div ref="viewRoot" class="scroll-mt-24">
+  <section ref="viewRoot" class="scroll-mt-24">
     <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
       <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 flex-1">
@@ -159,9 +159,7 @@ const getRowMotionProps = (index: number) =>
         </div>
       </div>
     </div>
-  </div>
-
-  <ParagraphCarousel
+    <ParagraphCarousel
     v-if="carousel"
     :id="`${viewId}-${displayId}`"
     :carousel-arrows="carouselArrows"
@@ -177,7 +175,7 @@ const getRowMotionProps = (index: number) =>
     :width="width"
   />
 
-  <WrapGrid
+    <WrapGrid
     v-else-if="isLoading"
     :classes="rowsWrapper"
     :container="container"
@@ -194,7 +192,7 @@ const getRowMotionProps = (index: number) =>
     </div>
   </WrapGrid>
 
-  <slot
+    <slot
     v-else-if="hasRows() && vueSlots.grid"
     :get-row-motion-props="getRowMotionProps"
     :handle-view-click="handleViewClick"
@@ -204,7 +202,7 @@ const getRowMotionProps = (index: number) =>
     :rows="getRenderedRows({ teaser: false })"
   />
 
-  <WrapGrid
+    <WrapGrid
     v-else-if="hasRows()"
     :classes="rowsWrapper"
     :container="container"
@@ -226,7 +224,7 @@ const getRowMotionProps = (index: number) =>
     </RevealMotion>
   </WrapGrid>
 
-  <UEmpty
+    <UEmpty
     v-else-if="loadError"
     description="Please try again."
     icon="i-lucide-alert-triangle"
@@ -240,7 +238,7 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-  <UEmpty
+    <UEmpty
     v-else
     icon="i-lucide-search-x"
     title="No results found"
@@ -269,11 +267,12 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-  <DrupalViewsPagination
-    v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
-    class="mt-8"
-    :current="currentPage"
-    :total-pages="effectivePager.totalPages"
-    @update:current="onPageChange"
-  />
+    <DrupalViewsPagination
+      v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
+      class="mt-8"
+      :current="currentPage"
+      :total-pages="effectivePager.totalPages"
+      @update:current="onPageChange"
+    />
+  </section>
 </template>

@@ -3,6 +3,31 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaVideo from '../../../layers/theme/app/components/global/Media/Video.vue'
 
 describe('MediaVideo (Nuxt runtime)', () => {
+  it('uses Nuxt Image for a versioned static video poster', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://player.example/embed/video',
+        originalRevision: '42-1710000000-123456',
+        originalSrc: 'https://drupal.example/files/poster.jpg',
+        responsiveStyle: 'card',
+        src: 'https://drupal.example/styles/card/poster.webp',
+        width: 1920,
+      },
+    })
+
+    const poster = wrapper.get('button img')
+
+    expect(poster.attributes('data-nuxt-img')).toBeDefined()
+    expect(poster.attributes('src')).toContain(
+      'poster.jpg?v=42-1710000000-123456',
+    )
+    expect(poster.attributes('srcset')).toContain(
+      'poster.jpg?v=42-1710000000-123456',
+    )
+    expect(poster.attributes('srcset')).not.toContain('/styles/card/')
+  })
+
   it('renders a responsive hero poster without initial video bytes', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {

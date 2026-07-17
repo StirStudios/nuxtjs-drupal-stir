@@ -1,7 +1,11 @@
 import { computed, unref } from 'vue'
 import type { ImgHTMLAttributes } from 'vue'
 
-type TeaserImage = Partial<ImgHTMLAttributes>
+type TeaserImage = Partial<ImgHTMLAttributes> & {
+  originalRevision?: string
+  originalSrc?: string
+  responsiveStyle?: string
+}
 
 const nodeEditPathPattern = /^\/node\/\d+\/edit\/?$/
 
@@ -85,6 +89,15 @@ export function useTeaserPost(
       alt: typeof media.alt === 'string' ? media.alt : extra.title ?? '',
       width: Number.isFinite(width) ? width : undefined,
       height: Number.isFinite(height) ? height : undefined,
+      originalRevision: typeof media.originalRevision === 'string'
+        ? media.originalRevision
+        : undefined,
+      originalSrc: typeof media.originalSrc === 'string'
+        ? media.originalSrc
+        : undefined,
+      responsiveStyle: typeof media.responsiveStyle === 'string'
+        ? media.responsiveStyle
+        : undefined,
       srcset: typeof media.srcset === 'string' ? media.srcset : undefined,
       sizes: typeof media.sizes === 'string' ? media.sizes : '(min-width: 768px) 50vw, 100vw',
       loading: 'lazy',

@@ -3,6 +3,26 @@ import { describe, expect, it } from 'vitest'
 import { useTeaserPost } from '../../layers/theme/app/composables/useTeaserPost'
 
 describe('useTeaserPost', () => {
+  it('preserves versioned image-delivery metadata for shared teaser cards', () => {
+    const { post } = useTeaserPost({
+      media: {
+        src: 'https://cms.example/styles/card/poster.webp',
+        srcset: 'https://cms.example/styles/card/poster.webp 400w',
+        originalSrc: 'https://cms.example/files/poster.jpg',
+        originalRevision: '42-1710000000-123456',
+        responsiveStyle: 'card',
+        width: 1920,
+        height: 1080,
+      },
+    })
+
+    expect(post.value.image).toMatchObject({
+      originalRevision: '42-1710000000-123456',
+      originalSrc: 'https://cms.example/files/poster.jpg',
+      responsiveStyle: 'card',
+    })
+  })
+
   it('prefers explicit node editLink over source editLink', () => {
     const { post } = useTeaserPost(
       {

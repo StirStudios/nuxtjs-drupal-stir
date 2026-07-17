@@ -29,8 +29,12 @@ const props = withDefaults(
 
     width?: number
     height?: number
+    originalRevision?: string
+    originalSrc?: string
     srcset?: string
     sizes?: string
+    deliverySizes?: string
+    responsiveStyle?: string
     loading?: 'eager' | 'lazy'
     fetchpriority?: 'high' | 'low' | 'auto'
 
@@ -55,8 +59,12 @@ const props = withDefaults(
     loadMinWidth: undefined,
     width: undefined,
     height: undefined,
+    originalRevision: undefined,
+    originalSrc: undefined,
     srcset: undefined,
     sizes: undefined,
+    deliverySizes: undefined,
+    responsiveStyle: undefined,
     loading: 'lazy',
     fetchpriority: 'auto',
     noWrapper: false,
@@ -190,6 +198,15 @@ const previewSrc = computed(() => {
 const previewSrcset = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.srcset,
 )
+const staticPosterOriginalSrc = computed(() =>
+  isAnimatedPreviewActive.value ? undefined : props.originalSrc,
+)
+const staticPosterOriginalRevision = computed(() =>
+  isAnimatedPreviewActive.value ? undefined : props.originalRevision,
+)
+const staticPosterResponsiveStyle = computed(() =>
+  isAnimatedPreviewActive.value ? undefined : props.responsiveStyle,
+)
 
 const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
@@ -246,15 +263,21 @@ watch(
 </script>
 
 <template>
-  <img
+  <MediaImage
     v-if="isBare && previewSrc"
     v-bind="attrs"
     :alt="alt || ''"
     aria-hidden="true"
-    class="absolute inset-0 h-full w-full object-cover"
+    :delivery-sizes="deliverySizes"
     :fetchpriority="fetchpriority"
     :height="height"
+    image-class="absolute inset-0 h-full w-full object-cover"
+    :is-hero="isHero"
     :loading="loading"
+    no-wrapper
+    :original-revision="staticPosterOriginalRevision"
+    :original-src="staticPosterOriginalSrc"
+    :responsive-style="staticPosterResponsiveStyle"
     :sizes="sizes || '100vw'"
     :src="previewSrc"
     :srcset="previewSrcset"
@@ -378,13 +401,19 @@ watch(
         >
           <source :src="animatedPreviewSrc" type="video/mp4" />
         </video>
-        <img
+        <MediaImage
           v-else
           :alt="alt || title || 'Video thumbnail'"
-          class="h-full w-full object-cover"
+          :delivery-sizes="deliverySizes"
           :fetchpriority="fetchpriority"
           :height="height"
+          image-class="h-full w-full object-cover"
+          :is-hero="false"
           :loading="loading"
+          no-wrapper
+          :original-revision="staticPosterOriginalRevision"
+          :original-src="staticPosterOriginalSrc"
+          :responsive-style="staticPosterResponsiveStyle"
           :sizes="sizes || '100vw'"
           :src="previewSrc"
           :srcset="previewSrcset"
