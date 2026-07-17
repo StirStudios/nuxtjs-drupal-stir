@@ -50,7 +50,7 @@ const appConfig = useAppConfig()
 const themeWebform = (
   (
     appConfig.stirTheme as {
-      webform?: { fieldVariant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
+      webform?: { fieldVariant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
     }
   ).webform || {}
 )
