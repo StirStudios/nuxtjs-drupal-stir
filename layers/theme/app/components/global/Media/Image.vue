@@ -21,6 +21,7 @@ const props = defineProps<{
   originalSrc?: string
   srcset?: string
   sizes?: string
+  deliverySizes?: string
   responsiveStyle?: string
   modalSrc?: string
   modalSrcset?: string
@@ -62,11 +63,14 @@ const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
-const providerSizes = computed(() => resolveImageDeliveryProfile(
-  props.responsiveStyle,
-  isHero.value,
-  theme.media.image.profiles,
-))
+const providerSizes = computed(() =>
+  props.deliverySizes?.trim()
+  || resolveImageDeliveryProfile(
+    props.responsiveStyle,
+    isHero.value,
+    theme.media.image.profiles,
+  ),
+)
 const providerSource = computed(() => versionImageSource(
   props.originalSrc,
   props.originalRevision,

@@ -82,6 +82,33 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
+  it('allows a layout to narrow Nuxt Image sizes without changing Drupal sizes', async () => {
+    const appConfig = useAppConfig()
+    const previousDelivery = appConfig.stirImageDelivery
+
+    appConfig.stirImageDelivery = 'nuxt'
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        props: {
+          alt: 'Compact card',
+          deliverySizes: '210px sm:270px md:330px',
+          noWrapper: true,
+          originalRevision: '42-1710000000-293400',
+          originalSrc: 'https://drupal.example/files/image.jpg',
+          responsiveStyle: 'card',
+          sizes: '(max-width: 639px) 210px, (max-width: 767px) 270px, 330px',
+          src: '/styles/card/image.webp',
+        },
+      })
+
+      expect(wrapper.get('img').attributes('sizes')).toBe('210px sm:270px md:330px')
+    }
+    finally {
+      appConfig.stirImageDelivery = previousDelivery
+    }
+  })
+
   it('avoids native auto-sizing for responsive wrapped images', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

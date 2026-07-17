@@ -22,6 +22,7 @@ export type DrupalMediaNodeProps = {
   alt?: string
   category?: string
   credit?: string
+  deliverySizes?: string
   fetchpriority?: 'auto' | 'high' | 'low'
   height?: number
   loading?: 'eager' | 'lazy'
