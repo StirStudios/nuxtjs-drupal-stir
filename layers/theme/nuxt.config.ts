@@ -8,7 +8,10 @@ import {
   loadPresentationManifest,
   type PresentationManifestMode,
 } from './build/presentationManifest'
-import { resolveImageCdnBase } from './build/imageCdn'
+import {
+  resolveDrupalImageDomain,
+  resolveImageCdnBase,
+} from './build/imageCdn'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
@@ -21,6 +24,7 @@ const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'drupal'
   ? 'drupal'
   : 'nuxt'
 const stirImageCdn = resolveImageCdnBase(process.env.NUXT_IMAGE_CDN)
+const drupalImageDomain = resolveDrupalImageDomain(process.env.DRUPAL_URL)
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = stirImageDelivery === 'nuxt'
   ? resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
@@ -53,19 +57,24 @@ export default defineNuxtConfig({
       })
     },
   ],
-  ...(stirImageDelivery === 'nuxt' && stirImageCdn
+  ...(stirImageDelivery === 'nuxt'
     ? {
         image: {
-          provider: 'stirCdn',
-          ipx: {},
-          providers: {
-            stirCdn: {
-              provider: ipxRuntimeProvider,
-              options: {
-                baseURL: `${stirImageCdn}/_ipx`,
-              },
-            },
-          },
+          domains: drupalImageDomain ? [drupalImageDomain] : [],
+          ...(stirImageCdn
+            ? {
+                provider: 'stirCdn',
+                ipx: {},
+                providers: {
+                  stirCdn: {
+                    provider: ipxRuntimeProvider,
+                    options: {
+                      baseURL: `${stirImageCdn}/_ipx`,
+                    },
+                  },
+                },
+              }
+            : {}),
         },
       }
     : {}),

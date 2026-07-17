@@ -83,11 +83,12 @@ a direct controls child, keeping anonymous production markup unchanged.
 
 ### Nuxt Image delivery
 
-Nuxt Image with the local IPX provider is the default image delivery path. Allow
-the Drupal asset hostname with `NUXT_IMAGE_DOMAINS`. Projects using IPX must
-also permit the package manager to build Sharp in their trusted-dependency
-policy. Set `STIR_IMAGE_DELIVERY=drupal` only as a temporary compatibility
-fallback to Drupal responsive `src` and `srcset` output.
+Nuxt Image with the local IPX provider is the default image delivery path. The
+Drupal asset hostname is allowed automatically from `DRUPAL_URL`; use
+`NUXT_IMAGE_DOMAINS` only for additional external asset hosts. Projects using
+IPX must also permit the package manager to build Sharp in their
+trusted-dependency policy. Set `STIR_IMAGE_DELIVERY=drupal` only as a temporary
+compatibility fallback to Drupal responsive `src` and `srcset` output.
 
 Set `NUXT_IMAGE_CDN` to an absolute CDN origin such as
 `https://images.example.com` to render IPX derivative URLs through an ordinary

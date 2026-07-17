@@ -22,3 +22,17 @@ export function resolveImageCdnBase(value: string | undefined): string | undefin
 
   return url.origin
 }
+
+export function resolveDrupalImageDomain(value: string | undefined): string | undefined {
+  const candidate = value?.trim()
+
+  if (!candidate) return undefined
+
+  try {
+    const url = new URL(candidate)
+
+    return ['http:', 'https:'].includes(url.protocol) ? url.host : undefined
+  } catch {
+    return undefined
+  }
+}
