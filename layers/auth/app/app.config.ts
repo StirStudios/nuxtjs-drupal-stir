@@ -13,4 +13,10 @@ export default defineAppConfig({
   authIntegration: {
     drupalAccounts: false,
   },
+
+  authProfileForm: {
+    booleanControl: 'checkbox',
+    editorFields: [],
+    fieldIcons: {},
+  },
 })
