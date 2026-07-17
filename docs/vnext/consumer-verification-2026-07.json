@@ -8,11 +8,11 @@
     "danceplugRoot": "be260de"
   },
   "finalIntegrationPilot": {
-    "generatedAt": "2026-07-17T00:48:17Z",
+    "generatedAt": "2026-07-17T01:02:00Z",
     "revisions": {
       "nuxtIntegration": "af408748",
       "stirTools": "7941fb2",
-      "danceplugNuxtBase": "cf44a9c",
+      "danceplugNuxt": "9467e2a",
       "danceplugRoot": "be260de"
     },
     "quality": {
@@ -20,6 +20,15 @@
       "lint": "passed",
       "typecheck": "passed",
       "productionBuild": "passed"
+    },
+    "imageDelivery": {
+      "mode": "nuxt",
+      "originAllowlist": "drupal.danceplug.local",
+      "ipxResponsiveVariants": "verified",
+      "webpConversion": "verified",
+      "versionedSourceCacheKeys": "verified",
+      "generatedImageCacheControl": "public, max-age=315360000, s-maxage=315360000",
+      "note": "Nuxt Image remains opt-in at the layer level; this pilot used STIR_IMAGE_DELIVERY=nuxt and NUXT_IMAGE_DOMAINS=drupal.danceplug.local."
     },
     "productionSmoke": {
       "homepage": "200 public",
@@ -31,29 +40,33 @@
     "lighthouse": {
       "environment": {
         "lighthouse": "13.4.0",
-        "chrome": "151.0.0.0",
+        "chrome": "150.0.7871.115",
         "formFactor": "mobile",
         "runsPerRoute": 3
       },
       "homepage": {
-        "score": 70,
-        "fcpMs": 4000,
-        "lcpMs": 5450,
-        "tbtMs": 86,
-        "totalBytes": 960000,
-        "imageBytes": 260000,
-        "videoBytes": 0
+        "score": 71,
+        "scoreRange": [63, 81],
+        "fcpMs": 3454,
+        "lcpMs": 5378,
+        "tbtMs": 71,
+        "totalBytes": 1001258,
+        "videoBytes": 0,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "note": "Median of three local production runs. The wide score range is driven by local FCP/LCP timing variance; the hero IPX image was eagerly discoverable with fetchpriority=high and passed the Lighthouse LCP discovery checks."
       },
       "class": {
-        "score": 74,
-        "fcpMs": 3360,
-        "lcpMs": 5150,
-        "tbtMs": 45,
-        "totalBytes": 520000,
-        "imageBytes": 40000,
+        "score": 92,
+        "scoreRange": [87, 92],
+        "fcpMs": 2402,
+        "lcpMs": 2927,
+        "tbtMs": 85,
+        "totalBytes": 523681,
         "videoBytes": 0,
-        "serverResponseMs": 166,
-        "note": "Functional and media-delivery behavior passed; compatibility CSS remains the principal render-blocking cost."
+        "accessibility": 97,
+        "bestPractices": 100,
+        "note": "Median of three isolated local production runs. This reproduces the earlier 92 result and confirms that the intervening 74 was not a representative regression."
       }
     }
   },
