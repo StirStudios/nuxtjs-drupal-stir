@@ -149,6 +149,7 @@
   "registrationSurface": {
     "components": [
       "layers/auth/app/components/Account/ProfileForm.vue",
+      "layers/auth/app/components/Account/Section.vue",
       "layers/auth/app/components/Account/SecurityForm.vue",
       "layers/auth/app/components/Auth/AuthCard.vue",
       "layers/auth/app/components/Auth/AuthFormPanel.vue",
@@ -173,6 +174,7 @@
       "layers/theme/app/components/App/ScrollToTop.vue",
       "layers/theme/app/components/ButtonModal.vue",
       "layers/theme/app/components/CardGradient.vue",
+      "layers/theme/app/components/Content/CompactTagList.vue",
       "layers/theme/app/components/Content/InteractiveCard.vue",
       "layers/theme/app/components/Drupal/NodeDisplay.vue",
       "layers/theme/app/components/Drupal/PageRoute.vue",
@@ -181,6 +183,7 @@
       "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
       "layers/theme/app/components/Drupal/ViewsFilters.vue",
       "layers/theme/app/components/Drupal/ViewsPagination.vue",
+      "layers/theme/app/components/Drupal/ViewsSearchField.vue",
       "layers/theme/app/components/Drupal/ViewsSelectField.vue",
       "layers/theme/app/components/Drupal/ViewsSort.vue",
       "layers/theme/app/components/Edit/Link.vue",
@@ -441,6 +444,7 @@
       ],
       "autoRegisteredComponents": [
         "layers/auth/app/components/Account/ProfileForm.vue",
+        "layers/auth/app/components/Account/Section.vue",
         "layers/auth/app/components/Account/SecurityForm.vue",
         "layers/auth/app/components/Auth/AuthCard.vue",
         "layers/auth/app/components/Auth/AuthFormPanel.vue",
@@ -465,6 +469,7 @@
         "layers/theme/app/components/App/ScrollToTop.vue",
         "layers/theme/app/components/ButtonModal.vue",
         "layers/theme/app/components/CardGradient.vue",
+        "layers/theme/app/components/Content/CompactTagList.vue",
         "layers/theme/app/components/Content/InteractiveCard.vue",
         "layers/theme/app/components/Drupal/NodeDisplay.vue",
         "layers/theme/app/components/Drupal/PageRoute.vue",
@@ -473,6 +478,7 @@
         "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
         "layers/theme/app/components/Drupal/ViewsFilters.vue",
         "layers/theme/app/components/Drupal/ViewsPagination.vue",
+        "layers/theme/app/components/Drupal/ViewsSearchField.vue",
         "layers/theme/app/components/Drupal/ViewsSelectField.vue",
         "layers/theme/app/components/Drupal/ViewsSort.vue",
         "layers/theme/app/components/Edit/Link.vue",
@@ -671,7 +677,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 112,
+    "components": 115,
     "composables": 62,
     "utils": 43,
     "plugins": 6,
