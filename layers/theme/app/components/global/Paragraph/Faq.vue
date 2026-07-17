@@ -101,18 +101,17 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
       trailing-icon="i-lucide-plus"
       :ui="{
         root: 'rounded-2xl border border-default bg-default',
-        item: 'border-b border-default last:border-b-0',
-        trigger: 'px-5 py-5 text-left hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
+        trigger: 'px-5 py-5 hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
         label: 'text-highlighted text-lg font-semibold',
-        trailingIcon: 'text-muted size-5 group-data-[state=open]:rotate-45',
-        body: 'px-5 pb-5 pt-0 md:px-6 md:pb-6',
+        trailingIcon: 'text-muted group-data-[state=open]:rotate-45',
+        body: 'px-5 pb-5 md:px-6 md:pb-6',
       }"
       :unmount-on-hide="false"
     >
       <template #body="{ item }">
         <div
           v-if="item.answerHtml"
-          class="prose max-w-none text-muted"
+          class="prose mt-3 max-w-none text-muted"
           v-html="item.answerHtml"
         />
 
