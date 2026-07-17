@@ -7,6 +7,7 @@ import {
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '#stir/utils/imageDelivery'
+import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
 defineOptions({ inheritAttrs: false })
 
@@ -50,6 +51,7 @@ const emit = defineEmits<{
 }>()
 
 const appConfig = useAppConfig()
+const runtimeConfig = useRuntimeConfig()
 const theme = appConfig.stirTheme
 const attrs = useAttrs()
 const { isFront } = usePageContext()
@@ -71,8 +73,9 @@ const providerSizes = computed(() =>
     theme.media.image.profiles,
   ),
 )
+const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
-  props.originalSrc,
+  toDrupalUrl(props.originalSrc, drupalOrigin.value),
   props.originalRevision,
 ))
 const isNuxtImage = computed(() =>
