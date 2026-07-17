@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
   "units": "gzip-kilobytes",
-  "maxInitialGzipKb": 193,
-  "maxInitialJavascriptGzipKb": 158,
+  "maxInitialGzipKb": 196,
+  "maxInitialJavascriptGzipKb": 160,
   "maxInitialCssGzipKb": 36,
   "maxAdminDeferredGzipKb": 170,
-  "maxRevealMotionGzipKb": 28
+  "maxRevealMotionGzipKb": 28,
+  "initialBudgetRationale": "Nuxt UI 4.10 embeds its 43 required UI icons for SSR and offline use, replacing runtime icon requests. Tighten these caps again after subsequent entry optimizations."
 }

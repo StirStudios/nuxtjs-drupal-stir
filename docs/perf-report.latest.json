@@ -1,29 +1,29 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-16T20:06:24.514Z",
+  "generatedAt": "2026-07-17T00:11:47.140Z",
   "initialClient": {
-    "sizeKb": 721.86,
-    "gzipKb": 191.79,
+    "sizeKb": 739.97,
+    "gzipKb": 195.02,
     "assets": [
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/BW_2hnRm.js",
-        "sizeKb": 449.2,
-        "gzipKb": 156.52
+        "file": "_nuxt/BnFxeu0a.js",
+        "sizeKb": 462.85,
+        "gzipKb": 159.3
       },
       {
-        "label": "entry.DsOGJlBq.css",
+        "label": "entry.DBVFJrJL.css",
         "role": "initial",
-        "file": "_nuxt/entry.DsOGJlBq.css",
-        "sizeKb": 272.66,
-        "gzipKb": 35.27
+        "file": "_nuxt/entry.DBVFJrJL.css",
+        "sizeKb": 277.12,
+        "gzipKb": 35.72
       }
     ],
     "entryModules": [
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@vue+runtime-core@3.5.39/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js",
-        "renderedBytes": 195521
+        "renderedBytes": 196214
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/tailwind-merge@3.6.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
@@ -43,15 +43,15 @@
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@vueuse+core@14.3.0_vue@3.5.39_typescript@5.9.3_/node_modules/@vueuse/core/dist/index.js",
-        "renderedBytes": 38137
+        "renderedBytes": 38993
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@vue+runtime-dom@3.5.39/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js",
-        "renderedBytes": 25382
+        "renderedBytes": 26407
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@vueuse+shared@14.3.0_vue@3.5.39_typescript@5.9.3_/node_modules/@vueuse/shared/dist/index.js",
-        "renderedBytes": 19651
+        "renderedBytes": 19081
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_0bc6e88abcd6c9c71b646abdfebd8aea/node_modules/nuxt/dist/app/composables/asyncData.js",
@@ -66,6 +66,10 @@
         "renderedBytes": 13603
       },
       {
+        "id": "virtual:nuxt:%2FUsers%2Fgg%2FClients%2FStir%20GIT%2Fnuxtjs-drupal-stir%2Fnode_modules%2F.cache%2Fnuxt%2F.nuxt%2Fnuxt-icon-client-bundle.mjs",
+        "renderedBytes": 12784
+      },
+      {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/vue-router@5.1.0_@vue+compiler-sfc@3.5.39_esbuild@0.28.1_rollup@4.62.2_vite@7.3.6_@type_88aa2fee63d7bf87c8bffd22812d3504/node_modules/vue-router/dist/devtools-DCoWQoU_.js",
         "renderedBytes": 11721
       },
@@ -74,8 +78,8 @@
         "renderedBytes": 10586
       },
       {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.9.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Toast.vue",
-        "renderedBytes": 10201
+        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.10.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Toast.vue",
+        "renderedBytes": 10197
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/tailwind-variants@3.2.2_tailwind-merge@3.6.0_tailwindcss@4.3.2/node_modules/tailwind-variants/dist/chunk-RZF76H2U.js",
@@ -90,7 +94,7 @@
         "renderedBytes": 9318
       },
       {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/reka-ui@2.9.10_vue@3.5.39_typescript@5.9.3_/node_modules/reka-ui/dist/Toast/ToastRootImpl.js",
+        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/reka-ui@2.10.1_vue@3.5.39_typescript@5.9.3_/node_modules/reka-ui/dist/Toast/ToastRootImpl.js",
         "renderedBytes": 8908
       },
       {
@@ -114,32 +118,28 @@
         "renderedBytes": 7559
       },
       {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/devalue@5.8.1/node_modules/devalue/src/parse.js",
-        "renderedBytes": 7151
+        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.10.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Link.vue",
+        "renderedBytes": 7245
       },
       {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.9.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Link.vue",
-        "renderedBytes": 7089
+        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/devalue@5.8.1/node_modules/devalue/src/parse.js",
+        "renderedBytes": 7151
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/unhead@2.1.15/node_modules/unhead/dist/client.mjs",
         "renderedBytes": 6883
       },
       {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.9.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Button.vue",
-        "renderedBytes": 6770
+        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/@nuxt+ui@4.10.0_646938b80cde5a7cf73da08d4bec3b23/node_modules/@nuxt/ui/dist/runtime/components/Button.vue",
+        "renderedBytes": 6762
       },
       {
         "id": "virtual:nuxt:%2FUsers%2Fgg%2FClients%2FStir%20GIT%2Fnuxtjs-drupal-stir%2Fnode_modules%2F.cache%2Fnuxt%2F.nuxt%2Fapp.config.mjs",
-        "renderedBytes": 6715
+        "renderedBytes": 6746
       },
       {
         "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/layers/theme/app/app.config.ts",
         "renderedBytes": 6575
-      },
-      {
-        "id": "/Users/gg/Clients/Stir GIT/nuxtjs-drupal-stir/node_modules/.pnpm/unhead@2.1.15/node_modules/unhead/dist/shared/unhead.B3VbJo7Y.mjs",
-        "renderedBytes": 6516
       }
     ]
   },
@@ -147,37 +147,37 @@
     {
       "label": "Text",
       "role": "admin-deferred",
-      "file": "_nuxt/utqNNaK2.js",
-      "sizeKb": 540.34,
-      "gzipKb": 167.27
+      "file": "_nuxt/BdarPmKi.js",
+      "sizeKb": 540.81,
+      "gzipKb": 167.39
     },
     {
       "label": "app-entry",
       "role": "initial",
-      "file": "_nuxt/BW_2hnRm.js",
-      "sizeKb": 449.2,
-      "gzipKb": 156.52
+      "file": "_nuxt/BnFxeu0a.js",
+      "sizeKb": 462.85,
+      "gzipKb": 159.3
     },
     {
-      "label": "entry.DsOGJlBq.css",
+      "label": "entry.DBVFJrJL.css",
       "role": "initial",
-      "file": "_nuxt/entry.DsOGJlBq.css",
-      "sizeKb": 272.66,
-      "gzipKb": 35.27
+      "file": "_nuxt/entry.DBVFJrJL.css",
+      "sizeKb": 277.12,
+      "gzipKb": 35.72
     },
     {
       "label": "theme:app/components/RevealMotion",
       "role": "async",
-      "file": "_nuxt/CxPzdCyY.js",
+      "file": "_nuxt/DJwT8q7W.js",
       "sizeKb": 77.78,
       "gzipKb": 26.88
     },
     {
-      "label": "_eW6x8o9R",
+      "label": "_B7HhGqJH",
       "role": "async",
-      "file": "_nuxt/eW6x8o9R.js",
-      "sizeKb": 144.85,
-      "gzipKb": 26.19
+      "file": "_nuxt/B7HhGqJH.js",
+      "sizeKb": 146.06,
+      "gzipKb": 26.38
     },
     {
       "label": "_BVPVYLj_",
@@ -187,71 +187,71 @@
       "gzipKb": 15.29
     },
     {
-      "label": "_CwF71hbC",
+      "label": "_Ck2T0w40",
       "role": "async",
-      "file": "_nuxt/CwF71hbC.js",
-      "sizeKb": 53.28,
-      "gzipKb": 14.62
+      "file": "_nuxt/Ck2T0w40.js",
+      "sizeKb": 53.72,
+      "gzipKb": 14.73
     },
     {
       "label": "theme:app/components/global/drupal-view--default",
       "role": "async",
-      "file": "_nuxt/DDctaRal.js",
-      "sizeKb": 39.99,
-      "gzipKb": 12.16
+      "file": "_nuxt/DhSyEIDP.js",
+      "sizeKb": 43.47,
+      "gzipKb": 13.19
     },
     {
       "label": "auth:app/layouts/account",
       "role": "async",
-      "file": "_nuxt/Bi2rxTNh.js",
-      "sizeKb": 41.46,
-      "gzipKb": 11.99
+      "file": "_nuxt/BtfNLeSC.js",
+      "sizeKb": 42.63,
+      "gzipKb": 12.15
     },
     {
-      "label": "_DhGW2XyI",
+      "label": "_CH26fLPz",
       "role": "async",
-      "file": "_nuxt/DhGW2XyI.js",
-      "sizeKb": 31.72,
-      "gzipKb": 11.86
+      "file": "_nuxt/CH26fLPz.js",
+      "sizeKb": 32.38,
+      "gzipKb": 12.05
     },
     {
-      "label": "_D-dQugiS",
+      "label": "_DS_H6gyH",
       "role": "async",
-      "file": "_nuxt/D-dQugiS.js",
-      "sizeKb": 40.24,
-      "gzipKb": 11.3
+      "file": "_nuxt/DS_H6gyH.js",
+      "sizeKb": 40.67,
+      "gzipKb": 11.38
     },
     {
-      "label": "vendor:@nuxt/ui",
+      "label": "_DXucZWFN",
       "role": "async",
-      "file": "_nuxt/CZJiB2SF.js",
-      "sizeKb": 27.8,
-      "gzipKb": 10.56
-    },
-    {
-      "label": "_CBK2NE_o",
-      "role": "async",
-      "file": "_nuxt/CBK2NE_o.js",
-      "sizeKb": 30.77,
-      "gzipKb": 10.48
+      "file": "_nuxt/DXucZWFN.js",
+      "sizeKb": 31.35,
+      "gzipKb": 10.73
     },
     {
       "label": "vendor:@nuxt/ui",
       "role": "async",
-      "file": "_nuxt/BE3caL6J.js",
+      "file": "_nuxt/CmQcklfA.js",
+      "sizeKb": 27.74,
+      "gzipKb": 10.55
+    },
+    {
+      "label": "vendor:@nuxt/ui",
+      "role": "async",
+      "file": "_nuxt/CPWOWPve.js",
       "sizeKb": 40.73,
-      "gzipKb": 10.26
+      "gzipKb": 10.27
     },
     {
       "label": "Number",
       "role": "async",
-      "file": "_nuxt/D3orWpqc.js",
-      "sizeKb": 27.54,
-      "gzipKb": 8.3
+      "file": "_nuxt/BReAya6F.js",
+      "sizeKb": 27.75,
+      "gzipKb": 8.41
     }
   ],
   "totalOutputSize": {
-    "total": "10.1 MB",
-    "gzip": "2.7 MB gzip"
+    "total": "10.2 MB",
+    "gzip": "2.74 MB gzip"
   }
 }
