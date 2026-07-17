@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "units": "gzip-kilobytes",
   "maxInitialGzipKb": 196,
-  "maxInitialJavascriptGzipKb": 160,
+  "maxInitialJavascriptGzipKb": 159.9,
   "maxInitialCssGzipKb": 36,
   "maxAdminDeferredGzipKb": 170,
   "maxRevealMotionGzipKb": 28,
