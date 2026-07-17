@@ -139,4 +139,20 @@ describe('Footer (Nuxt runtime)', () => {
     expect(wrapper.text()).toContain('info@sbpublicmarket.com')
     expect(appFooterContextExecuteCalls).toBe(1)
   })
+
+  it('uses the app context menu when a Nuxt-only page supplies an empty menu', async () => {
+    page.value = {
+      footer_menu: [],
+      site_info: {
+        name: 'Nuxt page',
+      },
+    }
+    appFooterContextExecuteCalls = 0
+
+    const wrapper = await mountFooter()
+
+    expect(wrapper.text()).toContain('Accessibility Statement')
+    expect(wrapper.text()).toContain('Privacy Policy')
+    expect(appFooterContextExecuteCalls).toBe(1)
+  })
 })
