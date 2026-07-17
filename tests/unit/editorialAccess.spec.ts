@@ -34,6 +34,19 @@ describe('resolveDrupalPageAccess', () => {
     }).hasEditorialAccess).toBe(false)
   })
 
+  it('does not treat read-only view and API tasks as editorial access', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: { uid: 42, roles: ['authenticated', 'class_subscriber'] },
+      local_tasks: {
+        primary: [
+          { label: 'View', url: '/node/1' },
+          { label: 'API', url: '/ce-api/node/1' },
+        ],
+        secondary: [],
+      },
+    }).hasEditorialAccess).toBe(false)
+  })
+
   it('does not expose anonymous local tasks as editorial controls', () => {
     expect(resolveDrupalPageAccess({
       current_user: { uid: 0, roles: ['anonymous'] },

@@ -21,6 +21,16 @@ const hasPositiveId = (value: unknown): boolean => {
   return Number.isInteger(id) && id > 0
 }
 
+const hasEditorialTask = (value: unknown): boolean => {
+  if (!value || typeof value !== 'object') return false
+
+  const label = 'label' in value && typeof value.label === 'string'
+    ? value.label.trim().toLowerCase()
+    : ''
+
+  return label !== '' && !['api', 'view'].includes(label)
+}
+
 export function resolveDrupalPageAccess(
   page: DrupalPageAccessSource | null | undefined,
 ) {
@@ -36,9 +46,8 @@ export function resolveDrupalPageAccess(
     || roles.includes('authenticated')
     || isAdministrator
   const tasks = page?.local_tasks
-  const hasLocalTasks =
-    (Array.isArray(tasks?.primary) && tasks.primary.length > 0)
-    || (Array.isArray(tasks?.secondary) && tasks.secondary.length > 0)
+  const hasLocalTasks = [tasks?.primary, tasks?.secondary]
+    .some(group => Array.isArray(group) && group.some(hasEditorialTask))
 
   return {
     isAdministrator,
