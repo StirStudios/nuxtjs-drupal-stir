@@ -17,6 +17,7 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('contentSlotNames')
     expect(nodeDisplay).toContain(':name="slotName"')
     expect(nodeDisplay).toContain(':url="props.url || props.path?.alias"')
+    expect(nodeDisplay).toContain('\'default\', \'uid\'')
 
     const nodeTypes = source('layers/theme/app/types/Node.ts')
 

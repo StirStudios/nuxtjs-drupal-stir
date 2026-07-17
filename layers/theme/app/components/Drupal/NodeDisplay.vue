@@ -31,7 +31,10 @@ const renderMode = computed<'teaser' | 'article' | 'default'>(() => {
 const showHero = computed(() =>
   pageLayout.value !== 'clear' && renderMode.value !== 'teaser',
 )
-const reservedSlotNames = new Set(['hero', 'teaser', 'article', 'default'])
+// System ownership is useful payload metadata, but it is not page content.
+// Keep ordinary configured node fields renderable while preventing Drupal's
+// raw UID entity-reference formatter from falling through into the document.
+const reservedSlotNames = new Set(['hero', 'teaser', 'article', 'default', 'uid'])
 const contentSlotNames = computed(() =>
   Object.keys(slots).filter((name) => !reservedSlotNames.has(name)),
 )
