@@ -1,7 +1,9 @@
 # vNext rebuild readiness report
 
 Status date: 2026-07-16  
-Nuxt checkpoint: `9a86b6aa`
+Nuxt checkpoint: `a59406b4`
+
+Nuxt integration checkpoint: `5727c206`
 Stir Tools checkpoint: `7941fb2`
 
 ## Executive status
@@ -25,13 +27,14 @@ The remaining readiness work is intentionally narrow:
 
 | Production build | Initial gzip | Initial JavaScript | Initial CSS | Server output |
 | --- | ---: | ---: | ---: | ---: |
-| Full compatibility | 191.79 kB | 156.52 kB | 35.27 kB | 10.1 MB |
-| Minimal | 154.52 kB | 120.52 kB | 34.00 kB | 5.56 MB |
-| Reduction | 19.43% | 23.00% | 3.60% | about 45% |
+| Full compatibility | 195.02 kB | 159.30 kB | 35.72 kB | 10.2 MB |
+| Minimal | 157.43 kB | 122.97 kB | 34.46 kB | 5.73 MB |
+| Reduction | 19.27% | 22.81% | 3.53% | about 44% |
 
-The full preset remains effectively flat against the original 191.27 kB
-compatibility baseline (+0.27%). Existing consumers retain behavior while new
-consumers can omit capabilities they do not need.
+The full preset is 1.96% above the original 191.27 kB compatibility baseline
+after Nuxt UI 4.10 began embedding all 43 required UI icons for immediate SSR
+and offline rendering. Existing consumers retain behavior and avoid runtime
+Iconify requests, while new consumers can omit capabilities they do not need.
 
 The validated strict presentation manifest also reduced the shared fixture CSS
 15.70% gzip. DancePlug's project build reduced its main CSS 10.57% gzip in the
@@ -77,11 +80,11 @@ Nuxt Webform submission response path now returns
 header reaches the client.
 
 The latest complete Stir Tools gate executes 924 tests and 6,659 assertions.
-The latest complete Nuxt checkpoint before the evidence-only additions passed
-the repository's lint, type, unit/runtime, SSR/hydration, accessibility,
-consumer, packed-consumer, and build gates. Subsequent runtime fixes passed
-their targeted tests, lint, typecheck, production builds, and live consumer
-checks.
+The final Nuxt integration checkpoint passed the repository's lint, type,
+unit/runtime, SSR/hydration, accessibility, consumer, packed-consumer, and
+production-build gates. The gate covered 345 unit/coverage tests, 96 Nuxt
+runtime tests, protected-page end-to-end behavior, and four accessibility
+profiles.
 
 ## Consumer findings
 
@@ -109,7 +112,7 @@ checks.
   overrides: inline CTA markup, interactive Views presentation, editorial node
   variants, and public user profiles. The generic entity-reference override was
   removed after its fallback behavior moved upstream. DancePlug checkpoints
-  `706e20a` (Nuxt) and `be260de` (root) verify the resulting boundary.
+  `cf44a9c` (Nuxt) and `be260de` (root) verify the resulting boundary.
 
 ### Piper
 
@@ -156,7 +159,7 @@ rollback path before another consumer moves.
 | Nuxt architecture/capability split | Passed | Minimal/full production builds and preset tests |
 | Stir Tools capability ownership | Passed | Optional Views/Webform/Paragraph/provider boundaries |
 | Producer-owned contracts | Passed | Versioned schemas, fixtures, producer and consumer validation |
-| Bundle/code-reduction target | Passed | 19.43% initial gzip and 45% server-output minimal reductions |
+| Bundle/code-reduction target | Passed | 19.27% initial gzip and about 44% server-output minimal reductions |
 | Listing parity/performance | Passed | Four live DancePlug paths inside all budgets |
 | Webform privacy/cacheability | Passed | Live render metadata and no-store submission response |
 | Consumer functional review | Passed with migration note | RSF/DancePlug passed; Piper requires Drupal 11+ |
