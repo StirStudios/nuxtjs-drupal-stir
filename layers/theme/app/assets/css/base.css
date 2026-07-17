@@ -33,11 +33,11 @@
   }
 
   :where(.prose, .admin-editor-prose) {
-    > :first-child {
+    & > :first-child {
       @apply mt-0;
     }
 
-    > :last-child {
+    & > :last-child {
       @apply mb-0;
     }
 
@@ -45,7 +45,7 @@
       @apply mt-12;
     }
 
-    > :where(h1, h2, h3, h4, h5, h6):first-child,
+    & > :where(h1, h2, h3, h4, h5, h6):first-child,
     :where(section > :where(h1, h2, h3, h4, h5, h6):first-child) {
       @apply mt-0;
     }
@@ -141,7 +141,7 @@
       @apply h-auto max-w-full;
     }
 
-    > :where(img, video, iframe, audio, figure),
+    & > :where(img, video, iframe, audio, figure),
     :where(section > :where(img, video, iframe, audio, figure)) {
       @apply my-8;
     }
