@@ -35,7 +35,7 @@ export interface StirDrupalHeaderOptions {
 
 export type StirDrupalRequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
-  body?: Record<string, unknown>
+  body?: FormData | Record<string, unknown>
   enforceSameOrigin?: boolean
   forwardClientIp?: boolean
   forwardCookies?: boolean

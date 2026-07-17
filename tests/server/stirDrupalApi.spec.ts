@@ -214,6 +214,36 @@ describe('Stir Drupal API boundary', () => {
     expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
   })
 
+  it('forwards multipart bodies through the protected mutation boundary', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      public: { api: 'https://cms.example.test' },
+    }))
+    const raw = vi.fn().mockResolvedValue({
+      _data: { uploaded: true },
+      headers: { getSetCookie: () => [] },
+      status: 200,
+    })
+
+    vi.stubGlobal('$fetch', { raw })
+    const { event } = createEvent()
+    const body = new FormData()
+
+    body.append('slot', 'gallery')
+    body.append('files[]', new Blob(['image']), 'image.webp')
+
+    await stirDrupalApiRequest(event, '/api/account/profile/media', {
+      method: 'POST',
+      body,
+      forwardCookies: true,
+    })
+
+    expect(raw).toHaveBeenCalledWith(
+      'https://cms.example.test/api/account/profile/media',
+      expect.objectContaining({ body }),
+    )
+  })
+
   it('supports an explicit same-origin opt-out for trusted server integrations', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
