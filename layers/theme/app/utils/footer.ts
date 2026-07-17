@@ -27,8 +27,11 @@ export type FooterThemeConfig = {
   base: string
   container: string
   content: string
+  centerSlot: string
   left: string
+  leftSlot: string
   right: string
+  rightSlot: string
   center: string
   footerLinks: string
   logo: string
@@ -72,8 +75,11 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'
   base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
   container: '',
   content: 'flex flex-col items-center justify-center gap-4 text-center',
+  centerSlot: '',
   left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
+  leftSlot: '',
   right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
+  rightSlot: '',
   footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
   logo: '',
   menu: 'mb-3',
@@ -150,8 +156,11 @@ export function resolveFooterConfig(
     base: toString(next.base, DEFAULT_FOOTER_THEME.base),
     container: toString(next.container, DEFAULT_FOOTER_THEME.container),
     content: toString(next.content, DEFAULT_FOOTER_THEME.content),
+    centerSlot: toString(next.centerSlot, DEFAULT_FOOTER_THEME.centerSlot),
     left: toString(next.left, DEFAULT_FOOTER_THEME.left),
+    leftSlot: toString(next.leftSlot, DEFAULT_FOOTER_THEME.leftSlot),
     right: toString(next.right, DEFAULT_FOOTER_THEME.right),
+    rightSlot: toString(next.rightSlot, DEFAULT_FOOTER_THEME.rightSlot),
     center: toString(next.center),
     footerLinks: toString(next.footerLinks, DEFAULT_FOOTER_THEME.footerLinks),
     logo: toString(next.logo, DEFAULT_FOOTER_THEME.logo),

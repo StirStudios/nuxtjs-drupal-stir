@@ -185,6 +185,7 @@ type StirThemeFooterConfig = {
   base?: ClassValue
   container?: ClassValue
   content?: ClassValue
+  centerSlot?: ClassValue
   layout?: 'default' | 'columns' | 'stacked' | string
   logo?: ClassValue
   menu?: ClassValue
@@ -193,7 +194,9 @@ type StirThemeFooterConfig = {
   requireSiteName?: boolean
   rights?: string
   left?: ClassValue
+  leftSlot?: ClassValue
   right?: ClassValue
+  rightSlot?: ClassValue
   sections?: {
     left?: string[]
     center?: string[]

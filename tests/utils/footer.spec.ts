@@ -21,6 +21,8 @@ describe('resolveFooterConfig', () => {
       showLogo: false,
       showMenu: 'yes',
       base: '  custom-footer  ',
+      leftSlot: ' order-2 lg:order-1 ',
+      rightSlot: ' order-1 lg:order-3 ',
       sections: {
         left: ['socials', 'socials', 'unknown'],
         center: null,
@@ -34,6 +36,8 @@ describe('resolveFooterConfig', () => {
     expect(config.showLogo).toBe(false)
     expect(config.showMenu).toBe(true)
     expect(config.base).toBe('custom-footer')
+    expect(config.leftSlot).toBe('order-2 lg:order-1')
+    expect(config.rightSlot).toBe('order-1 lg:order-3')
     expect(config.logoFromTheme).toBe('logo-scrolled')
     expect(config.sections).toEqual({
       left: ['socials'],

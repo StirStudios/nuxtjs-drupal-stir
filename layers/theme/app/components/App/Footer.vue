@@ -135,8 +135,9 @@ const shouldRenderFooter = computed(() =>
     :ui="{
       root: footerConfig.base,
       container: footerContainerClass,
-      left: hasLeft ? '' : 'hidden',
-      right: hasRight ? '' : 'hidden',
+      left: hasLeft ? footerConfig.leftSlot : 'hidden',
+      center: footerConfig.centerSlot,
+      right: hasRight ? footerConfig.rightSlot : 'hidden',
     }"
   >
     <template #left>
