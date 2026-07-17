@@ -1,0 +1,5 @@
+packages:
+  - .
+
+overrides:
+  fontless>esbuild: 0.28.1

@@ -90,6 +90,15 @@ their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
 dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
 manager security policy belongs to the consuming application and is not
 inherited from a layer.
+Until `fontless` moves its esbuild range to the patched release, pnpm consumers
+should also carry this temporary workspace policy and retain it only while
+`pnpm audit --prod` requires it:
+
+```yaml
+overrides:
+  fontless>esbuild: 0.28.1
+```
+
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.
@@ -97,8 +106,8 @@ resolve different revisions of the same layer.
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
-- **[Nuxt 4](https://nuxt.com/)**: `^4.4.8`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.9.0`
+- **[Nuxt 4](https://nuxt.com/)**: `unknown`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.10.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.2`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.7.0`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
