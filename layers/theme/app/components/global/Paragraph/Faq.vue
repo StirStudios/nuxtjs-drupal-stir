@@ -63,7 +63,8 @@ const faqNodes = computed<VNode[]>(() => {
 const accordionItems = computed<FaqAccordionItem[]>(() =>
   faqNodes.value.map((node, index) => {
     const itemProps = (node.props ?? {}) as FaqItemProps
-    const label = itemProps.question ?? itemProps.header ?? `Question ${index + 1}`
+    const label =
+      itemProps.question ?? itemProps.header ?? `Question ${index + 1}`
     const value = String(itemProps.uuid ?? itemProps.id ?? index)
 
     return {
@@ -82,15 +83,12 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
     <div v-if="header || trustedTextHtml" class="space-y-3">
-      <component
-        :is="headerTag || 'h2'"
-        v-if="header"
-      >
+      <component :is="headerTag || 'h2'" v-if="header">
         {{ header }}
       </component>
       <div
         v-if="trustedTextHtml"
-        class="prose max-w-none text-muted"
+        class="prose text-muted max-w-none"
         v-html="trustedTextHtml"
       />
     </div>
@@ -101,17 +99,18 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
       trailing-icon="i-lucide-plus"
       :ui="{
         root: 'rounded-2xl border border-default bg-default',
-        trigger: 'px-5 py-5 hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
+        trigger:
+          'px-5 py-5 hover:bg-muted/40 data-[state=open]:bg-muted/40 md:px-6 md:py-6',
         label: 'text-highlighted text-lg font-semibold',
         trailingIcon: 'text-muted group-data-[state=open]:rotate-45',
-        body: 'px-5 pb-5 md:px-6 md:pb-6',
+        body: 'p-5 md:p-6',
       }"
       :unmount-on-hide="false"
     >
       <template #body="{ item }">
         <div
           v-if="item.answerHtml"
-          class="prose mt-3 max-w-none text-muted"
+          class="prose text-muted max-w-none"
           v-html="item.answerHtml"
         />
 
