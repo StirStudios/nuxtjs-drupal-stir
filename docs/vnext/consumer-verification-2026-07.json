@@ -8,12 +8,12 @@
     "danceplugRoot": "be260de"
   },
   "finalIntegrationPilot": {
-    "generatedAt": "2026-07-17T01:25:00Z",
+    "generatedAt": "2026-07-17T03:00:04Z",
     "revisions": {
-      "nuxtIntegration": "0e49de5a",
+      "nuxtIntegration": "e17ca31f",
       "stirTools": "7941fb2",
-      "danceplugNuxt": "23f4669",
-      "danceplugRoot": "12f72c3"
+      "danceplugNuxt": "ae9ae0c",
+      "danceplugRoot": "27a59a6"
     },
     "quality": {
       "tests": "7 files / 15 tests passed",
@@ -22,8 +22,10 @@
       "productionBuild": "passed"
     },
     "imageDelivery": {
-      "mode": "nuxt",
-      "originAllowlist": "drupal.danceplug.local",
+      "mode": "nuxt-default",
+      "originAllowlist": "derived automatically from DRUPAL_URL",
+      "cdnBaseUrl": "https://danceplug-dev.b-cdn.net/_ipx",
+      "cdnBuildArtifact": "verified with local /_ipx origin route retained",
       "ipxResponsiveVariants": "verified",
       "webpConversion": "verified",
       "versionedSourceCacheKeys": "verified",
@@ -33,7 +35,7 @@
       "homepageImageWasteBytesBefore": 185645,
       "homepageImageWasteBytesAfter": 36741,
       "homepageTransferredBytesAfter": 911685,
-      "note": "Nuxt Image remains opt-in at the layer level; this pilot used STIR_IMAGE_DELIVERY=nuxt and NUXT_IMAGE_DOMAINS=drupal.danceplug.local."
+      "note": "Nuxt Image is the layer default. DancePlug needs only NUXT_IMAGE_CDN for the Bunny pull zone because DRUPAL_URL supplies the original-image allowlist. Live Bunny MISS/HIT and purge recovery remain pending an approved deployment."
     },
     "productionSmoke": {
       "homepage": "200 public",

@@ -1,9 +1,9 @@
 # vNext rebuild readiness report
 
 Status date: 2026-07-16  
-Nuxt checkpoint: `cd091bfe`
+Nuxt checkpoint: `e17ca31f`
 
-Nuxt integration checkpoint: `8967eefa`
+Nuxt integration checkpoint: `e17ca31f`
 Stir Tools checkpoint: `7941fb2`
 
 ## Executive status
@@ -18,7 +18,7 @@ a release or migration approval.
 The remaining readiness work is intentionally narrow:
 
 1. decide and implement the shared carousel autoplay/accessibility policy;
-2. finish the Nuxt Image production provider/cache decision;
+2. run the approved live Bunny pull-CDN cache and recovery proof;
 3. reconcile the dirty local RSF checkout with its newer remote `dev` branch;
 4. move Piper from Drupal 10 to the required Drupal 11+ baseline;
 5. rehearse one explicitly approved consumer cutover and rollback.
@@ -65,8 +65,14 @@ keys, immutable generated-image caching, exact per-layout sizes, and normalized
 Stir Tools image payloads. Tightening the decorative class-card contract and
 migrating instructor avatars reduced measured homepage image waste from
 185,645 to 36,741 bytes and a representative transfer from 1,001 to 912 kB.
-The opt-in layer adapter is implemented; production provider/CDN operations
-remain a decision gate before changing the default.
+Nuxt Image/IPX is now the layer default, with Drupal rendering retained as an
+explicit migration fallback. An ordinary pull-CDN provider reuses Nuxt's IPX
+URL contract, keeps the local `/_ipx` transformer available as Bunny's origin,
+and derives the Drupal allowlist automatically from `DRUPAL_URL`. The final
+production-build proof generated `https://danceplug-dev.b-cdn.net/_ipx` URLs
+without Bunny Optimizer, storage, or a second Drupal pull zone. Live Bunny
+MISS/HIT, first-hit, revision replacement, and purge recovery remain deployment
+evidence rather than an architecture decision.
 
 ## Drupal performance and contract evidence
 
@@ -86,7 +92,7 @@ header reaches the client.
 The latest complete Stir Tools gate executes 924 tests and 6,659 assertions.
 The final Nuxt integration checkpoint passed the repository's lint, type,
 unit/runtime, SSR/hydration, accessibility, consumer, packed-consumer, and
-production-build gates. The gate covered 345 unit/coverage tests, 97 Nuxt
+production-build gates. The gate covered 359 unit/coverage tests, 97 Nuxt
 runtime tests, protected-page end-to-end behavior, and four accessibility
 profiles.
 
@@ -119,7 +125,8 @@ profiles.
   overrides: inline CTA markup, interactive Views presentation, editorial node
   variants, and public user profiles. The generic entity-reference override was
   removed after its fallback behavior moved upstream. DancePlug checkpoints
-  `23f4669` (Nuxt) and `12f72c3` (root) verify the resulting boundary.
+  `ae9ae0c` (Nuxt) and `27a59a6` (root) verify the resulting boundary and the
+  CDN-ready default image delivery checkpoint.
 
 ### Piper
 
@@ -146,12 +153,15 @@ approval before implementation.
 
 ### Nuxt Image production delivery
 
-The adapter and positive DancePlug evidence justify continued adoption work,
-not an unconditional default switch. Local IPX caching, same-name revision
-keys, failure fallback, and visual coverage are verified. Approval still
-requires the production provider/CDN choice, first-hit and purge recovery
-evidence, private-media policy, and acceptance of the Sharp native-runtime
-cost (the test server artifact was 248 MB, 106 MB gzip).
+The provider decision and default switch are complete. Local IPX remains the
+no-CDN path; an ordinary Bunny pull zone can cache the same public `/_ipx/**`
+derivatives with Nuxt as its origin. Local production artifacts verify the
+Bunny base URL, retained origin route, and automatic Drupal host allowlist.
+Approval is still required before deployment, where first-hit and purge
+recovery, cache keys, same-name revision replacement, visual quality, and
+private-media behavior must be recorded. The Sharp-enabled DancePlug test
+artifact remains 248 MB (106 MB gzip) and must be built for the deployment
+architecture.
 
 ### Consumer cutover
 
@@ -173,7 +183,7 @@ rollback path before another consumer moves.
 | Consumer functional review | Passed with migration note | RSF/DancePlug passed; Piper requires Drupal 11+ |
 | Representative route Lighthouse | Passed with homepage exceptions | Class/Webform healthy; public homepages need final policy/provider work |
 | Carousel accessibility/LCP policy | Decision required | Approve recommended default/opt-in behavior |
-| Nuxt Image production provider | Decision required | Complete Bunny/CDN operational proof |
+| Nuxt Image production provider | Implemented; staging proof pending | Default IPX and Bunny pull-CDN artifact passed; live cache/recovery requires approved deployment |
 | RSF local/remote reconciliation | Pending merge authorization | Preserve dirty local work; use current remote architecture |
 | Pilot migration and rollback | Not started | Requires explicit cutover approval |
 

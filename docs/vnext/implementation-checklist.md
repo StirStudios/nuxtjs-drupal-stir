@@ -17,7 +17,7 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   section distinguishes the small intentional stable surface from the larger
   auto-scanned compatibility surface and records candidate deprecations without
   removing them ahead of consumer evidence.
-- Current measured repository surface: 110 components, 62 composables, 40 utilities, 6 plugins, 4 middleware files, 26 server routes, 25 production dependencies, 24 development dependencies, and 98 test files. Optional preset audits separately prove which of these are registered and shipped.
+- Current measured repository surface: 111 components, 62 composables, 43 utilities, 6 plugins, 4 middleware files, 26 server routes, 39 production dependencies, 25 development dependencies, and 105 test files. Optional preset audits separately prove which of these are registered and shipped.
 - N0 now fails on fatal Nuxt setup/hydration diagnostics, exercises a deterministic mocked-Drupal homepage twice under SSR, hydrates that homepage in Chromium CI, and validates packed minimal/full consumers in CI.
 - The blocking accessibility gate now scans a deterministic mocked-Drupal page
   in desktop/mobile and light/dark modes against WCAG 2 A/AA, WCAG 2.1/2.2 AA,
@@ -65,9 +65,9 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   Published platform and installed preset consumers contain no report writer.
 - The package allowlist ships runtime layers, presets, shared configuration,
   and the versioned Drupal contract—not repository tests, CI, audit scripts, or
-  internal review documents. The current archive is 233 kB/427 files after the
-  expanded producer-owned contracts and capability layers; packed-consumer CI
-  enforces tight 300 kB/427-entry caps. The prior 400-entry ratchet had become
+  internal review documents. Packed-consumer CI enforces tight 300 kB/429-entry
+  caps after the expanded producer-owned contracts, capability layers, and
+  focused image-delivery configuration. The prior 400-entry ratchet had become
   stale before the SEO extraction (committed HEAD already packed 416 entries),
   while the byte budget remained healthy.
 - Stir-owned app contracts now use explicit `#stir/utils`,
