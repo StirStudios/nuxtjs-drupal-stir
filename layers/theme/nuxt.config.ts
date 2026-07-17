@@ -23,7 +23,10 @@ const compatibilitySafelistCss = resolvePath(
 const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'drupal'
   ? 'drupal'
   : 'nuxt'
-const stirImageCdn = resolveImageCdnBase(process.env.NUXT_IMAGE_CDN)
+const stirImageCdn = resolveImageCdnBase(
+  process.env.NUXT_IMAGE_CDN,
+  process.env.NODE_ENV === 'development',
+)
 const drupalImageDomain = resolveDrupalImageDomain(process.env.DRUPAL_URL)
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = stirImageDelivery === 'nuxt'

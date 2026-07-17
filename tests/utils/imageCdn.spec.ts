@@ -14,6 +14,11 @@ describe('resolveImageCdnBase', () => {
       .toBe('https://images.example.com')
   })
 
+  it('always uses local IPX during development', () => {
+    expect(resolveImageCdnBase('https://images.example.com', true))
+      .toBeUndefined()
+  })
+
   it.each([
     'images.example.com',
     'ftp://images.example.com',

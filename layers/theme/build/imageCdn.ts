@@ -1,4 +1,9 @@
-export function resolveImageCdnBase(value: string | undefined): string | undefined {
+export function resolveImageCdnBase(
+  value: string | undefined,
+  development = false,
+): string | undefined {
+  if (development) return undefined
+
   const candidate = value?.trim()
 
   if (!candidate) return undefined
