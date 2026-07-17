@@ -8,12 +8,12 @@
     "danceplugRoot": "be260de"
   },
   "finalIntegrationPilot": {
-    "generatedAt": "2026-07-17T01:02:00Z",
+    "generatedAt": "2026-07-17T01:25:00Z",
     "revisions": {
-      "nuxtIntegration": "af408748",
+      "nuxtIntegration": "0e49de5a",
       "stirTools": "7941fb2",
-      "danceplugNuxt": "9467e2a",
-      "danceplugRoot": "be260de"
+      "danceplugNuxt": "23f4669",
+      "danceplugRoot": "12f72c3"
     },
     "quality": {
       "tests": "7 files / 15 tests passed",
@@ -28,6 +28,11 @@
       "webpConversion": "verified",
       "versionedSourceCacheKeys": "verified",
       "generatedImageCacheControl": "public, max-age=315360000, s-maxage=315360000",
+      "layoutSpecificSizes": "verified for DancePlug class marquee",
+      "normalizedInstructorImages": "verified through Stir Tools payload and IPX",
+      "homepageImageWasteBytesBefore": 185645,
+      "homepageImageWasteBytesAfter": 36741,
+      "homepageTransferredBytesAfter": 911685,
       "note": "Nuxt Image remains opt-in at the layer level; this pilot used STIR_IMAGE_DELIVERY=nuxt and NUXT_IMAGE_DOMAINS=drupal.danceplug.local."
     },
     "productionSmoke": {
