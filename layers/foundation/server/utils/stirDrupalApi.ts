@@ -5,7 +5,6 @@ import {
   getRequestIP,
   removeResponseHeader,
   setResponseHeader,
-  splitCookiesString,
   type H3Event,
 } from 'h3'
 import { assertStirSameOrigin } from './stirRequestSecurity'
@@ -277,8 +276,18 @@ export const getStirDrupalSetCookies = (
 
   const combinedHeader = headers.get?.('set-cookie')
 
-  return combinedHeader ? splitCookiesString(combinedHeader) : []
+  return combinedHeader ? splitStirSetCookieHeader(combinedHeader) : []
 }
+
+/**
+ * Splits a combined Set-Cookie header without treating an Expires date comma
+ * as a cookie boundary. This keeps the proxy compatible across H3 versions.
+ */
+export const splitStirSetCookieHeader = (header: string): string[] =>
+  header
+    .split(/,(?=\s*[!#$%&'*+\-.^_`|~0-9A-Za-z]+=)/)
+    .map(cookie => cookie.trim())
+    .filter(Boolean)
 
 export const filterStirDrupalSetCookies = (
   setCookies: readonly string[],

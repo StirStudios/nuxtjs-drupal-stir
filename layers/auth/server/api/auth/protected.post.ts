@@ -2,7 +2,6 @@ import {
   createError,
   defineEventHandler,
   readBody,
-  setResponseHeader,
 } from 'h3'
 import {
   layerAuthClearProtectedAccessCookie,
@@ -39,7 +38,10 @@ export default defineEventHandler(async (event) => {
   const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
 
   if (!rateLimit.allowed) {
-    setResponseHeader(event, 'Retry-After', rateLimit.retryAfterSeconds)
+    event.node.res.setHeader(
+      'Retry-After',
+      String(rateLimit.retryAfterSeconds),
+    )
 
     throw createError({
       statusCode: 429,

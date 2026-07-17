@@ -3,6 +3,7 @@ import {
   appendStirDrupalSetCookies,
   filterStirDrupalSessionCookies,
   getStirDrupalApiConfig,
+  splitStirSetCookieHeader,
   stirDrupalApiRequest,
   throwStirDrupalApiError,
 } from '../../layers/foundation/server/utils/stirDrupalApi'
@@ -76,6 +77,15 @@ describe('Stir Drupal API boundary', () => {
       'analytics=private; custom_drupal_session=session-value',
       ['custom_drupal_session'],
     )).toBe('custom_drupal_session=session-value')
+  })
+
+  it('splits combined Set-Cookie headers without splitting Expires dates', () => {
+    expect(splitStirSetCookieHeader(
+      'session=first; Expires=Wed, 21 Oct 2037 07:28:00 GMT; Path=/; HttpOnly, preference=compact; Path=/',
+    )).toEqual([
+      'session=first; Expires=Wed, 21 Oct 2037 07:28:00 GMT; Path=/; HttpOnly',
+      'preference=compact; Path=/',
+    ])
   })
 
   it('uses the filtered session cookie, timeout, and private cache policy', async () => {

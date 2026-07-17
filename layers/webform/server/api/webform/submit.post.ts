@@ -83,7 +83,7 @@ async function parseSubmission(
 
     assertWebformRawBodySize(byteLength, limits)
 
-    const value = rawBody?.toString('utf8') ?? ''
+    const value = rawBody?.toString() ?? ''
     let body: SubmissionBody
 
     try {
@@ -134,7 +134,7 @@ async function parseSubmission(
       continue
     }
 
-    const value = part.data.toString('utf8')
+    const value = new TextDecoder().decode(part.data)
 
     formData.append(part.name, value)
     setBodyValue(body, part.name, value)
