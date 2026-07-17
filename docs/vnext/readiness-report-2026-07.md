@@ -1,9 +1,9 @@
 # vNext rebuild readiness report
 
 Status date: 2026-07-16  
-Nuxt checkpoint: `a59406b4`
+Nuxt checkpoint: `cd091bfe`
 
-Nuxt integration checkpoint: `5727c206`
+Nuxt integration checkpoint: `8967eefa`
 Stir Tools checkpoint: `7941fb2`
 
 ## Executive status
@@ -49,19 +49,23 @@ Development-server measurements are excluded.
 | Consumer route | Score | FCP | LCP | TBT | Transfer | Result |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | RSF `/contact` | 95 | 1.96 s | 2.72 s | 25 ms | 557 kB | Healthy Webform route |
-| DancePlug class after deferred Bunny embed | 92 | 2.01 s | 3.15 s | 54 ms | 416 kB | Healthy class route |
+| DancePlug class after deferred Bunny embed | 92 | 2.40 s | 2.93 s | 85 ms | 524 kB | Healthy class route |
 | Piper `/venues` login | 89 | 1.97 s | 3.49 s | 64 ms | 413 kB | App-shell evidence only |
-| DancePlug homepage | 72 | 4.07 s | 4.83 s | 77 ms | 924 kB | Public homepage still needs work |
+| DancePlug homepage | 71 | 3.45 s | 5.38 s | 71 ms | 1,001 kB | Wide local variance; public homepage still needs work |
 | RSF homepage | 75 | 2.57 s | 5.77 s | 47 ms | 653 kB | Carousel policy blocks final LCP |
 
 The DancePlug class correction is a representative downstream simplification:
 removing an override that disabled the layer's click-to-load video default
 raised the score from 72 to 92 and reduced initial transfer from 7.04 MB to
-416 kB. Initial Bunny video requests fell to zero without removing playback.
+well below 1 MB. The final isolated median was 524 kB; initial Bunny video
+requests fell to zero without removing playback.
 
-DancePlug Nuxt Image testing improved its homepage score from 66 to 72, LCP by
-26.7%, image transfer by 8.3%, and TBT by 25.8% without a layout-shift
-regression. The opt-in layer adapter is implemented; provider/cache operations
+DancePlug Nuxt Image testing verifies real IPX WebP variants, versioned source
+keys, immutable generated-image caching, exact per-layout sizes, and normalized
+Stir Tools image payloads. Tightening the decorative class-card contract and
+migrating instructor avatars reduced measured homepage image waste from
+185,645 to 36,741 bytes and a representative transfer from 1,001 to 912 kB.
+The opt-in layer adapter is implemented; production provider/CDN operations
 remain a decision gate before changing the default.
 
 ## Drupal performance and contract evidence
@@ -82,7 +86,7 @@ header reaches the client.
 The latest complete Stir Tools gate executes 924 tests and 6,659 assertions.
 The final Nuxt integration checkpoint passed the repository's lint, type,
 unit/runtime, SSR/hydration, accessibility, consumer, packed-consumer, and
-production-build gates. The gate covered 345 unit/coverage tests, 96 Nuxt
+production-build gates. The gate covered 345 unit/coverage tests, 97 Nuxt
 runtime tests, protected-page end-to-end behavior, and four accessibility
 profiles.
 
@@ -108,11 +112,14 @@ profiles.
 - The homepage LCP image is eager, high-priority, discoverable in initial HTML,
   and fast to transfer. Remaining local delay is dominated by Drupal SSR and
   render-blocking CSS rather than an image-priority defect.
+- The image pilot now uses the upstream per-layout delivery-size contract and
+  Stir Tools' provider-neutral file payload. Class-marquee cards and instructor
+  avatars no longer recreate responsive-image delivery downstream.
 - The final same-name component audit retained four deliberate product
   overrides: inline CTA markup, interactive Views presentation, editorial node
   variants, and public user profiles. The generic entity-reference override was
   removed after its fallback behavior moved upstream. DancePlug checkpoints
-  `cf44a9c` (Nuxt) and `be260de` (root) verify the resulting boundary.
+  `23f4669` (Nuxt) and `12f72c3` (root) verify the resulting boundary.
 
 ### Piper
 
@@ -140,10 +147,11 @@ approval before implementation.
 ### Nuxt Image production delivery
 
 The adapter and positive DancePlug evidence justify continued adoption work,
-not an unconditional default switch. Approval still requires provider/CDN
-caching, first-hit latency, same-name replacement, private media, failure
-fallback, native-binary/runtime cost, visual-quality coverage, and purge
-recovery evidence.
+not an unconditional default switch. Local IPX caching, same-name revision
+keys, failure fallback, and visual coverage are verified. Approval still
+requires the production provider/CDN choice, first-hit and purge recovery
+evidence, private-media policy, and acceptance of the Sharp native-runtime
+cost (the test server artifact was 248 MB, 106 MB gzip).
 
 ### Consumer cutover
 
