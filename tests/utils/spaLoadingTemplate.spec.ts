@@ -19,4 +19,11 @@ describe('SPA loading template', () => {
     expect(template).toContain('@media (prefers-reduced-motion: reduce)')
     expect(template).toContain('min-height: 100dvh')
   })
+
+  it('inherits consumer Nuxt UI colors with neutral fallbacks', () => {
+    expect(template).toContain('var(--ui-primary, #64748b)')
+    expect(template).toContain('var(--ui-secondary, #94a3b8)')
+    expect(template).toContain('var(--ui-bg, #f8fafc)')
+    expect(template).toContain('var(--ui-text, #334155)')
+  })
 })
