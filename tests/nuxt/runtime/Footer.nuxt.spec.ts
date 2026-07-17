@@ -22,7 +22,7 @@ const appConfig = ref({
       showSubFooterRegion: false,
       showFooterRegion: false,
       content: 'flex flex-col gap-6',
-    },
+    } as Record<string, unknown>,
     navigation: {
       logo: true,
     },
@@ -167,9 +167,25 @@ describe('Footer (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="left"]').classes()).toEqual(expect.arrayContaining(['order-2', 'lg:order-1']))
     expect(wrapper.find('[data-slot="center"]').classes()).toEqual(expect.arrayContaining(['order-3', 'lg:order-2']))
     expect(wrapper.find('[data-slot="right"]').classes()).toEqual(expect.arrayContaining(['order-1', 'lg:order-3']))
+    expect(wrapper.find('[data-slot="container"]').classes()).toEqual(expect.arrayContaining(['flex', 'flex-col']))
 
     appConfig.value.stirTheme.footer.leftSlot = ''
     appConfig.value.stirTheme.footer.centerSlot = ''
     appConfig.value.stirTheme.footer.rightSlot = ''
+  })
+
+  it('hides the Nuxt UI center wrapper when the center section is empty', async () => {
+    page.value = {}
+    appConfig.value.stirTheme.footer.sections = {
+      left: ['slogan'],
+      center: [],
+      right: ['socials'],
+    }
+
+    const wrapper = await mountFooter()
+
+    expect(wrapper.find('[data-slot="center"]').classes()).toContain('hidden')
+
+    delete appConfig.value.stirTheme.footer.sections
   })
 })

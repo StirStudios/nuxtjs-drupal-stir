@@ -136,7 +136,7 @@ const shouldRenderFooter = computed(() =>
       root: footerConfig.base,
       container: footerContainerClass,
       left: hasLeft ? footerConfig.leftSlot : 'hidden',
-      center: footerConfig.centerSlot,
+      center: hasCenter ? footerConfig.centerSlot : 'hidden',
       right: hasRight ? footerConfig.rightSlot : 'hidden',
     }"
   >
