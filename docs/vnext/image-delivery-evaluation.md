@@ -160,7 +160,9 @@ local `/_ipx` route. When it is set to an ordinary pull-CDN origin, public image
 URLs use that origin while the CDN retrieves the same `/_ipx/**` paths from
 Nuxt. Drupal owns the originals and Nuxt/IPX owns the transformations. This
 does not require Bunny Optimizer, a storage zone, or a second CDN for Drupal
-originals.
+originals. Versioned `/_ipx/**` derivatives are emitted with a one-year public,
+immutable cache policy so an ordinary pull CDN can retain them at the edge;
+Drupal's source revision changes the derivative URL after a replacement upload.
 
 The remaining staging validation is operational rather than architectural:
 confirm cache MISS/HIT behavior, query/path cache keys, same-filename revision

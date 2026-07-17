@@ -200,6 +200,8 @@ describe('layer contract', () => {
     expect(themeConfig).toContain('\'runtime/providers/ipx.js\'')
     expect(themeConfig).toContain('provider: \'stirCdn\'')
     expect(themeConfig).toContain('baseURL: `${stirImageCdn}/_ipx`')
+    expect(themeConfig).toContain('\'/_ipx/**\'')
+    expect(themeConfig).toContain('\'cache-control\': \'public, max-age=31536000, immutable\'')
   })
 
   it('ships accessibility auditing as opt-in downstream development tooling', () => {

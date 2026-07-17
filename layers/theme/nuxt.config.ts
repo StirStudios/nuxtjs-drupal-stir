@@ -59,6 +59,13 @@ export default defineNuxtConfig({
   ],
   ...(stirImageDelivery === 'nuxt'
     ? {
+        routeRules: {
+          '/_ipx/**': {
+            headers: {
+              'cache-control': 'public, max-age=31536000, immutable',
+            },
+          },
+        },
         image: {
           domains: drupalImageDomain ? [drupalImageDomain] : [],
           ...(stirImageCdn
