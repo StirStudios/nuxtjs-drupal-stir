@@ -86,14 +86,15 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   and strict-manifest modes and fails unless the validated Drupal source reduces
   both raw and compressed CSS. The current recorded fixture drops 48,844 bytes
   raw (18.54%) and 5,309 bytes gzip (15.70%) without changing application code.
-- A paired production build now measures the capability split itself. The full
-  compatibility preset remains effectively flat at 191.79 kB initial gzip
-  against the 191.27 kB baseline (+0.27%), while the minimal preset starts at
-  154.52 kB: 37.27 kB or 19.43% below full. Initial JavaScript falls from
-  156.52 to 120.52 kB (23.00%), client transformation falls from 1,798 to 1,472
-  modules, and generated server output falls from 10.1 MB to 5.56 MB. This is
-  the intended compatibility tradeoff: existing consumers do not regress, and
-  new capability-selected consumers avoid code they did not request.
+- A paired production build now measures the capability split itself. After
+  Nuxt UI 4.10 embedded the layer's 43 required icons, the full compatibility
+  preset is 195.02 kB initial gzip and the minimal preset is 157.43 kB: 37.59
+  kB or 19.27% below full. Initial JavaScript falls from 159.30 to 122.97 kB
+  (22.81%), CSS falls from 35.72 to 34.46 kB (3.53%), and generated server
+  output falls from 10.2 MB to 5.73 MB (about 44%). The full preset is 1.96%
+  above the original 191.27 kB baseline in exchange for immediate SSR/offline
+  icons without runtime Iconify requests; capability-selected consumers still
+  avoid code they do not request.
 - Structural cleanup is frozen after the paired Nuxt `72e3a124` and Stir Tools
   `44daed3` checkpoints for a review cycle. Current production bundle artifacts
   are `docs/perf-report.latest.json` and
