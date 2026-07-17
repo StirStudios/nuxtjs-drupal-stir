@@ -1,9 +1,9 @@
 # Stir decoupled platform: vNext architecture review
 
-Nuxt layer reviewed branch/commit: `dev` refreshed at `f5912d9fad118f8fc5d4439a73270c3010fed9d7` (original full-review baseline `a8bb7aab1c1849c3710df37191278855692c0e0e`)  
-Stir Tools reviewed branch/commit: `dev` at `395686036c01ced16dec74d3febdae05e9e90985`  
-RSF consumer snapshots: Drupal `dev` at `b5f66e2605c3d3f574a4f6c3905dfb2e01ed2a15`; Nuxt `dev` at `e9ba93af8bf2c745eb59b4ed5a883fa37f25902a`  
-DancePlug consumer snapshots: Drupal `dev` at `a0120c29d8bd9d06cf97b562cff7d13bc83eb613`; Nuxt `dev` at `12f444025a9de8561453144496b61fc335353f34`  
+Nuxt layer reviewed branch/commit: `dev` refreshed at `f5912d9fad118f8fc5d4439a73270c3010fed9d7` (original full-review baseline `a8bb7aab1c1849c3710df37191278855692c0e0e`)
+Stir Tools reviewed branch/commit: `dev` at `395686036c01ced16dec74d3febdae05e9e90985`
+RSF consumer snapshots: Drupal `dev` at `b5f66e2605c3d3f574a4f6c3905dfb2e01ed2a15`; Nuxt `dev` at `e9ba93af8bf2c745eb59b4ed5a883fa37f25902a`
+DancePlug consumer snapshots: Drupal `dev` at `a0120c29d8bd9d06cf97b562cff7d13bc83eb613`; Nuxt `dev` at `12f444025a9de8561453144496b61fc335353f34`
 Review date: 2026-07-14; Nuxt delta refreshed 2026-07-15 (America/Los_Angeles)
 
 ## Verdict

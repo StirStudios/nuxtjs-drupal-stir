@@ -1,6 +1,6 @@
 # vNext rebuild readiness report
 
-Status date: 2026-07-16  
+Status date: 2026-07-16
 Nuxt checkpoint: `e17ca31f`
 
 Nuxt integration checkpoint: `e17ca31f`
