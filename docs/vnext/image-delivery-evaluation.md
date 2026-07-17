@@ -148,20 +148,21 @@ the same increase in browser JavaScript. Native binaries must be built for the
 deployment architecture. An external provider may avoid this self-hosted image
 processing cost and must be included in the production comparison.
 
-## Recommended staged decision
+## Integration decision
 
-1. Keep Drupal responsive image rendering as the default during the rebuild.
-2. Use the opt-in Nuxt Image delivery path behind `MediaImage`, which consumes
-   the versioned original source and semantic profiles and falls back to Drupal
-   for incomplete or unknown payloads.
-3. Enable it first in DancePlug development for representative heroes, grids,
-   cards, avatars, modal images, video posters, and user uploads.
-4. Compare Lighthouse/LCP, transferred bytes, cache hit ratios, first-hit
-   latency, visual quality, Node resource use, accessibility markup, and error
-   fallback against the existing path.
-5. Pause for an explicit product/operations decision before making Nuxt Image
-   the layer default or removing Drupal responsive image configuration.
+The DancePlug pilot established Nuxt Image/IPX as the layer default. `MediaImage`
+continues to consume the versioned original source and semantic profiles, with
+native Drupal rendering retained for incomplete or unknown payloads.
 
-The current evidence supports building the opt-in path. It does not yet prove
-that self-hosted IPX should be the production default for every downstream
-project.
+`STIR_IMAGE_DELIVERY=drupal` remains an explicit migration fallback. When
+`NUXT_IMAGE_CDN` is unset, derivatives are served by the Nuxt application's
+local `/_ipx` route. When it is set to an ordinary pull-CDN origin, public image
+URLs use that origin while the CDN retrieves the same `/_ipx/**` paths from
+Nuxt. Drupal owns the originals and Nuxt/IPX owns the transformations. This
+does not require Bunny Optimizer, a storage zone, or a second CDN for Drupal
+originals.
+
+The remaining staging validation is operational rather than architectural:
+confirm cache MISS/HIT behavior, query/path cache keys, same-filename revision
+replacement, first-hit latency, visual quality, and representative Lighthouse
+medians before production cutover.

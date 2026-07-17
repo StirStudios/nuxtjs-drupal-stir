@@ -172,7 +172,7 @@ describe('layer contract', () => {
     expect(packageJson.scripts?.['dev:prepare']).toBe('nuxi prepare')
   })
 
-  it('keeps Nuxt Image opt-in and outside the required runtime dependency set', () => {
+  it('uses Nuxt Image by default with an explicit Drupal fallback and CDN path', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),
       'utf8',
@@ -186,16 +186,20 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(packageJson.dependencies?.['@nuxt/image']).toBeUndefined()
-    expect(packageJson.peerDependencies?.['@nuxt/image']).toBe('^2.0.0')
-    expect(packageJson.peerDependenciesMeta?.['@nuxt/image']?.optional).toBe(true)
-    expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'nuxt\'')
+    expect(packageJson.dependencies?.['@nuxt/image']).toBe('^2.0.0')
+    expect(packageJson.peerDependencies?.['@nuxt/image']).toBeUndefined()
+    expect(packageJson.peerDependenciesMeta?.['@nuxt/image']).toBeUndefined()
+    expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'drupal\'')
+    expect(themeConfig).toContain('process.env.NUXT_IMAGE_CDN')
     expect(themeConfig).toContain('[\'@nuxt/image\']')
     expect(themeConfig).toContain('stirImageDelivery')
     expect(themeConfig).toContain('\'#stir-image-provider\': imageProviderComponent')
     expect(themeConfig).toContain('\'app/providers/NativeImageProvider.vue\'')
     expect(themeConfig).toContain('import.meta.resolve(\'@nuxt/image\')')
     expect(themeConfig).toContain('\'runtime/components/NuxtImg.vue\'')
+    expect(themeConfig).toContain('\'runtime/providers/ipx.js\'')
+    expect(themeConfig).toContain('provider: \'stirCdn\'')
+    expect(themeConfig).toContain('baseURL: `${stirImageCdn}/_ipx`')
   })
 
   it('ships accessibility auditing as opt-in downstream development tooling', () => {

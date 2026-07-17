@@ -28,6 +28,7 @@
     "production": [
       "@iconify-json/lucide",
       "@internationalized/date",
+      "@nuxt/image",
       "@nuxt/kit",
       "@nuxt/scripts",
       "@nuxt/ui",
@@ -68,7 +69,6 @@
     "development": [
       "@axe-core/playwright",
       "@nuxt/eslint",
-      "@nuxt/image",
       "@nuxt/schema",
       "@nuxt/test-utils",
       "@playwright/test",
@@ -675,16 +675,16 @@
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 26,
-    "productionDependencies": 38,
-    "developmentDependencies": 26,
-    "tests": 104,
+    "productionDependencies": 39,
+    "developmentDependencies": 25,
+    "tests": 105,
     "testsByArea": {
       "composables": 10,
       "contracts": 1,
       "nuxt": 37,
       "server": 22,
       "unit": 2,
-      "utils": 32
+      "utils": 33
     }
   },
   "tests": [
@@ -772,6 +772,7 @@
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/heroVideoSource.spec.ts",
+    "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",
     "tests/utils/layerContract.spec.ts",
     "tests/utils/navigation.spec.ts",

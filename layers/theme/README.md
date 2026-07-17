@@ -81,19 +81,26 @@ Editorial `EditLink` controls also render beside their slot without adding a
 shell. The editorial stylesheet positions the existing parent only when it has
 a direct controls child, keeping anonymous production markup unchanged.
 
-### Optional Nuxt Image delivery
+### Nuxt Image delivery
 
-Drupal responsive `src` and `srcset` output remains the default image delivery
-path. To test the provider path, install the optional peer `@nuxt/image`, set
-`STIR_IMAGE_DELIVERY=nuxt` at build time, and allow the Drupal asset hostname
-with `NUXT_IMAGE_DOMAINS`. Projects using the default IPX provider must also
-permit the package manager to build Sharp in their trusted-dependency policy.
+Nuxt Image with the local IPX provider is the default image delivery path. Allow
+the Drupal asset hostname with `NUXT_IMAGE_DOMAINS`. Projects using IPX must
+also permit the package manager to build Sharp in their trusted-dependency
+policy. Set `STIR_IMAGE_DELIVERY=drupal` only as a temporary compatibility
+fallback to Drupal responsive `src` and `srcset` output.
+
+Set `NUXT_IMAGE_CDN` to an absolute CDN origin such as
+`https://images.example.com` to render IPX derivative URLs through an ordinary
+pull CDN. The CDN origin must point to the Nuxt application, forward `/_ipx/**`,
+and cache successful responses. This mode deliberately reuses Nuxt Image's IPX
+provider and keeps Nuxt's local `/_ipx` transformer registered; it does not
+require Bunny Optimizer, a storage zone, or pre-uploaded derivatives.
 
 `MediaImage` uses Nuxt Image only when the payload contains both
 `originalSrc`/`originalRevision` and a known semantic profile. It versions the
 canonical source, passes it to Nuxt Image, and suppresses the Drupal derivative
-`srcset`. Missing metadata, unknown/project-specific responsive styles, or an
-unavailable opt-in retain native Drupal rendering.
+`srcset`. Missing metadata and unknown/project-specific responsive styles
+retain native Drupal rendering.
 
 Default profile sizes and WebP quality live under
 `stirTheme.media.image`. Downstream apps may override those app-config values,

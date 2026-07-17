@@ -19,7 +19,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('originalsrc')).toBeUndefined()
   })
 
-  it('uses the versioned original through Nuxt Image only when explicitly enabled', async () => {
+  it('uses the versioned original through Nuxt Image', async () => {
     const appConfig = useAppConfig()
     const previousDelivery = appConfig.stirImageDelivery
 
@@ -42,12 +42,14 @@ describe('MediaImage (Nuxt runtime)', () => {
       })
 
       expect(wrapper.get('img').attributes()).toMatchObject({
-        format: 'webp',
-        quality: '75',
-        sizes: 'sm:100vw md:50vw lg:33vw xl:400px',
+        'data-nuxt-img': '',
+        'sizes': '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px',
         src: 'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       })
-      expect(wrapper.get('img').attributes('srcset')).toBeUndefined()
+      expect(wrapper.get('img').attributes('srcset')).toContain(
+        'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
+      )
+      expect(wrapper.get('img').attributes('srcset')).not.toContain('/styles/')
     }
     finally {
       appConfig.stirImageDelivery = previousDelivery
@@ -102,7 +104,9 @@ describe('MediaImage (Nuxt runtime)', () => {
         },
       })
 
-      expect(wrapper.get('img').attributes('sizes')).toBe('210px sm:270px md:330px')
+      expect(wrapper.get('img').attributes('sizes')).toBe(
+        '(max-width: 640px) 210px, (max-width: 768px) 270px, 330px',
+      )
     }
     finally {
       appConfig.stirImageDelivery = previousDelivery

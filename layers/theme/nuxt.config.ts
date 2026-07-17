@@ -8,6 +8,7 @@ import {
   loadPresentationManifest,
   type PresentationManifestMode,
 } from './build/presentationManifest'
+import { resolveImageCdnBase } from './build/imageCdn'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
@@ -16,15 +17,18 @@ const compatibilitySafelistCss = resolvePath(
   themeLayerDir,
   'app/assets/css/safelist.inline.css',
 )
-const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'nuxt'
-  ? 'nuxt'
-  : 'drupal'
+const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'drupal'
+  ? 'drupal'
+  : 'nuxt'
+const stirImageCdn = resolveImageCdnBase(process.env.NUXT_IMAGE_CDN)
+const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = stirImageDelivery === 'nuxt'
-  ? resolvePath(
-      dirname(fileURLToPath(import.meta.resolve('@nuxt/image'))),
-      'runtime/components/NuxtImg.vue',
-    )
+  ? resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
   : resolvePath(themeLayerDir, 'app/providers/NativeImageProvider.vue')
+const ipxRuntimeProvider = resolvePath(
+  imageModuleDir,
+  'runtime/providers/ipx.js',
+)
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
@@ -49,6 +53,22 @@ export default defineNuxtConfig({
       })
     },
   ],
+  ...(stirImageDelivery === 'nuxt' && stirImageCdn
+    ? {
+        image: {
+          provider: 'stirCdn',
+          ipx: {},
+          providers: {
+            stirCdn: {
+              provider: ipxRuntimeProvider,
+              options: {
+                baseURL: `${stirImageCdn}/_ipx`,
+              },
+            },
+          },
+        },
+      }
+    : {}),
   appConfig: {
     stirImageDelivery,
   },
