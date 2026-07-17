@@ -7,6 +7,56 @@
     "danceplugNuxt": "706e20a",
     "danceplugRoot": "be260de"
   },
+  "finalIntegrationPilot": {
+    "generatedAt": "2026-07-17T00:48:17Z",
+    "revisions": {
+      "nuxtIntegration": "af408748",
+      "stirTools": "7941fb2",
+      "danceplugNuxtBase": "cf44a9c",
+      "danceplugRoot": "be260de"
+    },
+    "quality": {
+      "tests": "7 files / 15 tests passed",
+      "lint": "passed",
+      "typecheck": "passed",
+      "productionBuild": "passed"
+    },
+    "productionSmoke": {
+      "homepage": "200 public",
+      "class": "200 public",
+      "health": "passed",
+      "protectedAccount": "200 private, no-store, max-age=0",
+      "initialVideoRequests": 0
+    },
+    "lighthouse": {
+      "environment": {
+        "lighthouse": "13.4.0",
+        "chrome": "151.0.0.0",
+        "formFactor": "mobile",
+        "runsPerRoute": 3
+      },
+      "homepage": {
+        "score": 70,
+        "fcpMs": 4000,
+        "lcpMs": 5450,
+        "tbtMs": 86,
+        "totalBytes": 960000,
+        "imageBytes": 260000,
+        "videoBytes": 0
+      },
+      "class": {
+        "score": 74,
+        "fcpMs": 3360,
+        "lcpMs": 5150,
+        "tbtMs": 45,
+        "totalBytes": 520000,
+        "imageBytes": 40000,
+        "videoBytes": 0,
+        "serverResponseMs": 166,
+        "note": "Functional and media-delivery behavior passed; compatibility CSS remains the principal render-blocking cost."
+      }
+    }
+  },
   "packedConsumerVerification": {
     "rsf": {
       "source": "fresh remote dev clone",
