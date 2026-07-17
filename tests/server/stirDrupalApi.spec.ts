@@ -16,7 +16,12 @@ const createEvent = (cookie = '') => {
     event: {
       context: {},
       node: {
-        req: { headers: cookie ? { cookie } : {} },
+        req: {
+          headers: {
+            'sec-fetch-site': 'same-origin',
+            ...(cookie ? { cookie } : {}),
+          },
+        },
         res: {
           getHeader: (name: string) => headers.get(name.toLowerCase()),
           removeHeader: (name: string) => headers.delete(name.toLowerCase()),
@@ -159,6 +164,80 @@ describe('Stir Drupal API boundary', () => {
         redirect: 'manual',
       }),
     )
+  })
+
+  it('blocks cross-origin mutations before contacting Drupal', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      siteUrl: 'https://www.example.test',
+      public: { api: 'https://cms.example.test' },
+    }))
+    const raw = vi.fn()
+
+    vi.stubGlobal('$fetch', { raw })
+    const { event } = createEvent()
+    const requestHeaders = (
+      event as { node: { req: { headers: Record<string, string> } } }
+    ).node.req.headers
+
+    requestHeaders.origin = 'https://malicious.example.test'
+
+    await expect(stirDrupalApiRequest(event, '/api/account/settings/values', {
+      method: 'PATCH',
+      body: { values: { name: 'Updated' } },
+    })).rejects.toMatchObject({
+      statusCode: 403,
+      statusMessage: 'Cross-origin request blocked',
+    })
+    expect(raw).not.toHaveBeenCalled()
+  })
+
+  it('marks anonymous mutations private and no-store', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      public: { api: 'https://cms.example.test' },
+    }))
+    vi.stubGlobal('$fetch', {
+      raw: vi.fn().mockResolvedValue({
+        _data: { subscribed: true },
+        headers: { getSetCookie: () => [] },
+        status: 200,
+      }),
+    })
+    const { event, headers } = createEvent()
+
+    await stirDrupalApiRequest(event, '/api/newsletter/subscribe', {
+      method: 'POST',
+      body: { email: 'person@example.test' },
+    })
+
+    expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
+  })
+
+  it('supports an explicit same-origin opt-out for trusted server integrations', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      public: { api: 'https://cms.example.test' },
+    }))
+    const raw = vi.fn().mockResolvedValue({
+      _data: { accepted: true },
+      headers: { getSetCookie: () => [] },
+      status: 200,
+    })
+
+    vi.stubGlobal('$fetch', { raw })
+    const { event } = createEvent()
+    const requestHeaders = (
+      event as { node: { req: { headers: Record<string, string> } } }
+    ).node.req.headers
+
+    delete requestHeaders['sec-fetch-site']
+
+    await expect(stirDrupalApiRequest(event, '/api/integration/callback', {
+      method: 'POST',
+      enforceSameOrigin: false,
+    })).resolves.toEqual({ accepted: true })
+    expect(raw).toHaveBeenCalledOnce()
   })
 
   it('rejects upstream redirects instead of returning a false success', async () => {

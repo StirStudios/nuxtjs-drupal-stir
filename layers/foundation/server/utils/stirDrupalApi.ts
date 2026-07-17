@@ -8,6 +8,7 @@ import {
   splitCookiesString,
   type H3Event,
 } from 'h3'
+import { assertStirSameOrigin } from './stirRequestSecurity'
 
 // Shared by focused server capabilities and the full Drupal CE platform.
 const DEFAULT_DRUPAL_REQUEST_TIMEOUT_MS = 10_000
@@ -35,6 +36,7 @@ export interface StirDrupalHeaderOptions {
 export type StirDrupalRequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>
+  enforceSameOrigin?: boolean
   forwardClientIp?: boolean
   forwardCookies?: boolean
   forwardSetCookies?: boolean
@@ -435,6 +437,13 @@ export async function stirDrupalApiRequest<T>(
   path: string,
   options: StirDrupalRequestOptions = {},
 ): Promise<T> {
+  const method = options.method || 'POST'
+  const isMutation = method !== 'GET'
+
+  if (isMutation && options.enforceSameOrigin !== false) {
+    assertStirSameOrigin(event)
+  }
+
   const { baseUrl, apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
   const cookie = options.forwardCookies
     ? getStirForwardedCookie(event)
@@ -442,12 +451,11 @@ export async function stirDrupalApiRequest<T>(
   const clientIp = options.forwardClientIp
     ? getStirForwardedClientIp(event)
     : undefined
-  const method = options.method || 'POST'
   const csrfToken = cookie && method !== 'GET'
     ? await fetchStirDrupalCsrfToken(event)
     : undefined
 
-  if (cookie) {
+  if (cookie || isMutation) {
     markStirPrivateResponse(event)
   }
 
