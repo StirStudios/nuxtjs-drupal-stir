@@ -163,7 +163,7 @@ describe('layer contract', () => {
     expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
   })
 
-  it('requires consumers to own their Nuxt runtime directly', () => {
+  it('provides the Nuxt runtime through the installed layer package', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),
       'utf8',
@@ -173,18 +173,18 @@ describe('layer contract', () => {
       peerDependencies?: Record<string, string>
     }
 
-    expect(packageJson.dependencies?.nuxt).toBeUndefined()
-    expect(packageJson.peerDependencies?.nuxt).toBe('^4.5.0')
-    expect(packageJson.devDependencies?.nuxt).toBe('^4.5.0')
+    expect(packageJson.dependencies?.nuxt).toBe('^4.5.0')
+    expect(packageJson.peerDependencies?.nuxt).toBeUndefined()
+    expect(packageJson.devDependencies?.nuxt).toBeUndefined()
 
     const packedConsumer = readFileSync(
       resolve(rootDir, 'scripts/audit/packed-consumer.mjs'),
       'utf8',
     )
 
-    expect(packedConsumer).toContain('nuxt: rootPackage.peerDependencies.nuxt')
+    expect(packedConsumer).not.toContain('nuxt: rootPackage.peerDependencies.nuxt')
     expect(packedConsumer).toContain(
-      'Packed consumer must own the layer Nuxt peer directly.',
+      'Packed consumer must receive Nuxt from the layer package.',
     )
   })
 
@@ -434,6 +434,10 @@ describe('layer contract', () => {
     expect(existsSync(resolve(
       rootDir,
       'layers/foundation/server/middleware/drupal-session-no-ssr.ts',
+    ))).toBe(true)
+    expect(existsSync(resolve(
+      rootDir,
+      'layers/foundation/server/middleware/drupal-one-time-login-redirect.ts',
     ))).toBe(true)
     expect(existsSync(resolve(
       rootDir,
