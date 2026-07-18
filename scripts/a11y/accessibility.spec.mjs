@@ -198,7 +198,7 @@ const transitionRaceRuleIds = new Set([
   'landmark-one-main',
   'page-has-heading-one',
 ])
-const isTransitionRace = async (page, violations) => {
+const isTransitionRace = (violations) => {
   if (
     violations.length === 0 ||
     violations.some((violation) => !transitionRaceRuleIds.has(violation.id))
@@ -206,19 +206,19 @@ const isTransitionRace = async (page, violations) => {
     return false
   }
 
-  return (
-    (await page.locator('main').count()) === 1 &&
-    (await page.locator('h1').count()) === 1
-  )
+  return true
 }
 const analyzeStablePage = async (page, includeSelector) => {
   const results = await analyzePage(page, includeSelector)
-  if (!(await isTransitionRace(page, results.violations))) return results
+  if (!isTransitionRace(results.violations)) return results
 
   // Page transitions can replace the semantic page subtree while Axe is
-  // taking its snapshot. Retry only when the live DOM contradicts Axe and
-  // already contains exactly one main landmark and one h1. Real structural
-  // omissions therefore continue to fail without being hidden by a retry.
+  // taking its snapshot. Wait for the final structure and retry once. A real
+  // omission still fails at these explicit landmark gates rather than being
+  // hidden by the retry.
+  await page.waitForLoadState('load')
+  await page.locator('main').waitFor({ state: 'visible' })
+  await page.locator('h1').waitFor({ state: 'visible' })
   await page.waitForTimeout(motionSettleMs)
   await expect(page.locator('main')).toHaveCount(1)
   await expect(page.locator('h1')).toHaveCount(1)

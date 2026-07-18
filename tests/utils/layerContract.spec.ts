@@ -267,6 +267,18 @@ describe('layer contract', () => {
       'Do not replace a shared brand or semantic color token',
     )
 
+    const accessibilityConfig = readFileSync(
+      resolve(rootDir, 'scripts/a11y/playwright.config.mjs'),
+      'utf8',
+    )
+
+    expect(accessibilityConfig).toContain(
+      'fullyParallel: Boolean(externalBaseUrl)',
+    )
+    expect(accessibilityConfig).toContain(
+      'workers: externalBaseUrl ? (process.env.CI ? 2 : void 0) : 1',
+    )
+
     for (const dependency of ['@axe-core/playwright', '@playwright/test']) {
       expect(packageJson.peerDependencies?.[dependency]).toBeDefined()
       expect(packageJson.peerDependenciesMeta?.[dependency]?.optional).toBe(true)
