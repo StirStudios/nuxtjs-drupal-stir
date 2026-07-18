@@ -43,8 +43,8 @@ const imageProviderComponent = stirImageDelivery === 'nuxt'
   ? resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
   : resolvePath(themeLayerDir, 'app/providers/NativeImageProvider.vue')
 const ipxRuntimeProvider = resolvePath(
-  imageModuleDir,
-  'runtime/providers/ipx.js',
+  themeLayerDir,
+  'build/imageCdn.ts',
 )
 const loadModule = createJiti(import.meta.url, {
   interopDefault: false,
@@ -85,20 +85,20 @@ export default defineNuxtConfig({
         },
         image: {
           domains: drupalImageDomain ? [drupalImageDomain] : [],
-          ...(stirImageCdn
-            ? {
-                provider: 'stirCdn',
-                ipx: {},
-                providers: {
-                  stirCdn: {
-                    provider: ipxRuntimeProvider,
+          provider: 'stirIpx',
+          ipx: {},
+          providers: {
+            stirIpx: {
+              provider: ipxRuntimeProvider,
+              ...(stirImageCdn
+                ? {
                     options: {
                       baseURL: `${stirImageCdn}/_ipx`,
                     },
-                  },
-                },
-              }
-            : {}),
+                  }
+                : {}),
+            },
+          },
         },
       }
     : {}),

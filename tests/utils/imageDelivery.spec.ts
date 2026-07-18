@@ -3,6 +3,7 @@ import {
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '../../layers/theme/app/utils/imageDelivery'
+import createStirIpxProvider from '../../layers/theme/build/imageCdn'
 
 describe('versionImageSource', () => {
   it('adds a managed-file revision without changing the original path', () => {
@@ -42,5 +43,28 @@ describe('resolveImageDeliveryProfile', () => {
   it('uses a known Drupal responsive style and rejects unknown styles', () => {
     expect(resolveImageDeliveryProfile('card', false, profiles)).toBe(profiles.card)
     expect(resolveImageDeliveryProfile('unknown', false, profiles)).toBeUndefined()
+  })
+})
+
+describe('Stir IPX provider', () => {
+  it('keeps the managed-file revision out of the Drupal origin path', () => {
+    const provider = createStirIpxProvider()
+    const image = provider.getImage(
+      'https://drupal.example/sites/default/files/photo.jpg?v=42-1710000000-293400',
+      {
+        baseURL: 'https://cdn.example/_ipx',
+        modifiers: { format: 'webp', width: 640, height: 360 },
+      },
+      {
+        options: {
+          nuxt: { baseURL: '/' },
+        },
+      } as Parameters<typeof provider.getImage>[2],
+    )
+
+    expect(image.url).toBe(
+      'https://cdn.example/_ipx/f_webp&s_640x360/https://drupal.example/sites/default/files/photo.jpg?v=42-1710000000-293400',
+    )
+    expect(image.url).not.toContain('photo.jpg%3Fv')
   })
 })
