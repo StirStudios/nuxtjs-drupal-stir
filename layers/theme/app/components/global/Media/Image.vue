@@ -230,9 +230,16 @@ onMounted(() => {
         ? [
             theme.hero.image.base,
             isFront ? theme.hero.image.isFront : 'max-w-none',
+            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
             imageClass,
           ]
-        : [theme.media.base, theme.media.rounded, 'm-auto !object-contain', imageClass]
+        : [
+            theme.media.base,
+            theme.media.rounded,
+            'm-auto !object-contain',
+            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+            imageClass,
+          ]
     "
     :fetchpriority="fetchpriority || undefined"
     :format="isNuxtImage ? theme.media.image.format : undefined"

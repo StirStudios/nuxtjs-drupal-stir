@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
 
@@ -141,6 +141,38 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('sizes')).toBe(
       '(min-width: 768px) 50vw, 100vw',
     )
+  })
+
+  it('uses the bare image as its loading placeholder without another wrapper', async () => {
+    const complete = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get')
+      .mockReturnValue(false)
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        props: {
+          alt: 'Example image',
+          noWrapper: true,
+          src: '/image.webp',
+        },
+      })
+      const image = wrapper.get('img')
+
+      expect(wrapper.element.tagName).toBe('IMG')
+      expect(image.classes()).toEqual(expect.arrayContaining([
+        'bg-elevated',
+        'text-transparent',
+        'motion-safe:animate-pulse',
+      ]))
+
+      await image.trigger('load')
+
+      expect(image.classes()).not.toContain('bg-elevated')
+      expect(image.classes()).not.toContain('text-transparent')
+      expect(image.classes()).not.toContain('motion-safe:animate-pulse')
+    }
+    finally {
+      complete.mockRestore()
+    }
   })
 
   it('uses the viewport fallback when auto is the only wrapped size', async () => {
