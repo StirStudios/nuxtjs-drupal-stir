@@ -2,6 +2,7 @@ import {
   assertMethod,
   createError,
   getRequestURL,
+  getResponseHeader,
   proxyRequest,
   type H3Event,
 } from 'h3'
@@ -196,11 +197,18 @@ export const handleStirDrupalProxyResponse = (
   response: Response,
 ): void => {
   const upstreamCacheControl = response.headers.get('cache-control') ?? ''
+  const existingCacheControl = String(
+    getResponseHeader(event, 'Cache-Control') ?? '',
+  )
   const setsDrupalSession = filterStirDrupalSetCookies(
     getStirDrupalSetCookies(response.headers),
   ).length > 0
 
   replaceStirDrupalSetCookies(event, response)
+
+  if (/(?:^|,)\s*no-store\b/i.test(existingCacheControl)) {
+    return
+  }
 
   if (
     getStirForwardedCookie(event)

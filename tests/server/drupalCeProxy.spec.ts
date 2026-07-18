@@ -266,6 +266,18 @@ describe('Drupal CE proxy boundary', () => {
     )
   })
 
+  it('never replaces an existing private page boundary with public proxy caching', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', 'private, no-store, max-age=0')
+    handleStirDrupalProxyResponse(event, new Response('{}'))
+
+    expect(responseHeaders.get('cache-control')).toBe(
+      'private, no-store, max-age=0',
+    )
+  })
+
   it('requires browsers to revalidate anonymous CE responses', () => {
     stubRuntimeConfig()
     const { event, responseHeaders } = createEvent()
