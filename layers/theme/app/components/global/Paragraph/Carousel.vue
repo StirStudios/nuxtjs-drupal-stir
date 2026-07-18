@@ -104,9 +104,16 @@ function restoreFadeViewportPosition() {
     '[data-slot="viewport"]',
   )
 
-  if (viewport?.scrollLeft) {
-    viewport.scrollLeft = 0
+  if (!viewport) return
+
+  const resetScrollPosition = () => {
+    if (viewport.scrollLeft) {
+      viewport.scrollLeft = 0
+    }
   }
+
+  resetScrollPosition()
+  requestAnimationFrame(resetScrollPosition)
 }
 </script>
 
