@@ -135,7 +135,8 @@ const formatContrastSuggestions = (data) => {
   ].filter(Boolean)
   return suggestions.length
     ? `
-    Nearest passing suggestions: ${suggestions.join(' or ')}`
+    Nearest passing suggestions: ${suggestions.join(' or ')}
+    Apply the smallest contextual fix to this element and state. Do not replace a shared brand or semantic color token unless every use of that token has been visually and accessibly audited.`
     : ''
 }
 const formatViolations = (violations) =>
@@ -193,6 +194,36 @@ const analyzePage = (page, includeSelector) => {
 
   return builder.analyze()
 }
+const transitionRaceRuleIds = new Set([
+  'landmark-one-main',
+  'page-has-heading-one',
+])
+const isTransitionRace = async (page, violations) => {
+  if (
+    violations.length === 0 ||
+    violations.some((violation) => !transitionRaceRuleIds.has(violation.id))
+  ) {
+    return false
+  }
+
+  return (
+    (await page.locator('main').count()) === 1 &&
+    (await page.locator('h1').count()) === 1
+  )
+}
+const analyzeStablePage = async (page, includeSelector) => {
+  const results = await analyzePage(page, includeSelector)
+  if (!(await isTransitionRace(page, results.violations))) return results
+
+  // Page transitions can replace the semantic page subtree while Axe is
+  // taking its snapshot. Retry only when the live DOM contradicts Axe and
+  // already contains exactly one main landmark and one h1. Real structural
+  // omissions therefore continue to fail without being hidden by a retry.
+  await page.waitForTimeout(motionSettleMs)
+  await expect(page.locator('main')).toHaveCount(1)
+  await expect(page.locator('h1')).toHaveCount(1)
+  return analyzePage(page, includeSelector)
+}
 test.describe('automated accessibility', () => {
   for (const route of routes) {
     test(`${route} has no detectable WCAG or best-practice violations`, async ({
@@ -225,7 +256,7 @@ test.describe('automated accessibility', () => {
       })
       await revealFullPage(page)
       await page.waitForTimeout(motionSettleMs)
-      const results = await analyzePage(page)
+      const results = await analyzeStablePage(page)
       await testInfo.attach('axe-results', {
         body: JSON.stringify(results, null, 2),
         contentType: 'application/json',
@@ -249,7 +280,7 @@ test.describe('automated accessibility', () => {
         await hoverTarget.evaluate((element) =>
           element.setAttribute('data-a11y-active-scan', ''),
         )
-        const hoverResults = await analyzePage(
+        const hoverResults = await analyzeStablePage(
           page,
           '[data-a11y-active-scan]',
         )

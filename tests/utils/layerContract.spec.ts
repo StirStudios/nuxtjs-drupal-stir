@@ -255,6 +255,18 @@ describe('layer contract', () => {
       resolve(rootDir, 'scripts/a11y/server.mjs'),
       'utf8',
     )).toContain('new URL(\n  \'../../contracts/stir-tools/v1/fixtures/auth-ui-config.json\'')
+
+    const accessibilitySpec = readFileSync(
+      resolve(rootDir, 'scripts/a11y/accessibility.spec.mjs'),
+      'utf8',
+    )
+
+    expect(accessibilitySpec).toContain('analyzeStablePage')
+    expect(accessibilitySpec).toContain('isTransitionRace')
+    expect(accessibilitySpec).toContain(
+      'Do not replace a shared brand or semantic color token',
+    )
+
     for (const dependency of ['@axe-core/playwright', '@playwright/test']) {
       expect(packageJson.peerDependencies?.[dependency]).toBeDefined()
       expect(packageJson.peerDependenciesMeta?.[dependency]?.optional).toBe(true)
