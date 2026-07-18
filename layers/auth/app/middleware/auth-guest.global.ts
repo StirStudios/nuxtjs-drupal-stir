@@ -1,5 +1,5 @@
 import { useAuthConfig } from '../composables/auth/useAuthConfig'
-import { useAuthSession } from '../composables/auth/useAuthSession'
+import type { AuthSessionResponse } from '../types/auth'
 
 const GUEST_ONLY_AUTH_ROUTES = new Set([
   '/auth/login',
@@ -18,16 +18,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
   await ensureLoaded()
 
   const redirectPath = auth.value.loginRedirectPath || '/'
-  const session = useAuthSession()
+  // Guest-only routes must use the current request as their source of truth.
+  // Reusing hydrated auth state here can redirect an anonymous navigation after
+  // another session was authenticated, particularly across SSR/SPA boundaries.
+  const requestFetch = useRequestFetch()
+  const session = await requestFetch<AuthSessionResponse>('/api/auth/session')
 
-  await session.fetchSession()
-
-  if (session.loggedIn.value) {
+  if (session?.authenticated) {
     return navigateTo(redirectPath)
   }
 
   if (to.path === '/auth/register') {
-    const requestFetch = useRequestFetch()
     const policy = await requestFetch<{ allowed?: boolean }>(
       '/api/auth/register-policy',
     )
