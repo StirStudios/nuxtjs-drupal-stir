@@ -25,6 +25,11 @@ export default defineAppConfig({
     container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
     header: 'fixed top-0 z-30 w-full !p-0 md:px-auto',
 
+    auth: {
+      backgroundClass: 'bg-muted/50 dark:bg-default',
+      showBackgroundDecoration: true,
+    },
+
     navigation: {
       mode: 'fixed',
       logo: true,

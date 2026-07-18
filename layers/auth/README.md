@@ -89,6 +89,8 @@ Auth layouts are also frontend theme settings. Use `card`, `card-split`, or
 stirTheme: {
   auth: {
     layout: 'card-split',
+    backgroundClass: 'bg-muted/50 dark:bg-default',
+    showBackgroundDecoration: true,
     backgroundImage: '/themes/custom/site/auth.jpg',
     imagePosition: 'left',
     pages: {
@@ -110,8 +112,12 @@ stirTheme: {
 ```
 
 `imagePosition` accepts `'left'` or `'right'`; it controls which side displays
-the image or illustration in split layouts. `backgroundImage`, `imagePosition`,
-`showIcon`, and `backButton` support the same global and per-page structure.
+the image or illustration in split layouts. `backgroundClass`,
+`showBackgroundDecoration`, `backgroundImage`, `imagePosition`, `showIcon`, and
+`backButton` support the same global and per-page structure. The default auth
+canvas uses semantic Nuxt UI surfaces and subtle primary-color decoration;
+projects can replace `backgroundClass` or disable the decoration without a
+component override.
 `submitButton` accepts Nuxt UI `UButton` props, such as `size: 'xl'`, `color`,
 `variant`, `icon`, and `class`. Drupal remains the source for auth
 behaviour, fields, copy, password policy, and redirects. Drupal presentation

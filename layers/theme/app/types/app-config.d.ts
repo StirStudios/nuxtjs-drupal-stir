@@ -311,9 +311,11 @@ type StirThemeErrorConfig = {
 } & LooseRecord
 
 export type StirThemeAuthConfig = {
+  backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
+  showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
   submitButton?: StirThemeButtonLikeConfig
@@ -330,9 +332,11 @@ type StirThemeAuthPageKey =
   | 'verify'
 
 export type StirThemeAuthPageConfig = {
+  backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
+  showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
 } & LooseRecord
