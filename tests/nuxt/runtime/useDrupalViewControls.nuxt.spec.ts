@@ -17,6 +17,8 @@ mockNuxtImport('useDrupalCe', () => {
   })
 })
 
+mockNuxtImport('$fetch', () => state.api)
+
 const viewProps = {
   paragraphId: 42,
   viewId: 'testimonials',
@@ -107,7 +109,6 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     vi.useRealTimers()
     state.api.mockReset()
     state.legacyApi.mockReset()
-    vi.stubGlobal('$fetch', state.api)
     sessionStorage.clear()
     await resetRoute()
   })

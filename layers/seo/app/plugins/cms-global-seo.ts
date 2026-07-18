@@ -1,4 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
+import type { Link, Meta } from '@unhead/vue'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -53,19 +54,27 @@ function isDrupalRoute(route: ReturnType<typeof useRoute>, config: Required<CmsG
   return config.drupalRouteNames.includes(String(route.name || ''))
 }
 
-function withMetaKeys(tags: Array<Record<string, string>> = []) {
-  return tags.map((tag) => {
+function withMetaKeys(tags: Array<Record<string, string>> = []): Meta[] {
+  return tags.flatMap((tag) => {
+    if (!tag.name && !tag.property && !tag.charset && !tag['http-equiv']) {
+      return []
+    }
+
     const key = tag.name || tag.property || undefined
 
-    return key ? { ...tag, key } : tag
+    return [(key ? { ...tag, key } : tag) as unknown as Meta]
   })
 }
 
-function withLinkKeys(tags: Array<Record<string, string>> = []) {
-  return tags.map((tag) => {
+function withLinkKeys(tags: Array<Record<string, string>> = []): Link[] {
+  return tags.flatMap((tag) => {
+    if (!tag.rel || !tag.href) {
+      return []
+    }
+
     const key = [tag.rel, tag.sizes, tag.href].filter(Boolean).join(':') || undefined
 
-    return key ? { ...tag, key } : tag
+    return [(key ? { ...tag, key } : tag) as unknown as Link]
   })
 }
 

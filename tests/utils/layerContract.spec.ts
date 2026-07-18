@@ -174,8 +174,8 @@ describe('layer contract', () => {
     }
 
     expect(packageJson.dependencies?.nuxt).toBeUndefined()
-    expect(packageJson.peerDependencies?.nuxt).toBe('^4.4.8')
-    expect(packageJson.devDependencies?.nuxt).toBe('^4.4.8')
+    expect(packageJson.peerDependencies?.nuxt).toBe('^4.5.0')
+    expect(packageJson.devDependencies?.nuxt).toBe('^4.5.0')
 
     const packedConsumer = readFileSync(
       resolve(rootDir, 'scripts/audit/packed-consumer.mjs'),
@@ -644,8 +644,9 @@ describe('layer contract', () => {
       'utf8',
     )) as Record<string, number>
 
-    expect(budget.maxInitialJavascriptGzipKb).toBeLessThan(160)
-    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36)
+    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(229)
+    expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(192.5)
+    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36.5)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
   })
 

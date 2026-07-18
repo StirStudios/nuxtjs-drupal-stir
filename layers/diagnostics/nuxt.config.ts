@@ -8,7 +8,11 @@ type AnalysisOutputOptions = { dir?: string }
 type AnalysisOutputChunk = {
   type: 'chunk'
   isEntry: boolean
+  isDynamicEntry: boolean
   fileName: string
+  facadeModuleId: string | null
+  imports: string[]
+  dynamicImports: string[]
   modules: Record<string, { renderedLength: number }>
 }
 type AnalysisOutputAsset = { type: 'asset' }
@@ -28,12 +32,15 @@ export default defineNuxtConfig({
       ) {
         if (!String(options.dir || '').includes('/client')) return
 
-        const entries = Object.values(bundle)
-          .filter((asset): asset is AnalysisOutputChunk =>
-            asset.type === 'chunk' && asset.isEntry,
-          )
+        const chunks = Object.values(bundle)
+          .filter((asset): asset is AnalysisOutputChunk => asset.type === 'chunk')
           .map(chunk => ({
             fileName: chunk.fileName,
+            facadeModuleId: chunk.facadeModuleId,
+            isEntry: chunk.isEntry,
+            isDynamicEntry: chunk.isDynamicEntry,
+            imports: chunk.imports,
+            dynamicImports: chunk.dynamicImports,
             modules: Object.entries(chunk.modules)
               .map(([id, details]) => ({
                 id,
@@ -42,14 +49,14 @@ export default defineNuxtConfig({
               .sort((left, right) => right.renderedBytes - left.renderedBytes),
           }))
 
-        if (!entries.length) return
+        if (!chunks.length) return
 
         const auditDir = resolve(repositoryDir, '.audit')
 
         mkdirSync(auditDir, { recursive: true })
         writeFileSync(
           resolve(auditDir, 'client-entry-modules.json'),
-          `${JSON.stringify({ entries }, null, 2)}\n`,
+          `${JSON.stringify({ chunks }, null, 2)}\n`,
         )
       },
     }],

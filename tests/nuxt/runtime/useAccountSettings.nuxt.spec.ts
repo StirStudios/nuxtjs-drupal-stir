@@ -1,9 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { useAccountSettings } from '../../../layers/auth/app/composables/account/useAccountSettings'
 
 const wrappers: Array<{ unmount: () => void }> = []
+const state = vi.hoisted(() => ({
+  api: vi.fn(),
+}))
+
+mockNuxtImport('$fetch', () => state.api)
 
 const mountComposable = async () => {
   let settings: ReturnType<typeof useAccountSettings> | undefined
@@ -26,6 +31,7 @@ const mountComposable = async () => {
 describe('useAccountSettings', () => {
   afterEach(() => {
     wrappers.splice(0).forEach(wrapper => wrapper.unmount())
+    state.api.mockReset()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
@@ -46,7 +52,7 @@ describe('useAccountSettings', () => {
         updated_fields: ['account_email'],
       })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -88,7 +94,7 @@ describe('useAccountSettings', () => {
       })
       .mockResolvedValueOnce({ updated: true })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -126,7 +132,7 @@ describe('useAccountSettings', () => {
         updated_fields: ['account_name'],
       })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
     const settings = await mountComposable()
 
     await settings.load()
@@ -157,7 +163,7 @@ describe('useAccountSettings', () => {
       },
     })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
     const settings = await mountComposable()
 
     await settings.load()
@@ -179,7 +185,7 @@ describe('useAccountSettings', () => {
       values: { account_email: 'before@example.test' },
     })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -206,7 +212,7 @@ describe('useAccountSettings', () => {
       })
       .mockRejectedValueOnce(new Error('Update failed'))
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -229,7 +235,7 @@ describe('useAccountSettings', () => {
       values: { account_email: 'Person@Example.test' },
     })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
