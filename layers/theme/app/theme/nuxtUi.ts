@@ -35,15 +35,15 @@ export const nuxtUiTheme = {
 
   carousel: {
     slots: {
-      root: 'group relative focus:outline-none',
+      root: 'group/carousel relative focus:outline-none',
     },
     variants: {
       orientation: {
         horizontal: {
           container: '-ms-0 flex-row',
           item: 'ps-0',
-          prev: 'start-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex',
-          next: 'end-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex',
+          prev: 'start-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 md:inline-flex',
+          next: 'end-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 md:inline-flex',
         },
       },
     },
