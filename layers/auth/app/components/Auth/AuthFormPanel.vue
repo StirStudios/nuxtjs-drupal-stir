@@ -31,6 +31,7 @@ defineSlots<{
 
 <template>
   <UAuthForm
+    class="text-left"
     :description="description"
     :fields="fields"
     :icon="icon"
