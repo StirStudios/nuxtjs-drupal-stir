@@ -39,6 +39,47 @@ describe('MediaItem (Nuxt runtime)', () => {
     expect(wrapper.html()).not.toContain('motion-safe:opacity-0')
   })
 
+  it('keeps overlay media visible when no reveal direction is configured', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        overlay: true,
+        tk: {
+          propsOf: () => ({
+            alt: 'Project detail',
+            src: '/project-detail.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('[aria-label="Open media modal"]').classes())
+      .not.toContain('motion-safe:opacity-0')
+  })
+
+  it('preserves the hidden initial state for animated overlay media', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        direction: 'fade-up',
+        index: 0,
+        node: h('div'),
+        overlay: true,
+        tk: {
+          propsOf: () => ({
+            alt: 'Animated project detail',
+            src: '/animated-project-detail.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('[aria-label="Open media modal"]').classes())
+      .toContain('motion-safe:opacity-0')
+  })
+
   it('activates a deferred gallery source near the viewport', async () => {
     let callback: IntersectionObserverCallback | undefined
     const disconnect = vi.fn()

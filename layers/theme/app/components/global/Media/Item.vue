@@ -135,7 +135,8 @@ const shouldAnimate = computed(() =>
       v-if="!isVideo"
       v-bind="overlayImageProps"
       :aria-label="'Open media modal'"
-      class="motion-safe:opacity-0 cursor-pointer"
+      class="cursor-pointer"
+      :class="{ 'motion-safe:opacity-0': shouldAnimate }"
       :edit-actions="editActions"
       :image-class="[
         'transition-transform',
@@ -153,8 +154,9 @@ const shouldAnimate = computed(() =>
     <div
       v-else
       aria-label="Open video modal"
-      class="group motion-safe:opacity-0 relative overflow-hidden"
+      class="group relative overflow-hidden"
       :class="[
+        { 'motion-safe:opacity-0': shouldAnimate },
         theme.media.rounded,
         'cursor-pointer',
         'grid place-items-center text-white',
