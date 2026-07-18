@@ -19,6 +19,17 @@ describe('layer contract', () => {
     )
     expect(foundationConfig).toContain('\'cache-control\': developmentNoStore')
     expect(foundationConfig).toContain('\'Cache-Control\': developmentNoStore')
+
+    const platformConfig = readFileSync(
+      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(platformConfig).toContain('...(isDevelopment')
+    expect(platformConfig).toContain('passThroughHeaders: [')
+    expect(platformConfig).not.toContain(
+      'passThroughHeaders: [\n                \'cache-control\'',
+    )
   })
 
   it('composes the compatibility root from explicit capability layers', () => {

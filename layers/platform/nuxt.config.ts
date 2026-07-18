@@ -5,6 +5,7 @@ const resolveLayerPath = (path: string) =>
   fileURLToPath(new URL(`../../${path}`, import.meta.url))
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+const isDevelopment = process.env.NODE_ENV === 'development'
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
@@ -105,6 +106,16 @@ export default defineNuxtConfig({
         disableFormHandler: true,
         enableComponentPreview: false,
         customErrorPages: true,
+        ...(isDevelopment
+          ? {
+              passThroughHeaders: [
+                'content-language',
+                'set-cookie',
+                'x-drupal-cache',
+                'x-drupal-dynamic-cache',
+              ],
+            }
+          : {}),
       },
     ],
   ] as Array<string | [string, Record<string, unknown>]>,
