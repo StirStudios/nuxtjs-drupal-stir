@@ -157,7 +157,7 @@ function restoreFadeViewportPosition() {
       :prev="prevButton"
       :prev-icon="theme.carousel.arrows?.prevIcon"
       :ui="{
-        root: theme.carousel.root,
+        root: ['stir-carousel', theme.carousel.root],
         container: 'items-center transition-[height]',
         item: gridItems,
       }"
@@ -168,3 +168,14 @@ function restoreFadeViewportPosition() {
     </UCarousel>
   </div>
 </template>
+
+<style>
+@media (min-width: 48rem) {
+  .stir-carousel:hover [data-slot='prev'],
+  .stir-carousel:hover [data-slot='next'],
+  .stir-carousel:focus-within [data-slot='prev'],
+  .stir-carousel:focus-within [data-slot='next'] {
+    opacity: 1;
+  }
+}
+</style>
