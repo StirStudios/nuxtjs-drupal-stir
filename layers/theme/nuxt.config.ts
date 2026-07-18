@@ -2,7 +2,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addTypeTemplate, useNuxt } from '@nuxt/kit'
+import {
+  addTypeTemplate,
+  findPath,
+  useNuxt,
+} from '@nuxt/kit'
+import { createJiti } from 'jiti'
 import {
   buildPresentationSource,
   loadPresentationManifest,
@@ -12,10 +17,15 @@ import {
   resolveDrupalImageDomain,
   resolveImageCdnBase,
 } from './build/imageCdn'
+import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
 const appConfigTypes = resolvePath(themeLayerDir, 'app/types/app-config.d.ts')
+const upstreamSpaLoadingTemplate = resolvePath(
+  themeLayerDir,
+  'app/spa-loading-template.html',
+)
 const compatibilitySafelistCss = resolvePath(
   themeLayerDir,
   'app/assets/css/safelist.inline.css',
@@ -36,6 +46,10 @@ const ipxRuntimeProvider = resolvePath(
   imageModuleDir,
   'runtime/providers/ipx.js',
 )
+const loadModule = createJiti(import.meta.url, {
+  interopDefault: false,
+  moduleCache: false,
+})
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
@@ -103,6 +117,56 @@ export default defineNuxtConfig({
       if (!hasCssEntry(nuxt.options.css, themeCss)) {
         nuxt.options.css.push(themeCss)
       }
+
+      const rootAppConfigPath = await findPath(
+        resolvePath(nuxt.options.srcDir, 'app.config'),
+      )
+      let rootAppConfig: {
+        ui?: { colors?: Record<string, unknown> }
+      } = {}
+
+      if (rootAppConfigPath) {
+        const globals = globalThis as typeof globalThis & {
+          defineAppConfig?: (config: unknown) => unknown
+        }
+        const previousDefineAppConfig = globals.defineAppConfig
+
+        globals.defineAppConfig = (config) => config
+
+        try {
+          const loadedAppConfig = await loadModule.import<{
+            default?: typeof rootAppConfig
+          }>(rootAppConfigPath)
+
+          rootAppConfig = loadedAppConfig.default || {}
+        } finally {
+          if (previousDefineAppConfig) {
+            globals.defineAppConfig = previousDefineAppConfig
+          } else {
+            delete globals.defineAppConfig
+          }
+        }
+      }
+
+      const spaTemplateSource = typeof nuxt.options.spaLoadingTemplate === 'string'
+        ? nuxt.options.spaLoadingTemplate
+        : upstreamSpaLoadingTemplate
+      const spaTemplate = readFileSync(spaTemplateSource, 'utf8')
+      const generatedSpaTemplateDir = resolvePath(
+        nuxt.options.rootDir,
+        'node_modules/.cache/stir-spa-loader',
+      )
+      const generatedSpaTemplate = resolvePath(
+        generatedSpaTemplateDir,
+        'spa-loading-template.html',
+      )
+
+      await mkdir(generatedSpaTemplateDir, { recursive: true })
+      await writeFile(
+        generatedSpaTemplate,
+        `${buildSpaLoaderThemeStyle(rootAppConfig)}\n${spaTemplate}`,
+      )
+      nuxt.options.spaLoadingTemplate = generatedSpaTemplate
 
       const mode = (process.env.STIR_PRESENTATION_MANIFEST_MODE || 'compatibility') as PresentationManifestMode
 

@@ -110,6 +110,14 @@ but should keep the semantic keys (`hero`, `full`, `container`, `split`, and
 components. Modal image normalization promotes Drupal's
 `modalResponsiveStyle` so the modal selects the corresponding profile.
 
+### SPA loading presentation
+
+The shared SPA loading template automatically derives its first-paint primary,
+secondary, and neutral palettes from the consumer project's `ui.colors` app
+config. This happens while Nuxt prepares the project, before Nuxt UI mounts, so
+authenticated client-rendered routes do not flash the upstream palette. Projects
+do not need to copy the loading template merely to inherit their brand colors.
+
 ### Standard Drupal field values
 
 Global components render producer-owned standard field contracts without
