@@ -14,11 +14,11 @@ const props = withDefaults(defineProps<{
 const toneClasses = computed(() => {
   switch (props.tone) {
     case 'success':
-      return 'text-emerald-700 dark:text-emerald-300'
+      return 'text-success'
     case 'warning':
-      return 'text-amber-700 dark:text-amber-300'
+      return 'text-warning'
     case 'error':
-      return 'text-red-700 dark:text-red-300'
+      return 'text-error'
     default:
       return 'text-muted'
   }
@@ -26,7 +26,11 @@ const toneClasses = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4 py-2 text-center">
+  <div
+    :aria-busy="loading"
+    aria-live="polite"
+    class="space-y-4 py-2 text-center"
+  >
     <div class="flex justify-center">
       <UIcon
         v-if="icon"
