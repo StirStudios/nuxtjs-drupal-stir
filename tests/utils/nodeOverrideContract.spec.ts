@@ -30,6 +30,12 @@ describe('node override contract', () => {
     expect(pageRoute).toContain('pageLayout.value || \'default\'')
   })
 
+  it('promotes page fetch failures to the global error page during client rendering', () => {
+    const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
+
+    expect(pageRoute).toContain('fatal: true')
+  })
+
   it('keeps the default node component forwarding every Drupal slot', () => {
     const nodeDefault = source('layers/theme/app/components/global/node--default.vue')
 

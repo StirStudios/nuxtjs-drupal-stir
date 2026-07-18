@@ -99,7 +99,11 @@ function customPageError(error: unknown) {
   const code = payload?.statusCode ?? 500
   const message = payload?.statusMessage ?? 'Page not found'
 
-  throw createError({ statusCode: code, statusMessage: message })
+  throw createError({
+    statusCode: code,
+    statusMessage: message,
+    fatal: true,
+  })
 }
 
 function getErrorPayload(
