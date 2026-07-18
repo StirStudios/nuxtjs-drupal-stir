@@ -30,13 +30,15 @@ const getIconForLabel = (label: string): string | null => {
   return iconMap[label] || null
 }
 
-type LocalTask = { label: string; url: string }
+type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
 type MenuLink = {
   label: string
   to: string
   icon: string | null
   tooltip: boolean
+  active?: boolean
+  onSelect?: (event: Event) => void
 }
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
 type AccountMenuFetchOptions = NonNullable<
@@ -62,6 +64,37 @@ const frontendReturnUrl = computed(() =>
   new URL(route.fullPath, requestUrl.origin).toString(),
 )
 
+const navigateAdminLink = (event: Event, destination: string) => {
+  const originalEvent =
+    event instanceof CustomEvent && event.detail?.originalEvent instanceof Event
+      ? event.detail.originalEvent
+      : event
+
+  if (
+    originalEvent instanceof MouseEvent &&
+    (originalEvent.metaKey ||
+      originalEvent.ctrlKey ||
+      originalEvent.shiftKey ||
+      originalEvent.altKey)
+  ) {
+    return
+  }
+
+  originalEvent.preventDefault()
+
+  if (import.meta.client) {
+    window.location.assign(destination)
+  }
+}
+
+const getAdminLinkSelectHandler = (destination: string) => {
+  const destinationOrigin = new URL(destination, requestUrl.origin).origin
+
+  return destinationOrigin === drupalOrigin.value
+    ? (event: Event) => navigateAdminLink(event, destination)
+    : undefined
+}
+
 const tabs = computed<LocalTasks>(() => {
   const localTasks = page.value?.local_tasks as Partial<LocalTasks> | undefined
 
@@ -73,16 +106,20 @@ const tabs = computed<LocalTasks>(() => {
 
 const localTaskLinks = computed(() =>
   tabs.value.primary
-    .map((tab: LocalTask) => {
+    .map((tab: LocalTask): MenuLink | null => {
       const rawTo = getValidTo(tab.url)
 
       if (!rawTo) return null
 
+      const to = normalizeAdminUrl(rawTo)
+
       return {
         label: tab.label,
-        to: normalizeAdminUrl(rawTo),
+        to,
         icon: getIconForLabel(tab.label),
         tooltip: isCompactTabs.value,
+        active: tab.active === true,
+        onSelect: getAdminLinkSelectHandler(to),
       }
     })
     .filter((tab): tab is MenuLink => tab !== null),
@@ -191,17 +228,20 @@ const loadAccountMenu = async () => {
     const menuItems = Array.isArray(rawMenu) ? rawMenu : []
 
     accountMenu.value = menuItems
-      .map((item) => {
+      .map((item): MenuLink | null => {
         const label = item.title || ''
         const rawTo = getValidTo(item.relative || item.url)
 
         if (!label || !rawTo) return null
 
+        const to = normalizeAdminUrl(rawTo)
+
         return {
           label,
-          to: normalizeAdminUrl(rawTo),
+          to,
           icon: getIconForLabel(label),
           tooltip: isCompactTabs.value,
+          onSelect: getAdminLinkSelectHandler(to),
         }
       })
       .filter((item): item is MenuLink => item !== null)
@@ -245,18 +285,21 @@ watch(
 )
 
 const links = computed(() => {
+  const dashboardTo = normalizeAdminUrl('/admin/content')
   const baseLinks = [
     [
       {
         label: 'Drupal CMS',
         icon: getIconForLabel('Drupal CMS'),
-        to: normalizeAdminUrl('/admin/content'),
+        to: dashboardTo,
         tooltip: isCompactTabs.value,
+        onSelect: getAdminLinkSelectHandler(dashboardTo),
       },
     ],
   ]
 
   const tasks = localTaskLinks.value.length ? [localTaskLinks.value] : []
+  const accountTo = normalizeAdminUrl('/user')
   const accountItem = accountMenu.value.length
     ? {
         label: user.value?.name || 'Account',
@@ -267,52 +310,25 @@ const links = computed(() => {
     : {
         label: user.value?.name || 'Account',
         icon: getIconForLabel('My account'),
-        to: normalizeAdminUrl('/user'),
+        to: accountTo,
         tooltip: isCompactTabs.value,
+        onSelect: getAdminLinkSelectHandler(accountTo),
       }
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
 
-const handleNavigationClick = (event: MouseEvent) => {
-  if (
-    event.defaultPrevented ||
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey
-  ) {
-    return
-  }
-
-  const target = event.target
-
-  if (!(target instanceof Element)) return
-
-  const anchor = target.closest<HTMLAnchorElement>('a[href]')
-
-  if (!anchor) return
-
-  const destination = new URL(anchor.href, window.location.href)
-
-  if (destination.origin !== drupalOrigin.value) return
-
-  event.preventDefault()
-  window.location.assign(destination.toString())
-}
 </script>
 
 <template>
   <UTheme :ui="adminUiTheme">
-    <div class="contents" @click.capture="handleNavigationClick">
-      <UNavigationMenu
-        color="neutral"
-        content-orientation="vertical"
-        :items="links"
-        variant="link"
-      />
-    </div>
+    <UNavigationMenu
+      aria-label="Drupal administration"
+      color="neutral"
+      content-orientation="vertical"
+      :items="links"
+      variant="link"
+    />
   </UTheme>
 </template>
 
