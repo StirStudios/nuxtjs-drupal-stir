@@ -263,6 +263,7 @@ describe('layer contract', () => {
 
     expect(accessibilitySpec).toContain('analyzeStablePage')
     expect(accessibilitySpec).toContain('isTransitionRace')
+    expect(accessibilitySpec).toContain('revealStableFullPage')
     expect(accessibilitySpec).toContain(
       'Do not replace a shared brand or semantic color token',
     )

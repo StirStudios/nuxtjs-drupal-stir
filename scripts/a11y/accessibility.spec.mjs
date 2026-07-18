@@ -184,6 +184,23 @@ const revealFullPage = async (page) => {
     await pause(250)
   })
 }
+const revealStableFullPage = async (page) => {
+  try {
+    await revealFullPage(page)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    if (!message.includes('Execution context was destroyed')) throw error
+
+    // Nuxt may perform one client navigation while a managed dev server warms.
+    // Wait for the replacement document and repeat the read-only reveal once.
+    // A second interruption remains a real test failure.
+    await page.waitForLoadState('load')
+    await page.locator('main').waitFor({ state: 'visible' })
+    await page.locator('h1').waitFor({ state: 'visible' })
+    await revealFullPage(page)
+  }
+}
 const analyzePage = (page, includeSelector) => {
   const builder = new AxeBuilder({ page })
     .exclude('nuxt-devtools-frame')
@@ -254,7 +271,7 @@ test.describe('automated accessibility', () => {
           }
         `,
       })
-      await revealFullPage(page)
+      await revealStableFullPage(page)
       await page.waitForTimeout(motionSettleMs)
       const results = await analyzeStablePage(page)
       await testInfo.attach('axe-results', {
