@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
+import { useIntersectionObserver, usePreferredReducedMotion } from '@vueuse/core'
 import {
   resolveCarouselArrowButton,
 } from '#stir/utils/nuxtUiProps'
@@ -38,6 +39,21 @@ const theme = useAppConfig().stirTheme
 const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
+
+type CarouselController = {
+  emblaApi?: {
+    plugins: () => {
+      autoplay?: {
+        play: () => void
+        stop: () => void
+      }
+    }
+  }
+}
+
+const carousel = useTemplateRef<CarouselController>('carousel')
+const preferredMotion = usePreferredReducedMotion()
+const carouselIsVisible = ref(false)
 const carouselImageDeliverySizes = computed(() =>
   resolveCarouselImageDeliverySizes(
     props.gridItems,
@@ -49,6 +65,11 @@ provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
 
 onMounted(() => {
   mounted.value = true
+
+  if (!intersectionObserverSupported.value) {
+    carouselIsVisible.value = true
+    syncAutoplay()
+  }
 })
 
 const slides = computed(() => {
@@ -79,7 +100,7 @@ const autoScrollSpeed = computed(() => {
 })
 
 const autoScrollOptions = computed(() =>
-  props.carouselAutoscroll
+  props.carouselAutoscroll && preferredMotion.value !== 'reduce'
     ? {
         speed: autoScrollSpeed.value,
         startDelay: 0,
@@ -90,9 +111,10 @@ const autoScrollOptions = computed(() =>
 )
 
 const autoplayOptions = computed(() =>
-  !props.carouselAutoscroll
+  !props.carouselAutoscroll && preferredMotion.value !== 'reduce'
     ? {
         delay: interval.value,
+        playOnInit: false,
         stopOnMouseEnter: true,
         stopOnInteraction: false,
       }
@@ -108,6 +130,38 @@ const nextButton = computed(() =>
 const carouselLabel = computed(() =>
   `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
 )
+
+function autoplayPlugin() {
+  return carousel.value?.emblaApi?.plugins().autoplay
+}
+
+function syncAutoplay() {
+  if (
+    !mounted.value
+    || props.carouselAutoscroll
+    || preferredMotion.value === 'reduce'
+    || !carouselIsVisible.value
+  ) {
+    autoplayPlugin()?.stop()
+    return
+  }
+
+  // The autoplay plugin applies the configured delay before advancing, so
+  // starting it when the carousel enters view preserves Drupal's interval for
+  // the first transition as well as every later one.
+  autoplayPlugin()?.play()
+}
+
+const { isSupported: intersectionObserverSupported } = useIntersectionObserver(
+  carouselRoot,
+  ([entry]) => {
+    carouselIsVisible.value = Boolean(entry?.isIntersecting)
+    syncAutoplay()
+  },
+  { threshold: 0.1 },
+)
+
+watch([carousel, preferredMotion, interval], syncAutoplay, { flush: 'post' })
 
 function restoreFadeViewportPosition() {
   if (!props.carouselFade) return
@@ -142,6 +196,7 @@ function restoreFadeViewportPosition() {
 
     <UCarousel
       v-if="slides.length"
+      ref="carousel"
       v-slot="{ item }"
       :aria-label="carouselLabel"
       :arrows="mounted ? carouselArrows : false"

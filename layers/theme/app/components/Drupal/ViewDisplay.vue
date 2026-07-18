@@ -159,21 +159,22 @@ const getRowMotionProps = (index: number) =>
         </div>
       </div>
     </div>
-    <ParagraphCarousel
-    v-if="carousel"
-    :id="`${viewId}-${displayId}`"
-    :carousel-arrows="carouselArrows"
-    :carousel-autoheight="carouselAutoheight"
-    :carousel-autoscroll="carouselAutoscroll"
-    :carousel-fade="carouselFade"
-    :carousel-indicators="carouselIndicators"
-    :carousel-interval="carouselInterval"
-    :grid-items="gridItems"
-    :items="getCarouselRows()"
-    :randomize="randomizeEnabled"
-    :spacing="spacing"
-    :width="width"
-  />
+    <LazyParagraphCarousel
+      v-if="carousel"
+      :id="`${viewId}-${displayId}`"
+      :carousel-arrows="carouselArrows"
+      :carousel-autoheight="carouselAutoheight"
+      :carousel-autoscroll="carouselAutoscroll"
+      :carousel-fade="carouselFade"
+      :carousel-indicators="carouselIndicators"
+      :carousel-interval="carouselInterval"
+      :grid-items="gridItems"
+      hydrate-on-visible
+      :items="getCarouselRows()"
+      :randomize="randomizeEnabled"
+      :spacing="spacing"
+      :width="width"
+    />
 
     <WrapGrid
     v-else-if="isLoading"
