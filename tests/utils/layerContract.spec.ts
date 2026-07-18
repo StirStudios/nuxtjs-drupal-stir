@@ -508,9 +508,15 @@ describe('layer contract', () => {
       resolve(rootDir, 'layers/auth/app/components/Auth/AuthFormPanel.vue'),
       'utf8',
     )
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
 
     expect(authFormPanel).toContain('<template #title>')
     expect(authFormPanel).toContain('<h1 class="mb-0! text-xl! font-semibold!">{{ title }}</h1>')
+    expect(themeConfig).toMatch(/class:\s*['"]min-h-12['"]/)
+    expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })
 
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
@@ -541,6 +547,16 @@ describe('layer contract', () => {
     expect(paragraphText).toContain('<LazyRevealMotion')
     expect(paragraphText).toContain('v-if="hasRevealMotion"')
     expect(paragraphText).toContain('v-else')
+  })
+
+  it('keeps view-card reveal delays short for visible grid rows', () => {
+    const viewDisplay = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/Drupal/ViewDisplay.vue'),
+      'utf8',
+    )
+
+    expect(viewDisplay).toMatch(/getRevealDelayMs\(index, \{ mode: ['"]dense['"] \}\)/)
+    expect(viewDisplay).not.toContain(': getRevealDelayMs(index)')
   })
 
   it('registers video iframes explicitly without subscriber polling', () => {

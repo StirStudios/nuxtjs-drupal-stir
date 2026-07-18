@@ -28,6 +28,10 @@ export default defineAppConfig({
     auth: {
       backgroundClass: 'bg-muted/50 dark:bg-default',
       showBackgroundDecoration: true,
+      submitButton: {
+        class: 'min-h-12',
+        size: 'xl',
+      },
     },
 
     navigation: {

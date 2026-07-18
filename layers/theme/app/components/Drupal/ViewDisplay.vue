@@ -115,7 +115,7 @@ const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(pr
 const getRowMotionProps = (index: number) =>
   getRevealMotionProps(
     props.direction,
-    props.direction ? getRevealDelayMs(index, { mode: 'dense' }) : getRevealDelayMs(index),
+    getRevealDelayMs(index, { mode: 'dense' }),
     { ssrVisible: true },
   )
 
