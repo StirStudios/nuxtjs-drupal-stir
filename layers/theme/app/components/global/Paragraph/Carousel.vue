@@ -33,6 +33,7 @@ const props = defineProps<{
 const theme = useAppConfig().stirTheme
 const slots = useSlots()
 const mounted = ref(false)
+const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
 
 onMounted(() => {
   mounted.value = true
@@ -95,10 +96,27 @@ const nextButton = computed(() =>
 const carouselLabel = computed(() =>
   `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
 )
+
+function restoreFadeViewportPosition() {
+  if (!props.carouselFade) return
+
+  const viewport = carouselRoot.value?.querySelector<HTMLElement>(
+    '[data-slot="viewport"]',
+  )
+
+  if (viewport?.scrollLeft) {
+    viewport.scrollLeft = 0
+  }
+}
 </script>
 
 <template>
-  <div class="relative z-10" :class="[theme.carousel.padding, width, spacing]">
+  <div
+    ref="carouselRoot"
+    class="relative z-10"
+    :class="[theme.carousel.padding, width, spacing]"
+    @focusin.capture="restoreFadeViewportPosition"
+  >
     <component :is="headerTag || 'h2'" v-if="header">
       {{ header }}
     </component>
