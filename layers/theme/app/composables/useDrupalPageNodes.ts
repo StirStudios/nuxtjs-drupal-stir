@@ -24,7 +24,11 @@ export function getDrupalPageNodeView(
 export function getDrupalPageNodeViewTargetId(node: VNode | undefined): string {
   const targetId = getDrupalPageNodeView(node)?.targetId
 
-  return typeof targetId === 'string' ? targetId : ''
+  if (typeof targetId === 'string' && targetId) return targetId
+
+  const viewId = getVNodeProp<unknown>(node, 'viewId')
+
+  return typeof viewId === 'string' ? viewId : ''
 }
 
 export function isDrupalPageViewNode(
