@@ -25,10 +25,9 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(platformConfig).toContain('...(isDevelopment')
-    expect(platformConfig).toContain('passThroughHeaders: [')
-    expect(platformConfig).not.toContain(
-      'passThroughHeaders: [\n                \'cache-control\'',
+    expect(platformConfig).toContain('\'modules:done\'()')
+    expect(platformConfig).toContain(
+      'header => header.toLowerCase() !== \'cache-control\'',
     )
   })
 

@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url'
+import { useNuxt } from '@nuxt/kit'
 import { normalizeEnvironmentUrl } from '../../config/runtime'
 
 const resolveLayerPath = (path: string) =>
@@ -106,17 +107,22 @@ export default defineNuxtConfig({
         disableFormHandler: true,
         enableComponentPreview: false,
         customErrorPages: true,
-        ...(isDevelopment
-          ? {
-              passThroughHeaders: [
-                'content-language',
-                'set-cookie',
-                'x-drupal-cache',
-                'x-drupal-dynamic-cache',
-              ],
-            }
-          : {}),
       },
     ],
   ] as Array<string | [string, Record<string, unknown>]>,
+
+  hooks: {
+    'modules:done'() {
+      if (!isDevelopment) return
+
+      const nuxt = useNuxt()
+      const drupalCe = nuxt.options.runtimeConfig.drupalCe as {
+        passThroughHeaders?: string[]
+      }
+
+      drupalCe.passThroughHeaders = drupalCe.passThroughHeaders?.filter(
+        header => header.toLowerCase() !== 'cache-control',
+      )
+    },
+  },
 })
