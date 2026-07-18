@@ -36,7 +36,7 @@ const toneClasses = computed(() => {
       />
     </div>
     <div class="space-y-2">
-      <h1 class="text-highlighted text-xl font-semibold">
+      <h1 class="text-highlighted mb-0! text-xl! font-semibold!">
         {{ title }}
       </h1>
       <p class="text-muted mx-auto max-w-sm text-sm leading-6">
