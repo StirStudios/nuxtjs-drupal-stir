@@ -39,6 +39,12 @@ function getHashElement(hash: string) {
   return document.getElementById(decodedId) || document.getElementById(rawId)
 }
 
+function getHashScrollBehavior() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 'auto' as const
+    : 'smooth' as const
+}
+
 async function waitForHashElement(hash: string) {
   for (let attempt = 0; attempt < HASH_TARGET_ATTEMPTS; attempt += 1) {
     const element = getHashElement(hash)
@@ -96,10 +102,12 @@ export default <RouterOptions>{
       return element
         ? {
             top: element.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_TOP,
-            behavior: 'smooth' as const,
+            behavior: getHashScrollBehavior(),
           }
         : { top: 0 }
     }
+
+    await waitForRoutePageFinish(to.path, from.path)
 
     return { top: 0 }
   },

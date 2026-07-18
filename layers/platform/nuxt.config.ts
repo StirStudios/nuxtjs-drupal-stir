@@ -14,14 +14,6 @@ const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 export default defineNuxtConfig({
   extends: ['../foundation', '../core', '../theme'],
 
-  app: {
-    head: {
-      htmlAttrs: {
-        class: 'scroll-smooth',
-      },
-    },
-  },
-
   vite: {
     optimizeDeps: {
       include: [

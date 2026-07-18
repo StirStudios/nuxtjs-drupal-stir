@@ -1,6 +1,9 @@
 import type { Ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
 
+const RESTORE_HEIGHT_ATTEMPTS = 180
+const RESTORE_HEIGHT_TOLERANCE = 8
+
 interface DrupalViewScrollRestoreProps {
   displayId?: string
   parentUuid?: string
@@ -13,14 +16,36 @@ interface UseDrupalViewScrollRestoreOptions {
   viewRoot: Readonly<Ref<HTMLElement | null>>
 }
 
+export function shouldRestoreDrupalViewScroll(
+  isHistoryNavigation: boolean,
+  restoreTargetPath: string | null,
+  routeFullPath: string,
+) {
+  return isHistoryNavigation || restoreTargetPath === routeFullPath
+}
+
+export function canRestoreDrupalViewScroll(
+  top: number,
+  scrollHeight: number,
+  viewportHeight: number,
+) {
+  return scrollHeight - viewportHeight >= top - RESTORE_HEIGHT_TOLERANCE
+}
+
+function nextFrame() {
+  return new Promise(resolve => requestAnimationFrame(resolve))
+}
+
 export function useDrupalViewScrollRestore(
   props: DrupalViewScrollRestoreProps,
   options: UseDrupalViewScrollRestoreOptions,
 ) {
   const route = useRoute()
   const restoredScrollPosition = ref(false)
+  const restoringScrollPosition = ref(false)
   const isHistoryNavigation = ref(false)
   const restoreTargetKey = 'stir:view-scroll-restore-target'
+  let restoreRunId = 0
 
   function scrollStorageKeyFor(fullPath = route.fullPath) {
     return [
@@ -44,10 +69,11 @@ export function useDrupalViewScrollRestore(
     )
   }
 
-  function restoreScrollPosition() {
+  async function restoreScrollPosition() {
     if (
       !import.meta.client ||
-      restoredScrollPosition.value
+      restoredScrollPosition.value ||
+      restoringScrollPosition.value
     ) {
       return
     }
@@ -72,21 +98,38 @@ export function useDrupalViewScrollRestore(
         return
       }
 
+      restoringScrollPosition.value = true
+      const runId = ++restoreRunId
+
+      for (let attempt = 0; attempt < RESTORE_HEIGHT_ATTEMPTS; attempt += 1) {
+        if (runId !== restoreRunId) return
+
+        if (canRestoreDrupalViewScroll(
+          top,
+          document.documentElement.scrollHeight,
+          window.innerHeight,
+        )) {
+          break
+        }
+
+        await nextFrame()
+      }
+
+      if (runId !== restoreRunId) return
+
+      window.scrollTo({
+        top,
+        behavior: 'instant',
+      })
       restoredScrollPosition.value = true
       isHistoryNavigation.value = false
       sessionStorage.removeItem(restoreTargetKey)
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({
-            top,
-            behavior: 'instant',
-          })
-        })
-      })
     }
     catch {
       sessionStorage.removeItem(scrollStorageKeyFor())
+    }
+    finally {
+      restoringScrollPosition.value = false
     }
   }
 
@@ -148,15 +191,13 @@ export function useDrupalViewScrollRestore(
       saveScrollPosition(scrollStorageKeyFor(oldFullPath))
       restoredScrollPosition.value = false
 
-      if (
-        isHistoryNavigation.value ||
-        sessionStorage.getItem(restoreTargetKey) === route.fullPath
-      ) {
+      if (shouldRestoreDrupalViewScroll(
+        isHistoryNavigation.value,
+        sessionStorage.getItem(restoreTargetKey),
+        route.fullPath,
+      )) {
         nextTick(restoreScrollPosition)
-        return
       }
-
-      scrollToViewTop()
     },
   )
 
@@ -167,6 +208,7 @@ export function useDrupalViewScrollRestore(
   })
 
   onBeforeUnmount(() => {
+    restoreRunId += 1
     saveScrollPosition()
   })
 
