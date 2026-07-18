@@ -273,16 +273,46 @@ const links = computed(() => {
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
+
+const handleNavigationClick = (event: MouseEvent) => {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+
+  const target = event.target
+
+  if (!(target instanceof Element)) return
+
+  const anchor = target.closest<HTMLAnchorElement>('a[href]')
+
+  if (!anchor) return
+
+  const destination = new URL(anchor.href, window.location.href)
+
+  if (destination.origin !== drupalOrigin.value) return
+
+  event.preventDefault()
+  window.location.assign(destination.toString())
+}
 </script>
 
 <template>
   <UTheme :ui="adminUiTheme">
-    <UNavigationMenu
-      color="neutral"
-      content-orientation="vertical"
-      :items="links"
-      variant="link"
-    />
+    <div class="contents" @click.capture="handleNavigationClick">
+      <UNavigationMenu
+        color="neutral"
+        content-orientation="vertical"
+        :items="links"
+        variant="link"
+      />
+    </div>
   </UTheme>
 </template>
 
