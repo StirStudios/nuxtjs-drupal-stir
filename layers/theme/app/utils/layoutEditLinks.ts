@@ -5,7 +5,7 @@ export type LayoutEditLinkIndex = ReadonlyMap<string, string>
 export const layoutEditLinksKey: InjectionKey<ComputedRef<LayoutEditLinkIndex>> =
   Symbol('stir-layout-edit-links')
 
-/** Adds the current frontend page as Drupal's post-edit destination. */
+/** Adds the current frontend page as Drupal's trusted post-edit destination. */
 export function withEditorDestination(
   editLink: string,
   frontendUrl: string,
@@ -22,7 +22,12 @@ export function withEditorDestination(
       return editLink
     }
 
-    backend.searchParams.set('destination', frontend.toString())
+    // Core reserves `destination` for internal redirects and may reject an
+    // absolute URL while rebuilding or submitting an entity form. The
+    // trusted_redirect module owns `trusted_destination` and validates its
+    // hostname before allowing the external return.
+    backend.searchParams.delete('destination')
+    backend.searchParams.set('trusted_destination', frontend.toString())
     return backend.toString()
   }
   catch {

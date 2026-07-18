@@ -50,12 +50,12 @@ describe('buildLayoutEditLinkIndex', () => {
 })
 
 describe('withEditorDestination', () => {
-  it('replaces Drupal destination with the current frontend page', () => {
+  it('replaces Drupal destination with a trusted frontend return', () => {
     expect(withEditorDestination(
       'https://cms.example.com/node/3/edit?destination=%2Fnode%2F3',
       'https://www.example.com/contact?preview=1#section-6',
     )).toBe(
-      'https://cms.example.com/node/3/edit?destination=https%3A%2F%2Fwww.example.com%2Fcontact%3Fpreview%3D1%23section-6',
+      'https://cms.example.com/node/3/edit?trusted_destination=https%3A%2F%2Fwww.example.com%2Fcontact%3Fpreview%3D1%23section-6',
     )
   })
 
