@@ -510,7 +510,7 @@ describe('layer contract', () => {
     )
 
     expect(authFormPanel).toContain('<template #title>')
-    expect(authFormPanel).toContain('<h1>{{ title }}</h1>')
+    expect(authFormPanel).toContain('<h1 class="mb-0! text-xl! font-semibold!">{{ title }}</h1>')
   })
 
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {

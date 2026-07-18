@@ -152,6 +152,18 @@ ${violation.helpUrl}
 ${nodes}`
     })
     .join('\n\n')
+const assertNoViolations = (violations, context) => {
+  if (violations.length === 0) return
+  const affectedElements = violations.reduce(
+    (total, violation) => total + violation.nodes.length,
+    0,
+  )
+  const ruleLabel = violations.length === 1 ? 'rule' : 'rules'
+  const elementLabel = affectedElements === 1 ? 'element' : 'elements'
+  throw new Error(
+    `Accessibility audit failed ${context}: ${violations.length} ${ruleLabel} affected ${affectedElements} ${elementLabel}.\n\n${formatViolations(violations)}`,
+  )
+}
 const revealFullPage = async (page) => {
   await page.evaluate(async () => {
     const pause = (duration) =>
@@ -198,6 +210,19 @@ test.describe('automated accessibility', () => {
       // landmark or heading still fails deterministically at this boundary.
       await page.locator('main').first().waitFor({ state: 'attached' })
       await page.locator('h1').first().waitFor({ state: 'attached' })
+      // Measure stable rendered colors rather than a midpoint from a theme,
+      // hover, carousel, or hydration transition.
+      await page.addStyleTag({
+        content: `
+          *, *::before, *::after {
+            animation-delay: 0s !important;
+            animation-duration: 0s !important;
+            scroll-behavior: auto !important;
+            transition-delay: 0s !important;
+            transition-duration: 0s !important;
+          }
+        `,
+      })
       await revealFullPage(page)
       await page.waitForTimeout(motionSettleMs)
       const results = await analyzePage(page)
@@ -205,12 +230,7 @@ test.describe('automated accessibility', () => {
         body: JSON.stringify(results, null, 2),
         contentType: 'application/json',
       })
-      expect(
-        results.violations.length,
-        `Accessibility violations found on ${route}:
-
-${formatViolations(results.violations)}`,
-      ).toBe(0)
+      assertNoViolations(results.violations, `on ${route}`)
       const opaqueTargets = page.locator(opaqueSelector)
       for (let index = 0; index < (await opaqueTargets.count()); index += 1) {
         const opaqueTarget = opaqueTargets.nth(index)
@@ -240,12 +260,10 @@ ${formatViolations(results.violations)}`,
           body: JSON.stringify(hoverResults, null, 2),
           contentType: 'application/json',
         })
-        expect(
-          hoverResults.violations.length,
-          `Accessibility violations found while hovering target ${index + 1} on ${route}:
-
-${formatViolations(hoverResults.violations)}`,
-        ).toBe(0)
+        assertNoViolations(
+          hoverResults.violations,
+          `while hovering target ${index + 1} on ${route}`,
+        )
       }
     })
   }
