@@ -119,6 +119,7 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       to: fullEditLink.value,
+      navigateInPlace: true,
     })
   }
 
@@ -136,6 +137,7 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       to: layoutEditLink.value,
+      navigateInPlace: true,
     })
   }
 

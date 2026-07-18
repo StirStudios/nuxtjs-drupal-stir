@@ -27,6 +27,9 @@ const closeAllTooltips = () => {
   tooltipOpen.value = {}
 }
 
+const rendersActionAsButton = (action: EditAction) =>
+  props.renderAsButtons === true || action.navigateInPlace === true
+
 const openActionInBrowser = (action: EditAction) => {
   if (!action.to || !import.meta.client) return
 
@@ -46,7 +49,7 @@ const openActionInBrowser = (action: EditAction) => {
 const handleActionClick = (action: EditAction) => {
   closeAllTooltips()
 
-  if (action.to && props.renderAsButtons === true) {
+  if (action.to && rendersActionAsButton(action)) {
     openActionInBrowser(action)
   }
 
@@ -89,9 +92,9 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
           color="neutral"
           :disabled="action.disabled"
           :icon="action.icon"
-          :rel="props.renderAsButtons ? undefined : action.rel"
-          :target="props.renderAsButtons ? undefined : action.target"
-          :to="props.renderAsButtons ? undefined : action.to"
+          :rel="rendersActionAsButton(action) ? undefined : action.rel"
+          :target="rendersActionAsButton(action) ? undefined : action.target"
+          :to="rendersActionAsButton(action) ? undefined : action.to"
           :ui="{ base: action.buttonClass }"
           :variant="action.variant"
           @click="handleActionClick(action)"
