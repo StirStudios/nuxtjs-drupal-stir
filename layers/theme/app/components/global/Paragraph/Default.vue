@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CustomElementNode } from '#stir/types'
+import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 
 const isDev = import.meta.dev
 
@@ -15,6 +16,14 @@ const props = defineProps<{
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
+const route = useRoute()
+const requestUrl = useRequestURL()
+const editLink = computed(() => {
+  const link = typeof props.editLink === 'string' ? props.editLink.trim() : ''
+  const frontendUrl = new URL(route.fullPath, requestUrl.origin).toString()
+
+  return link ? withEditorDestination(link, frontendUrl) : ''
+})
 
 const toPascalCase = (value: string) =>
   value
@@ -125,9 +134,9 @@ const suggestedComponentPath = computed(() => {
         Suggested file:
         <code>{{ suggestedComponentPath }}</code>
       </p>
-      <p v-if="props.editLink" class="mb-4">
+      <p v-if="editLink" class="mb-4">
         Drupal edit link:
-        <ULink class="underline" rel="noopener noreferrer" target="_blank" :to="props.editLink">
+        <ULink class="underline" :to="editLink">
           Open paragraph edit form
         </ULink>
       </p>

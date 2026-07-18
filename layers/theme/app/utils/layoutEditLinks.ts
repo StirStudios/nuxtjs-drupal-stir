@@ -5,6 +5,31 @@ export type LayoutEditLinkIndex = ReadonlyMap<string, string>
 export const layoutEditLinksKey: InjectionKey<ComputedRef<LayoutEditLinkIndex>> =
   Symbol('stir-layout-edit-links')
 
+/** Adds the current frontend page as Drupal's post-edit destination. */
+export function withEditorDestination(
+  editLink: string,
+  frontendUrl: string,
+): string {
+  try {
+    const backend = new URL(editLink)
+    const frontend = new URL(frontendUrl)
+    const allowedSchemes = new Set(['http:', 'https:'])
+
+    if (
+      !allowedSchemes.has(backend.protocol)
+      || !allowedSchemes.has(frontend.protocol)
+    ) {
+      return editLink
+    }
+
+    backend.searchParams.set('destination', frontend.toString())
+    return backend.toString()
+  }
+  catch {
+    return editLink
+  }
+}
+
 export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
   const links = new Map<string, string>()
   const visited = new WeakSet<object>()

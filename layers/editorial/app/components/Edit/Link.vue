@@ -3,6 +3,7 @@ import type { EditAction } from '#stir/types'
 import {
   buildLayoutEditLinkIndex,
   layoutEditLinksKey,
+  withEditorDestination,
 } from '#stir/utils/layoutEditLinks'
 
 defineOptions({
@@ -28,44 +29,50 @@ const emit = defineEmits<{
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
+const route = useRoute()
+const requestUrl = useRequestURL()
 const providedLayoutEditLinks = inject(layoutEditLinksKey, null)
 const fallbackLayoutEditLinks = providedLayoutEditLinks
   ? null
   : computed(() => buildLayoutEditLinkIndex(page.value))
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
-const fullEditLink = computed(() =>
-  typeof props.link === 'string' ? props.link.trim() : '',
+const frontendReturnUrl = computed(() =>
+  new URL(route.fullPath, requestUrl.origin).toString(),
 )
+const fullEditLink = computed(() => {
+  const link = typeof props.link === 'string' ? props.link.trim() : ''
+
+  return link ? withEditorDestination(link, frontendReturnUrl.value) : ''
+})
 const hasLink = computed(() => fullEditLink.value.length > 0)
-const isExternalLink = computed(() => /^https?:\/\//.test(fullEditLink.value))
 
 const layoutEditLink = computed(() => {
   const explicitLink =
     typeof props.layoutLink === 'string' ? props.layoutLink.trim() : ''
 
-  if (explicitLink) return explicitLink
+  if (explicitLink) {
+    return withEditorDestination(explicitLink, frontendReturnUrl.value)
+  }
 
   const parentUuid =
     typeof props.parentUuid === 'string' ? props.parentUuid.trim() : ''
 
   if (!parentUuid) return ''
 
-  return (
+  const link = (
     providedLayoutEditLinks?.value.get(parentUuid)
     ?? fallbackLayoutEditLinks?.value.get(parentUuid)
     ?? ''
   )
+
+  return link ? withEditorDestination(link, frontendReturnUrl.value) : ''
 })
 const hasLayoutLink = computed(
   () =>
     layoutEditLink.value.length > 0 &&
     layoutEditLink.value !== fullEditLink.value,
 )
-const isExternalLayoutLink = computed(() =>
-  /^https?:\/\//.test(layoutEditLink.value),
-)
-
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const layoutEditLabel = computed(() => 'Edit layout')
@@ -102,9 +109,7 @@ const actions = computed<EditAction[]>(() => {
     const tooltip = hasSingleAction
       ? singleActionLabel.value
       : fullEditLabel.value
-    const ariaLabel = isExternalLink.value
-      ? `${tooltip} (opens in a new tab)`
-      : `${tooltip} this section`
+    const ariaLabel = `${tooltip} this section`
 
     result.push({
       key: 'full',
@@ -114,8 +119,6 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       to: fullEditLink.value,
-      target: isExternalLink.value ? '_blank' : undefined,
-      rel: isExternalLink.value ? 'noopener noreferrer' : undefined,
     })
   }
 
@@ -123,9 +126,7 @@ const actions = computed<EditAction[]>(() => {
     const tooltip = hasSingleAction
       ? singleActionLabel.value
       : layoutEditLabel.value
-    const ariaLabel = isExternalLayoutLink.value
-      ? `${tooltip} (opens in a new tab)`
-      : `${tooltip} this layout`
+    const ariaLabel = `${tooltip} this layout`
 
     result.push({
       key: 'layout',
@@ -135,8 +136,6 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       to: layoutEditLink.value,
-      target: isExternalLayoutLink.value ? '_blank' : undefined,
-      rel: isExternalLayoutLink.value ? 'noopener noreferrer' : undefined,
     })
   }
 

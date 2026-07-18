@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
+import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
 const route = useRoute()
+const requestUrl = useRequestURL()
 const config = useRuntimeConfig()
 const user = computed(() => page.value?.current_user || null)
 const { hasEditorialAccess, isAuthenticated } = usePageContext()
@@ -56,6 +58,9 @@ const getValidTo = (value: unknown): string | null => {
 }
 
 const isCompactTabs = useMediaQuery('(max-width: 767px)')
+const frontendReturnUrl = computed(() =>
+  new URL(route.fullPath, requestUrl.origin).toString(),
+)
 
 const tabs = computed<LocalTasks>(() => {
   const localTasks = page.value?.local_tasks as Partial<LocalTasks> | undefined
@@ -145,7 +150,10 @@ const normalizeAdminUrl = (value: string): string => {
     return '/account/settings'
   }
 
-  return toDrupalUrl(value, drupalOrigin.value)
+  return withEditorDestination(
+    toDrupalUrl(value, drupalOrigin.value),
+    frontendReturnUrl.value,
+  )
 }
 
 const getAccountMenuUrl = (): string => {
