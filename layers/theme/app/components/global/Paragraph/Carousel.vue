@@ -3,6 +3,10 @@ import type { VNode } from 'vue'
 import {
   resolveCarouselArrowButton,
 } from '#stir/utils/nuxtUiProps'
+import {
+  carouselImageDeliverySizesKey,
+  resolveCarouselImageDeliverySizes,
+} from '#stir/utils/imageDelivery'
 
 const props = defineProps<{
   id?: number | string
@@ -34,6 +38,14 @@ const theme = useAppConfig().stirTheme
 const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
+const carouselImageDeliverySizes = computed(() =>
+  resolveCarouselImageDeliverySizes(
+    props.gridItems,
+    theme.media.image.profiles.full,
+  ),
+)
+
+provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
 
 onMounted(() => {
   mounted.value = true

@@ -42,8 +42,8 @@ export const nuxtUiTheme = {
         horizontal: {
           container: '-ms-0 flex-row',
           item: 'ps-0',
-          prev: 'start-5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 sm:start-5',
-          next: 'end-5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 sm:end-5',
+          prev: 'start-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex',
+          next: 'end-5 top-1/2 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 md:inline-flex',
         },
       },
     },

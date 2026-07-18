@@ -4,6 +4,7 @@ import { useIntersectionObserver } from '@vueuse/core'
 import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
+  carouselImageDeliverySizesKey,
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '#stir/utils/imageDelivery'
@@ -61,12 +62,14 @@ const normalizedLoading = computed<'lazy' | 'eager'>(() => {
 })
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
+const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const providerSizes = computed(() =>
   props.deliverySizes?.trim()
+  || carouselDeliverySizes?.value?.trim()
   || resolveImageDeliveryProfile(
     props.responsiveStyle,
     isHero.value,

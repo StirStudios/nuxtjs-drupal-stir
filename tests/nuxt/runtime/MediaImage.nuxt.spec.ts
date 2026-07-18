@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
+import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
   it('accepts a canonical provider source without leaking it into markup', async () => {
@@ -107,6 +108,40 @@ describe('MediaImage (Nuxt runtime)', () => {
       expect(wrapper.get('img').attributes('sizes')).toBe(
         '(max-width: 640px) 210px, (max-width: 768px) 270px, 330px',
       )
+    }
+    finally {
+      appConfig.stirImageDelivery = previousDelivery
+    }
+  })
+
+  it('uses a full-width carousel profile instead of a nested card profile', async () => {
+    const appConfig = useAppConfig()
+    const previousDelivery = appConfig.stirImageDelivery
+
+    appConfig.stirImageDelivery = 'nuxt'
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        global: {
+          provide: {
+            [carouselImageDeliverySizesKey as symbol]: computed(() =>
+              'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+            ),
+          },
+        },
+        props: {
+          alt: 'Full-width carousel image',
+          noWrapper: true,
+          originalSrc: 'https://drupal.example/files/image.jpg',
+          responsiveStyle: 'card',
+          src: '/styles/card/image.webp',
+        },
+      })
+
+      expect(wrapper.get('img').attributes('sizes')).toBe(
+        '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, (max-width: 1280px) 100vw, (max-width: 1536px) 100vw, 100vw',
+      )
+      expect(wrapper.get('img').attributes('srcset')).toContain('3072')
     }
     finally {
       appConfig.stirImageDelivery = previousDelivery

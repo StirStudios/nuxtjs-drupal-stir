@@ -1,4 +1,28 @@
+import type { ComputedRef, InjectionKey } from 'vue'
+
 export type StirImageDeliveryMode = 'drupal' | 'nuxt'
+
+export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
+  Symbol('stirCarouselImageDeliverySizes')
+
+export function resolveCarouselImageDeliverySizes(
+  gridItems: string | undefined,
+  fullProfile: string | undefined,
+): string | undefined {
+  const profile = fullProfile?.trim()
+
+  if (!profile) return undefined
+
+  const itemClasses = gridItems?.trim()
+
+  if (!itemClasses) return profile
+
+  const hasMultiItemWidth = /(?:^|:|\s)(?:basis|w)-(?:1\/[2-9]|[2-9]\/[3-9])(?:\s|$)/.test(
+    itemClasses,
+  )
+
+  return hasMultiItemWidth ? undefined : profile
+}
 
 export function versionImageSource(
   source: string | undefined,

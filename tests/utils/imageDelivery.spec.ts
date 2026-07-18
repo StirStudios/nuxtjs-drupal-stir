@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  resolveCarouselImageDeliverySizes,
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '../../layers/theme/app/utils/imageDelivery'
@@ -43,6 +44,20 @@ describe('resolveImageDeliveryProfile', () => {
   it('uses a known Drupal responsive style and rejects unknown styles', () => {
     expect(resolveImageDeliveryProfile('card', false, profiles)).toBe(profiles.card)
     expect(resolveImageDeliveryProfile('unknown', false, profiles)).toBeUndefined()
+  })
+})
+
+describe('resolveCarouselImageDeliverySizes', () => {
+  const full = 'sm:100vw md:100vw lg:100vw xl:100vw'
+
+  it('uses the full profile for the default single-slide carousel', () => {
+    expect(resolveCarouselImageDeliverySizes(undefined, full)).toBe(full)
+    expect(resolveCarouselImageDeliverySizes('basis-full', full)).toBe(full)
+  })
+
+  it('preserves nested media profiles when several slides are visible', () => {
+    expect(resolveCarouselImageDeliverySizes('basis-full md:basis-1/2', full)).toBeUndefined()
+    expect(resolveCarouselImageDeliverySizes('w-1/3', full)).toBeUndefined()
   })
 })
 
