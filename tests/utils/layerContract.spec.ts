@@ -5,6 +5,22 @@ import { describe, expect, it } from 'vitest'
 const rootDir = resolve(__dirname, '../..')
 
 describe('layer contract', () => {
+  it('prevents Safari from retaining stale local Vite module graphs', () => {
+    const foundationConfig = readFileSync(
+      resolve(rootDir, 'layers/foundation/nuxt.config.ts'),
+      'utf8',
+    )
+
+    expect(foundationConfig).toContain(
+      'const isDevelopment = process.env.NODE_ENV === \'development\'',
+    )
+    expect(foundationConfig).toContain(
+      'const developmentNoStore = \'private, no-store, max-age=0\'',
+    )
+    expect(foundationConfig).toContain('\'cache-control\': developmentNoStore')
+    expect(foundationConfig).toContain('\'Cache-Control\': developmentNoStore')
+  })
+
   it('composes the compatibility root from explicit capability layers', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
     const platformConfig = readFileSync(

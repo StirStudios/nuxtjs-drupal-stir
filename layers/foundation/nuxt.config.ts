@@ -16,6 +16,8 @@ const foundationCss = fileURLToPath(
   new URL('./app/assets/css/main.css', import.meta.url),
 )
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
+const isDevelopment = process.env.NODE_ENV === 'development'
+const developmentNoStore = 'private, no-store, max-age=0'
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
@@ -35,6 +37,18 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: isDevelopment
+    ? {
+        '/**': {
+          headers: {
+            'cache-control': developmentNoStore,
+            expires: '0',
+            pragma: 'no-cache',
+          },
+        },
+      }
+    : {},
+
   devServer: {
     host: '127.0.0.1',
   },
@@ -45,9 +59,16 @@ export default defineNuxtConfig({
     },
     server: {
       allowedHosts:
-        process.env.NODE_ENV === 'development'
+        isDevelopment
           ? [process.env.SERVER_DOMAIN_CLIENT || 'localhost']
           : [],
+      headers: isDevelopment
+        ? {
+            'Cache-Control': developmentNoStore,
+            Expires: '0',
+            Pragma: 'no-cache',
+          }
+        : undefined,
     },
     build: {
       minify: true,
@@ -55,7 +76,7 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: process.env.NODE_ENV === 'development',
+    enabled: isDevelopment,
   },
 
   experimental: {
