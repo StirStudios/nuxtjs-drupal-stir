@@ -46,4 +46,42 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     expect(wrapper.find('.region.first > .first-item').exists()).toBe(true)
     expect(wrapper.find('.region.second .region.first > .nested-item').exists()).toBe(true)
   })
+
+  it('can show the second region first only while a two-column layout is stacked', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: {
+        id: 'reversed',
+        layout: 'two_column_8_4',
+        reverseMobile: true,
+      },
+      slots: {
+        first: '<article>Form</article>',
+        second: '<aside>Contact details</aside>',
+      },
+    })
+
+    expect(wrapper.find('.region.first').classes()).toEqual(
+      expect.arrayContaining(['order-2', 'lg:order-none']),
+    )
+    expect(wrapper.find('.region.second').classes()).toEqual(
+      expect.arrayContaining(['order-1', 'lg:order-none']),
+    )
+  })
+
+  it('ignores reversed mobile stacking for layouts with more than two columns', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: {
+        id: 'four-column',
+        layout: 'four_column',
+        reverseMobile: true,
+      },
+      slots: {
+        first: '<article>One</article>',
+        second: '<article>Two</article>',
+      },
+    })
+
+    expect(wrapper.find('.region.first').classes()).not.toContain('order-2')
+    expect(wrapper.find('.region.second').classes()).not.toContain('order-1')
+  })
 })

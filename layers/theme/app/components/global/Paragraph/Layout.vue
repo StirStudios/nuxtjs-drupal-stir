@@ -24,6 +24,7 @@ const props = defineProps<{
   gridClass?: string
   classes?: string
   regionAlign?: Record<string, string>
+  reverseMobile?: boolean
 
   randomize?: boolean
   editLink?: string
@@ -35,6 +36,19 @@ const isGridLayout = computed(
   () => props.layout === 'grid' || props.layout?.startsWith('grid_col') === true,
 )
 const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
+const reversesTwoColumnMobileStack = computed(
+  () => props.reverseMobile === true && props.layout?.startsWith('two_column') === true,
+)
+const mobileRegionOrderClass = (slotName: string) => {
+  if (!reversesTwoColumnMobileStack.value) return ''
+
+  return {
+    top: 'order-0 lg:order-none',
+    second: 'order-1 lg:order-none',
+    first: 'order-2 lg:order-none',
+    bottom: 'order-3 lg:order-none',
+  }[slotName] ?? ''
+}
 const sectionId = computed(() => {
   if (props.label) return slugify(props.label)
   return `section-${props.id ?? 'unknown'}`
@@ -62,6 +76,7 @@ const sectionId = computed(() => {
             'region',
             slotName,
             props.regionAlign?.[slotName],
+            mobileRegionOrderClass(slotName),
             ['top', 'bottom'].includes(slotName) ? 'col-span-full' : '',
           ]"
         >
