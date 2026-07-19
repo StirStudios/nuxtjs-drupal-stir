@@ -19,7 +19,7 @@ const props = defineProps<{
   widthClass?: string
   align?: string
   direction?: string
-  overlay?: boolean
+  overlay?: boolean | number | string
   randomize?: boolean
 
   masonry?: {
@@ -35,6 +35,9 @@ const props = defineProps<{
 }>()
 
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const overlayEnabled = computed(
+  () => props.overlay === true || props.overlay === 1 || props.overlay === '1',
+)
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
@@ -144,7 +147,7 @@ onMounted(() => {
           "
           :index="i"
           :node="node"
-          :overlay="overlay"
+          :overlay="overlayEnabled"
           :reveal-mode="revealMode"
           :tk="tk"
           @edit-action-select="selectAction"
@@ -168,7 +171,7 @@ onMounted(() => {
           "
           :index="i"
           :node="node"
-          :overlay="overlay"
+          :overlay="overlayEnabled"
           :reveal-mode="revealMode"
           :tk="tk"
           @edit-action-select="selectAction"
@@ -179,7 +182,7 @@ onMounted(() => {
   </EditLink>
 
   <ParagraphMediaModal
-    v-if="overlay && itemsOrdered.length > 0"
+    v-if="overlayEnabled && itemsOrdered.length > 0"
     v-model:open="open"
     :active-index="activeIndex"
     :items="itemsOrdered"

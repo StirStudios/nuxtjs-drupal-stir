@@ -309,12 +309,14 @@ watch(
     ref="videoElement"
     v-bind="attrs"
     aria-hidden="true"
-    class="absolute inset-0 h-full w-full object-cover"
+    class="pointer-events-none absolute inset-0 h-full w-full object-cover"
     disablepictureinpicture
+    disableremoteplayback
     loop
     muted
     playsinline
     :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
+    tabindex="-1"
   >
     <source
       v-if="isBareVideoSourceActive"
