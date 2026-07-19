@@ -317,13 +317,11 @@ describe('MediaVideo (Nuxt runtime)', () => {
     )
   })
 
-  it('uses playback dimensions instead of cinematic poster dimensions', async () => {
+  it('uses the standard embed canvas instead of cinematic poster dimensions', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
         height: 816,
         mediaEmbed: 'https://player.mediadelivery.net/embed/library/video',
-        playbackHeight: 1080,
-        playbackWidth: 1920,
         src: '/cinematic-preview.webp',
         width: 1920,
       },
@@ -331,7 +329,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
 
     expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
     expect(wrapper.get('div').attributes('style')).toContain(
-      'aspect-ratio: 1920 / 1080; height: auto;',
+      'aspect-ratio: 16 / 9; height: auto;',
     )
   })
 

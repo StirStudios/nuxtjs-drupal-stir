@@ -25,8 +25,6 @@ export type DrupalMediaNodeProps = {
   deliverySizes?: string
   fetchpriority?: 'auto' | 'high' | 'low'
   height?: number
-  playbackWidth?: number
-  playbackHeight?: number
   loading?: 'eager' | 'lazy'
   mediaEmbed?: unknown
   mid?: number | string

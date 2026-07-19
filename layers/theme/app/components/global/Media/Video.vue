@@ -30,8 +30,6 @@ const props = withDefaults(
 
     width?: number
     height?: number
-    playbackWidth?: number
-    playbackHeight?: number
     originalRevision?: string
     originalSrc?: string
     srcset?: string
@@ -69,8 +67,6 @@ const props = withDefaults(
     loadMinWidth: undefined,
     width: undefined,
     height: undefined,
-    playbackWidth: undefined,
-    playbackHeight: undefined,
     originalRevision: undefined,
     originalSrc: undefined,
     srcset: undefined,
@@ -173,11 +169,8 @@ const ratioConfig = {
   fourThree: 'aspect-[4/3]',
 } as const
 const playbackDimensions = computed(() => {
-  const playbackWidth = props.playbackWidth ?? 0
-  const playbackHeight = props.playbackHeight ?? 0
-
-  if (playbackWidth > 0 && playbackHeight > 0) {
-    return { width: playbackWidth, height: playbackHeight }
+  if (playbackSource.value?.kind === 'embed') {
+    return { width: 16, height: 9 }
   }
 
   return { width: props.width ?? 0, height: props.height ?? 0 }
