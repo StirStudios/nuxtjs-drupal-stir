@@ -28,8 +28,16 @@ figure {
   }
 }
 
+:where(.prose, .admin-editor-prose) drupal-media[data-media-type='image'] {
+  @apply block w-full max-w-full;
+
+  > img {
+    @apply m-0 h-auto w-auto max-w-full;
+  }
+}
+
 .align-left {
-  @apply mx-auto max-w-sm sm:float-left sm:me-5 sm:mb-5;
+  @apply mx-auto mb-5 max-w-sm sm:float-left sm:me-5;
 }
 
 .align-center {
@@ -37,7 +45,7 @@ figure {
 }
 
 .align-right {
-  @apply mx-auto max-w-sm sm:float-right sm:ms-5 sm:mb-5;
+  @apply mx-auto mb-5 max-w-sm sm:float-right sm:ms-5;
 }
 
 .sr-hide {
