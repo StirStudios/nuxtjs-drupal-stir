@@ -29,7 +29,7 @@ figure {
 }
 
 :where(.prose, .admin-editor-prose) drupal-media[data-media-type='image'] {
-  @apply block w-full max-w-full;
+  @apply block w-full;
 
   > img {
     @apply m-0 h-auto w-auto max-w-full;
