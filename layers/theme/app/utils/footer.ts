@@ -81,7 +81,7 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'
   right: 'flex flex-col items-center gap-3 text-center lg:items-end lg:text-right',
   rightSlot: 'order-3',
   footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
-  logo: 'max-h-16 w-auto',
+  logo: 'h-16 w-auto',
   menu: '',
   menuItem: 'min-w-0 py-0',
   menuList: 'flex flex-wrap justify-center',
