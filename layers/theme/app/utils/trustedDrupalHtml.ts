@@ -6,10 +6,16 @@ export interface RichTextImageResolution {
   srcset?: string
 }
 
+export interface RichTextImageContext {
+  alignment?: 'center' | 'left' | 'right'
+  structured: boolean
+}
+
 export type RichTextImageResolver = (
   source: string,
   width?: number,
   height?: number,
+  context?: RichTextImageContext,
 ) => RichTextImageResolution
 
 /**
@@ -83,10 +89,19 @@ export function optimizeDrupalRichTextImages(
 
     if (!canonicalSource) return tag
 
+    const alignmentClass = attribute(mediaTag, 'class') || attribute(tag, 'class') || ''
+    const alignment = (['left', 'center', 'right'] as const).find(value =>
+      alignmentClass.split(/\s+/).includes(`align-${value}`),
+    )
+
     const resolved = resolve(
       canonicalSource,
       numberAttribute(tag, 'width'),
       numberAttribute(tag, 'height'),
+      {
+        alignment,
+        structured: Boolean(mediaTag),
+      },
     )
 
     if (!resolved.src || !resolved.srcset) return tag

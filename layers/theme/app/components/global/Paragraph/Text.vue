@@ -50,9 +50,11 @@ const trustedTextHtml = computed(() => {
 
   const image = appConfig.stirTheme.media.image
 
-  return optimizeDrupalRichTextImages(html, (source, width, height) =>
+  return optimizeDrupalRichTextImages(html, (source, width, height, context) =>
     $img.getSizes(source, {
-      sizes: image.profiles.container,
+      sizes: context?.alignment === 'left' || context?.alignment === 'right'
+        ? image.profiles.split
+        : image.profiles.container,
       modifiers: {
         format: image.format,
         height,

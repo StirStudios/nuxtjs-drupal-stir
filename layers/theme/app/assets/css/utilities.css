@@ -29,11 +29,15 @@ figure {
 }
 
 :where(.prose, .admin-editor-prose) drupal-media[data-media-type='image'] {
-  @apply block w-full;
+  @apply block mb-5 w-full;
 
   > img {
-    @apply m-0 h-auto w-auto max-w-full;
+    @apply m-0 h-auto w-full max-w-full float-none;
   }
+}
+
+:where(.prose, .admin-editor-prose) drupal-media[data-media-type='image']:is(.align-left, .align-right) {
+  @apply sm:w-[calc(50%-0.625rem)] sm:max-w-none;
 }
 
 .align-left {

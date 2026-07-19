@@ -24,13 +24,17 @@ describe('optimizeDrupalRichTextImages', () => {
       src: '/_ipx/f_webp&s_1200x800/https://cdn.example/image.jpg?v=42',
       srcset: '/_ipx/f_webp&s_640x427/https://cdn.example/image.jpg?v=42 640w',
     }))
-    const html = '<drupal-media data-media-type="image" data-original-src="https://cdn.example/image.jpg" data-original-revision="42"><img src="/styles/1024/image.webp" srcset="/styles/640/image.webp 640w" width="1200" height="800" alt="Example"></drupal-media>'
+    const html = '<drupal-media class="align-left" data-media-type="image" data-original-src="https://cdn.example/image.jpg" data-original-revision="42"><img src="/styles/1024/image.webp" srcset="/styles/640/image.webp 640w" width="1200" height="800" alt="Example"></drupal-media>'
     const result = optimizeDrupalRichTextImages(html, resolve)
 
     expect(resolve).toHaveBeenCalledWith(
       'https://cdn.example/image.jpg?v=42',
       1200,
       800,
+      {
+        alignment: 'left',
+        structured: true,
+      },
     )
     expect(result).toContain('data-nuxt-img=""')
     expect(result).toContain('src="/_ipx/f_webp&amp;s_1200x800/https://cdn.example/image.jpg?v=42"')
@@ -40,14 +44,24 @@ describe('optimizeDrupalRichTextImages', () => {
 
   it('supports legacy standalone image metadata during fleet migration', () => {
     const html = '<img src="/styles/card.webp" originalsrc="https://cdn.example/original.jpg" originalrevision="7" width="800" height="600">'
-    const result = optimizeDrupalRichTextImages(html, () => ({
+    const resolve = vi.fn(() => ({
       src: '/_ipx/s_800x600/https://cdn.example/original.jpg?v=7',
       srcset: '/_ipx/s_400x300/https://cdn.example/original.jpg?v=7 400w',
     }))
+    const result = optimizeDrupalRichTextImages(html, resolve)
 
     expect(result).toContain('data-nuxt-img=""')
     expect(result).toContain('/_ipx/s_800x600/')
     expect(result).not.toContain('/styles/card.webp')
+    expect(resolve).toHaveBeenCalledWith(
+      'https://cdn.example/original.jpg?v=7',
+      800,
+      600,
+      {
+        alignment: undefined,
+        structured: false,
+      },
+    )
   })
 
   it('leaves ordinary trusted HTML untouched', () => {
