@@ -14,7 +14,7 @@ import {
   type PresentationManifestMode,
 } from './build/presentationManifest'
 import {
-  resolveDrupalImageDomain,
+  resolveDrupalImageDomains,
   resolveImageCdnBase,
 } from './build/imageCdn'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
@@ -37,7 +37,10 @@ const stirImageCdn = resolveImageCdnBase(
   process.env.NUXT_IMAGE_CDN,
   process.env.NODE_ENV === 'development',
 )
-const drupalImageDomain = resolveDrupalImageDomain(process.env.DRUPAL_URL)
+const drupalImageDomains = resolveDrupalImageDomains(
+  process.env.DRUPAL_URL,
+  process.env.DRUPAL_CDN,
+)
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = stirImageDelivery === 'nuxt'
   ? resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
@@ -84,7 +87,7 @@ export default defineNuxtConfig({
           },
         },
         image: {
-          domains: drupalImageDomain ? [drupalImageDomain] : [],
+          domains: drupalImageDomains,
           provider: 'stirIpx',
           ipx: {},
           providers: {

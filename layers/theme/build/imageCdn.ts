@@ -95,3 +95,11 @@ export function resolveDrupalImageDomain(value: string | undefined): string | un
     return undefined
   }
 }
+
+export function resolveDrupalImageDomains(
+  ...values: Array<string | undefined>
+): string[] {
+  return [...new Set(values
+    .map(resolveDrupalImageDomain)
+    .filter((domain): domain is string => Boolean(domain)))]
+}

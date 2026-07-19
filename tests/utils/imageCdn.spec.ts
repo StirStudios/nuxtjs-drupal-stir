@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   resolveDrupalImageDomain,
+  resolveDrupalImageDomains,
   resolveImageCdnBase,
 } from '../../layers/theme/build/imageCdn'
 
@@ -43,4 +44,22 @@ describe('resolveDrupalImageDomain', () => {
       expect(resolveDrupalImageDomain(value)).toBeUndefined()
     },
   )
+})
+
+describe('resolveDrupalImageDomains', () => {
+  it('allows both the Drupal origin and its configured CDN origin', () => {
+    expect(resolveDrupalImageDomains(
+      'https://cms.example.com',
+      'https://assets.example.com',
+    )).toEqual(['cms.example.com', 'assets.example.com'])
+  })
+
+  it('removes duplicate and invalid origins', () => {
+    expect(resolveDrupalImageDomains(
+      'https://cms.example.com',
+      'https://cms.example.com/',
+      'not-a-url',
+      undefined,
+    )).toEqual(['cms.example.com'])
+  })
 })

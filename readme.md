@@ -208,7 +208,7 @@ attributes above; the harness does not depend on project-specific components.
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
-- `NUXT_IMAGE_DOMAINS`: Optional comma-separated allowlist for image hosts beyond the Drupal host automatically derived from `DRUPAL_URL`
+- `DRUPAL_CDN`: Optional Drupal asset CDN origin. When set in the Nuxt environment, its host is automatically trusted as an IPX source alongside `DRUPAL_URL`
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required
 - `STIR_IMAGE_DELIVERY`: Set to `drupal` only to restore legacy Drupal responsive-image delivery; Nuxt Image/IPX is the default
 - `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
