@@ -12,6 +12,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
+    type?: 'video'
     mid?: string | number
     title?: string
     alt?: string
@@ -29,6 +30,8 @@ const props = withDefaults(
 
     width?: number
     height?: number
+    playbackWidth?: number
+    playbackHeight?: number
     originalRevision?: string
     originalSrc?: string
     srcset?: string
@@ -37,12 +40,19 @@ const props = withDefaults(
     responsiveStyle?: string
     loading?: 'eager' | 'lazy'
     fetchpriority?: 'high' | 'low' | 'auto'
+    modalSrc?: string
+    modalSrcset?: string
+    modalSizes?: string
+    modalResponsiveStyle?: string
+    credit?: string
+    hideCredit?: boolean
 
     noWrapper?: boolean
     deferEmbed?: boolean
     editActions?: EditAction[]
   }>(),
   {
+    type: undefined,
     mid: undefined,
     title: undefined,
     alt: undefined,
@@ -59,6 +69,8 @@ const props = withDefaults(
     loadMinWidth: undefined,
     width: undefined,
     height: undefined,
+    playbackWidth: undefined,
+    playbackHeight: undefined,
     originalRevision: undefined,
     originalSrc: undefined,
     srcset: undefined,
@@ -67,6 +79,12 @@ const props = withDefaults(
     responsiveStyle: undefined,
     loading: 'lazy',
     fetchpriority: 'auto',
+    modalSrc: undefined,
+    modalSrcset: undefined,
+    modalSizes: undefined,
+    modalResponsiveStyle: undefined,
+    credit: undefined,
+    hideCredit: false,
     noWrapper: false,
     deferEmbed: true,
     editActions: undefined,
@@ -154,9 +172,18 @@ const ratioConfig = {
   square: 'aspect-square',
   fourThree: 'aspect-[4/3]',
 } as const
+const playbackDimensions = computed(() => {
+  const playbackWidth = props.playbackWidth ?? 0
+  const playbackHeight = props.playbackHeight ?? 0
+
+  if (playbackWidth > 0 && playbackHeight > 0) {
+    return { width: playbackWidth, height: playbackHeight }
+  }
+
+  return { width: props.width ?? 0, height: props.height ?? 0 }
+})
 const aspectClass = computed(() => {
-  const width = props.width
-  const height = props.height
+  const { width, height } = playbackDimensions.value
 
   if (!width || !height) return 'aspect-video'
   if (height === 480) return ratioConfig.fourThree
@@ -168,8 +195,8 @@ const aspectClass = computed(() => {
   return ratioConfig.square
 })
 const wrapperStyle = computed(() => ({
-  aspectRatio: props.width && props.height
-    ? `${props.width} / ${props.height}`
+  aspectRatio: playbackDimensions.value.width && playbackDimensions.value.height
+    ? `${playbackDimensions.value.width} / ${playbackDimensions.value.height}`
     : '16 / 9',
   height: 'auto',
 }))

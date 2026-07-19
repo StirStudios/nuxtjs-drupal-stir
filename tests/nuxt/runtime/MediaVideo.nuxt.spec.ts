@@ -316,4 +316,44 @@ describe('MediaVideo (Nuxt runtime)', () => {
       'aspect-ratio: 1920 / 1080; height: auto;',
     )
   })
+
+  it('uses playback dimensions instead of cinematic poster dimensions', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 816,
+        mediaEmbed: 'https://player.mediadelivery.net/embed/library/video',
+        playbackHeight: 1080,
+        playbackWidth: 1920,
+        src: '/cinematic-preview.webp',
+        width: 1920,
+      },
+    })
+
+    expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toContain(
+      'aspect-ratio: 1920 / 1080; height: auto;',
+    )
+  })
+
+  it('does not forward modal-only media metadata to the wrapper element', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        mediaEmbed: 'https://player.mediadelivery.net/embed/library/video',
+        modalResponsiveStyle: 'container',
+        modalSizes: '100vw',
+        modalSrc: '/modal.webp',
+        modalSrcset: '/modal.webp 1200w',
+        src: '/preview.webp',
+        type: 'video',
+      },
+    })
+
+    const attributes = wrapper.get('div').attributes()
+
+    expect(attributes.type).toBeUndefined()
+    expect(attributes.modalsrc).toBeUndefined()
+    expect(attributes.modalsrcset).toBeUndefined()
+    expect(attributes.modalsizes).toBeUndefined()
+    expect(attributes.modalresponsivestyle).toBeUndefined()
+  })
 })
