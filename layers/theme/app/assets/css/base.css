@@ -74,6 +74,14 @@
       @apply my-5 leading-7 text-pretty;
     }
 
+    :where(p:first-child) {
+      @apply mt-0;
+    }
+
+    :where(p:last-child) {
+      @apply mb-0;
+    }
+
     :where(ul) {
       @apply my-5 ps-6;
     }
