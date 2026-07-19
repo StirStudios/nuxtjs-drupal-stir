@@ -192,7 +192,7 @@ export default defineAppConfig({
     },
 
     card: {
-      base: 'relative isolate overflow-hidden rounded-xl bg-black/80 dark:bg-black text-white',
+      base: 'relative isolate overflow-hidden rounded-xl bg-black/80 dark:bg-black text-white p-5 sm:p-20',
       effect:
         'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl aspect-[1155/678] opacity-40 z-0',
       sizes: {
