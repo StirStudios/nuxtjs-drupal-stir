@@ -259,6 +259,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function saveViewState(page = currentPage.value): void {
     if (!import.meta.client) return
 
+    pruneStoredViewState(sessionStorage)
     sessionStorage.setItem(
       viewStateStorageKeyFor(),
       JSON.stringify(snapshotCurrentViewState(page)),

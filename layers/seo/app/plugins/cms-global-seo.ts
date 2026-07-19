@@ -1,5 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
-import type { Link, Meta } from '@unhead/vue'
+import type { Link, Meta, ReactiveHead } from '@unhead/vue'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -87,7 +87,7 @@ export default defineNuxtPlugin(async () => {
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
-    () => {
+    (): ReactiveHead => {
       const head = {
         htmlAttrs: { lang: lang.value },
       }

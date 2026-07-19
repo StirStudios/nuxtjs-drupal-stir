@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import { useEventListener } from '@vueuse/core'
+import { pruneStoredViewState } from '../utils/drupalViewState'
 
 const RESTORE_HEIGHT_ATTEMPTS = 180
 const RESTORE_HEIGHT_TOLERANCE = 8
@@ -60,6 +61,7 @@ export function useDrupalViewScrollRestore(
   function saveScrollPosition(key = scrollStorageKeyFor()) {
     if (!import.meta.client) return
 
+    pruneStoredViewState(sessionStorage)
     sessionStorage.setItem(
       key,
       JSON.stringify({
