@@ -13,6 +13,8 @@ describe('resolveFooterConfig', () => {
     expect(first).toMatchObject(DEFAULT_FOOTER_THEME)
     expect(first.sections).toEqual(DEFAULT_FOOTER_SECTIONS)
     expect(first.sections.left).not.toBe(second.sections.left)
+    expect(first.centerSlot).toBe('order-3 lg:order-2')
+    expect(first.rightSlot).toBe('order-2 lg:order-3')
   })
 
   it('normalizes supported values and falls back for invalid values', () => {

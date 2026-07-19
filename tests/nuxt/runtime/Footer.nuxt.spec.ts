@@ -128,8 +128,8 @@ describe('Footer (Nuxt runtime)', () => {
     expect(wrapper.text()).toContain('Accessibility Statement')
     expect(wrapper.text()).toContain('info@sbpublicmarket.com')
     expect(wrapper.find('[data-slot="left"]').classes()).toContain('order-1')
-    expect(wrapper.find('[data-slot="center"]').classes()).toContain('order-2')
-    expect(wrapper.find('[data-slot="right"]').classes()).toContain('order-3')
+    expect(wrapper.find('[data-slot="center"]').classes()).toEqual(expect.arrayContaining(['order-3', 'lg:order-2']))
+    expect(wrapper.find('[data-slot="right"]').classes()).toEqual(expect.arrayContaining(['order-2', 'lg:order-3']))
   })
 
   it('uses app context fallback when page footer_menu or site_info are missing', async () => {
