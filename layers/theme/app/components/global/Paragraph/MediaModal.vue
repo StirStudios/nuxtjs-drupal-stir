@@ -139,7 +139,7 @@ function closeModal(): void {
         :ui="{
           root: 'stir-media-modal-carousel h-full',
           container: 'ms-0 h-full items-center',
-          item: 'flex h-full basis-full items-center justify-center overflow-hidden ps-0',
+          item: 'flex h-full basis-full items-center justify-center overflow-hidden px-4',
           prev: 'hidden opacity-100 md:inline-flex',
           next: 'hidden opacity-100 md:inline-flex',
         }"
