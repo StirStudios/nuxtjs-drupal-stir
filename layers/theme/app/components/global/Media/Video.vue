@@ -45,6 +45,7 @@ const props = withDefaults(
     credit?: string
     hideCredit?: boolean
 
+    isHero?: boolean
     noWrapper?: boolean
     deferEmbed?: boolean
     editActions?: EditAction[]
@@ -81,6 +82,7 @@ const props = withDefaults(
     modalResponsiveStyle: undefined,
     credit: undefined,
     hideCredit: false,
+    isHero: undefined,
     noWrapper: false,
     deferEmbed: true,
     editActions: undefined,
@@ -91,8 +93,11 @@ const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
 const attrs = useAttrs()
 const { initializePlayers, registerIframe } = useVideoPlayers()
-const isHero = inject<boolean>('isHero', false)
-const isBare = computed(() => isHero || props.noWrapper === true)
+const injectedIsHero = inject<boolean>('isHero', false)
+const isHero = computed(() =>
+  props.isHero !== undefined ? props.isHero : injectedIsHero,
+)
+const isBare = computed(() => isHero.value || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
 const iframeElement = ref<HTMLIFrameElement | null>(null)
 const localVideoSrc = computed(() => {
@@ -283,56 +288,58 @@ watch(
 </script>
 
 <template>
-  <MediaImage
-    v-if="isBare && previewSrc"
-    v-bind="attrs"
-    :alt="alt || ''"
-    aria-hidden="true"
-    :delivery-sizes="deliverySizes"
-    :fetchpriority="fetchpriority"
-    :height="height"
-    image-class="absolute inset-0 h-full w-full object-cover"
-    :is-hero="isHero"
-    :loading="loading"
-    no-wrapper
-    :original-revision="staticPosterOriginalRevision"
-    :original-src="staticPosterOriginalSrc"
-    :responsive-style="staticPosterResponsiveStyle"
-    :sizes="sizes || '100vw'"
-    :src="previewSrc"
-    :srcset="previewSrcset"
-    :width="width"
-  />
-
-  <video
-    v-if="isBare && directHeroVideoSrc"
-    ref="videoElement"
-    v-bind="attrs"
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-0 h-full w-full object-cover"
-    disablepictureinpicture
-    disableremoteplayback
-    loop
-    muted
-    playsinline
-    :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
-    tabindex="-1"
-  >
-    <source
-      v-if="isBareVideoSourceActive"
-      :src="directHeroVideoSrc"
+  <template v-if="isBare">
+    <MediaImage
+      v-if="previewSrc"
+      v-bind="attrs"
+      :alt="alt || ''"
+      aria-hidden="true"
+      :delivery-sizes="deliverySizes"
+      :fetchpriority="fetchpriority"
+      :height="height"
+      image-class="absolute inset-0 h-full w-full object-cover"
+      :is-hero="isHero"
+      :loading="loading"
+      no-wrapper
+      :original-revision="staticPosterOriginalRevision"
+      :original-src="staticPosterOriginalSrc"
+      :responsive-style="staticPosterResponsiveStyle"
+      :sizes="sizes || '100vw'"
+      :src="previewSrc"
+      :srcset="previewSrcset"
+      :width="width"
     />
-  </video>
 
-  <iframe
-    v-if="isBare && remoteHeroVideoSrc && isBareVideoSourceActive"
-    allow="autoplay; encrypted-media; picture-in-picture"
-    aria-hidden="true"
-    class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
-    :src="remoteHeroVideoSrc"
-    tabindex="-1"
-    :title="title || 'Background video'"
-  />
+    <video
+      v-if="directHeroVideoSrc"
+      ref="videoElement"
+      v-bind="attrs"
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+      disablepictureinpicture
+      disableremoteplayback
+      loop
+      muted
+      playsinline
+      :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
+      tabindex="-1"
+    >
+      <source
+        v-if="isBareVideoSourceActive"
+        :src="directHeroVideoSrc"
+      />
+    </video>
+
+    <iframe
+      v-if="remoteHeroVideoSrc && isBareVideoSourceActive"
+      allow="autoplay; encrypted-media; picture-in-picture"
+      aria-hidden="true"
+      class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+      :src="remoteHeroVideoSrc"
+      tabindex="-1"
+      :title="title || 'Background video'"
+    />
+  </template>
 
   <div
     v-else

@@ -58,6 +58,26 @@ describe('MediaVideo (Nuxt runtime)', () => {
     })
   })
 
+  it('honors the explicit hero context passed through a Drupal media slot', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        isHero: true,
+        mediaEmbed: '/hero.mp4',
+        src: '/hero-poster.webp',
+        title: 'Background Video',
+      },
+    })
+
+    expect(wrapper.find('button').exists()).toBe(false)
+    expect(wrapper.get('video').attributes()).toMatchObject({
+      'aria-hidden': 'true',
+      'disablepictureinpicture': '',
+      'disableremoteplayback': '',
+      'tabindex': '-1',
+    })
+    expect(wrapper.get('img').attributes('aria-hidden')).toBe('true')
+  })
+
   it('supports explicitly loading a bare video immediately', async () => {
     const load = vi
       .spyOn(HTMLMediaElement.prototype, 'load')
