@@ -78,7 +78,7 @@ const providerSizes = computed(() =>
 )
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
-  toDrupalUrl(props.originalSrc, drupalOrigin.value),
+  toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
 const isNuxtImage = computed(() =>

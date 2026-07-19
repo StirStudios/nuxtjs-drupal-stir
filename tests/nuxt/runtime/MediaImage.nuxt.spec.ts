@@ -57,6 +57,32 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
+  it('optimizes media without canonical metadata from its rendered source', async () => {
+    const appConfig = useAppConfig()
+    const previousDelivery = appConfig.stirImageDelivery
+
+    appConfig.stirImageDelivery = 'nuxt'
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        props: {
+          alt: 'Instagram image',
+          platform: 'instagram',
+          responsiveStyle: 'card',
+          src: 'https://drupal.example/styles/1024/instagram.webp',
+          srcset: 'https://drupal.example/styles/640/instagram.webp 640w',
+        },
+      })
+
+      expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
+      expect(wrapper.get('img').attributes('srcset')).not.toContain('styles/640')
+      expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
+    }
+    finally {
+      appConfig.stirImageDelivery = previousDelivery
+    }
+  })
+
   it('keeps Drupal delivery when an optimizer profile is unknown', async () => {
     const appConfig = useAppConfig()
     const previousDelivery = appConfig.stirImageDelivery

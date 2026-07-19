@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
-import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import {
+  optimizeDrupalRichTextImages,
+  trustedDrupalHtml,
+} from '#stir/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   id?: number | string
@@ -21,6 +24,8 @@ const props = defineProps<{
 }>()
 
 const attrs = useAttrs()
+const appConfig = useAppConfig()
+const $img = useImage()
 const { isAdministrator } = usePageContext()
 
 const isEditing = ref(false)
@@ -38,7 +43,25 @@ const sourceText = computed(() => {
   return normalizedTextSource ?? (snakeSource.trim() ? snakeSource : undefined) ?? props.text ?? ''
 })
 
-const trustedTextHtml = computed(() => trustedDrupalHtml(renderedText.value))
+const trustedTextHtml = computed(() => {
+  const html = trustedDrupalHtml(renderedText.value)
+
+  if (appConfig.stirImageDelivery !== 'nuxt') return html
+
+  const image = appConfig.stirTheme.media.image
+
+  return optimizeDrupalRichTextImages(html, (source, width, height) =>
+    $img.getSizes(source, {
+      sizes: image.profiles.container,
+      modifiers: {
+        format: image.format,
+        height,
+        quality: image.quality,
+        width,
+      },
+    }),
+  )
+})
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
 const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
