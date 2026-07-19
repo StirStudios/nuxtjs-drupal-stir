@@ -138,8 +138,10 @@ function closeModal(): void {
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{
-          root: 'stir-media-modal-carousel h-full',
+          root: 'group/media-modal stir-media-modal-carousel h-full',
           container: 'items-center h-full',
+          prev: 'hidden opacity-0 motion-safe:transition-opacity md:inline-flex md:group-hover/media-modal:opacity-100 md:group-focus-within/media-modal:opacity-100 focus-visible:opacity-100',
+          next: 'hidden opacity-0 motion-safe:transition-opacity md:inline-flex md:group-hover/media-modal:opacity-100 md:group-focus-within/media-modal:opacity-100 focus-visible:opacity-100',
         }"
         @select="handleCarouselSelect"
       >
@@ -201,15 +203,6 @@ function closeModal(): void {
 
 <style>
 @layer components {
-  @media (min-width: 48rem) {
-    .stir-media-modal-carousel:hover [data-slot='prev'],
-    .stir-media-modal-carousel:hover [data-slot='next'],
-    .stir-media-modal-carousel:focus-within [data-slot='prev'],
-    .stir-media-modal-carousel:focus-within [data-slot='next'] {
-      opacity: 1;
-    }
-  }
-
   .media-modal [aria-roledescription='carousel'] {
     @apply h-full;
 
