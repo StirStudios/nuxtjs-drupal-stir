@@ -56,4 +56,28 @@ describe('WrapGrid (Nuxt runtime)', () => {
     expect(inner?.classList.contains('relative')).toBe(true)
     expect(outer?.classList.contains('isolate')).toBe(true)
   })
+
+  it('keeps container gutters outside the card surface', async () => {
+    const wrapper = await mountSuspended(WrapGrid, {
+      props: {
+        card: true,
+        container: true,
+        gridItems: 'grid grid-cols-1',
+        width: 'max-w-4xl',
+      },
+      slots: {
+        default: '<span>Contained card content</span>',
+      },
+    })
+    const content = wrapper.find('span')
+    const grid = content.element.parentElement
+    const card = grid?.parentElement
+    const container = card?.parentElement
+
+    expect(grid?.classList.contains('grid')).toBe(true)
+    expect(card?.classList.contains('isolate')).toBe(true)
+    expect(card?.classList.contains('max-w-4xl')).toBe(true)
+    expect(container?.classList.contains('px-4')).toBe(true)
+    expect(card?.classList.contains('px-4')).toBe(false)
+  })
 })

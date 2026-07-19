@@ -19,9 +19,8 @@ const gridStyles = computed(() => {
   )
 })
 
-const wrapperClasses = computed(() => {
+const contentWrapperClasses = computed(() => {
   return [
-    props.container ? themeContainer : null,
     props.card ? themeCard.base : null,
     props.classes || null,
     props.width || null,
@@ -29,13 +28,22 @@ const wrapperClasses = computed(() => {
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
 const combinedClasses = computed(() => [
-  ...wrapperClasses.value,
+  props.container ? themeContainer : null,
+  ...contentWrapperClasses.value,
   ...gridStyles.value,
-])
+].filter((value): value is string => typeof value === 'string' && value.length > 0))
 </script>
 
 <template>
-  <WrapDiv v-if="props.card" :styles="wrapperClasses">
+  <WrapDiv v-if="props.card && props.container" :styles="themeContainer">
+    <WrapDiv :styles="contentWrapperClasses">
+      <WrapDiv :styles="gridStyles">
+        <slot />
+      </WrapDiv>
+      <LazyCardGradient :layout="props" />
+    </WrapDiv>
+  </WrapDiv>
+  <WrapDiv v-else-if="props.card" :styles="contentWrapperClasses">
     <WrapDiv :styles="gridStyles">
       <slot />
     </WrapDiv>
