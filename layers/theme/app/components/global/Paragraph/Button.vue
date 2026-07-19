@@ -27,6 +27,15 @@ const props = defineProps<{
     title?: string
     url?: string
     external?: boolean
+    linkTitle?: string
+    linkUri?: string
+    linkResolvableUri?: string
+    content?: string
+    props?: {
+      label?: string
+      url?: string
+      external?: boolean
+    }
   }
 
   editLink?: string
@@ -37,7 +46,16 @@ const tk = useSlotsToolkit(vueSlots)
 const open = ref(false)
 const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
-const linkData = computed(() => props.link || {})
+const linkData = computed(() => {
+  const link = props.link
+  const url = link?.url ?? link?.props?.url ?? link?.linkResolvableUri ?? link?.linkUri
+
+  return {
+    title: link?.title ?? link?.props?.label ?? link?.linkTitle ?? link?.content,
+    url,
+    external: link?.external ?? link?.props?.external ?? /^https?:\/\//.test(url || ''),
+  }
+})
 const isExternal = computed(() => !!linkData.value.external)
 const btnLabel = computed(() => linkData.value.title || 'View link')
 const btnColor = computed(() => resolveUiColor(props.color))
