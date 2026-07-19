@@ -10,6 +10,35 @@ export interface ComponentTreeDiagnosticProps {
 
 type ComponentResolver = (element: string) => unknown
 
+function inferPropType(value: unknown): string {
+  if (Array.isArray(value)) return 'unknown[]'
+  if (value === null || value === undefined) return 'unknown'
+  if (typeof value === 'object') return 'Record<string, unknown>'
+
+  return typeof value
+}
+
+export function createParagraphComponentStarter(
+  props: Record<string, unknown>,
+  slotNames: string[],
+): string {
+  const propLines = Object.entries(props).map(([key, value]) =>
+    `  ${JSON.stringify(key)}?: ${inferPropType(value)}`,
+  )
+  const script = propLines.length
+    ? `<script setup lang="ts">\ndefineProps<{\n${propLines.join('\n')}\n}>()\n</${'script'}>\n\n`
+    : ''
+  const slotLines = slotNames.length
+    ? slotNames.map(name =>
+        name === 'default'
+          ? '  <slot />'
+          : `  <slot name="${name}" />`,
+      )
+    : ['  <!-- Add this paragraph\'s presentation here. -->']
+
+  return `${script}<template>\n  <section>\n${slotLines.join('\n')}\n  </section>\n</template>\n`
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }

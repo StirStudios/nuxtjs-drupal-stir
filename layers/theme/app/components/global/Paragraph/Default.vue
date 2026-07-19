@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { useClipboard } from '@vueuse/core'
 import type { CustomElementNode } from '#stir/types'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
+import { createParagraphComponentStarter } from '../../../utils/componentTreeDiagnostics'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 const isDev = import.meta.dev
 
@@ -13,6 +19,9 @@ const props = defineProps<{
 
   editLink?: string
 }>()
+const attrs = useAttrs()
+const slots = useSlots()
+const toast = useToast()
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
@@ -115,6 +124,45 @@ const suggestedComponentPath = computed(() => {
 
   return `layers/theme/app/components/global/${element}.vue`
 })
+
+const renderableSlotNames = computed(() => Object.keys(slots))
+const payloadProps = computed<Record<string, unknown>>(() => {
+  const values: Record<string, unknown> = { ...attrs }
+
+  for (const [key, value] of Object.entries(props)) {
+    if (value !== undefined) values[key] = value
+  }
+
+  return Object.fromEntries(
+    Object.entries(values).filter(([key]) =>
+      key !== 'class'
+      && key !== 'style'
+      && !key.startsWith('on'),
+    ),
+  )
+})
+const debugPayload = computed(() => JSON.stringify({
+  element: resolvedElement.value,
+  props: payloadProps.value,
+  slots: renderableSlotNames.value,
+}, null, 2))
+
+const starterSource = computed(() => createParagraphComponentStarter(
+  payloadProps.value,
+  renderableSlotNames.value,
+))
+const { copy, copied, isSupported: canCopy } = useClipboard({
+  source: starterSource,
+})
+
+const copyStarter = async () => {
+  await copy()
+  toast.add({
+    color: 'success',
+    icon: 'i-lucide-check',
+    title: 'Component starter copied',
+  })
+}
 </script>
 
 <template>
@@ -140,10 +188,45 @@ const suggestedComponentPath = computed(() => {
           Open paragraph edit form
         </ULink>
       </p>
-      <details class="rounded border border-default p-3">
-        <summary class="cursor-pointer text-sm font-medium">Debug props</summary>
-        <pre class="mt-3 overflow-auto text-xs">{{ props }}</pre>
-      </details>
+      <UCollapsible class="rounded-md border border-default bg-default">
+        <UButton
+          block
+          color="neutral"
+          icon="i-lucide-code-xml"
+          label="Payload and component starter"
+          trailing-icon="i-lucide-chevron-down"
+          :ui="{ base: 'justify-start', trailingIcon: 'ms-auto' }"
+          variant="ghost"
+        />
+
+        <template #content>
+          <div class="space-y-4 border-t border-default p-3">
+            <div>
+              <p class="mb-2 text-sm font-medium">Normalized payload</p>
+              <pre class="max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs"><code>{{ debugPayload }}</code></pre>
+            </div>
+            <div>
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <p class="text-sm font-medium">Component starter</p>
+                <UButton
+                  v-if="canCopy"
+                  color="neutral"
+                  :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'"
+                  :label="copied ? 'Copied' : 'Copy component'"
+                  size="xs"
+                  variant="soft"
+                  @click.stop="copyStarter"
+                />
+              </div>
+              <pre class="max-h-96 overflow-auto rounded-md bg-muted p-3 text-xs"><code>{{ starterSource }}</code></pre>
+            </div>
+          </div>
+        </template>
+      </UCollapsible>
     </template>
   </UAlert>
+
+  <template v-for="slotName in renderableSlotNames" :key="slotName">
+    <slot :name="slotName" />
+  </template>
 </template>

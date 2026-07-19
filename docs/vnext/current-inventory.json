@@ -689,13 +689,13 @@
     "serverRoutes": 26,
     "productionDependencies": 42,
     "developmentDependencies": 24,
-    "tests": 112,
+    "tests": 114,
     "testsByArea": {
       "composables": 11,
       "contracts": 1,
-      "nuxt": 39,
+      "nuxt": 40,
       "server": 23,
-      "unit": 2,
+      "unit": 3,
       "utils": 36
     }
   },
@@ -734,6 +734,7 @@
     "tests/nuxt/runtime/NodePage.nuxt.spec.ts",
     "tests/nuxt/runtime/OptionValue.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts",
+    "tests/nuxt/runtime/ParagraphDefault.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphLayout.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
@@ -776,6 +777,7 @@
     "tests/server/webformSubmit.spec.ts",
     "tests/unit/editorialAccess.spec.ts",
     "tests/unit/layoutEditLinks.spec.ts",
+    "tests/unit/paragraphComponentStarter.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
     "tests/utils/calendlyWidget.spec.ts",
