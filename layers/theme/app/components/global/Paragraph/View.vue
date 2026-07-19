@@ -7,7 +7,7 @@ defineProps<{
 
   header?: string
   gridItems?: string
-  randomize?: boolean
+  randomize?: boolean | string
   width?: string
   spacing?: string
   editLink?: string
