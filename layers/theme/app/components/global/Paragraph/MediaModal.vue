@@ -138,6 +138,7 @@ function closeModal(): void {
         :start-index="startIndex"
         :ui="{
           root: 'stir-media-modal-carousel h-full',
+          viewport: 'h-full',
           container: 'ms-0 h-full items-center',
           item: 'flex h-full basis-full items-center justify-center overflow-hidden px-4',
           prev: 'hidden opacity-100 md:inline-flex',
@@ -206,14 +207,6 @@ function closeModal(): void {
 
 <style>
 @layer components {
-  .media-modal [aria-roledescription='carousel'] {
-    @apply h-full;
-
-    .overflow-hidden {
-      @apply h-full;
-    }
-  }
-
   .media-modal img {
     @apply max-h-[80vh] object-contain;
   }
