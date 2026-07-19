@@ -138,10 +138,10 @@ function closeModal(): void {
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{
-          root: 'group/media-modal stir-media-modal-carousel h-full',
+          root: 'stir-media-modal-carousel h-full',
           container: 'items-center h-full',
-          prev: 'hidden opacity-0 motion-safe:transition-opacity md:inline-flex md:group-hover/media-modal:opacity-100 md:group-focus-within/media-modal:opacity-100 focus-visible:opacity-100',
-          next: 'hidden opacity-0 motion-safe:transition-opacity md:inline-flex md:group-hover/media-modal:opacity-100 md:group-focus-within/media-modal:opacity-100 focus-visible:opacity-100',
+          prev: 'hidden opacity-100 md:inline-flex',
+          next: 'hidden opacity-100 md:inline-flex',
         }"
         @select="handleCarouselSelect"
       >
