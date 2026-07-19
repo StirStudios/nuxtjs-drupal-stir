@@ -87,13 +87,16 @@ function closeModal(): void {
     :portal="portal"
     :title="modalAccessibleTitle"
     :ui="{
+      overlay: 'bg-black/90 backdrop-blur-sm',
       content: 'bg-transparent divide-none p-0',
+      body: 'relative h-dvh overflow-hidden p-0',
       header: 'hidden',
     }"
   >
     <template v-if="open" #body>
       <UButton
-        class="absolute top-4 right-4 z-10"
+        aria-label="Close media preview"
+        class="absolute top-4 right-4 z-20 shadow-lg sm:top-6 sm:right-6"
         color="neutral"
         icon="i-lucide-x"
         size="lg"
@@ -134,7 +137,10 @@ function closeModal(): void {
         :prev="prevCarouselButton"
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
-        :ui="{ container: 'items-center h-full' }"
+        :ui="{
+          root: 'stir-media-modal-carousel h-full',
+          container: 'items-center h-full',
+        }"
         @select="handleCarouselSelect"
       >
         <template #default="{ item }">
@@ -168,9 +174,12 @@ function closeModal(): void {
             (theme.mediaModal.description?.media && modalDescription) ||
             modalCredit
           "
-          class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/75 px-4 py-3 text-center text-white backdrop-blur-sm"
+          class="absolute bottom-4 left-1/2 z-10 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/80 px-4 py-3 text-center text-white shadow-xl backdrop-blur-md sm:bottom-6 sm:w-auto sm:min-w-64"
         >
-          <div v-if="theme.mediaModal.title && modalTitle" class="font-semibold">
+          <div
+            v-if="theme.mediaModal.title && modalTitle"
+            class="text-sm leading-snug font-semibold sm:text-base"
+          >
             {{ modalTitle }}
           </div>
 
@@ -192,6 +201,15 @@ function closeModal(): void {
 
 <style>
 @layer components {
+  @media (min-width: 48rem) {
+    .stir-media-modal-carousel:hover [data-slot='prev'],
+    .stir-media-modal-carousel:hover [data-slot='next'],
+    .stir-media-modal-carousel:focus-within [data-slot='prev'],
+    .stir-media-modal-carousel:focus-within [data-slot='next'] {
+      opacity: 1;
+    }
+  }
+
   .media-modal [aria-roledescription='carousel'] {
     @apply h-full;
 

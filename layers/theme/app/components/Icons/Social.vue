@@ -2,7 +2,7 @@
 import type { SocialIcon } from '#stir/types'
 
 const props = defineProps<SocialIcon>()
-const iconSize = props.iconSize || 'size-10'
+const iconSize = props.iconSize || 'size-8'
 </script>
 
 <template>
