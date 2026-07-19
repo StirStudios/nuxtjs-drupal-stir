@@ -137,8 +137,8 @@ function closeModal(): void {
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
         :ui="{
-          root: 'stir-media-modal-carousel h-full',
-          viewport: 'h-full px-4',
+          root: 'stir-media-modal-carousel h-full px-4',
+          viewport: 'h-full',
           container: 'ms-0 h-full items-center',
           item: 'flex h-full basis-full items-center justify-center overflow-hidden',
           prev: 'hidden opacity-100 md:inline-flex',
