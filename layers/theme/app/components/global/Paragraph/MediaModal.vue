@@ -44,20 +44,23 @@ const prevCarouselButton = computed(() =>
 const nextCarouselButton = computed(() =>
   resolveCarouselArrowButton(theme.carousel.arrows?.next),
 )
-const singleVideoFrameStyle = computed(() => {
-  if (firstItem.value?.type !== 'video') return undefined
 
-  const width = Number(firstItem.value.width)
-  const height = Number(firstItem.value.height)
+function mediaFrameStyle(item: ModalMediaItem) {
+  const width = Number(item.width)
+  const height = Number(item.height)
+  const hasDimensions =
+    Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0
+
   const aspectRatio =
-    Number.isFinite(width) && Number.isFinite(height) && height > 0
+    hasDimensions
       ? width / height
       : 16 / 9
 
   return {
-    maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
+    aspectRatio: `${aspectRatio}`,
+    width: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
   }
-})
+}
 
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
@@ -109,12 +112,8 @@ function closeModal(): void {
         class="flex h-full w-full items-center justify-center p-4"
       >
         <div
-          :class="
-            firstItem.type === 'video'
-              ? ['w-full overflow-hidden', theme.media.rounded]
-              : 'contents'
-          "
-          :style="singleVideoFrameStyle"
+          :class="['overflow-hidden', theme.media.rounded]"
+          :style="mediaFrameStyle(firstItem)"
         >
           <component
             :is="mediaComponentFor(firstItem.type)"
@@ -146,7 +145,10 @@ function closeModal(): void {
         @select="handleCarouselSelect"
       >
         <template #default="{ item }">
-          <div :class="['overflow-hidden', theme.media.rounded]">
+          <div
+            :class="['mx-auto overflow-hidden', theme.media.rounded]"
+            :style="mediaFrameStyle(item)"
+          >
             <component
               :is="mediaComponentFor(item.type)"
               :key="item.key"
