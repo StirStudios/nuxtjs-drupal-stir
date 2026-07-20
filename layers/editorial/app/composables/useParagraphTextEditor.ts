@@ -6,6 +6,7 @@ import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 import type {} from '@tiptap/extension-link'
+import { DrupalMedia } from '../extensions/DrupalMedia'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
   const adminTooltipUi = {
@@ -126,34 +127,6 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     },
   })
 
-  const DrupalMediaNode = Node.create({
-    name: 'drupalMedia',
-    group: 'block',
-    atom: true,
-    selectable: true,
-    draggable: false,
-    parseHTML() {
-      return [{ tag: 'drupal-media' }]
-    },
-    addAttributes() {
-      return {
-        'data-entity-type': {
-          default: null,
-        },
-        'data-entity-uuid': {
-          default: null,
-        },
-      }
-    },
-    renderHTML({
-      HTMLAttributes,
-    }: {
-      HTMLAttributes: Record<string, unknown>
-    }) {
-      return ['drupal-media', mergeAttributes(HTMLAttributes), '\u00a0']
-    },
-  })
-
   const editorValue = ref('')
 
   const richTextClass = 'admin-editor-prose max-w-none'
@@ -165,7 +138,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     ListItemWithAttributes,
     DivNode,
     SectionNode,
-    DrupalMediaNode,
+    DrupalMedia,
   ]
 
   const headingToolbarItems = [
