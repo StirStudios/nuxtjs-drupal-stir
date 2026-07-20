@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import {
+  resolveBooleanProp,
   resolveUiButtonVariant,
   resolveUiColor,
   resolveUiSize,
@@ -20,7 +21,7 @@ const props = defineProps<{
   size?: string
   variant?: string
   icon?: string
-  block?: boolean
+  block?: boolean | number | string
 
   link?: {
     element?: string
@@ -61,7 +62,7 @@ const btnLabel = computed(() => linkData.value.title || 'View link')
 const btnColor = computed(() => resolveUiColor(props.color))
 const btnVariant = computed(() => resolveUiButtonVariant(props.variant))
 const btnSize = computed(() => resolveUiSize(props.size, 'xl'))
-const btnBlock = computed(() => props.block ?? false)
+const btnBlock = computed(() => resolveBooleanProp(props.block))
 const iconName = computed(() => props.icon || null)
 const slotMedia = computed(() => tk.mediaItems())
 
