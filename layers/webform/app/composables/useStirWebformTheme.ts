@@ -45,7 +45,9 @@ export function useStirWebformTheme(): ResolvedStirWebformTheme {
       floating: webform.labels?.floating ?? forms.floatingLabels,
       ...webform.labels,
       floatingClass: [
-        fieldVariant === 'material' ? '' : 'px-1.5',
+        fieldVariant === 'material'
+          ? ''
+          : 'px-1.5 peer-placeholder-shown:px-0 peer-focus:px-1.5',
         ...(Array.isArray(labelBase) ? labelBase : [labelBase ?? '']),
       ].filter(Boolean),
     },

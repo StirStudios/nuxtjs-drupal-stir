@@ -22,5 +22,7 @@ export default defineAppConfig({
   popup: {
     enabled: false,
     component: '',
+    webformCollapsible: false,
+    webformToggleLabel: 'Subscribe for updates',
   },
 } as unknown as AppConfigInput)
