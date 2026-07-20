@@ -49,7 +49,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="container" class="text-sm">
+  <div ref="container" class="turnstile-field text-sm">
     <LazyNuxtTurnstile
       v-if="shouldRenderTurnstile"
       v-model="turnstileToken"
@@ -58,3 +58,11 @@ onBeforeUnmount(() => {
     />
   </div>
 </template>
+
+<style>
+.turnstile-field:not(:has(iframe)) {
+  height: 0;
+  margin-block-end: 0 !important;
+  overflow: hidden;
+}
+</style>

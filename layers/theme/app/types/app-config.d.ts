@@ -259,7 +259,6 @@ type StirThemeWebformConfig = {
   scrollToTopDelayMs?: number
   scrollToTopFallbackDelayMs?: number
   spacing?: ClassValue
-  spacingLarge?: ClassValue
   formClass?: ClassValue
   labels?: {
     floating?: boolean

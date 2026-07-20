@@ -12,7 +12,6 @@ type WebformThemeConfig = {
   fieldGroupHeader?: string
   response?: string
   spacing?: string
-  spacingLarge?: string
   submitAlign?: string
   submitComponent?: string
   fieldVariant?: string
@@ -80,10 +79,7 @@ const submitButtonProps = computed(() => ({
 <template>
   <UForm
     v-if="!isFormSubmitted"
-    :class="[
-      props.themeWebform.formClass,
-      props.themeWebform.spacingLarge ?? props.themeWebform.spacing,
-    ]"
+    :class="[props.themeWebform.formClass, props.themeWebform.spacing]"
     :schema="schema"
     :state="state"
     :validate-on="validateOn"

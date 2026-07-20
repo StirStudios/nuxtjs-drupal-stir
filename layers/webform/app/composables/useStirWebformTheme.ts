@@ -5,7 +5,6 @@ type StirWebformTheme = {
   scrollToTopDelayMs?: number
   scrollToTopFallbackDelayMs?: number
   spacing?: string
-  spacingLarge?: string
   formClass?: string
   labels?: {
     floating?: boolean
