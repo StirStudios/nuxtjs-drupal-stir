@@ -53,7 +53,7 @@ export const nuxtUiTheme = {
     slots: {
       label: 'block font-medium text-default/80',
       container: 'mt-1',
-      error: 'mt-1 text-error',
+      error: 'mt-1 text-start text-error',
     },
   },
 

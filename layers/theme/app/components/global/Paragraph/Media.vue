@@ -6,6 +6,7 @@ import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   id?: number | string
@@ -20,7 +21,7 @@ const props = defineProps<{
   align?: string
   direction?: string
   overlay?: boolean | number | string
-  randomize?: boolean
+  randomize?: boolean | number | string
 
   masonry?: {
     lanes?: Record<string, number>
@@ -59,7 +60,11 @@ const getMediaItemKey = (node: MediaNode, index: number) => {
   return `media-${index}`
 }
 
-const { orderedIndices } = useMediaOrdering(slotMedia, props, tk)
+const { orderedIndices } = useMediaOrdering(
+  slotMedia,
+  () => resolveBooleanProp(props.randomize),
+  tk,
+)
 const slotMediaOrdered = computed(() =>
   orderedIndices.value
     .map((i) => slotMedia.value[i])

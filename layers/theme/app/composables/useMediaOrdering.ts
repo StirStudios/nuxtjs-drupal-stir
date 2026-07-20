@@ -1,8 +1,9 @@
 import type { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import type { MaybeRefOrGetter } from 'vue'
 
 export function useMediaOrdering(
   slotMedia: Ref<unknown[]>,
-  props: { randomize?: boolean },
+  randomize: MaybeRefOrGetter<boolean>,
   tk: ReturnType<typeof useSlotsToolkit>,
 ) {
   const baseIndices = computed(() => slotMedia.value.map((_, i) => i))
@@ -25,7 +26,7 @@ export function useMediaOrdering(
   const orderedIndices = tk.hydrateOrder(
     () => baseIndices.value,
     () => {
-      if (props.randomize) return computeRandomOrder()
+      if (toValue(randomize)) return computeRandomOrder()
       return baseIndices.value
     },
   )

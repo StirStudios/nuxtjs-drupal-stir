@@ -44,4 +44,8 @@ describe('Nuxt UI theme preset', () => {
     expect(materialButton).toContain('text-base')
     expect(materialButton).not.toContain('text-md')
   })
+
+  it('start-aligns form errors independently of their container', () => {
+    expect(nuxtUiTheme.formField.slots.error).toContain('text-start')
+  })
 })
