@@ -1,9 +1,19 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTeaserPost } from '../../layers/theme/app/composables/useTeaserPost'
 
 describe('useTeaserPost', () => {
-  it('preserves versioned image-delivery metadata for shared teaser cards', () => {
+  beforeEach(() => {
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      public: {
+        drupalCe: {
+          drupalBaseUrl: 'https://cms.example',
+        },
+      },
+    }))
+  })
+
+  it('normalizes shared teaser images for Nuxt Image delivery', () => {
     const { post } = useTeaserPost({
       media: {
         src: 'https://cms.example/styles/card/poster.webp',
@@ -17,10 +27,26 @@ describe('useTeaserPost', () => {
     })
 
     expect(post.value.image).toMatchObject({
-      originalRevision: '42-1710000000-123456',
-      originalSrc: 'https://cms.example/files/poster.jpg',
-      deliveryProfile: 'card',
+      src: 'https://cms.example/files/poster.jpg?v=42-1710000000-123456',
+      width: 1920,
+      height: 1080,
     })
+    expect(post.value.image).not.toHaveProperty('originalSrc')
+    expect(post.value.image).not.toHaveProperty('deliveryProfile')
+  })
+
+  it('prefixes relative Drupal teaser image paths', () => {
+    const { post } = useTeaserPost({
+      media: {
+        src: '/sites/default/files/poster.jpg',
+        width: 800,
+        height: 600,
+      },
+    })
+
+    expect(post.value.image?.src).toBe(
+      'https://cms.example/sites/default/files/poster.jpg',
+    )
   })
 
   it('prefers explicit node editLink over source editLink', () => {
