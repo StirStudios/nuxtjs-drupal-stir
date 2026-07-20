@@ -12,11 +12,6 @@ const transformedOptions = computed(() =>
   transformOptions(props.field['#options'] || {}),
 )
 
-onMounted(() => {
-  if (props.state[props.fieldName] === undefined) {
-    props.state[props.fieldName] = ''
-  }
-})
 </script>
 
 <template>
@@ -24,7 +19,7 @@ onMounted(() => {
     v-model="state[fieldName]"
     class="form-input w-full"
     :items="transformedOptions"
-    orientation="horizontal"
+    :orientation="field['#orientation'] === 'horizontal' ? 'horizontal' : 'vertical'"
   >
     <template #description="{ item }">
       <span class="mt-2 block whitespace-pre-line">{{ item.description }}</span>

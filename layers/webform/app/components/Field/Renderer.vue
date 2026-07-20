@@ -3,6 +3,10 @@ import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import {
+  resolveWebformBoolean,
+  resolveWebformFieldType,
+} from '#stir-webform/utils/webformFieldUtils'
 
 import {
   LazyFieldInput,
@@ -61,31 +65,18 @@ const componentMap: Record<string, Component> = {
 
 const shouldRender = computed(() => {
   return (
-    props.bypassRelocatedFilter === true || props.field['#relocated'] !== true
+    props.bypassRelocatedFilter === true ||
+    !resolveWebformBoolean(props.field['#relocated'])
   )
 })
 
 const useFloatingLabels = computed(
-  () => props.field['#floating_label'] ?? webform.labels.floating,
+  () =>
+    props.field['#floating_label'] === undefined
+      ? webform.labels.floating
+      : resolveWebformBoolean(props.field['#floating_label']),
 )
-const resolvedFieldType = computed(() => {
-  const rawType = String(props.field['#type'] ?? '').trim().toLowerCase()
-  const inputType =
-    props.field['#input_type'] ??
-    props.field['#inputType'] ??
-    props.field['#widget'] ??
-    (props.field['#attributes'] as Record<string, unknown> | undefined)?.type
-  const normalizedInputType = String(inputType ?? '').trim().toLowerCase()
-
-  if (rawType === 'range') return 'range'
-  if (rawType.includes('range')) return 'range'
-
-  if (rawType === 'number' && normalizedInputType === 'range') {
-    return 'range'
-  }
-
-  return rawType
-})
+const resolvedFieldType = computed(() => resolveWebformFieldType(props.field))
 
 const resolvedComponent = computed(
   () => componentMap[resolvedFieldType.value] || null,
@@ -98,10 +89,10 @@ const resolvedComponentProps = computed(() =>
 
 const shouldShowLabel = computed(
   () =>
-    props.field['#type'] !== 'checkbox' &&
-    props.field['#type'] !== 'datetime' &&
-    props.field['#type'] !== 'date' &&
-    props.field['#type'] !== 'hidden' &&
+    resolvedFieldType.value !== 'checkbox' &&
+    resolvedFieldType.value !== 'datetime' &&
+    resolvedFieldType.value !== 'date' &&
+    resolvedFieldType.value !== 'hidden' &&
     (resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||
       !useFloatingLabels.value),
@@ -109,7 +100,8 @@ const shouldShowLabel = computed(
 
 const shouldShowDescription = computed(
   () =>
-    props.field['#type'] !== 'checkbox' && props.field['#type'] !== 'hidden',
+    resolvedFieldType.value !== 'checkbox' &&
+    resolvedFieldType.value !== 'hidden',
 )
 
 const { visible, checked } = useEvaluateState(
@@ -141,7 +133,7 @@ const fieldUi = computed(() => {
 
 <template>
   <input
-    v-if="field['#type'] === 'hidden'"
+    v-if="resolvedFieldType === 'hidden'"
     :name="fieldName"
     type="hidden"
     :value="field['#defaultValue']"
@@ -152,11 +144,11 @@ const fieldUi = computed(() => {
     :disabled="!checked"
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
-    :required="!!field['#required']"
+    :required="resolveWebformBoolean(field['#required'])"
     :ui="fieldUi"
   >
     <LazyButtonModal
-      v-if="field['#modal'] === true"
+      v-if="resolveWebformBoolean(field['#modal'])"
       :modal-id="field['#name']"
     />
 

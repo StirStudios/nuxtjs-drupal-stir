@@ -260,7 +260,6 @@
       "layers/webform/app/components/Field/Relocated.vue",
       "layers/webform/app/components/Field/Renderer.vue",
       "layers/webform/app/components/Field/Select.vue",
-      "layers/webform/app/components/Field/SelectMenu.vue",
       "layers/webform/app/components/Field/Textarea.vue",
       "layers/webform/app/components/WebformContent.vue",
       "layers/webform/app/components/WebformForm.vue",
@@ -322,6 +321,7 @@
       "layers/theme/app/composables/useSlotsToolkit.ts",
       "layers/theme/app/composables/useSocialIcons.ts",
       "layers/theme/app/composables/useStirDrupalCe.ts",
+      "layers/theme/app/composables/useStirFormTheme.ts",
       "layers/theme/app/composables/useTeaserPost.ts",
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useVideoPlayers.ts",
@@ -370,6 +370,7 @@
       "layers/webform/app/utils/stateUtils.ts",
       "layers/webform/app/utils/transformUtils.ts",
       "layers/webform/app/utils/visibilityUtils.ts",
+      "layers/webform/app/utils/webformFieldUtils.ts",
       "layers/webform/app/utils/webformFileUtils.ts",
       "layers/webform/app/utils/webformRedirect.ts",
       "layers/webform/app/utils/webformScrollToTop.ts"
@@ -555,7 +556,6 @@
         "layers/webform/app/components/Field/Relocated.vue",
         "layers/webform/app/components/Field/Renderer.vue",
         "layers/webform/app/components/Field/Select.vue",
-        "layers/webform/app/components/Field/SelectMenu.vue",
         "layers/webform/app/components/Field/Textarea.vue",
         "layers/webform/app/components/WebformContent.vue",
         "layers/webform/app/components/WebformForm.vue",
@@ -617,6 +617,7 @@
         "layers/theme/app/composables/useSlotsToolkit.ts",
         "layers/theme/app/composables/useSocialIcons.ts",
         "layers/theme/app/composables/useStirDrupalCe.ts",
+        "layers/theme/app/composables/useStirFormTheme.ts",
         "layers/theme/app/composables/useTeaserPost.ts",
         "layers/theme/app/composables/useThirdPartyScript.ts",
         "layers/theme/app/composables/useVideoPlayers.ts",
@@ -665,6 +666,7 @@
         "layers/webform/app/utils/stateUtils.ts",
         "layers/webform/app/utils/transformUtils.ts",
         "layers/webform/app/utils/visibilityUtils.ts",
+        "layers/webform/app/utils/webformFieldUtils.ts",
         "layers/webform/app/utils/webformFileUtils.ts",
         "layers/webform/app/utils/webformRedirect.ts",
         "layers/webform/app/utils/webformScrollToTop.ts"
@@ -678,22 +680,22 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 116,
-    "composables": 61,
-    "utils": 43,
+    "components": 115,
+    "composables": 62,
+    "utils": 44,
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 26,
     "productionDependencies": 42,
     "developmentDependencies": 24,
-    "tests": 115,
+    "tests": 116,
     "testsByArea": {
       "composables": 11,
       "contracts": 1,
       "nuxt": 40,
       "server": 23,
       "unit": 4,
-      "utils": 36
+      "utils": 37
     }
   },
   "tests": [
@@ -809,6 +811,7 @@
     "tests/utils/thirdPartyScripts.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",
     "tests/utils/validationErrors.spec.ts",
+    "tests/utils/webformFieldUtils.spec.ts",
     "tests/utils/webformFileUtils.spec.ts",
     "tests/utils/webformRedirect.spec.ts",
     "tests/utils/webformScrollToTop.spec.ts"

@@ -22,6 +22,10 @@ import type {
   WebformState,
 } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
+import {
+  resolveWebformFieldType,
+  resolveWebformMultiple,
+} from '#stir-webform/utils/webformFieldUtils'
 
 type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
@@ -133,26 +137,8 @@ const groupedFields = computed(() => {
 })
 
 const formResetKey = ref(0)
-const isRangeLikeField = (field: WebformFieldProps) => {
-  const type = String(field['#type'] ?? '')
-    .trim()
-    .toLowerCase()
-  const inputType = String(
-    field['#input_type'] ??
-      field['#inputType'] ??
-      field['#widget'] ??
-      (field['#attributes'] as Record<string, unknown> | undefined)?.type ??
-      '',
-  )
-    .trim()
-    .toLowerCase()
-
-  return (
-    type === 'range' ||
-    type.includes('range') ||
-    (type === 'number' && inputType === 'range')
-  )
-}
+const isRangeLikeField = (field: WebformFieldProps) =>
+  resolveWebformFieldType(field) === 'range'
 
 const getFieldDefaultValue = (
   field: WebformFieldProps,
@@ -176,10 +162,8 @@ const getFieldDefaultValue = (
   }
 
   const type = field['#type']
-  const multipleCount = Number(field['#multiple'])
   const multiple =
-    field['#multiple'] === true ||
-    (Number.isFinite(multipleCount) && multipleCount > 1) ||
+    resolveWebformMultiple(field['#multiple']) ||
     (typeof field['#cardinality'] === 'number' && field['#cardinality'] !== 1)
 
   if (isWebformFileField(field)) return multiple ? [] : undefined

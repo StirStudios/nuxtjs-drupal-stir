@@ -2,6 +2,7 @@
 import type { WebformFieldProps } from '#stir/types'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
+import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -9,7 +10,6 @@ const props = defineProps<{
   state: Record<string, boolean | string>
 }>()
 
-const checkboxValue = ref<boolean>(false)
 const optionProps = props.field['#optionProperties'] || {}
 const checkboxId = computed(
   () => String(props.field['#id'] ?? `checkbox-${props.fieldName}`),
@@ -25,36 +25,17 @@ const { disabled, checked } = useEvaluateState(
   props.state,
 )
 
-onMounted(() => {
-  const initial = Object.prototype.hasOwnProperty.call(
-    props.state,
-    props.fieldName,
-  )
-    ? !!props.state[props.fieldName]
-    : !!props.field['#defaultValue']
-
-  checkboxValue.value = initial
-  props.state[props.fieldName] = initial
+const checkboxValue = computed({
+  get: () => resolveWebformBoolean(props.state[props.fieldName]),
+  set: (value: boolean | 'indeterminate') => {
+    props.state[props.fieldName] = value === true
+  },
 })
 
 if (props.field['#states']?.checked) {
   watch(checked, (value) => {
-    const safe = !!value
-
-    checkboxValue.value = safe
-    props.state[props.fieldName] = safe
+    checkboxValue.value = value
   })
-} else {
-  watch(checkboxValue, (val) => {
-    props.state[props.fieldName] = !!val
-  })
-}
-
-const handleModelUpdate = (val: boolean | 'indeterminate') => {
-  const safe = val === true
-
-  checkboxValue.value = safe
-  props.state[props.fieldName] = safe
 }
 </script>
 
@@ -70,7 +51,6 @@ const handleModelUpdate = (val: boolean | 'indeterminate') => {
     :ui="{
       label: descriptionContent ? 'sr-only' : '',
     }"
-    @update:model-value="handleModelUpdate"
   >
     <template #label>
       <span :class="{ 'text-muted': optionProps.disabled }">

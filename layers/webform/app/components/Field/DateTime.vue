@@ -5,6 +5,10 @@ import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
 import { generateTimeOptions, getOffsetString } from '#stir/utils/dateUtils'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
+import {
+  resolveWebformBoolean,
+  resolveWebformCardinality,
+} from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -12,10 +16,15 @@ const props = defineProps<{
   state: WebformState
 }>()
 
-const { emitFormInput, emitFormChange } = useFormField()
+const {
+  color: validationColor,
+  highlight: validationHighlight,
+  emitFormInput,
+  emitFormChange,
+} = useFormField()
 const webform = useStirWebformTheme()
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
-const multiple = Number(props.field['#multiple']) || 1
+const multiple = resolveWebformCardinality(props.field['#multiple'])
 const minTime = String(props.field['#dateTimeMin'] ?? '10:00:00')
 const maxTime = String(props.field['#dateTimeMax'] ?? '22:00:00')
 const step = Number(props.field['#dateTimeStep']) || 1800
@@ -64,7 +73,12 @@ const dateFieldLabel = (index: number) =>
     : String(props.field['#title'] ?? 'Date')
 const timeFieldLabel = (index: number) =>
   multiple > 1 ? `Time ${index + 1}` : 'Time'
-const fieldRequired = computed(() => !!props.field['#required'])
+const fieldRequired = computed(() =>
+  resolveWebformBoolean(props.field['#required']),
+)
+const fieldInvalid = computed(
+  () => validationColor.value === 'error' || validationHighlight.value === true,
+)
 
 watchEffect(() => {
   if (!Array.isArray(props.state[props.fieldName])) {
@@ -109,6 +123,7 @@ watch(
         <UFormField :label="dateFieldLabel(i)" :required="fieldRequired">
           <DateTimeCalendar
             v-model="block.date"
+            :invalid="fieldInvalid"
             :label="dateFieldLabel(i)"
             :timezone="siteTimezone"
             :variant="fieldVariant"
@@ -118,6 +133,7 @@ watch(
         <UFormField :label="timeFieldLabel(i)" :required="fieldRequired">
           <DateTimeSelect
             v-model="block.start"
+            :invalid="fieldInvalid"
             :items="timeOptions"
             placeholder="Select time"
             :variant="fieldVariant"

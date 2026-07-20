@@ -6,6 +6,7 @@ import {
   getFileMaxSize,
   isFileValue,
 } from '#stir-webform/utils/webformFileUtils'
+import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -62,6 +63,6 @@ const modelValue = computed<File | File[] | null>({
     layout="list"
     :multiple="isMultiple"
     :name="fieldName"
-    :required="!!field['#required']"
+    :required="resolveWebformBoolean(field['#required'])"
   />
 </template>

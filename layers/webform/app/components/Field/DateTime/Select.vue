@@ -8,6 +8,7 @@ type SelectItem = {
 }
 
 defineProps<{
+  invalid?: boolean
   items: SelectItem[]
   placeholder?: string
   variant?: UiFieldVariant
@@ -37,7 +38,10 @@ const contentId = computed(() => {
 <template>
   <USelect
     v-model="model"
+    :aria-invalid="invalid || undefined"
     class="w-full"
+    :color="invalid ? 'error' : undefined"
+    :highlight="invalid"
     :items="items"
     :placeholder="placeholder"
     :variant="variant"

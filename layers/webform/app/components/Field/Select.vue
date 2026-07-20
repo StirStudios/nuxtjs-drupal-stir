@@ -20,27 +20,7 @@ const portal = useOverlayPortal()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 
-const getDefaultValue = () => {
-  const value = props.field?.['#defaultValue']
-
-  return typeof value === 'string' ? value : ''
-}
-
 const tabBus = useEventBus<string>('tab-changed')
-
-onMounted(() => {
-  props.state[props.fieldName] ??= getDefaultValue()
-})
-
-watch(
-  () => props.state[props.fieldName],
-  (newVal) => {
-    if (!newVal) {
-      props.state[props.fieldName] = getDefaultValue()
-    }
-  },
-  { immediate: true },
-)
 
 const selectItems = computed(() => {
   if (Array.isArray(props.items)) return props.items

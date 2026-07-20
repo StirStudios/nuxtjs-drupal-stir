@@ -1,5 +1,9 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
+  resolveWebformBoolean,
+  resolveWebformMultiple,
+} from '#stir-webform/utils/webformFieldUtils'
+import {
   custom,
   object,
   optional,
@@ -111,15 +115,20 @@ function createFieldSchema(field: WebformFieldProps): GenericSchema {
     for (const [key, subField] of Object.entries(
       composite as Record<string, WebformFieldProps>,
     )) {
-      const required = field['#required'] === true || subField['#required'] === true
+      const required =
+        resolveWebformBoolean(field['#required']) ||
+        resolveWebformBoolean(subField['#required'])
       const message = field['#requiredError'] || 'This field is required'
 
       entries[key] = valueSchema(value =>
         required && isEmpty(value) ? message : null,
       )
     }
-    const requiresComposite = field['#required'] === true
-      || Object.values(composite).some(subField => subField['#required'] === true)
+    const requiresComposite =
+      resolveWebformBoolean(field['#required']) ||
+      Object.values(composite).some(subField =>
+        resolveWebformBoolean(subField['#required']),
+      )
 
     return requiresComposite ? object(entries) : optional(object(entries))
   }
@@ -141,9 +150,9 @@ function fieldValidationMessage(
   value: unknown,
 ): string | null {
   const requiredError = field['#requiredError'] || 'This field is required'
-  const required = field['#required'] === true
+  const required = resolveWebformBoolean(field['#required'])
   const type = field['#type']
-  const multiple = '#multiple' in field && Boolean(field['#multiple'])
+  const multiple = resolveWebformMultiple(field['#multiple'])
 
   if (isWebformFileField(field)) {
     const values = allowsMultipleFiles(field)

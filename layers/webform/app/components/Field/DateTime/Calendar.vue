@@ -11,6 +11,7 @@ import {
 import type { DateTimeDate } from '#stir/types'
 
 const props = defineProps<{
+  invalid?: boolean
   label: string
   modelValue: DateTimeDate | null
   timezone: string
@@ -21,7 +22,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: DateTimeDate | null]
 }>()
 
-const { id } = useFormField()
+const { id, size, color, disabled, ariaAttrs } = useFormField()
 const portal = useOverlayPortal()
 const df = computed(() =>
   new DateFormatter('en-US', {
@@ -56,13 +57,23 @@ const selectedDateLabel = computed(() =>
 <template>
   <UPopover
     v-model:open="popoverOpen"
+    class="w-full"
     :portal="portal"
   >
     <UButton
+      v-bind="ariaAttrs"
       :id="id"
+      :aria-invalid="invalid || undefined"
       class="w-full justify-start"
+      :color="invalid ? 'error' : (color ?? 'neutral')"
+      :disabled="disabled"
       icon="i-lucide-calendar"
-      size="md"
+      :size="size ?? 'xl'"
+      :ui="{
+        base: invalid ? 'font-normal ring-error' : 'font-normal',
+        label: model ? 'text-default' : 'text-dimmed',
+        leadingIcon: 'text-dimmed',
+      }"
       :variant="buttonVariant"
     >
       <span class="sr-only">{{ label }}:</span>

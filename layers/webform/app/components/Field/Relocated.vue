@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps, WebformState } from '#stir/types'
+import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   fields: Record<string, WebformFieldProps>
@@ -9,7 +10,7 @@ const props = defineProps<{
 
 const movedFields = computed(() =>
   props.orderedFieldNames.filter(
-    (name) => props.fields[name]?.['#relocated'] === true,
+    (name) => resolveWebformBoolean(props.fields[name]?.['#relocated']),
   ),
 )
 </script>

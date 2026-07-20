@@ -85,6 +85,8 @@ export interface WebformOptionProperties {
   linkedTo?: string[]
 }
 
+export type WebformBooleanValue = boolean | number | string
+
 export interface WebformFieldProps {
   [key: string]: unknown
   '#type': InputType
@@ -98,7 +100,7 @@ export interface WebformFieldProps {
   '#input_type'?: string
   '#inputType'?: string
   '#widget'?: string
-  '#required'?: boolean
+  '#required'?: WebformBooleanValue
   '#requiredError'?: string
   '#options'?: Record<string, string>
   '#optionProperties'?: Record<string, WebformOptionProperties>
@@ -109,7 +111,11 @@ export interface WebformFieldProps {
   '#accept'?: string
   '#file_extensions'?: string
   '#upload_validators'?: Record<string, unknown>
-  '#multiple'?: number | boolean
+  '#multiple'?: WebformBooleanValue
+  '#disabled'?: WebformBooleanValue
+  '#floating_label'?: WebformBooleanValue
+  '#modal'?: WebformBooleanValue
+  '#relocated'?: WebformBooleanValue
   '#states'?: States
   '#group'?: string
   '#groupMaxSelected'?: number

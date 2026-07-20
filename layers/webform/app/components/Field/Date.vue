@@ -6,6 +6,7 @@ import {
   getLocalTimeZone,
 } from '@internationalized/date'
 import { resolveUiButtonVariant } from '#stir/utils/nuxtUiProps'
+import { resolveWebformCardinality } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -13,13 +14,20 @@ const props = defineProps<{
   state: WebformState
 }>()
 
-const { emitFormInput, emitFormChange } = useFormField()
+const {
+  id,
+  size,
+  color,
+  disabled,
+  ariaAttrs,
+  emitFormInput,
+  emitFormChange,
+} = useFormField()
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
-const isMaterial = computed(() => webform.fieldVariant === 'material')
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
-const max = Number(props.field['#multiple']) || 1
+const max = resolveWebformCardinality(props.field['#multiple'])
 
 const models = ref<CalendarDate[]>([])
 const popoverOpen = ref(false)
@@ -91,10 +99,24 @@ const calendarModel = computed({
 <template>
   <UPopover
     v-model:open="popoverOpen"
-    :class="{ 'w-full': isMaterial }"
+    class="w-full"
     :portal="portal"
   >
-    <UButton icon="i-lucide-calendar" size="xl" :variant="buttonVariant">
+    <UButton
+      :id="id"
+      class="w-full justify-start"
+      :color="color ?? 'neutral'"
+      :disabled="disabled"
+      icon="i-lucide-calendar"
+      :size="size ?? 'xl'"
+      :ui="{
+        base: color === 'error' ? 'font-normal ring-error' : 'font-normal',
+        label: models.length ? 'text-default' : 'text-dimmed',
+        leadingIcon: 'text-dimmed',
+      }"
+      :variant="buttonVariant"
+      v-bind="ariaAttrs"
+    >
       <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}
     </UButton>

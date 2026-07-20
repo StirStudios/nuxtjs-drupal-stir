@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '#stir/types'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
+import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -49,7 +50,7 @@ const countryOptions = computed(() => {
 
 const useFloatingLabels = computed(() =>
   props.field['#floating_label'] !== undefined
-    ? props.field['#floating_label']
+    ? resolveWebformBoolean(props.field['#floating_label'])
     : webform.labels.floating,
 )
 
@@ -69,7 +70,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
       "
       :name="`${fieldName}.${key}`"
-      :required="!!field['#required']"
+      :required="resolveWebformBoolean(field['#required'])"
     >
       <UInput
         v-if="key !== 'country'"

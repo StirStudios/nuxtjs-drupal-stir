@@ -8,6 +8,7 @@ import {
 } from '#stir-webform/utils/selectionUtils'
 import { normalizeValue } from '#stir/utils/stringUtils'
 import { handleTabChange } from '#stir-webform/utils/visibilityUtils'
+import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -41,7 +42,9 @@ onBeforeUnmount(() => {
   stopTabBus = null
 })
 
-const isFieldDisabled = computed(() => props.field['#disabled'] === true)
+const isFieldDisabled = computed(() =>
+  resolveWebformBoolean(props.field['#disabled']),
+)
 const toStringArray = (value: unknown): string[] =>
   Array.isArray(value)
     ? value.filter((entry): entry is string => typeof entry === 'string')
@@ -73,7 +76,10 @@ const items = computed(() => {
       ? toStringArray(conditionValue)
       : typeof conditionValue === 'object' && conditionValue !== null
         ? Object.keys(conditionValue as Record<string, unknown>).filter(
-            (k) => (conditionValue as Record<string, unknown>)[k] === true,
+            (k) =>
+              resolveWebformBoolean(
+                (conditionValue as Record<string, unknown>)[k],
+              ),
           )
         : []
 
