@@ -36,7 +36,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
       :class="['px-1.5', webform.labels.base]"
       :for="id"
     >
-      <span class="inline-flex rounded-sm bg-default px-1">
+      <span class="inline-flex rounded-sm bg-default pe-1">
         {{ props.field['#title'] }}
       </span>
     </label>

@@ -14,7 +14,7 @@ export default defineAppConfig({
       formClass: '',
       labels: {
         base: [
-          'pointer-events-none absolute -top-2 start-2 z-10 text-sm font-medium text-default transition-all duration-150 ease-out',
+          'pointer-events-none absolute -top-2 start-0 z-10 text-sm font-medium text-default transition-all duration-150 ease-out',
           'peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:font-normal peer-placeholder-shown:text-dimmed',
           'peer-focus:-top-2 peer-focus:text-sm peer-focus:font-medium peer-focus:text-primary',
         ],

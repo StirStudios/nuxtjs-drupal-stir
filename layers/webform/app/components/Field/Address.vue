@@ -86,7 +86,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
           :class="['px-1.5', webform.labels.base]"
           :for="getFieldId(String(key))"
         >
-          <span class="inline-flex rounded-sm bg-default px-1">
+          <span class="inline-flex rounded-sm bg-default pe-1">
             {{ getCompositeLabel(fieldData, String(key)) }}
           </span>
         </label>
