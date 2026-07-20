@@ -73,7 +73,7 @@ const sectionId = computed(() => {
         <div
           v-if="!hasGridItems || slotName !== 'items'"
           :class="[
-            'region',
+            'region flex-col',
             slotName,
             props.regionAlign?.[slotName],
             mobileRegionOrderClass(slotName),

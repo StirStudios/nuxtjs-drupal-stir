@@ -47,6 +47,31 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     expect(wrapper.find('.region.second .region.first > .nested-item').exists()).toBe(true)
   })
 
+  it('keeps multiple components in an aligned region stacked vertically', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: {
+        id: 'aligned-region',
+        layout: 'two_column',
+        regionAlign: {
+          second: 'md:flex justify-center text-center',
+        },
+      },
+      slots: {
+        first: '<img class="contact-image" alt="" />',
+        second: `
+          <div class="contact-copy">Contact copy</div>
+          <form class="contact-form">Contact form</form>
+        `,
+      },
+    })
+
+    expect(wrapper.find('.region.second').classes()).toEqual(
+      expect.arrayContaining(['flex-col', 'md:flex', 'justify-center', 'text-center']),
+    )
+    expect(wrapper.find('.region.second > .contact-copy').exists()).toBe(true)
+    expect(wrapper.find('.region.second > .contact-form').exists()).toBe(true)
+  })
+
   it('can show the second region first only while a two-column layout is stacked', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: {
