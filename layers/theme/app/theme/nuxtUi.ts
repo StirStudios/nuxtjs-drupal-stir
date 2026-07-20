@@ -1,9 +1,9 @@
 const materialControlBase =
-  'rounded-md border-b-2 border-b-accented bg-default transition-colors focus-visible:border-b-primary focus-visible:ring-2 focus-visible:ring-primary/60 aria-invalid:border-b-error aria-invalid:focus-visible:ring-error/60 dark:border-b-default dark:aria-invalid:border-b-error'
+  'rounded-md border-b-2 border-b-accented bg-default px-0! outline-none transition-colors focus:outline-none focus-visible:border-b-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 aria-invalid:border-b-error aria-invalid:focus-visible:ring-error/60 dark:border-b-default dark:aria-invalid:border-b-error'
 
 export const materialTextControl = `text-highlighted ${materialControlBase}`
 export const materialSelectControl = `${materialTextControl} pb-3!`
-export const materialButton = `text-muted ${materialControlBase} gap-2 py-3 text-base font-normal`
+export const materialButton = `text-muted ${materialControlBase} min-h-12 w-full justify-start gap-2 py-3 text-base font-normal`
 
 export const nuxtUiTheme = {
   colors: {

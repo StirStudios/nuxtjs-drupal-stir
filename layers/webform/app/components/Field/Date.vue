@@ -94,7 +94,7 @@ const calendarModel = computed({
     :class="{ 'w-full': isMaterial }"
     :portal="portal"
   >
-    <UButton icon="i-lucide-calendar" size="md" :variant="buttonVariant">
+    <UButton icon="i-lucide-calendar" size="xl" :variant="buttonVariant">
       <span class="sr-only">{{ field['#title'] }}:</span>
       {{ selectedDatesLabel }}
     </UButton>
