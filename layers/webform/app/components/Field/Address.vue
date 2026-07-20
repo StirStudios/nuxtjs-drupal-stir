@@ -83,7 +83,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       >
         <label
           v-if="useFloatingLabels"
-          :class="['px-1.5', webform.labels.base]"
+          :class="webform.labels.floatingClass"
           :for="getFieldId(String(key))"
         >
           <span class="inline-flex rounded-sm bg-default pe-1">

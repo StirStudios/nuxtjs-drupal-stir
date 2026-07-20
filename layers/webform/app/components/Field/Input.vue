@@ -109,7 +109,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
   >
     <label
       v-if="floatingLabel"
-      :class="['px-1.5', webform.labels.base]"
+      :class="webform.labels.floatingClass"
       :for="id"
     >
       <span class="inline-flex rounded-sm bg-default pe-1">

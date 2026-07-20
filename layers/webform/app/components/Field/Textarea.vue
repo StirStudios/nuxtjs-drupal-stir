@@ -33,7 +33,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
   >
     <label
       v-if="props.floatingLabel"
-      :class="['px-1.5', webform.labels.base]"
+      :class="webform.labels.floatingClass"
       :for="id"
     >
       <span class="inline-flex rounded-sm bg-default pe-1">
