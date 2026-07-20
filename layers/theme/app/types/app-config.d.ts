@@ -4,7 +4,7 @@ type LooseRecord = Record<string, unknown>
 type ClassValue = string
 type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
-type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
+export type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
 type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
@@ -279,6 +279,11 @@ type StirThemeWebformConfig = {
   fieldVariant?: UiFieldVariantName
 } & LooseRecord
 
+export type StirThemeFormsConfig = {
+  floatingLabels?: boolean
+  variant?: UiFieldVariantName
+} & LooseRecord
+
 type StirThemeTurnstileConfig = {
   appearance?: 'always' | 'execute' | 'interaction-only'
 } & LooseRecord
@@ -372,6 +377,7 @@ type StirThemeConfig = {
   carousel?: StirThemeCarouselConfig
   mediaModal?: StirThemeModalConfig
   overlay?: StirThemeOverlayConfig
+  forms?: StirThemeFormsConfig
   webform?: StirThemeWebformConfig
   turnstile?: StirThemeTurnstileConfig
   card?: StirThemeCardConfig
@@ -432,6 +438,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   carousel: ResolvedStirThemeCarouselConfig
   mediaModal: ResolvedStirThemeModalConfig
   overlay: StirThemeOverlayConfig
+  forms: StirThemeFormsConfig
   webform: ResolvedStirThemeWebformConfig
   turnstile: StirThemeTurnstileConfig
   card: ResolvedStirThemeCardConfig

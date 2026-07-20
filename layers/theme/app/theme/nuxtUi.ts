@@ -1,5 +1,5 @@
 const materialControlBase =
-  'rounded-none border-b-2 border-b-accented bg-transparent px-0! transition-colors focus:border-b-default aria-invalid:border-b-error aria-invalid:ring-0 dark:border-b-default dark:focus:border-b-inverted dark:aria-invalid:border-b-error'
+  'rounded-md border-b-2 border-b-accented bg-default transition-colors focus-visible:border-b-primary focus-visible:ring-2 focus-visible:ring-primary/60 aria-invalid:border-b-error aria-invalid:focus-visible:ring-error/60 dark:border-b-default dark:aria-invalid:border-b-error'
 
 export const materialTextControl = `text-highlighted ${materialControlBase}`
 export const materialSelectControl = `${materialTextControl} pb-3!`

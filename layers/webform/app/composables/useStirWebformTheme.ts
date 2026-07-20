@@ -31,10 +31,15 @@ type ResolvedStirWebformTheme = StirWebformTheme & {
 
 export function useStirWebformTheme(): ResolvedStirWebformTheme {
   const stirTheme = useAppConfig().stirTheme as { webform?: StirWebformTheme }
+  const forms = useStirFormTheme()
   const webform = stirTheme.webform ?? {}
 
   return {
+    fieldVariant: webform.fieldVariant ?? forms.variant,
     ...webform,
-    labels: webform.labels ?? {},
+    labels: {
+      floating: webform.labels?.floating ?? forms.floatingLabels,
+      ...webform.labels,
+    },
   }
 }

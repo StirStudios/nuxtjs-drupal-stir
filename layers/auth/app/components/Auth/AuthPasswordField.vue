@@ -14,6 +14,7 @@ const props = defineProps<{
 }>()
 
 const show = ref(false)
+const forms = useStirFormTheme()
 
 function checkStrength(str: string) {
   return passwordRequirements.value.map((req) => ({
@@ -149,6 +150,7 @@ function defaultPasswordRequirements(policy?: AuthPasswordPolicy): AuthPasswordR
       :placeholder="field?.placeholder || 'Password'"
       :type="show ? 'text' : 'password'"
       :ui="{ trailing: 'pe-1' }"
+      :variant="forms.variant"
     >
       <template #trailing>
         <UButton

@@ -18,6 +18,9 @@ const props = defineProps<{
 
 const webform = useStirWebformTheme()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
+const inputUi = computed(() => props.floatingLabel
+  ? { base: ['peer', isMaterial.value ? 'pt-4!' : ''] }
+  : {})
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
@@ -98,7 +101,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
     :placeholder="inputPlaceholder"
     :step="isNumber ? field['#step'] || 1 : undefined"
     :type="inputType"
-    :ui="floatingLabel ? { base: 'peer' } : {}"
+    :ui="inputUi"
     :variant="fieldVariant"
     @beforeinput="handleTelBeforeInput"
     @keydown="handleTelKeydown"
@@ -106,10 +109,10 @@ function updateFieldValue(value: string | number | null | undefined): void {
   >
     <label
       v-if="floatingLabel"
-      :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
+      :class="['px-1.5', webform.labels.base]"
       :for="id"
     >
-      <span :class="[isMaterial ? '' : 'bg-default px-1', 'inline-flex']">
+      <span class="inline-flex rounded-sm bg-default px-1">
         {{ field['#title'] }}
       </span>
     </label>

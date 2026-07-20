@@ -12,6 +12,9 @@ const props = defineProps<{
 
 const webform = useStirWebformTheme()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
+const textareaUi = computed(() => props.floatingLabel
+  ? { base: ['peer', isMaterial.value ? 'pt-4!' : ''] }
+  : {})
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const id = computed(() => injectedInputId?.value ?? props.fieldName)
@@ -25,15 +28,15 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
     :class="['w-full', webform.fieldText]"
     :placeholder="props.floatingLabel ? ' ' : ''"
     :rows="1"
-    :ui="props.floatingLabel ? { base: 'peer' } : {}"
+    :ui="textareaUi"
     :variant="fieldVariant"
   >
     <label
       v-if="props.floatingLabel"
-      :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
+      :class="['px-1.5', webform.labels.base]"
       :for="id"
     >
-      <span :class="[isMaterial ? '' : 'bg-default px-1', 'inline-flex']">
+      <span class="inline-flex rounded-sm bg-default px-1">
         {{ props.field['#title'] }}
       </span>
     </label>

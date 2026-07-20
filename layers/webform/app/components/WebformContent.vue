@@ -82,9 +82,7 @@ const submitButtonProps = computed(() => ({
     v-if="!isFormSubmitted"
     :class="[
       props.themeWebform.formClass,
-      props.themeWebform.fieldVariant === 'material'
-        ? props.themeWebform.spacingLarge
-        : props.themeWebform.spacing,
+      props.themeWebform.spacingLarge ?? props.themeWebform.spacing,
     ]"
     :schema="schema"
     :state="state"

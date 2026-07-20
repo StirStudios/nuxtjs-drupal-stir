@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AuthFormField, AuthFormProps, FormError } from '@nuxt/ui'
 
-defineProps<{
+const props = defineProps<{
   title: string
   description: string
   icon?: string
@@ -13,6 +13,13 @@ defineProps<{
     state: Record<string, unknown>,
   ) => FormError<string>[] | Promise<FormError<string>[]>
 }>()
+
+const forms = useStirFormTheme()
+const themedFields = computed(() => props.fields.map(field => (
+  field.type === 'checkbox' || field.type === 'otp'
+    ? field
+    : { ...field, variant: field.variant ?? forms.variant }
+)))
 
 defineEmits<{
   submit: [event: unknown]
@@ -33,7 +40,7 @@ defineSlots<{
   <UAuthForm
     class="text-left"
     :description="description"
-    :fields="fields"
+    :fields="themedFields"
     :icon="icon"
     :loading="loading"
     :submit="submit"

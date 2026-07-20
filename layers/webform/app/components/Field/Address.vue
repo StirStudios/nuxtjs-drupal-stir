@@ -12,6 +12,9 @@ const props = defineProps<{
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const isMaterial = computed(() => webform.fieldVariant === 'material')
+const inputUi = computed(() => useFloatingLabels.value
+  ? { base: ['peer', isMaterial.value ? 'pt-4!' : ''] }
+  : {})
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 
 const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
@@ -75,15 +78,15 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         v-model="state[fieldName]![String(key)]"
         class="w-full"
         :placeholder="useFloatingLabels ? ' ' : ''"
-        :ui="useFloatingLabels ? { base: 'peer' } : {}"
+        :ui="inputUi"
         :variant="fieldVariant"
       >
         <label
           v-if="useFloatingLabels"
-          :class="[isMaterial ? '' : 'px-1.5', webform.labels.base]"
+          :class="['px-1.5', webform.labels.base]"
           :for="getFieldId(String(key))"
         >
-          <span :class="[isMaterial ? '' : 'bg-default px-1', 'inline-flex']">
+          <span class="inline-flex rounded-sm bg-default px-1">
             {{ getCompositeLabel(fieldData, String(key)) }}
           </span>
         </label>

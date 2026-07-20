@@ -11,14 +11,12 @@ export default defineAppConfig({
       scrollToTopDelayMs: 0,
       scrollToTopFallbackDelayMs: 180,
       spacing: 'space-y-5',
-      spacingLarge: 'space-y-10',
       formClass: '',
       labels: {
-        floating: false,
         base: [
-          'text-default pointer-events-none absolute start-0 -top-2.5 text-sm font-medium transition-all duration-150 ease-out [&>span]:rounded-sm',
-          'peer-placeholder-shown:text-default/80 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal',
-          'peer-focus:text-highlighted peer-focus:-top-2.5 peer-focus:text-sm peer-focus:font-medium',
+          'pointer-events-none absolute -top-2 start-2 z-10 text-sm font-medium text-default transition-all duration-150 ease-out',
+          'peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:font-normal peer-placeholder-shown:text-dimmed',
+          'peer-focus:-top-2 peer-focus:text-sm peer-focus:font-medium peer-focus:text-primary',
         ],
       },
       fieldGroupHeader: 'mb-6 text-xl font-semibold',
@@ -32,7 +30,6 @@ export default defineAppConfig({
       submitComponent: '',
       buttonClass: '',
       submitButtonSize: '2xl',
-      fieldVariant: 'outline',
     },
   },
 })
