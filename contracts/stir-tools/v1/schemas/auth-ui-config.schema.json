@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": [
     "version",
+    "accountsEnabled",
     "loginRedirectPath",
     "logoutRedirectPath",
     "identifierModes",
@@ -19,6 +20,7 @@
   ],
   "properties": {
     "version": { "const": 2 },
+    "accountsEnabled": { "type": "boolean" },
     "loginRedirectPath": { "type": "string", "minLength": 1 },
     "logoutRedirectPath": { "type": "string", "minLength": 1 },
     "identifierModes": {

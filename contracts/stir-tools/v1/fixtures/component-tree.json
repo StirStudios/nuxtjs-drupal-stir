@@ -166,7 +166,7 @@
                 "alt": "Project gallery image",
                 "width": 1600,
                 "height": 1067,
-                "responsiveStyle": "container"
+                "deliveryProfile": "container"
               },
               "slots": {}
             }
@@ -194,7 +194,7 @@
                 "alt": "Featured image",
                 "width": 1200,
                 "height": 800,
-                "responsiveStyle": "container"
+                "deliveryProfile": "container"
               },
               "slots": {}
             }
@@ -230,7 +230,7 @@
                 "alt": "Hero video",
                 "width": 1920,
                 "height": 1080,
-                "responsiveStyle": "full",
+                "deliveryProfile": "full",
                 "loading": "eager",
                 "fetchpriority": "high",
                 "mediaEmbed": "https://video.example/hero.mp4"
@@ -301,7 +301,7 @@
                 "alt": "Contact our team",
                 "width": 1200,
                 "height": 800,
-                "responsiveStyle": "container"
+                "deliveryProfile": "container"
               },
               "slots": {}
             }

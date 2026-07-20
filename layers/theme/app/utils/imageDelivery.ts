@@ -1,7 +1,5 @@
 import type { ComputedRef, InjectionKey } from 'vue'
 
-export type StirImageDeliveryMode = 'drupal' | 'nuxt'
-
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
 
@@ -51,15 +49,18 @@ export function versionImageSource(
 }
 
 export function resolveImageDeliveryProfile(
-  responsiveStyle: string | undefined,
+  deliveryProfile: string | undefined,
   isHero: boolean,
   profiles: Record<string, string>,
 ): string | undefined {
-  const key = isHero ? 'hero' : responsiveStyle?.trim()
+  const requestedKey = deliveryProfile?.trim()
+  const key = isHero || requestedKey === 'auto'
+    ? (isHero ? 'hero' : 'container')
+    : requestedKey || 'container'
 
   if (!key) return undefined
 
-  const profile = profiles[key]?.trim()
+  const profile = (profiles[key] || profiles.container)?.trim()
 
   return profile || undefined
 }

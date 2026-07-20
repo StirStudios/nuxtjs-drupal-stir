@@ -1,4 +1,4 @@
-import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
+import { useAuthConfig } from '../composables/auth/useAuthConfig'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
 
@@ -59,9 +59,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   markPrivateResponse()
 
-  const integrationEnabled = useAuthIntegration()
-  const allowAuthenticatedUserBypass =
-    integrationEnabled && config.allowAuthenticatedUserBypass !== false
+  let allowAuthenticatedUserBypass = false
+
+  if (config.allowAuthenticatedUserBypass !== false) {
+    const authConfig = useAuthConfig()
+
+    await authConfig.ensureLoaded()
+    allowAuthenticatedUserBypass = authConfig.accountsEnabled.value
+  }
   const protectedSession = useProtectedSession()
 
   await protectedSession.fetchSession()

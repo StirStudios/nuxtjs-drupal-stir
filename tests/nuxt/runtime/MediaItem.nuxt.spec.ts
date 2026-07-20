@@ -126,14 +126,14 @@ describe('MediaItem (Nuxt runtime)', () => {
     )
     await nextTick()
 
-    expect(wrapper.get('img').attributes('src')).toBe('/gallery.webp')
+    expect(wrapper.get('img').attributes('src')).toContain('/gallery.webp')
     expect(wrapper.get('.media').attributes('aria-busy')).toBeUndefined()
     expect(disconnect).toHaveBeenCalledOnce()
 
     await wrapper.setProps({ deferLoad: false })
     await wrapper.setProps({ deferLoad: true })
 
-    expect(wrapper.get('img').attributes('src')).toBe('/gallery.webp')
+    expect(wrapper.get('img').attributes('src')).toContain('/gallery.webp')
     expect(wrapper.get('.media').attributes('aria-busy')).toBeUndefined()
   })
 })

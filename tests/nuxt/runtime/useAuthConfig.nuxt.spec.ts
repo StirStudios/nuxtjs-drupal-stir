@@ -1,37 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { clearNuxtData } from '#app'
 import { defineComponent } from 'vue'
 import { useAuthConfig } from '../../../layers/auth/app/composables/auth/useAuthConfig'
-
-const state = vi.hoisted(() => ({
-  drupalAccounts: true,
-}))
-
-mockNuxtImport('useAppConfig', () => {
-  return () => ({
-    authIntegration: {
-      drupalAccounts: state.drupalAccounts,
-    },
-    colorMode: {
-      forced: false,
-      preference: 'system',
-      showToggle: true,
-      lightRoutes: [],
-      darkRoutes: [],
-    },
-    ui: {
-      colors: {
-        neutral: 'slate',
-        primary: 'green',
-      },
-      prefix: 'ui',
-    },
-    icon: {
-      provider: 'local',
-    },
-  })
-})
 
 describe('useAuthConfig', () => {
   let authConfigCalls = 0
@@ -39,13 +10,14 @@ describe('useAuthConfig', () => {
 
   beforeEach(() => {
     authConfigCalls = 0
-    state.drupalAccounts = true
     clearNuxtData('stir-auth-ui-config')
     unregisterEndpoint = registerEndpoint('/api/auth/config', async () => {
       authConfigCalls++
       await new Promise(resolve => setTimeout(resolve, 10))
 
       return {
+        version: 2,
+        accountsEnabled: true,
         loginRedirectPath: '/account',
       }
     })
@@ -55,7 +27,6 @@ describe('useAuthConfig', () => {
     unregisterEndpoint?.()
     unregisterEndpoint = undefined
     clearNuxtData('stir-auth-ui-config')
-    state.drupalAccounts = false
   })
 
   it('dedupes concurrent auth config requests', async () => {
@@ -74,5 +45,4 @@ describe('useAuthConfig', () => {
     await vi.waitFor(() => expect(authConfigCalls).toBe(1))
     wrapper.unmount()
   })
-
 })

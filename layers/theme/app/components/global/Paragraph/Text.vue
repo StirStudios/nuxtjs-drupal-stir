@@ -29,6 +29,7 @@ const $img = useImage()
 const { isAdministrator } = usePageContext()
 
 const isEditing = ref(false)
+const isLoadingEditor = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
 const editSourceText = ref<string | null>(null)
 const renderedText = ref(props.text ?? '')
@@ -45,8 +46,6 @@ const sourceText = computed(() => {
 
 const trustedTextHtml = computed(() => {
   const html = trustedDrupalHtml(renderedText.value)
-
-  if (appConfig.stirImageDelivery !== 'nuxt') return html
 
   const image = appConfig.stirTheme.media.image
 
@@ -76,6 +75,9 @@ const wrapStyles = computed(() =>
 )
 
 async function startEditing() {
+  if (isEditing.value || isLoadingEditor.value) return
+
+  isLoadingEditor.value = true
   editSourceText.value = sourceText.value
 
   if (canInlineEdit.value && paragraphId.value > 0) {
@@ -91,16 +93,23 @@ async function startEditing() {
   }
 
   isEditing.value = true
+  isLoadingEditor.value = false
 }
 
 function stopEditing() {
   isEditing.value = false
+  isLoadingEditor.value = false
   editSourceText.value = null
 }
 
-function handleSaved(nextText: string) {
-  renderedText.value = nextText
-  stopEditing()
+async function handleSaved() {
+  isLoadingEditor.value = true
+
+  try {
+    await refreshNuxtData()
+  } finally {
+    stopEditing()
+  }
 }
 
 watch(() => props.text, (value) => {
@@ -115,17 +124,45 @@ watch(() => props.text, (value) => {
       controls-placement="slot"
       :link="editLink"
       :parent-uuid="parentUuid"
-      :show-quick-edit="canInlineEdit && isEditing === false"
+      :show-quick-edit="canInlineEdit && isEditing === false && isLoadingEditor === false"
       @quick-edit="startEditing"
     >
-      <template v-if="isEditing && canInlineEdit">
-        <LazyEditText
-          :classes="classes"
-          :paragraph-id="paragraphId"
-          :source-text="editSourceText ?? sourceText"
-          @cancel="stopEditing"
-          @saved="handleSaved"
-        />
+      <template v-if="(isEditing || isLoadingEditor) && canInlineEdit">
+        <div
+          v-if="isLoadingEditor"
+          class="grid min-h-32 place-items-center rounded-lg border border-default bg-elevated p-6"
+          role="status"
+        >
+          <UIcon
+            aria-hidden="true"
+            class="size-5 animate-spin text-muted"
+            name="i-lucide-loader-circle"
+          />
+          <span class="sr-only">Loading editor</span>
+        </div>
+        <Suspense v-else>
+          <LazyEditText
+            :classes="classes"
+            :paragraph-id="paragraphId"
+            :source-text="editSourceText ?? sourceText"
+            @cancel="stopEditing"
+            @saved="handleSaved"
+          />
+
+          <template #fallback>
+            <div
+              class="grid min-h-32 place-items-center rounded-lg border border-default bg-elevated p-6"
+              role="status"
+            >
+              <UIcon
+                aria-hidden="true"
+                class="size-5 animate-spin text-muted"
+                name="i-lucide-loader-circle"
+              />
+              <span class="sr-only">Loading editor</span>
+            </div>
+          </template>
+        </Suspense>
       </template>
 
       <template v-else-if="trustedTextHtml">

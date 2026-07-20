@@ -32,16 +32,10 @@ const props = withDefaults(
     height?: number
     originalRevision?: string
     originalSrc?: string
-    srcset?: string
-    sizes?: string
     deliverySizes?: string
-    responsiveStyle?: string
+    deliveryProfile?: string
     loading?: 'eager' | 'lazy'
     fetchpriority?: 'high' | 'low' | 'auto'
-    modalSrc?: string
-    modalSrcset?: string
-    modalSizes?: string
-    modalResponsiveStyle?: string
     credit?: string
     hideCredit?: boolean
 
@@ -70,16 +64,10 @@ const props = withDefaults(
     height: undefined,
     originalRevision: undefined,
     originalSrc: undefined,
-    srcset: undefined,
-    sizes: undefined,
     deliverySizes: undefined,
-    responsiveStyle: undefined,
+    deliveryProfile: undefined,
     loading: 'lazy',
     fetchpriority: 'auto',
-    modalSrc: undefined,
-    modalSrcset: undefined,
-    modalSizes: undefined,
-    modalResponsiveStyle: undefined,
     credit: undefined,
     hideCredit: false,
     isHero: undefined,
@@ -92,6 +80,20 @@ const props = withDefaults(
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
 const attrs = useAttrs()
+const forwardedAttrs = computed(() => {
+  const {
+    modalResponsiveStyle: _modalResponsiveStyle,
+    modalSizes: _modalSizes,
+    modalSrc: _modalSrc,
+    modalSrcset: _modalSrcset,
+    responsiveStyle: _responsiveStyle,
+    sizes: _sizes,
+    srcset: _srcset,
+    ...safeAttrs
+  } = attrs
+
+  return safeAttrs
+})
 const { initializePlayers, registerIframe } = useVideoPlayers()
 const injectedIsHero = inject<boolean>('isHero', false)
 const isHero = computed(() =>
@@ -220,17 +222,16 @@ const previewSrc = computed(() => {
 
   return localVideoSrc.value ? undefined : props.src
 })
-const previewSrcset = computed(() =>
-  isAnimatedPreviewActive.value ? undefined : props.srcset,
-)
 const staticPosterOriginalSrc = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.originalSrc,
 )
 const staticPosterOriginalRevision = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.originalRevision,
 )
-const staticPosterResponsiveStyle = computed(() =>
-  isAnimatedPreviewActive.value ? undefined : props.responsiveStyle,
+const staticPosterDeliveryProfile = computed(() =>
+  isAnimatedPreviewActive.value
+    ? undefined
+    : props.deliveryProfile,
 )
 
 const emit = defineEmits<{
@@ -291,9 +292,10 @@ watch(
   <template v-if="isBare">
     <MediaImage
       v-if="previewSrc"
-      v-bind="attrs"
+      v-bind="forwardedAttrs"
       :alt="alt || ''"
       aria-hidden="true"
+      :delivery-profile="staticPosterDeliveryProfile"
       :delivery-sizes="deliverySizes"
       :fetchpriority="fetchpriority"
       :height="height"
@@ -303,17 +305,14 @@ watch(
       no-wrapper
       :original-revision="staticPosterOriginalRevision"
       :original-src="staticPosterOriginalSrc"
-      :responsive-style="staticPosterResponsiveStyle"
-      :sizes="sizes || '100vw'"
       :src="previewSrc"
-      :srcset="previewSrcset"
       :width="width"
     />
 
     <video
       v-if="directHeroVideoSrc"
       ref="videoElement"
-      v-bind="attrs"
+      v-bind="forwardedAttrs"
       aria-hidden="true"
       class="pointer-events-none absolute inset-0 h-full w-full object-cover"
       disablepictureinpicture
@@ -344,7 +343,7 @@ watch(
   <div
     v-else
     ref="previewRoot"
-    v-bind="attrs"
+    v-bind="forwardedAttrs"
     :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
     :style="wrapperStyle"
   >
@@ -433,6 +432,7 @@ watch(
         <MediaImage
           v-else
           :alt="alt || title || 'Video thumbnail'"
+          :delivery-profile="staticPosterDeliveryProfile"
           :delivery-sizes="deliverySizes"
           :fetchpriority="fetchpriority"
           :height="height"
@@ -442,10 +442,7 @@ watch(
           no-wrapper
           :original-revision="staticPosterOriginalRevision"
           :original-src="staticPosterOriginalSrc"
-          :responsive-style="staticPosterResponsiveStyle"
-          :sizes="sizes || '100vw'"
           :src="previewSrc"
-          :srcset="previewSrcset"
           :width="width"
         />
       </div>

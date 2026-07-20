@@ -99,17 +99,12 @@ protectedRoutes: {
 }
 ```
 
-### 🔑 `authIntegration`
+### 🔑 Drupal account capability
 
-```ts
-authIntegration: {
-  drupalAccounts: false,
-}
-```
-
-- `drupalAccounts: false` disables Drupal account UI routes while keeping `/auth/protected` available.
-- Set `drupalAccounts: true` only for sites that use the Drupal `stir_account` endpoints.
-- Drupal `/api/auth/config` owns account-auth redirects, UI copy, and password policy.
+Drupal `/api/auth/config` owns account availability, redirects, UI copy, and
+password policy. Disable **Decoupled frontend accounts** in Stir Account
+settings to close the account UI routes while keeping `/auth/protected`
+available. No app-config flag is required.
 
 ### 🔐 `stirTheme.auth`
 

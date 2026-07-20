@@ -56,10 +56,6 @@ type ProtectedRoutesConfig = {
   fallbackRedirectPath?: string
 } & LooseRecord
 
-type AuthIntegrationConfig = {
-  drupalAccounts?: boolean
-} & LooseRecord
-
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
@@ -448,9 +444,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
 
 declare module 'nuxt/schema' {
   interface AppConfigInput {
-    stirImageDelivery?: 'drupal' | 'nuxt'
     protectedRoutes?: ProtectedRoutesConfig
-    authIntegration?: AuthIntegrationConfig
     analytics?: AnalyticsConfig
     thirdPartyScripts?: ThirdPartyScriptsConfig
     userway?: UserwayConfig
@@ -462,9 +456,7 @@ declare module 'nuxt/schema' {
   }
 
   interface AppConfig {
-    stirImageDelivery: 'drupal' | 'nuxt'
     protectedRoutes: ProtectedRoutesConfig
-    authIntegration: AuthIntegrationConfig
     analytics: AnalyticsConfig
     thirdPartyScripts: ThirdPartyScriptsConfig
     userway: UserwayConfig

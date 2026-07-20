@@ -1,5 +1,6 @@
 import {
   array,
+  boolean,
   getDotPath,
   integer,
   isValiError,
@@ -7,6 +8,7 @@ import {
   minLength,
   minValue,
   number,
+  optional,
   parse,
   picklist,
   pipe,
@@ -49,6 +51,7 @@ const message = () => strictObject({
 
 const authUiConfigSchema = strictObject({
   version: literal(2),
+  accountsEnabled: optional(boolean()),
   loginRedirectPath: requiredText(),
   logoutRedirectPath: requiredText(),
   identifierModes: strictObject({

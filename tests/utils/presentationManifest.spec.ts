@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import {
   buildPresentationSource,
+  compatibilityPresentationUtilities,
   inlinePresentationSource,
   loadPresentationManifest,
   parsePresentationManifest,
@@ -59,7 +60,9 @@ describe('CMS presentation manifest', () => {
 
     expect(utilities).toEqual(expect.arrayContaining([
       'grid-cols-2',
+      'basis-1/2',
       'lg:grid-cols-3',
+      'lg:basis-1/3',
       'gap-4',
       'lg:gap-6',
       'py-10',
@@ -71,6 +74,24 @@ describe('CMS presentation manifest', () => {
       'md:gap-4',
       'lg:grid-cols-[8fr_4fr]',
     ]))
+  })
+
+  it('keeps the transitional compatibility policy finite and centralized', () => {
+    const utilities = compatibilityPresentationUtilities()
+
+    expect(utilities).toEqual(expect.arrayContaining([
+      'grid-cols-12',
+      '2xl:grid-cols-12',
+      'basis-1/12',
+      '2xl:basis-1/12',
+      'gap-20',
+      '2xl:gap-20',
+      'p-20',
+      'lg:p-20',
+      'lg:grid-cols-[8fr_4fr]',
+    ]))
+    expect(new Set(utilities).size).toBe(utilities.length)
+    expect(utilities.every(utility => !utility.includes('[') || utility.includes('grid-cols-['))).toBe(true)
   })
 
   it('emits literal Tailwind 4 inline sources', () => {

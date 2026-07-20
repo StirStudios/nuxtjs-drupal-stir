@@ -4,6 +4,7 @@ import type { ImgHTMLAttributes } from 'vue'
 type TeaserImage = Partial<ImgHTMLAttributes> & {
   originalRevision?: string
   originalSrc?: string
+  deliveryProfile?: string
   responsiveStyle?: string
 }
 
@@ -95,11 +96,11 @@ export function useTeaserPost(
       originalSrc: typeof media.originalSrc === 'string'
         ? media.originalSrc
         : undefined,
-      responsiveStyle: typeof media.responsiveStyle === 'string'
-        ? media.responsiveStyle
-        : undefined,
-      srcset: typeof media.srcset === 'string' ? media.srcset : undefined,
-      sizes: typeof media.sizes === 'string' ? media.sizes : '(min-width: 768px) 50vw, 100vw',
+      deliveryProfile: typeof media.deliveryProfile === 'string'
+        ? media.deliveryProfile
+        : typeof media.responsiveStyle === 'string'
+          ? media.responsiveStyle
+          : 'card',
       loading: 'lazy',
       fetchpriority: 'low',
       decoding: 'async',

@@ -10,7 +10,7 @@ describe('useTeaserPost', () => {
         srcset: 'https://cms.example/styles/card/poster.webp 400w',
         originalSrc: 'https://cms.example/files/poster.jpg',
         originalRevision: '42-1710000000-123456',
-        responsiveStyle: 'card',
+        deliveryProfile: 'card',
         width: 1920,
         height: 1080,
       },
@@ -19,7 +19,7 @@ describe('useTeaserPost', () => {
     expect(post.value.image).toMatchObject({
       originalRevision: '42-1710000000-123456',
       originalSrc: 'https://cms.example/files/poster.jpg',
-      responsiveStyle: 'card',
+      deliveryProfile: 'card',
     })
   })
 

@@ -39,6 +39,7 @@ const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)$/u
 const LEGACY_UTILITY = /^(?:(?:xs|sm|md|lg|xl|2xl):)?(?:hidden|block|flex|grid|list-none|aspect-(?:video|square)|text-muted|m-auto|mx-auto|(?:grid-cols|columns|col-span)-[1-9][0-9]*|basis-(?:full|1\/[1-9][0-9]*)|gap-(?:[0-9]|1[0-9]|20)|space-y-(?:[1-9]|10|20)|(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)|(?:max-)?w-(?:xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl))$/u
+const COMPATIBILITY_BREAKPOINTS = ['', 'xs:', 'sm:', 'md:', 'lg:', 'xl:', '2xl:']
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)
@@ -137,6 +138,48 @@ function addSpacing(classes: Set<string>, value: string): void {
   classes.add(value)
 }
 
+/**
+ * Builds the finite fallback used while a project adopts CMS manifests.
+ *
+ * Keep this policy beside the exact manifest mapper so Drupal presentation
+ * utilities have one source of truth. It replaces the generated checked-in
+ * safelist and deliberately covers only values accepted by Stir Tools.
+ */
+export function compatibilityPresentationUtilities(): string[] {
+  const classes = new Set<string>([
+    'grid', 'grid-cols-1', 'list-none', 'aspect-video', 'aspect-square',
+    'text-muted', 'm-auto', 'mx-auto',
+    'w-xs', 'w-sm', 'w-md', 'w-lg', 'w-xl', 'w-2xl',
+    'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl',
+    'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl',
+    'justify-start', 'justify-center', 'justify-end',
+    'items-start', 'items-center', 'items-end',
+    'text-start', 'text-center', 'text-end', 'md:flex',
+    'lg:grid-cols-[8fr_4fr]', 'lg:grid-cols-[4fr_8fr]',
+  ])
+  const spacingValues = [0, 1, 2, 3, 4, 5, 10, 15, 20]
+  const spacingAxes = ['', 't', 'r', 'b', 'l', 'x', 'y']
+
+  for (const breakpoint of COMPATIBILITY_BREAKPOINTS) {
+    classes.add(`${breakpoint}hidden`)
+    classes.add(`${breakpoint}block`)
+    classes.add(`${breakpoint}flex`)
+    for (let value = 1; value <= 12; value += 1) {
+      classes.add(`${breakpoint}grid-cols-${value}`)
+      classes.add(`${breakpoint}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
+    }
+    for (let value = 0; value <= 20; value += 1) classes.add(`${breakpoint}gap-${value}`)
+    for (const value of spacingValues) {
+      for (const axis of spacingAxes) {
+        classes.add(`${breakpoint}p${axis}-${value}`)
+        classes.add(`${breakpoint}m${axis}-${value}`)
+      }
+    }
+  }
+
+  return [...classes].sort()
+}
+
 export function presentationUtilities(
   manifest: PresentationManifest,
   mode: Exclude<PresentationManifestMode, 'compatibility'> = 'hybrid',
@@ -154,6 +197,7 @@ export function presentationUtilities(
     for (const value of values) {
       if (value < 1 || value > 12) throw new Error(`Unsupported grid column count: ${value}`)
       classes.add(`${prefix(breakpoint)}grid-cols-${value}`)
+      classes.add(`${prefix(breakpoint)}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
     }
   }
   for (const [breakpoint, values] of Object.entries(manifest.used.grid.gap)) {

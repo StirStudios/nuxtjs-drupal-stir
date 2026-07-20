@@ -88,8 +88,9 @@ Drupal origin hostname is allowed automatically from `DRUPAL_URL`. Set the same
 `DRUPAL_CDN` value in Nuxt when Drupal rewrites original media to an asset CDN;
 the layer automatically trusts both origins as IPX sources. Projects using IPX
 must also permit the package manager to build Sharp in their
-trusted-dependency policy. Set `STIR_IMAGE_DELIVERY=drupal` only as a temporary
-compatibility fallback to Drupal responsive `src` and `srcset` output.
+trusted-dependency policy. Nuxt Image is the single frontend image-delivery
+path; Drupal supplies the original asset, revision, intrinsic dimensions, and
+semantic delivery profile rather than generating frontend derivatives.
 
 Set `NUXT_IMAGE_CDN` to an absolute CDN origin such as
 `https://images.example.com` to render IPX derivative URLs through an ordinary
@@ -98,18 +99,16 @@ and cache successful responses. This mode deliberately reuses Nuxt Image's IPX
 provider and keeps Nuxt's local `/_ipx` transformer registered; it does not
 require Bunny Optimizer, a storage zone, or pre-uploaded derivatives.
 
-`MediaImage` uses Nuxt Image only when the payload contains both
-`originalSrc`/`originalRevision` and a known semantic profile. It versions the
-canonical source, passes it to Nuxt Image, and suppresses the Drupal derivative
-`srcset`. Missing metadata and unknown/project-specific responsive styles
-retain native Drupal rendering.
+`MediaImage` versions `originalSrc` (falling back to `src`) with
+`originalRevision` and passes the canonical source to Nuxt Image. Unknown or
+missing profiles use the `container` profile, so payload omissions remain safe
+without reviving Drupal derivative delivery.
 
 Default profile sizes and WebP quality live under
 `stirTheme.media.image`. Downstream apps may override those app-config values,
 but should keep the semantic keys (`hero`, `full`, `container`, `split`, and
 `card`) instead of scattering provider-specific size strings through
-components. Modal image normalization promotes Drupal's
-`modalResponsiveStyle` so the modal selects the corresponding profile.
+components.
 
 ### SPA loading presentation
 

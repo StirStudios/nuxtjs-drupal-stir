@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "accountsEnabled": true,
   "loginRedirectPath": "/",
   "logoutRedirectPath": "/auth/login",
   "identifierModes": {

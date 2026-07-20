@@ -1,5 +1,4 @@
 import type { AuthSessionResponse, AuthSessionUser } from '../../types/auth'
-import { useAuthIntegration } from './useAuthIntegration'
 
 type FetchSessionOptions = {
   force?: boolean
@@ -16,7 +15,6 @@ export function useAuthSession() {
     'auth-session-user',
     () => null,
   )
-  const integrationEnabled = useAuthIntegration()
   const requestFetch = useRequestFetch()
   const { error, execute } = useAsyncData(
     'stir-auth-session',
@@ -38,11 +36,6 @@ export function useAuthSession() {
   )
 
   const fetchSession = async (options: FetchSessionOptions = {}) => {
-    if (!integrationEnabled) {
-      clearSession()
-      return
-    }
-
     if (ready.value && !options.force) return
 
     await execute({ dedupe: 'defer' })

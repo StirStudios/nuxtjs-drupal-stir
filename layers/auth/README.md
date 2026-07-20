@@ -31,15 +31,13 @@ The root configuration includes:
 extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-The full preset includes this layer; the minimal preset excludes it. Within the
-full preset, leave `authIntegration.drupalAccounts` disabled when Drupal account
-UI is not used; the local `/auth/protected` route remains available.
+The full preset includes this layer; the minimal preset excludes it. The local
+`/auth/protected` route remains available independently of Drupal accounts.
 
 ## Configuration
 
 Drupal owns account-auth redirects, UI copy, field labels, and password policy
-through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
-integration is installed.
+through `/api/auth/config`, including whether frontend accounts are enabled.
 
 The version-2 response is validated against Drupal's producer-owned auth UI
 contract before it reaches composables. Unknown structure, invalid identifier
@@ -52,21 +50,10 @@ before Nuxt decides whether `/auth/register` is available. Unknown,
 contradictory, malformed, or unavailable policy responses fail closed, and the
 public request does not forward visitor cookies.
 
-```ts
-export default defineAppConfig({
-  authIntegration: {
-    drupalAccounts: true,
-  },
-})
-```
-
-Leave `authIntegration.drupalAccounts` unset or `false` when a project only
-needs `/auth/protected` for password-protected Nuxt pages. Account UI routes are
-redirected to `protectedRoutes.fallbackRedirectPath`, while protected-page
-access keeps working.
-
-Normal pages only read this integration flag. Drupal auth UI configuration is
-requested only by account and auth routes that need it.
+Disable **Decoupled frontend accounts** in Drupal when a project only needs
+`/auth/protected`. Account UI routes then redirect to
+`protectedRoutes.fallbackRedirectPath`, while protected-page access keeps
+working. No downstream Nuxt feature flag is required.
 
 Theme all auth submit buttons from Nuxt without adding presentation settings to
 Drupal:

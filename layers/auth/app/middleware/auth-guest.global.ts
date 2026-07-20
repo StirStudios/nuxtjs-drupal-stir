@@ -11,11 +11,10 @@ const GUEST_ONLY_AUTH_ROUTES = new Set([
 export default defineNuxtRouteMiddleware(async (to) => {
   if (!GUEST_ONLY_AUTH_ROUTES.has(to.path)) return
 
-  const { auth, ensureLoaded, integrationEnabled } = useAuthConfig()
-
-  if (!integrationEnabled) return
+  const { accountsEnabled, auth, ensureLoaded } = useAuthConfig()
 
   await ensureLoaded()
+  if (!accountsEnabled.value) return
 
   const redirectPath = auth.value.loginRedirectPath || '/'
   // Guest-only routes must use the current request as their source of truth.

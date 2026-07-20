@@ -21,14 +21,8 @@ const props = defineProps<{
 
   originalRevision?: string
   originalSrc?: string
-  srcset?: string
-  sizes?: string
   deliverySizes?: string
-  responsiveStyle?: string
-  modalSrc?: string
-  modalSrcset?: string
-  modalSizes?: string
-  modalResponsiveStyle?: string
+  deliveryProfile?: string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
@@ -55,6 +49,20 @@ const appConfig = useAppConfig()
 const runtimeConfig = useRuntimeConfig()
 const theme = appConfig.stirTheme
 const attrs = useAttrs()
+const forwardedAttrs = computed(() => {
+  const {
+    modalResponsiveStyle: _modalResponsiveStyle,
+    modalSizes: _modalSizes,
+    modalSrc: _modalSrc,
+    modalSrcset: _modalSrcset,
+    responsiveStyle: _responsiveStyle,
+    sizes: _sizes,
+    srcset: _srcset,
+    ...safeAttrs
+  } = attrs
+
+  return safeAttrs
+})
 const { isFront } = usePageContext()
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
@@ -71,7 +79,7 @@ const providerSizes = computed(() =>
   props.deliverySizes?.trim()
   || carouselDeliverySizes?.value?.trim()
   || resolveImageDeliveryProfile(
-    props.responsiveStyle,
+    props.deliveryProfile,
     isHero.value,
     theme.media.image.profiles,
   ),
@@ -81,54 +89,25 @@ const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
-const isNuxtImage = computed(() =>
-  appConfig.stirImageDelivery === 'nuxt'
-  && Boolean(providerSource.value && providerSizes.value),
-)
-const imageComponent = computed(() =>
-  isNuxtImage.value ? ProviderImage : 'img',
-)
-const fallbackSizes = computed(() => props.sizes?.trim() || '100vw')
-const wrappedSizes = computed(() => {
-  const sizes = fallbackSizes.value.replace(/^auto(?:\s*,\s*)?/i, '')
-
-  return sizes || '100vw'
-})
-const renderedSrc = computed(() =>
-  isNuxtImage.value ? providerSource.value : props.src,
-)
-const renderedSrcset = computed(() =>
-  isNuxtImage.value ? undefined : props.srcset,
-)
-const nativeSrcsetAttrs = computed(() =>
-  isNuxtImage.value ? {} : { srcset: renderedSrcset.value },
-)
 const bareImageAttrs = computed(() => ({
-  ...attrs,
-  ...nativeSrcsetAttrs.value,
+  ...forwardedAttrs.value,
 }))
-const bareRenderedSizes = computed(() =>
-  isNuxtImage.value ? providerSizes.value : fallbackSizes.value,
-)
-const wrappedRenderedSizes = computed(() =>
-  isNuxtImage.value ? providerSizes.value : wrappedSizes.value,
-)
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
 )
 const rootAttrs = computed(() =>
   props.link
     ? {
-        ...attrs,
+        ...forwardedAttrs.value,
         href: props.link,
         target: '_blank',
         rel: 'noopener noreferrer',
         'aria-label': linkAriaLabel.value,
       }
-    : attrs,
+    : forwardedAttrs.value,
 )
 const hasImageSource = computed(() =>
-  Boolean(props.src?.trim() || props.srcset?.trim()),
+  Boolean(providerSource.value),
 )
 const hasInlineEditActions = computed(
   () => (props.editActions?.length ?? 0) > 0,
@@ -196,7 +175,7 @@ function syncLoadedFromImageElement() {
 }
 
 watch(
-  () => [props.src, props.srcset, props.sizes, props.width, props.height],
+  () => [providerSource.value, providerSizes.value, props.width, props.height],
   () => {
     isLoaded.value = !hasImageSource.value
     nextTick(syncLoadedFromImageElement)
@@ -222,8 +201,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <component
-    :is="imageComponent"
+  <ProviderImage
     v-if="isBare"
     :ref="setImageElementRef"
     v-bind="bareImageAttrs"
@@ -245,12 +223,12 @@ onMounted(() => {
           ]
     "
     :fetchpriority="fetchpriority || undefined"
-    :format="isNuxtImage ? theme.media.image.format : undefined"
+    :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
-    :quality="isNuxtImage ? theme.media.image.quality : undefined"
-    :sizes="bareRenderedSizes"
-    :src="renderedSrc"
+    :quality="theme.media.image.quality"
+    :sizes="providerSizes"
+    :src="providerSource"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -275,11 +253,9 @@ onMounted(() => {
       class="absolute inset-0 z-0 h-full w-full rounded-none"
     />
 
-    <component
-      :is="imageComponent"
+    <ProviderImage
       v-if="!isSourceDeferred && !isEager"
       :ref="setImageElementRef"
-      v-bind="nativeSrcsetAttrs"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -288,22 +264,20 @@ onMounted(() => {
         !isLoaded && 'opacity-0',
         imageClass,
       ]"
-      :format="isNuxtImage ? theme.media.image.format : undefined"
+      :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
-      :quality="isNuxtImage ? theme.media.image.quality : undefined"
-      :sizes="wrappedRenderedSizes"
-      :src="renderedSrc"
+      :quality="theme.media.image.quality"
+      :sizes="providerSizes"
+      :src="providerSource"
       :width="width"
       @error="handleError"
       @load="handleLoad"
     />
 
-    <component
-      :is="imageComponent"
+    <ProviderImage
       v-else-if="!isSourceDeferred"
       :ref="setImageElementRef"
-      v-bind="nativeSrcsetAttrs"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -312,12 +286,12 @@ onMounted(() => {
         imageClass,
       ]"
       fetchpriority="high"
-      :format="isNuxtImage ? theme.media.image.format : undefined"
+      :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
-      :quality="isNuxtImage ? theme.media.image.quality : undefined"
-      :sizes="wrappedRenderedSizes"
-      :src="renderedSrc"
+      :quality="theme.media.image.quality"
+      :sizes="providerSizes"
+      :src="providerSource"
       :width="width"
       @error="handleError"
       @load="handleLoad"

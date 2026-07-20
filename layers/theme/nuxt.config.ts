@@ -10,6 +10,8 @@ import {
 import { createJiti } from 'jiti'
 import {
   buildPresentationSource,
+  compatibilityPresentationUtilities,
+  inlinePresentationSource,
   loadPresentationManifest,
   type PresentationManifestMode,
 } from './build/presentationManifest'
@@ -26,13 +28,6 @@ const upstreamSpaLoadingTemplate = resolvePath(
   themeLayerDir,
   'app/spa-loading-template.html',
 )
-const compatibilitySafelistCss = resolvePath(
-  themeLayerDir,
-  'app/assets/css/safelist.inline.css',
-)
-const stirImageDelivery = process.env.STIR_IMAGE_DELIVERY === 'drupal'
-  ? 'drupal'
-  : 'nuxt'
 const stirImageCdn = resolveImageCdnBase(
   process.env.NUXT_IMAGE_CDN,
   process.env.NODE_ENV === 'development',
@@ -42,9 +37,7 @@ const drupalImageDomains = resolveDrupalImageDomains(
   process.env.DRUPAL_CDN,
 )
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
-const imageProviderComponent = stirImageDelivery === 'nuxt'
-  ? resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
-  : resolvePath(themeLayerDir, 'app/providers/NativeImageProvider.vue')
+const imageProviderComponent = resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
 const ipxRuntimeProvider = resolvePath(
   themeLayerDir,
   'build/imageCdn.ts',
@@ -69,7 +62,7 @@ export default defineNuxtConfig({
     '#stir-image-provider': imageProviderComponent,
   },
   modules: [
-    ...(stirImageDelivery === 'nuxt' ? ['@nuxt/image'] : []),
+    '@nuxt/image',
     function registerStirAppConfigTypes() {
       addTypeTemplate({
         filename: 'types/stir-app-config.d.ts',
@@ -77,36 +70,29 @@ export default defineNuxtConfig({
       })
     },
   ],
-  ...(stirImageDelivery === 'nuxt'
-    ? {
-        routeRules: {
-          '/_ipx/**': {
-            headers: {
-              'cache-control': 'public, max-age=31536000, immutable',
-            },
-          },
-        },
-        image: {
-          domains: drupalImageDomains,
-          provider: 'stirIpx',
-          ipx: {},
-          providers: {
-            stirIpx: {
-              provider: ipxRuntimeProvider,
-              ...(stirImageCdn
-                ? {
-                    options: {
-                      baseURL: `${stirImageCdn}/_ipx`,
-                    },
-                  }
-                : {}),
-            },
-          },
-        },
-      }
-    : {}),
-  appConfig: {
-    stirImageDelivery,
+  routeRules: {
+    '/_ipx/**': {
+      headers: {
+        'cache-control': 'public, max-age=31536000, immutable',
+      },
+    },
+  },
+  image: {
+    domains: drupalImageDomains,
+    provider: 'stirIpx',
+    ipx: {},
+    providers: {
+      stirIpx: {
+        provider: ipxRuntimeProvider,
+        ...(stirImageCdn
+          ? {
+              options: {
+                baseURL: `${stirImageCdn}/_ipx`,
+              },
+            }
+          : {}),
+      },
+    },
   },
   hooks: {
     async 'modules:done'() {
@@ -177,7 +163,31 @@ export default defineNuxtConfig({
         throw new Error(`Invalid STIR_PRESENTATION_MANIFEST_MODE: ${mode}`)
       }
       if (mode === 'compatibility') {
-        nuxt.options.alias['#stir-presentation-source'] = compatibilitySafelistCss
+        const generatedDir = resolvePath(
+          nuxt.options.rootDir,
+          'node_modules/.cache/stir-presentation',
+        )
+        const compatibilityUtilities = compatibilityPresentationUtilities()
+        const compatibilitySource = inlinePresentationSource(compatibilityUtilities)
+        const generatedCss = resolvePath(generatedDir, 'compatibility.inline.css')
+
+        await mkdir(generatedDir, { recursive: true })
+        await writeFile(generatedCss, compatibilitySource)
+        nuxt.options.alias['#stir-presentation-source'] = generatedCss
+        nuxt.options.runtimeConfig.public.stirPresentationBuild = {
+          manifestRevision: '',
+          sourceRevision: '',
+          mode,
+          utilityCount: compatibilityUtilities.length,
+          manifestUsageCount: 0,
+          legacyUtilityCount: compatibilityUtilities.length,
+          rejectedLegacyUtilityCount: 0,
+          sourceBytes: Buffer.byteLength(compatibilitySource, 'utf8'),
+          generationDurationMs: 0,
+          schemaVersion: 0,
+          siteUuid: '',
+          theme: '',
+        }
         return
       }
 

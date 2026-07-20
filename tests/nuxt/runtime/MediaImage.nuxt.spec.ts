@@ -15,139 +15,99 @@ describe('MediaImage (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('img').attributes('src')).toBe('/styles/card/example.webp')
+    expect(wrapper.get('img').attributes('src')).toContain(
+      '/media/original.jpg?v=42-1710000000-293400',
+    )
+    expect(wrapper.get('img').attributes('src')).not.toContain('/styles/card/')
     expect(wrapper.get('img').attributes('originalrevision')).toBeUndefined()
     expect(wrapper.get('img').attributes('originalsrc')).toBeUndefined()
   })
 
   it('uses the versioned original through Nuxt Image', async () => {
-    const appConfig = useAppConfig()
-    const previousDelivery = appConfig.stirImageDelivery
-
-    appConfig.stirImageDelivery = 'nuxt'
-
-    try {
-      const wrapper = await mountSuspended(MediaImage, {
+    const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Provider image',
           height: 900,
           noWrapper: true,
           originalRevision: '42-1710000000-293400',
           originalSrc: 'https://drupal.example/files/image.jpg?download=1',
-          responsiveStyle: 'card',
-          sizes: '100vw',
+          deliveryProfile: 'card',
           src: '/styles/card/image.webp',
           srcset: '/styles/640/image.webp 640w',
           width: 1600,
         },
-      })
+    })
 
-      expect(wrapper.get('img').attributes()).toMatchObject({
+    expect(wrapper.get('img').attributes()).toMatchObject({
         'data-nuxt-img': '',
         'sizes': '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px',
         src: 'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       })
-      expect(wrapper.get('img').attributes('srcset')).toContain(
+    expect(wrapper.get('img').attributes('srcset')).toContain(
         'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       )
-      expect(wrapper.get('img').attributes('srcset')).not.toContain('/styles/')
-    }
-    finally {
-      appConfig.stirImageDelivery = previousDelivery
-    }
+    expect(wrapper.get('img').attributes('srcset')).not.toContain('/styles/')
   })
 
   it('optimizes media without canonical metadata from its rendered source', async () => {
-    const appConfig = useAppConfig()
-    const previousDelivery = appConfig.stirImageDelivery
-
-    appConfig.stirImageDelivery = 'nuxt'
-
-    try {
-      const wrapper = await mountSuspended(MediaImage, {
+    const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Instagram image',
           platform: 'instagram',
-          responsiveStyle: 'card',
+          deliveryProfile: 'card',
           src: 'https://drupal.example/styles/1024/instagram.webp',
           srcset: 'https://drupal.example/styles/640/instagram.webp 640w',
         },
-      })
+    })
 
-      expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
-      expect(wrapper.get('img').attributes('srcset')).not.toContain('styles/640')
-      expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
-    }
-    finally {
-      appConfig.stirImageDelivery = previousDelivery
-    }
+    expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
+    expect(wrapper.get('img').attributes('srcset')).not.toContain('styles/640')
+    expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
   })
 
-  it('keeps Drupal delivery when an optimizer profile is unknown', async () => {
-    const appConfig = useAppConfig()
-    const previousDelivery = appConfig.stirImageDelivery
-
-    appConfig.stirImageDelivery = 'nuxt'
-
-    try {
+  it('falls back to the container profile when a profile is unknown', async () => {
       const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Fallback image',
           noWrapper: true,
           originalRevision: '42-1710000000-293400',
           originalSrc: 'https://drupal.example/files/image.jpg',
-          responsiveStyle: 'project-specific',
+          deliveryProfile: 'project-specific',
           src: '/styles/project/image.webp',
           srcset: '/styles/640/image.webp 640w',
         },
       })
 
-      expect(wrapper.get('img').attributes('data-nuxt-img')).toBeUndefined()
-      expect(wrapper.get('img').attributes('src')).toBe('/styles/project/image.webp')
-      expect(wrapper.get('img').attributes('srcset')).toBe('/styles/640/image.webp 640w')
-    }
-    finally {
-      appConfig.stirImageDelivery = previousDelivery
-    }
+      expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
+      expect(wrapper.get('img').attributes('src')).toContain(
+        'image.jpg?v=42-1710000000-293400',
+      )
+      expect(wrapper.get('img').attributes('sizes')).toBe(
+        '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px',
+      )
   })
 
   it('allows a layout to narrow Nuxt Image sizes without changing Drupal sizes', async () => {
-    const appConfig = useAppConfig()
-    const previousDelivery = appConfig.stirImageDelivery
-
-    appConfig.stirImageDelivery = 'nuxt'
-
-    try {
-      const wrapper = await mountSuspended(MediaImage, {
+    const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Compact card',
           deliverySizes: '210px sm:270px md:330px',
           noWrapper: true,
           originalRevision: '42-1710000000-293400',
           originalSrc: 'https://drupal.example/files/image.jpg',
-          responsiveStyle: 'card',
+          deliveryProfile: 'card',
           sizes: '(max-width: 639px) 210px, (max-width: 767px) 270px, 330px',
           src: '/styles/card/image.webp',
         },
-      })
+    })
 
-      expect(wrapper.get('img').attributes('sizes')).toBe(
+    expect(wrapper.get('img').attributes('sizes')).toBe(
         '(max-width: 640px) 210px, (max-width: 768px) 270px, 330px',
       )
-    }
-    finally {
-      appConfig.stirImageDelivery = previousDelivery
-    }
   })
 
   it('uses a full-width carousel profile instead of a nested card profile', async () => {
-    const appConfig = useAppConfig()
-    const previousDelivery = appConfig.stirImageDelivery
-
-    appConfig.stirImageDelivery = 'nuxt'
-
-    try {
-      const wrapper = await mountSuspended(MediaImage, {
+    const wrapper = await mountSuspended(MediaImage, {
         global: {
           provide: {
             [carouselImageDeliverySizesKey as symbol]: computed(() =>
@@ -159,33 +119,29 @@ describe('MediaImage (Nuxt runtime)', () => {
           alt: 'Full-width carousel image',
           noWrapper: true,
           originalSrc: 'https://drupal.example/files/image.jpg',
-          responsiveStyle: 'card',
+          deliveryProfile: 'card',
           src: '/styles/card/image.webp',
         },
-      })
+    })
 
-      expect(wrapper.get('img').attributes('sizes')).toBe(
+    expect(wrapper.get('img').attributes('sizes')).toBe(
         '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, (max-width: 1280px) 100vw, (max-width: 1536px) 100vw, 100vw',
       )
-      expect(wrapper.get('img').attributes('srcset')).toContain('3072')
-    }
-    finally {
-      appConfig.stirImageDelivery = previousDelivery
-    }
+    expect(wrapper.get('img').attributes('srcset')).toContain('3072')
   })
 
   it('avoids native auto-sizing for responsive wrapped images', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Example',
-        sizes: 'auto, (min-width: 768px) 33vw, 100vw',
+        deliverySizes: '100vw md:33vw',
         src: '/image.webp',
         srcset: '/image-320.webp 320w, /image-640.webp 640w',
       },
     })
 
     expect(wrapper.get('img').attributes('sizes')).toBe(
-      '(min-width: 768px) 33vw, 100vw',
+      '(max-width: 768px) 100vw, 33vw',
     )
   })
 
@@ -194,13 +150,13 @@ describe('MediaImage (Nuxt runtime)', () => {
       props: {
         alt: 'Example',
         noWrapper: true,
-        sizes: '(min-width: 768px) 50vw, 100vw',
+        deliverySizes: '100vw md:50vw',
         src: '/image.webp',
       },
     })
 
     expect(wrapper.get('img').attributes('sizes')).toBe(
-      '(min-width: 768px) 50vw, 100vw',
+      '(max-width: 768px) 100vw, 50vw',
     )
   })
 
@@ -236,16 +192,17 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
-  it('uses the viewport fallback when auto is the only wrapped size', async () => {
+  it('uses the container profile when no delivery profile is provided', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Example',
-        sizes: 'auto',
         src: '/image.webp',
       },
     })
 
-    expect(wrapper.get('img').attributes('sizes')).toBe('100vw')
+    expect(wrapper.get('img').attributes('sizes')).toBe(
+      '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px',
+    )
   })
 
   it('preserves image dimensions without exposing deferred sources', async () => {

@@ -30,28 +30,6 @@ export function useMediaModal(
         type,
       }
 
-      if (type === 'image') {
-        const modalSrc = typeof item.modalSrc === 'string' ? item.modalSrc : ''
-        const modalSrcset = typeof item.modalSrcset === 'string' ? item.modalSrcset : ''
-        const modalSizes = typeof item.modalSizes === 'string' ? item.modalSizes : ''
-        const modalResponsiveStyle = typeof item.modalResponsiveStyle === 'string'
-          ? item.modalResponsiveStyle
-          : ''
-
-        if (modalSrc !== '') {
-          item.src = modalSrc
-        }
-        if (modalSrcset !== '') {
-          item.srcset = modalSrcset
-        }
-        if (modalSizes !== '') {
-          item.sizes = modalSizes
-        }
-        if (modalResponsiveStyle !== '') {
-          item.responsiveStyle = modalResponsiveStyle
-        }
-      }
-
       return item
     }),
   )

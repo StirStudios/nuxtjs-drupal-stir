@@ -41,4 +41,25 @@ describe('DrupalMedia editor extension', () => {
 
     editor.destroy()
   })
+
+  it('shows a placeholder without adding it to saved Drupal markup', () => {
+    const element = document.createElement('div')
+    const editor = new Editor({
+      element,
+      content:
+        '<drupal-media data-entity-type="media" data-media-type="image" data-entity-uuid="15fd4195-edaf-4345-a607-41b22000dbfb">&nbsp;</drupal-media>',
+      extensions: [Document, Paragraph, Text, DrupalMedia],
+    })
+
+    const placeholder = element.querySelector(
+      '[data-drupal-media-placeholder="true"]',
+    )
+
+    expect(placeholder?.textContent).toContain('Embedded image')
+    expect(placeholder?.textContent).toContain('restored after saving')
+    expect(editor.getHTML()).not.toContain('drupal-media-placeholder')
+    expect(editor.getHTML()).toContain('<drupal-media')
+
+    editor.destroy()
+  })
 })

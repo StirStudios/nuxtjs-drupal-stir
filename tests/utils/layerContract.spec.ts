@@ -198,7 +198,7 @@ describe('layer contract', () => {
     expect(packageJson.scripts?.['dev:prepare']).toBe('nuxi prepare')
   })
 
-  it('uses Nuxt Image by default with an explicit Drupal fallback and CDN path', () => {
+  it('uses Nuxt Image as the single image-delivery path with optional CDN routing', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),
       'utf8',
@@ -215,12 +215,12 @@ describe('layer contract', () => {
     expect(packageJson.dependencies?.['@nuxt/image']).toBe('^2.0.0')
     expect(packageJson.peerDependencies?.['@nuxt/image']).toBeUndefined()
     expect(packageJson.peerDependenciesMeta?.['@nuxt/image']).toBeUndefined()
-    expect(themeConfig).toContain('process.env.STIR_IMAGE_DELIVERY === \'drupal\'')
+    expect(themeConfig).not.toContain('STIR_IMAGE_DELIVERY')
     expect(themeConfig).toContain('process.env.NUXT_IMAGE_CDN')
-    expect(themeConfig).toContain('[\'@nuxt/image\']')
-    expect(themeConfig).toContain('stirImageDelivery')
+    expect(themeConfig).toContain('\'@nuxt/image\'')
+    expect(themeConfig).not.toContain('stirImageDelivery')
     expect(themeConfig).toContain('\'#stir-image-provider\': imageProviderComponent')
-    expect(themeConfig).toContain('\'app/providers/NativeImageProvider.vue\'')
+    expect(themeConfig).not.toContain('NativeImageProvider')
     expect(themeConfig).toContain('import.meta.resolve(\'@nuxt/image\')')
     expect(themeConfig).toContain('\'runtime/components/NuxtImg.vue\'')
     expect(themeConfig).toContain('\'build/imageCdn.ts\'')
@@ -265,10 +265,10 @@ describe('layer contract', () => {
     expect(accessibilitySpec).toContain('isTransitionRace')
     expect(accessibilitySpec).toContain('revealStableFullPage')
     expect(accessibilitySpec).toContain(
-      "process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'",
+      'process.env.A11Y_ROOT_SELECTOR ?? \'#__nuxt\'',
     )
     expect(accessibilitySpec).toContain(
-      "process.env.A11Y_DOCUMENT_MODE !== 'widget'",
+      'process.env.A11Y_DOCUMENT_MODE !== \'widget\'',
     )
     expect(accessibilitySpec).toContain(
       'Do not replace a shared brand or semantic color token',

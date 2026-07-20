@@ -13,10 +13,9 @@ describe('useMediaModal', () => {
       type: 'image',
       mid: '1',
       src: '/small.jpg',
-      modalSrc: '/large.jpg',
-      modalSrcset: '/large.jpg 1200w',
-      modalSizes: '100vw',
-      modalResponsiveStyle: 'container',
+      originalSrc: '/original.jpg',
+      originalRevision: '1-2-3',
+      deliveryProfile: 'full',
       title: 'Image',
     })
     const video = h('div', {
@@ -33,10 +32,10 @@ describe('useMediaModal', () => {
       {
         key: '1',
         type: 'image',
-        src: '/large.jpg',
-        srcset: '/large.jpg 1200w',
-        sizes: '100vw',
-        responsiveStyle: 'container',
+        src: '/small.jpg',
+        originalSrc: '/original.jpg',
+        originalRevision: '1-2-3',
+        deliveryProfile: 'full',
       },
       {
         key: '2',

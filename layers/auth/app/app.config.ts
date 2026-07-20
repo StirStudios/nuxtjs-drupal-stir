@@ -10,10 +10,6 @@ export default defineAppConfig({
     fallbackRedirectPath: '/',
   },
 
-  authIntegration: {
-    drupalAccounts: false,
-  },
-
   authProfileForm: {
     booleanControl: 'checkbox',
     editorFields: [],

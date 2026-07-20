@@ -10,7 +10,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
         mediaEmbed: 'https://player.example/embed/video',
         originalRevision: '42-1710000000-123456',
         originalSrc: 'https://drupal.example/files/poster.jpg',
-        responsiveStyle: 'card',
+        deliveryProfile: 'card',
         src: 'https://drupal.example/styles/card/poster.webp',
         width: 1920,
       },
@@ -35,9 +35,8 @@ describe('MediaVideo (Nuxt runtime)', () => {
         height: 720,
         mediaEmbed: '/hero.mp4',
         noWrapper: true,
-        sizes: '100vw',
+        deliverySizes: '100vw',
         src: '/hero-poster.webp',
-        srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
         width: 1280,
       },
     })
@@ -52,10 +51,10 @@ describe('MediaVideo (Nuxt runtime)', () => {
       fetchpriority: 'high',
       height: '720',
       sizes: '100vw',
-      src: '/hero-poster.webp',
-      srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
       width: '1280',
     })
+    expect(poster.attributes('src')).toContain('/hero-poster.webp')
+    expect(poster.attributes('srcset')).toContain('/hero-poster.webp')
   })
 
   it('honors the explicit hero context passed through a Drupal media slot', async () => {
@@ -152,7 +151,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
     await nextTick()
 
     expect(wrapper.find('video').exists()).toBe(false)
-    expect(wrapper.get('img').attributes('src')).toBe('/hero-poster.webp')
+    expect(wrapper.get('img').attributes('src')).toContain('/hero-poster.webp')
     const iframe = wrapper.get('iframe')
     const iframeSrc = iframe.attributes('src')
 
@@ -257,9 +256,8 @@ describe('MediaVideo (Nuxt runtime)', () => {
         animatedPreviewSrc: '/animated-preview.webp',
         height: 360,
         previewMode: 'animated',
-        sizes: '(min-width: 768px) 33vw, 100vw',
+        deliverySizes: '100vw md:33vw',
         src: '/static-preview.webp',
-        srcset: '/static-320.webp 320w, /static-640.webp 640w',
         width: 640,
       },
     })
@@ -268,23 +266,21 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(button.get('img').attributes()).toMatchObject({
       height: '360',
       loading: 'lazy',
-      sizes: '(min-width: 768px) 33vw, 100vw',
-      src: '/static-preview.webp',
-      srcset: '/static-320.webp 320w, /static-640.webp 640w',
+      sizes: '(max-width: 768px) 100vw, 33vw',
       width: '640',
     })
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/static-preview.webp')
 
     await button.trigger('mouseenter')
 
-    expect(button.get('img').attributes('src')).toBe('/animated-preview.webp')
-    expect(button.get('img').attributes('srcset')).toBeUndefined()
+    expect(button.get('img').attributes('src')).toContain('/animated-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/animated-preview.webp')
 
     await button.trigger('mouseleave')
 
-    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
-    expect(button.get('img').attributes('srcset')).toBe(
-      '/static-320.webp 320w, /static-640.webp 640w',
-    )
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/static-preview.webp')
   })
 
   it('renders animated MP4 previews as deferred muted video', async () => {
@@ -298,7 +294,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
     const button = wrapper.get('button')
 
     expect(button.find('video').exists()).toBe(false)
-    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
 
     await button.trigger('mouseenter')
 
@@ -318,7 +314,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
     await button.trigger('mouseleave')
 
     expect(button.find('video').exists()).toBe(false)
-    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
   })
 
   it('preserves the declared aspect ratio inside stretching layouts', async () => {

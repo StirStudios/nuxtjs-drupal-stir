@@ -313,6 +313,23 @@
     }
   }
 
+  .admin-editor-media-placeholder {
+    @apply my-4 flex min-h-20 flex-col justify-center gap-1 rounded-md border border-dashed px-4 py-3;
+    border-color: var(--admin-border) !important;
+    background-color: var(--admin-bg-muted);
+    color: var(--admin-text) !important;
+  }
+
+  .admin-editor-media-placeholder-label {
+    @apply text-sm font-semibold capitalize;
+    color: var(--admin-text-strong) !important;
+  }
+
+  .admin-editor-media-placeholder-description {
+    @apply text-xs;
+    color: var(--admin-text-muted) !important;
+  }
+
   .admin-ui-status-saving {
     color: var(--admin-status-saving);
   }

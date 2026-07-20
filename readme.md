@@ -212,7 +212,6 @@ attributes above; the harness does not depend on project-specific components.
 - `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
 - `DRUPAL_CDN`: Optional Drupal asset CDN origin. When set in the Nuxt environment, its host is automatically trusted as an IPX source alongside `DRUPAL_URL`
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required
-- `STIR_IMAGE_DELIVERY`: Set to `drupal` only to restore legacy Drupal responsive-image delivery; Nuxt Image/IPX is the default
 - `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
@@ -248,15 +247,12 @@ In this repository, auth is enabled by default through:
 extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-Drupal account auth is disabled by default through app config. Use
-`@stir/base/presets/minimal` for the shared renderer without optional auth,
+Use `@stir/base/presets/minimal` for the shared renderer without optional auth,
 Webform, SEO, editorial, analytics, scripts, or integration capabilities. Core
 Webform submission and Drupal CSRF forwarding remain independent of account
 auth.
-If it only needs password-protected Nuxt pages, keep the layer and leave
-`authIntegration.drupalAccounts` unset or set it to `false` in app config.
-Set `authIntegration.drupalAccounts: true` only for projects that provide the
-Drupal `stir_account` endpoints.
+Drupal's Stir Account settings decide whether frontend account pages are
+available. Password-protected Nuxt pages remain independent.
 
 When enabled, the auth layer is aligned with `stir_account` endpoints and uses `/auth/*` pages:
 
@@ -270,8 +266,7 @@ When enabled, the auth layer is aligned with `stir_account` endpoints and uses `
 
 Behavior notes:
 
-- `authIntegration.drupalAccounts: false` disables the account UI routes (`/account/*`, login, register, password reset, verify) while keeping `/auth/protected` available.
-- Drupal `/api/auth/config` is the source of truth for account-auth redirects, UI copy, and password policy; frontend values are safe fallbacks only.
+- Drupal `/api/auth/config` is the source of truth for account availability, redirects, UI copy, and password policy; frontend values are safe fallbacks only.
 - Client auth state comes from `/api/auth/session` only.
 - Requests with Drupal `SESS*`/`SSESS*` cookies skip SSR for page routes and return `Cache-Control: private, no-store, max-age=0`; anonymous requests keep normal SSR for SEO.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
@@ -306,7 +301,7 @@ pnpm test:all   # Run unit, Nuxt runtime, and E2E tests
 pnpm test:watch # Run unit tests in watch mode
 pnpm verify:core # Tests, lint, typecheck, and root production build
 pnpm verify:ci  # Full gate, including downstream consumer compatibility
-pnpm css:generate-safelist # Regenerate Tailwind's CMS-driven inline safelist
+pnpm perf:presentation     # Compare compatibility and CMS-manifest CSS output
 pnpm perf:report # Build + output top client chunk size report
 pnpm deps:update:safe # Safe dependency update flow
 pnpm release    # Tag + prepare release

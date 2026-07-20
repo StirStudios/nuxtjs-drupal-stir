@@ -1,4 +1,4 @@
-import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
+import { useAuthConfig } from '../composables/auth/useAuthConfig'
 
 const ACCOUNT_AUTH_ROUTES = new Set([
   '/auth/login',
@@ -12,11 +12,14 @@ function isAccountRoute(path: string): boolean {
   return path === '/account' || path.startsWith('/account/')
 }
 
-export default defineNuxtRouteMiddleware((to) => {
-  const integrationEnabled = useAuthIntegration()
-
-  if (integrationEnabled) return
+export default defineNuxtRouteMiddleware(async (to) => {
   if (!isAccountRoute(to.path) && !ACCOUNT_AUTH_ROUTES.has(to.path)) return
+
+  const { accountsEnabled, ensureLoaded } = useAuthConfig()
+
+  await ensureLoaded()
+
+  if (accountsEnabled.value) return
 
   return navigateTo(useAppConfig().protectedRoutes?.fallbackRedirectPath || '/')
 })

@@ -22,24 +22,18 @@ export type DrupalMediaNodeProps = {
   alt?: string
   category?: string
   credit?: string
+  deliveryProfile?: string
   deliverySizes?: string
   fetchpriority?: 'auto' | 'high' | 'low'
   height?: number
   loading?: 'eager' | 'lazy'
   mediaEmbed?: unknown
   mid?: number | string
-  modalSizes?: string
-  modalSrc?: string
-  modalSrcset?: string
-  modalResponsiveStyle?: string
   originalRevision?: string
   originalSrc?: string
   link?: string
   rel?: 'noopener'
-  responsiveStyle?: string
-  sizes?: string
   src?: string
-  srcset?: string
   title?: string
   url?: string
   width?: number
