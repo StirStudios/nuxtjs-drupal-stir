@@ -38,8 +38,6 @@ type PrivacyNoticeConfig = {
 type PopupConfig = {
   enabled?: boolean
   component?: string
-  webformCollapsible?: boolean
-  webformToggleLabel?: string
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {
