@@ -11,6 +11,8 @@ const routes = (process.env.A11Y_ROUTES ?? '/')
   .split(',')
   .map((route) => route.trim())
   .filter(Boolean)
+const rootSelector = process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'
+const documentMode = process.env.A11Y_DOCUMENT_MODE !== 'widget'
 const hoverSelector =
   process.env.A11Y_HOVER_SELECTOR ?? '[data-a11y-scan-hover]'
 const opaqueSelector =
@@ -197,7 +199,7 @@ const revealStableFullPage = async (page) => {
     // A second interruption remains a real test failure.
     await page.waitForLoadState('load')
     await page.locator('main').waitFor({ state: 'visible' })
-    await page.locator('h1').waitFor({ state: 'visible' })
+    if (documentMode) await page.locator('h1').waitFor({ state: 'visible' })
     await revealFullPage(page)
   }
 }
@@ -208,6 +210,7 @@ const analyzePage = (page, includeSelector) => {
     .withTags(accessibilityTags)
 
   if (includeSelector) builder.include(includeSelector)
+  if (!documentMode) builder.disableRules(['page-has-heading-one'])
 
   return builder.analyze()
 }
@@ -235,10 +238,10 @@ const analyzeStablePage = async (page, includeSelector) => {
   // hidden by the retry.
   await page.waitForLoadState('load')
   await page.locator('main').waitFor({ state: 'visible' })
-  await page.locator('h1').waitFor({ state: 'visible' })
+  if (documentMode) await page.locator('h1').waitFor({ state: 'visible' })
   await page.waitForTimeout(motionSettleMs)
   await expect(page.locator('main')).toHaveCount(1)
-  await expect(page.locator('h1')).toHaveCount(1)
+  if (documentMode) await expect(page.locator('h1')).toHaveCount(1)
   return analyzePage(page, includeSelector)
 }
 test.describe('automated accessibility', () => {
@@ -250,14 +253,16 @@ test.describe('automated accessibility', () => {
       expect(response?.ok(), `Expected ${route} to load successfully`).toBe(
         true,
       )
-      await page.locator('#__nuxt').waitFor({ state: 'attached' })
+      await page.locator(rootSelector).waitFor({ state: 'attached' })
       await page.waitForLoadState('load')
       // Nuxt can replace the hydrated page subtree after the root container is
       // attached. These are baseline document requirements, so wait for the
       // final landmarks before Axe observes the page. A genuinely missing
       // landmark or heading still fails deterministically at this boundary.
       await page.locator('main').first().waitFor({ state: 'attached' })
-      await page.locator('h1').first().waitFor({ state: 'attached' })
+      if (documentMode) {
+        await page.locator('h1').first().waitFor({ state: 'attached' })
+      }
       // Measure stable rendered colors rather than a midpoint from a theme,
       // hover, carousel, or hydration transition.
       await page.addStyleTag({

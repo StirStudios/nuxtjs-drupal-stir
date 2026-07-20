@@ -159,6 +159,8 @@ Supported audit configuration:
 
 - `A11Y_BASE_URL`: scan an existing site and skip the managed local server.
 - `A11Y_ROUTES`: comma-separated route list; defaults to `/`.
+- `A11Y_ROOT_SELECTOR`: Nuxt application root selector; defaults to `#__nuxt`. Set this when an embeddable application configures a custom `app.rootId`.
+- `A11Y_DOCUMENT_MODE`: set to `widget` for an embedded application whose host document owns the page-level `<h1>`; all component and landmark checks remain enabled.
 - `A11Y_SERVER_URL`: managed local server URL; defaults to `http://127.0.0.1:4173`.
 - `A11Y_SERVER_COMMAND`: managed server command; defaults to `pnpm dev --host 127.0.0.1 --port 4173`.
 - `A11Y_USE_FIXTURE`: set to `true` only when the packaged deterministic Drupal fixture should replace the downstream backend; enabled automatically when auditing this base repository.

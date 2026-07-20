@@ -265,6 +265,12 @@ describe('layer contract', () => {
     expect(accessibilitySpec).toContain('isTransitionRace')
     expect(accessibilitySpec).toContain('revealStableFullPage')
     expect(accessibilitySpec).toContain(
+      "process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'",
+    )
+    expect(accessibilitySpec).toContain(
+      "process.env.A11Y_DOCUMENT_MODE !== 'widget'",
+    )
+    expect(accessibilitySpec).toContain(
       'Do not replace a shared brand or semantic color token',
     )
 
