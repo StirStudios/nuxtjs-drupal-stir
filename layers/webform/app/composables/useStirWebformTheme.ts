@@ -26,6 +26,7 @@ type StirWebformTheme = {
 }
 
 type ResolvedStirWebformTheme = StirWebformTheme & {
+  floatingControlClass: string[]
   labels: NonNullable<StirWebformTheme['labels']> & {
     floatingClass: string[]
   }
@@ -41,13 +42,14 @@ export function useStirWebformTheme(): ResolvedStirWebformTheme {
   return {
     ...webform,
     fieldVariant,
+    floatingControlClass: ['peer', 'pt-4!', 'pb-2.5!'],
     labels: {
       floating: webform.labels?.floating ?? forms.floatingLabels,
       ...webform.labels,
       floatingClass: [
         fieldVariant === 'material'
-          ? ''
-          : 'px-1.5 peer-placeholder-shown:px-0 peer-focus:px-1.5',
+          ? '-top-2 start-0 peer-placeholder-shown:top-3 peer-focus:-top-2'
+          : 'top-0 start-1.5 -translate-y-1/2 rounded-sm bg-default px-1.5 peer-placeholder-shown:top-1/2 peer-placeholder-shown:start-2.5 peer-placeholder-shown:bg-transparent peer-placeholder-shown:px-0 peer-focus:top-0 peer-focus:start-1.5 peer-focus:bg-default peer-focus:px-1.5',
         ...(Array.isArray(labelBase) ? labelBase : [labelBase ?? '']),
       ].filter(Boolean),
     },

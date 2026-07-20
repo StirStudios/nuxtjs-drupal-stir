@@ -17,9 +17,8 @@ const props = defineProps<{
 }>()
 
 const webform = useStirWebformTheme()
-const isMaterial = computed(() => webform.fieldVariant === 'material')
 const inputUi = computed(() => props.floatingLabel
-  ? { base: ['peer', isMaterial.value ? 'pt-4!' : ''] }
+  ? { base: webform.floatingControlClass }
   : {})
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
@@ -112,7 +111,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
       :class="webform.labels.floatingClass"
       :for="id"
     >
-      <span class="inline-flex rounded-sm bg-default pe-1">
+      <span class="inline-flex">
         {{ field['#title'] }}
       </span>
     </label>

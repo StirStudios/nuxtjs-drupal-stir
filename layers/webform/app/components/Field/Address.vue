@@ -11,9 +11,8 @@ const props = defineProps<{
 
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
-const isMaterial = computed(() => webform.fieldVariant === 'material')
 const inputUi = computed(() => useFloatingLabels.value
-  ? { base: ['peer', isMaterial.value ? 'pt-4!' : ''] }
+  ? { base: webform.floatingControlClass }
   : {})
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 
@@ -86,7 +85,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
           :class="webform.labels.floatingClass"
           :for="getFieldId(String(key))"
         >
-          <span class="inline-flex rounded-sm bg-default pe-1">
+          <span class="inline-flex">
             {{ getCompositeLabel(fieldData, String(key)) }}
           </span>
         </label>
