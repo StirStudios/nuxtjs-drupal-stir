@@ -99,7 +99,7 @@ function closeModal(): void {
     <template v-if="open" #body>
       <UButton
         aria-label="Close media preview"
-        class="absolute top-4 right-4 z-20 shadow-lg sm:top-6 sm:right-6"
+        class="absolute top-4 right-4 z-20 rounded-full shadow-lg sm:top-6 sm:right-6"
         color="neutral"
         icon="i-lucide-x"
         size="lg"
