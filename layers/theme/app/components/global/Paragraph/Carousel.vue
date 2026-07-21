@@ -228,8 +228,8 @@ function restoreFadeViewportPosition() {
 @media (min-width: 48rem) {
   .stir-carousel:hover [data-slot='prev'],
   .stir-carousel:hover [data-slot='next'],
-  .stir-carousel:focus-within [data-slot='prev'],
-  .stir-carousel:focus-within [data-slot='next'] {
+  .stir-carousel:has(:focus-visible) [data-slot='prev'],
+  .stir-carousel:has(:focus-visible) [data-slot='next'] {
     opacity: 1;
   }
 }
