@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "package": {
     "name": "nuxtjs-drupal-stir",
-    "version": "4.3.8",
+    "version": "4.4.0",
     "packageManager": "pnpm@10.33.1",
     "engines": {
       "node": "^22.13.0 || ^24.11.0 || >=26.0.0"
