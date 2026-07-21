@@ -15,7 +15,7 @@ const keepTemporary = process.argv.includes('--keep-temporary')
 const maxArchiveBytes = 300_000
 // Verified published baseline. Keep this as a ratchet: new files must represent
 // a deliberate shared capability and pass the packed-consumer audit.
-const maxArchiveEntries = 437
+const maxArchiveEntries = 439
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {

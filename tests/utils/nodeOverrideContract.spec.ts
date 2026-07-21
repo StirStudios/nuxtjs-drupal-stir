@@ -18,6 +18,8 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain(':name="slotName"')
     expect(nodeDisplay).toContain(':url="props.url || props.path?.alias"')
     expect(nodeDisplay).toContain('\'default\', \'uid\'')
+    expect(nodeDisplay).toContain('v-if="renderMode !== \'teaser\'"')
+    expect(nodeDisplay).toContain(':link="props.editLink"')
 
     const nodeTypes = source('layers/theme/app/types/Node.ts')
 

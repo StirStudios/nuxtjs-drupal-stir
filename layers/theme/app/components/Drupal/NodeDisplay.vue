@@ -47,6 +47,14 @@ provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
 
   <LazyRegionArea v-if="props.showBeforeMain" area="before_main" />
 
+  <!-- Full-node editor controls are shared behavior. Custom content-type
+       renderers inherit them by composing DrupalNodeDisplay. Teasers keep
+       their existing control inside NodeTeaser to avoid duplicates. -->
+  <EditLink
+    v-if="renderMode !== 'teaser'"
+    :link="props.editLink"
+  />
+
   <slot
     v-if="renderMode === 'teaser' && slots.teaser"
     name="teaser"
