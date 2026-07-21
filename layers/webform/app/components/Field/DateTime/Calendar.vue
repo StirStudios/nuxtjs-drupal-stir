@@ -70,7 +70,9 @@ const selectedDateLabel = computed(() =>
       icon="i-lucide-calendar"
       :size="size ?? 'xl'"
       :ui="{
-        base: invalid ? 'font-normal ring-error' : 'font-normal',
+        base: invalid
+          ? 'text-base font-normal normal-case ring-error'
+          : 'text-base font-normal normal-case',
         label: model ? 'text-default' : 'text-dimmed',
         leadingIcon: 'text-dimmed',
       }"

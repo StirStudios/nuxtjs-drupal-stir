@@ -8,6 +8,7 @@ describe('normalizeWebformDefinition', () => {
       fields: {
         eventDate: {
           '#type': 'number',
+          '#name': 'event_date',
           '#required': '1',
           '#multiple': '3',
           '#default_value': ['2026-07-20'],
@@ -28,8 +29,8 @@ describe('normalizeWebformDefinition', () => {
       actions: [{ '#type': 'webform_actions', '#submit__label': 'Send' }],
     })
 
-    expect(webform.fields.eventDate).toMatchObject({
-      '#name': 'eventDate',
+    expect(webform.fields.event_date).toMatchObject({
+      '#name': 'event_date',
       '#required': true,
       '#multiple': true,
       '#cardinality': 3,
@@ -43,9 +44,32 @@ describe('normalizeWebformDefinition', () => {
         },
       },
     })
-    expect(webform.fields.eventDate).not.toHaveProperty('#default_value')
+    expect(webform.fields.event_date).not.toHaveProperty('#default_value')
     expect(webform.fields.enabled?.['#defaultValue']).toBe(true)
     expect(webform.actions[0]?.['#submitLabel']).toBe('Send')
+  })
+
+  it('uses Drupal #name as the canonical field key', () => {
+    const webform = normalizeWebformDefinition({
+      schemaVersion: 1,
+      fields: {
+        eventDetails: {
+          '#type': 'section',
+          '#name': 'event_details',
+          children: {
+            partnerName_1: {
+              '#type': 'textfield',
+              '#name': 'partner_name_1',
+            },
+          },
+        },
+      },
+    })
+
+    expect(Object.keys(webform.fields)).toEqual(['event_details'])
+    expect(Object.keys(webform.fields.event_details?.children ?? {})).toEqual([
+      'partner_name_1',
+    ])
   })
 
   it('rejects unsupported contract versions at the boundary', () => {

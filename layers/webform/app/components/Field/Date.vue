@@ -109,7 +109,9 @@ const calendarModel = computed({
       icon="i-lucide-calendar"
       :size="size ?? 'xl'"
       :ui="{
-        base: color === 'error' ? 'font-normal ring-error' : 'font-normal',
+        base: color === 'error'
+          ? 'text-base font-normal normal-case ring-error'
+          : 'text-base font-normal normal-case',
         label: models.length ? 'text-default' : 'text-dimmed',
         leadingIcon: 'text-dimmed',
       }"

@@ -157,7 +157,10 @@ function normalizeWebformFields(value: unknown): Record<string, WebformFieldProp
         return []
       }
 
-      return [[name, normalizeWebformField(field, name)]]
+      const normalizedField = normalizeWebformField(field, name)
+      const machineName = String(normalizedField['#name'] || name)
+
+      return [[machineName, normalizedField]]
     }),
   )
 }
