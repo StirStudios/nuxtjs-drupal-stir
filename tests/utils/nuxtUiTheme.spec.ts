@@ -48,4 +48,10 @@ describe('Nuxt UI theme preset', () => {
   it('start-aligns form errors independently of their container', () => {
     expect(nuxtUiTheme.formField.slots.error).toContain('text-start')
   })
+
+  it('uses the same default size for text and number inputs', () => {
+    expect(nuxtUiTheme.inputNumber.defaultVariants.size).toBe(
+      nuxtUiTheme.input.defaultVariants.size,
+    )
+  })
 })

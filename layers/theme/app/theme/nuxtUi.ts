@@ -92,12 +92,12 @@ export const nuxtUiTheme = {
 
   inputNumber: {
     variants: {
-      size: {
-        md: 'gap-1.5 px-2.5 py-1.5 text-base',
-      },
       variant: {
         material: materialTextControl,
       },
+    },
+    defaultVariants: {
+      size: 'xl',
     },
   },
 
