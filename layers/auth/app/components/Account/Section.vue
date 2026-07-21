@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { resolveComponent } from 'vue'
-
 const props = withDefaults(defineProps<{
   card?: boolean
   heading?: string

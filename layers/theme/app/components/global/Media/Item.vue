@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { resolveComponent } from 'vue'
 import type { Component, VNode } from 'vue'
 import type { SlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'

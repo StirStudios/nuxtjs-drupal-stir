@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineAsyncComponent, resolveComponent } from 'vue'
 import type { PopupMedia, PopupNode, PopupProps } from '#stir/types'
 
 const appConfig = useAppConfig()
