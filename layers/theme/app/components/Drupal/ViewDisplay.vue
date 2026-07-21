@@ -4,7 +4,10 @@ import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type { RenderedDrupalViewRow } from '#stir/composables/useDrupalViewRows'
 import { useDrupalViewRenderedRows } from '#stir/composables/useDrupalViewRows'
-import { useDrupalViewScrollRestore } from '#stir/composables/useDrupalViewScrollRestore'
+import {
+  shouldPersistDrupalViewScroll,
+  useDrupalViewScrollRestore,
+} from '#stir/composables/useDrupalViewScrollRestore'
 
 const props = defineProps<DrupalViewProps>()
 
@@ -106,9 +109,13 @@ onMounted(() => {
   randomizeRowsOnClient.value = true
 })
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
+const scrollRestoreEnabled = computed(() =>
+  !props.carousel && shouldPersistDrupalViewScroll(effectivePager.value?.totalPages),
+)
 const { getRevealDelayMs, getRevealMotionProps, revealMotionKey } = useRevealMotionConfig()
 const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(props, {
   currentPage,
+  enabled: scrollRestoreEnabled,
   viewRoot,
 })
 

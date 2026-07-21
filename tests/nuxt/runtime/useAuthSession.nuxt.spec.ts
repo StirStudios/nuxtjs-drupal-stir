@@ -123,4 +123,36 @@ describe('useAuthSession', () => {
     })
     wrapper.unmount()
   })
+
+  it('clears a previously authenticated user when Drupal rejects the session', async () => {
+    const SessionHarness = defineComponent({
+      setup() {
+        return useAuthSession()
+      },
+      template: '<div />',
+    })
+
+    const wrapper = await mountSuspended(SessionHarness)
+    const session = wrapper.vm as {
+      fetchSession: (options?: { force?: boolean }) => Promise<void>
+      loggedIn: boolean
+      user: Record<string, unknown> | null
+    }
+
+    await session.fetchSession()
+    expect(session.loggedIn).toBe(true)
+    expect(session.user).not.toBeNull()
+
+    unregisterEndpoint?.()
+    unregisterEndpoint = registerEndpoint('/api/auth/session', () => {
+      throw createError({ statusCode: 403, statusMessage: 'Access denied' })
+    })
+
+    await expect(session.fetchSession({ force: true })).rejects.toMatchObject({
+      statusCode: 403,
+    })
+    expect(session.loggedIn).toBe(false)
+    expect(session.user).toBeNull()
+    wrapper.unmount()
+  })
 })

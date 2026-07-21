@@ -4,6 +4,18 @@ type FetchSessionOptions = {
   force?: boolean
 }
 
+function isInvalidSessionError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+
+  const status = 'statusCode' in error
+    ? (error as { statusCode?: unknown }).statusCode
+    : 'status' in error
+      ? (error as { status?: unknown }).status
+      : undefined
+
+  return status === 401 || status === 403
+}
+
 export function useAuthSession() {
   const ready = useState<boolean>('auth-session-ready', () => false)
   const loggedIn = useState<boolean>('auth-session-logged-in', () => false)
@@ -41,6 +53,10 @@ export function useAuthSession() {
     await execute({ dedupe: 'defer' })
 
     if (error.value) {
+      if (isInvalidSessionError(error.value)) {
+        clearSession()
+      }
+
       throw error.value
     }
   }

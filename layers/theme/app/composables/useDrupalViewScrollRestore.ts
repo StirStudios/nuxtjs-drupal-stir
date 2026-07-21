@@ -14,7 +14,12 @@ interface DrupalViewScrollRestoreProps {
 
 interface UseDrupalViewScrollRestoreOptions {
   currentPage: Ref<number>
+  enabled: Readonly<Ref<boolean>>
   viewRoot: Readonly<Ref<HTMLElement | null>>
+}
+
+export function shouldPersistDrupalViewScroll(totalPages: number | undefined) {
+  return typeof totalPages === 'number' && totalPages > 1
 }
 
 export function shouldRestoreDrupalViewScroll(
@@ -59,7 +64,7 @@ export function useDrupalViewScrollRestore(
   }
 
   function saveScrollPosition(key = scrollStorageKeyFor()) {
-    if (!import.meta.client) return
+    if (!import.meta.client || !options.enabled.value) return
 
     pruneStoredViewState(sessionStorage)
     sessionStorage.setItem(
@@ -74,6 +79,7 @@ export function useDrupalViewScrollRestore(
   async function restoreScrollPosition() {
     if (
       !import.meta.client ||
+      !options.enabled.value ||
       restoredScrollPosition.value ||
       restoringScrollPosition.value
     ) {
@@ -148,7 +154,7 @@ export function useDrupalViewScrollRestore(
   }
 
   function handleViewClick(event: MouseEvent) {
-    if (!import.meta.client) return
+    if (!import.meta.client || !options.enabled.value) return
 
     const target = event.target instanceof Element ? event.target : null
     const link = target?.closest('a[href]')
@@ -161,7 +167,7 @@ export function useDrupalViewScrollRestore(
   }
 
   function scrollToViewTop() {
-    if (!import.meta.client) return
+    if (!import.meta.client || !options.enabled.value) return
 
     nextTick(() => {
       options.viewRoot.value?.scrollIntoView({
@@ -172,6 +178,8 @@ export function useDrupalViewScrollRestore(
   }
 
   function markHistoryNavigation() {
+    if (!options.enabled.value) return
+
     isHistoryNavigation.value = true
   }
 

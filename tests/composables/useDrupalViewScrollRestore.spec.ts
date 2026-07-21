@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
   canRestoreDrupalViewScroll,
+  shouldPersistDrupalViewScroll,
   shouldRestoreDrupalViewScroll,
 } from '../../layers/theme/app/composables/useDrupalViewScrollRestore'
 
 describe('useDrupalViewScrollRestore', () => {
+  it('persists scroll only for views with multiple pages', () => {
+    expect(shouldPersistDrupalViewScroll(undefined)).toBe(false)
+    expect(shouldPersistDrupalViewScroll(0)).toBe(false)
+    expect(shouldPersistDrupalViewScroll(1)).toBe(false)
+    expect(shouldPersistDrupalViewScroll(2)).toBe(true)
+  })
+
   it('does not move the viewport during ordinary route navigation', () => {
     expect(shouldRestoreDrupalViewScroll(false, null, '/post')).toBe(false)
     expect(shouldRestoreDrupalViewScroll(false, '/production', '/post')).toBe(false)
