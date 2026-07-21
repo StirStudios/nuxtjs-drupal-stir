@@ -203,6 +203,7 @@
       "layers/theme/app/components/Wrap/Div.vue",
       "layers/theme/app/components/Wrap/Grid.vue",
       "layers/theme/app/components/global/BlockContentParagraph.vue",
+      "layers/theme/app/components/global/EditableRichText.vue",
       "layers/theme/app/components/global/Media/Audio.vue",
       "layers/theme/app/components/global/Media/Document.vue",
       "layers/theme/app/components/global/Media/Image.vue",
@@ -499,6 +500,7 @@
         "layers/theme/app/components/Wrap/Div.vue",
         "layers/theme/app/components/Wrap/Grid.vue",
         "layers/theme/app/components/global/BlockContentParagraph.vue",
+        "layers/theme/app/components/global/EditableRichText.vue",
         "layers/theme/app/components/global/Media/Audio.vue",
         "layers/theme/app/components/global/Media/Document.vue",
         "layers/theme/app/components/global/Media/Image.vue",
@@ -680,7 +682,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 115,
+    "components": 116,
     "composables": 62,
     "utils": 44,
     "plugins": 6,

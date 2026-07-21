@@ -599,15 +599,33 @@ describe('layer contract', () => {
   })
 
   it('does not load the reveal renderer for static paragraph text', () => {
+    const editableRichText = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
+      'utf8',
+    )
+
+    expect(editableRichText).toContain('const hasRevealMotion = computed')
+    expect(editableRichText).toContain('<LazyRevealMotion')
+    expect(editableRichText).toContain('v-if="hasRevealMotion"')
+    expect(editableRichText).toContain('v-else')
+  })
+
+  it('keeps paragraph layout separate from reusable rich-text editing', () => {
     const paragraphText = readFileSync(
       resolve(rootDir, 'layers/theme/app/components/global/Paragraph/Text.vue'),
       'utf8',
     )
+    const editableRichText = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
+      'utf8',
+    )
 
-    expect(paragraphText).toContain('const hasRevealMotion = computed')
-    expect(paragraphText).toContain('<LazyRevealMotion')
-    expect(paragraphText).toContain('v-if="hasRevealMotion"')
-    expect(paragraphText).toContain('v-else')
+    expect(paragraphText).toContain('<WrapDiv')
+    expect(paragraphText).toContain('<EditableRichText')
+    expect(paragraphText).not.toContain('v-html')
+    expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
+    expect(editableRichText).toContain(':show-quick-edit=')
+    expect(editableRichText).toContain('<LazyEditText')
   })
 
   it('keeps view-card reveal delays short for visible grid rows', () => {
