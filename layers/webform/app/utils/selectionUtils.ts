@@ -10,6 +10,7 @@ export const syncLinkedSelections = (
   currentValues: string[],
   optionProperties: Record<string, WebformOptionProperties>,
   disabledKeys: ReadonlySet<string> = new Set(),
+  previousValues: string[] = [],
 ): string[] => {
   const optionKeys = Object.keys(optionProperties)
   const resolveKey = (raw: string): string =>
@@ -21,7 +22,24 @@ export const syncLinkedSelections = (
   )
   const explicitlySelected = new Set(selectedValues.map(normalizeValue))
   const requiredLinkedKeys = new Set<string>()
-  const updated = [...currentValues]
+  let updated = [...currentValues]
+
+  const newlySelectedValues = selectedValues.filter(
+    value => !previousValues.includes(value),
+  )
+  const latestSelectedValue = newlySelectedValues.at(-1) ?? selectedValues.at(-1)
+  const latestSelectedKey = latestSelectedValue
+    ? resolveKey(latestSelectedValue)
+    : null
+  const excludedKeys = new Set(
+    latestSelectedKey
+      ? (optionProperties[latestSelectedKey]?.exclusiveWith ?? []).map(resolveKey)
+      : [],
+  )
+
+  if (excludedKeys.size) {
+    updated = updated.filter(key => !excludedKeys.has(resolveKey(key)))
+  }
 
   for (let index = 0; index < updated.length; index += 1) {
     const selectedKey = resolveKey(updated[index] ?? '')
@@ -33,7 +51,11 @@ export const syncLinkedSelections = (
 
       requiredLinkedKeys.add(linkedKey)
 
-      if (!updated.includes(linkedKey) && !disabledKeys.has(linkedKey)) {
+      if (
+        !updated.includes(linkedKey)
+        && !disabledKeys.has(linkedKey)
+        && !excludedKeys.has(linkedKey)
+      ) {
         updated.push(linkedKey)
       }
     }

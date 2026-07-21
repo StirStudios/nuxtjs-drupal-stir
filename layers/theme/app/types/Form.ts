@@ -84,6 +84,7 @@ export interface WebformOptionProperties {
     includes?: string
   }
   linkedTo?: string[]
+  exclusiveWith?: string[]
 }
 
 export interface WebformFieldProps {

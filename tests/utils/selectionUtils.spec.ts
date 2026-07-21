@@ -46,4 +46,29 @@ describe('syncLinkedSelections', () => {
       new Set(['linked_option']),
     )).toEqual(['parent_option'])
   })
+
+  it('keeps the latest mutually exclusive option and optional add-ons', () => {
+    const properties = {
+      coordination_only: { exclusiveWith: ['0-65', '66-130'] },
+      '0-65': { exclusiveWith: ['coordination_only'] },
+      '66-130': { exclusiveWith: ['coordination_only'] },
+      offsite_ceremony: { linkedTo: ['0-65', '66-130'] },
+    }
+
+    expect(syncLinkedSelections(
+      ['coordination_only', '66-130', 'offsite_ceremony'],
+      ['coordination_only', '66-130', 'offsite_ceremony'],
+      properties,
+      new Set(),
+      ['66-130', 'offsite_ceremony'],
+    )).toEqual(['coordination_only', 'offsite_ceremony'])
+
+    expect(syncLinkedSelections(
+      ['coordination_only', '66-130', 'offsite_ceremony'],
+      ['coordination_only', '66-130', 'offsite_ceremony'],
+      properties,
+      new Set(['0-65']),
+      ['coordination_only', 'offsite_ceremony'],
+    )).toEqual(['66-130', 'offsite_ceremony'])
+  })
 })

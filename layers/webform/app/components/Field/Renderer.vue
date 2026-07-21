@@ -162,6 +162,7 @@ const fieldUi = computed(() => {
       :field-name="fieldName"
       :floating-label="
         resolvedFieldType === 'checkbox' ||
+          resolvedFieldType === 'checkboxes' ||
           resolvedFieldType === 'number' ||
           resolvedFieldType === 'range'
           ? undefined

@@ -46,6 +46,27 @@ function toCamelCase(value: string): string {
   )
 }
 
+function toDrupalMachineName(value: string): string {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toLowerCase()
+}
+
+function comparableMachineName(value: string): string {
+  return value.replace(/[_-]/g, '').toLowerCase()
+}
+
+function resolveDrupalMachineName(
+  transportedName: string,
+  canonicalNames: string[],
+): string {
+  const comparable = comparableMachineName(transportedName)
+
+  return canonicalNames.find(
+    candidate => comparableMachineName(candidate) === comparable,
+  ) || toDrupalMachineName(transportedName)
+}
+
 function normalizeMetadataKeys(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(normalizeMetadataKeys)
   if (!value || typeof value !== 'object') return value
@@ -58,13 +79,32 @@ function normalizeMetadataKeys(value: unknown): unknown {
   )
 }
 
-function normalizeMetadataMap(value: unknown): unknown {
+function normalizeMetadataMap(
+  value: unknown,
+  canonicalMachineNames: string[] = [],
+): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return value
 
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([machineName, item]) => [
-      machineName,
+      canonicalMachineNames.length
+        ? resolveDrupalMachineName(machineName, canonicalMachineNames)
+        : machineName,
       normalizeMetadataKeys(item),
+    ]),
+  )
+}
+
+function normalizeOptionMap(
+  value: unknown,
+  canonicalMachineNames: string[],
+): unknown {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return value
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([machineName, label]) => [
+      resolveDrupalMachineName(machineName, canonicalMachineNames),
+      label,
     ]),
   )
 }
@@ -128,10 +168,23 @@ function normalizeWebformField(
     source['#cardinality'] = cardinality
   }
 
-  for (const property of ['#optionProperties', '#rules']) {
-    if (source[property] !== undefined) {
-      source[property] = normalizeMetadataMap(source[property])
-    }
+  const optionKeys = Array.isArray(source['#optionKeys'])
+    ? source['#optionKeys'].filter(
+        (value): value is string => typeof value === 'string',
+      )
+    : []
+
+  if (source['#options'] !== undefined) {
+    source['#options'] = normalizeOptionMap(source['#options'], optionKeys)
+  }
+  if (source['#optionProperties'] !== undefined) {
+    source['#optionProperties'] = normalizeMetadataMap(
+      source['#optionProperties'],
+      optionKeys,
+    )
+  }
+  if (source['#rules'] !== undefined) {
+    source['#rules'] = normalizeMetadataMap(source['#rules'])
   }
 
   source['#name'] = String(source['#name'] || fallbackName)

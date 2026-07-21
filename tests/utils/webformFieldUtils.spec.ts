@@ -72,6 +72,36 @@ describe('normalizeWebformDefinition', () => {
     ])
   })
 
+  it('restores Drupal option machine names changed by Custom Elements', () => {
+    const webform = normalizeWebformDefinition({
+      schemaVersion: 1,
+      fields: {
+        dinnerAppetizers: {
+          '#type': 'checkboxes',
+          '#name': 'dinner_appetizers',
+          '#optionKeys': ['mini_meatballs', 'chef-Special'],
+          '#options': {
+            miniMeatballs: 'Mini Meatballs',
+            chefSpecial: 'Chef Special',
+          },
+          '#optionProperties': {
+            miniMeatballs: { price: 6 },
+            chefSpecial: { price: 8 },
+          },
+        },
+      },
+    })
+
+    expect(webform.fields.dinner_appetizers?.['#options']).toEqual({
+      mini_meatballs: 'Mini Meatballs',
+      'chef-Special': 'Chef Special',
+    })
+    expect(webform.fields.dinner_appetizers?.['#optionProperties']).toEqual({
+      mini_meatballs: { price: 6 },
+      'chef-Special': { price: 8 },
+    })
+  })
+
   it('rejects unsupported contract versions at the boundary', () => {
     expect(() => normalizeWebformDefinition({ schemaVersion: 2 })).toThrow(
       'Unsupported webform schema version: 2',

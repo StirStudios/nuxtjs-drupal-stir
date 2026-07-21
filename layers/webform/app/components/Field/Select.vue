@@ -13,6 +13,7 @@ const props = defineProps<{
   state: Record<string, string>
   items?: Record<string, string> | Array<{ label: string; value: string }>
   placeholder?: string
+  floatingLabel?: boolean
 }>()
 
 const webform = useStirWebformTheme()

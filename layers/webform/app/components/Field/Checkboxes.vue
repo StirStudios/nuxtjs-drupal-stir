@@ -92,7 +92,7 @@ const items = computed(() => {
     return {
       label: trustedDrupalHtml(String(label ?? '')),
       value: key,
-      props: {
+      meta: {
         ...rawProps,
         description: trustedDrupalHtml(String(rawProps.description ?? '')),
         disabled,
@@ -121,6 +121,7 @@ const handleModelUpdate = (val: unknown) => {
     updated,
     props.field['#optionProperties'] ?? {},
     disabledKeys,
+    previous,
   )
 
   updated = enforceGroupLimit(
@@ -147,13 +148,13 @@ const handleModelUpdate = (val: unknown) => {
     <template #label="{ item }">
       <span
         class="label"
-        :class="{ 'text-muted': item.props.disabled }"
+        :class="{ 'text-muted': item.meta.disabled }"
         v-html="item.label"
       />
       <span
-        v-if="item.props.description"
-        :class="{ 'text-muted': item.props.disabled }"
-        v-html="item.props.description"
+        v-if="item.meta.description"
+        :class="{ 'text-muted': item.meta.disabled }"
+        v-html="item.meta.description"
       />
     </template>
   </UCheckboxGroup>
