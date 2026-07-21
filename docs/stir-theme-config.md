@@ -713,11 +713,11 @@ webform: {
 	],
   },
   fieldGroupHeader: 'mb-6 text-xl font-semibold',
-  fieldGroup: 'space-y-5',
+  fieldGroup: 'mb-14 space-y-5',
   fieldInput: 'w-full',
   response: 'px-6 py-3 bg-muted rounded-lg italic',
   description: 'mb-2 text-sm text-muted',
-  help: 'mt-1 text-sm text-muted',
+  help: 'my-3 text-sm text-muted',
   submitAlign: '',
   submitComponent: '',
   submitButtonSize: '2xl',
@@ -727,6 +727,8 @@ webform: {
 
 - `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
 - `submitComponent` optionally names a globally registered custom submit action component. When empty or unresolved, the default `UButton` submit action is used.
+- Most projects do not need a `webform` override. Override only values that genuinely differ from these defaults.
+- `spacing` controls the root form rhythm, while `fieldGroup` controls fields inside each Drupal group and the space after that group. There is no separate `spacingLarge` setting.
 
 Common downstream webform override:
 
