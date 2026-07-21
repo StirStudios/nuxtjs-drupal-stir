@@ -58,7 +58,6 @@ const placeholder = computed(() => {
 const defaultValue = computed(() => {
   const rawDefault =
     props.field['#defaultValue'] ??
-    props.field['#default_value'] ??
     props.field['#value']
   const numberValue = Number(rawDefault)
 

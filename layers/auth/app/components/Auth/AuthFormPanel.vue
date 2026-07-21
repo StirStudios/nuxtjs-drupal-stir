@@ -15,11 +15,15 @@ const props = defineProps<{
 }>()
 
 const forms = useStirFormTheme()
-const themedFields = computed(() => props.fields.map(field => (
-  field.type === 'checkbox' || field.type === 'otp'
-    ? field
-    : { ...field, variant: field.variant ?? forms.variant }
-)))
+const fieldVariant = computed(() => resolveUiFieldVariant(forms.variant))
+const themedFields = computed<AuthFormField[]>(() => props.fields.map((field) => {
+  if (field.type === 'checkbox' || field.type === 'otp') return field
+
+  return {
+    ...field,
+    variant: field.variant ?? fieldVariant.value,
+  } as AuthFormField
+}))
 
 defineEmits<{
   submit: [event: unknown]

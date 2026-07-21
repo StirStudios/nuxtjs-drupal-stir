@@ -2,7 +2,6 @@
 import type { WebformFieldProps } from '#stir/types'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
-import { resolveWebformBoolean } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -26,7 +25,7 @@ const { disabled, checked } = useEvaluateState(
 )
 
 const checkboxValue = computed({
-  get: () => resolveWebformBoolean(props.state[props.fieldName]),
+  get: () => props.state[props.fieldName] === true,
   set: (value: boolean | 'indeterminate') => {
     props.state[props.fieldName] = value === true
   },

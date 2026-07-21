@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { flattenWebformFields } from '#stir-webform/utils/flattenWebformFields'
 import { evaluateContainerVisibility } from '#stir-webform/composables/useContainerVisibility'
-import { transformPayloadToSnakeCase } from '#stir-webform/utils/transformUtils'
+import { serializeWebformSubmission } from '#stir-webform/utils/transformUtils'
 import { getHiddenDefaults } from '#stir/utils/getHiddenDefaults'
 import { useWindowScroll } from '@vueuse/core'
 import {
@@ -23,16 +23,15 @@ import type {
 } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import {
-  resolveWebformFieldType,
-  resolveWebformMultiple,
+  normalizeWebformDefinition,
 } from '#stir-webform/utils/webformFieldUtils'
 
 type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
 const props = defineProps<WebformProps>()
-const webform = computed<WebformDefinition>(() => {
-  return props.webform || ({} as WebformDefinition)
-})
+const webform = computed<WebformDefinition>(() =>
+  normalizeWebformDefinition(props.webform),
+)
 
 const { y } = useWindowScroll()
 const toast = useToast()
@@ -118,7 +117,7 @@ async function ensureSchemaReady(): Promise<void> {
 
 onMounted(requestSchema)
 const submitButtonLabel = computed(
-  () => actions[0]?.['#submit_Label'] || 'Submit',
+  () => actions[0]?.['#submitLabel'] || 'Submit',
 )
 
 const groupedFields = computed(() => {
@@ -137,14 +136,12 @@ const groupedFields = computed(() => {
 })
 
 const formResetKey = ref(0)
-const isRangeLikeField = (field: WebformFieldProps) =>
-  resolveWebformFieldType(field) === 'range'
+const isRangeLikeField = (field: WebformFieldProps) => field['#type'] === 'range'
 
 const getFieldDefaultValue = (
   field: WebformFieldProps,
 ): WebformState[string] => {
-  const defaultValue =
-    field['#default'] ?? field['#defaultValue'] ?? field['#default_value']
+  const defaultValue = field['#defaultValue']
 
   if (defaultValue !== undefined && defaultValue !== null) {
     if (Array.isArray(defaultValue)) return [...defaultValue]
@@ -162,9 +159,7 @@ const getFieldDefaultValue = (
   }
 
   const type = field['#type']
-  const multiple =
-    resolveWebformMultiple(field['#multiple']) ||
-    (typeof field['#cardinality'] === 'number' && field['#cardinality'] !== 1)
+  const multiple = field['#multiple'] === true
 
   if (isWebformFileField(field)) return multiple ? [] : undefined
   if (type === 'checkboxes' || multiple) return []
@@ -244,8 +239,8 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     const hiddenDefaults = getHiddenDefaults(fields)
     const payload = {
       webform_id: webformId,
-      ...transformPayloadToSnakeCase(state),
-      ...transformPayloadToSnakeCase(hiddenDefaults),
+      ...serializeWebformSubmission(state),
+      ...serializeWebformSubmission(hiddenDefaults),
       turnstile_response: turnstileToken.value,
     }
     const body = hasFileValue(payload)

@@ -6,7 +6,6 @@ import {
   getLocalTimeZone,
 } from '@internationalized/date'
 import { resolveUiButtonVariant } from '#stir/utils/nuxtUiProps'
-import { resolveWebformCardinality } from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -27,7 +26,7 @@ const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
-const max = resolveWebformCardinality(props.field['#multiple'])
+const max = props.field['#cardinality'] ?? 1
 
 const models = ref<CalendarDate[]>([])
 const popoverOpen = ref(false)

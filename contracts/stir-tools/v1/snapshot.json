@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.23.0",
+  "contractVersion": "1.24.0",
   "files": {
     "fixtures/account-settings-update-error.json": "55b9059ee49f33b77876622afd3dabc30369dec71f6eff56b9698610ab5a678f",
     "fixtures/account-settings-update-success.json": "23fca3887518f9ddbc9f52abae9bf2aab021dc9e0a185cbc83cfe22cea7c5076",
@@ -24,10 +24,11 @@
     "fixtures/media-video-local.json": "f70d56f2828e5f783838fc046bd1c1189d1b1f7d134755e4c2c757488e906bcb",
     "fixtures/presentation-usage-manifest.json": "baf3adef0038562e12bf58dc68ff8cc1aabb0cc369a53c6c1487262c73a57990",
     "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
-    "fixtures/webform-contact.json": "a3119636626089bc7129785dc5c253d351b648a6a2283291aca8e0e74eb59fcc",
+    "fixtures/webform-calculator.json": "a52a397e845256d8b054411bf9aa630f0d975ee603a59e4c1155f959f6f4b6fa",
+    "fixtures/webform-contact.json": "7074c24531e159b3cc479f538832b1087886cc400ac11f8a34be07581d673ee1",
     "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
     "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
-    "manifest.json": "1f55e291008d9ad61cb218f15c63fe3f5cefde2dc1a536d9f98cf362140c0358",
+    "manifest.json": "4526cbf61e6e565508ffbad8f9076349f8058aa0797504d13897486ec34f37bf",
     "schemas/account-settings-update.schema.json": "6f3362b418e3b31afbd54e9f76be2d6bd052f8b4a59383ebdcab4666941ae252",
     "schemas/account-settings-values.schema.json": "189523229869b68ba03c8cbee22c83855d6f869b8a10ab06170463d241efb1ea",
     "schemas/account-snapshot.schema.json": "05b5d141c97761acb5e8c607ce244d300dad30315e5900d5bd2d91ce8d70d81e",
@@ -46,6 +47,6 @@
     "schemas/presentation-usage-manifest.schema.json": "379c99e28f9bde97c442e8a29d903cb31ecc376cb0dfcc2f8862ca963822e828",
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
-    "schemas/webform.schema.json": "bdc9c3d321bb2b23bebe7aeb884583a01a7d1162e58c6ff2ee024c0ef8faab14"
+    "schemas/webform.schema.json": "0a7e21c7d873c4c2413d7a7d84b690756bbd89dfad9aaedcbfa635760592f24f"
   }
 }

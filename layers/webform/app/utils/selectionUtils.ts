@@ -16,8 +16,7 @@ export const syncLinkedSelections = (
     optionKeys.find(key => normalizeValue(key) === normalizeValue(raw)) ?? raw
   const allLinkedKeys = new Set(
     Object.values(optionProperties).flatMap((properties) =>
-      [...(properties.linked_to ?? []), ...(properties.linkedTo ?? [])]
-        .map(resolveKey),
+      (properties.linkedTo ?? []).map(resolveKey),
     ),
   )
   const explicitlySelected = new Set(selectedValues.map(normalizeValue))
@@ -27,10 +26,7 @@ export const syncLinkedSelections = (
   for (let index = 0; index < updated.length; index += 1) {
     const selectedKey = resolveKey(updated[index] ?? '')
     const properties = optionProperties[selectedKey]
-    const linkedKeys = [
-      ...(properties?.linked_to ?? []),
-      ...(properties?.linkedTo ?? []),
-    ]
+    const linkedKeys = properties?.linkedTo ?? []
 
     for (const rawLinkedKey of linkedKeys) {
       const linkedKey = resolveKey(rawLinkedKey)

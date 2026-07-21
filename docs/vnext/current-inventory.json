@@ -688,14 +688,14 @@
     "serverRoutes": 26,
     "productionDependencies": 42,
     "developmentDependencies": 24,
-    "tests": 116,
+    "tests": 118,
     "testsByArea": {
       "composables": 11,
       "contracts": 1,
       "nuxt": 40,
       "server": 23,
       "unit": 4,
-      "utils": 37
+      "utils": 39
     }
   },
   "tests": [
@@ -783,6 +783,7 @@
     "tests/utils/calendlyWidget.spec.ts",
     "tests/utils/colorMode.spec.ts",
     "tests/utils/componentTreeDiagnostics.spec.ts",
+    "tests/utils/dateUtils.spec.ts",
     "tests/utils/drupalContractFixtures.spec.ts",
     "tests/utils/drupalHeaders.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
@@ -809,6 +810,7 @@
     "tests/utils/spaLoaderTheme.spec.ts",
     "tests/utils/spaLoadingTemplate.spec.ts",
     "tests/utils/thirdPartyScripts.spec.ts",
+    "tests/utils/transformUtils.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",
     "tests/utils/validationErrors.spec.ts",
     "tests/utils/webformFieldUtils.spec.ts",

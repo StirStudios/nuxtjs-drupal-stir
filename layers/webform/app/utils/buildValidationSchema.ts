@@ -1,9 +1,5 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
-  resolveWebformBoolean,
-  resolveWebformMultiple,
-} from '#stir-webform/utils/webformFieldUtils'
-import {
   custom,
   object,
   optional,
@@ -115,9 +111,7 @@ function createFieldSchema(field: WebformFieldProps): GenericSchema {
     for (const [key, subField] of Object.entries(
       composite as Record<string, WebformFieldProps>,
     )) {
-      const required =
-        resolveWebformBoolean(field['#required']) ||
-        resolveWebformBoolean(subField['#required'])
+      const required = field['#required'] === true || subField['#required'] === true
       const message = field['#requiredError'] || 'This field is required'
 
       entries[key] = valueSchema(value =>
@@ -125,10 +119,8 @@ function createFieldSchema(field: WebformFieldProps): GenericSchema {
       )
     }
     const requiresComposite =
-      resolveWebformBoolean(field['#required']) ||
-      Object.values(composite).some(subField =>
-        resolveWebformBoolean(subField['#required']),
-      )
+      field['#required'] === true ||
+      Object.values(composite).some(subField => subField['#required'] === true)
 
     return requiresComposite ? object(entries) : optional(object(entries))
   }
@@ -150,9 +142,9 @@ function fieldValidationMessage(
   value: unknown,
 ): string | null {
   const requiredError = field['#requiredError'] || 'This field is required'
-  const required = resolveWebformBoolean(field['#required'])
+  const required = field['#required'] === true
   const type = field['#type']
-  const multiple = resolveWebformMultiple(field['#multiple'])
+  const multiple = field['#multiple'] === true
 
   if (isWebformFileField(field)) {
     const values = allowsMultipleFiles(field)
@@ -179,7 +171,7 @@ function fieldValidationMessage(
 
   if (type === 'checkboxes' || multiple) {
     const values = Array.isArray(value) ? value : []
-    const multipleCount = Number(field['#multiple'])
+    const multipleCount = field['#cardinality'] ?? 1
     const requiredCount = (type === 'date' || type === 'datetime')
       && Number.isFinite(multipleCount)
       && multipleCount > 1

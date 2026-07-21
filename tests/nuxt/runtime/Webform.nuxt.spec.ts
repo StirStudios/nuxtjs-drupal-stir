@@ -6,6 +6,7 @@ import ParagraphWebform from '../../../layers/webform/app/components/global/Para
 import type { WebformDefinition } from '../../../layers/theme/app/types'
 
 const webform = {
+  schemaVersion: 1,
   actions: [{ '#type': 'submit', '#title': 'Submit' }],
   fields: {
     name: {

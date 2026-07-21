@@ -3,12 +3,8 @@ import type { DateTimeBlock, DateTimeDate, WebformFieldProps, WebformState } fro
 import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
-import { generateTimeOptions, getOffsetString } from '#stir/utils/dateUtils'
+import { formatWebformDateTime, generateTimeOptions } from '#stir/utils/dateUtils'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
-import {
-  resolveWebformBoolean,
-  resolveWebformCardinality,
-} from '#stir-webform/utils/webformFieldUtils'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -24,7 +20,7 @@ const {
 } = useFormField()
 const webform = useStirWebformTheme()
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
-const multiple = resolveWebformCardinality(props.field['#multiple'])
+const multiple = props.field['#cardinality'] ?? 1
 const minTime = String(props.field['#dateTimeMin'] ?? '10:00:00')
 const maxTime = String(props.field['#dateTimeMax'] ?? '22:00:00')
 const step = Number(props.field['#dateTimeStep']) || 1800
@@ -33,12 +29,6 @@ const siteTimezone =
     ? props.field['#timezone']
     : 'America/Los_Angeles'
 const timeOptions = generateTimeOptions(minTime, maxTime, step)
-
-function formatCalendarDate(date: DateTimeDate): string {
-  return `${date.year}-${String(date.month).padStart(2, '0')}-${String(
-    date.day,
-  ).padStart(2, '0')}`
-}
 
 const blocks = ref<DateTimeBlock[]>(
   Array.from({ length: multiple }, (_, i) => {
@@ -73,9 +63,7 @@ const dateFieldLabel = (index: number) =>
     : String(props.field['#title'] ?? 'Date')
 const timeFieldLabel = (index: number) =>
   multiple > 1 ? `Time ${index + 1}` : 'Time'
-const fieldRequired = computed(() =>
-  resolveWebformBoolean(props.field['#required']),
-)
+const fieldRequired = computed(() => props.field['#required'] === true)
 const fieldInvalid = computed(
   () => validationColor.value === 'error' || validationHighlight.value === true,
 )
@@ -89,17 +77,13 @@ watchEffect(() => {
 
   blocks.value.forEach((block) => {
     if (block.date && block.start) {
-      const dateStr = formatCalendarDate(block.date)
-      const [h = '', m = ''] = block.start.split(':')
-      const s = '00'
+      const value = formatWebformDateTime(
+        block.date,
+        block.start,
+        siteTimezone,
+      )
 
-      if (!h || !m) return
-
-      const jsDate = new Date(`${dateStr}T${h}:${m}:${s}`)
-      const offset = getOffsetString(siteTimezone, jsDate)
-      const full = `${dateStr}T${h}:${m}:${s}${offset}`
-
-      values.push(full)
+      if (value) values.push(value)
     }
   })
 

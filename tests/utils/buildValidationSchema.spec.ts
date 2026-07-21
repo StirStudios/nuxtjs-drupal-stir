@@ -19,7 +19,8 @@ describe('buildValidationSchema', () => {
     const fields: Record<string, WebformFieldProps> = {
       eventDate: createDateTimeField({
         '#required': true,
-        '#multiple': 3,
+        '#multiple': true,
+        '#cardinality': 3,
       }),
     }
     const state: WebformState = {}
@@ -112,7 +113,8 @@ describe('buildValidationSchema', () => {
       },
       eventDate: createDateTimeField({
         '#required': true,
-        '#multiple': 3,
+        '#multiple': true,
+        '#cardinality': 3,
         '#states': {
           visible: {
             ':input[name="showDates"]': { value: 'yes' },

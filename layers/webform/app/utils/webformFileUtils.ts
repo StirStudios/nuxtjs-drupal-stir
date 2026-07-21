@@ -1,5 +1,4 @@
 import type { WebformFieldProps } from '#stir/types'
-import { resolveWebformMultiple } from '#stir-webform/utils/webformFieldUtils'
 
 export const WEBFORM_FILE_FIELD_TYPES = [
   'file',
@@ -26,10 +25,7 @@ export function isWebformFileField(field: WebformFieldProps): boolean {
 }
 
 export function allowsMultipleFiles(field: WebformFieldProps): boolean {
-  return (
-    resolveWebformMultiple(field['#multiple']) ||
-    (typeof field['#cardinality'] === 'number' && field['#cardinality'] !== 1)
-  )
+  return field['#multiple'] === true
 }
 
 export function getFileExtensions(field: WebformFieldProps): string[] {

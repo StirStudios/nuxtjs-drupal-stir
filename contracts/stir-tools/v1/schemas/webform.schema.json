@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "schemaVersion",
     "webformId",
     "webformTitle",
     "fields",
@@ -15,19 +16,70 @@
     "webformSubmissions"
   ],
   "properties": {
+    "schemaVersion": { "const": 1 },
     "webformId": { "type": "string", "minLength": 1 },
     "webformTitle": { "type": "string" },
     "fields": {
       "type": "object",
-      "additionalProperties": { "type": "object" }
+      "additionalProperties": { "$ref": "#/definitions/field" }
     },
     "actions": {
       "type": "array",
-      "items": { "type": "object" }
+      "items": { "$ref": "#/definitions/action" }
     },
     "webformConfirmation": { "type": "string" },
     "webformConfirmationType": { "type": "string", "minLength": 1 },
     "webformRedirect": { "type": ["string", "null"] },
     "webformSubmissions": { "type": ["string", "null"] }
+  },
+  "definitions": {
+    "field": {
+      "type": "object",
+      "required": ["#type", "#name"],
+      "properties": {
+        "#type": { "type": "string", "minLength": 1 },
+        "#name": { "type": "string", "minLength": 1 },
+        "#title": { "type": ["string", "null"] },
+        "#required": { "type": "boolean" },
+        "#disabled": { "type": "boolean" },
+        "#readonly": { "type": "boolean" },
+        "#floatingLabel": { "type": "boolean" },
+        "#modal": { "type": "boolean" },
+        "#relocated": { "type": "boolean" },
+        "#multiple": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "integer", "minimum": 1 }
+          ]
+        },
+        "#cardinality": { "type": "integer", "minimum": 1 },
+        "#defaultValue": {},
+        "#inputType": { "type": "string" },
+        "#requiredError": { "type": "string" },
+        "#optionProperties": { "type": "object" },
+        "#perGuest": { "type": "boolean" },
+        "#isTaxable": { "type": "boolean" },
+        "#serviceFeeApplicable": { "type": "boolean" },
+        "#maxSelected": { "type": "integer", "minimum": 0 },
+        "#minSelected": { "type": "integer", "minimum": 0 },
+        "#groupMaxSelected": { "type": "integer", "minimum": 0 },
+        "#tabGroup": { "type": "string" },
+        "children": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/field" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "action": {
+      "type": "object",
+      "required": ["#type"],
+      "properties": {
+        "#type": { "type": "string", "minLength": 1 },
+        "#title": { "type": "string" },
+        "#submitLabel": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
   }
 }

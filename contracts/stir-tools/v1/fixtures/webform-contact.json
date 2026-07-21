@@ -1,17 +1,21 @@
 {
+  "schemaVersion": 1,
   "webformId": "contact",
   "webformTitle": "Contact",
   "fields": {
     "email": {
       "#type": "textfield",
       "#title": "Email",
-      "#name": "email"
+      "#name": "email",
+      "#required": true,
+      "#defaultValue": "hello@example.com"
     }
   },
   "actions": [
     {
       "#type": "webform_actions",
-      "#title": "Submit"
+      "#title": "Submit",
+      "#submitLabel": "Send"
     }
   ],
   "webformConfirmation": "Thanks contact",

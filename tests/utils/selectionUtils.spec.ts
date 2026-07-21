@@ -18,7 +18,7 @@ describe('syncLinkedSelections', () => {
       [],
       ['linked_option'],
       {
-        parent_option: { linked_to: ['linked_option'] },
+        parent_option: { linkedTo: ['linked_option'] },
         linked_option: {},
       },
     )).toEqual([])
@@ -29,7 +29,7 @@ describe('syncLinkedSelections', () => {
       ['linked_option'],
       ['linked_option'],
       {
-        parent_option: { linked_to: ['linked_option'] },
+        parent_option: { linkedTo: ['linked_option'] },
         linked_option: {},
       },
     )).toEqual(['linked_option'])
@@ -40,7 +40,7 @@ describe('syncLinkedSelections', () => {
       ['parent_option'],
       ['parent_option'],
       {
-        parent_option: { linked_to: ['linked_option'] },
+        parent_option: { linkedTo: ['linked_option'] },
         linked_option: {},
       },
       new Set(['linked_option']),

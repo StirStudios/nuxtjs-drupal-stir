@@ -1,23 +1,10 @@
-import { toSnakeCase } from '#stir/utils/stringUtils'
 import { hasFileValue, isFileValue } from './webformFileUtils'
 
 type OptionObject = { label: string; description?: string }
 type OptionValue = string | OptionObject
-type AddressPayload = {
-  address?: string
-  address_2?: string
-  city?: string
-  stateProvince?: string
-  postalCode?: string
-  country?: string
-}
 
 function isOptionObject(value: OptionValue): value is OptionObject {
   return typeof value === 'object' && value !== null && 'label' in value
-}
-
-function isAddressPayload(value: unknown): value is AddressPayload {
-  return typeof value === 'object' && value !== null && 'address' in value
 }
 
 export function transformOptions(
@@ -32,67 +19,45 @@ export function transformOptions(
   })
 }
 
-export function transformPayloadToSnakeCase<T extends Record<string, unknown>>(
+/**
+ * Serializes form state without changing Drupal-defined field or option keys.
+ */
+export function serializeWebformSubmission<T extends Record<string, unknown>>(
   payload: T,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {}
 
   Object.entries(payload).forEach(([key, value]) => {
-    const snakeKey = toSnakeCase(key)
-
     if (value === null || value === undefined) {
-      result[snakeKey] = value
-      return
-    }
-
-    if (isAddressPayload(value) && typeof value.address === 'string') {
-      result[snakeKey] = {
-        address: value.address ?? '',
-        address_2: value.address_2 ?? '',
-        city: value.city ?? '',
-        state_province: value.stateProvince ?? '',
-        postal_code: value.postalCode ?? '',
-        country: value.country ?? '',
-      }
+      result[key] = value
       return
     }
 
     if (isFileValue(value) || (Array.isArray(value) && hasFileValue(value))) {
-      result[snakeKey] = value
+      result[key] = value
       return
     }
 
     if (typeof value === 'object' && !Array.isArray(value)) {
-      result[snakeKey] = Object.values(value)
-        .map((v) => (typeof v === 'string' ? toSnakeCase(v) : v))
-        .filter(Boolean)
+      result[key] = serializeWebformSubmission(
+        value as Record<string, unknown>,
+      )
       return
     }
 
     if (Array.isArray(value)) {
-      result[snakeKey] = value
-        .map((v) => {
-          if (typeof v !== 'string') return v
-
-          if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}$/.test(v)) return v
-
-          return toSnakeCase(v)
-        })
-        .filter(Boolean)
+      result[key] = value.filter(
+        item => item !== '' && item !== null && item !== undefined,
+      )
       return
     }
 
     if (typeof value === 'boolean') {
-      result[snakeKey] = value ? '1' : '0'
+      result[key] = value ? '1' : '0'
       return
     }
 
-    if (typeof value === 'string') {
-      result[snakeKey] = value
-      return
-    }
-
-    result[snakeKey] = value
+    result[key] = value
   })
 
   return result

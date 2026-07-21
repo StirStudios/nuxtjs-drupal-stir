@@ -1,57 +1,76 @@
 import { describe, expect, it } from 'vitest'
-import {
-  resolveWebformBoolean,
-  resolveWebformCardinality,
-  resolveWebformFieldType,
-  resolveWebformMultiple,
-} from '../../layers/webform/app/utils/webformFieldUtils'
-import type { WebformFieldProps } from '../../layers/theme/app/types'
+import { normalizeWebformDefinition } from '../../layers/webform/app/utils/webformFieldUtils'
 
-const field = (
-  overrides: Partial<WebformFieldProps> = {},
-): WebformFieldProps => ({
-  '#type': 'text',
-  '#title': 'Field',
-  '#name': 'field',
-  ...overrides,
-})
+describe('normalizeWebformDefinition', () => {
+  it('adapts legacy wire values once into the canonical contract', () => {
+    const webform = normalizeWebformDefinition({
+      webformId: 'contact',
+      fields: {
+        eventDate: {
+          '#type': 'number',
+          '#required': '1',
+          '#multiple': '3',
+          '#default_value': ['2026-07-20'],
+          '#input_type': 'range',
+          '#option_properties': {
+            chef_special: {
+              alreadyCamel: 'preserved',
+              check_against: 'guestCount',
+              linked_to: ['basePackage'],
+            },
+          },
+        },
+        enabled: {
+          '#type': 'checkbox',
+          '#default_value': '1',
+        },
+      },
+      actions: [{ '#type': 'webform_actions', '#submit__label': 'Send' }],
+    })
 
-describe('webformFieldUtils', () => {
-  it.each([
-    [true, true],
-    [1, true],
-    ['1', true],
-    ['true', true],
-    [false, false],
-    [0, false],
-    ['0', false],
-    ['false', false],
-    [undefined, false],
-  ])('normalizes Drupal boolean value %s', (value, expected) => {
-    expect(resolveWebformBoolean(value)).toBe(expected)
+    expect(webform.fields.eventDate).toMatchObject({
+      '#name': 'eventDate',
+      '#required': true,
+      '#multiple': true,
+      '#cardinality': 3,
+      '#defaultValue': ['2026-07-20'],
+      '#type': 'range',
+      '#optionProperties': {
+        chef_special: {
+          alreadyCamel: 'preserved',
+          checkAgainst: 'guestCount',
+          linkedTo: ['basePackage'],
+        },
+      },
+    })
+    expect(webform.fields.eventDate).not.toHaveProperty('#default_value')
+    expect(webform.fields.enabled?.['#defaultValue']).toBe(true)
+    expect(webform.actions[0]?.['#submitLabel']).toBe('Send')
   })
 
-  it('normalizes numeric and boolean cardinality values', () => {
-    expect(resolveWebformCardinality('3')).toBe(3)
-    expect(resolveWebformCardinality('0')).toBe(1)
-    expect(resolveWebformCardinality(true)).toBe(1)
-    expect(resolveWebformMultiple('3')).toBe(true)
-    expect(resolveWebformMultiple('1')).toBe(true)
-    expect(resolveWebformMultiple(1)).toBe(false)
-    expect(resolveWebformMultiple('0')).toBe(false)
+  it('rejects unsupported contract versions at the boundary', () => {
+    expect(() => normalizeWebformDefinition({ schemaVersion: 2 })).toThrow(
+      'Unsupported webform schema version: 2',
+    )
   })
 
-  it('normalizes range aliases once for renderer and state setup', () => {
-    expect(
-      resolveWebformFieldType({
-        ...field(),
-        '#type': 'webform_range',
-      } as unknown as WebformFieldProps),
-    ).toBe('range')
-    expect(
-      resolveWebformFieldType(
-        field({ '#type': 'number', '#input_type': 'range' }),
-      ),
-    ).toBe('range')
+  it('drops malformed fields before components consume the payload', () => {
+    const webform = normalizeWebformDefinition({
+      schemaVersion: 1,
+      fields: {
+        validName: { '#type': 'textfield' },
+        missingType: { '#title': 'Invalid' },
+        scalar: 'invalid',
+      },
+      actions: [{ '#type': 'submit' }, { '#title': 'Invalid' }, 'invalid'],
+    })
+
+    expect(webform.fields).toEqual({
+      validName: {
+        '#name': 'validName',
+        '#type': 'textfield',
+      },
+    })
+    expect(webform.actions).toEqual([{ '#type': 'submit' }])
   })
 })

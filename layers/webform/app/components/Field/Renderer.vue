@@ -3,10 +3,6 @@ import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
-import {
-  resolveWebformBoolean,
-  resolveWebformFieldType,
-} from '#stir-webform/utils/webformFieldUtils'
 
 import {
   LazyFieldInput,
@@ -66,17 +62,17 @@ const componentMap: Record<string, Component> = {
 const shouldRender = computed(() => {
   return (
     props.bypassRelocatedFilter === true ||
-    !resolveWebformBoolean(props.field['#relocated'])
+    props.field['#relocated'] !== true
   )
 })
 
 const useFloatingLabels = computed(
   () =>
-    props.field['#floating_label'] === undefined
+    props.field['#floatingLabel'] === undefined
       ? webform.labels.floating
-      : resolveWebformBoolean(props.field['#floating_label']),
+      : props.field['#floatingLabel'],
 )
-const resolvedFieldType = computed(() => resolveWebformFieldType(props.field))
+const resolvedFieldType = computed(() => props.field['#type'])
 
 const resolvedComponent = computed(
   () => componentMap[resolvedFieldType.value] || null,
@@ -144,11 +140,11 @@ const fieldUi = computed(() => {
     :disabled="!checked"
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
-    :required="resolveWebformBoolean(field['#required'])"
+    :required="field['#required']"
     :ui="fieldUi"
   >
     <LazyButtonModal
-      v-if="resolveWebformBoolean(field['#modal'])"
+      v-if="field['#modal']"
       :modal-id="field['#name']"
     />
 
