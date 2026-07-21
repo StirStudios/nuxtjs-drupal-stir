@@ -11,6 +11,8 @@ const routes = (process.env.A11Y_ROUTES ?? '/')
   .split(',')
   .map((route) => route.trim())
   .filter(Boolean)
+const rootSelector = process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'
+const documentMode = process.env.A11Y_DOCUMENT_MODE !== 'widget'
 const hoverSelector =
   process.env.A11Y_HOVER_SELECTOR ?? '[data-a11y-scan-hover]'
 const opaqueSelector =
@@ -135,7 +137,8 @@ const formatContrastSuggestions = (data) => {
   ].filter(Boolean)
   return suggestions.length
     ? `
-    Nearest passing suggestions: ${suggestions.join(' or ')}`
+    Nearest passing suggestions: ${suggestions.join(' or ')}
+    Apply the smallest contextual fix to this element and state. Do not replace a shared brand or semantic color token unless every use of that token has been visually and accessibly audited.`
     : ''
 }
 const formatViolations = (violations) =>
@@ -152,6 +155,18 @@ ${violation.helpUrl}
 ${nodes}`
     })
     .join('\n\n')
+const assertNoViolations = (violations, context) => {
+  if (violations.length === 0) return
+  const affectedElements = violations.reduce(
+    (total, violation) => total + violation.nodes.length,
+    0,
+  )
+  const ruleLabel = violations.length === 1 ? 'rule' : 'rules'
+  const elementLabel = affectedElements === 1 ? 'element' : 'elements'
+  throw new Error(
+    `Accessibility audit failed ${context}: ${violations.length} ${ruleLabel} affected ${affectedElements} ${elementLabel}.\n\n${formatViolations(violations)}`,
+  )
+}
 const revealFullPage = async (page) => {
   await page.evaluate(async () => {
     const pause = (duration) =>
@@ -171,6 +186,23 @@ const revealFullPage = async (page) => {
     await pause(250)
   })
 }
+const revealStableFullPage = async (page) => {
+  try {
+    await revealFullPage(page)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    if (!message.includes('Execution context was destroyed')) throw error
+
+    // Nuxt may perform one client navigation while a managed dev server warms.
+    // Wait for the replacement document and repeat the read-only reveal once.
+    // A second interruption remains a real test failure.
+    await page.waitForLoadState('load')
+    await page.locator('main').waitFor({ state: 'visible' })
+    if (documentMode) await page.locator('h1').waitFor({ state: 'visible' })
+    await revealFullPage(page)
+  }
+}
 const analyzePage = (page, includeSelector) => {
   const builder = new AxeBuilder({ page })
     .exclude('nuxt-devtools-frame')
@@ -178,8 +210,39 @@ const analyzePage = (page, includeSelector) => {
     .withTags(accessibilityTags)
 
   if (includeSelector) builder.include(includeSelector)
+  if (!documentMode) builder.disableRules(['page-has-heading-one'])
 
   return builder.analyze()
+}
+const transitionRaceRuleIds = new Set([
+  'landmark-one-main',
+  'page-has-heading-one',
+])
+const isTransitionRace = (violations) => {
+  if (
+    violations.length === 0 ||
+    violations.some((violation) => !transitionRaceRuleIds.has(violation.id))
+  ) {
+    return false
+  }
+
+  return true
+}
+const analyzeStablePage = async (page, includeSelector) => {
+  const results = await analyzePage(page, includeSelector)
+  if (!isTransitionRace(results.violations)) return results
+
+  // Page transitions can replace the semantic page subtree while Axe is
+  // taking its snapshot. Wait for the final structure and retry once. A real
+  // omission still fails at these explicit landmark gates rather than being
+  // hidden by the retry.
+  await page.waitForLoadState('load')
+  await page.locator('main').waitFor({ state: 'visible' })
+  if (documentMode) await page.locator('h1').waitFor({ state: 'visible' })
+  await page.waitForTimeout(motionSettleMs)
+  await expect(page.locator('main')).toHaveCount(1)
+  if (documentMode) await expect(page.locator('h1')).toHaveCount(1)
+  return analyzePage(page, includeSelector)
 }
 test.describe('automated accessibility', () => {
   for (const route of routes) {
@@ -190,21 +253,37 @@ test.describe('automated accessibility', () => {
       expect(response?.ok(), `Expected ${route} to load successfully`).toBe(
         true,
       )
-      await page.locator('#__nuxt').waitFor({ state: 'attached' })
+      await page.locator(rootSelector).waitFor({ state: 'attached' })
       await page.waitForLoadState('load')
-      await revealFullPage(page)
+      // Nuxt can replace the hydrated page subtree after the root container is
+      // attached. These are baseline document requirements, so wait for the
+      // final landmarks before Axe observes the page. A genuinely missing
+      // landmark or heading still fails deterministically at this boundary.
+      await page.locator('main').first().waitFor({ state: 'attached' })
+      if (documentMode) {
+        await page.locator('h1').first().waitFor({ state: 'attached' })
+      }
+      // Measure stable rendered colors rather than a midpoint from a theme,
+      // hover, carousel, or hydration transition.
+      await page.addStyleTag({
+        content: `
+          *, *::before, *::after {
+            animation-delay: 0s !important;
+            animation-duration: 0s !important;
+            scroll-behavior: auto !important;
+            transition-delay: 0s !important;
+            transition-duration: 0s !important;
+          }
+        `,
+      })
+      await revealStableFullPage(page)
       await page.waitForTimeout(motionSettleMs)
-      const results = await analyzePage(page)
+      const results = await analyzeStablePage(page)
       await testInfo.attach('axe-results', {
         body: JSON.stringify(results, null, 2),
         contentType: 'application/json',
       })
-      expect(
-        results.violations.length,
-        `Accessibility violations found on ${route}:
-
-${formatViolations(results.violations)}`,
-      ).toBe(0)
+      assertNoViolations(results.violations, `on ${route}`)
       const opaqueTargets = page.locator(opaqueSelector)
       for (let index = 0; index < (await opaqueTargets.count()); index += 1) {
         const opaqueTarget = opaqueTargets.nth(index)
@@ -223,7 +302,7 @@ ${formatViolations(results.violations)}`,
         await hoverTarget.evaluate((element) =>
           element.setAttribute('data-a11y-active-scan', ''),
         )
-        const hoverResults = await analyzePage(
+        const hoverResults = await analyzeStablePage(
           page,
           '[data-a11y-active-scan]',
         )
@@ -234,12 +313,10 @@ ${formatViolations(results.violations)}`,
           body: JSON.stringify(hoverResults, null, 2),
           contentType: 'application/json',
         })
-        expect(
-          hoverResults.violations.length,
-          `Accessibility violations found while hovering target ${index + 1} on ${route}:
-
-${formatViolations(hoverResults.violations)}`,
-        ).toBe(0)
+        assertNoViolations(
+          hoverResults.violations,
+          `while hovering target ${index + 1} on ${route}`,
+        )
       }
     })
   }

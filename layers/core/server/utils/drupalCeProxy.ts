@@ -2,6 +2,7 @@ import {
   assertMethod,
   createError,
   getRequestURL,
+  getResponseHeader,
   proxyRequest,
   type H3Event,
 } from 'h3'
@@ -12,7 +13,7 @@ import {
   getStirForwardedCookie,
   markStirPrivateResponse,
   replaceStirDrupalSetCookies,
-} from '../../../../server/utils/stirDrupalApi'
+} from '../../../foundation/server/utils/stirDrupalApi'
 
 interface StirDrupalCeProxyTargets {
   ceBaseUrl: string
@@ -30,6 +31,8 @@ const FORWARDED_HEADERS = [
   'x-real-ip',
 ]
 const MENU_NAME_PATTERN = '[A-Za-z0-9_-]+'
+const SHARED_REVALIDATION_CACHE_CONTROL
+  = 'public, max-age=0, must-revalidate, s-maxage=300'
 
 const normalizeBaseUrl = (value: unknown): string =>
   typeof value === 'string' ? value.trim().replace(/\/+$/, '') : ''
@@ -193,14 +196,37 @@ export const handleStirDrupalProxyResponse = (
   event: H3Event,
   response: Response,
 ): void => {
+  const upstreamCacheControl = response.headers.get('cache-control') ?? ''
+  const existingCacheControl = String(
+    getResponseHeader(event, 'Cache-Control') ?? '',
+  )
   const setsDrupalSession = filterStirDrupalSetCookies(
     getStirDrupalSetCookies(response.headers),
   ).length > 0
 
   replaceStirDrupalSetCookies(event, response)
 
-  if (getStirForwardedCookie(event) || setsDrupalSession) {
+  if (/(?:^|,)\s*no-store\b/i.test(existingCacheControl)) {
+    return
+  }
+
+  if (
+    getStirForwardedCookie(event)
+    || setsDrupalSession
+    || /(?:^|,)\s*(?:private|no-store)\b/i.test(upstreamCacheControl)
+  ) {
     markStirPrivateResponse(event)
+    return
+  }
+
+  if (
+    (event.method === 'GET' || event.method === 'HEAD')
+    && response.ok
+  ) {
+    event.node.res.setHeader(
+      'Cache-Control',
+      SHARED_REVALIDATION_CACHE_CONTROL,
+    )
   }
 }
 

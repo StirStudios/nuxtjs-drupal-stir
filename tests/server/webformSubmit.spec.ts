@@ -1,6 +1,6 @@
-import { readRawBody } from 'h3'
+import { readRawBody, type H3Event } from 'h3'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import webformSubmitHandler from '../../layers/core/server/api/webform/submit.post'
+import webformSubmitHandler from '../../layers/webform/server/api/webform/submit.post'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),
@@ -9,7 +9,17 @@ vi.mock('h3', async (importOriginal) => ({
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 
-const createEvent = (headers: Record<string, string> = {}) => {
+type TestEvent = H3Event & {
+  node: {
+    res: {
+      getHeader: (name: string) => string | string[] | undefined
+      setHeader: (name: string, value: string | string[]) => void
+      statusCode: number
+    }
+  }
+}
+
+const createEvent = (headers: Record<string, string> = {}): TestEvent => {
   const responseHeaders = new Map<string, string | string[]>()
 
   return {
@@ -22,7 +32,7 @@ const createEvent = (headers: Record<string, string> = {}) => {
         },
       },
     },
-  } as never
+  } as unknown as TestEvent
 }
 
 describe('POST /api/webform/submit', () => {
@@ -103,12 +113,82 @@ describe('POST /api/webform/submit', () => {
   })
 
   it('rejects an oversized declared request before reading its body', async () => {
-    await expect(webformSubmitHandler(createEvent({
+    const event = createEvent({
       'content-length': '1025',
       'content-type': 'application/json',
-    }))).rejects.toMatchObject({ statusCode: 413 })
+    })
+
+    await expect(webformSubmitHandler(event)).rejects.toMatchObject({ statusCode: 413 })
 
     expect(readRawBody).not.toHaveBeenCalled()
+    expect(event.node.res.getHeader('cache-control'))
+      .toBe('private, no-store, max-age=0')
+  })
+
+  it('preserves safe Drupal validation details and status', async () => {
+    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+      webform_id: 'contact',
+      turnstile_response: 'token',
+    })))
+    const validation = {
+      error: {
+        message: 'Submitted data contains validation errors.',
+        details: { email: ['Email is required.'] },
+        flat: ['Email is required.'],
+      },
+    }
+    const raw = vi.fn()
+      .mockResolvedValueOnce({
+        _data: 'csrf-token',
+        headers: { getSetCookie: () => [] },
+        status: 200,
+      })
+      .mockResolvedValueOnce({
+        _data: validation,
+        headers: { getSetCookie: () => [] },
+        status: 400,
+      })
+
+    vi.stubGlobal('$fetch', { raw })
+    const event = createEvent({ 'content-type': 'application/json' })
+
+    await expect(webformSubmitHandler(event)).resolves.toEqual(validation)
+    expect((event as { node: { res: { statusCode: number } } }).node.res.statusCode)
+      .toBe(400)
+    expect(event.node.res.getHeader('cache-control'))
+      .toBe('private, no-store, max-age=0')
+    expect(raw).toHaveBeenNthCalledWith(
+      2,
+      'https://cms.example.test/api/stir_webform_rest/submit',
+      expect.objectContaining({ ignoreResponseError: true }),
+    )
+  })
+
+  it('sanitizes resolved upstream server failures', async () => {
+    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+      webform_id: 'contact',
+      turnstile_response: 'token',
+    })))
+    const raw = vi.fn()
+      .mockResolvedValueOnce({
+        _data: 'csrf-token',
+        headers: { getSetCookie: () => [] },
+        status: 200,
+      })
+      .mockResolvedValueOnce({
+        _data: { error: { message: 'Database password leaked' } },
+        headers: { getSetCookie: () => [] },
+        status: 500,
+      })
+
+    vi.stubGlobal('$fetch', { raw })
+
+    await expect(webformSubmitHandler(createEvent({
+      'content-type': 'application/json',
+    }))).rejects.toMatchObject({
+      statusCode: 502,
+      statusMessage: 'Form submission failed. Please try again later.',
+    })
   })
 
   it('sanitizes upstream failures', async () => {

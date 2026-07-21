@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "webformId": "venue_calculator",
+  "webformTitle": "Venue Calculator",
+  "fields": {
+    "packages": {
+      "#type": "section",
+      "#name": "packages",
+      "#title": "Packages",
+      "children": {
+        "mealChoice": {
+          "#type": "checkboxes",
+          "#name": "mealChoice",
+          "#title": "Meal choice",
+          "#required": true,
+          "#options": {
+            "chefSpecial": "Chef special"
+          },
+          "#optionProperties": {
+            "chefSpecial": {
+              "price": 45,
+              "checkAgainst": "guestCount",
+              "linkedTo": ["basePackage"]
+            }
+          },
+          "#perGuest": true,
+          "#isTaxable": true,
+          "#serviceFeeApplicable": true,
+          "#maxSelected": 1
+        }
+      }
+    },
+    "eventDate": {
+      "#type": "date",
+      "#name": "eventDate",
+      "#title": "Event date",
+      "#required": true,
+      "#multiple": 3,
+      "#cardinality": 3,
+      "#relocated": true
+    }
+  },
+  "actions": [
+    {
+      "#type": "webform_actions",
+      "#title": "Submit",
+      "#submitLabel": "Get estimate"
+    }
+  ],
+  "webformConfirmation": "Thank you",
+  "webformConfirmationType": "message",
+  "webformRedirect": null,
+  "webformSubmissions": null
+}

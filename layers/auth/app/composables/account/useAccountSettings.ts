@@ -1,18 +1,9 @@
-type SettingsValuesResponse = {
-  fields?: Record<string, {
-    editable?: boolean
-    requires_current_password?: boolean
-  }>
-  values?: Record<string, unknown>
-}
+import type {
+  AccountSettingsUpdateResponse,
+  AccountSettingsValuesResponse,
+} from '../../../shared/types/accountSettings'
 
-type SettingsUpdateResponse = {
-  updated?: boolean
-  updated_fields?: string[]
-  no_changes?: boolean
-}
-
-const SETTINGS_FIELDS = ['account_email'] as const
+const SETTINGS_FIELDS = ['account_name', 'account_email'] as const
 
 type SettingsField = typeof SETTINGS_FIELDS[number]
 
@@ -24,15 +15,18 @@ const normalizeComparableValue = (field: SettingsField, value: unknown): string 
 
 export function useAccountSettings() {
   const values = ref<Record<string, unknown>>({
+    account_name: '',
     account_email: '',
     current_password: '',
   })
   const baselineValues = ref<Record<string, unknown>>({
+    account_name: '',
     account_email: '',
   })
   const loading = ref(false)
   const saving = ref(false)
   const fieldEditability = ref<Record<string, boolean>>({
+    account_name: false,
     account_email: true,
   })
   const accountEmailRequiresCurrentPassword = ref(false)
@@ -50,6 +44,8 @@ export function useAccountSettings() {
 
   const hasChanges = computed(() => {
     return SETTINGS_FIELDS.some((field) => {
+      if (fieldEditability.value[field] !== true) return false
+
       const current = normalizeComparableValue(field, values.value[field])
       const baseline = normalizeComparableValue(field, baselineValues.value[field])
 
@@ -60,13 +56,14 @@ export function useAccountSettings() {
   const load = async () => {
     loading.value = true
     try {
-      const response = await $fetch<SettingsValuesResponse>('/api/account/settings/values')
+      const response = await $fetch<AccountSettingsValuesResponse>('/api/account/settings/values')
       const sourceValues =
         response && typeof response.values === 'object' && response.values !== null
           ? response.values
           : {}
 
       values.value = {
+        account_name: String(sourceValues.account_name ?? ''),
         account_email: String(sourceValues.account_email ?? ''),
         current_password: '',
       }
@@ -77,6 +74,10 @@ export function useAccountSettings() {
           : {}
 
       fieldEditability.value = {
+        account_name:
+          typeof sourceFields.account_name?.editable === 'boolean'
+            ? sourceFields.account_name.editable
+            : false,
         account_email:
           typeof sourceFields.account_email?.editable === 'boolean'
             ? sourceFields.account_email.editable
@@ -86,6 +87,7 @@ export function useAccountSettings() {
         sourceFields.account_email?.requires_current_password === true
 
       baselineValues.value = {
+        account_name: values.value.account_name,
         account_email: values.value.account_email,
       }
     } finally {
@@ -105,6 +107,8 @@ export function useAccountSettings() {
     saving.value = true
     try {
       const changedValues = SETTINGS_FIELDS.reduce<Record<string, string>>((acc, field) => {
+        if (fieldEditability.value[field] !== true) return acc
+
         const current = String(values.value[field] ?? '').trim()
         const comparableCurrent = normalizeComparableValue(field, current)
         const baseline = normalizeComparableValue(field, baselineValues.value[field])
@@ -126,7 +130,7 @@ export function useAccountSettings() {
         changedValues.current_password = currentPassword
       }
 
-      const response = await $fetch<SettingsUpdateResponse>(
+      const response = await $fetch<AccountSettingsUpdateResponse>(
         '/api/account/settings/values',
         {
           method: 'PATCH',
@@ -137,6 +141,7 @@ export function useAccountSettings() {
       )
 
       baselineValues.value = {
+        account_name: values.value.account_name,
         account_email: values.value.account_email,
       }
       values.value.current_password = ''

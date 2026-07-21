@@ -11,18 +11,18 @@ import {
   normalizeDrupalViewFilters,
   normalizeDrupalViewPager,
   primaryDrupalViewSort,
-} from '~/composables/useDrupalViewQuery'
-import type { NormalizedViewFilter, ViewPager } from '~/composables/useDrupalViewQuery'
+} from '#stir/composables/useDrupalViewQuery'
+import type { NormalizedViewFilter, ViewPager } from '#stir/composables/useDrupalViewQuery'
 import {
   drupalViewLoadErrorMessage,
   isDrupalViewAbortError,
-} from '~/composables/useDrupalViewErrors'
+} from '#stir/composables/useDrupalViewErrors'
 import {
   findDrupalViewNodeInResponse,
   getDrupalViewNodeProps,
   getDrupalViewNodeRows,
-} from '~/composables/useDrupalViewNode'
-import type { ExposedFilter, ExposedSort } from '~/types/View'
+} from '#stir/composables/useDrupalViewNode'
+import type { ExposedFilter, ExposedSort } from '#stir/types/View'
 import {
   createDefaultDrupalViewState,
   createViewStateSnapshot,
@@ -32,12 +32,13 @@ import {
   parseStoredViewState,
   sanitizeDrupalViewStoredFilters,
   sanitizeDrupalViewStoredSorts,
-} from '~/utils/drupalViewState'
-import type { ViewStateSnapshot } from '~/utils/drupalViewState'
+} from '#stir/utils/drupalViewState'
+import type { ViewStateSnapshot } from '#stir/utils/drupalViewState'
 
-export type { ExposedFilter, ExposedSort } from '~/types/View'
+export type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 interface UseDrupalViewControlsProps {
+  paragraphId?: number | string
   viewId?: string
   displayId?: string
   parentUuid?: string
@@ -48,7 +49,7 @@ interface UseDrupalViewControlsProps {
 }
 
 export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
-  const { $ceApi } = useDrupalCe()
+  const { $ceApi } = useStirDrupalCe()
   const route = useRoute()
   const routeControls = useRouteListControls()
 
@@ -258,6 +259,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   function saveViewState(page = currentPage.value): void {
     if (!import.meta.client) return
 
+    pruneStoredViewState(sessionStorage)
     sessionStorage.setItem(
       viewStateStorageKeyFor(),
       JSON.stringify(snapshotCurrentViewState(page)),
@@ -416,14 +418,24 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     try {
       const query = buildQueryParams(page)
-      const params = buildDrupalViewSearchParams(query)
-      const queryString = params.toString()
-      const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
+      let pageResponse: unknown
+      const paragraphId = Number(props.paragraphId)
 
-      const api = $ceApi()
-      const pageResponse = await api(requestPath, {
-        signal: activeAbortController.signal,
-      })
+      if (Number.isInteger(paragraphId) && paragraphId > 0) {
+        pageResponse = await $fetch(`/api/view/${paragraphId}`, {
+          query,
+          signal: activeAbortController.signal,
+        })
+      } else {
+        const params = buildDrupalViewSearchParams(query)
+        const queryString = params.toString()
+        const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
+        const api = $ceApi()
+
+        pageResponse = await api(requestPath, {
+          signal: activeAbortController.signal,
+        })
+      }
       const viewNode = findDrupalViewNodeInResponse(pageResponse, props)
 
       if (requestId !== activeRequestId) return

@@ -70,5 +70,44 @@ export default defineAppConfig({
 - One inner Drupal CE route loads.
 - Header/menu links render correctly.
 - Drupal views with filters, sort, and pagination work.
+- View Paragraph payloads should include `paragraphId`; interactive controls
+  then refresh only `/api/view/{paragraphId}`. Full-page refresh remains a
+  compatibility fallback for older Drupal payloads.
 - App-context edit links appear when authenticated.
 - Webform submit proxy still works.
+
+## CMS presentation manifest
+
+The default `compatibility` mode keeps the complete finite Drupal utility
+safelist while a project is migrated. Set these build variables to compile the
+smaller project-specific source:
+
+- `STIR_PRESENTATION_MANIFEST_MODE=hybrid` uses the CMS `used` set plus a small
+  editorial reserve. `strict` uses only used values plus structural layout
+  recipes.
+- `STIR_PRESENTATION_MANIFEST` is an authenticated Drupal endpoint URL or a
+  local JSON file exported with `drush stir-layout:presentation-manifest`.
+- `STIR_PRESENTATION_MANIFEST_API_KEY` is sent only for an HTTP source.
+- `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
+  approved local fallback when the primary source is unavailable.
+
+Hybrid and strict builds fail when the manifest is missing, invalid, uses an
+unknown semantic value, contains a rejected legacy utility, or has a mismatched
+revision. The verified Drupal revision remains available in public runtime
+config as `stirPresentationManifestRevision`. `stirPresentationBuild` records
+the manifest and generated-source revisions, generation mode, manifest usage
+count, generated utility count and source bytes, accepted/rejected legacy
+utility counts, generation duration, schema version, site UUID, and Drupal
+theme. The source revision includes the generation mode, so concurrent strict
+and hybrid builds cannot collide in the shared build cache.
+
+The same non-secret build identity is exposed at `/api/health` as
+`presentation`. Deployment monitoring can compare its `manifestRevision` with
+Drupal's `ETag` or `X-Stir-Presentation-Revision` header. A difference is an
+observable rebuild signal; the deployment provider remains a downstream
+choice, and the health request does not query Drupal or trigger a deployment.
+
+The checked fixture build reduces the main CSS artifact from approximately
+35.15 kB gzip in compatibility mode to 30.03 kB in strict mode (about 14.6%).
+Each project's result depends on its actual manifest; this fixture is a
+regression measurement, not a promised production size.

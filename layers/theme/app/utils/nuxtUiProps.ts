@@ -26,6 +26,10 @@ export type CarouselArrowButton = {
   size: UiSize
 }
 
+export function resolveBooleanProp(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'true'
+}
+
 function resolveStringProp<T extends string>(
   value: unknown,
   fallback: T,

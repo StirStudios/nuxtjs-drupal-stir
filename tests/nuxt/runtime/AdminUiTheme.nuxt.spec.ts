@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { UNavigationMenu, UTheme } from '#components'
-import { adminUiTheme } from '../../../layers/theme/app/utils/adminUiTheme'
+import { adminUiTheme } from '../../../layers/editorial/app/utils/adminUiTheme'
 
 const AdminNavigation = defineComponent({
   components: { UNavigationMenu, UTheme },

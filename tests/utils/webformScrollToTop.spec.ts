@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import {
   createScrollToTopRunner,
   getWebformScrollConfig,
-} from '../../layers/theme/app/utils/webformScrollToTop'
+} from '../../layers/webform/app/utils/webformScrollToTop'
 
 describe('webformScrollToTop', () => {
   it('normalizes config defaults and overrides', () => {

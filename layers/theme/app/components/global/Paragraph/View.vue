@@ -7,7 +7,7 @@ defineProps<{
 
   header?: string
   gridItems?: string
-  randomize?: boolean
+  randomize?: boolean | string
   width?: string
   spacing?: string
   editLink?: string
@@ -15,6 +15,8 @@ defineProps<{
 
   viewId?: string
   displayId?: string
+  paragraphId?: number | string
+  paragraphUuid?: string
   view?: unknown
 
   carousel?: boolean

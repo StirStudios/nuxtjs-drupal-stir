@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/component-tree.schema.json",
+  "title": "Stir source-independent component tree",
+  "$ref": "#/definitions/content",
+  "definitions": {
+    "content": {
+      "oneOf": [
+        { "type": "string" },
+        { "$ref": "#/definitions/component" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/content" }
+        }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element"],
+      "properties": {
+        "element": { "type": "string", "minLength": 1 },
+        "props": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": true
+            },
+            {
+              "type": "array",
+              "maxItems": 0
+            }
+          ]
+        },
+        "slots": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/definitions/content" }
+            },
+            {
+              "type": "array",
+              "maxItems": 0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

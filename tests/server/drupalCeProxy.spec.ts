@@ -8,7 +8,7 @@ import {
   isStirDrupalProxyPathSafe,
   proxyStirDrupalMenuRequest,
 } from '../../layers/core/server/utils/drupalCeProxy'
-import { replaceStirDrupalSetCookies } from '../../server/utils/stirDrupalApi'
+import { replaceStirDrupalSetCookies } from '../../layers/foundation/server/utils/stirDrupalApi'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),
@@ -264,6 +264,66 @@ describe('Drupal CE proxy boundary', () => {
     expect(responseHeaders.get('cache-control')).toBe(
       'private, no-store, max-age=0',
     )
+  })
+
+  it('never replaces an existing private page boundary with public proxy caching', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', 'private, no-store, max-age=0')
+    handleStirDrupalProxyResponse(event, new Response('{}'))
+
+    expect(responseHeaders.get('cache-control')).toBe(
+      'private, no-store, max-age=0',
+    )
+  })
+
+  it('requires browsers to revalidate anonymous CE responses', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', 'public, max-age=3600')
+    handleStirDrupalProxyResponse(event, new Response('{}'))
+
+    expect(responseHeaders.get('cache-control')).toBe(
+      'public, max-age=0, must-revalidate, s-maxage=300',
+    )
+  })
+
+  it('does not make anonymous write responses publicly cacheable', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    Object.assign(event, { method: 'POST' })
+
+    responseHeaders.set('cache-control', 'no-store')
+    handleStirDrupalProxyResponse(event, new Response('{}'))
+
+    expect(responseHeaders.get('cache-control')).toBe('no-store')
+  })
+
+  it('preserves an upstream private cache boundary for anonymous requests', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', 'private, max-age=60')
+    handleStirDrupalProxyResponse(event, new Response('{}', {
+      headers: { 'cache-control': 'private, max-age=60' },
+    }))
+
+    expect(responseHeaders.get('cache-control')).toBe(
+      'private, no-store, max-age=0',
+    )
+  })
+
+  it('does not make Drupal error responses publicly cacheable', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', 'no-cache')
+    handleStirDrupalProxyResponse(event, new Response('{}', { status: 404 }))
+
+    expect(responseHeaders.get('cache-control')).toBe('no-cache')
   })
 
   it('prevents shared caching when Drupal creates a session', () => {

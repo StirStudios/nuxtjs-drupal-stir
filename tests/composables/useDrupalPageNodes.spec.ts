@@ -28,6 +28,21 @@ describe('useDrupalPageNodes', () => {
     expect(isDrupalPageViewNode(testimonials, 'testimonials')).toBe(true)
   })
 
+  it('finds rendered view nodes by their normalized view id', () => {
+    const rows = h(TestComponent, { viewId: 'work', displayId: 'block_1' })
+    const wrapper = h(
+      TestComponent,
+      { element: 'paragraph-view' },
+      { content: () => [rows] },
+    )
+    const nodes = useDrupalPageNodes(() => [wrapper])
+
+    expect(findDrupalPageViewNodes([wrapper], 'work')).toEqual([rows])
+    expect(getDrupalPageNodeViewTargetId(rows)).toBe('work')
+    expect(nodes.views('work')).toEqual([rows])
+    expect(nodes.isView(rows, 'work')).toBe(true)
+  })
+
   it('finds nested nodes by element and prop', () => {
     const text = h(TestComponent, { element: 'paragraph-text', text: 'Body' })
     const image = h(TestComponent, {

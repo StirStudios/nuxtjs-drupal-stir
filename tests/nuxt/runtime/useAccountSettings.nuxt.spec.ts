@@ -1,9 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { useAccountSettings } from '../../../layers/auth/app/composables/account/useAccountSettings'
 
 const wrappers: Array<{ unmount: () => void }> = []
+const state = vi.hoisted(() => ({
+  api: vi.fn(),
+}))
+
+mockNuxtImport('$fetch', () => state.api)
 
 const mountComposable = async () => {
   let settings: ReturnType<typeof useAccountSettings> | undefined
@@ -26,6 +31,7 @@ const mountComposable = async () => {
 describe('useAccountSettings', () => {
   afterEach(() => {
     wrappers.splice(0).forEach(wrapper => wrapper.unmount())
+    state.api.mockReset()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
@@ -46,7 +52,7 @@ describe('useAccountSettings', () => {
         updated_fields: ['account_email'],
       })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -88,7 +94,7 @@ describe('useAccountSettings', () => {
       })
       .mockResolvedValueOnce({ updated: true })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -109,6 +115,65 @@ describe('useAccountSettings', () => {
     )
   })
 
+  it('loads and updates a username only when Drupal marks it editable', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        fields: {
+          account_name: { editable: true },
+          account_email: { editable: true },
+        },
+        values: {
+          account_name: 'before-name',
+          account_email: 'before@example.test',
+        },
+      })
+      .mockResolvedValueOnce({
+        updated: true,
+        updated_fields: ['account_name'],
+      })
+
+    state.api.mockImplementation(fetchMock)
+    const settings = await mountComposable()
+
+    await settings.load()
+    expect(settings.values.value.account_name).toBe('before-name')
+    settings.values.value.account_name = 'after-name'
+    expect(settings.hasChanges.value).toBe(true)
+
+    await settings.save()
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/account/settings/values',
+      {
+        method: 'PATCH',
+        body: { values: { account_name: 'after-name' } },
+      },
+    )
+  })
+
+  it('does not submit a username Drupal marks read-only', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      fields: {
+        account_name: { editable: false },
+        account_email: { editable: true },
+      },
+      values: {
+        account_name: 'fixed-name',
+        account_email: 'before@example.test',
+      },
+    })
+
+    state.api.mockImplementation(fetchMock)
+    const settings = await mountComposable()
+
+    await settings.load()
+    settings.values.value.account_name = 'ignored-name'
+
+    expect(settings.hasChanges.value).toBe(false)
+    await expect(settings.save()).resolves.toMatchObject({ no_changes: true })
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
   it('rejects a protected email change without the current password', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce({
       fields: {
@@ -120,7 +185,7 @@ describe('useAccountSettings', () => {
       values: { account_email: 'before@example.test' },
     })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -147,7 +212,7 @@ describe('useAccountSettings', () => {
       })
       .mockRejectedValueOnce(new Error('Update failed'))
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 
@@ -170,7 +235,7 @@ describe('useAccountSettings', () => {
       values: { account_email: 'Person@Example.test' },
     })
 
-    vi.stubGlobal('$fetch', fetchMock)
+    state.api.mockImplementation(fetchMock)
 
     const settings = await mountComposable()
 

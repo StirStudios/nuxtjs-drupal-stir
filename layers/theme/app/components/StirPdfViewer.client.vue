@@ -15,9 +15,11 @@ if (import.meta.dev && !window.__stirPdfViewerWarned) {
 </script>
 
 <template>
-  <div
-    class="rounded border border-red-300 bg-red-50 p-4 text-sm text-red-600 italic"
-  >
-    PDF Viewer is not installed. This is a placeholder component.
-  </div>
+  <UAlert
+    color="error"
+    description="Add a project PDF viewer component to enable document previews."
+    icon="i-lucide-file-warning"
+    title="PDF Viewer is not installed"
+    variant="soft"
+  />
 </template>

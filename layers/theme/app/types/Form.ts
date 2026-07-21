@@ -1,5 +1,6 @@
 export type InputType =
   | 'text'
+  | 'textfield'
   | 'email'
   | 'number'
   | 'tel'
@@ -50,10 +51,13 @@ export interface WebformProps {
 }
 
 export interface WebformDefinition {
+  schemaVersion: 1
   webformId: string
   webformTitle: string
   webformConfirmation: string
-  webformSubmissions: string
+  webformConfirmationType?: string
+  webformRedirect?: string | null
+  webformSubmissions?: string | null
   fields: Record<string, WebformFieldProps>
   actions: WebformActionProps[]
 }
@@ -79,21 +83,20 @@ export interface WebformOptionProperties {
     field?: string
     includes?: string
   }
-  linked_to?: string[]
   linkedTo?: string[]
+  exclusiveWith?: string[]
 }
 
 export interface WebformFieldProps {
   [key: string]: unknown
   '#type': InputType
-  '#title': string
+  '#title'?: string
   '#value'?: number | string
   '#name': string
   '#description'?: string
   '#placeholder'?: string
   '#autocomplete'?: string
   '#pattern'?: string
-  '#input_type'?: string
   '#inputType'?: string
   '#widget'?: string
   '#required'?: boolean
@@ -107,7 +110,14 @@ export interface WebformFieldProps {
   '#accept'?: string
   '#file_extensions'?: string
   '#upload_validators'?: Record<string, unknown>
-  '#multiple'?: number | boolean
+  '#defaultValue'?: unknown
+  '#multiple'?: boolean
+  '#cardinality'?: number
+  '#disabled'?: boolean
+  '#readonly'?: boolean
+  '#floatingLabel'?: boolean
+  '#modal'?: boolean
+  '#relocated'?: boolean
   '#states'?: States
   '#group'?: string
   '#groupMaxSelected'?: number
@@ -127,9 +137,8 @@ export interface GroupField extends WebformFieldProps {
 export interface WebformActionProps {
   [key: string]: unknown
   '#type': string
-  '#title': string
-  '#submit_label'?: string
-  '#submit_Label'?: string
+  '#title'?: string
+  '#submitLabel'?: string
 }
 
 export type WebformState = Record<

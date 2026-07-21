@@ -1,0 +1,68 @@
+<script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
+
+type TurnstileTheme = {
+  appearance?: 'always' | 'execute' | 'interaction-only'
+}
+
+const turnstileToken = defineModel<string>()
+const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
+  .turnstile ?? {}) as TurnstileTheme
+const container = ref<HTMLElement | null>(null)
+const shouldRenderTurnstile = ref(false)
+let stopObserver: (() => void) | null = null
+
+const revealTurnstile = () => {
+  if (shouldRenderTurnstile.value) return
+  shouldRenderTurnstile.value = true
+  stopObserver?.()
+  stopObserver = null
+}
+
+onMounted(() => {
+  if (!import.meta.client || shouldRenderTurnstile.value) return
+  if (!container.value) {
+    revealTurnstile()
+    return
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    revealTurnstile()
+    return
+  }
+
+  const { stop } = useIntersectionObserver(
+    container,
+    (entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) revealTurnstile()
+    },
+    { rootMargin: '300px 0px' },
+  )
+
+  stopObserver = stop
+})
+
+onBeforeUnmount(() => {
+  stopObserver?.()
+  stopObserver = null
+})
+</script>
+
+<template>
+  <div ref="container" class="turnstile-field text-sm">
+    <LazyNuxtTurnstile
+      v-if="shouldRenderTurnstile"
+      v-model="turnstileToken"
+      class="max-w-xs overflow-x-hidden"
+      :options="{ appearance: themeTurnstile.appearance, size: 'flexible' }"
+    />
+  </div>
+</template>
+
+<style>
+.turnstile-field:not(:has(iframe)) {
+  height: 0;
+  margin-block-end: 0 !important;
+  overflow: hidden;
+}
+</style>

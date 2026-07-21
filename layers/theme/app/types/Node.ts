@@ -12,6 +12,7 @@ export interface DrupalNodeRelatedItem {
 
 export interface NodeCommonProps {
   title: string
+  url?: string
   type?: string
   isArticle?: boolean | string
   editLink?: string

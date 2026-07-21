@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
-import { resolveUiColor } from '~/utils/nuxtUiProps'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { resolveUiColor } from '#stir/utils/nuxtUiProps'
 
 type UITimelineItem = {
   date?: string

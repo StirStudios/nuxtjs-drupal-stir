@@ -54,8 +54,8 @@ remain available without a pre-existing session token.
 - The local `/auth/protected` password gate verifies Turnstile in Nuxt before
   comparing the configured password. `TURNSTILE_KEY` and `TURNSTILE_SECRET`
   are therefore required whenever `PROTECTED_PASSWORD` is enabled.
-- Production also requires a separate high-entropy `PROTECTED_COOKIE_SECRET`
-  for signing the protected-access cookie.
+- Protected-access cookies are signed with `PROTECTED_PASSWORD`; rotating the
+  password immediately invalidates existing protected sessions.
 - SSR responses for configured protected routes and authentication pages are
   marked `private, no-store`; do not override that policy in Varnish or at the
   edge.

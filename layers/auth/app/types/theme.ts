@@ -42,9 +42,11 @@ export type AuthBackButtonConfig = AuthButtonConfig & {
 }
 
 export type AuthPageConfig = {
+  backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
+  showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: AuthBackButtonConfig
 } & LooseRecord

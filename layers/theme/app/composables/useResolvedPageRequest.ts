@@ -1,4 +1,4 @@
-import { resolvePageRequest, type PageRequestRoute } from '~/utils/pageRequest'
+import { resolvePageRequest, type PageRequestRoute } from '#stir/utils/pageRequest'
 
 export function useResolvedPageRequest(route: PageRequestRoute = useRoute()) {
   const path = computed(() => resolvePageRequest(route).path)

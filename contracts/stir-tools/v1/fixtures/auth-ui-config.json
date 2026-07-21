@@ -1,0 +1,143 @@
+{
+  "version": 2,
+  "accountsEnabled": true,
+  "loginRedirectPath": "/",
+  "logoutRedirectPath": "/auth/login",
+  "identifierModes": {
+    "login": "email_or_username",
+    "passwordRequest": "email_or_username"
+  },
+  "login": {
+    "title": "Login",
+    "description": "Sign in to continue.",
+    "submitLabel": "Continue",
+    "identifier": {
+      "mode": "email_or_username",
+      "label": "Email or username",
+      "placeholder": "Enter your email or username",
+      "requiredMessage": "Email or username is required",
+      "invalidMessage": ""
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password",
+      "requiredMessage": "Password is required"
+    },
+    "successToast": {
+      "title": "Success",
+      "description": "Signed in successfully."
+    }
+  },
+  "register": {
+    "title": "Create Account",
+    "description": "Create your account to continue.",
+    "submitLabel": "Create Account",
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter your email",
+      "requiredMessage": "Email is required",
+      "invalidMessage": "Enter a valid email address"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Create a password"
+    },
+    "complete": {
+      "verificationTitle": "Verify your email",
+      "createdTitle": "Account created",
+      "verificationSentDescription": "Check your inbox to verify your account before signing in.",
+      "verificationRequiredDescription": "Your account was created and requires email verification before sign-in.",
+      "createdDescription": "Your account has been created. You can now sign in."
+    }
+  },
+  "passwordRequest": {
+    "title": "Reset Password",
+    "description": "Enter your email or username to receive reset instructions.",
+    "submitLabel": "Send Reset Instructions",
+    "identifier": {
+      "mode": "email_or_username",
+      "label": "Email or username",
+      "placeholder": "Enter your email or username",
+      "requiredMessage": "Email or username is required",
+      "invalidMessage": ""
+    },
+    "sentTitle": "Check your inbox",
+    "sentDescription": "If an account exists for that email or username, reset instructions have been sent."
+  },
+  "passwordReset": {
+    "title": "Choose a New Password",
+    "description": "Set a new password for your account.",
+    "submitLabel": "Update Password",
+    "password": {
+      "label": "New password",
+      "placeholder": "Enter your new password"
+    },
+    "confirmPassword": {
+      "label": "Confirm password",
+      "placeholder": "Confirm your new password",
+      "requiredMessage": "Confirm password is required",
+      "mismatchMessage": "Passwords do not match"
+    },
+    "checkingTitle": "Checking reset link",
+    "unavailableTitle": "Reset link unavailable",
+    "invalidLinkMessage": "Reset link is invalid or incomplete.",
+    "expiredLinkMessage": "This reset link is invalid, expired, or already used.",
+    "successToast": {
+      "title": "Password updated",
+      "description": "Your password has been reset. You can now sign in."
+    }
+  },
+  "verify": {
+    "loadingTitle": "Verifying account",
+    "successTitle": "Account verified",
+    "failedTitle": "Verification failed",
+    "loadingDescription": "Verifying your account...",
+    "invalidDescription": "Verification link is invalid or incomplete.",
+    "successDescription": "Your account has been verified. You can now sign in.",
+    "failedDescription": "Verification failed or link expired."
+  },
+  "protectedPage": {
+    "title": "Protected Access",
+    "description": "Enter the page password to continue."
+  },
+  "passwordPolicy": {
+    "minLength": 8,
+    "maxLength": 128,
+    "requiredMessage": "Password is required",
+    "minLengthMessage": "Password must be at least 8 characters",
+    "maxLengthMessage": "Password must be 128 characters or less",
+    "lowercaseMessage": "Password must include a lowercase letter",
+    "uppercaseMessage": "Password must include an uppercase letter",
+    "numberMessage": "Password must include a number",
+    "notSameAsCurrentMessage": "New password must be different from current password",
+    "requirements": [
+      {
+        "key": "minLength",
+        "pattern": ".{8,}",
+        "label": "At least 8 characters"
+      },
+      {
+        "key": "number",
+        "pattern": "\\d",
+        "label": "At least 1 number"
+      },
+      {
+        "key": "lowercase",
+        "pattern": "[a-z]",
+        "label": "At least 1 lowercase letter"
+      },
+      {
+        "key": "uppercase",
+        "pattern": "[A-Z]",
+        "label": "At least 1 uppercase letter"
+      }
+    ],
+    "strengthLabels": {
+      "empty": "Enter a password",
+      "weak": "Weak password",
+      "medium": "Medium password",
+      "strong": "Strong password",
+      "mustContain": "Must contain:"
+    }
+  }
+}

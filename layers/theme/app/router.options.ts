@@ -1,5 +1,4 @@
 import type { RouterOptions } from '@nuxt/schema'
-import { useNuxtApp } from '#app'
 
 const SAVED_POSITION_ATTEMPTS = 60
 const HASH_TARGET_ATTEMPTS = 60
@@ -38,6 +37,12 @@ function getHashElement(hash: string) {
   const decodedId = safeDecodeURIComponent(rawId)
 
   return document.getElementById(decodedId) || document.getElementById(rawId)
+}
+
+function getHashScrollBehavior() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? 'auto' as const
+    : 'smooth' as const
 }
 
 async function waitForHashElement(hash: string) {
@@ -97,10 +102,12 @@ export default <RouterOptions>{
       return element
         ? {
             top: element.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_TOP,
-            behavior: 'smooth' as const,
+            behavior: getHashScrollBehavior(),
           }
         : { top: 0 }
     }
+
+    await waitForRoutePageFinish(to.path, from.path)
 
     return { top: 0 }
   },

@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  createProtectedAccessToken,
-  verifyProtectedAccessToken,
-} from '../../layers/core/server/utils/protectedAccessToken'
-import {
   layerAuthCreateProtectedAccessToken,
   layerAuthConstantTimeEquals,
   layerAuthVerifyProtectedAccessToken,
@@ -21,14 +17,12 @@ describe('protected access tokens', () => {
   it('creates tokens compatible with the original Node HMAC base64url format', async () => {
     vi.setSystemTime(NOW)
 
-    await expect(createProtectedAccessToken(SECRET, 60)).resolves.toBe(NODE_COMPATIBLE_TOKEN)
     await expect(layerAuthCreateProtectedAccessToken(SECRET, 60)).resolves.toBe(NODE_COMPATIBLE_TOKEN)
   })
 
   it('verifies original Node HMAC base64url tokens', async () => {
     vi.setSystemTime(NOW)
 
-    await expect(verifyProtectedAccessToken(NODE_COMPATIBLE_TOKEN, SECRET)).resolves.toBe(true)
     await expect(layerAuthVerifyProtectedAccessToken(NODE_COMPATIBLE_TOKEN, SECRET)).resolves.toBe(true)
   })
 

@@ -1,0 +1,7 @@
+{
+  "type": "video",
+  "mid": 99,
+  "title": "Example local video",
+  "src": "https://www.example.com/sites/default/files/video/example.mp4",
+  "alt": "A short demonstration of the finished project"
+}

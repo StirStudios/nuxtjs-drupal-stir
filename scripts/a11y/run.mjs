@@ -13,6 +13,10 @@ const configTemplatePath = fileURLToPath(
 const specTemplatePath = fileURLToPath(
   new URL('./accessibility.spec.mjs', import.meta.url),
 )
+const serverPath = fileURLToPath(new URL('./server.mjs', import.meta.url))
+const packageRoot = fileURLToPath(new URL('../..', import.meta.url))
+const useFixture = process.env.A11Y_USE_FIXTURE === 'true'
+  || path.resolve(process.cwd()) === path.resolve(packageRoot)
 const requestedArgs = process.argv.slice(2)
 const passthroughCommands = new Set(['install', 'show-report'])
 const isPassthrough = passthroughCommands.has(requestedArgs[0] ?? '')
@@ -60,7 +64,11 @@ const cleanUp = async () => {
 
 const child = spawn(process.execPath, [playwrightCli, ...playwrightArgs], {
   cwd: process.cwd(),
-  env: process.env,
+  env: {
+    ...process.env,
+    STIR_A11Y_SERVER_SCRIPT: serverPath,
+    STIR_A11Y_USE_FIXTURE: useFixture ? 'true' : 'false',
+  },
   stdio: 'inherit',
 })
 

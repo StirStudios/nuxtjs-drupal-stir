@@ -12,7 +12,6 @@ describe('/api/auth/protected', () => {
   it('returns false when no protected access cookie is present', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       protectedPassword: 'secret',
-      protectedCookieSecret: 'cookie-secret',
     }))
 
     const response = await protectedSessionHandler({
@@ -24,11 +23,9 @@ describe('/api/auth/protected', () => {
 
   it('returns true when the protected access cookie is valid', async () => {
     const secret = 'secret'
-    const cookieSecret = 'cookie-secret'
 
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       protectedPassword: secret,
-      protectedCookieSecret: cookieSecret,
     }))
     const token = await layerAuthCreateProtectedAccessToken(
       layerAuthGetProtectedAccessSecret(),
@@ -51,7 +48,6 @@ describe('/api/auth/protected', () => {
   it('invalidates protected access when the password rotates', async () => {
     const runtimeConfig = {
       protectedPassword: 'old-password',
-      protectedCookieSecret: 'cookie-secret',
     }
 
     vi.stubGlobal('useRuntimeConfig', vi.fn(() => runtimeConfig))

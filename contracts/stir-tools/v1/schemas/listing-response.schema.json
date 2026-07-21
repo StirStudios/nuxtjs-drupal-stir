@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/listing-response.schema.json",
+  "title": "Stir listing response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "listing", "items", "pager", "filters", "sort", "meta"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "listing": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "items": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "pager": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page", "pageSize", "total", "totalPages", "hasNext"],
+      "properties": {
+        "page": { "type": "integer", "minimum": 0 },
+        "pageSize": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "total": { "type": ["integer", "null"], "minimum": 0 },
+        "totalPages": { "type": ["integer", "null"], "minimum": 0 },
+        "hasNext": { "type": "boolean" }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active", "options"],
+      "properties": {
+        "active": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "object", "additionalProperties": true }
+          }
+        }
+      }
+    },
+    "sort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["by", "order"],
+      "properties": {
+        "by": { "type": "string", "minLength": 1 },
+        "order": { "enum": ["asc", "desc"] }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "summaryEntityType", "summaryViewMode", "personalized"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "summaryEntityType": { "type": "string", "minLength": 1 },
+        "summaryViewMode": { "type": "string", "minLength": 1 },
+        "personalized": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-<div class="stir-spa-loader" role="status" aria-live="polite">
+<div class="stir-spa-loader" role="status" aria-live="polite" aria-atomic="true">
   <div class="stir-spa-loader__panel">
     <div class="stir-spa-loader__mark" aria-hidden="true">
       <span></span>
@@ -11,23 +11,24 @@
 
 <style>
   .stir-spa-loader {
-    --stir-orange: #f26a00;
-    --stir-graphite: #383533;
-    --stir-pearl: #f4f1ee;
-    --stir-sand: #f59a54;
-    --stir-charcoal: #605d5c;
-    --stir-jumbo: #888685;
+    --stir-orange: var(--stir-loader-primary, var(--ui-primary, #64748b));
+    --stir-graphite: var(--stir-loader-text, var(--ui-text, #334155));
+    --stir-pearl: var(--stir-loader-bg, var(--ui-bg, #f8fafc));
+    --stir-sand: var(--stir-loader-secondary, var(--ui-secondary, #94a3b8));
+    --stir-charcoal: var(--stir-loader-text-toned, var(--ui-text-toned, #475569));
+    --stir-jumbo: var(--stir-loader-text-muted, var(--ui-text-muted, #64748b));
 
     position: fixed;
     inset: 0;
     z-index: 2147483647;
     display: grid;
     min-height: 100vh;
+    min-height: 100dvh;
     place-items: center;
     overflow: hidden;
     background:
-      radial-gradient(circle at 18% 20%, rgba(242, 106, 0, 0.18), transparent 34rem),
-      radial-gradient(circle at 82% 72%, rgba(245, 154, 84, 0.2), transparent 30rem),
+      radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--stir-orange) 18%, transparent), transparent 34rem),
+      radial-gradient(circle at 82% 72%, color-mix(in srgb, var(--stir-sand) 20%, transparent), transparent 30rem),
       linear-gradient(135deg, var(--stir-pearl), #ffffff);
     color: var(--stir-graphite);
     font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
@@ -41,7 +42,7 @@
     padding: 1rem 1.15rem;
     border: 1px solid rgba(96, 93, 92, 0.28);
     border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.82);
+    background: color-mix(in srgb, var(--stir-pearl) 82%, transparent);
     box-shadow: 0 24px 80px rgba(56, 53, 51, 0.18);
     backdrop-filter: blur(18px);
   }
@@ -54,7 +55,7 @@
     flex: 0 0 auto;
     place-items: center;
     border-radius: 999px;
-    background: rgba(242, 106, 0, 0.14);
+    background: color-mix(in srgb, var(--stir-orange) 14%, transparent);
   }
 
   .stir-spa-loader__mark::before {
@@ -63,7 +64,7 @@
     content: "";
     border: 2px solid transparent;
     border-top-color: var(--stir-orange);
-    border-right-color: rgba(245, 154, 84, 0.42);
+    border-right-color: color-mix(in srgb, var(--stir-sand) 42%, transparent);
     border-radius: inherit;
     animation: stir-loader-spin 900ms linear infinite;
   }
@@ -123,19 +124,19 @@
   @media (prefers-color-scheme: dark) {
     .stir-spa-loader {
       background:
-        radial-gradient(circle at 18% 20%, rgba(242, 106, 0, 0.2), transparent 34rem),
-        radial-gradient(circle at 82% 72%, rgba(245, 154, 84, 0.14), transparent 30rem),
-        linear-gradient(135deg, var(--stir-graphite), #1f1d20);
+        radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--stir-orange) 20%, transparent), transparent 34rem),
+        radial-gradient(circle at 82% 72%, color-mix(in srgb, var(--stir-sand) 14%, transparent), transparent 30rem),
+        linear-gradient(135deg, var(--stir-pearl), #1f1d20);
       color: var(--stir-pearl);
     }
 
     .stir-spa-loader__panel {
       border-color: rgba(244, 241, 238, 0.16);
-      background: rgba(56, 53, 51, 0.86);
+      background: color-mix(in srgb, var(--stir-pearl) 86%, transparent);
     }
 
     .stir-spa-loader__mark {
-      background: rgba(245, 154, 84, 0.14);
+      background: color-mix(in srgb, var(--stir-sand) 14%, transparent);
     }
 
     .stir-spa-loader__mark::before {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import useDarkMode from '~/composables/useDarkMode'
-import { resolveColorModeState } from '~/utils/colorMode'
+import useDarkMode from '#stir/composables/useDarkMode'
+import { resolveColorModeState } from '#stir/utils/colorMode'
 
 const appConfig = useAppConfig()
 const { isDark } = useDarkMode()

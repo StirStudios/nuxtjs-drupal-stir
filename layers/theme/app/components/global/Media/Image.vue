@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import type { EditAction, EditActionKey } from '~/types/EditControls'
+import ProviderImage from '#stir-image-provider'
+import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import {
+  carouselImageDeliverySizesKey,
+  resolveImageDeliveryProfile,
+  versionImageSource,
+} from '#stir/utils/imageDelivery'
+import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
 defineOptions({ inheritAttrs: false })
 
@@ -11,13 +19,10 @@ const props = defineProps<{
   type?: string
   platform?: string
 
-  srcset?: string
-  sizes?: string
-  responsiveStyle?: string
-  modalSrc?: string
-  modalSrcset?: string
-  modalSizes?: string
-  modalResponsiveStyle?: string
+  originalRevision?: string
+  originalSrc?: string
+  deliverySizes?: string
+  deliveryProfile?: string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
@@ -40,8 +45,24 @@ const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
 }>()
 
-const theme = useAppConfig().stirTheme
+const appConfig = useAppConfig()
+const runtimeConfig = useRuntimeConfig()
+const theme = appConfig.stirTheme
 const attrs = useAttrs()
+const forwardedAttrs = computed(() => {
+  const {
+    modalResponsiveStyle: _modalResponsiveStyle,
+    modalSizes: _modalSizes,
+    modalSrc: _modalSrc,
+    modalSrcset: _modalSrcset,
+    responsiveStyle: _responsiveStyle,
+    sizes: _sizes,
+    srcset: _srcset,
+    ...safeAttrs
+  } = attrs
+
+  return safeAttrs
+})
 const { isFront } = usePageContext()
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
   if (props.loading === 'eager') return 'eager'
@@ -49,32 +70,44 @@ const normalizedLoading = computed<'lazy' | 'eager'>(() => {
 })
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
+const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
-const fallbackSizes = computed(() => props.sizes?.trim() || '100vw')
-const wrappedSizes = computed(() => {
-  const sizes = fallbackSizes.value.replace(/^auto(?:\s*,\s*)?/i, '')
-
-  return sizes || '100vw'
-})
+const providerSizes = computed(() =>
+  props.deliverySizes?.trim()
+  || carouselDeliverySizes?.value?.trim()
+  || resolveImageDeliveryProfile(
+    props.deliveryProfile,
+    isHero.value,
+    theme.media.image.profiles,
+  ),
+)
+const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
+const providerSource = computed(() => versionImageSource(
+  toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
+  props.originalRevision,
+))
+const bareImageAttrs = computed(() => ({
+  ...forwardedAttrs.value,
+}))
 const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
 )
 const rootAttrs = computed(() =>
   props.link
     ? {
-        ...attrs,
+        ...forwardedAttrs.value,
         href: props.link,
         target: '_blank',
         rel: 'noopener noreferrer',
         'aria-label': linkAriaLabel.value,
       }
-    : attrs,
+    : forwardedAttrs.value,
 )
 const hasImageSource = computed(() =>
-  Boolean(props.src?.trim() || props.srcset?.trim()),
+  Boolean(providerSource.value),
 )
 const hasInlineEditActions = computed(
   () => (props.editActions?.length ?? 0) > 0,
@@ -97,6 +130,19 @@ const deferredFrameStyle = computed(() => {
   return { aspectRatio: `${width} / ${height}` }
 })
 const imageElement = ref<HTMLImageElement | null>(null)
+
+function setImageElementRef(
+  value: Element | ComponentPublicInstance | null,
+): void {
+  if (value instanceof HTMLImageElement) {
+    imageElement.value = value
+    return
+  }
+
+  const element = value && '$el' in value ? value.$el : null
+
+  imageElement.value = element instanceof HTMLImageElement ? element : null
+}
 
 const { isSupported, stop } = useIntersectionObserver(
   imageRoot,
@@ -129,7 +175,7 @@ function syncLoadedFromImageElement() {
 }
 
 watch(
-  () => [props.src, props.srcset, props.sizes, props.width, props.height],
+  () => [providerSource.value, providerSizes.value, props.width, props.height],
   () => {
     isLoaded.value = !hasImageSource.value
     nextTick(syncLoadedFromImageElement)
@@ -155,26 +201,34 @@ onMounted(() => {
 </script>
 
 <template>
-  <img
+  <ProviderImage
     v-if="isBare"
-    ref="imageElement"
-    v-bind="attrs"
+    :ref="setImageElementRef"
+    v-bind="bareImageAttrs"
     :alt="alt || ''"
     :class="
       isHero
         ? [
             theme.hero.image.base,
             isFront ? theme.hero.image.isFront : 'max-w-none',
+            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
             imageClass,
           ]
-        : [theme.media.base, theme.media.rounded, 'm-auto !object-contain', imageClass]
+        : [
+            theme.media.base,
+            theme.media.rounded,
+            'm-auto !object-contain',
+            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+            imageClass,
+          ]
     "
     :fetchpriority="fetchpriority || undefined"
+    :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
-    :sizes="fallbackSizes"
-    :src="src"
-    :srcset="srcset"
+    :quality="theme.media.image.quality"
+    :sizes="providerSizes"
+    :src="providerSource"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -199,9 +253,9 @@ onMounted(() => {
       class="absolute inset-0 z-0 h-full w-full rounded-none"
     />
 
-    <img
+    <ProviderImage
       v-if="!isSourceDeferred && !isEager"
-      ref="imageElement"
+      :ref="setImageElementRef"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -210,19 +264,20 @@ onMounted(() => {
         !isLoaded && 'opacity-0',
         imageClass,
       ]"
+      :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="wrappedSizes"
-      :src="src"
-      :srcset="srcset"
+      :quality="theme.media.image.quality"
+      :sizes="providerSizes"
+      :src="providerSource"
       :width="width"
       @error="handleError"
       @load="handleLoad"
     />
 
-    <img
+    <ProviderImage
       v-else-if="!isSourceDeferred"
-      ref="imageElement"
+      :ref="setImageElementRef"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -231,11 +286,12 @@ onMounted(() => {
         imageClass,
       ]"
       fetchpriority="high"
+      :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
-      :sizes="wrappedSizes"
-      :src="src"
-      :srcset="srcset"
+      :quality="theme.media.image.quality"
+      :sizes="providerSizes"
+      :src="providerSource"
       :width="width"
       @error="handleError"
       @load="handleLoad"

@@ -8,7 +8,7 @@ import {
   stirDrupalApiRequest,
   throwStirDrupalApiError,
   type StirDrupalRequestOptions,
-} from '../../../../server/utils/stirDrupalApi'
+} from '../../../foundation/server/utils/stirDrupalApi'
 
 export function layerAuthGetDrupalApiConfig() {
   return getStirDrupalApiConfig()

@@ -6,9 +6,6 @@ import { useAuthSession } from '../../../layers/auth/app/composables/auth/useAut
 
 mockNuxtImport('useAppConfig', () => {
   return () => ({
-    authIntegration: {
-      drupalAccounts: true,
-    },
     colorMode: {
       forced: false,
       preference: 'system',

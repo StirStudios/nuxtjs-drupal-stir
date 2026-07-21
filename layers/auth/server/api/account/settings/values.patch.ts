@@ -1,21 +1,21 @@
 import { defineEventHandler, readBody } from 'h3'
+import type {
+  AccountSettingsUpdateResponse,
+  AccountSettingsValuesPayload,
+} from '../../../../shared/types/accountSettings'
 import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
-
-type SettingsValuesPayload = {
-  values?: Record<string, unknown>
-}
 
 export default defineEventHandler(async (event) => {
   assertStirSameOrigin(event)
 
-  const body = await readBody<SettingsValuesPayload>(event)
+  const body = await readBody<AccountSettingsValuesPayload>(event)
   const values =
     body && typeof body.values === 'object' && body.values !== null
       ? body.values
       : {}
 
   try {
-    return await layerAuthDrupalApiRequest<Record<string, unknown>>(
+    return await layerAuthDrupalApiRequest<AccountSettingsUpdateResponse>(
       event,
       '/api/account/settings/values',
       {

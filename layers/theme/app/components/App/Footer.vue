@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import FooterAtomList from '~/components/App/Footer/AtomList.vue'
+import FooterAtomList from '#stir/components/App/Footer/AtomList.vue'
 import type {
   AppContextFooterMenuItem,
   AppContextSiteInfo,
-} from '~/composables/useAppContext'
-import type { SocialIcon } from '~/types'
+} from '#stir/composables/useAppContext'
+import type { SocialIcon } from '#stir/types'
 import {
   resolveFooterConfig,
   toThemeRecord,
   type FooterAtomVisibility,
   type FooterSections,
-} from '~/utils/footer'
+} from '#stir/utils/footer'
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { iconsSocialConfig } = useSocialIcons()
 const currentYear = new Date().getFullYear()
@@ -36,13 +36,14 @@ const socialIcons = computed<SocialIcon[]>(() => Array.isArray(iconsSocialConfig
 const pageFooterMenu = computed<AppContextFooterMenuItem[] | undefined>(() =>
   Array.isArray(page.value?.footer_menu) ? page.value?.footer_menu as AppContextFooterMenuItem[] : undefined,
 )
+const hasPageFooterMenu = computed(() => (pageFooterMenu.value?.length ?? 0) > 0)
 const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
   page.value?.site_info && typeof page.value.site_info === 'object'
     ? page.value.site_info as AppContextSiteInfo
     : undefined,
 )
 
-const needsAppContext = computed(() => !pageFooterMenu.value || !pageSiteInfo.value)
+const needsAppContext = computed(() => !hasPageFooterMenu.value || !pageSiteInfo.value)
 
 if (needsAppContext.value) {
   await loadAppFooterContext()
@@ -54,7 +55,7 @@ watch(needsAppContext, (active) => {
 })
 
 const footerMenu = computed<AppContextFooterMenuItem[]>(() => {
-  if (Array.isArray(pageFooterMenu.value)) {
+  if (hasPageFooterMenu.value && pageFooterMenu.value) {
     return pageFooterMenu.value
   }
 
@@ -134,8 +135,9 @@ const shouldRenderFooter = computed(() =>
     :ui="{
       root: footerConfig.base,
       container: footerContainerClass,
-      left: hasLeft ? '' : 'hidden',
-      right: hasRight ? '' : 'hidden',
+      left: hasLeft ? footerConfig.leftSlot : 'hidden',
+      center: hasCenter ? footerConfig.centerSlot : 'hidden',
+      right: hasRight ? footerConfig.rightSlot : 'hidden',
     }"
   >
     <template #left>

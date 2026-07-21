@@ -73,4 +73,41 @@ describe('AuthPage', () => {
     expect(wrapper.find('.grid').exists()).toBe(true)
     wrapper.unmount()
   })
+
+  it('renders the default semantic auth canvas without project overrides', async () => {
+    state.appConfig.stirTheme = { auth: {} }
+
+    const wrapper = await mountSuspended(AuthPage, {
+      slots: {
+        default: '<div>Auth form</div>',
+      },
+    })
+
+    const canvas = wrapper.find('[role="presentation"]')
+
+    expect(canvas.classes()).toContain('bg-muted/50')
+    expect(canvas.findAll('[aria-hidden="true"]')).toHaveLength(2)
+    wrapper.unmount()
+  })
+
+  it('allows the auth theme to replace the canvas and disable decoration', async () => {
+    state.appConfig.stirTheme = {
+      auth: {
+        backgroundClass: 'bg-elevated',
+        showBackgroundDecoration: false,
+      },
+    }
+
+    const wrapper = await mountSuspended(AuthPage, {
+      slots: {
+        default: '<div>Auth form</div>',
+      },
+    })
+
+    const canvas = wrapper.find('[role="presentation"]')
+
+    expect(canvas.classes()).toContain('bg-elevated')
+    expect(canvas.findAll('[aria-hidden="true"]')).toHaveLength(0)
+    wrapper.unmount()
+  })
 })

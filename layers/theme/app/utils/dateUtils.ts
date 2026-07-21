@@ -1,27 +1,39 @@
-export function getOffsetString(
+import { CalendarDateTime, toZoned } from '@internationalized/date'
+
+type DateParts = {
+  year: number
+  month: number
+  day: number
+}
+
+/**
+ * Formats a Webform datetime using the Drupal-provided IANA timezone.
+ */
+export function formatWebformDateTime(
+  date: DateParts,
+  time: string,
   timeZone: string,
-  date: Date = new Date(),
 ): string {
-  const dtf = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    timeZoneName: 'shortOffset',
-  })
+  const [hour, minute] = time.split(':').map(Number)
 
-  const parts = dtf.formatToParts(date)
-  const offset = parts.find((p) => p.type === 'timeZoneName')?.value || 'GMT+0'
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return ''
 
-  const match = offset.match(/GMT([+-]?\d+)(?::(\d+))?/)
+  const localDateTime = new CalendarDateTime(
+    date.year,
+    date.month,
+    date.day,
+    hour,
+    minute,
+    0,
+  )
+  const zonedDateTime = toZoned(localDateTime, timeZone)
+  const offsetMinutes = zonedDateTime.offset / 60_000
+  const sign = offsetMinutes < 0 ? '-' : '+'
+  const absoluteOffset = Math.abs(offsetMinutes)
+  const offsetHours = String(Math.floor(absoluteOffset / 60)).padStart(2, '0')
+  const offsetRemainder = String(absoluteOffset % 60).padStart(2, '0')
 
-  if (match && match[1] !== undefined) {
-    const rawHours = match[1]
-    const sign = rawHours.startsWith('-') ? '-' : '+'
-    const hours = String(Math.abs(Number(rawHours))).padStart(2, '0')
-    const minutes = String(match[2] || '0').padStart(2, '0')
-
-    return `${sign}${hours}${minutes}`
-  }
-
-  return '+0000'
+  return `${localDateTime.toString()}${sign}${offsetHours}${offsetRemainder}`
 }
 
 export function generateTimeOptions(min: string, max: string, step: number) {

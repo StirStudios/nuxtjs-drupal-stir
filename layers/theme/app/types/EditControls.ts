@@ -9,6 +9,7 @@ export interface EditAction {
   buttonClass: string
   disabled?: boolean
   to?: string
+  navigateInPlace?: boolean
   target?: '_blank'
   rel?: 'noopener noreferrer'
 }

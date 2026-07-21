@@ -7,6 +7,7 @@ import {
   defaultDrupalViewFilterValue,
   firstViewControlString,
   parseStoredViewState,
+  pruneStoredViewState,
   sanitizeDrupalViewStoredFilters,
   sanitizeDrupalViewStoredSorts,
 } from '../../layers/theme/app/utils/drupalViewState'
@@ -86,6 +87,37 @@ describe('Drupal view state', () => {
       savedAt: 900,
     }), 1000, 200)).toBeNull()
     expect(parseStoredViewState(fresh, 1200, 200)).toBeNull()
+  })
+
+  it('prunes malformed, expired, and excess view storage records', () => {
+    const values = new Map<string, string>([
+      ['unrelated', 'keep'],
+      ['stir:view-scroll:/expired:view:block:', JSON.stringify({ savedAt: 100 })],
+      ['stir:view-controls:/broken:view:block:', '{'],
+      ['stir:view-controls:/old:view:block:', JSON.stringify({ savedAt: 850 })],
+      ['stir:view-scroll:/new:view:block:', JSON.stringify({ savedAt: 950 })],
+    ])
+    const storage = {
+      get length() {
+        return values.size
+      },
+      key(index: number) {
+        return [...values.keys()][index] ?? null
+      },
+      getItem(key: string) {
+        return values.get(key) ?? null
+      },
+      removeItem(key: string) {
+        values.delete(key)
+      },
+    }
+
+    pruneStoredViewState(storage, 1000, 200, 1)
+
+    expect([...values.keys()]).toEqual([
+      'unrelated',
+      'stir:view-scroll:/new:view:block:',
+    ])
   })
 
   it('normalizes scalar, array, missing, single, and multiple values', () => {

@@ -3,12 +3,23 @@ import { defineConfig, devices } from '@playwright/test'
 const externalBaseUrl = process.env.A11Y_BASE_URL
 const localBaseUrl = process.env.A11Y_SERVER_URL ?? 'http://127.0.0.1:4173'
 const projectRoot = process.cwd()
+const managedServerCommand = process.env.A11Y_SERVER_COMMAND
+  ?? (process.env.STIR_A11Y_USE_FIXTURE === 'true'
+    ? `"${process.execPath}" "${process.env.STIR_A11Y_SERVER_SCRIPT}"`
+    : 'pnpm dev --host 127.0.0.1 --port 4173')
 const playwrightConfig = defineConfig({
   testDir: import.meta.dirname,
-  fullyParallel: true,
+  // A downstream dev server compiles and hydrates on demand. Warm it through
+  // one browser state at a time so parallel first requests cannot trigger HMR
+  // navigations while Axe is snapshotting. Existing/deployed targets remain
+  // parallel because they are already stable.
+  fullyParallel: Boolean(externalBaseUrl),
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : void 0,
+  // Axe can occasionally observe Nuxt between hydration DOM updates even after
+  // the load and motion-settle gates. Retry once locally so the same
+  // deterministic check must fail twice; CI keeps its stronger two retries.
+  retries: process.env.CI ? 2 : 1,
+  workers: externalBaseUrl ? (process.env.CI ? 2 : void 0) : 1,
   outputDir: path.join(projectRoot, 'test-results'),
   reporter: [
     ['line'],
@@ -30,9 +41,7 @@ const playwrightConfig = defineConfig({
   webServer: externalBaseUrl
     ? void 0
     : {
-        command:
-          process.env.A11Y_SERVER_COMMAND ??
-          'pnpm dev --host 127.0.0.1 --port 4173',
+        command: managedServerCommand,
         cwd: projectRoot,
         url: localBaseUrl,
         reuseExistingServer: !process.env.CI,

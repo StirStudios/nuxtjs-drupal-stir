@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   allowsNonEssentialScripts,
   resolvePrivacyConsentStatus,
-} from '../../layers/theme/app/composables/usePrivacyConsent'
+} from '../../layers/integrations/app/composables/usePrivacyConsent'
 
 describe('privacy consent', () => {
   it('preserves accepted legacy cookie values', () => {

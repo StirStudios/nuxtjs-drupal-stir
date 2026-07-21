@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/media-image.schema.json",
+  "title": "Image media payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "mid",
+    "title",
+    "src",
+    "alt",
+    "width",
+    "height",
+    "delivery_profile",
+    "loading",
+    "fetchpriority"
+  ],
+  "properties": {
+    "type": { "enum": ["image", "basic-image"] },
+    "mid": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "title": { "type": "string" },
+    "src": { "type": "string", "minLength": 1 },
+    "original_src": { "type": "string", "minLength": 1 },
+    "original_revision": { "type": "string", "pattern": "^[0-9]+-[0-9]+-[0-9]+$" },
+    "alt": { "type": "string" },
+    "width": { "type": ["integer", "null"], "minimum": 0 },
+    "height": { "type": ["integer", "null"], "minimum": 0 },
+    "delivery_profile": {
+      "enum": ["auto", "card", "split", "container", "full", "hero"]
+    },
+    "loading": { "enum": ["lazy", "eager"] },
+    "fetchpriority": { "enum": ["low", "auto", "high"] },
+    "credit": { "type": "string", "minLength": 1 },
+    "link": { "type": "string", "minLength": 1 },
+    "rel": { "const": "noopener" },
+    "category": { "type": "string", "minLength": 1 }
+  },
+  "dependencies": {
+    "link": ["rel"],
+    "rel": ["link"]
+  }
+}

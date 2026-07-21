@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import {
+  optimizeDrupalRichTextImages,
+  trustedDrupalHtml,
+} from '#stir/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   id?: number | string
@@ -21,9 +24,12 @@ const props = defineProps<{
 }>()
 
 const attrs = useAttrs()
+const appConfig = useAppConfig()
+const $img = useImage()
 const { isAdministrator } = usePageContext()
 
 const isEditing = ref(false)
+const isLoadingEditor = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
 const editSourceText = ref<string | null>(null)
 const renderedText = ref(props.text ?? '')
@@ -38,7 +44,25 @@ const sourceText = computed(() => {
   return normalizedTextSource ?? (snakeSource.trim() ? snakeSource : undefined) ?? props.text ?? ''
 })
 
-const trustedTextHtml = computed(() => trustedDrupalHtml(renderedText.value))
+const trustedTextHtml = computed(() => {
+  const html = trustedDrupalHtml(renderedText.value)
+
+  const image = appConfig.stirTheme.media.image
+
+  return optimizeDrupalRichTextImages(html, (source, width, height, context) =>
+    $img.getSizes(source, {
+      sizes: context?.alignment === 'left' || context?.alignment === 'right'
+        ? image.profiles.split
+        : image.profiles.container,
+      modifiers: {
+        format: image.format,
+        height,
+        quality: image.quality,
+        width,
+      },
+    }),
+  )
+})
 const canInlineEdit = computed(() => isAdministrator.value && paragraphId.value > 0)
 const richTextClass = 'prose max-w-none'
 const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
@@ -51,6 +75,9 @@ const wrapStyles = computed(() =>
 )
 
 async function startEditing() {
+  if (isEditing.value || isLoadingEditor.value) return
+
+  isLoadingEditor.value = true
   editSourceText.value = sourceText.value
 
   if (canInlineEdit.value && paragraphId.value > 0) {
@@ -66,16 +93,23 @@ async function startEditing() {
   }
 
   isEditing.value = true
+  isLoadingEditor.value = false
 }
 
 function stopEditing() {
   isEditing.value = false
+  isLoadingEditor.value = false
   editSourceText.value = null
 }
 
-function handleSaved(nextText: string) {
-  renderedText.value = nextText
-  stopEditing()
+async function handleSaved() {
+  isLoadingEditor.value = true
+
+  try {
+    await refreshNuxtData()
+  } finally {
+    stopEditing()
+  }
 }
 
 watch(() => props.text, (value) => {
@@ -90,17 +124,45 @@ watch(() => props.text, (value) => {
       controls-placement="slot"
       :link="editLink"
       :parent-uuid="parentUuid"
-      :show-quick-edit="canInlineEdit && isEditing === false"
+      :show-quick-edit="canInlineEdit && isEditing === false && isLoadingEditor === false"
       @quick-edit="startEditing"
     >
-      <template v-if="isEditing && canInlineEdit">
-        <LazyEditText
-          :classes="classes"
-          :paragraph-id="paragraphId"
-          :source-text="editSourceText ?? sourceText"
-          @cancel="stopEditing"
-          @saved="handleSaved"
-        />
+      <template v-if="(isEditing || isLoadingEditor) && canInlineEdit">
+        <div
+          v-if="isLoadingEditor"
+          class="grid min-h-32 place-items-center rounded-lg border border-default bg-elevated p-6"
+          role="status"
+        >
+          <UIcon
+            aria-hidden="true"
+            class="size-5 animate-spin text-muted"
+            name="i-lucide-loader-circle"
+          />
+          <span class="sr-only">Loading editor</span>
+        </div>
+        <Suspense v-else>
+          <LazyEditText
+            :classes="classes"
+            :paragraph-id="paragraphId"
+            :source-text="editSourceText ?? sourceText"
+            @cancel="stopEditing"
+            @saved="handleSaved"
+          />
+
+          <template #fallback>
+            <div
+              class="grid min-h-32 place-items-center rounded-lg border border-default bg-elevated p-6"
+              role="status"
+            >
+              <UIcon
+                aria-hidden="true"
+                class="size-5 animate-spin text-muted"
+                name="i-lucide-loader-circle"
+              />
+              <span class="sr-only">Loading editor</span>
+            </div>
+          </template>
+        </Suspense>
       </template>
 
       <template v-else-if="trustedTextHtml">

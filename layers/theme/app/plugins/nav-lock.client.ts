@@ -1,4 +1,4 @@
-import { useNavLock } from '~/composables/useNavLock'
+import { useNavLock } from '#stir/composables/useNavLock'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const { locked } = useNavLock()

@@ -1,0 +1,7 @@
+{
+  "updated": false,
+  "error": "Submitted data contains validation errors.",
+  "errors": {
+    "account_email": "Email format is invalid."
+  }
+}

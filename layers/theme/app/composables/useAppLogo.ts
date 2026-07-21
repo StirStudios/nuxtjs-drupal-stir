@@ -1,9 +1,9 @@
 import { useMounted } from '@vueuse/core'
-import useDarkMode from '~/composables/useDarkMode'
+import useDarkMode from '#stir/composables/useDarkMode'
 
 export function useAppLogo(props: { addClasses?: string }) {
   const { isDark } = useDarkMode()
-  const { getPage } = useDrupalCe()
+  const { getPage } = useStirDrupalCe()
   const page = getPage()
   const mounted = useMounted()
 

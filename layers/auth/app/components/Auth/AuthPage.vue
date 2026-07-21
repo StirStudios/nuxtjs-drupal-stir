@@ -85,6 +85,28 @@ const themePageConfig = computed<AuthPageConfig>(() =>
   authPageKey.value ? themeAuth.value.pages?.[authPageKey.value] || {} : {},
 )
 
+const pageBackgroundClass = computed(() =>
+  resolveConfigString(
+    themePageConfig.value.backgroundClass,
+    resolveConfigString(
+      themeAuth.value.backgroundClass,
+      'bg-muted/50 dark:bg-default',
+    ),
+  ),
+)
+
+const showBackgroundDecoration = computed(() => {
+  if (typeof themePageConfig.value.showBackgroundDecoration === 'boolean') {
+    return themePageConfig.value.showBackgroundDecoration
+  }
+
+  if (typeof themeAuth.value.showBackgroundDecoration === 'boolean') {
+    return themeAuth.value.showBackgroundDecoration
+  }
+
+  return true
+})
+
 const pageLayout = computed<AuthLayout>(() =>
   resolveAuthLayout(themePageConfig.value.layout) ||
   resolveAuthLayout(themeAuth.value.layout) ||
@@ -216,11 +238,25 @@ provide(authLayoutContextKey, layoutContext)
   <div
     v-else
     class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-10 text-center"
-    :class="isResolvedCardSplit ? 'bg-muted' : undefined"
+    :class="[pageBackgroundClass, { 'bg-muted': isResolvedCardSplit }]"
     role="presentation"
     :style="pageStyle"
   >
-    <main :class="isResolvedCardSplit ? 'w-full max-w-5xl' : 'w-full max-w-md'" role="main">
+    <div
+      v-if="showBackgroundDecoration && !hasResolvedBackgroundImage"
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-32 -left-24 size-80 rounded-full bg-primary/15 blur-3xl sm:size-96"
+    />
+    <div
+      v-if="showBackgroundDecoration && !hasResolvedBackgroundImage"
+      aria-hidden="true"
+      class="pointer-events-none absolute -right-24 -bottom-32 size-80 rounded-full bg-primary/10 blur-3xl sm:size-96"
+    />
+    <main
+      class="relative z-10"
+      :class="isResolvedCardSplit ? 'w-full max-w-5xl' : 'w-full max-w-md'"
+      role="main"
+    >
       <slot />
     </main>
   </div>

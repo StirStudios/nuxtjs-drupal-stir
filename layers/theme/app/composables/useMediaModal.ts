@@ -1,10 +1,10 @@
 import type { Ref, VNode } from 'vue'
 import { computed, ref } from 'vue'
-import type { SlotsToolkit } from '~/composables/useSlotsToolkit'
+import type { SlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type {
   DrupalMediaNodeProps,
   NormalizedDrupalMediaNodeProps,
-} from '~/types'
+} from '#stir/types'
 import { normalizeDrupalMediaType } from '../utils/drupalMediaTypes'
 
 export type ModalMediaItem = NormalizedDrupalMediaNodeProps & {
@@ -28,22 +28,6 @@ export function useMediaModal(
         ...props,
         key: mid ?? src ?? `${type}-${i}`,
         type,
-      }
-
-      if (type === 'image') {
-        const modalSrc = typeof item.modalSrc === 'string' ? item.modalSrc : ''
-        const modalSrcset = typeof item.modalSrcset === 'string' ? item.modalSrcset : ''
-        const modalSizes = typeof item.modalSizes === 'string' ? item.modalSizes : ''
-
-        if (modalSrc !== '') {
-          item.src = modalSrc
-        }
-        if (modalSrcset !== '') {
-          item.srcset = modalSrcset
-        }
-        if (modalSizes !== '') {
-          item.sizes = modalSizes
-        }
       }
 
       return item

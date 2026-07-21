@@ -23,6 +23,57 @@ export interface ViewStateStorageIdentity {
 }
 
 export const VIEW_STATE_MAX_AGE_MS = 30 * 60 * 1000
+export const VIEW_STATE_MAX_ENTRIES = 20
+export const VIEW_STATE_STORAGE_PREFIXES = [
+  'stir:view-controls:',
+  'stir:view-scroll:',
+] as const
+
+interface ViewStateStorage {
+  readonly length: number
+  key(index: number): string | null
+  getItem(key: string): string | null
+  removeItem(key: string): void
+}
+
+export function pruneStoredViewState(
+  storage: ViewStateStorage,
+  now = Date.now(),
+  maxAgeMs = VIEW_STATE_MAX_AGE_MS,
+  maxEntries = VIEW_STATE_MAX_ENTRIES,
+): void {
+  const entries: Array<{ key: string, savedAt: number }> = []
+
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index)
+
+    if (!key || !VIEW_STATE_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix))) {
+      continue
+    }
+
+    try {
+      const parsed = JSON.parse(storage.getItem(key) || '') as { savedAt?: unknown }
+      const savedAt = typeof parsed.savedAt === 'number' ? parsed.savedAt : 0
+
+      if (!savedAt || now - savedAt > maxAgeMs) {
+        storage.removeItem(key)
+        index -= 1
+        continue
+      }
+
+      entries.push({ key, savedAt })
+    }
+    catch {
+      storage.removeItem(key)
+      index -= 1
+    }
+  }
+
+  entries
+    .sort((left, right) => right.savedAt - left.savedAt)
+    .slice(Math.max(0, maxEntries))
+    .forEach(entry => storage.removeItem(entry.key))
+}
 
 export function cloneViewControlValues(
   values: Record<string, ViewControlValue>,

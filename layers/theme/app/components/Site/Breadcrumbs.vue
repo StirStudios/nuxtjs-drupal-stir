@@ -8,7 +8,7 @@ const props = defineProps<{
   crumbs?: CrumbItem[]
 }>()
 
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const breadcrumbs = computed<CrumbItem[]>(() => {
   if (props.crumbs && props.crumbs.length > 0) {

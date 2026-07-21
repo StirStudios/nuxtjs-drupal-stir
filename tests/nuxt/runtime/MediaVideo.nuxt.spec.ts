@@ -3,6 +3,31 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaVideo from '../../../layers/theme/app/components/global/Media/Video.vue'
 
 describe('MediaVideo (Nuxt runtime)', () => {
+  it('uses Nuxt Image for a versioned static video poster', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://player.example/embed/video',
+        originalRevision: '42-1710000000-123456',
+        originalSrc: 'https://drupal.example/files/poster.jpg',
+        deliveryProfile: 'card',
+        src: 'https://drupal.example/styles/card/poster.webp',
+        width: 1920,
+      },
+    })
+
+    const poster = wrapper.get('button img')
+
+    expect(poster.attributes('data-nuxt-img')).toBeDefined()
+    expect(poster.attributes('src')).toContain(
+      'poster.jpg?v=42-1710000000-123456',
+    )
+    expect(poster.attributes('srcset')).toContain(
+      'poster.jpg?v=42-1710000000-123456',
+    )
+    expect(poster.attributes('srcset')).not.toContain('/styles/card/')
+  })
+
   it('renders a responsive hero poster without initial video bytes', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
@@ -10,9 +35,8 @@ describe('MediaVideo (Nuxt runtime)', () => {
         height: 720,
         mediaEmbed: '/hero.mp4',
         noWrapper: true,
-        sizes: '100vw',
+        deliverySizes: '100vw',
         src: '/hero-poster.webp',
-        srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
         width: 1280,
       },
     })
@@ -27,10 +51,30 @@ describe('MediaVideo (Nuxt runtime)', () => {
       fetchpriority: 'high',
       height: '720',
       sizes: '100vw',
-      src: '/hero-poster.webp',
-      srcset: '/hero-640.webp 640w, /hero-1280.webp 1280w',
       width: '1280',
     })
+    expect(poster.attributes('src')).toContain('/hero-poster.webp')
+    expect(poster.attributes('srcset')).toContain('/hero-poster.webp')
+  })
+
+  it('honors the explicit hero context passed through a Drupal media slot', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        isHero: true,
+        mediaEmbed: '/hero.mp4',
+        src: '/hero-poster.webp',
+        title: 'Background Video',
+      },
+    })
+
+    expect(wrapper.find('button').exists()).toBe(false)
+    expect(wrapper.get('video').attributes()).toMatchObject({
+      'aria-hidden': 'true',
+      'disablepictureinpicture': '',
+      'disableremoteplayback': '',
+      'tabindex': '-1',
+    })
+    expect(wrapper.get('img').attributes('aria-hidden')).toBe('true')
   })
 
   it('supports explicitly loading a bare video immediately', async () => {
@@ -53,6 +97,93 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(wrapper.get('source').attributes('src')).toBe('/hero.mp4')
     expect(load).toHaveBeenCalledOnce()
     load.mockRestore()
+  })
+
+  it('plays a Drupal local-video src without treating the MP4 as a poster', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        src: '/media/example.mp4',
+        title: 'Example local video',
+      },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('video').exists()).toBe(false)
+
+    await wrapper.get('button').trigger('click')
+
+    expect(wrapper.get('video').attributes('controls')).toBeDefined()
+    expect(wrapper.get('source').attributes('src')).toBe('/media/example.mp4')
+  })
+
+  it('uses a Drupal local-video src directly for bare hero video', async () => {
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadMinWidth: 0,
+        loadStrategy: 'immediate',
+        noWrapper: true,
+        src: '/media/background.mp4',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.get('source').attributes('src')).toBe('/media/background.mp4')
+    load.mockRestore()
+  })
+
+  it('renders a deferred remote hero as a muted background iframe', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        loadMinWidth: 0,
+        mediaEmbed: 'https://www.youtube.com/embed/abcdefghijk',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+        title: 'Hero film',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('img').attributes('src')).toContain('/hero-poster.webp')
+    const iframe = wrapper.get('iframe')
+    const iframeSrc = iframe.attributes('src')
+
+    expect(iframeSrc).toBeTruthy()
+    const iframeUrl = new URL(iframeSrc || '')
+
+    expect(iframe.attributes('tabindex')).toBe('-1')
+    expect(iframe.attributes('title')).toBe('Hero film')
+    expect(iframeUrl.searchParams.get('autoplay')).toBe('1')
+    expect(iframeUrl.searchParams.get('mute')).toBe('1')
+    expect(iframeUrl.searchParams.get('loop')).toBe('1')
+  })
+
+  it('renders a signed Bunny player URL as an iframe', async () => {
+    const embed = 'https://player.mediadelivery.net/embed/348346/video-id?responsive=true&token=signed-token&expires=1784223559'
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        deferEmbed: false,
+        mediaEmbed: embed,
+        mid: 'video-id',
+        title: 'Subscriber class',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.find('video').exists()).toBe(false)
+    expect(wrapper.get('iframe').attributes()).toMatchObject({
+      'data-mid': 'video-id',
+      'src': embed,
+      'title': 'Subscriber class',
+    })
   })
 
   it('does not load bare video below the configured viewport width', async () => {
@@ -125,9 +256,8 @@ describe('MediaVideo (Nuxt runtime)', () => {
         animatedPreviewSrc: '/animated-preview.webp',
         height: 360,
         previewMode: 'animated',
-        sizes: '(min-width: 768px) 33vw, 100vw',
+        deliverySizes: '100vw md:33vw',
         src: '/static-preview.webp',
-        srcset: '/static-320.webp 320w, /static-640.webp 640w',
         width: 640,
       },
     })
@@ -136,22 +266,108 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(button.get('img').attributes()).toMatchObject({
       height: '360',
       loading: 'lazy',
-      sizes: '(min-width: 768px) 33vw, 100vw',
-      src: '/static-preview.webp',
-      srcset: '/static-320.webp 320w, /static-640.webp 640w',
+      sizes: '(max-width: 768px) 100vw, 33vw',
       width: '640',
     })
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/static-preview.webp')
 
     await button.trigger('mouseenter')
 
-    expect(button.get('img').attributes('src')).toBe('/animated-preview.webp')
-    expect(button.get('img').attributes('srcset')).toBeUndefined()
+    expect(button.get('img').attributes('src')).toContain('/animated-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/animated-preview.webp')
 
     await button.trigger('mouseleave')
 
-    expect(button.get('img').attributes('src')).toBe('/static-preview.webp')
-    expect(button.get('img').attributes('srcset')).toBe(
-      '/static-320.webp 320w, /static-640.webp 640w',
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+    expect(button.get('img').attributes('srcset')).toContain('/static-preview.webp')
+  })
+
+  it('renders animated MP4 previews as deferred muted video', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        animatedPreviewSrc: '/animated-preview.mp4',
+        previewMode: 'animated',
+        src: '/static-preview.webp',
+      },
+    })
+    const button = wrapper.get('button')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+
+    await button.trigger('mouseenter')
+
+    expect(button.find('img').exists()).toBe(false)
+    expect(button.get('video').attributes()).toMatchObject({
+      autoplay: '',
+      loop: '',
+      muted: '',
+      playsinline: '',
+      preload: 'none',
+    })
+    expect(button.get('source').attributes()).toMatchObject({
+      src: '/animated-preview.mp4',
+      type: 'video/mp4',
+    })
+
+    await button.trigger('mouseleave')
+
+    expect(button.find('video').exists()).toBe(false)
+    expect(button.get('img').attributes('src')).toContain('/static-preview.webp')
+  })
+
+  it('preserves the declared aspect ratio inside stretching layouts', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://example.com/embed/video',
+        src: '/static-preview.webp',
+        width: 1920,
+      },
+    })
+
+    expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toContain(
+      'aspect-ratio: 1920 / 1080; height: auto;',
     )
+  })
+
+  it('uses the standard embed canvas instead of cinematic poster dimensions', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 816,
+        mediaEmbed: 'https://player.mediadelivery.net/embed/library/video',
+        src: '/cinematic-preview.webp',
+        width: 1920,
+      },
+    })
+
+    expect(wrapper.get('div').classes()).toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toContain(
+      'aspect-ratio: 16 / 9; height: auto;',
+    )
+  })
+
+  it('does not forward modal-only media metadata to the wrapper element', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        mediaEmbed: 'https://player.mediadelivery.net/embed/library/video',
+        modalResponsiveStyle: 'container',
+        modalSizes: '100vw',
+        modalSrc: '/modal.webp',
+        modalSrcset: '/modal.webp 1200w',
+        src: '/preview.webp',
+        type: 'video',
+      },
+    })
+
+    const attributes = wrapper.get('div').attributes()
+
+    expect(attributes.type).toBeUndefined()
+    expect(attributes.modalsrc).toBeUndefined()
+    expect(attributes.modalsrcset).toBeUndefined()
+    expect(attributes.modalsizes).toBeUndefined()
+    expect(attributes.modalresponsivestyle).toBeUndefined()
   })
 })

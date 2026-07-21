@@ -1,0 +1,9 @@
+{
+  "authenticated": true,
+  "uid": 7,
+  "name": "Demo Dancer",
+  "account_name": "demo",
+  "mail": "demo@example.com",
+  "roles": ["authenticated"],
+  "profile_complete": true
+}

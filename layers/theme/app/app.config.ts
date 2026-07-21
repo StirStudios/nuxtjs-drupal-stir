@@ -1,63 +1,13 @@
 import type { AppConfigInput } from 'nuxt/schema'
-import {
-  materialVariant,
-  materialVariantWithPB,
-  materialVariantMuted,
-} from './utils/uiVariants'
+import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
-  cmsGlobalSeo: {
-    enabled: false,
-    ignoredPathPrefixes: ['/account', '/auth'],
-    ignoredPaths: [],
-    drupalRouteNames: ['slug'],
-  },
-
   colorMode: {
     forced: false,
     preference: 'dark',
     showToggle: false,
     lightRoutes: [],
     darkRoutes: [],
-  },
-
-  privacyNotice: {
-    enabled: false,
-    mode: 'notice',
-    position: 'center',
-    dismissible: true,
-    title: '',
-    message: '',
-    messageLinks: 'For more information please review our',
-    termsUrl: '',
-    privacyUrl: '',
-    cookiePolicyUrl: '',
-    cookieConsentUrl: '',
-    links: [],
-    legalLinks: [],
-    buttonLabel: 'Got it',
-    declineButtonLabel: 'Decline',
-  },
-
-  userway: {
-    enabled: false,
-    account: '',
-    loadDelayMs: 5000,
-    position: 3,
-    size: 'small',
-    color: '#ffffff',
-    type: '1',
-  },
-
-  popup: {
-    enabled: false,
-    component: '',
-  },
-
-  analytics: {
-    plausible: {
-      domain: '',
-    },
   },
 
   thirdPartyScripts: {
@@ -72,8 +22,17 @@ export default defineAppConfig({
     showBreadcrumbs: false,
 
     heading: 'mb-12 text-center text-6xl lg:mb-20',
-    container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
-    header: 'fixed top-0 z-30 w-full !p-0 md:px-auto',
+    container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
+    header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
+
+    auth: {
+      backgroundClass: 'bg-muted/50 dark:bg-default',
+      showBackgroundDecoration: true,
+      submitButton: {
+        class: 'min-h-12',
+        size: 'xl',
+      },
+    },
 
     navigation: {
       mode: 'fixed',
@@ -84,7 +43,7 @@ export default defineAppConfig({
       transparentAtTop: false,
       base: 'h-auto transform py-3 duration-500',
       background:
-        'border-none bg-default/90 shadow backdrop-blur-md dark:bg-default/70',
+        'bg-default/90 dark:bg-default/70 border-none shadow backdrop-blur-md',
       container: 'flex-wrap',
       color: 'primary',
       variant: 'link',
@@ -97,9 +56,10 @@ export default defineAppConfig({
         container: 'relative',
         desktopNav: 'hidden lg:flex',
         leftNav: 'app-nav app-nav-left',
-        logoLink: 'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
+        logoLink:
+          'app-logo-link mx-4 inline-flex shrink-0 items-center lg:mx-8',
         mobileLogo: 'lg:hidden',
-        mobileLeft: 'lg:hidden flex items-center gap-1.5',
+        mobileLeft: 'flex items-center gap-1.5 lg:hidden',
         right: 'lg:absolute lg:right-4',
         rightNav: 'app-nav app-nav-right',
       },
@@ -112,8 +72,7 @@ export default defineAppConfig({
         angle: false,
         angleDeg: 35,
         angleOffsetX: '1.5rem',
-        link:
-          'min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium text-default before:rounded-lg hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 sm:text-lg',
+        link: 'text-default hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium before:rounded-lg sm:text-lg',
         list: 'w-full space-y-1.5',
         body: 'flex flex-col',
       },
@@ -126,7 +85,7 @@ export default defineAppConfig({
       noMediaFallback:
         'bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
-        'relative after:to-bg-black-10 after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
+        'after:to-bg-black-10 relative after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
       isFront: 'h-screen',
       image: {
         base: 'absolute min-h-full w-auto max-w-none min-w-full',
@@ -149,16 +108,21 @@ export default defineAppConfig({
       layout: 'default',
       requireSiteName: false,
       rights: '',
-      base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
-      container: '',
-      content: 'flex flex-col items-center justify-center gap-4 text-center',
-      left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
-      right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
+      base: 'bg-accented text-default dark:bg-muted/50 mt-12 py-8 text-sm sm:py-10 lg:mt-20',
+      container: 'flex flex-col gap-y-8 lg:flex-row lg:gap-y-0',
+      content: 'flex flex-col items-center justify-center gap-3 text-center',
+      centerSlot: 'order-3 lg:order-2',
+      left: 'flex flex-col items-center gap-3 text-center text-sm leading-relaxed lg:items-start lg:text-left',
+      leftSlot: 'order-1',
+      right:
+        'flex flex-col items-center gap-3 text-center lg:items-end lg:text-right',
+      rightSlot: 'order-2 lg:order-3',
       copyright: 'mb-0',
-      email: '',
-      footerLinks: 'transition-colors text-primary hover:text-primary/90',
-      logo: '',
-      menu: 'mb-3',
+      email: 'break-all',
+      footerLinks:
+        'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
+      logo: 'h-16 w-auto',
+      menu: '',
       menuItem: 'min-w-0 py-0',
       menuList: 'flex flex-wrap justify-center',
       poweredBy: 'mb-0',
@@ -172,12 +136,23 @@ export default defineAppConfig({
       showSocials: true,
       showSubFooterRegion: true,
       slogan: 'mb-2',
-      socialIcon: 'me-1',
-      socials: 'flex gap-1',
+      socialIcon: '',
+      socials: 'flex flex-wrap items-center justify-center gap-3',
     },
 
     media: {
       base: 'relative h-full w-full overflow-hidden object-cover',
+      image: {
+        format: 'webp',
+        quality: 75,
+        profiles: {
+          hero: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+          container: 'sm:100vw md:90vw xl:1200px',
+          split: 'sm:100vw md:50vw xl:600px',
+          card: 'sm:100vw md:50vw lg:33vw xl:400px',
+        },
+      },
       rounded: 'rounded-xl',
       video: {
         loadMinWidth: 768,
@@ -218,45 +193,10 @@ export default defineAppConfig({
       portal: true,
     },
 
-    webform: {
-      showToasts: true,
-      scrollToTopOnSuccess: true,
-      scrollToTopOnReset: true,
-      scrollToTopDelayMs: 0,
-      scrollToTopFallbackDelayMs: 180,
-      spacing: 'space-y-5',
-      spacingLarge: 'space-y-10',
-      formClass: '',
-      labels: {
-        floating: false,
-        base: [
-          'pointer-events-none absolute -top-1.5 left-0 text-xs font-medium text-default/80 transition-all',
-          'peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:text-default/80',
-          'peer-focus:-top-1.5 peer-focus:text-xs peer-focus:font-medium peer-focus:text-highlighted',
-        ],
-      },
-      fieldGroupHeader: 'mb-6 text-xl font-semibold',
-      fieldGroup: 'space-y-10',
-      fieldInput: 'w-full',
-      fieldText: '!text-sm !leading-normal',
-      response: 'rounded-lg bg-muted px-6 py-3 italic',
-      description: 'desc mb-3 text-muted',
-      help: 'desc my-3 text-muted',
-      submitAlign: '',
-      submitComponent: '',
-      buttonClass: '',
-      submitButtonSize: '2xl',
-      fieldVariant: 'outline',
-    },
-
-    turnstile: {
-      appearance: 'always',
-    },
-
     card: {
-      base: 'relative isolate overflow-hidden rounded-xl bg-black/80 dark:bg-black text-white',
+      base: 'relative isolate overflow-hidden rounded-xl bg-black/80 p-5 text-white sm:p-20 dark:bg-black',
       effect:
-        'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl aspect-[1155/678] opacity-40 z-0',
+        'absolute top-1/2 left-1/2 z-0 aspect-[1155/678] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl',
       sizes: {
         default: 'w-[72rem]',
         compact: 'w-[120%] opacity-35',
@@ -299,112 +239,5 @@ export default defineAppConfig({
     },
   },
 
-  ui: {
-    colors: {
-      primary: 'lime',
-      neutral: 'zinc',
-    },
-
-    button: {
-      slots: {
-        base: 'transition-all duration-300',
-      },
-      variants: {
-        size: {
-          '2xl': {
-            base: 'px-10 py-3 text-md gap-2',
-          },
-        },
-        variant: {
-          material: materialVariantMuted,
-        },
-      },
-    },
-
-    modal: {
-      slots: {
-        title: 'mb-0',
-      },
-    },
-
-    carousel: {
-      slots: {
-        root: 'group relative focus:outline-none',
-      },
-      variants: {
-        orientation: {
-          horizontal: {
-            container: 'flex-row -ms-0',
-            item: 'ps-0',
-            prev: 'start-5 sm:start-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-            next: 'end-5 sm:end-5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity',
-          },
-        },
-      },
-    },
-
-    formField: {
-      slots: {
-        label: 'block font-medium text-default/80',
-        container: 'mt-1',
-        error: 'mt-1 text-error',
-      },
-    },
-
-    input: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    select: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    selectMenu: {
-      variants: {
-        variant: {
-          material: materialVariantWithPB,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-      },
-    },
-
-    inputNumber: {
-      variants: {
-        size: {
-          md: 'px-2.5 py-1.5 text-base gap-1.5',
-        },
-        variant: {
-          material: materialVariant,
-        },
-      },
-    },
-
-    textarea: {
-      variants: {
-        variant: {
-          material: materialVariant,
-        },
-      },
-      defaultVariants: {
-        size: 'xl',
-        variant: 'material',
-      },
-    },
-  } as unknown as NonNullable<AppConfigInput['ui']>,
+  ui: nuxtUiTheme as unknown as NonNullable<AppConfigInput['ui']>,
 })

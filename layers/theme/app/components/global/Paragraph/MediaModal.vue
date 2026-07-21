@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useModalMediaPlayback } from '~/composables/useModalMediaPlayback'
-import type { ModalMediaItem } from '~/composables/useMediaModal'
-import { resolveCarouselArrowButton } from '~/utils/nuxtUiProps'
+import { useModalMediaPlayback } from '#stir/composables/useModalMediaPlayback'
+import type { ModalMediaItem } from '#stir/composables/useMediaModal'
+import { resolveCarouselArrowButton } from '#stir/utils/nuxtUiProps'
 import { drupalMediaComponentName } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
@@ -44,29 +44,38 @@ const prevCarouselButton = computed(() =>
 const nextCarouselButton = computed(() =>
   resolveCarouselArrowButton(theme.carousel.arrows?.next),
 )
-const singleVideoFrameStyle = computed(() => {
-  if (firstItem.value?.type !== 'video') return undefined
 
-  const width = Number(firstItem.value.width)
-  const height = Number(firstItem.value.height)
+function mediaFrameStyle(item: ModalMediaItem) {
+  const width = Number(item.width)
+  const height = Number(item.height)
+  const hasDimensions =
+    Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0
+
   const aspectRatio =
-    Number.isFinite(width) && Number.isFinite(height) && height > 0
+    hasDimensions
       ? width / height
       : 16 / 9
 
   return {
-    maxWidth: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
+    aspectRatio: `${aspectRatio}`,
+    width: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
   }
-})
+}
 
 const { handleCarouselSelect } = useModalMediaPlayback({
   getCurrentMid: () => String(activeItem.value?.mid ?? ''),
   getActiveMid: index => String(props.items[index]?.mid ?? ''),
-  onSelect: index => emit('select', index),
+  onSelect: (index) => {
+    emit('select', index)
+  },
 })
 
 function mediaComponentFor(type: unknown) {
   return drupalMediaComponentName(type)
+}
+
+function closeModal(): void {
+  open.value = false
 }
 </script>
 
@@ -81,18 +90,21 @@ function mediaComponentFor(type: unknown) {
     :portal="portal"
     :title="modalAccessibleTitle"
     :ui="{
+      overlay: 'bg-black/90 backdrop-blur-sm',
       content: 'bg-transparent divide-none p-0',
+      body: 'relative h-dvh overflow-hidden p-0',
       header: 'hidden',
     }"
   >
     <template v-if="open" #body>
       <UButton
-        class="absolute top-4 right-4 z-10"
+        aria-label="Close media preview"
+        class="absolute top-4 right-4 z-20 rounded-full shadow-lg sm:top-6 sm:right-6"
         color="neutral"
         icon="i-lucide-x"
         size="lg"
         variant="soft"
-        @click="open = false"
+        @click="closeModal"
       />
 
       <div
@@ -100,12 +112,8 @@ function mediaComponentFor(type: unknown) {
         class="flex h-full w-full items-center justify-center p-4"
       >
         <div
-          :class="
-            firstItem.type === 'video'
-              ? ['w-full overflow-hidden', theme.media.rounded]
-              : 'contents'
-          "
-          :style="singleVideoFrameStyle"
+          :class="['overflow-hidden', theme.media.rounded]"
+          :style="mediaFrameStyle(firstItem)"
         >
           <component
             :is="mediaComponentFor(firstItem.type)"
@@ -128,11 +136,21 @@ function mediaComponentFor(type: unknown) {
         :prev="prevCarouselButton"
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :start-index="startIndex"
-        :ui="{ container: 'items-center h-full' }"
+        :ui="{
+          root: 'stir-media-modal-carousel h-full px-4',
+          viewport: 'h-full',
+          container: 'ms-0 h-full items-center',
+          item: 'flex h-full basis-full items-center justify-center overflow-hidden',
+          prev: 'hidden opacity-100 md:inline-flex',
+          next: 'hidden opacity-100 md:inline-flex',
+        }"
         @select="handleCarouselSelect"
       >
         <template #default="{ item }">
-          <div :class="['overflow-hidden', theme.media.rounded]">
+          <div
+            :class="['mx-auto overflow-hidden', theme.media.rounded]"
+            :style="mediaFrameStyle(item)"
+          >
             <component
               :is="mediaComponentFor(item.type)"
               :key="item.key"
@@ -162,9 +180,12 @@ function mediaComponentFor(type: unknown) {
             (theme.mediaModal.description?.media && modalDescription) ||
             modalCredit
           "
-          class="absolute bottom-6 left-1/2 max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/75 px-4 py-3 text-center text-white backdrop-blur-sm"
+          class="absolute bottom-4 left-1/2 z-10 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 space-y-1 rounded-lg bg-black/80 px-4 py-3 text-center text-white shadow-xl backdrop-blur-md sm:bottom-6 sm:w-auto sm:min-w-64"
         >
-          <div v-if="theme.mediaModal.title && modalTitle" class="font-semibold">
+          <div
+            v-if="theme.mediaModal.title && modalTitle"
+            class="text-sm leading-snug font-semibold sm:text-base"
+          >
             {{ modalTitle }}
           </div>
 
@@ -186,14 +207,6 @@ function mediaComponentFor(type: unknown) {
 
 <style>
 @layer components {
-  .media-modal [aria-roledescription='carousel'] {
-    @apply h-full;
-
-    .overflow-hidden {
-      @apply h-full;
-    }
-  }
-
   .media-modal img {
     @apply max-h-[80vh] object-contain;
   }

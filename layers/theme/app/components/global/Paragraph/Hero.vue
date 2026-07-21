@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
-import { usePageContext } from '~/composables/usePageContext'
-import { useIntersectionObserver } from '~/composables/useIntersectionObserver'
-import { useNavLockedSnapshot } from '~/composables/useNavLockedSnapshot'
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
+import { usePageContext } from '#stir/composables/usePageContext'
+import { useIntersectionObserver } from '#stir/composables/useIntersectionObserver'
+import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
@@ -28,7 +28,7 @@ defineSlots<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { observeVideos } = useIntersectionObserver()
-const { getPage } = useDrupalCe()
+const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { isFront } = usePageContext()
 const { hero: heroTheme } = useAppConfig().stirTheme

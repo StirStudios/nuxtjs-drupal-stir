@@ -1,0 +1,437 @@
+{
+  "element": "node-page",
+  "props": {
+    "id": "42",
+    "title": "Example page"
+  },
+  "slots": {
+    "body": "<p>Rendered body text.</p>",
+    "section": [
+      {
+        "element": "paragraph-text",
+        "props": {
+          "text": "<p>Reusable component content.</p>",
+          "classes": "lead",
+          "direction": "up",
+          "align": "center",
+          "width": "w-lg",
+          "spacing": "py-8"
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-layout",
+        "props": {
+          "uuid": "00000000-0000-4000-8000-000000000042",
+          "layout": "two_column",
+          "card": false,
+          "classes": "feature-layout",
+          "container": true,
+          "header": "Layout section",
+          "headerTag": "h2",
+          "gridClass": "lg:grid-cols-2 lg:gap-6"
+        },
+        "slots": {
+          "first": [
+            {
+              "element": "paragraph-text",
+              "props": {
+                "uuid": "00000000-0000-4000-8000-000000000043",
+                "parentUuid": "00000000-0000-4000-8000-000000000042",
+                "region": "first",
+                "text": "<p>Left region content.</p>"
+              },
+              "slots": {}
+            }
+          ],
+          "second": [
+            {
+              "element": "paragraph-layout",
+              "props": {
+                "uuid": "00000000-0000-4000-8000-000000000044",
+                "parentUuid": "00000000-0000-4000-8000-000000000042",
+                "region": "second",
+                "layout": "one_column",
+                "gridClass": "grid-cols-1 gap-4"
+              },
+              "slots": {
+                "first": [
+                  {
+                    "element": "paragraph-text",
+                    "props": {
+                      "uuid": "00000000-0000-4000-8000-000000000045",
+                      "parentUuid": "00000000-0000-4000-8000-000000000044",
+                      "region": "first",
+                      "text": "<p>Nested region content.</p>"
+                    },
+                    "slots": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-icon",
+        "props": {
+          "align": "center",
+          "iconName": "i-lucide-star",
+          "iconSize": 7
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-enzuzo",
+        "props": {
+          "embedUrl": "https://example.invalid/enzuzo.js"
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-calculator",
+        "props": {
+          "embedUrl": "https://example.invalid/calculator.js",
+          "venueId": "example-venue"
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-calendly",
+        "props": {
+          "calendlyUrl": "https://calendly.com/stir/example?hide_event_type_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=222222&primary_color=0055aa",
+          "calendlyBg": "#ffffff",
+          "calendlyPrimary": "#0055aa",
+          "calendlyTextColor": "#222222"
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-faq",
+        "props": {
+          "header": "Frequently asked questions",
+          "headerTag": "h2",
+          "text": "<p>Helpful booking information.</p>"
+        },
+        "slots": {
+          "items": [
+            {
+              "element": "paragraph-faq-item",
+              "props": {
+                "question": "Can I change my booking?",
+                "headerTag": "h3",
+                "answer": "<p>Yes, contact the venue.</p>"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-timeline",
+        "props": {
+          "color": "primary"
+        },
+        "slots": {
+          "timeline": [
+            {
+              "element": "paragraph-timeline-item",
+              "props": {
+                "date": "2026",
+                "header": "vNext architecture",
+                "headerTag": "h3",
+                "icon": "i-lucide-rocket",
+                "text": "<p>Explicit component contracts introduced.</p>"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-media",
+        "props": {
+          "direction": "up",
+          "header": "Project gallery",
+          "headerTag": "h2",
+          "overlay": true,
+          "randomize": false
+        },
+        "slots": {
+          "media": [
+            {
+              "element": "media-image",
+              "props": {
+                "src": "/sites/default/files/gallery.jpg",
+                "alt": "Project gallery image",
+                "width": 1600,
+                "height": 1067,
+                "deliveryProfile": "container"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-carousel",
+        "props": {
+          "header": "Featured media",
+          "headerTag": "h2",
+          "carouselArrows": true,
+          "carouselAutoheight": false,
+          "carouselAutoscroll": false,
+          "carouselFade": false,
+          "carouselIndicators": true,
+          "carouselInterval": 5000
+        },
+        "slots": {
+          "media": [
+            {
+              "element": "media-image",
+              "props": {
+                "src": "/sites/default/files/featured.jpg",
+                "alt": "Featured image",
+                "width": 1200,
+                "height": 800,
+                "deliveryProfile": "container"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-hero",
+        "props": {
+          "direction": "fade-up",
+          "header": "Built for performance",
+          "headerTag": "h2",
+          "text": "<p>A Drupal-powered Nuxt experience.</p>"
+        },
+        "slots": {
+          "button": [
+            {
+              "element": "paragraph-button",
+              "props": {
+                "link": {
+                  "title": "Learn more",
+                  "url": "/about"
+                }
+              },
+              "slots": {}
+            }
+          ],
+          "media": [
+            {
+              "element": "media-video",
+              "props": {
+                "src": "/sites/default/files/hero-poster.jpg",
+                "alt": "Hero video",
+                "width": 1920,
+                "height": 1080,
+                "deliveryProfile": "full",
+                "loading": "eager",
+                "fetchpriority": "high",
+                "mediaEmbed": "https://video.example/hero.mp4"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-button",
+        "props": {
+          "block": false,
+          "color": "primary",
+          "icon": "i-lucide-file-text",
+          "size": "lg",
+          "variant": "solid"
+        },
+        "slots": {
+          "media": [
+            {
+              "element": "media-document",
+              "props": {
+                "type": "document",
+                "title": "Project brochure",
+                "url": "/sites/default/files/project-brochure.pdf",
+                "alt": "Download the project brochure"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-webform",
+        "props": {
+          "webform": {
+            "webformId": "contact",
+            "webformTitle": "Contact",
+            "fields": {},
+            "actions": []
+          }
+        },
+        "slots": {}
+      },
+      {
+        "element": "paragraph-popup",
+        "props": {
+          "alert": "<p>Limited availability.</p>",
+          "popupDelay": 2500,
+          "popupOnce": true,
+          "popupThreshold": 0.5,
+          "popupTrigger": "scroll",
+          "text": "<p>Request more information.</p>",
+          "webform": {
+            "webformId": "contact",
+            "webformTitle": "Contact",
+            "fields": {},
+            "actions": []
+          }
+        },
+        "slots": {
+          "media": [
+            {
+              "element": "media-image",
+              "props": {
+                "src": "/sites/default/files/popup.jpg",
+                "alt": "Contact our team",
+                "width": 1200,
+                "height": 800,
+                "deliveryProfile": "container"
+              },
+              "slots": {}
+            }
+          ]
+        }
+      },
+      {
+        "element": "paragraph-tabs",
+        "props": {},
+        "slots": {
+          "tab": [
+            {
+              "element": "paragraph-tab",
+              "props": {
+                "title": "Overview",
+                "headerTag": "h2"
+              },
+              "slots": {
+                "tabContent": [
+                  {
+                    "element": "paragraph-text",
+                    "props": {
+                      "text": "<p>Visible tab content.</p>"
+                    },
+                    "slots": {}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "media": [
+      {
+        "element": "media-image",
+        "props": {
+          "src": "/sites/default/files/example.jpg",
+          "alt": "Example image",
+          "width": 1200,
+          "height": 800
+        },
+        "slots": {}
+      }
+    ],
+    "level": [
+      {
+        "element": "entity-reference",
+        "props": {
+          "id": "7",
+          "uuid": "00000000-0000-4000-8000-000000000007",
+          "entityType": "taxonomy_term",
+          "type": "taxonomy_term",
+          "bundle": "level",
+          "label": "Intermediate"
+        },
+        "slots": {}
+      }
+    ],
+    "resources": [
+      {
+        "element": "field-link",
+        "props": {
+          "url": "https://example.com/guide",
+          "label": "Read the guide",
+          "external": true
+        },
+        "slots": {}
+      }
+    ],
+    "schedule": [
+      {
+        "element": "date-time-value",
+        "props": {
+          "datetime": "2026-07-15T18:30:00Z",
+          "dateOnly": false
+        },
+        "slots": {}
+      }
+    ],
+    "location": [
+      {
+        "element": "address-value",
+        "props": {
+          "organization": "Royal Festival Hall",
+          "addressLine1": "Southbank Centre",
+          "locality": "London",
+          "postalCode": "SE1 8XX",
+          "countryCode": "GB",
+          "lines": [
+            "Royal Festival Hall",
+            "Southbank Centre",
+            "London SE1 8XX",
+            "GB"
+          ],
+          "label": "Royal Festival Hall, Southbank Centre, London SE1 8XX, GB",
+          "searchQuery": "Royal Festival Hall, Southbank Centre, London, SE1 8XX, GB"
+        },
+        "slots": {}
+      }
+    ],
+    "capacity": [
+      {
+        "element": "field-value",
+        "props": {
+          "value": 480,
+          "valueType": "integer"
+        },
+        "slots": {}
+      }
+    ],
+    "featured": [
+      {
+        "element": "field-value",
+        "props": {
+          "value": true,
+          "valueType": "boolean"
+        },
+        "slots": {}
+      }
+    ],
+    "audience": [
+      {
+        "element": "option-value",
+        "props": {
+          "value": "all_ages",
+          "label": "All ages"
+        },
+        "slots": {}
+      }
+    ]
+  }
+}

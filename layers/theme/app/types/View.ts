@@ -1,8 +1,9 @@
-import type { ViewPager } from '~/composables/useDrupalViewQuery'
+import type { ViewPager } from '#stir/composables/useDrupalViewQuery'
 
 export interface ExposedFilter {
   label: string
   queryParamName: string
+  type?: string
   multiple?: boolean
   disabled?: boolean
   options?: Record<string, string> | string[]
@@ -27,6 +28,8 @@ export interface DrupalViewProps {
   container?: boolean
   viewId?: string
   displayId?: string
+  paragraphId?: number | string
+  paragraphUuid?: string
   parentUuid?: string
   pager?: ViewPager | unknown
   randomize?: boolean | string

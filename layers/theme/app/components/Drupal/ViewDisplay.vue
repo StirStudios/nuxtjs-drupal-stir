@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { DrupalViewProps } from '~/types'
-import { useRevealMotionConfig } from '~/composables/useRevealMotionConfig'
-import { useSlotsToolkit } from '~/composables/useSlotsToolkit'
-import type { RenderedDrupalViewRow } from '~/composables/useDrupalViewRows'
-import { useDrupalViewRenderedRows } from '~/composables/useDrupalViewRows'
-import { useDrupalViewScrollRestore } from '~/composables/useDrupalViewScrollRestore'
+import type { DrupalViewProps } from '#stir/types'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import type { RenderedDrupalViewRow } from '#stir/composables/useDrupalViewRows'
+import { useDrupalViewRenderedRows } from '#stir/composables/useDrupalViewRows'
+import { useDrupalViewScrollRestore } from '#stir/composables/useDrupalViewScrollRestore'
 
 const props = defineProps<DrupalViewProps>()
 
-const { renderCustomElements } = useDrupalCe()
+const { renderCustomElements } = useStirDrupalCe()
 
 defineSlots<{
   rows?(): unknown
@@ -115,14 +115,14 @@ const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(pr
 const getRowMotionProps = (index: number) =>
   getRevealMotionProps(
     props.direction,
-    props.direction ? getRevealDelayMs(index, { mode: 'dense' }) : getRevealDelayMs(index),
+    getRevealDelayMs(index, { mode: 'dense' }),
     { ssrVisible: true },
   )
 
 </script>
 
 <template>
-  <div ref="viewRoot" class="scroll-mt-24">
+  <section ref="viewRoot" class="scroll-mt-24">
     <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
       <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 flex-1">
@@ -159,25 +159,24 @@ const getRowMotionProps = (index: number) =>
         </div>
       </div>
     </div>
-  </div>
+    <LazyParagraphCarousel
+      v-if="carousel"
+      :id="`${viewId}-${displayId}`"
+      :carousel-arrows="carouselArrows"
+      :carousel-autoheight="carouselAutoheight"
+      :carousel-autoscroll="carouselAutoscroll"
+      :carousel-fade="carouselFade"
+      :carousel-indicators="carouselIndicators"
+      :carousel-interval="carouselInterval"
+      :grid-items="gridItems"
+      hydrate-on-visible
+      :items="getCarouselRows()"
+      :randomize="randomizeEnabled"
+      :spacing="spacing"
+      :width="width"
+    />
 
-  <ParagraphCarousel
-    v-if="carousel"
-    :id="`${viewId}-${displayId}`"
-    :carousel-arrows="carouselArrows"
-    :carousel-autoheight="carouselAutoheight"
-    :carousel-autoscroll="carouselAutoscroll"
-    :carousel-fade="carouselFade"
-    :carousel-indicators="carouselIndicators"
-    :carousel-interval="carouselInterval"
-    :grid-items="gridItems"
-    :items="getCarouselRows()"
-    :randomize="randomizeEnabled"
-    :spacing="spacing"
-    :width="width"
-  />
-
-  <WrapGrid
+    <WrapGrid
     v-else-if="isLoading"
     :classes="rowsWrapper"
     :container="container"
@@ -194,7 +193,7 @@ const getRowMotionProps = (index: number) =>
     </div>
   </WrapGrid>
 
-  <slot
+    <slot
     v-else-if="hasRows() && vueSlots.grid"
     :get-row-motion-props="getRowMotionProps"
     :handle-view-click="handleViewClick"
@@ -204,7 +203,7 @@ const getRowMotionProps = (index: number) =>
     :rows="getRenderedRows({ teaser: false })"
   />
 
-  <WrapGrid
+    <WrapGrid
     v-else-if="hasRows()"
     :classes="rowsWrapper"
     :container="container"
@@ -226,7 +225,7 @@ const getRowMotionProps = (index: number) =>
     </RevealMotion>
   </WrapGrid>
 
-  <UEmpty
+    <UEmpty
     v-else-if="loadError"
     description="Please try again."
     icon="i-lucide-alert-triangle"
@@ -240,7 +239,7 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-  <UEmpty
+    <UEmpty
     v-else
     icon="i-lucide-search-x"
     title="No results found"
@@ -269,11 +268,12 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-  <DrupalViewsPagination
-    v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
-    class="mt-8"
-    :current="currentPage"
-    :total-pages="effectivePager.totalPages"
-    @update:current="onPageChange"
-  />
+    <DrupalViewsPagination
+      v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
+      class="mt-8"
+      :current="currentPage"
+      :total-pages="effectivePager.totalPages"
+      @update:current="onPageChange"
+    />
+  </section>
 </template>

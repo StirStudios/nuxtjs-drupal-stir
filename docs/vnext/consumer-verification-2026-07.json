@@ -1,0 +1,211 @@
+{
+  "generatedAt": "2026-07-16T23:38:49.747Z",
+  "revisions": {
+    "nuxtLayer": "b6d40399",
+    "stirTools": "7941fb2",
+    "rsfRemoteDev": "1238410e808fc9021ca3bcbef1c6a53fd368a087",
+    "danceplugNuxt": "706e20a",
+    "danceplugRoot": "be260de"
+  },
+  "finalIntegrationPilot": {
+    "generatedAt": "2026-07-17T03:00:04Z",
+    "revisions": {
+      "nuxtIntegration": "e17ca31f",
+      "stirTools": "7941fb2",
+      "danceplugNuxt": "ae9ae0c",
+      "danceplugRoot": "27a59a6"
+    },
+    "quality": {
+      "tests": "7 files / 15 tests passed",
+      "lint": "passed",
+      "typecheck": "passed",
+      "productionBuild": "passed"
+    },
+    "imageDelivery": {
+      "mode": "nuxt-default",
+      "originAllowlist": "derived automatically from DRUPAL_URL",
+      "cdnBaseUrl": "https://danceplug-dev.b-cdn.net/_ipx",
+      "cdnBuildArtifact": "verified with local /_ipx origin route retained",
+      "ipxResponsiveVariants": "verified",
+      "webpConversion": "verified",
+      "versionedSourceCacheKeys": "verified",
+      "generatedImageCacheControl": "public, max-age=315360000, s-maxage=315360000",
+      "layoutSpecificSizes": "verified for DancePlug class marquee",
+      "normalizedInstructorImages": "verified through Stir Tools payload and IPX",
+      "homepageImageWasteBytesBefore": 185645,
+      "homepageImageWasteBytesAfter": 36741,
+      "homepageTransferredBytesAfter": 911685,
+      "note": "Nuxt Image is the layer default. DancePlug needs only NUXT_IMAGE_CDN for the Bunny pull zone because DRUPAL_URL supplies the original-image allowlist. Live Bunny MISS/HIT and purge recovery remain pending an approved deployment."
+    },
+    "productionSmoke": {
+      "homepage": "200 public",
+      "class": "200 public",
+      "health": "passed",
+      "protectedAccount": "200 private, no-store, max-age=0",
+      "initialVideoRequests": 0
+    },
+    "lighthouse": {
+      "environment": {
+        "lighthouse": "13.4.0",
+        "chrome": "150.0.7871.115",
+        "formFactor": "mobile",
+        "runsPerRoute": 3
+      },
+      "homepage": {
+        "score": 71,
+        "scoreRange": [63, 81],
+        "fcpMs": 3454,
+        "lcpMs": 5378,
+        "tbtMs": 71,
+        "totalBytes": 1001258,
+        "videoBytes": 0,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "note": "Median of three local production runs. The wide score range is driven by local FCP/LCP timing variance; the hero IPX image was eagerly discoverable with fetchpriority=high and passed the Lighthouse LCP discovery checks."
+      },
+      "class": {
+        "score": 92,
+        "scoreRange": [87, 92],
+        "fcpMs": 2402,
+        "lcpMs": 2927,
+        "tbtMs": 85,
+        "totalBytes": 523681,
+        "videoBytes": 0,
+        "accessibility": 97,
+        "bestPractices": 100,
+        "note": "Median of three isolated local production runs. This reproduces the earlier 92 result and confirms that the intervening 74 was not a representative regression."
+      }
+    }
+  },
+  "packedConsumerVerification": {
+    "rsf": {
+      "source": "fresh remote dev clone",
+      "node": "22.22.0",
+      "typecheck": "passed",
+      "productionBuild": "passed",
+      "adaptations": [
+        "declared Nuxt peer ^4.4.8",
+        "extended installed @stir/base package"
+      ],
+      "note": "The dirty local RSF checkout was not modified. Remote dev still needs these two package/config changes when an explicit consumer cutover is approved."
+    }
+  },
+  "functionalReview": {
+    "rsf": {
+      "routes": ["/", "/about", "/contact"],
+      "desktop": "passed",
+      "mobile": "passed",
+      "mobileNavigation": "passed",
+      "contactWebformRender": "passed",
+      "brokenImagesObserved": 0,
+      "browserErrorsObserved": 0
+    },
+    "piper": {
+      "routes": ["/", "/venues"],
+      "protectedLoginRender": "passed",
+      "anonymousRoot": "current 403/not-found response",
+      "drupalRuntime": "10",
+      "note": "Application-only auth shell; excluded from public-website score comparisons. Drupal 11+ migration readiness remains required before vNext cutover."
+    },
+    "danceplug": {
+      "routes": ["/", "/class/tov-012"],
+      "authenticatedDashboard": "passed",
+      "editorialAdminLinks": "passed",
+      "classBunnyIframePlayer": "passed"
+    }
+  },
+  "productionLighthouse": {
+    "environment": {
+      "lighthouse": "13.4.0",
+      "chrome": "151.0.0.0",
+      "formFactor": "mobile",
+      "runsPerRoute": 3
+    },
+    "rsf": {
+      "homepage": {
+        "score": 75,
+        "fcpMs": 2567.9913749999996,
+        "lcpMs": 5768.480799999996,
+        "tbtMs": 47.000000000000455,
+        "cls": 0,
+        "totalBytes": 653060,
+        "requestCount": 90,
+        "cssBytes": 27929,
+        "jsBytes": 344835,
+        "imageBytes": 115530,
+        "videoBytes": 0
+      },
+      "contactWebform": {
+        "score": 95,
+        "fcpMs": 1960.917625,
+        "lcpMs": 2719.50115,
+        "tbtMs": 25,
+        "cls": 0.00483366367381918,
+        "totalBytes": 556844,
+        "requestCount": 76,
+        "cssBytes": 27203,
+        "jsBytes": 338584,
+        "imageBytes": 44473,
+        "videoBytes": 0
+      }
+    },
+    "piper": {
+      "protectedVenuesLogin": {
+        "score": 89,
+        "fcpMs": 1966.8715,
+        "lcpMs": 3485.428400000003,
+        "tbtMs": 64,
+        "cls": 0.01217374579851323,
+        "totalBytes": 413192,
+        "requestCount": 57,
+        "cssBytes": 33998,
+        "jsBytes": 265936,
+        "imageBytes": 0,
+        "videoBytes": 0
+      }
+    },
+    "danceplug": {
+      "homepage": {
+        "score": 72,
+        "fcpMs": 4065.6699999999987,
+        "lcpMs": 4828.421249999998,
+        "tbtMs": 76.793275,
+        "cls": 0,
+        "totalBytes": 923773,
+        "requestCount": 109,
+        "cssBytes": 37975,
+        "jsBytes": 364507,
+        "imageBytes": 231141,
+        "videoBytes": 0
+      },
+      "classBeforeDeferredEmbed": {
+        "score": 72,
+        "fcpMs": 3290,
+        "lcpMs": 5140,
+        "tbtMs": 76,
+        "totalBytes": 7040000,
+        "note": "Bunny iframe eagerly loaded scripts, thumbnail, and video segments; most segment bytes were classified as XHR rather than Media."
+      },
+      "classAfterDeferredEmbed": {
+        "score": 92,
+        "fcpMs": 2013.6040000000003,
+        "lcpMs": 3150.515,
+        "tbtMs": 54.00000000000023,
+        "cls": 0,
+        "totalBytes": 416311,
+        "requestCount": 105,
+        "cssBytes": 35123,
+        "jsBytes": 313192,
+        "imageBytes": 38024,
+        "videoBytes": 0,
+        "initialVideoRequestCount": 0
+      }
+    }
+  },
+  "excludedMeasurements": [
+    {
+      "consumer": "danceplug",
+      "reason": "Development-server run included Nuxt development code, DevTools, and source maps; it is not production evidence."
+    }
+  ]
+}

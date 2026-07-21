@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { glob, mkdir, writeFile } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import process from 'node:process'
 import lighthouse from 'lighthouse'
 import { launch } from 'chrome-launcher'
@@ -16,6 +17,27 @@ const runs = Math.max(1, numberOption('runs', 3))
 const shouldAssert = args.includes('--assert')
 const outputDirectory = '.lighthouse'
 const combinedMediaBudget = option('max-media-bytes', '')
+
+async function resolveChromePath() {
+  if (process.env.LIGHTHOUSE_CHROME_PATH) {
+    return process.env.LIGHTHOUSE_CHROME_PATH
+  }
+
+  const patterns = process.platform === 'darwin'
+    ? [
+        `${homedir()}/Library/Caches/stir-lighthouse/chrome/*/*/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`,
+      ]
+    : process.platform === 'linux'
+      ? [`${homedir()}/.cache/stir-lighthouse/chrome/*/*/chrome`]
+      : []
+  const matches = []
+
+  for (const pattern of patterns) {
+    for await (const match of glob(pattern)) matches.push(match)
+  }
+
+  return matches.sort().at(-1)
+}
 
 const budgets = {
   imageBytes: numberOption('max-image-bytes', 1_000_000),
@@ -97,10 +119,11 @@ async function main() {
   await mkdir(outputDirectory, { recursive: true })
   const results = []
   let environment
+  const chromePath = await resolveChromePath()
 
   for (let index = 1; index <= runs; index += 1) {
     const chrome = await launch({
-      chromePath: process.env.LIGHTHOUSE_CHROME_PATH,
+      chromePath,
       chromeFlags: ['--headless', '--ignore-certificate-errors', '--no-sandbox'],
     })
 

@@ -6,22 +6,34 @@ export type CustomElementNode = {
 }
 
 export type DrupalMediaType = 'audio' | 'document' | 'image' | 'link' | 'video'
+export type DrupalMediaPayloadType = DrupalMediaType | 'basic-image'
+
+export type DrupalMediaSummary = {
+  hasAudio: boolean
+  hasVideo: boolean
+  hasImage: boolean
+  hasLink: boolean
+  hasDocument: boolean
+  count: number
+}
 
 export type DrupalMediaNodeProps = {
-  type?: DrupalMediaType
+  type?: DrupalMediaPayloadType
   alt?: string
+  category?: string
   credit?: string
+  deliveryProfile?: string
+  deliverySizes?: string
   fetchpriority?: 'auto' | 'high' | 'low'
   height?: number
   loading?: 'eager' | 'lazy'
   mediaEmbed?: unknown
   mid?: number | string
-  modalSizes?: string
-  modalSrc?: string
-  modalSrcset?: string
-  sizes?: string
+  originalRevision?: string
+  originalSrc?: string
+  link?: string
+  rel?: 'noopener'
   src?: string
-  srcset?: string
   title?: string
   url?: string
   width?: number

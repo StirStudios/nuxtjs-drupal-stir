@@ -1,19 +1,13 @@
-import {
-  defineNuxtRouteMiddleware,
-  navigateTo,
-  useAppConfig,
-  useResponseHeader,
-} from '#app'
-import { useAuthIntegration } from '../composables/auth/useAuthIntegration'
+import { useAuthConfig } from '../composables/auth/useAuthConfig'
 import { useAuthSession } from '../composables/auth/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
 
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 
 function markPrivateResponse(): void {
-  if (!import.meta.server) return
-
-  useResponseHeader('Cache-Control').value = PRIVATE_NO_STORE
+  if (import.meta.server) {
+    useResponseHeader('Cache-Control').value = PRIVATE_NO_STORE
+  }
 }
 
 function matchesProtectedPath(routePath: string, rule: string): boolean {
@@ -65,9 +59,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   markPrivateResponse()
 
-  const integrationEnabled = useAuthIntegration()
-  const allowAuthenticatedUserBypass =
-    integrationEnabled && config.allowAuthenticatedUserBypass !== false
+  let allowAuthenticatedUserBypass = false
+
+  if (config.allowAuthenticatedUserBypass !== false) {
+    const authConfig = useAuthConfig()
+
+    await authConfig.ensureLoaded()
+    allowAuthenticatedUserBypass = authConfig.accountsEnabled.value
+  }
   const protectedSession = useProtectedSession()
 
   await protectedSession.fetchSession()

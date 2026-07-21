@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
   "units": "gzip-kilobytes",
-  "maxInitialGzipKb": 193,
-  "maxInitialJavascriptGzipKb": 158,
-  "maxInitialCssGzipKb": 36,
+  "maxInitialGzipKb": 229,
+  "maxInitialJavascriptGzipKb": 192.5,
+  "maxInitialCssGzipKb": 36.5,
   "maxAdminDeferredGzipKb": 170,
-  "maxRevealMotionGzipKb": 28
+  "maxRevealMotionGzipKb": 28,
+  "initialBudgetRationale": "Nuxt 4.5 with Vite 8/Rolldown renders fewer initial module bytes and builds about twice as fast, but splits the static entry graph into separately compressed chunks. These caps tightly ratchet the measured graph-aware Nuxt 4.5 baseline; revisit them after downstream transfer and Lighthouse validation."
 }

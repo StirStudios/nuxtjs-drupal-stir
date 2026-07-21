@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { trustedDrupalHtml } from '~/utils/trustedDrupalHtml'
+import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
-const { getMessages } = useDrupalCe()
+const { getMessages } = useStirDrupalCe()
 const toast = useToast()
 
 // Use an array in state to keep payload serialization simple.

@@ -37,15 +37,53 @@ export default withNuxt(
     },
   },
   {
+    files: ['layers/*/app/**/*.{js,ts,vue}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '#app',
+              allowTypeImports: true,
+              message: 'Use Nuxt auto-imports for runtime APIs in app code; keep type imports explicit.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['~/utils', '~/utils/**', '~/composables', '~/composables/**', '~/components', '~/components/**', '~/types', '~/types/**'],
+              message: 'Use the explicit `#stir/*` surface; `~/*` is reserved for compatibility consumers.',
+            },
+            {
+              group: ['**/theme/app/utils/**', '**/theme/app/composables/**', '**/theme/app/components/**', '**/theme/app/types/**'],
+              message: 'Use the explicit `#stir/*` surface instead of importing theme internals by path.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['layers/theme/**/*.{js,ts,vue}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: '#app',
+              allowTypeImports: true,
+              message: 'Use Nuxt auto-imports for runtime APIs in app code; keep type imports explicit.',
+            },
+          ],
           patterns: [
             {
-              group: ['../../types', '../../../types', '../../../../types'],
-              message: 'Use `~/types` for shared form types in layers/theme.',
+              group: ['~/utils', '~/utils/**', '~/composables', '~/composables/**', '~/components', '~/components/**', '~/types', '~/types/**'],
+              message: 'Use the explicit `#stir/*` surface; `~/*` is reserved for compatibility consumers.',
+            },
+            {
+              group: ['**/theme/app/utils/**', '**/theme/app/composables/**', '**/theme/app/components/**', '**/theme/app/types/**'],
+              message: 'Use the explicit `#stir/*` surface instead of importing theme internals by path.',
             },
           ],
         },

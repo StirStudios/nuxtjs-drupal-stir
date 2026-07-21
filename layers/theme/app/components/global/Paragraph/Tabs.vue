@@ -62,7 +62,7 @@ watch(active, async () => {
     :items="items"
     :orientation="orientation"
     :ui="{
-      root: 'items-start gap-2 m-auto w-full',
+      root: 'app-tabs items-start gap-2 m-auto w-full',
       list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
       content: 'flex-1 min-w-0',
       trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
@@ -71,9 +71,27 @@ watch(active, async () => {
     variant="link"
   >
     <template #content>
-      <div ref="contentRef">
+      <div ref="contentRef" class="tab-content">
         <component :is="activeTabNode" v-if="activeTabNode" />
       </div>
     </template>
   </UTabs>
 </template>
+
+<style scoped>
+@reference "~/assets/css/main.css";
+
+.tab-content {
+  :deep(ul) {
+    @apply pt-0;
+  }
+
+  :deep(p) {
+    @apply pb-0;
+  }
+}
+
+:deep(.app-tabs[data-orientation='horizontal']) {
+  @apply overflow-y-clip;
+}
+</style>

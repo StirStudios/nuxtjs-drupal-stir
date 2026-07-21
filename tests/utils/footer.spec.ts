@@ -13,6 +13,8 @@ describe('resolveFooterConfig', () => {
     expect(first).toMatchObject(DEFAULT_FOOTER_THEME)
     expect(first.sections).toEqual(DEFAULT_FOOTER_SECTIONS)
     expect(first.sections.left).not.toBe(second.sections.left)
+    expect(first.centerSlot).toBe('order-3 lg:order-2')
+    expect(first.rightSlot).toBe('order-2 lg:order-3')
   })
 
   it('normalizes supported values and falls back for invalid values', () => {
@@ -21,6 +23,8 @@ describe('resolveFooterConfig', () => {
       showLogo: false,
       showMenu: 'yes',
       base: '  custom-footer  ',
+      leftSlot: ' order-2 lg:order-1 ',
+      rightSlot: ' order-1 lg:order-3 ',
       sections: {
         left: ['socials', 'socials', 'unknown'],
         center: null,
@@ -34,6 +38,8 @@ describe('resolveFooterConfig', () => {
     expect(config.showLogo).toBe(false)
     expect(config.showMenu).toBe(true)
     expect(config.base).toBe('custom-footer')
+    expect(config.leftSlot).toBe('order-2 lg:order-1')
+    expect(config.rightSlot).toBe('order-1 lg:order-3')
     expect(config.logoFromTheme).toBe('logo-scrolled')
     expect(config.sections).toEqual({
       left: ['socials'],

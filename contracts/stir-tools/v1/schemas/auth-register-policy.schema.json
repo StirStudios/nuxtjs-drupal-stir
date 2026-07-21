@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/auth-register-policy.schema.json",
+  "title": "Stir account registration policy response",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "mode"],
+      "properties": {
+        "allowed": { "const": false },
+        "mode": { "const": "admin_only" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "mode"],
+      "properties": {
+        "allowed": { "const": true },
+        "mode": {
+          "enum": ["visitors", "visitors_admin_approval"]
+        }
+      }
+    }
+  ]
+}

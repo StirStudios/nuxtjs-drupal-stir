@@ -21,40 +21,39 @@ manage Drupal tokens directly.
 
 ## Consumption
 
-Downstream applications should extend the repository's root layer. Extending
-this internal sub-layer alone is not a supported distribution contract.
+Downstream applications that only need auth/account may extend this capability
+directly. It composes Turnstile and the shared foundation without loading the
+Drupal CE website platform, theme, menus, app context, or View/Paragraph routes.
 
 The root configuration includes:
 
 ```ts
-extends: ['./layers/core', './layers/theme', './layers/auth']
+extends: ['@stir/base/layers/auth/nuxt.config']
 ```
 
-There is currently no separate auth-free preset. Leave
-`authIntegration.drupalAccounts` disabled when Drupal account UI is not used;
-the local `/auth/protected` route remains available.
+The full preset includes this layer; the minimal preset excludes it. The local
+`/auth/protected` route remains available independently of Drupal accounts.
 
 ## Configuration
 
 Drupal owns account-auth redirects, UI copy, field labels, and password policy
-through `/api/auth/config`. Nuxt only needs to know whether the Drupal account
-integration is installed.
+through `/api/auth/config`, including whether frontend accounts are enabled.
 
-```ts
-export default defineAppConfig({
-  authIntegration: {
-    drupalAccounts: true,
-  },
-})
-```
+The version-2 response is validated against Drupal's producer-owned auth UI
+contract before it reaches composables. Unknown structure, invalid identifier
+modes or password patterns, and unavailable providers retain the existing empty
+local fallback. Because the endpoint is public and site-wide, visitor cookies
+are not forwarded.
 
-Leave `authIntegration.drupalAccounts` unset or `false` when a project only
-needs `/auth/protected` for password-protected Nuxt pages. Account UI routes are
-redirected to `protectedRoutes.fallbackRedirectPath`, while protected-page
-access keeps working.
+Drupal's public `/api/auth/register-policy` response is contract-validated
+before Nuxt decides whether `/auth/register` is available. Unknown,
+contradictory, malformed, or unavailable policy responses fail closed, and the
+public request does not forward visitor cookies.
 
-Normal pages only read this integration flag. Drupal auth UI configuration is
-requested only by account and auth routes that need it.
+Disable **Decoupled frontend accounts** in Drupal when a project only needs
+`/auth/protected`. Account UI routes then redirect to
+`protectedRoutes.fallbackRedirectPath`, while protected-page access keeps
+working. No downstream Nuxt feature flag is required.
 
 Theme all auth submit buttons from Nuxt without adding presentation settings to
 Drupal:
@@ -77,6 +76,8 @@ Auth layouts are also frontend theme settings. Use `card`, `card-split`, or
 stirTheme: {
   auth: {
     layout: 'card-split',
+    backgroundClass: 'bg-muted/50 dark:bg-default',
+    showBackgroundDecoration: true,
     backgroundImage: '/themes/custom/site/auth.jpg',
     imagePosition: 'left',
     pages: {
@@ -98,8 +99,12 @@ stirTheme: {
 ```
 
 `imagePosition` accepts `'left'` or `'right'`; it controls which side displays
-the image or illustration in split layouts. `backgroundImage`, `imagePosition`,
-`showIcon`, and `backButton` support the same global and per-page structure.
+the image or illustration in split layouts. `backgroundClass`,
+`showBackgroundDecoration`, `backgroundImage`, `imagePosition`, `showIcon`, and
+`backButton` support the same global and per-page structure. The default auth
+canvas uses semantic Nuxt UI surfaces and subtle primary-color decoration;
+projects can replace `backgroundClass` or disable the decoration without a
+component override.
 `submitButton` accepts Nuxt UI `UButton` props, such as `size: 'xl'`, `color`,
 `variant`, `icon`, and `class`. Drupal remains the source for auth
 behaviour, fields, copy, password policy, and redirects. Drupal presentation

@@ -4,55 +4,9 @@ type LooseRecord = Record<string, unknown>
 type ClassValue = string
 type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
-type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
+export type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
 type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
-export type StirThemeButtonLikeConfig = {
-  class?: ClassValue
-  color?: UiColorName
-  icon?: string
-  size?: UiSizeName
-  variant?: UiButtonVariantName
-} & LooseRecord
-
-type ProtectedRoutesConfig = {
-  requireLoginPaths?: string[]
-  loginPath?: string
-  redirectOnLogin?: string
-  allowAuthenticatedUserBypass?: boolean
-  fallbackRedirectPath?: string
-} & LooseRecord
-
-type AuthIntegrationConfig = {
-  drupalAccounts?: boolean
-} & LooseRecord
-
-type PlausibleConfig = {
-  enabled?: boolean
-  domain?: string
-  apiHost?: string
-} & LooseRecord
-
-type AnalyticsConfig = {
-  plausible?: PlausibleConfig
-} & LooseRecord
-
-type ThirdPartyScriptsConfig = {
-  allowedOrigins?: {
-    calculator?: string[]
-    enzuzo?: string[]
-  }
-} & LooseRecord
-
-type UserwayConfig = {
-  enabled?: boolean
-  account?: string
-  loadDelayMs?: number
-  position?: number
-  size?: 'small' | 'medium' | 'large'
-  color?: string
-  type?: string
-} & LooseRecord
 
 type PrivacyNoticeLink = {
   label?: string
@@ -84,6 +38,49 @@ type PrivacyNoticeConfig = {
 type PopupConfig = {
   enabled?: boolean
   component?: string
+} & LooseRecord
+
+export type StirThemeButtonLikeConfig = {
+  class?: ClassValue
+  color?: UiColorName
+  icon?: string
+  size?: UiSizeName
+  variant?: UiButtonVariantName
+} & LooseRecord
+
+type ProtectedRoutesConfig = {
+  requireLoginPaths?: string[]
+  loginPath?: string
+  redirectOnLogin?: string
+  allowAuthenticatedUserBypass?: boolean
+  fallbackRedirectPath?: string
+} & LooseRecord
+
+type PlausibleConfig = {
+  enabled?: boolean
+  domain?: string
+  apiHost?: string
+} & LooseRecord
+
+type AnalyticsConfig = {
+  plausible?: PlausibleConfig
+} & LooseRecord
+
+type ThirdPartyScriptsConfig = {
+  allowedOrigins?: {
+    calculator?: string[]
+    enzuzo?: string[]
+  }
+} & LooseRecord
+
+type UserwayConfig = {
+  enabled?: boolean
+  account?: string
+  loadDelayMs?: number
+  position?: number
+  size?: 'small' | 'medium' | 'large'
+  color?: string
+  type?: string
 } & LooseRecord
 
 type CmsGlobalSeoConfig = {
@@ -184,6 +181,7 @@ type StirThemeFooterConfig = {
   base?: ClassValue
   container?: ClassValue
   content?: ClassValue
+  centerSlot?: ClassValue
   layout?: 'default' | 'columns' | 'stacked' | string
   logo?: ClassValue
   menu?: ClassValue
@@ -192,7 +190,9 @@ type StirThemeFooterConfig = {
   requireSiteName?: boolean
   rights?: string
   left?: ClassValue
+  leftSlot?: ClassValue
   right?: ClassValue
+  rightSlot?: ClassValue
   sections?: {
     left?: string[]
     center?: string[]
@@ -219,6 +219,11 @@ type StirThemeFooterConfig = {
 type StirThemeMediaConfig = {
   base?: ClassValue
   rounded?: ClassValue
+  image?: {
+    format?: 'avif' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
+    quality?: number
+    profiles?: Record<string, string>
+  } & LooseRecord
   video?: {
     loadMinWidth?: number
     loadStrategy?: 'after-load' | 'immediate'
@@ -254,7 +259,6 @@ type StirThemeWebformConfig = {
   scrollToTopDelayMs?: number
   scrollToTopFallbackDelayMs?: number
   spacing?: ClassValue
-  spacingLarge?: ClassValue
   formClass?: ClassValue
   labels?: {
     floating?: boolean
@@ -272,6 +276,11 @@ type StirThemeWebformConfig = {
   buttonClass?: ClassValue
   submitButtonSize?: UiSizeName
   fieldVariant?: UiFieldVariantName
+} & LooseRecord
+
+export type StirThemeFormsConfig = {
+  floatingLabels?: boolean
+  variant?: UiFieldVariantName
 } & LooseRecord
 
 type StirThemeTurnstileConfig = {
@@ -302,9 +311,11 @@ type StirThemeErrorConfig = {
 } & LooseRecord
 
 export type StirThemeAuthConfig = {
+  backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
+  showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
   submitButton?: StirThemeButtonLikeConfig
@@ -321,9 +332,11 @@ type StirThemeAuthPageKey =
   | 'verify'
 
 export type StirThemeAuthPageConfig = {
+  backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
   imagePosition?: 'left' | 'right'
+  showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
 } & LooseRecord
@@ -363,6 +376,7 @@ type StirThemeConfig = {
   carousel?: StirThemeCarouselConfig
   mediaModal?: StirThemeModalConfig
   overlay?: StirThemeOverlayConfig
+  forms?: StirThemeFormsConfig
   webform?: StirThemeWebformConfig
   turnstile?: StirThemeTurnstileConfig
   card?: StirThemeCardConfig
@@ -384,6 +398,9 @@ type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
+  image: NonNullable<StirThemeMediaConfig['image']> & {
+    profiles: Record<string, string>
+  }
   video: NonNullable<StirThemeMediaConfig['video']>
   transitions: Record<string, ClassValue>
   effects: Record<string, ClassValue>
@@ -420,6 +437,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   carousel: ResolvedStirThemeCarouselConfig
   mediaModal: ResolvedStirThemeModalConfig
   overlay: StirThemeOverlayConfig
+  forms: StirThemeFormsConfig
   webform: ResolvedStirThemeWebformConfig
   turnstile: StirThemeTurnstileConfig
   card: ResolvedStirThemeCardConfig
@@ -433,27 +451,25 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
 declare module 'nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
-    authIntegration?: AuthIntegrationConfig
     analytics?: AnalyticsConfig
     thirdPartyScripts?: ThirdPartyScriptsConfig
     userway?: UserwayConfig
-    privacyNotice?: PrivacyNoticeConfig
-    popup?: PopupConfig
     cmsGlobalSeo?: CmsGlobalSeoConfig
     colorMode?: ColorModeConfig
+    privacyNotice?: PrivacyNoticeConfig
+    popup?: PopupConfig
     stirTheme?: StirThemeConfig
   }
 
   interface AppConfig {
     protectedRoutes: ProtectedRoutesConfig
-    authIntegration: AuthIntegrationConfig
     analytics: AnalyticsConfig
     thirdPartyScripts: ThirdPartyScriptsConfig
     userway: UserwayConfig
-    privacyNotice: PrivacyNoticeConfig
-    popup: PopupConfig
     cmsGlobalSeo: CmsGlobalSeoConfig
     colorMode: ColorModeConfig
+    privacyNotice: PrivacyNoticeConfig
+    popup: PopupConfig
     stirTheme: ResolvedStirThemeConfig
   }
 }

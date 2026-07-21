@@ -1,5 +1,7 @@
 import { computed, unref } from 'vue'
 import type { ImgHTMLAttributes } from 'vue'
+import { versionImageSource } from '#stir/utils/imageDelivery'
+import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
 type TeaserImage = Partial<ImgHTMLAttributes>
 
@@ -15,6 +17,8 @@ export function useTeaserPost(
     editLink?: string
   } = {},
 ) {
+  const runtimeConfig = useRuntimeConfig()
+  const drupalOrigin = getDrupalOrigin(runtimeConfig.public)
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null
 
@@ -80,13 +84,22 @@ export function useTeaserPost(
       ? media.height
       : Number(media.height)
 
+    const source = versionImageSource(
+      toDrupalUrl(
+        typeof media.originalSrc === 'string' ? media.originalSrc : m.src,
+        drupalOrigin,
+      ),
+      typeof media.originalRevision === 'string'
+        ? media.originalRevision
+        : undefined,
+    )
+
     return {
-      src: m.src,
+      src: source,
       alt: typeof media.alt === 'string' ? media.alt : extra.title ?? '',
       width: Number.isFinite(width) ? width : undefined,
       height: Number.isFinite(height) ? height : undefined,
-      srcset: typeof media.srcset === 'string' ? media.srcset : undefined,
-      sizes: typeof media.sizes === 'string' ? media.sizes : '(min-width: 768px) 50vw, 100vw',
+      sizes: 'sm:100vw md:50vw',
       loading: 'lazy',
       fetchpriority: 'low',
       decoding: 'async',

@@ -2,7 +2,7 @@ import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createPasswordRequestValidationSchema } from '../../utils/authValidation'
-import { mapYupValidationErrors } from '../../utils/yupValidation'
+import { validateForm } from '../../utils/validationErrors'
 import type { AuthUiIdentifierField } from '../../types/auth'
 
 export function usePasswordRequest() {
@@ -34,14 +34,12 @@ export function usePasswordRequest() {
   ])
 
   const validate = (formState: { identifier?: string }) => {
-    try {
+    return validateForm(
       createPasswordRequestValidationSchema(
         identifierField.value,
-      ).validateSync(formState, { abortEarly: false })
-      return []
-    } catch (error: unknown) {
-      return mapYupValidationErrors(error)
-    }
+      ),
+      formState,
+    )
   }
 
   const onSubmit = async (

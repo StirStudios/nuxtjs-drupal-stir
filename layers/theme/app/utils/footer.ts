@@ -27,8 +27,11 @@ export type FooterThemeConfig = {
   base: string
   container: string
   content: string
+  centerSlot: string
   left: string
+  leftSlot: string
   right: string
+  rightSlot: string
   center: string
   footerLinks: string
   logo: string
@@ -69,20 +72,23 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'
   showPoweredBy: true,
   showFooterRegion: true,
   showSubFooterRegion: true,
-  base: 'mt-12 bg-accented py-10 text-sm text-default dark:bg-muted/50 lg:mt-20',
-  container: '',
-  content: 'flex flex-col items-center justify-center gap-4 text-center',
-  left: 'mt-8 text-sm leading-relaxed lg:mt-0 lg:text-left',
-  right: 'flex flex-col items-center gap-2 lg:items-end lg:text-right',
-  footerLinks: 'transition-colors text-primary hover:text-primary/90',
-  logo: '',
-  menu: 'mb-3',
+  base: 'mt-12 bg-accented py-8 text-sm text-default dark:bg-muted/50 sm:py-10 lg:mt-20',
+  container: 'flex flex-col gap-y-8 lg:flex-row lg:gap-y-0',
+  content: 'flex flex-col items-center justify-center gap-3 text-center',
+  centerSlot: 'order-3 lg:order-2',
+  left: 'flex flex-col items-center gap-3 text-center text-sm leading-relaxed lg:items-start lg:text-left',
+  leftSlot: 'order-1',
+  right: 'flex flex-col items-center gap-3 text-center lg:items-end lg:text-right',
+  rightSlot: 'order-2 lg:order-3',
+  footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
+  logo: 'h-16 w-auto',
+  menu: '',
   menuItem: 'min-w-0 py-0',
   menuList: 'flex flex-wrap justify-center',
-  socials: 'flex gap-1',
-  socialIcon: 'me-1',
+  socials: 'flex flex-wrap items-center justify-center gap-3',
+  socialIcon: '',
   slogan: 'mb-2',
-  email: '',
+  email: 'break-all',
   copyright: 'mb-0',
   poweredBy: 'mb-0',
   rights: '',
@@ -150,8 +156,11 @@ export function resolveFooterConfig(
     base: toString(next.base, DEFAULT_FOOTER_THEME.base),
     container: toString(next.container, DEFAULT_FOOTER_THEME.container),
     content: toString(next.content, DEFAULT_FOOTER_THEME.content),
+    centerSlot: toString(next.centerSlot, DEFAULT_FOOTER_THEME.centerSlot),
     left: toString(next.left, DEFAULT_FOOTER_THEME.left),
+    leftSlot: toString(next.leftSlot, DEFAULT_FOOTER_THEME.leftSlot),
     right: toString(next.right, DEFAULT_FOOTER_THEME.right),
+    rightSlot: toString(next.rightSlot, DEFAULT_FOOTER_THEME.rightSlot),
     center: toString(next.center),
     footerLinks: toString(next.footerLinks, DEFAULT_FOOTER_THEME.footerLinks),
     logo: toString(next.logo, DEFAULT_FOOTER_THEME.logo),

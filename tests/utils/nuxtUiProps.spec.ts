@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  resolveBooleanProp,
   resolveCarouselArrowButton,
   resolveOptionalUiButtonVariant,
   resolveOptionalUiColor,
@@ -11,6 +12,16 @@ import {
 } from '../../layers/theme/app/utils/nuxtUiProps'
 
 describe('nuxtUiProps', () => {
+  it('normalizes boolean values serialized by Drupal', () => {
+    expect(resolveBooleanProp(true)).toBe(true)
+    expect(resolveBooleanProp(1)).toBe(true)
+    expect(resolveBooleanProp('1')).toBe(true)
+    expect(resolveBooleanProp('true')).toBe(true)
+    expect(resolveBooleanProp(false)).toBe(false)
+    expect(resolveBooleanProp('0')).toBe(false)
+    expect(resolveBooleanProp(undefined)).toBe(false)
+  })
+
   it('normalizes shared carousel arrow button defaults', () => {
     expect(resolveCarouselArrowButton()).toEqual({
       color: 'neutral',

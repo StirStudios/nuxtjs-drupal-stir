@@ -2,7 +2,6 @@ import {
   createError,
   defineEventHandler,
   readBody,
-  setResponseHeader,
 } from 'h3'
 import {
   layerAuthClearProtectedAccessCookie,
@@ -15,6 +14,7 @@ import {
   layerAuthRecordProtectedLoginFailure,
   layerAuthResetProtectedLoginRateLimit,
 } from '../../utils/protectedRateLimit'
+import { assertStirSameOrigin } from '../../../../foundation/server/utils/stirRequestSecurity'
 
 type ProtectedBody = {
   action?: unknown
@@ -23,6 +23,8 @@ type ProtectedBody = {
 }
 
 export default defineEventHandler(async (event) => {
+  assertStirSameOrigin(event)
+
   const body = await readBody<ProtectedBody>(event)
   const action =
     typeof body?.action === 'string' ? body.action.toLowerCase().trim() : ''
@@ -36,7 +38,10 @@ export default defineEventHandler(async (event) => {
   const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
 
   if (!rateLimit.allowed) {
-    setResponseHeader(event, 'Retry-After', rateLimit.retryAfterSeconds)
+    event.node.res.setHeader(
+      'Retry-After',
+      String(rateLimit.retryAfterSeconds),
+    )
 
     throw createError({
       statusCode: 429,
@@ -86,13 +91,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const secret = layerAuthGetProtectedAccessSecret()
-
-  if (!secret) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Protected cookie secret is not configured',
-    })
-  }
 
   await layerAuthSetProtectedAccessCookie(event, secret)
   await layerAuthResetProtectedLoginRateLimit(event)
