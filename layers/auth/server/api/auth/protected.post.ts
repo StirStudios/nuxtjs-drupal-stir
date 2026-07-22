@@ -1,11 +1,14 @@
 import {
   createError,
   defineEventHandler,
+  getCookie,
   readBody,
 } from 'h3'
 import {
+  LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME,
   layerAuthClearProtectedAccessCookie,
   layerAuthGetProtectedAccessSecret,
+  layerAuthIsProtectedAccessAuthenticated,
   layerAuthSetProtectedAccessCookie,
 } from '../../utils/protectedAccess'
 import { layerAuthConstantTimeEquals } from '../../utils/protectedAccessToken'
@@ -82,6 +85,13 @@ export default defineEventHandler(async (event) => {
     !expectedPassword ||
     !layerAuthConstantTimeEquals(submittedPassword, expectedPassword)
   ) {
+    if (
+      getCookie(event, LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME)
+      && !await layerAuthIsProtectedAccessAuthenticated(event, expectedPassword)
+    ) {
+      layerAuthClearProtectedAccessCookie(event)
+    }
+
     await layerAuthRecordProtectedLoginFailure(event)
 
     throw createError({
