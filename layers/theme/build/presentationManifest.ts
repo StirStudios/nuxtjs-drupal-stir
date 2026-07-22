@@ -166,6 +166,8 @@ export function compatibilityPresentationUtilities(): string[] {
     classes.add(`${breakpoint}flex`)
     for (let value = 1; value <= 12; value += 1) {
       classes.add(`${breakpoint}grid-cols-${value}`)
+      classes.add(`${breakpoint}columns-${value}`)
+      classes.add(`${breakpoint}col-span-${value}`)
       classes.add(`${breakpoint}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
     }
     for (let value = 0; value <= 20; value += 1) classes.add(`${breakpoint}gap-${value}`)
