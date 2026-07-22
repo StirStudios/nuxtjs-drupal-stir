@@ -1,4 +1,6 @@
+import type { ImageProvider } from '@nuxt/image'
 import createIpxProvider from '@nuxt/image/runtime/providers/ipx'
+import type { IPXOptions } from '@nuxt/image/runtime/providers/ipx'
 
 function extractRevision(source: string): {
   revision?: string
@@ -27,7 +29,7 @@ function extractRevision(source: string): {
   }
 }
 
-export default () => {
+export default (): ImageProvider<Partial<IPXOptions>> => {
   const provider = createIpxProvider()
 
   return {
