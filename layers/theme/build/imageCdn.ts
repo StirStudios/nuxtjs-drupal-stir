@@ -1,10 +1,4 @@
-import type { ImageProvider } from '@nuxt/image'
 import createIpxProvider from '@nuxt/image/runtime/providers/ipx'
-import type { IPXOptions } from '@nuxt/image/runtime/providers/ipx'
-
-type StirIpxOptions = Omit<Partial<IPXOptions>, 'modifiers'> & {
-  modifiers: NonNullable<IPXOptions['modifiers']>
-}
 
 function extractRevision(source: string): {
   revision?: string
@@ -33,15 +27,11 @@ function extractRevision(source: string): {
   }
 }
 
-export default (): ImageProvider<StirIpxOptions> => {
+export default () => {
   const provider = createIpxProvider()
 
   return {
     ...provider,
-    defaults: {
-      ...provider.defaults,
-      modifiers: provider.defaults?.modifiers ?? {},
-    },
     getImage(
       source: Parameters<typeof provider.getImage>[0],
       options: Parameters<typeof provider.getImage>[1],

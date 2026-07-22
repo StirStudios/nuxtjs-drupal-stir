@@ -13,6 +13,14 @@ const appConfig = useAppConfig()
 const $img = useImage()
 const { isAdministrator } = usePageContext()
 
+const getRichTextImageSizes = $img.getSizes as unknown as (
+  source: string,
+  options: {
+    modifiers: Record<string, number | string | undefined>
+    sizes: string | undefined
+  },
+) => ReturnType<typeof $img.getSizes>
+
 const isEditing = ref(false)
 const isLoadingEditor = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
@@ -40,7 +48,7 @@ const trustedTextHtml = computed(() => {
   const image = appConfig.stirTheme.media.image
 
   return optimizeDrupalRichTextImages(html, (source, width, height, context) =>
-    $img.getSizes(source, {
+    getRichTextImageSizes(source, {
       sizes:
         context?.alignment === 'left' || context?.alignment === 'right'
           ? image.profiles.split
