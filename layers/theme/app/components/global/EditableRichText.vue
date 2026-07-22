@@ -1,25 +1,12 @@
 <script setup lang="ts">
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
-import {
-  optimizeDrupalRichTextImages,
-  trustedDrupalHtml,
-} from '#stir/utils/trustedDrupalHtml'
+import { useOptimizedDrupalHtml } from '#stir/composables/useOptimizedDrupalHtml'
 import type { EditableRichTextProps } from '#stir/types'
 
 const props = defineProps<EditableRichTextProps>()
 
 const attrs = useAttrs()
-const appConfig = useAppConfig()
-const $img = useImage()
 const { isAdministrator } = usePageContext()
-
-const getRichTextImageSizes = $img.getSizes as unknown as (
-  source: string,
-  options: {
-    modifiers: Record<string, number | string | undefined>
-    sizes: string | undefined
-  },
-) => ReturnType<typeof $img.getSizes>
 
 const isEditing = ref(false)
 const isLoadingEditor = ref(false)
@@ -42,26 +29,7 @@ const sourceText = computed(() => {
   )
 })
 
-const trustedTextHtml = computed(() => {
-  const html = trustedDrupalHtml(renderedText.value)
-
-  const image = appConfig.stirTheme.media.image
-
-  return optimizeDrupalRichTextImages(html, (source, width, height, context) =>
-    getRichTextImageSizes(source, {
-      sizes:
-        context?.alignment === 'left' || context?.alignment === 'right'
-          ? image.profiles.split
-          : image.profiles.container,
-      modifiers: {
-        format: image.format,
-        height,
-        quality: image.quality,
-        width,
-      },
-    }),
-  )
-})
+const trustedTextHtml = useOptimizedDrupalHtml(renderedText)
 const canInlineEdit = computed(
   () => isAdministrator.value && paragraphId.value > 0,
 )

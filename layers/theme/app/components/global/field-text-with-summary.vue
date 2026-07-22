@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { useOptimizedDrupalHtml } from '#stir/composables/useOptimizedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,
@@ -20,10 +20,8 @@ const props = withDefaults(
   },
 )
 
-const trustedHtml = computed(() =>
-  trustedDrupalHtml(
-    props.content || props.processed || props.value || props.summary,
-  ),
+const trustedHtml = useOptimizedDrupalHtml(
+  () => props.content || props.processed || props.value || props.summary,
 )
 </script>
 
