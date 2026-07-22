@@ -149,6 +149,8 @@ stirTheme: {
   `color`, `variant`, `icon`, and `class`.
 - `pages` also supports `register`, `passwordRequest`, `verify`, and `protectedPage`.
 - Per-page settings override global auth theme settings.
+- `backgroundImage` should reference the original Drupal image. Auth layouts
+  automatically deliver it through Nuxt Image/IPX as a 1920px WebP background.
 - Auth layouts and visuals are read only from `stirTheme.auth`, never from
   Drupal's auth configuration response.
 
