@@ -58,4 +58,22 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoplay')).toBe(false)
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
   })
+
+  it('releases arrow focus after pointer activation', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        items: [h('article', 'One'), h('article', 'Two')],
+      },
+    })
+    const arrow = document.createElement('button')
+
+    arrow.dataset.slot = 'next'
+    const blur = vi.spyOn(arrow, 'blur')
+
+    wrapper.element.append(arrow)
+
+    arrow.dispatchEvent(new Event('pointerup', { bubbles: true }))
+
+    expect(blur).toHaveBeenCalledOnce()
+  })
 })

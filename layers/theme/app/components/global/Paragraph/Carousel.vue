@@ -181,6 +181,16 @@ function restoreFadeViewportPosition() {
   resetScrollPosition()
   requestAnimationFrame(resetScrollPosition)
 }
+
+function releasePointerArrowFocus(event: PointerEvent) {
+  const target = event.target
+
+  if (!(target instanceof Element)) return
+
+  target
+    .closest<HTMLElement>('[data-slot="prev"], [data-slot="next"]')
+    ?.blur()
+}
 </script>
 
 <template>
@@ -189,6 +199,7 @@ function restoreFadeViewportPosition() {
     class="relative z-10"
     :class="[theme.carousel.padding, width, spacing]"
     @focusin.capture="restoreFadeViewportPosition"
+    @pointerup.capture="releasePointerArrowFocus"
   >
     <component :is="headerTag || 'h2'" v-if="header">
       {{ header }}
