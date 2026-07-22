@@ -82,6 +82,8 @@ describe('CMS presentation manifest', () => {
     expect(utilities).toEqual(expect.arrayContaining([
       'grid-cols-12',
       '2xl:grid-cols-12',
+      'col-span-2',
+      'sm:columns-2',
       'basis-1/12',
       '2xl:basis-1/12',
       'gap-20',
