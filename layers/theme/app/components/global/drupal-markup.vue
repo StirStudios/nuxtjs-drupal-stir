@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { useOptimizedDrupalHtml } from '#stir/composables/useOptimizedDrupalHtml'
 
 defineOptions({
   inheritAttrs: false,
@@ -11,7 +11,7 @@ const props = defineProps<{
   hide?: boolean
   isArticle?: boolean | string
 }>()
-const trustedHtml = computed(() => trustedDrupalHtml(props.content))
+const trustedHtml = useOptimizedDrupalHtml(() => props.content)
 
 defineSlots<{
   default(): unknown
