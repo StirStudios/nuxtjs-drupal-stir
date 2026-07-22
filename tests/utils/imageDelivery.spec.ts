@@ -62,6 +62,10 @@ describe('resolveCarouselImageDeliverySizes', () => {
 })
 
 describe('Stir IPX provider', () => {
+  it('declares modifier defaults for generated Nuxt Image consumer types', () => {
+    expect(createStirIpxProvider().defaults?.modifiers).toEqual({})
+  })
+
   it('keeps the managed-file revision out of the Drupal origin path', () => {
     const provider = createStirIpxProvider()
     const image = provider.getImage(
