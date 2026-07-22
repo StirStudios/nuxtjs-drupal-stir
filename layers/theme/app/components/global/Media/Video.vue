@@ -41,6 +41,7 @@ const props = withDefaults(
 
     isHero?: boolean
     noWrapper?: boolean
+    pauseWhenHidden?: boolean
     deferEmbed?: boolean
     editActions?: EditAction[]
   }>(),
@@ -72,6 +73,7 @@ const props = withDefaults(
     hideCredit: false,
     isHero: undefined,
     noWrapper: false,
+    pauseWhenHidden: undefined,
     deferEmbed: true,
     editActions: undefined,
   },
@@ -94,7 +96,7 @@ const forwardedAttrs = computed(() => {
 
   return safeAttrs
 })
-const { initializePlayers, registerIframe } = useVideoPlayers()
+const { initializePlayers, registerIframe, videoPlayers } = useVideoPlayers()
 const injectedIsHero = inject<boolean>('isHero', false)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
@@ -102,6 +104,10 @@ const isHero = computed(() =>
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
 const iframeElement = ref<HTMLIFrameElement | null>(null)
+const backgroundPlayerId = useId()
+const backgroundPlayerKey = computed(() =>
+  props.mid === undefined ? `background-${backgroundPlayerId}` : String(props.mid),
+)
 const localVideoSrc = computed(() => {
   if (props.mediaEmbed || !isDirectVideoFile(props.src)) return undefined
 
@@ -120,6 +126,9 @@ const directHeroVideoSrc = computed(() =>
 )
 const remoteHeroVideoSrc = computed(() =>
   heroVideoSource.value?.kind === 'embed' ? heroVideoSource.value.src : undefined,
+)
+const pauseWhenHidden = computed(() =>
+  props.pauseWhenHidden ?? isBare.value,
 )
 const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
   const strategy = props.loadStrategy ?? mediaTheme.video?.loadStrategy
@@ -148,6 +157,18 @@ const isAnimatedPreviewHovered = ref(false)
 const previewRoot = ref<HTMLElement | null>(null)
 const isPreviewVisible = useElementVisibility(previewRoot, {
   rootMargin: '200px 0px',
+})
+const directBackgroundTarget = computed(() =>
+  pauseWhenHidden.value && isBare.value ? videoElement.value : null,
+)
+const remoteBackgroundTarget = computed(() =>
+  pauseWhenHidden.value && isBare.value ? iframeElement.value : null,
+)
+const isDirectBackgroundVisible = useElementVisibility(directBackgroundTarget, {
+  threshold: 0.1,
+})
+const isRemoteBackgroundVisible = useElementVisibility(remoteBackgroundTarget, {
+  threshold: 0.1,
 })
 const isPreviewViewport = useMediaQuery(
   () => `(min-width: ${props.previewMinWidth}px)`,
@@ -267,6 +288,31 @@ function deactivateAnimatedPreview(): void {
   isAnimatedPreviewHovered.value = false
 }
 
+function syncDirectBackgroundPlayback(visible: boolean): void {
+  if (!pauseWhenHidden.value || !isBare.value || !videoElement.value) return
+
+  if (visible) {
+    void videoElement.value.play().catch(() => {})
+    return
+  }
+
+  videoElement.value.pause()
+}
+
+function syncRemoteBackgroundPlayback(visible: boolean): void {
+  if (!pauseWhenHidden.value || !isBare.value || !backgroundPlayerKey.value) return
+
+  const player = videoPlayers.value.get(backgroundPlayerKey.value)
+
+  if (!player?.isReady) return
+
+  const method = visible ? 'play' : 'pause'
+
+  if (!player.supports('method', method)) return
+
+  player[method]()
+}
+
 onMounted(() => {
   if (!isBare.value && !props.deferEmbed) {
     isEmbedActive.value = true
@@ -275,6 +321,28 @@ onMounted(() => {
   if (!isBare.value && shouldShowIframe.value) {
     void scheduleInitializePlayers()
   }
+
+})
+
+watch(
+  [remoteHeroVideoSrc, isBareVideoSourceActive, iframeElement],
+  ([source, active, iframe]) => {
+    if (isBare.value && source && active && iframe) {
+      void scheduleInitializePlayers()
+    }
+  },
+  { flush: 'post', immediate: true },
+)
+
+watch([isDirectBackgroundVisible, directBackgroundTarget, isBareVideoSourceActive], ([visible]) => {
+  syncDirectBackgroundPlayback(visible)
+}, {
+  flush: 'post',
+  immediate: true,
+})
+
+watchEffect(() => {
+  syncRemoteBackgroundPlayback(isRemoteBackgroundVisible.value)
 })
 
 watch(
@@ -331,9 +399,11 @@ watch(
 
     <iframe
       v-if="remoteHeroVideoSrc && isBareVideoSourceActive"
+      ref="iframeElement"
       allow="autoplay; encrypted-media; picture-in-picture"
       aria-hidden="true"
       class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+      :data-mid="backgroundPlayerKey || undefined"
       :src="remoteHeroVideoSrc"
       tabindex="-1"
       :title="title || 'Background video'"

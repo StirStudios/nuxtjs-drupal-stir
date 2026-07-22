@@ -1,8 +1,80 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaVideo from '../../../layers/theme/app/components/global/Media/Video.vue'
 
 describe('MediaVideo (Nuxt runtime)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('pauses and resumes a direct background video with viewport visibility', async () => {
+    const observers: Array<{
+      callback: IntersectionObserverCallback
+      targets: Element[]
+    }> = []
+
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        private readonly record: {
+          callback: IntersectionObserverCallback
+          targets: Element[]
+        }
+
+        constructor(callback: IntersectionObserverCallback) {
+          this.record = { callback, targets: [] }
+          observers.push(this.record)
+        }
+
+        disconnect() {}
+        observe(target: Element) { this.record.targets.push(target) }
+        takeRecords() { return [] }
+        unobserve() {}
+      },
+    )
+    const play = vi
+      .spyOn(HTMLMediaElement.prototype, 'play')
+      .mockResolvedValue()
+    const pause = vi
+      .spyOn(HTMLMediaElement.prototype, 'pause')
+      .mockImplementation(() => {})
+
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {})
+
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        loadMinWidth: 0,
+        mediaEmbed: '/hero.mp4',
+        noWrapper: true,
+      },
+    })
+
+    await nextTick()
+
+    const video = wrapper.get('video').element
+    const videoObserver = observers.find(observer => observer.targets.includes(video))
+    const entry = (isIntersecting: boolean, time: number) => ({
+      isIntersecting,
+      target: video,
+      time,
+    }) as unknown as IntersectionObserverEntry
+
+    expect(videoObserver).toBeDefined()
+    videoObserver!.callback(
+      [entry(false, 1)],
+      {} as IntersectionObserver,
+    )
+    await vi.waitFor(() => expect(pause).toHaveBeenCalled())
+
+    videoObserver!.callback(
+      [entry(true, 2)],
+      {} as IntersectionObserver,
+    )
+    await vi.waitFor(() => expect(play).toHaveBeenCalled())
+  })
+
   it('uses Nuxt Image for a versioned static video poster', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
