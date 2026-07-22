@@ -163,7 +163,7 @@ describe('layer contract', () => {
     expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
   })
 
-  it('provides the Nuxt runtime through the installed layer package', () => {
+  it('defines and verifies the supported Nuxt runtime', () => {
     const packageJson = JSON.parse(readFileSync(
       resolve(rootDir, 'package.json'),
       'utf8',
@@ -182,9 +182,9 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(packedConsumer).not.toContain('nuxt: rootPackage.peerDependencies.nuxt')
+    expect(packedConsumer).toContain('nuxt: rootPackage.dependencies.nuxt')
     expect(packedConsumer).toContain(
-      'Packed consumer must receive Nuxt from the layer package.',
+      'Packed consumer must declare the supported Nuxt runtime.',
     )
   })
 

@@ -58,6 +58,7 @@ describe('/api/auth/protected', () => {
 
     runtimeConfig.protectedPassword = 'new-password'
 
+    const headers = new Map<string, string | string[]>()
     const response = await protectedSessionHandler({
       node: {
         req: {
@@ -65,9 +66,16 @@ describe('/api/auth/protected', () => {
             cookie: `protected_access=${token}`,
           },
         },
+        res: {
+          getHeader: (name: string) => headers.get(name.toLowerCase()),
+          setHeader: (name: string, value: string | string[]) => {
+            headers.set(name.toLowerCase(), value)
+          },
+        },
       },
     } as never)
 
     expect(response).toEqual({ protectedAuthenticated: false })
+    expect(headers.get('set-cookie')).toEqual(expect.stringContaining('Max-Age=0'))
   })
 })

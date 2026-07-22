@@ -129,6 +129,7 @@ async function main() {
         },
         dependencies: {
           '@stir/base': `file:${archivePath}`,
+          nuxt: rootPackage.dependencies.nuxt,
         },
         devDependencies: {
           typescript: rootPackage.devDependencies.typescript,
@@ -141,8 +142,8 @@ async function main() {
     const installedConsumerPackage = JSON.parse(
       await readFile(join(consumerDir, 'package.json'), 'utf8'),
     )
-    if (installedConsumerPackage.dependencies?.nuxt !== undefined) {
-      throw new Error('Packed consumer must receive Nuxt from the layer package.')
+    if (installedConsumerPackage.dependencies?.nuxt !== rootPackage.dependencies.nuxt) {
+      throw new Error('Packed consumer must declare the supported Nuxt runtime.')
     }
     if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
       throw new Error('Packed layer did not expose the stir-a11y executable.')
