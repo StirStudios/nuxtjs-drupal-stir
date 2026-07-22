@@ -162,6 +162,19 @@
     }
   }
 
+  .admin-ui-unpublished-link {
+    color: var(--admin-accent-text) !important;
+
+    &::before {
+      background-color: var(--admin-accent-bg) !important;
+    }
+
+    &:hover::before,
+    &:focus-visible::before {
+      background-color: var(--admin-accent-bg-subtle) !important;
+    }
+  }
+
   .admin-ui-nav-child-link {
     @apply p-2 text-sm;
     color: var(--admin-text-muted) !important;

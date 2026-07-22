@@ -219,7 +219,12 @@ const shouldRenderIndividualField = (fieldName: string) =>
 const isContainerVisible = (containerName: string) =>
   evaluateContainerVisibility(containerName, state, fields, getGroupFields)
 
-const wrapStyles = computed(() => [props.width, props.spacing].filter((value): value is string => typeof value === 'string' && value.length > 0))
+const wrapStyles = computed(() =>
+  ['w-full', props.width, props.spacing].filter(
+    (value): value is string =>
+      typeof value === 'string' && value.length > 0,
+  ),
+)
 
 const handleResetSubmission = async () => {
   isFormSubmitted.value = false

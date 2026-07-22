@@ -694,13 +694,13 @@
     "serverRoutes": 26,
     "productionDependencies": 43,
     "developmentDependencies": 27,
-    "tests": 118,
+    "tests": 119,
     "testsByArea": {
       "composables": 11,
       "contracts": 1,
       "nuxt": 40,
       "server": 23,
-      "unit": 4,
+      "unit": 5,
       "utils": 39
     }
   },
@@ -782,6 +782,7 @@
     "tests/server/webformSubmit.spec.ts",
     "tests/unit/drupalMediaEditor.spec.ts",
     "tests/unit/editorialAccess.spec.ts",
+    "tests/unit/editorialTaskLinks.spec.ts",
     "tests/unit/layoutEditLinks.spec.ts",
     "tests/unit/paragraphComponentStarter.spec.ts",
     "tests/utils/authValidation.spec.ts",
