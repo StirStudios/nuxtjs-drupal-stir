@@ -65,22 +65,16 @@ export function withUnpublishedTask(
 ): EditorialTaskLink[] {
   if (published !== false) return links
 
-  const editIndex = links.findIndex(link => link.label === 'Edit')
-  const editLink = links[editIndex]
-
-  if (editIndex < 0 || !editLink) return links
-
-  const taskLinks = [...links]
-
-  taskLinks.splice(editIndex, 0, {
-    ...editLink,
-    label: 'Unpublished',
-    icon: 'i-lucide-eye-off',
-    class: 'admin-ui-unpublished-link',
-    active: false,
-  })
-
-  return taskLinks
+  return links.map(link =>
+    link.label === 'View'
+      ? {
+          ...link,
+          label: 'Unpublished',
+          icon: 'i-lucide-eye-off',
+          class: 'admin-ui-unpublished-link',
+        }
+      : link,
+  )
 }
 
 export const adminUiTheme = {
