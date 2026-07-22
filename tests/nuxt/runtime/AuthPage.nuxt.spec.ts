@@ -26,14 +26,17 @@ const state = vi.hoisted(() => ({
     },
   } as Record<string, unknown>,
   auth: {} as Record<string, unknown>,
+  imageResolver: vi.fn((source: string) => `/_ipx/test/${source}`),
 }))
 
 mockNuxtImport('useAppConfig', () => () => state.appConfig)
 mockNuxtImport('useAuthConfig', () => () => ({ auth: ref(state.auth) }))
+mockNuxtImport('useImage', () => () => state.imageResolver)
 
 describe('AuthPage', () => {
   beforeEach(async () => {
     state.auth = {}
+    state.imageResolver.mockClear()
     state.appConfig = {
       colorMode: {
         forced: false,
@@ -71,6 +74,19 @@ describe('AuthPage', () => {
     })
 
     expect(wrapper.find('.grid').exists()).toBe(true)
+
+    const imagePanel = wrapper.find('[aria-hidden="true"]')
+
+    expect(imagePanel.attributes('style')).toContain('/_ipx/')
+    expect(imagePanel.attributes('style')).toContain('https://example.com/global-auth.jpg')
+    expect(state.imageResolver).toHaveBeenCalledWith(
+      'https://example.com/global-auth.jpg',
+      {
+        width: 1920,
+        quality: 80,
+        format: 'webp',
+      },
+    )
     wrapper.unmount()
   })
 

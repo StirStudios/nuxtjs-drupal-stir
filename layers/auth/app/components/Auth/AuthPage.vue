@@ -20,6 +20,7 @@ import type {
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const appConfig = useAppConfig()
+const $img = useImage()
 
 type AuthPageConfigKey =
   | 'login'
@@ -171,15 +172,29 @@ const resolvedBackgroundImage = computed(() => {
   return apiBase ? `${apiBase}${image}` : image
 })
 
+const deliveredBackgroundImage = computed(() => {
+  const image = resolvedBackgroundImage.value
+
+  if (!image) {
+    return ''
+  }
+
+  return $img(image, {
+    width: 1920,
+    quality: 80,
+    format: 'webp',
+  })
+})
+
 const pageStyle = computed(() =>
-  pageLayout.value === 'card' && resolvedBackgroundImage.value
-    ? ({ backgroundImage: `url('${resolvedBackgroundImage.value}')` } as const)
+  pageLayout.value === 'card' && deliveredBackgroundImage.value
+    ? ({ backgroundImage: `url('${deliveredBackgroundImage.value}')` } as const)
     : undefined,
 )
 
 const imagePanelStyle = computed(() =>
-  resolvedBackgroundImage.value
-    ? ({ backgroundImage: `url('${resolvedBackgroundImage.value}')` } as const)
+  deliveredBackgroundImage.value
+    ? ({ backgroundImage: `url('${deliveredBackgroundImage.value}')` } as const)
     : undefined,
 )
 
@@ -202,7 +217,7 @@ const backButtonProps = computed(() => ({
 const layoutContext = computed(() => ({
   layout: pageLayout.value,
   imagePosition: imagePosition.value,
-  image: resolvedBackgroundImage.value,
+  image: deliveredBackgroundImage.value,
   showIcon: showIcon.value,
 }))
 
