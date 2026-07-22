@@ -85,9 +85,17 @@ export default defineEventHandler(async (event) => {
     !expectedPassword ||
     !layerAuthConstantTimeEquals(submittedPassword, expectedPassword)
   ) {
+    const protectedAccessCookie = getCookie(
+      event,
+      LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME,
+    )
+
     if (
-      getCookie(event, LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME)
-      && !await layerAuthIsProtectedAccessAuthenticated(event, expectedPassword)
+      protectedAccessCookie
+      && (
+        !expectedPassword
+        || !await layerAuthIsProtectedAccessAuthenticated(event, expectedPassword)
+      )
     ) {
       layerAuthClearProtectedAccessCookie(event)
     }

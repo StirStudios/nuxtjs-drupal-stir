@@ -116,6 +116,31 @@ describe('POST /api/auth/protected', () => {
     expect(headers.get('set-cookie')).toEqual(expect.stringContaining('Max-Age=0'))
   })
 
+  it('clears a stale access cookie when protected access is not configured', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      protectedPassword: '',
+      protectedRateLimit: { enabled: false },
+    }))
+    vi.mocked(readBody).mockResolvedValue({
+      password: 'submitted-password',
+      turnstile_response: 'valid-token',
+    })
+    vi.stubGlobal('verifyTurnstileToken', vi.fn().mockResolvedValue({
+      success: true,
+    }))
+    const { event, headers } = createEvent()
+    const requestHeaders = (
+      event as { node: { req: { headers: Record<string, string> } } }
+    ).node.req.headers
+
+    requestHeaders.cookie = 'protected_access=stale-token'
+
+    await expect(protectedLoginHandler(event)).rejects.toMatchObject({
+      statusCode: 401,
+    })
+    expect(headers.get('set-cookie')).toEqual(expect.stringContaining('Max-Age=0'))
+  })
+
   it('preserves a valid access cookie after an invalid password', async () => {
     vi.mocked(readBody).mockResolvedValue({
       password: 'incorrect',
