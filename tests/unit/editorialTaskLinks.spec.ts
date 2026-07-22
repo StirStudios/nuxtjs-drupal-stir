@@ -23,30 +23,24 @@ function buildLinks(): EditorialTaskLink[] {
 }
 
 describe('withUnpublishedTask', () => {
-  it('inserts an unpublished edit shortcut before Edit', () => {
+  it('replaces View with the unpublished page status', () => {
     const links = buildLinks()
     const result = withUnpublishedTask(links, false)
 
-    expect(result.map(link => link.label)).toEqual([
-      'View',
-      'Unpublished',
-      'Edit',
-    ])
-    expect(result[1]).toMatchObject({
-      to: '/node/42/edit',
+    expect(result.map(link => link.label)).toEqual(['Unpublished', 'Edit'])
+    expect(result[0]).toMatchObject({
+      to: '/node/42',
       icon: 'i-lucide-eye-off',
       class: 'admin-ui-unpublished-link',
-      active: false,
     })
-    expect(result[1]?.onSelect).toBe(links[1]?.onSelect)
     expect(links.map(link => link.label)).toEqual(['View', 'Edit'])
   })
 
-  it('leaves published pages and pages without an edit task unchanged', () => {
+  it('leaves published pages and task lists without View unchanged', () => {
     const links = buildLinks()
-    const withoutEdit = links.slice(0, 1)
+    const withoutView = links.slice(1)
 
     expect(withUnpublishedTask(links, true)).toBe(links)
-    expect(withUnpublishedTask(withoutEdit, false)).toBe(withoutEdit)
+    expect(withUnpublishedTask(withoutView, false)).toEqual(withoutView)
   })
 })
