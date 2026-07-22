@@ -2,7 +2,11 @@
 import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
-import { adminUiTheme } from '../../utils/adminUiTheme'
+import {
+  adminUiTheme,
+  type EditorialTaskLink,
+  withUnpublishedTask,
+} from '../../utils/adminUiTheme'
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
@@ -32,14 +36,7 @@ const getIconForLabel = (label: string): string | null => {
 
 type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
-type MenuLink = {
-  label: string
-  to: string
-  icon: string | null
-  tooltip: boolean
-  active?: boolean
-  onSelect?: (event: Event) => void
-}
+type MenuLink = EditorialTaskLink
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
 type AccountMenuFetchOptions = NonNullable<
   Parameters<typeof $fetch<AccountMenuItem[]>>[1]
@@ -123,6 +120,10 @@ const localTaskLinks = computed(() =>
       }
     })
     .filter((tab): tab is MenuLink => tab !== null),
+)
+
+const editorialTaskLinks = computed(() =>
+  withUnpublishedTask(localTaskLinks.value, page.value?.published),
 )
 
 const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
@@ -298,7 +299,7 @@ const links = computed(() => {
     ],
   ]
 
-  const tasks = localTaskLinks.value.length ? [localTaskLinks.value] : []
+  const tasks = editorialTaskLinks.value.length ? [editorialTaskLinks.value] : []
   const accountTo = normalizeAdminUrl('/user')
   const accountItem = accountMenu.value.length
     ? {

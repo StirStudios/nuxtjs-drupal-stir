@@ -48,4 +48,22 @@ describe('Webform (Nuxt runtime)', () => {
       expect(wrapper.get('button[type="submit"]').text()).toBe('Submit')
     })
   })
+
+  it('fills flex regions up to the selected content width', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform,
+        width: 'm-auto lg:max-w-3xl',
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('form').element.parentElement?.classList).toContain(
+      'w-full',
+    )
+    expect(wrapper.get('form').element.parentElement?.classList).toContain(
+      'lg:max-w-3xl',
+    )
+  })
 })

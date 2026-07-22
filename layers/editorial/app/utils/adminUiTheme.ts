@@ -49,6 +49,40 @@ type AdminUiTheme = {
   }
 }
 
+export type EditorialTaskLink = {
+  label: string
+  to: string
+  icon: string | null
+  tooltip: boolean
+  class?: string
+  active?: boolean
+  onSelect?: (event: Event) => void
+}
+
+export function withUnpublishedTask(
+  links: EditorialTaskLink[],
+  published: unknown,
+): EditorialTaskLink[] {
+  if (published !== false) return links
+
+  const editIndex = links.findIndex(link => link.label === 'Edit')
+  const editLink = links[editIndex]
+
+  if (editIndex < 0 || !editLink) return links
+
+  const taskLinks = [...links]
+
+  taskLinks.splice(editIndex, 0, {
+    ...editLink,
+    label: 'Unpublished',
+    icon: 'i-lucide-eye-off',
+    class: 'admin-ui-unpublished-link',
+    active: false,
+  })
+
+  return taskLinks
+}
+
 export const adminUiTheme = {
   navigationMenu: {
     root: 'admin-ui admin-ui-scope admin-ui-nav-root app-admin-tabs-font sticky top-0 z-60 h-[3.5rem] w-full p-4',
