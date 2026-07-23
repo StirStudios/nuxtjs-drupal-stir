@@ -2,6 +2,10 @@
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useOptimizedDrupalHtml } from '#stir/composables/useOptimizedDrupalHtml'
 import type { EditableRichTextProps } from '#stir/types'
+import {
+  formattedTextApiPath,
+  normalizeFormattedTextEditTarget,
+} from '#stir/utils/formattedTextEditTarget'
 
 const props = defineProps<EditableRichTextProps>()
 
@@ -11,6 +15,18 @@ const { isAdministrator } = usePageContext()
 const isEditing = ref(false)
 const isLoadingEditor = ref(false)
 const paragraphId = computed(() => Number(props.id || 0))
+const editTarget = computed(() => {
+  const configured = normalizeFormattedTextEditTarget(props.editTarget)
+
+  if (configured) return configured
+  if (paragraphId.value <= 0) return null
+
+  return {
+    entityType: 'paragraph',
+    entityId: paragraphId.value,
+    fieldName: 'field_text',
+  }
+})
 const editSourceText = ref<string | null>(null)
 const renderedText = ref(props.text ?? '')
 
@@ -31,7 +47,7 @@ const sourceText = computed(() => {
 
 const trustedTextHtml = useOptimizedDrupalHtml(renderedText)
 const canInlineEdit = computed(
-  () => isAdministrator.value && paragraphId.value > 0,
+  () => isAdministrator.value && editTarget.value !== null,
 )
 const richTextClass = 'prose max-w-none'
 const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
@@ -44,10 +60,10 @@ async function startEditing() {
   isLoadingEditor.value = true
   editSourceText.value = sourceText.value
 
-  if (canInlineEdit.value && paragraphId.value > 0) {
+  if (canInlineEdit.value && editTarget.value) {
     try {
       const response = await $fetch<{ ok: boolean; text?: string }>(
-        `/api/paragraph/${paragraphId.value}/text`,
+        formattedTextApiPath(editTarget.value),
       )
 
       if (response?.ok === true && typeof response.text === 'string') {
@@ -88,8 +104,6 @@ watch(
 
 <template>
   <EditLink
-    v-slot="{ actions, hasActions, selectAction }"
-    controls-placement="slot"
     :link="editLink"
     :parent-uuid="parentUuid"
     :show-quick-edit="
@@ -113,7 +127,7 @@ watch(
       <Suspense v-else>
         <LazyEditText
           :classes="classes"
-          :paragraph-id="paragraphId"
+          :edit-target="editTarget!"
           :source-text="editSourceText ?? sourceText"
           @cancel="stopEditing"
           @saved="handleSaved"
@@ -135,14 +149,11 @@ watch(
       </Suspense>
     </template>
 
-    <template v-else-if="trustedTextHtml">
-      <div class="relative grid">
-        <LazyEditControls
-          v-if="hasActions"
-          :actions="actions"
-          container-class="sticky top-16 z-[500] col-start-1 row-start-1 self-start justify-self-end"
-          @select="selectAction"
-        />
+    <template v-else-if="$slots.default || trustedTextHtml">
+      <template v-if="$slots.default">
+        <slot />
+      </template>
+      <template v-else>
         <LazyRevealMotion
           v-if="hasRevealMotion"
           :key="`text-${paragraphId}-${revealMotionKey}`"
@@ -151,7 +162,7 @@ watch(
         >
           <div
             :class="
-              ['col-start-1 row-start-1', classes, richTextClass]
+              [classes, richTextClass]
                 .filter(Boolean)
                 .join(' ')
             "
@@ -161,17 +172,13 @@ watch(
         <div
           v-else
           :class="
-            ['col-start-1 row-start-1', classes, richTextClass]
+            [classes, richTextClass]
               .filter(Boolean)
               .join(' ')
           "
           v-html="trustedTextHtml"
         />
-      </div>
-    </template>
-
-    <template v-else-if="hasActions">
-      <LazyEditControls :actions="actions" @select="selectAction" />
+      </template>
     </template>
   </EditLink>
 </template>

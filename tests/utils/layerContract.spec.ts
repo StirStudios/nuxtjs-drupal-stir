@@ -626,6 +626,36 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')
+    expect(editableRichText).not.toContain('controls-placement="slot"')
+    expect(editableRichText).not.toContain('<LazyEditControls')
+    expect(editableRichText).not.toContain('sticky top-16')
+    expect(editableRichText).not.toContain('<div class="relative">')
+  })
+
+  it('allows list items to be reordered without broad nested dragging', () => {
+    const textEditor = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
+      'utf8',
+    )
+
+    expect(textEditor).toContain('<UEditorDragHandle')
+    expect(textEditor).toContain(
+      'allowedContainers: [\'bulletList\', \'orderedList\']',
+    )
+  })
+
+  it('normalizes prose edges through a single Drupal field wrapper', () => {
+    const baseCss = readFileSync(
+      resolve(rootDir, 'layers/theme/app/assets/css/base.css'),
+      'utf8',
+    )
+
+    expect(baseCss).toContain(
+      '& > :where(div:only-child) > :first-child',
+    )
+    expect(baseCss).toContain(
+      '& > :where(div:only-child) > :last-child',
+    )
   })
 
   it('keeps view-card reveal delays short for visible grid rows', () => {
