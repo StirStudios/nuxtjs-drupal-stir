@@ -13,5 +13,5 @@ export interface EditableRichTextProps {
   classes?: string
   direction?: string
   editLink?: string
-  editTarget?: FormattedTextEditTarget | Record<string, unknown>
+  editTarget?: unknown
 }
