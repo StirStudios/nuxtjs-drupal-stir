@@ -41,6 +41,14 @@
       @apply mb-0;
     }
 
+    & > :where(div:only-child) > :first-child {
+      @apply mt-0;
+    }
+
+    & > :where(div:only-child) > :last-child {
+      @apply mb-0;
+    }
+
     :where(section + section) {
       @apply mt-12;
     }

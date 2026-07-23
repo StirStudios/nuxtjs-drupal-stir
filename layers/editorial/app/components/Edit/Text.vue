@@ -203,7 +203,12 @@ onMounted(async () => {
           :items="suggestionItems as never"
         />
 
-        <UEditorDragHandle :editor="editor" />
+        <UEditorDragHandle
+          :editor="editor"
+          :nested="{
+            allowedContainers: ['bulletList', 'orderedList'],
+          }"
+        />
       </UEditor>
 
       <div class="mt-4 flex items-center justify-between gap-3 p-4">

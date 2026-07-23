@@ -150,28 +150,17 @@ watch(
     </template>
 
     <template v-else-if="$slots.default || trustedTextHtml">
-      <div class="relative">
-        <template v-if="$slots.default">
-          <slot />
-        </template>
-        <template v-else>
-          <LazyRevealMotion
-            v-if="hasRevealMotion"
-            :key="`text-${paragraphId}-${revealMotionKey}`"
-            as-child
-            v-bind="motionProps"
-          >
-            <div
-              :class="
-                [classes, richTextClass]
-                  .filter(Boolean)
-                  .join(' ')
-              "
-              v-html="trustedTextHtml"
-            />
-          </LazyRevealMotion>
+      <template v-if="$slots.default">
+        <slot />
+      </template>
+      <template v-else>
+        <LazyRevealMotion
+          v-if="hasRevealMotion"
+          :key="`text-${paragraphId}-${revealMotionKey}`"
+          as-child
+          v-bind="motionProps"
+        >
           <div
-            v-else
             :class="
               [classes, richTextClass]
                 .filter(Boolean)
@@ -179,8 +168,17 @@ watch(
             "
             v-html="trustedTextHtml"
           />
-        </template>
-      </div>
+        </LazyRevealMotion>
+        <div
+          v-else
+          :class="
+            [classes, richTextClass]
+              .filter(Boolean)
+              .join(' ')
+          "
+          v-html="trustedTextHtml"
+        />
+      </template>
     </template>
   </EditLink>
 </template>
