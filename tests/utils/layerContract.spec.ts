@@ -657,9 +657,9 @@ describe('layer contract', () => {
     expect(editLink).toContain('class="admin-ui-edit-shell"')
     expect(editLink).toContain('<slot\n    v-else')
     expect(adminCss).toContain('.admin-ui-edit-shell')
-    expect(adminCss).toContain('> :first-child')
+    expect(adminCss).toContain('> :first-child > :first-child')
     expect(adminCss).toContain(
-      '> :last-child:not([data-admin-ui-controls])',
+      '> :has(+ [data-admin-ui-controls]) > :last-child',
     )
   })
 
