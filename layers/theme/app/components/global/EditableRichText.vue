@@ -153,12 +153,15 @@ watch(
 
     <template v-else-if="$slots.default || trustedTextHtml">
       <div class="relative">
-        <LazyEditControls
+        <div
           v-if="hasActions"
-          :actions="actions"
-          container-class="sticky top-16 z-[500] flex h-0 justify-end overflow-visible"
-          @select="selectAction"
-        />
+          class="sticky top-16 z-[500] flex h-0 justify-end overflow-visible"
+        >
+          <LazyEditControls
+            :actions="actions"
+            @select="selectAction"
+          />
+        </div>
         <template v-if="$slots.default">
           <slot />
         </template>
