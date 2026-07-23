@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: 'quick-edit'): void
 }>()
 
+const slots = useSlots()
 const { getPage } = useStirDrupalCe()
 const page = getPage()
 const route = useRoute()
@@ -148,6 +149,12 @@ const hasActions = computed(() => actions.value.length > 0)
 const rendersSiblingControls = computed(
   () => props.controlsPlacement !== 'slot',
 )
+const wrapsContentWithControls = computed(
+  () =>
+    hasActions.value &&
+    rendersSiblingControls.value &&
+    slots.default !== undefined,
+)
 
 const handleActionSelect = (key: EditAction['key']) => {
   if (key === 'quick') emit('quick-edit')
@@ -156,7 +163,7 @@ const handleActionSelect = (key: EditAction['key']) => {
 
 <template>
   <div
-    v-if="hasActions && rendersSiblingControls"
+    v-if="wrapsContentWithControls"
     class="admin-ui-edit-shell"
   >
     <slot
@@ -169,10 +176,16 @@ const handleActionSelect = (key: EditAction['key']) => {
       @select="handleActionSelect"
     />
   </div>
-  <slot
-    v-else
-    :actions="actions"
-    :has-actions="hasActions"
-    :select-action="handleActionSelect"
-  />
+  <template v-else>
+    <slot
+      :actions="actions"
+      :has-actions="hasActions"
+      :select-action="handleActionSelect"
+    />
+    <LazyEditControls
+      v-if="hasActions && rendersSiblingControls"
+      :actions="actions"
+      @select="handleActionSelect"
+    />
+  </template>
 </template>
