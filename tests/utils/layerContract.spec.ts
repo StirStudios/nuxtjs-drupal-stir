@@ -643,6 +643,20 @@ describe('layer contract', () => {
     expect(textEditor).not.toContain('allowedContainers')
   })
 
+  it('keeps presentation classes off the rich-text editor shell', () => {
+    const textEditor = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
+      'utf8',
+    )
+
+    expect(textEditor).toContain(
+      'class="admin-ui admin-ui-scope admin-ui-panel rounded-lg"',
+    )
+    expect(textEditor).not.toContain(
+      ':class="[classes, \'admin-ui admin-ui-scope admin-ui-panel rounded-lg\']"',
+    )
+  })
+
   it('isolates only rich-text controls without wrapping normal output', () => {
     const editLink = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),
