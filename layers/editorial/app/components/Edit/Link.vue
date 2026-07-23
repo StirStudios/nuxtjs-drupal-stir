@@ -20,7 +20,7 @@ const props = defineProps<{
   quickEditDisabled?: boolean
   quickEditLabel?: string
   fullEditLabel?: string
-  controlsPlacement?: 'sibling' | 'slot'
+  controlsPlacement?: 'sibling' | 'slot' | 'isolated'
 }>()
 
 const emit = defineEmits<{
@@ -149,10 +149,10 @@ const hasActions = computed(() => actions.value.length > 0)
 const rendersSiblingControls = computed(
   () => props.controlsPlacement !== 'slot',
 )
-const wrapsContentWithControls = computed(
+const isolatesControls = computed(
   () =>
+    props.controlsPlacement === 'isolated' &&
     hasActions.value &&
-    rendersSiblingControls.value &&
     slots.default !== undefined,
 )
 
@@ -163,7 +163,7 @@ const handleActionSelect = (key: EditAction['key']) => {
 
 <template>
   <div
-    v-if="wrapsContentWithControls"
+    v-if="isolatesControls"
     class="admin-ui-edit-shell"
   >
     <slot

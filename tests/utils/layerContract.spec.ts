@@ -643,9 +643,16 @@ describe('layer contract', () => {
     expect(textEditor).not.toContain('allowedContainers')
   })
 
-  it('isolates sibling editorial controls without wrapping anonymous output', () => {
+  it('isolates only rich-text controls without wrapping normal output', () => {
     const editLink = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),
+      'utf8',
+    )
+    const editableRichText = readFileSync(
+      resolve(
+        rootDir,
+        'layers/theme/app/components/global/EditableRichText.vue',
+      ),
       'utf8',
     )
     const adminCss = readFileSync(
@@ -653,14 +660,18 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(editLink).toContain('const wrapsContentWithControls = computed')
-    expect(editLink).toContain('slots.default !== undefined')
-    expect(editLink).toContain('v-if="wrapsContentWithControls"')
+    expect(editLink).toContain(
+      'controlsPlacement?: \'sibling\' | \'slot\' | \'isolated\'',
+    )
+    expect(editLink).toContain(
+      'props.controlsPlacement === \'isolated\'',
+    )
+    expect(editLink).toContain('v-if="isolatesControls"')
     expect(editLink).toContain('class="admin-ui-edit-shell"')
-    expect(editLink).toContain('<template v-else>')
     expect(editLink).toContain(
       'v-if="hasActions && rendersSiblingControls"',
     )
+    expect(editableRichText).toContain('controls-placement="isolated"')
     expect(adminCss).toContain('.admin-ui-edit-shell')
     expect(adminCss).toContain('> :first-child > :first-child')
     expect(adminCss).toContain(
