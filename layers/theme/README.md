@@ -77,9 +77,9 @@ grids. Card grids deliberately retain separate outer and content layers because
 the gradient is a sibling behind the grid content. Do not add unconditional
 wrapper elements around these components merely to make styling convenient.
 
-Editorial `EditLink` controls also render beside their slot without adding a
-shell. The editorial stylesheet positions the existing parent only when it has
-a direct controls child, keeping anonymous production markup unchanged.
+Editorial `EditLink` adds a positioning shell only when administrative controls
+are present. Anonymous production markup remains wrapper-free, while each
+editable field owns the positioning context for its controls.
 
 ### Nuxt Image delivery
 

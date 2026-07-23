@@ -632,15 +632,39 @@ describe('layer contract', () => {
     expect(editableRichText).not.toContain('<div class="relative">')
   })
 
-  it('allows list items to be reordered without broad nested dragging', () => {
+  it('allows top-level blocks and nested list items without unwrapping Drupal structures', () => {
     const textEditor = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
       'utf8',
     )
 
     expect(textEditor).toContain('<UEditorDragHandle')
-    expect(textEditor).toContain(
-      'allowedContainers: [\'bulletList\', \'orderedList\']',
+    expect(textEditor).toContain(':nested="editorNestedDragHandleOptions"')
+    expect(textEditor).not.toContain('allowedContainers')
+  })
+
+  it('isolates sibling editorial controls without wrapping anonymous output', () => {
+    const editLink = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),
+      'utf8',
+    )
+    const adminCss = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/assets/css/admin-ui.css'),
+      'utf8',
+    )
+
+    expect(editLink).toContain('const wrapsContentWithControls = computed')
+    expect(editLink).toContain('slots.default !== undefined')
+    expect(editLink).toContain('v-if="wrapsContentWithControls"')
+    expect(editLink).toContain('class="admin-ui-edit-shell"')
+    expect(editLink).toContain('<template v-else>')
+    expect(editLink).toContain(
+      'v-if="hasActions && rendersSiblingControls"',
+    )
+    expect(adminCss).toContain('.admin-ui-edit-shell')
+    expect(adminCss).toContain('> :first-child > :first-child')
+    expect(adminCss).toContain(
+      '> :has(+ [data-admin-ui-controls]) > :last-child',
     )
   })
 

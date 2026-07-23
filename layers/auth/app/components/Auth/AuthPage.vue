@@ -21,6 +21,15 @@ const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const appConfig = useAppConfig()
 const $img = useImage()
+const resolveImage = $img as unknown as (
+  source: string,
+  modifiers?: {
+    width?: number | string
+    height?: number | string
+    quality?: number | string
+    format?: string
+  },
+) => string
 
 type AuthPageConfigKey =
   | 'login'
@@ -179,7 +188,7 @@ const deliveredBackgroundImage = computed(() => {
     return ''
   }
 
-  return $img(image, {
+  return resolveImage(image, {
     width: 1920,
     quality: 80,
     format: 'webp',

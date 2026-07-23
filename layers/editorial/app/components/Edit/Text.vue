@@ -2,6 +2,7 @@
 import { useEventListener, useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '../../composables/useParagraphTextEditor'
 import { adminUiTheme } from '../../utils/adminUiTheme'
+import { editorNestedDragHandleOptions } from '../../utils/editorDragHandle'
 import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSave'
 import type { FormattedTextEditTarget } from '#stir/types'
 import { formattedTextApiPath } from '#stir/utils/formattedTextEditTarget'
@@ -205,9 +206,7 @@ onMounted(async () => {
 
         <UEditorDragHandle
           :editor="editor"
-          :nested="{
-            allowedContainers: ['bulletList', 'orderedList'],
-          }"
+          :nested="editorNestedDragHandleOptions"
         />
       </UEditor>
 

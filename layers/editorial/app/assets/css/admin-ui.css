@@ -122,6 +122,16 @@
 
   .admin-ui-edit-shell {
     @apply relative;
+
+    > :first-child,
+    > :first-child > :first-child {
+      @apply mt-0;
+    }
+
+    > :has(+ [data-admin-ui-controls]),
+    > :has(+ [data-admin-ui-controls]) > :last-child {
+      @apply mb-0;
+    }
   }
 
   .admin-ui-nav-root {
