@@ -1,3 +1,9 @@
+export interface FormattedTextEditTarget {
+  entityType: string
+  entityId: number | string
+  fieldName: string
+}
+
 export interface EditableRichTextProps {
   id?: number | string
   uuid?: string
@@ -7,4 +13,5 @@ export interface EditableRichTextProps {
   classes?: string
   direction?: string
   editLink?: string
+  editTarget?: FormattedTextEditTarget | Record<string, unknown>
 }

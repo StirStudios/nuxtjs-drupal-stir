@@ -37,7 +37,8 @@ describe('DrupalMedia editor extension', () => {
       'data-entity-uuid="15fd4195-edaf-4345-a607-41b22000dbfb"',
     )
     expect(html).toContain('data-view-mode="media_library"')
-    expect(editor.schema.nodes.drupalMedia?.spec.selectable).toBe(false)
+    expect(editor.schema.nodes.drupalMedia?.spec.selectable).toBe(true)
+    expect(editor.schema.nodes.drupalMedia?.spec.draggable).toBe(true)
 
     editor.destroy()
   })

@@ -1,32 +1,22 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 
-type DrupalMediaAttributes = Record<string, string>
+type StirCtaAttributes = Record<string, string>
 
-function mediaPlaceholderLabel(attributes: DrupalMediaAttributes): string {
-  const mediaType = attributes['data-media-type']?.trim()
-
-  if (mediaType) {
-    return `Embedded ${mediaType.replaceAll('_', ' ')}`
-  }
-
-  return 'Embedded media'
-}
-
-function readAttributes(element: Element): DrupalMediaAttributes {
+function readAttributes(element: Element): StirCtaAttributes {
   return Object.fromEntries(
     Array.from(element.attributes, ({ name, value }) => [name, value]),
   )
 }
 
-export const DrupalMedia = Node.create({
-  name: 'drupalMedia',
+export const StirCta = Node.create({
+  name: 'stirCta',
   group: 'block',
   atom: true,
   selectable: true,
   draggable: true,
 
   parseHTML() {
-    return [{ tag: 'drupal-media' }]
+    return [{ tag: 'stir-cta' }]
   },
 
   addAttributes() {
@@ -41,7 +31,7 @@ export const DrupalMedia = Node.create({
 
   renderHTML({ node, HTMLAttributes }) {
     return [
-      'drupal-media',
+      'stir-cta',
       mergeAttributes(node.attrs.preservedAttributes, HTMLAttributes),
       '\u00a0',
     ]
@@ -49,18 +39,19 @@ export const DrupalMedia = Node.create({
 
   addNodeView() {
     return ({ node }) => {
-      const attributes = node.attrs.preservedAttributes as DrupalMediaAttributes
+      const attributes = node.attrs.preservedAttributes as StirCtaAttributes
       const dom = document.createElement('div')
       const label = document.createElement('span')
       const description = document.createElement('span')
+      const variant = attributes['data-variant']?.trim()
 
       dom.className = 'admin-editor-media-placeholder'
       dom.contentEditable = 'false'
-      dom.dataset.drupalMediaPlaceholder = 'true'
+      dom.dataset.stirCtaPlaceholder = 'true'
       dom.setAttribute('role', 'note')
 
       label.className = 'admin-editor-media-placeholder-label'
-      label.textContent = mediaPlaceholderLabel(attributes)
+      label.textContent = variant ? `Call to action: ${variant}` : 'Call to action'
 
       description.className = 'admin-editor-media-placeholder-description'
       description.textContent = 'Preserved from Drupal and restored after saving.'

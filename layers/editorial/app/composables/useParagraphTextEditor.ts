@@ -7,6 +7,7 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 import type {} from '@tiptap/extension-link'
 import { DrupalMedia } from '../extensions/DrupalMedia'
+import { StirCta } from '../extensions/StirCta'
 
 export function useParagraphTextEditor(sourceText: Ref<string>) {
   const adminTooltipUi = {
@@ -139,6 +140,7 @@ export function useParagraphTextEditor(sourceText: Ref<string>) {
     DivNode,
     SectionNode,
     DrupalMedia,
+    StirCta,
   ]
 
   const headingToolbarItems = [

@@ -3,9 +3,11 @@ import { useEventListener, useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '../../composables/useParagraphTextEditor'
 import { adminUiTheme } from '../../utils/adminUiTheme'
 import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSave'
+import type { FormattedTextEditTarget } from '#stir/types'
+import { formattedTextApiPath } from '#stir/utils/formattedTextEditTarget'
 
 const props = defineProps<{
-  paragraphId: number
+  editTarget: FormattedTextEditTarget
   sourceText: string
   classes?: string
 }>()
@@ -58,22 +60,15 @@ function closeEditor(event: 'cancel' | 'saved', value = ''): void {
 
 async function saveInline() {
   if (isSaving.value) return
-  if (props.paragraphId === 0) return
 
   const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
-
-  if (valueToSave === '') {
-    saveError.value = 'Text is required.'
-
-    return
-  }
 
   isSaving.value = true
   resetEditMessages()
 
   try {
     const response = await $fetch<{ ok: boolean; message?: string }>(
-      `/api/paragraph/${props.paragraphId}/text`,
+      formattedTextApiPath(props.editTarget),
       {
         method: 'POST',
         body: {
@@ -207,6 +202,8 @@ onMounted(async () => {
           :editor="editor"
           :items="suggestionItems as never"
         />
+
+        <UEditorDragHandle :editor="editor" />
       </UEditor>
 
       <div class="mt-4 flex items-center justify-between gap-3 p-4">
