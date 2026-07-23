@@ -104,8 +104,6 @@ watch(
 
 <template>
   <EditLink
-    v-slot="{ actions, hasActions, selectAction }"
-    controls-placement="slot"
     :link="editLink"
     :parent-uuid="parentUuid"
     :show-quick-edit="
@@ -153,15 +151,6 @@ watch(
 
     <template v-else-if="$slots.default || trustedTextHtml">
       <div class="relative">
-        <div
-          v-if="hasActions"
-          class="sticky top-16 z-[500] flex h-0 justify-end overflow-visible"
-        >
-          <LazyEditControls
-            :actions="actions"
-            @select="selectAction"
-          />
-        </div>
         <template v-if="$slots.default">
           <slot />
         </template>
@@ -192,10 +181,6 @@ watch(
           />
         </template>
       </div>
-    </template>
-
-    <template v-else-if="hasActions">
-      <LazyEditControls :actions="actions" @select="selectAction" />
     </template>
   </EditLink>
 </template>

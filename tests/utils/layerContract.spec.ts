@@ -626,6 +626,9 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')
+    expect(editableRichText).not.toContain('controls-placement="slot"')
+    expect(editableRichText).not.toContain('<LazyEditControls')
+    expect(editableRichText).not.toContain('sticky top-16')
   })
 
   it('keeps view-card reveal delays short for visible grid rows', () => {
