@@ -104,6 +104,7 @@ watch(
 
 <template>
   <EditLink
+    controls-placement="isolated"
     :link="editLink"
     :parent-uuid="parentUuid"
     :show-quick-edit="
