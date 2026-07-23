@@ -155,14 +155,24 @@ const handleActionSelect = (key: EditAction['key']) => {
 </script>
 
 <template>
+  <div
+    v-if="hasActions && rendersSiblingControls"
+    class="admin-ui-edit-shell"
+  >
+    <slot
+      :actions="actions"
+      :has-actions="hasActions"
+      :select-action="handleActionSelect"
+    />
+    <LazyEditControls
+      :actions="actions"
+      @select="handleActionSelect"
+    />
+  </div>
   <slot
+    v-else
     :actions="actions"
     :has-actions="hasActions"
     :select-action="handleActionSelect"
-  />
-  <LazyEditControls
-    v-if="hasActions && rendersSiblingControls"
-    :actions="actions"
-    @select="handleActionSelect"
   />
 </template>

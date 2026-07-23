@@ -644,6 +644,26 @@ describe('layer contract', () => {
     )
   })
 
+  it('isolates sibling editorial controls without wrapping anonymous output', () => {
+    const editLink = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),
+      'utf8',
+    )
+    const adminCss = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/assets/css/admin-ui.css'),
+      'utf8',
+    )
+
+    expect(editLink).toContain('v-if="hasActions && rendersSiblingControls"')
+    expect(editLink).toContain('class="admin-ui-edit-shell"')
+    expect(editLink).toContain('<slot\n    v-else')
+    expect(adminCss).toContain('.admin-ui-edit-shell')
+    expect(adminCss).toContain('> :first-child')
+    expect(adminCss).toContain(
+      '> :last-child:not([data-admin-ui-controls])',
+    )
+  })
+
   it('normalizes prose edges through a single Drupal field wrapper', () => {
     const baseCss = readFileSync(
       resolve(rootDir, 'layers/theme/app/assets/css/base.css'),
