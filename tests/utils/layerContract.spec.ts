@@ -632,16 +632,15 @@ describe('layer contract', () => {
     expect(editableRichText).not.toContain('<div class="relative">')
   })
 
-  it('allows list items to be reordered without broad nested dragging', () => {
+  it('allows top-level blocks and nested list items to be reordered', () => {
     const textEditor = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
       'utf8',
     )
 
     expect(textEditor).toContain('<UEditorDragHandle')
-    expect(textEditor).toContain(
-      'allowedContainers: [\'bulletList\', \'orderedList\']',
-    )
+    expect(textEditor).toContain('nested')
+    expect(textEditor).not.toContain('allowedContainers')
   })
 
   it('isolates sibling editorial controls without wrapping anonymous output', () => {

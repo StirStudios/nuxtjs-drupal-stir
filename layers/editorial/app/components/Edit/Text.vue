@@ -205,9 +205,7 @@ onMounted(async () => {
 
         <UEditorDragHandle
           :editor="editor"
-          :nested="{
-            allowedContainers: ['bulletList', 'orderedList'],
-          }"
+          nested
         />
       </UEditor>
 
