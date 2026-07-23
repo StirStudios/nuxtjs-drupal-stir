@@ -90,11 +90,7 @@
       @apply mb-0;
     }
 
-    :where(ul) {
-      @apply my-5 ps-6;
-    }
-
-    :where(ol) {
+    :where(ul, ol) {
       @apply my-5 ps-6;
     }
 
@@ -115,7 +111,11 @@
     }
 
     :where(li) {
-      @apply my-1.5 leading-7;
+      @apply leading-7;
+    }
+
+    :where(ul:not(.list-none) > li + li, ol:not(.list-none) > li + li) {
+      @apply mt-1.5;
     }
 
     :where(li > p) {
