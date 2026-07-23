@@ -680,6 +680,9 @@ describe('layer contract', () => {
     expect(baseCss).toContain(
       '& > :where(div:only-child) > :last-child',
     )
+    expect(baseCss).toContain(
+      ':where(ul:not(.list-none) > li + li, ol:not(.list-none) > li + li)',
+    )
   })
 
   it('keeps view-card reveal delays short for visible grid rows', () => {
