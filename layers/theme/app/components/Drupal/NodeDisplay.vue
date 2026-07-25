@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { NodeDefaultProps } from '#stir/types'
 import { usePageContext } from '#stir/composables/usePageContext'
+import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
@@ -40,6 +42,10 @@ const contentSlotNames = computed(() =>
 )
 
 provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
+provideRevealMotionScope(
+  () => props.pageAnimation,
+  { stagger: () => resolveBooleanProp(props.pageAnimationStagger) },
+)
 </script>
 
 <template>

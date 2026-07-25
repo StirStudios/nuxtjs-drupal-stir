@@ -15,7 +15,7 @@ defineProps<{
   quickEditDisabled?: boolean
   quickEditLabel?: string
   fullEditLabel?: string
-  controlsPlacement?: 'sibling' | 'slot'
+  controlsPlacement?: 'sibling' | 'slot' | 'isolated'
 }>()
 
 defineSlots<{

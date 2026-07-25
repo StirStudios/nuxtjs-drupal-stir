@@ -9,6 +9,7 @@ import {
 } from '../../../utils/drupalMediaTypes'
 import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 
 type RevealMode = 'default' | 'gallery'
 
@@ -74,15 +75,17 @@ const mediaComponent = computed(
 
 const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } =
   useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 
 const resolvedDelayMs = computed(() =>
-  props.revealMode === 'gallery'
+  getRevealDelayMs(staggerIndex.value)
+  + (props.revealMode === 'gallery'
     ? getRevealDelayMs(props.index, { mode: 'dense' })
-    : getRevealDelayMs(props.index),
+    : getRevealDelayMs(props.index)),
 )
 
 const revealMotionProps = computed(() =>
-  getRevealMotionProps(props.direction, resolvedDelayMs.value, {
+  getRevealMotionProps(effect.value, resolvedDelayMs.value, {
     // CSS supplies the motion-safe pre-hydration state; Motion owns the reveal.
     ssrVisible: true,
   }),

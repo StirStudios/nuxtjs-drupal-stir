@@ -3,6 +3,7 @@ import { cloneVNode } from 'vue'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
@@ -107,8 +108,13 @@ const sectionClasses = computed(() => {
     .flat()
     .filter(Boolean)
 })
-const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
-const heroMotionProps = useRevealMotionProps(() => props.direction)
+const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+  useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const heroMotionProps = useRevealMotionProps(
+  effect,
+  () => getRevealDelayMs(staggerIndex.value),
+)
 </script>
 
 <template>
