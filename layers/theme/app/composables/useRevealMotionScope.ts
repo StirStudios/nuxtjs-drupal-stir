@@ -35,11 +35,19 @@ export function resolveScopedRevealEffect(
 ): string | undefined {
   const explicit = normalizeScopeEffect(explicitEffect)
 
-  if (!explicit || INHERITED_REVEAL_EFFECTS.has(explicit)) {
+  if (isInheritedRevealEffect(explicit)) {
     return inheritedEffect
   }
 
+  if (!explicit) return inheritedEffect
+
   return DISABLED_REVEAL_EFFECTS.has(explicit) ? undefined : explicit
+}
+
+export function isInheritedRevealEffect(value: unknown): boolean {
+  const normalized = normalizeScopeEffect(value)
+
+  return !normalized || INHERITED_REVEAL_EFFECTS.has(normalized)
 }
 
 export function provideRevealMotionScope(
@@ -63,6 +71,8 @@ export function useRevealMotionScope(
 ) {
   const inheritedScope = inject(revealMotionScopeKey, null)
   const scopeIndex = inheritedScope?.takeIndex() ?? 0
+  const isInherited = computed(() =>
+    isInheritedRevealEffect(toValue(explicitEffect)))
   const effect = computed(() =>
     resolveScopedRevealEffect(
       toValue(explicitEffect),
@@ -73,6 +83,7 @@ export function useRevealMotionScope(
 
   return {
     effect,
+    isInherited,
     staggerIndex,
   }
 }

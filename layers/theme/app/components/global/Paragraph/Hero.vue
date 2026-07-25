@@ -3,7 +3,10 @@ import { cloneVNode } from 'vue'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
-import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
+import {
+  provideRevealMotionScope,
+  useRevealMotionScope,
+} from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
@@ -110,11 +113,16 @@ const sectionClasses = computed(() => {
 })
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
   useRevealMotionConfig()
-const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const { effect, isInherited, staggerIndex } =
+  useRevealMotionScope(() => props.direction)
 const heroMotionProps = useRevealMotionProps(
-  effect,
+  () => isInherited.value ? undefined : effect.value,
   () => getRevealDelayMs(staggerIndex.value),
 )
+
+// Page-wide scroll reveals should never hide above-the-fold hero descendants.
+// Editors can still animate the hero text by choosing an explicit direction.
+provideRevealMotionScope(() => undefined)
 </script>
 
 <template>

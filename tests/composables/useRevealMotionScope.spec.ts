@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { resolveScopedRevealEffect } from '../../layers/theme/app/composables/useRevealMotionScope'
+import {
+  isInheritedRevealEffect,
+  resolveScopedRevealEffect,
+} from '../../layers/theme/app/composables/useRevealMotionScope'
 
 describe('resolveScopedRevealEffect', () => {
   it('inherits when an element has no explicit animation', () => {
@@ -11,5 +14,13 @@ describe('resolveScopedRevealEffect', () => {
     expect(resolveScopedRevealEffect('slide-left', 'fade-up')).toBe('slide-left')
     expect(resolveScopedRevealEffect('off', 'fade-up')).toBeUndefined()
     expect(resolveScopedRevealEffect('none', 'fade-up')).toBeUndefined()
+  })
+
+  it('distinguishes inherited values from explicit opt-outs', () => {
+    expect(isInheritedRevealEffect(undefined)).toBe(true)
+    expect(isInheritedRevealEffect('inherit')).toBe(true)
+    expect(isInheritedRevealEffect('default')).toBe(true)
+    expect(isInheritedRevealEffect('off')).toBe(false)
+    expect(isInheritedRevealEffect('fade-up')).toBe(false)
   })
 })

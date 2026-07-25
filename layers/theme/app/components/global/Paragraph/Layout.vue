@@ -73,6 +73,12 @@ const layoutMotionProps = useRevealMotionProps(
     : undefined,
   () => getRevealDelayMs(staggerIndex.value),
 )
+const headerMotionProps = useRevealMotionProps(
+  () => animationScope.value === 'children'
+    ? resolvedLayoutEffect.value
+    : undefined,
+  () => getRevealDelayMs(staggerIndex.value),
+)
 
 provideRevealMotionScope(
   () => animationScope.value === 'children'
@@ -96,9 +102,14 @@ provideRevealMotionScope(
       :grid-items="gridClass"
       :width="width"
     >
-      <component :is="headerTag || 'h2'" v-if="header" class="col-span-full">
+      <RevealMotionElement
+        v-if="header"
+        :as="headerTag || 'h2'"
+        class="col-span-full"
+        :motion-props="headerMotionProps"
+      >
         {{ props.header }}
-      </component>
+      </RevealMotionElement>
 
       <slot v-if="hasGridItems" name="items" />
 
