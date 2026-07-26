@@ -3,6 +3,7 @@ import {
   isInheritedRevealEffect,
   resolveScopedRevealEffect,
 } from '../../layers/theme/app/composables/useRevealMotionScope'
+import { REVEAL_DEFAULTS } from '../../layers/theme/app/composables/useRevealMotionConfig'
 
 describe('resolveScopedRevealEffect', () => {
   it('inherits when an element has no explicit animation', () => {
@@ -22,5 +23,14 @@ describe('resolveScopedRevealEffect', () => {
     expect(isInheritedRevealEffect('default')).toBe(true)
     expect(isInheritedRevealEffect('off')).toBe(false)
     expect(isInheritedRevealEffect('fade-up')).toBe(false)
+  })
+
+  it('uses the balanced site-wide reveal timing profile', () => {
+    expect(REVEAL_DEFAULTS).toMatchObject({
+      durationMs: 800,
+      staggerMs: 100,
+      threshold: 0.12,
+      rootMargin: '0px 0px -15% 0px',
+    })
   })
 })

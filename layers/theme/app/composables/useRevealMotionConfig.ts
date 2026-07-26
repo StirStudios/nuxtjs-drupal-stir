@@ -24,12 +24,12 @@ type RevealMotionOptions = {
   ssrVisible?: boolean
 }
 
-const REVEAL_DEFAULTS = {
+export const REVEAL_DEFAULTS = {
   durationMs: 800,
-  staggerMs: 250,
+  staggerMs: 100,
   ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
-  threshold: 0,
-  rootMargin: '0px 0px -10% 0px',
+  threshold: 0.12,
+  rootMargin: '0px 0px -15% 0px',
 }
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
