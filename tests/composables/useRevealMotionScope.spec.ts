@@ -27,12 +27,12 @@ describe('resolveScopedRevealEffect', () => {
 
   it('uses the balanced site-wide reveal timing profile', () => {
     expect(REVEAL_DEFAULTS).toMatchObject({
-      durationMs: 800,
-      distancePx: 60,
-      staggerMs: 100,
-      ease: [0.16, 1, 0.3, 1],
-      threshold: 0.12,
-      rootMargin: '0px 0px -15% 0px',
+      durationMs: 850,
+      distancePx: 50,
+      staggerMs: 110,
+      ease: [0.22, 1, 0.36, 1],
+      threshold: 0.1,
+      rootMargin: '-12% 0px -12% 0px',
     })
   })
 })

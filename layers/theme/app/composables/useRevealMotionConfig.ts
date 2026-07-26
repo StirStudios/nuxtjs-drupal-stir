@@ -24,15 +24,16 @@ export type RevealStaggerMode = 'default' | 'dense'
 
 type RevealMotionOptions = {
   ssrVisible?: boolean
+  trigger?: 'enter' | 'in-view'
 }
 
 export const REVEAL_DEFAULTS = {
-  durationMs: 800,
-  distancePx: 60,
-  staggerMs: 100,
-  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-  threshold: 0.12,
-  rootMargin: '0px 0px -15% 0px',
+  durationMs: 850,
+  distancePx: 50,
+  staggerMs: 110,
+  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  threshold: 0.1,
+  rootMargin: '-12% 0px -12% 0px',
 }
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
@@ -234,18 +235,24 @@ export function useRevealMotionConfig() {
 
     return {
       initial: ssrVisible && !hasMounted.value ? false : initial,
-      whileInView: REVEAL_VISIBLE_TARGET,
+      ...(options.trigger === 'enter'
+        ? { animate: REVEAL_VISIBLE_TARGET }
+        : { whileInView: REVEAL_VISIBLE_TARGET }),
       transition: {
         type: 'tween',
         duration: resolved.value.durationMs / 1000,
         ease: resolved.value.ease,
         delay: resolvedDelay,
       },
-      inViewOptions: {
-        once: animateOnce.value,
-        amount: resolved.value.threshold,
-        margin: resolved.value.rootMargin,
-      },
+      ...(options.trigger === 'enter'
+        ? {}
+        : {
+            inViewOptions: {
+              once: animateOnce.value,
+              amount: resolved.value.threshold,
+              margin: resolved.value.rootMargin,
+            },
+          }),
       style: normalizedEffect.startsWith('flip-')
         ? { transformStyle: 'preserve-3d' }
         : undefined,

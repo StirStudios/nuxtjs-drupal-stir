@@ -111,13 +111,19 @@ const sectionClasses = computed(() => {
     .flat()
     .filter(Boolean)
 })
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+const { getRevealDelayMs, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, isInherited, staggerIndex } =
   useRevealMotionScope(() => props.direction)
 const heroMotionProps = useRevealMotionProps(
   () => isInherited.value ? undefined : effect.value,
   () => getRevealDelayMs(staggerIndex.value),
+  {
+    // Explicit hero motion is an SSR-rendered entrance animation, not a
+    // viewport reveal. Inherited page motion continues to skip the hero.
+    ssrVisible: false,
+    trigger: 'enter',
+  },
 )
 
 // Page-wide scroll reveals should never hide above-the-fold hero descendants.
@@ -146,7 +152,6 @@ provideRevealMotionScope(() => undefined)
     <template v-else>
       <section class="relative" :class="sectionClasses">
         <RevealMotion
-          :key="`hero-${revealMotionKey}`"
           as-child
           v-bind="heroMotionProps"
         >
@@ -154,6 +159,7 @@ provideRevealMotionScope(() => undefined)
             :class="[
               heroTheme.text.base,
               isFrontEffective && heroTheme.text.isFront,
+              'motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
           >
             <slot name="title">
