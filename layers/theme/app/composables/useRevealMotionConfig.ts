@@ -4,6 +4,7 @@ import { onMounted, toValue } from 'vue'
 
 type RevealLike = {
   durationMs?: unknown
+  distancePx?: unknown
   staggerMs?: unknown
   ease?: unknown
   threshold?: unknown
@@ -12,6 +13,7 @@ type RevealLike = {
 
 export type RevealMotionResolved = {
   durationMs: number
+  distancePx: number
   staggerMs: number
   ease: [number, number, number, number]
   threshold: number
@@ -26,8 +28,9 @@ type RevealMotionOptions = {
 
 export const REVEAL_DEFAULTS = {
   durationMs: 800,
+  distancePx: 60,
   staggerMs: 100,
-  ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
+  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
   threshold: 0.12,
   rootMargin: '0px 0px -15% 0px',
 }
@@ -123,6 +126,21 @@ function normalizeRevealEffect(effect: string | undefined): string | undefined {
     : undefined
 }
 
+function resolveRevealInitialTarget(
+  effect: string,
+  distancePx: number,
+): MotionEffectTarget | undefined {
+  const target = REVEAL_HIDDEN_TARGETS[effect]
+
+  if (!target) return undefined
+
+  return {
+    ...target,
+    x: target.x === undefined ? undefined : Math.sign(target.x) * distancePx,
+    y: target.y === undefined ? undefined : Math.sign(target.y) * distancePx,
+  }
+}
+
 export function useRevealConfig() {
   const theme = useAppConfig().stirTheme
 
@@ -132,6 +150,10 @@ export function useRevealConfig() {
 
   const resolved = computed<RevealMotionResolved>(() => ({
     durationMs: toFiniteNumber(raw.value.durationMs, REVEAL_DEFAULTS.durationMs),
+    distancePx: Math.max(
+      0,
+      toFiniteNumber(raw.value.distancePx, REVEAL_DEFAULTS.distancePx),
+    ),
     staggerMs: toFiniteNumber(raw.value.staggerMs, REVEAL_DEFAULTS.staggerMs),
     ease: toCubicBezier(raw.value.ease, REVEAL_DEFAULTS.ease),
     threshold: toFiniteNumber(raw.value.threshold, REVEAL_DEFAULTS.threshold),
@@ -201,7 +223,10 @@ export function useRevealMotionConfig() {
       return { initial: false }
     }
 
-    const initial = REVEAL_HIDDEN_TARGETS[normalizedEffect]
+    const initial = resolveRevealInitialTarget(
+      normalizedEffect,
+      resolved.value.distancePx,
+    )
 
     if (!initial) {
       return { initial: false }
