@@ -216,9 +216,12 @@ export default defineAppConfig({
     animations: {
       once: true,
       reveal: {
-        durationMs: 1200,
-        staggerMs: 250,
+        durationMs: 850,
+        distancePx: 50,
+        staggerMs: 110,
         ease: [0.22, 1, 0.36, 1],
+        threshold: 0.1,
+        rootMargin: '-12% 0px -12% 0px',
       },
     },
 

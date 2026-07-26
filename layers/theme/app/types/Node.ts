@@ -20,6 +20,8 @@ export interface NodeCommonProps {
   uid?: string | object
   hide?: boolean | string
   path?: DrupalNodePath
+  pageAnimation?: string
+  pageAnimationStagger?: boolean | number | string
 }
 
 export interface NodeDefaultProps extends NodeCommonProps {

@@ -4,6 +4,7 @@ import { onMounted, toValue } from 'vue'
 
 type RevealLike = {
   durationMs?: unknown
+  distancePx?: unknown
   staggerMs?: unknown
   ease?: unknown
   threshold?: unknown
@@ -12,6 +13,7 @@ type RevealLike = {
 
 export type RevealMotionResolved = {
   durationMs: number
+  distancePx: number
   staggerMs: number
   ease: [number, number, number, number]
   threshold: number
@@ -22,14 +24,16 @@ export type RevealStaggerMode = 'default' | 'dense'
 
 type RevealMotionOptions = {
   ssrVisible?: boolean
+  trigger?: 'enter' | 'in-view'
 }
 
-const REVEAL_DEFAULTS = {
-  durationMs: 800,
-  staggerMs: 250,
-  ease: [0.42, 0, 0.58, 1] as [number, number, number, number],
-  threshold: 0,
-  rootMargin: '0px 0px -10% 0px',
+export const REVEAL_DEFAULTS = {
+  durationMs: 850,
+  distancePx: 50,
+  staggerMs: 110,
+  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  threshold: 0.1,
+  rootMargin: '-12% 0px -12% 0px',
 }
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
@@ -54,6 +58,10 @@ const REVEAL_HIDDEN_TARGETS: Record<string, MotionEffectTarget> = {
   'fade-down': { opacity: 0, y: -100 },
   'fade-left': { opacity: 0, x: -100 },
   'fade-right': { opacity: 0, x: 100 },
+  'fade-up-right': { opacity: 0, x: 100, y: 100 },
+  'fade-up-left': { opacity: 0, x: -100, y: 100 },
+  'fade-down-right': { opacity: 0, x: 100, y: -100 },
+  'fade-down-left': { opacity: 0, x: -100, y: -100 },
   'flip-up': { opacity: 0, rotateX: 90 },
   'flip-down': { opacity: 0, rotateX: -90 },
   'flip-left': { opacity: 0, rotateY: -90 },
@@ -119,6 +127,21 @@ function normalizeRevealEffect(effect: string | undefined): string | undefined {
     : undefined
 }
 
+function resolveRevealInitialTarget(
+  effect: string,
+  distancePx: number,
+): MotionEffectTarget | undefined {
+  const target = REVEAL_HIDDEN_TARGETS[effect]
+
+  if (!target) return undefined
+
+  return {
+    ...target,
+    x: target.x === undefined ? undefined : Math.sign(target.x) * distancePx,
+    y: target.y === undefined ? undefined : Math.sign(target.y) * distancePx,
+  }
+}
+
 export function useRevealConfig() {
   const theme = useAppConfig().stirTheme
 
@@ -128,6 +151,10 @@ export function useRevealConfig() {
 
   const resolved = computed<RevealMotionResolved>(() => ({
     durationMs: toFiniteNumber(raw.value.durationMs, REVEAL_DEFAULTS.durationMs),
+    distancePx: Math.max(
+      0,
+      toFiniteNumber(raw.value.distancePx, REVEAL_DEFAULTS.distancePx),
+    ),
     staggerMs: toFiniteNumber(raw.value.staggerMs, REVEAL_DEFAULTS.staggerMs),
     ease: toCubicBezier(raw.value.ease, REVEAL_DEFAULTS.ease),
     threshold: toFiniteNumber(raw.value.threshold, REVEAL_DEFAULTS.threshold),
@@ -197,7 +224,10 @@ export function useRevealMotionConfig() {
       return { initial: false }
     }
 
-    const initial = REVEAL_HIDDEN_TARGETS[normalizedEffect]
+    const initial = resolveRevealInitialTarget(
+      normalizedEffect,
+      resolved.value.distancePx,
+    )
 
     if (!initial) {
       return { initial: false }
@@ -205,18 +235,24 @@ export function useRevealMotionConfig() {
 
     return {
       initial: ssrVisible && !hasMounted.value ? false : initial,
-      whileInView: REVEAL_VISIBLE_TARGET,
+      ...(options.trigger === 'enter'
+        ? { animate: REVEAL_VISIBLE_TARGET }
+        : { whileInView: REVEAL_VISIBLE_TARGET }),
       transition: {
         type: 'tween',
         duration: resolved.value.durationMs / 1000,
         ease: resolved.value.ease,
         delay: resolvedDelay,
       },
-      inViewOptions: {
-        once: animateOnce.value,
-        amount: resolved.value.threshold,
-        margin: resolved.value.rootMargin,
-      },
+      ...(options.trigger === 'enter'
+        ? {}
+        : {
+            inViewOptions: {
+              once: animateOnce.value,
+              amount: resolved.value.threshold,
+              margin: resolved.value.rootMargin,
+            },
+          }),
       style: normalizedEffect.startsWith('flip-')
         ? { transformStyle: 'preserve-3d' }
         : undefined,

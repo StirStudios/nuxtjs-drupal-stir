@@ -3,6 +3,7 @@ import {
   buildLayoutEditLinkIndex,
   layoutEditLinksKey,
 } from '../../utils/layoutEditLinks'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
   forcedLayout?: string
@@ -26,6 +27,15 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
+const pageContentProps = computed(() => {
+  return (page.value?.content?.props || {}) as {
+    pageAnimation?: string
+    pageAnimationStagger?: boolean | number | string
+  }
+})
+const pageAnimation = computed(() => pageContentProps.value.pageAnimation)
+const pageAnimationStagger = computed(() =>
+  resolveBooleanProp(pageContentProps.value.pageAnimationStagger))
 const layout = computed(() => props.forcedLayout || pageLayout.value || 'default')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
@@ -130,9 +140,19 @@ function getErrorPayload(
       :render-custom-elements="renderCustomElements"
       :theme="theme"
     >
-      <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
-      <component :is="renderCustomElements(page.content)" v-if="page?.content" />
-      <LazyRegionArea area="after_main" hydrate-on-visible />
+      <PageRevealScope
+        :effect="pageAnimation"
+        :stagger="pageAnimationStagger"
+      >
+        <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
+        <component :is="renderCustomElements(page.content)" v-if="page?.content" />
+        <LazyRegionArea area="after_main" />
+        <LazyRegionArea
+          v-if="theme.footer?.showSubFooterRegion !== false"
+          area="sub_footer"
+          as="aside"
+        />
+      </PageRevealScope>
     </slot>
   </NuxtLayout>
 </template>

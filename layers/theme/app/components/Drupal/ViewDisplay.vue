@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DrupalViewProps } from '#stir/types'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type { RenderedDrupalViewRow } from '#stir/composables/useDrupalViewRows'
 import { useDrupalViewRenderedRows } from '#stir/composables/useDrupalViewRows'
@@ -113,6 +114,7 @@ const scrollRestoreEnabled = computed(() =>
   !props.carousel && shouldPersistDrupalViewScroll(effectivePager.value?.totalPages),
 )
 const { getRevealDelayMs, getRevealMotionProps, revealMotionKey } = useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(props, {
   currentPage,
   enabled: scrollRestoreEnabled,
@@ -121,8 +123,9 @@ const { handleViewClick, restoreScrollPosition } = useDrupalViewScrollRestore(pr
 
 const getRowMotionProps = (index: number) =>
   getRevealMotionProps(
-    props.direction,
-    getRevealDelayMs(index, { mode: 'dense' }),
+    effect.value,
+    getRevealDelayMs(staggerIndex.value)
+    + getRevealDelayMs(index, { mode: 'dense' }),
     { ssrVisible: true },
   )
 

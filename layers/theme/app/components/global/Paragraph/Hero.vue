@@ -3,6 +3,10 @@ import { cloneVNode } from 'vue'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import {
+  provideRevealMotionScope,
+  useRevealMotionScope,
+} from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
@@ -107,8 +111,24 @@ const sectionClasses = computed(() => {
     .flat()
     .filter(Boolean)
 })
-const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
-const heroMotionProps = useRevealMotionProps(() => props.direction)
+const { getRevealDelayMs, useRevealMotionProps } =
+  useRevealMotionConfig()
+const { effect, isInherited, staggerIndex } =
+  useRevealMotionScope(() => props.direction)
+const heroMotionProps = useRevealMotionProps(
+  () => isInherited.value ? undefined : effect.value,
+  () => getRevealDelayMs(staggerIndex.value),
+  {
+    // Explicit hero motion is an SSR-rendered entrance animation, not a
+    // viewport reveal. Inherited page motion continues to skip the hero.
+    ssrVisible: false,
+    trigger: 'enter',
+  },
+)
+
+// Page-wide scroll reveals should never hide above-the-fold hero descendants.
+// Editors can still animate the hero text by choosing an explicit direction.
+provideRevealMotionScope(() => undefined)
 </script>
 
 <template>
@@ -132,7 +152,6 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
     <template v-else>
       <section class="relative" :class="sectionClasses">
         <RevealMotion
-          :key="`hero-${revealMotionKey}`"
           as-child
           v-bind="heroMotionProps"
         >
@@ -140,6 +159,7 @@ const heroMotionProps = useRevealMotionProps(() => props.direction)
             :class="[
               heroTheme.text.base,
               isFrontEffective && heroTheme.text.isFront,
+              'motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
           >
             <slot name="title">

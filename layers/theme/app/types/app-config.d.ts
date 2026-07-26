@@ -349,6 +349,7 @@ export type StirThemeAuthBackButtonConfig = StirThemeButtonLikeConfig & {
 
 type StirThemeRevealConfig = {
   durationMs?: number
+  distancePx?: number
   threshold?: number
   rootMargin?: string
   staggerMs?: number

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { useOptimizedDrupalHtml } from '#stir/composables/useOptimizedDrupalHtml'
 import type { EditableRichTextProps } from '#stir/types'
 import {
@@ -50,8 +51,13 @@ const canInlineEdit = computed(
   () => isAdministrator.value && editTarget.value !== null,
 )
 const richTextClass = 'prose max-w-none'
-const { revealMotionKey, useRevealMotionProps } = useRevealMotionConfig()
-const motionProps = useRevealMotionProps(() => props.direction)
+const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+  useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const motionProps = useRevealMotionProps(
+  effect,
+  () => getRevealDelayMs(staggerIndex.value),
+)
 const hasRevealMotion = computed(() => 'whileInView' in motionProps.value)
 
 async function startEditing() {

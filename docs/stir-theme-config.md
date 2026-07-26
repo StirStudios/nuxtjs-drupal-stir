@@ -607,8 +607,26 @@ hero: {
 ```ts
 animations: {
   once: false,
+  reveal: {
+    durationMs: 800,
+    staggerMs: 250,
+    threshold: 0,
+    rootMargin: '0px 0px -10% 0px',
+  },
 },
 ```
+
+Drupal page and Layout paragraph animation settings form an inheritance chain:
+
+1. A node's `pageAnimation` is the default for supported page content.
+2. A Layout paragraph can inherit that value, replace it for eligible children,
+   or animate the whole layout as one unit.
+3. Text, Media, Hero, and View paragraph `direction` values override the
+   inherited effect. `off` explicitly disables inherited animation.
+
+When staggering is enabled at page or Layout scope, eligible children consume
+the configured `reveal.staggerMs` delay in content order. Reduced-motion
+preferences always disable movement.
 
 ### 🧱 Grid separator
 

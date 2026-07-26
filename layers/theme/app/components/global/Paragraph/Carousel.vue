@@ -8,6 +8,11 @@ import {
   carouselImageDeliverySizesKey,
   resolveCarouselImageDeliverySizes,
 } from '#stir/utils/imageDelivery'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import {
+  provideRevealMotionScope,
+  useRevealMotionScope,
+} from '#stir/composables/useRevealMotionScope'
 
 const props = defineProps<{
   id?: number | string
@@ -24,6 +29,7 @@ const props = defineProps<{
 
   header?: string
   headerTag?: string
+  direction?: string
 
   carouselIndicators?: boolean
   carouselArrows?: boolean
@@ -60,8 +66,17 @@ const carouselImageDeliverySizes = computed(() =>
     theme.media.image.profiles.full,
   ),
 )
+const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+  useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const carouselMotionProps = useRevealMotionProps(
+  effect,
+  () => getRevealDelayMs(staggerIndex.value),
+)
 
 provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
+// The carousel enters as one unit; its media slides should not double animate.
+provideRevealMotionScope(() => undefined)
 
 onMounted(() => {
   mounted.value = true
@@ -194,45 +209,48 @@ function releasePointerArrowFocus(event: PointerEvent) {
 </script>
 
 <template>
-  <div
-    ref="carouselRoot"
+  <RevealMotionElement
+    :key="`carousel-${id}-${revealMotionKey}`"
     class="relative z-10"
     :class="[theme.carousel.padding, width, spacing]"
+    :motion-props="carouselMotionProps"
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"
   >
-    <component :is="headerTag || 'h2'" v-if="header">
-      {{ header }}
-    </component>
+    <div ref="carouselRoot">
+      <component :is="headerTag || 'h2'" v-if="header">
+        {{ header }}
+      </component>
 
-    <UCarousel
-      v-if="slides.length"
-      ref="carousel"
-      v-slot="{ item }"
-      :aria-label="carouselLabel"
-      :arrows="mounted ? carouselArrows : false"
-      :auto-height="carouselAutoheight"
-      :auto-scroll="autoScrollOptions"
-      :autoplay="autoplayOptions"
-      :dots="carouselIndicators"
-      :fade="carouselFade"
-      :items="slides"
-      loop
-      :next="nextButton"
-      :next-icon="theme.carousel.arrows?.nextIcon"
-      :prev="prevButton"
-      :prev-icon="theme.carousel.arrows?.prevIcon"
-      :ui="{
-        root: ['stir-carousel', theme.carousel.root],
-        container: 'items-center transition-[height]',
-        item: gridItems,
-      }"
-    >
-      <WrapDiv :styles="gridItems">
-        <component :is="item.vnode" :key="item.key" />
-      </WrapDiv>
-    </UCarousel>
-  </div>
+      <UCarousel
+        v-if="slides.length"
+        ref="carousel"
+        v-slot="{ item }"
+        :aria-label="carouselLabel"
+        :arrows="mounted ? carouselArrows : false"
+        :auto-height="carouselAutoheight"
+        :auto-scroll="autoScrollOptions"
+        :autoplay="autoplayOptions"
+        :dots="carouselIndicators"
+        :fade="carouselFade"
+        :items="slides"
+        loop
+        :next="nextButton"
+        :next-icon="theme.carousel.arrows?.nextIcon"
+        :prev="prevButton"
+        :prev-icon="theme.carousel.arrows?.prevIcon"
+        :ui="{
+          root: ['stir-carousel', theme.carousel.root],
+          container: 'items-center transition-[height]',
+          item: gridItems,
+        }"
+      >
+        <WrapDiv :styles="gridItems">
+          <component :is="item.vnode" :key="item.key" />
+        </WrapDiv>
+      </UCarousel>
+    </div>
+  </RevealMotionElement>
 </template>
 
 <style>

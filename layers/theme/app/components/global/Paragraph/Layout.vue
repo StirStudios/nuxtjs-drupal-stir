@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { slugify } from '#stir/utils/stringUtils'
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import {
+  provideRevealMotionScope,
+  useRevealMotionScope,
+} from '#stir/composables/useRevealMotionScope'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 defineOptions({
   inheritAttrs: false,
@@ -27,6 +33,9 @@ const props = defineProps<{
   reverseMobile?: boolean
 
   randomize?: boolean
+  direction?: string
+  animationScope?: 'children' | 'layout'
+  animationStagger?: boolean | number | string
   editLink?: string
 }>()
 
@@ -53,19 +62,54 @@ const sectionId = computed(() => {
   if (props.label) return slugify(props.label)
   return `section-${props.id ?? 'unknown'}`
 })
+const animationScope = computed(() => props.animationScope || 'children')
+const { effect: resolvedLayoutEffect, staggerIndex } =
+  useRevealMotionScope(() => props.direction)
+const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+  useRevealMotionConfig()
+const layoutMotionProps = useRevealMotionProps(
+  () => animationScope.value === 'layout'
+    ? resolvedLayoutEffect.value
+    : undefined,
+  () => getRevealDelayMs(staggerIndex.value),
+)
+const headerMotionProps = useRevealMotionProps(
+  () => animationScope.value === 'children'
+    ? resolvedLayoutEffect.value
+    : undefined,
+  () => getRevealDelayMs(staggerIndex.value),
+)
+
+provideRevealMotionScope(
+  () => animationScope.value === 'children'
+    ? resolvedLayoutEffect.value
+    : undefined,
+  { stagger: () => resolveBooleanProp(props.animationStagger) },
+)
 </script>
 
 <template>
-  <section :id="sectionId" :class="[classes || 'content', spacing]">
+  <RevealMotionElement
+    :id="sectionId"
+    :key="`layout-${id}-${revealMotionKey}`"
+    as="section"
+    :class="[classes || 'content', spacing]"
+    :motion-props="layoutMotionProps"
+  >
     <WrapGrid
       :card="card"
       :container="container"
       :grid-items="gridClass"
       :width="width"
     >
-      <component :is="headerTag || 'h2'" v-if="header" class="col-span-full">
+      <RevealMotionElement
+        v-if="header"
+        :as="headerTag || 'h2'"
+        class="col-span-full"
+        :motion-props="headerMotionProps"
+      >
         {{ props.header }}
-      </component>
+      </RevealMotionElement>
 
       <slot v-if="hasGridItems" name="items" />
 
@@ -84,5 +128,5 @@ const sectionId = computed(() => {
         </div>
       </template>
     </WrapGrid>
-  </section>
+  </RevealMotionElement>
 </template>

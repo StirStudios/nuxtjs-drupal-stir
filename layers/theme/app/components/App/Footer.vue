@@ -123,12 +123,6 @@ const shouldRenderFooter = computed(() =>
 </script>
 
 <template>
-  <LazyRegionArea
-    v-if="footerConfig.showSubFooterRegion"
-    area="sub_footer"
-    as="aside"
-  />
-
   <UFooter
     v-if="shouldRenderFooter"
     aria-label="Site Footer"
