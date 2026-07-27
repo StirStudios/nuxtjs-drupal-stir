@@ -46,7 +46,10 @@ const sourceText = computed(() => {
   )
 })
 
-const trustedTextHtml = useOptimizedDrupalHtml(renderedText)
+const trustedTextHtml = useOptimizedDrupalHtml(
+  renderedText,
+  () => props.classes,
+)
 const canInlineEdit = computed(
   () => isAdministrator.value && editTarget.value !== null,
 )

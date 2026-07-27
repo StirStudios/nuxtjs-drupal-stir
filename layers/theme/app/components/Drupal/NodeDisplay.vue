@@ -3,6 +3,11 @@ import type { NodeDefaultProps } from '#stir/types'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import {
+  carouselImageDeliverySizesKey,
+  carouselNestedImageDeliveryProfileKey,
+  layoutImageDeliveryProfileKey,
+} from '#stir/utils/imageDelivery'
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
@@ -40,8 +45,34 @@ const reservedSlotNames = new Set(['hero', 'teaser', 'article', 'default', 'uid'
 const contentSlotNames = computed(() =>
   Object.keys(slots).filter((name) => !reservedSlotNames.has(name)),
 )
+const theme = useAppConfig().stirTheme
+const parentCarouselImageDeliverySizes = inject(
+  carouselImageDeliverySizesKey,
+  undefined,
+)
+const parentLayoutImageDeliveryProfile = inject(
+  layoutImageDeliveryProfileKey,
+  undefined,
+)
+const carouselNestedImageDeliveryProfile = inject(
+  carouselNestedImageDeliveryProfileKey,
+  undefined,
+)
+const nestedImageDeliveryProfile = computed(() =>
+  carouselNestedImageDeliveryProfile?.value
+  || parentLayoutImageDeliveryProfile?.value,
+)
+const nestedCarouselImageDeliverySizes = computed(() => {
+  const profile = carouselNestedImageDeliveryProfile?.value
+
+  return profile
+    ? theme.media.image.profiles[profile]
+    : parentCarouselImageDeliverySizes?.value
+})
 
 provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
+provide(carouselImageDeliverySizesKey, nestedCarouselImageDeliverySizes)
+provide(layoutImageDeliveryProfileKey, nestedImageDeliveryProfile)
 provideRevealMotionScope(
   () => props.pageAnimation,
   { stagger: () => resolveBooleanProp(props.pageAnimationStagger) },

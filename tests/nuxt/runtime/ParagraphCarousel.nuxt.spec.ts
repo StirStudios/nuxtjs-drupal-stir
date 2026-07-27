@@ -59,6 +59,28 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
   })
 
+  it('does not initialize autoplay for a single slide', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        carouselInterval: 10000,
+        items: [h('article', 'Only slide')],
+      },
+    })
+
+    expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoplay')).toBe(false)
+  })
+
+  it('does not initialize auto-scroll for a single slide', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        carouselAutoscroll: true,
+        items: [h('article', 'Only slide')],
+      },
+    })
+
+    expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
+  })
+
   it('releases arrow focus after pointer activation', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
