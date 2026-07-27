@@ -1,5 +1,5 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { h, ref } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ParagraphCarousel from '../../../layers/theme/app/components/global/Paragraph/Carousel.vue'
 
@@ -79,6 +79,32 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     })
 
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
+  })
+
+  it('passes an explicit card profile to nested Drupal node slides', async () => {
+    const NodeSlide = defineComponent({
+      name: 'NodeSlide',
+      props: {
+        imageDeliveryProfile: String,
+        uid: String,
+      },
+      setup: props => () => h(
+        'article',
+        { 'data-delivery-profile': props.imageDeliveryProfile },
+        'Nested node',
+      ),
+    })
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        items: [
+          h(NodeSlide, { uid: '2' }),
+          h(NodeSlide, { uid: '3' }),
+        ],
+      },
+    })
+
+    expect(wrapper.find('[data-delivery-profile="card"]').exists()).toBe(true)
+    expect(wrapper.getComponent(NodeSlide).props('imageDeliveryProfile')).toBe('card')
   })
 
   it('releases arrow focus after pointer activation', async () => {

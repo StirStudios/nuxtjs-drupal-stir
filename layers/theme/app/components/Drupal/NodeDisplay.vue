@@ -11,10 +11,12 @@ import {
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
+    imageDeliveryProfile?: string
     showBeforeMain?: boolean
     teaserModes?: string[]
   }>(),
   {
+    imageDeliveryProfile: undefined,
     showBeforeMain: true,
     teaserModes: () => ['teaser', 'listing', 'card'],
   },
@@ -59,11 +61,13 @@ const carouselNestedImageDeliveryProfile = inject(
   undefined,
 )
 const nestedImageDeliveryProfile = computed(() =>
-  carouselNestedImageDeliveryProfile?.value
+  props.imageDeliveryProfile
+  || carouselNestedImageDeliveryProfile?.value
   || parentLayoutImageDeliveryProfile?.value,
 )
 const nestedCarouselImageDeliverySizes = computed(() => {
-  const profile = carouselNestedImageDeliveryProfile?.value
+  const profile = props.imageDeliveryProfile
+    || carouselNestedImageDeliveryProfile?.value
 
   return profile
     ? theme.media.image.profiles[profile]

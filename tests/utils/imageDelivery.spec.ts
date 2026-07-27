@@ -69,6 +69,13 @@ describe('resolveLayoutImageDeliveryProfile', () => {
       'grid-cols-1',
     )).toBeUndefined()
   })
+
+  it('uses split delivery for a constrained one-column layout', () => {
+    expect(resolveLayoutImageDeliveryProfile(
+      'one_column',
+      'grid grid-cols-1 sm:max-w-lg',
+    )).toBe('split')
+  })
 })
 
 describe('resolveCarouselImageDeliverySizes', () => {

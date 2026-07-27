@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
+import { cloneVNode, type VNode } from 'vue'
 import { useIntersectionObserver, usePreferredReducedMotion } from '@vueuse/core'
 import {
   resolveCarouselArrowButton,
@@ -103,9 +103,17 @@ const slides = computed(() => {
 
   return raw.map((vnode, i) => {
     const typedNode = vnode as VNode
+    const vnodeProps = typedNode.props as Record<string, unknown> | null
+    const isDrupalNode = vnodeProps !== null && 'uid' in vnodeProps
+    const renderedVNode =
+      isDrupalNode && carouselNestedImageDeliveryProfile.value
+        ? cloneVNode(typedNode, {
+            imageDeliveryProfile: carouselNestedImageDeliveryProfile.value,
+          })
+        : typedNode
 
     return {
-      vnode: typedNode,
+      vnode: renderedVNode,
       key: typedNode.key ?? i,
     }
   })

@@ -22,6 +22,9 @@ export function resolveLayoutImageDeliveryProfile(
   if (maximumColumns >= 3) return 'card'
   if (maximumColumns === 2 || layout?.startsWith('two_column')) return 'split'
   if (layout === 'grid') return 'card'
+  if (/(?:^|\s)(?:\w+:)*max-w-(?:xs|sm|md|lg|xl|[2-7]xl)(?:\s|$)/.test(values)) {
+    return 'split'
+  }
 
   return undefined
 }
