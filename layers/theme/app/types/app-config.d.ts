@@ -307,7 +307,7 @@ type StirThemeErrorConfig = {
   color?: UiColorName
   size?: UiSizeName
   icon?: string
-  variant?: UiButtonVariantName
+  variant?: Exclude<UiButtonVariantName, 'material'>
 } & LooseRecord
 
 export type StirThemeAuthConfig = {
