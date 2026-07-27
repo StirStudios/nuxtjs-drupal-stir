@@ -6,6 +6,7 @@ import {
 } from '#stir/utils/nuxtUiProps'
 import {
   carouselImageDeliverySizesKey,
+  carouselNestedImageDeliveryProfileKey,
   resolveCarouselImageDeliverySizes,
 } from '#stir/utils/imageDelivery'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
@@ -66,6 +67,11 @@ const carouselImageDeliverySizes = computed(() =>
     theme.media.image.profiles.full,
   ),
 )
+const carouselNestedImageDeliveryProfile = computed(() =>
+  carouselImageDeliverySizes.value === theme.media.image.profiles.full
+    ? 'card'
+    : undefined,
+)
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
@@ -75,6 +81,10 @@ const carouselMotionProps = useRevealMotionProps(
 )
 
 provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
+provide(
+  carouselNestedImageDeliveryProfileKey,
+  carouselNestedImageDeliveryProfile,
+)
 // The carousel enters as one unit; its media slides should not double animate.
 provideRevealMotionScope(() => undefined)
 
@@ -115,7 +125,9 @@ const autoScrollSpeed = computed(() => {
 })
 
 const autoScrollOptions = computed(() =>
-  props.carouselAutoscroll && preferredMotion.value !== 'reduce'
+  slides.value.length > 1
+  && props.carouselAutoscroll
+  && preferredMotion.value !== 'reduce'
     ? {
         speed: autoScrollSpeed.value,
         startDelay: 0,
@@ -126,7 +138,9 @@ const autoScrollOptions = computed(() =>
 )
 
 const autoplayOptions = computed(() =>
-  !props.carouselAutoscroll && preferredMotion.value !== 'reduce'
+  slides.value.length > 1
+  && !props.carouselAutoscroll
+  && preferredMotion.value !== 'reduce'
     ? {
         delay: interval.value,
         playOnInit: false,
@@ -153,6 +167,7 @@ function autoplayPlugin() {
 function syncAutoplay() {
   if (
     !mounted.value
+    || slides.value.length <= 1
     || props.carouselAutoscroll
     || preferredMotion.value === 'reduce'
     || !carouselIsVisible.value

@@ -33,6 +33,7 @@ describe('optimizeDrupalRichTextImages', () => {
       800,
       {
         alignment: 'left',
+        containerClass: undefined,
         structured: true,
       },
     )
@@ -59,7 +60,29 @@ describe('optimizeDrupalRichTextImages', () => {
       600,
       {
         alignment: undefined,
+        containerClass: undefined,
         structured: false,
+      },
+    )
+  })
+
+  it('provides the nearest rich-text grid class as image context', () => {
+    const resolve = vi.fn(() => ({
+      src: '/_ipx/s_640x480/https://cdn.example/grid.jpg',
+      srcset: '/_ipx/s_640x480/https://cdn.example/grid.jpg 640w',
+    }))
+    const html = '<div class="grid md:grid-cols-2 lg:grid-cols-3"><drupal-media data-original-src="https://cdn.example/grid.jpg"><img src="/grid.jpg" width="1200" height="900"></drupal-media></div>'
+
+    optimizeDrupalRichTextImages(html, resolve)
+
+    expect(resolve).toHaveBeenCalledWith(
+      'https://cdn.example/grid.jpg',
+      1200,
+      900,
+      {
+        alignment: undefined,
+        containerClass: 'grid md:grid-cols-2 lg:grid-cols-3',
+        structured: true,
       },
     )
   })

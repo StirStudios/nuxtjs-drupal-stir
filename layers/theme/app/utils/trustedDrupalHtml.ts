@@ -8,6 +8,7 @@ export interface RichTextImageResolution {
 
 export interface RichTextImageContext {
   alignment?: 'center' | 'left' | 'right'
+  containerClass?: string
   structured: boolean
 }
 
@@ -57,6 +58,22 @@ function setAttribute(tag: string, name: string, value: string): string {
   return withoutAttribute.replace(/\s*\/?>(?=\s*$)/, ` ${name}="${escapeAttribute(value)}">`)
 }
 
+function enclosingTag(
+  sourceHtml: string,
+  offset: number,
+  tagName: string,
+): string {
+  const enclosingStart = sourceHtml.lastIndexOf(`<${tagName}`, offset)
+  const enclosingEnd = sourceHtml.lastIndexOf(`</${tagName}>`, offset)
+
+  return enclosingStart > enclosingEnd
+    ? sourceHtml.slice(
+        enclosingStart,
+        sourceHtml.indexOf('>', enclosingStart) + 1,
+      )
+    : ''
+}
+
 /**
  * Enhances trusted Drupal rich-text images with the configured image provider.
  *
@@ -68,11 +85,8 @@ export function optimizeDrupalRichTextImages(
   resolve: RichTextImageResolver,
 ): string {
   return html.replace(/<img\b[^>]*>/gi, (tag, offset, sourceHtml: string) => {
-    const enclosingStart = sourceHtml.lastIndexOf('<drupal-media', offset)
-    const enclosingEnd = sourceHtml.lastIndexOf('</drupal-media>', offset)
-    const mediaTag = enclosingStart > enclosingEnd
-      ? sourceHtml.slice(enclosingStart, sourceHtml.indexOf('>', enclosingStart) + 1)
-      : ''
+    const mediaTag = enclosingTag(sourceHtml, offset, 'drupal-media')
+    const containerTag = enclosingTag(sourceHtml, offset, 'div')
     const originalSource = attribute(mediaTag, 'data-original-src')
       || attribute(tag, 'data-original-src')
       || attribute(tag, 'originalsrc')
@@ -100,6 +114,7 @@ export function optimizeDrupalRichTextImages(
       numberAttribute(tag, 'height'),
       {
         alignment,
+        containerClass: attribute(containerTag, 'class'),
         structured: Boolean(mediaTag),
       },
     )
