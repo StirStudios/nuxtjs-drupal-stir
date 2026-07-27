@@ -6,6 +6,10 @@ import {
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import {
+  layoutImageDeliveryProfileKey,
+  resolveLayoutImageDeliveryProfile,
+} from '#stir/utils/imageDelivery'
 
 defineOptions({
   inheritAttrs: false,
@@ -45,6 +49,9 @@ const isGridLayout = computed(
   () => props.layout === 'grid' || props.layout?.startsWith('grid_col') === true,
 )
 const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
+const imageDeliveryProfile = computed(() =>
+  resolveLayoutImageDeliveryProfile(props.layout, props.gridClass),
+)
 const reversesTwoColumnMobileStack = computed(
   () => props.reverseMobile === true && props.layout?.startsWith('two_column') === true,
 )
@@ -86,6 +93,7 @@ provideRevealMotionScope(
     : undefined,
   { stagger: () => resolveBooleanProp(props.animationStagger) },
 )
+provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
 </script>
 
 <template>

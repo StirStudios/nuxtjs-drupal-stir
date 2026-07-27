@@ -2,6 +2,27 @@ import type { ComputedRef, InjectionKey } from 'vue'
 
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
+export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =
+  Symbol('stirLayoutImageDeliveryProfile')
+
+export function resolveLayoutImageDeliveryProfile(
+  layout: string | undefined,
+  gridClass: string | undefined,
+): string | undefined {
+  const values = `${layout || ''} ${gridClass || ''}`
+  const columns = [...values.matchAll(
+    /(?:^|[:\s])(?:grid-cols-|grid_col_|col_?)(\d+)(?:\s|$)/g,
+  )]
+    .map(match => Number(match[1]))
+    .filter(Number.isFinite)
+  const maximumColumns = columns.length > 0 ? Math.max(...columns) : 0
+
+  if (maximumColumns >= 3) return 'card'
+  if (maximumColumns === 2 || layout?.startsWith('two_column')) return 'split'
+  if (layout === 'grid') return 'card'
+
+  return undefined
+}
 
 export function resolveCarouselImageDeliverySizes(
   gridItems: string | undefined,
@@ -15,11 +36,17 @@ export function resolveCarouselImageDeliverySizes(
 
   if (!itemClasses) return profile
 
-  const hasMultiItemWidth = /(?:^|:|\s)(?:basis|w)-(?:1\/[2-9]|[2-9]\/[3-9])(?:\s|$)/.test(
-    itemClasses,
-  )
+  const responsiveWidths = [...itemClasses.matchAll(
+    /(?:^|\s)(?:(sm|md|lg|xl|2xl):)?(?:basis|w)-(\d+)\/(\d+)(?=\s|$)/g,
+  )].map(([, breakpoint, numerator, denominator]) => {
+    const width = Math.round(Number(numerator) / Number(denominator) * 100)
 
-  return hasMultiItemWidth ? undefined : profile
+    return `${breakpoint || 'sm'}:${width}vw`
+  })
+
+  return responsiveWidths.length > 0
+    ? responsiveWidths.join(' ')
+    : profile
 }
 
 export function versionImageSource(
