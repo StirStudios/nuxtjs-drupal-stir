@@ -50,7 +50,10 @@ const isGridLayout = computed(
 )
 const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
 const imageDeliveryProfile = computed(() =>
-  resolveLayoutImageDeliveryProfile(props.layout, props.gridClass),
+  resolveLayoutImageDeliveryProfile(
+    props.layout,
+    [props.gridClass, props.width].filter(Boolean).join(' '),
+  ),
 )
 const reversesTwoColumnMobileStack = computed(
   () => props.reverseMobile === true && props.layout?.startsWith('two_column') === true,
