@@ -19,6 +19,7 @@ const props = defineProps<{
   deferLoad?: boolean
   direction?: string
   revealMode?: RevealMode
+  deliveryProfile?: string
   overlay?: boolean
   editActions?: EditAction[]
   tk: Pick<SlotsToolkit, 'propsOf'>
@@ -33,10 +34,19 @@ const theme = useAppConfig().stirTheme
 
 const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
   const raw = props.tk.propsOf(props.node)
+  const explicitDeliveryProfile = typeof raw.deliveryProfile === 'string'
+    ? raw.deliveryProfile.trim()
+    : ''
+  const explicitDeliverySizes = typeof raw.deliverySizes === 'string'
+    ? raw.deliverySizes.trim()
+    : ''
 
   return {
     ...raw,
     type: normalizeDrupalMediaType(raw.type),
+    deliveryProfile: explicitDeliverySizes
+      ? explicitDeliveryProfile
+      : props.deliveryProfile || explicitDeliveryProfile,
   }
 })
 const overlayImageProps = computed(() => {

@@ -109,6 +109,11 @@ const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
+const deliveryProfile = computed(() => {
+  if (!isVisualGallery.value) return undefined
+
+  return slotMediaOrdered.value.length >= 3 ? 'card' : 'split'
+})
 const lanes = computed(() => resolveResponsiveGridValue(
   props.masonry?.lanes,
   viewportWidth.value,
@@ -146,6 +151,7 @@ onMounted(() => {
       >
         <MediaItem
           :key="getMediaItemKey(node, i)"
+          :delivery-profile="deliveryProfile"
           :direction="direction"
           :edit-actions="
             i === 0 ? actions : undefined
@@ -170,6 +176,7 @@ onMounted(() => {
           v-for="(node, i) in slotMediaOrdered"
           :key="getMediaItemKey(node, i)"
           :defer-load="isImageGallery && i >= 4"
+          :delivery-profile="deliveryProfile"
           :direction="direction"
           :edit-actions="
             i === 0 ? actions : undefined

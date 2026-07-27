@@ -5,6 +5,7 @@ import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
   carouselImageDeliverySizesKey,
+  layoutImageDeliveryProfileKey,
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '#stir/utils/imageDelivery'
@@ -71,6 +72,7 @@ const normalizedLoading = computed<'lazy' | 'eager'>(() => {
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
 const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
+const layoutDeliveryProfile = inject(layoutImageDeliveryProfileKey, undefined)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
@@ -79,7 +81,9 @@ const providerSizes = computed(() =>
   props.deliverySizes?.trim()
   || carouselDeliverySizes?.value?.trim()
   || resolveImageDeliveryProfile(
-    props.deliveryProfile,
+    props.deliveryProfile?.trim() === 'container'
+      ? layoutDeliveryProfile?.value || props.deliveryProfile
+      : props.deliveryProfile || layoutDeliveryProfile?.value,
     isHero.value,
     theme.media.image.profiles,
   ),

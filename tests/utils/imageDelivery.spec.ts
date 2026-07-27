@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  resolveLayoutImageDeliveryProfile,
   resolveCarouselImageDeliverySizes,
   resolveImageDeliveryProfile,
   versionImageSource,
@@ -47,6 +48,29 @@ describe('resolveImageDeliveryProfile', () => {
   })
 })
 
+describe('resolveLayoutImageDeliveryProfile', () => {
+  it('uses card delivery for grids with three or more columns', () => {
+    expect(resolveLayoutImageDeliveryProfile(
+      'grid',
+      'grid-cols-1 md:grid-cols-3 xl:grid-cols-5',
+    )).toBe('card')
+  })
+
+  it('uses split delivery for two-column layouts', () => {
+    expect(resolveLayoutImageDeliveryProfile(
+      'two_column',
+      'grid-cols-1 lg:grid-cols-2',
+    )).toBe('split')
+  })
+
+  it('does not constrain ordinary one-column content', () => {
+    expect(resolveLayoutImageDeliveryProfile(
+      'default',
+      'grid-cols-1',
+    )).toBeUndefined()
+  })
+})
+
 describe('resolveCarouselImageDeliverySizes', () => {
   const full = 'sm:100vw md:100vw lg:100vw xl:100vw'
 
@@ -55,9 +79,12 @@ describe('resolveCarouselImageDeliverySizes', () => {
     expect(resolveCarouselImageDeliverySizes('basis-full', full)).toBe(full)
   })
 
-  it('preserves nested media profiles when several slides are visible', () => {
-    expect(resolveCarouselImageDeliverySizes('basis-full md:basis-1/2', full)).toBeUndefined()
-    expect(resolveCarouselImageDeliverySizes('w-1/3', full)).toBeUndefined()
+  it('derives responsive image widths when several slides are visible', () => {
+    expect(resolveCarouselImageDeliverySizes(
+      'basis-1/2 md:basis-1/3 lg:basis-1/5',
+      full,
+    )).toBe('sm:50vw md:33vw lg:20vw')
+    expect(resolveCarouselImageDeliverySizes('w-1/3', full)).toBe('sm:33vw')
   })
 })
 

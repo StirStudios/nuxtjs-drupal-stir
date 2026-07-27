@@ -59,6 +59,47 @@ describe('MediaItem (Nuxt runtime)', () => {
       .not.toContain('motion-safe:opacity-0')
   })
 
+  it('uses the contextual delivery profile for gallery images', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        deliveryProfile: 'card',
+        index: 0,
+        node: h('div'),
+        tk: {
+          propsOf: () => ({
+            alt: 'Gallery image',
+            src: '/gallery.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('img').attributes('sizes'))
+      .toBe('(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px')
+  })
+
+  it('preserves explicit delivery sizes over the contextual profile', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        deliveryProfile: 'card',
+        index: 0,
+        node: h('div'),
+        tk: {
+          propsOf: () => ({
+            alt: 'Full-width image',
+            deliverySizes: 'sm:100vw xl:960px',
+            src: '/full.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('img').attributes('sizes'))
+      .toBe('(max-width: 1280px) 100vw, 960px')
+  })
+
   it('preserves the hidden initial state for animated overlay media', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {
