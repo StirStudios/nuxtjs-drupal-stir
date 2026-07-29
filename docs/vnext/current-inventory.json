@@ -196,6 +196,7 @@
       "layers/theme/app/components/Icons/ColorMode.vue",
       "layers/theme/app/components/Icons/Social.vue",
       "layers/theme/app/components/NavigationPrevNext.vue",
+      "layers/theme/app/components/PageRevealScope.vue",
       "layers/theme/app/components/RegionArea.vue",
       "layers/theme/app/components/RevealMotion.vue",
       "layers/theme/app/components/RevealMotionElement.vue",
@@ -498,6 +499,7 @@
         "layers/theme/app/components/Icons/ColorMode.vue",
         "layers/theme/app/components/Icons/Social.vue",
         "layers/theme/app/components/NavigationPrevNext.vue",
+        "layers/theme/app/components/PageRevealScope.vue",
         "layers/theme/app/components/RegionArea.vue",
         "layers/theme/app/components/RevealMotion.vue",
         "layers/theme/app/components/RevealMotionElement.vue",
@@ -695,7 +697,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 117,
+    "components": 118,
     "composables": 63,
     "utils": 46,
     "plugins": 6,
@@ -703,14 +705,14 @@
     "serverRoutes": 27,
     "productionDependencies": 43,
     "developmentDependencies": 27,
-    "tests": 125,
+    "tests": 126,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 41,
       "server": 24,
       "unit": 8,
-      "utils": 39
+      "utils": 40
     }
   },
   "tests": [
@@ -813,6 +815,7 @@
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
+    "tests/utils/heroMotionAccessibility.spec.ts",
     "tests/utils/heroVideoSource.spec.ts",
     "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",

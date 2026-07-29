@@ -338,7 +338,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(button.get('img').attributes()).toMatchObject({
       height: '360',
       loading: 'lazy',
-      sizes: '(max-width: 768px) 100vw, 33vw',
+      sizes: '(max-width: 767px) 100vw, 33vw',
       width: '640',
     })
     expect(button.get('img').attributes('src')).toContain('/static-preview.webp')

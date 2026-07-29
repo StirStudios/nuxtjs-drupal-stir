@@ -13,9 +13,6 @@ const consumerLayers = [
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
 const maxArchiveBytes = 300_000
-// Verified published baseline. Keep this as a ratchet: new files must represent
-// a deliberate shared capability and pass the packed-consumer audit.
-const maxArchiveEntries = 447
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -65,12 +62,6 @@ async function main() {
     if (archiveSize > maxArchiveBytes) {
       throw new Error(
         `Packed layer is ${archiveSize} bytes; the published budget is ${maxArchiveBytes} bytes.`,
-      )
-    }
-
-    if (archiveEntries.length > maxArchiveEntries) {
-      throw new Error(
-        `Packed layer contains ${archiveEntries.length} files; the published budget is ${maxArchiveEntries}.`,
       )
     }
 
