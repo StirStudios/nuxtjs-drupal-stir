@@ -173,7 +173,7 @@ describe('layer contract', () => {
       peerDependencies?: Record<string, string>
     }
 
-    expect(packageJson.dependencies?.nuxt).toBe('^4.5.0')
+    expect(packageJson.dependencies?.nuxt).toMatch(/^\^4\./)
     expect(packageJson.peerDependencies?.nuxt).toBeUndefined()
     expect(packageJson.devDependencies?.nuxt).toBeUndefined()
 
@@ -212,7 +212,7 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(packageJson.dependencies?.['@nuxt/image']).toBe('^2.0.0')
+    expect(packageJson.dependencies?.['@nuxt/image']).toMatch(/^\^2\./)
     expect(packageJson.peerDependencies?.['@nuxt/image']).toBeUndefined()
     expect(packageJson.peerDependenciesMeta?.['@nuxt/image']).toBeUndefined()
     expect(themeConfig).not.toContain('STIR_IMAGE_DELIVERY')

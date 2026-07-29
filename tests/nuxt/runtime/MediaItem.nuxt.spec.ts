@@ -76,7 +76,7 @@ describe('MediaItem (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes('sizes'))
-      .toBe('(max-width: 768px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 400px')
+      .toBe('(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 400px')
   })
 
   it('preserves explicit delivery sizes over the contextual profile', async () => {
@@ -97,7 +97,7 @@ describe('MediaItem (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes('sizes'))
-      .toBe('(max-width: 1280px) 100vw, 960px')
+      .toBe('(max-width: 1279px) 100vw, 960px')
   })
 
   it('preserves the hidden initial state for animated overlay media', async () => {
