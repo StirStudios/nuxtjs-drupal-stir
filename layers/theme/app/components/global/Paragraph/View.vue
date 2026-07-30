@@ -1,5 +1,8 @@
 <script setup lang="ts">
-defineProps<{
+import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
+
+const props = defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
@@ -27,8 +30,22 @@ defineProps<{
   carouselIndicators?: boolean
   carouselInterval?: number
 }>()
+
+const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+  useRevealMotionConfig()
+const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const motionProps = useRevealMotionProps(
+  effect,
+  () => getRevealDelayMs(staggerIndex.value),
+)
 </script>
 
 <template>
-  <slot name="content" />
+  <RevealMotionElement
+    :key="`view-${id}-${revealMotionKey}`"
+    as="div"
+    :motion-props="motionProps"
+  >
+    <slot name="content" />
+  </RevealMotionElement>
 </template>
