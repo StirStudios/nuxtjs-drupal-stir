@@ -9,6 +9,7 @@ const props = defineProps<{
   apiOrigin?: string
   piperOrigin?: string
   venueId?: string
+  direction?: string
 
   editLink?: string
 }>()
@@ -79,9 +80,11 @@ watch(
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <ClientOnly>
-      <div v-bind="widgetAttrs" />
-    </ClientOnly>
-  </EditLink>
+  <ParagraphReveal :id="id" :direction="direction">
+    <EditLink :link="editLink" :parent-uuid="parentUuid">
+      <ClientOnly>
+        <div v-bind="widgetAttrs" />
+      </ClientOnly>
+    </EditLink>
+  </ParagraphReveal>
 </template>

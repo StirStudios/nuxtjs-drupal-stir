@@ -63,18 +63,20 @@ const timelineColor = computed(() => resolveUiColor(props.color))
 </script>
 
 <template>
-  <WrapDiv :align="align" :styles="wrapperClasses">
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
-      <UTimeline
-        class="max-w-3xl"
-        :color="timelineColor"
-        :default-value="timelineItems.length - 1"
-        :items="timelineItems"
-      >
-        <template #rich-description="{ item }: { item: UITimelineItem }">
-          <div class="prose max-w-none" v-html="item.description" />
-        </template>
-      </UTimeline>
-    </EditLink>
-  </WrapDiv>
+  <ParagraphReveal :id="id" :direction="direction">
+    <WrapDiv :align="align" :styles="wrapperClasses">
+      <EditLink :link="editLink" :parent-uuid="parentUuid">
+        <UTimeline
+          class="max-w-3xl"
+          :color="timelineColor"
+          :default-value="timelineItems.length - 1"
+          :items="timelineItems"
+        >
+          <template #rich-description="{ item }: { item: UITimelineItem }">
+            <div class="prose max-w-none" v-html="item.description" />
+          </template>
+        </UTimeline>
+      </EditLink>
+    </WrapDiv>
+  </ParagraphReveal>
 </template>

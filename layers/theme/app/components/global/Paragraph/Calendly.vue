@@ -17,6 +17,7 @@ const props = defineProps<{
   calendlyPrimary?: string
   calendlyTextColor?: string
   title?: string
+  direction?: string
 
   editLink?: string
 }>()
@@ -56,11 +57,13 @@ useCalendlyWidget(container, calendlyUrl.value)
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
-    <div
-      ref="container"
-      :class="['m-auto w-full', props.calendlyScheme || 'scheme-normal']"
-      v-bind="$attrs"
-    />
-  </EditLink>
+  <ParagraphReveal :id="id" :direction="direction">
+    <EditLink :link="editLink" :parent-uuid="parentUuid">
+      <div
+        ref="container"
+        :class="['m-auto w-full', props.calendlyScheme || 'scheme-normal']"
+        v-bind="$attrs"
+      />
+    </EditLink>
+  </ParagraphReveal>
 </template>

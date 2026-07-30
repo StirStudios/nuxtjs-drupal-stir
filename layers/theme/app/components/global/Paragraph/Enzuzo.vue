@@ -6,6 +6,7 @@ const props = defineProps<{
   region?: string
 
   embedUrl?: string
+  direction?: string
   editLink?: string
 }>()
 
@@ -28,5 +29,7 @@ useThirdPartyScript(normalizedEmbedUrl, {
 </script>
 
 <template>
-  <div id="__enzuzo-root" />
+  <ParagraphReveal :id="id" :direction="direction">
+    <div id="__enzuzo-root" />
+  </ParagraphReveal>
 </template>

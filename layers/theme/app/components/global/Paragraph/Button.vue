@@ -16,6 +16,7 @@ const props = defineProps<{
   align?: string
   spacing?: string
   width?: string
+  direction?: string
 
   color?: string
   size?: string
@@ -101,7 +102,12 @@ const pdfUrl = computed(() =>
 </script>
 
 <template>
-  <div :class="['flex w-full', align, spacing, width]">
+  <ParagraphReveal
+    :id="id"
+    as="div"
+    :class="['flex w-full', align, spacing, width]"
+    :direction="direction"
+  >
     <EditLink :link="editLink" :parent-uuid="parentUuid">
       <UButton
         v-if="hasPdf"
@@ -129,7 +135,7 @@ const pdfUrl = computed(() =>
         :variant="btnVariant"
       />
     </EditLink>
-  </div>
+  </ParagraphReveal>
 
   <LazyUModal
     v-if="hasPdf && theme.showPdf"

@@ -8,6 +8,7 @@ defineProps<{
   parentUuid?: string
   region?: string
 
+  direction?: string
   editLink?: string
 }>()
 
@@ -52,30 +53,32 @@ watch(active, async () => {
 </script>
 
 <template>
-  <div v-if="items.length <= 1">
-    <component :is="activeTabNode" v-if="activeTabNode" />
-  </div>
+  <ParagraphReveal :id="id" class="w-full" :direction="direction">
+    <div v-if="items.length <= 1">
+      <component :is="activeTabNode" v-if="activeTabNode" />
+    </div>
 
-  <UTabs
-    v-else
-    v-model="active"
-    :items="items"
-    :orientation="orientation"
-    :ui="{
-      root: 'app-tabs items-start gap-2 m-auto w-full',
-      list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
-      content: 'flex-1 min-w-0',
-      trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
-      indicator: 'bg-primary',
-    }"
-    variant="link"
-  >
-    <template #content>
-      <div ref="contentRef" class="tab-content">
-        <component :is="activeTabNode" v-if="activeTabNode" />
-      </div>
-    </template>
-  </UTabs>
+    <UTabs
+      v-else
+      v-model="active"
+      :items="items"
+      :orientation="orientation"
+      :ui="{
+        root: 'app-tabs items-start gap-2 m-auto w-full',
+        list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
+        content: 'flex-1 min-w-0',
+        trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
+        indicator: 'bg-primary',
+      }"
+      variant="link"
+    >
+      <template #content>
+        <div ref="contentRef" class="tab-content">
+          <component :is="activeTabNode" v-if="activeTabNode" />
+        </div>
+      </template>
+    </UTabs>
+  </ParagraphReveal>
 </template>
 
 <style scoped>
