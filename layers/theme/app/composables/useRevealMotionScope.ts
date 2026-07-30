@@ -71,6 +71,8 @@ export function useRevealMotionScope(
 ) {
   const inheritedScope = inject(revealMotionScopeKey, null)
   const scopeIndex = inheritedScope?.takeIndex() ?? 0
+  const inheritedStagger = computed(() =>
+    inheritedScope?.stagger.value === true)
   const isInherited = computed(() =>
     isInheritedRevealEffect(toValue(explicitEffect)))
   const effect = computed(() =>
@@ -83,6 +85,7 @@ export function useRevealMotionScope(
 
   return {
     effect,
+    inheritedStagger,
     isInherited,
     staggerIndex,
   }

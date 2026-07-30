@@ -1,7 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import ParagraphLayout from '../../../layers/theme/app/components/global/Paragraph/Layout.vue'
+import {
+  provideRevealMotionScope,
+  useRevealMotionScope,
+} from '../../../layers/theme/app/composables/useRevealMotionScope'
+
+const RevealScopeProbe = defineComponent({
+  setup() {
+    const { inheritedStagger, staggerIndex } =
+      useRevealMotionScope(() => undefined)
+
+    return () => h('span', {
+      class: 'reveal-scope-probe',
+      'data-stagger': String(inheritedStagger.value),
+      'data-stagger-index': String(staggerIndex.value),
+    })
+  },
+})
 
 describe('ParagraphLayout (Nuxt runtime)', () => {
   it('renders repeatable grid items directly for grid layouts', async () => {
@@ -108,5 +125,43 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
 
     expect(wrapper.find('.region.first').classes()).not.toContain('order-2')
     expect(wrapper.find('.region.second').classes()).not.toContain('order-1')
+  })
+
+  it('registers the heading before animated layout children', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: {
+        id: 'heading-order',
+        header: 'Heading first',
+        animationStagger: true,
+      },
+      slots: {
+        first: () => h(RevealScopeProbe),
+      },
+    })
+
+    const probe = wrapper.find('.reveal-scope-probe')
+
+    expect(probe.attributes('data-stagger')).toBe('true')
+    expect(Number(probe.attributes('data-stagger-index'))).toBeGreaterThan(0)
+  })
+
+  it('carries page stagger into layout children', async () => {
+    const PageScope = defineComponent({
+      setup() {
+        provideRevealMotionScope(() => 'fade-up', { stagger: true })
+
+        return () => h(ParagraphLayout, {
+          id: 'page-stagger',
+          header: 'Heading first',
+        }, {
+          first: () => h(RevealScopeProbe),
+        })
+      },
+    })
+    const wrapper = await mountSuspended(PageScope)
+    const probe = wrapper.find('.reveal-scope-probe')
+
+    expect(probe.attributes('data-stagger')).toBe('true')
+    expect(Number(probe.attributes('data-stagger-index'))).toBeGreaterThan(0)
   })
 })
