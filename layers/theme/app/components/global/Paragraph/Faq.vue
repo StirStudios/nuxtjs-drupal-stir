@@ -20,6 +20,7 @@ const props = defineProps<{
   classes?: string
   width?: string
   spacing?: string
+  direction?: string
 
   editLink?: string
 }>()
@@ -79,7 +80,12 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
 </script>
 
 <template>
-  <section :class="sectionClasses">
+  <ParagraphReveal
+    :id="id"
+    as="section"
+    :class="sectionClasses"
+    :direction="direction"
+  >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
     <div v-if="header || trustedTextHtml" class="space-y-3">
@@ -117,5 +123,5 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
         <EditLink :link="item.editLink" :parent-uuid="item.parentUuid" />
       </template>
     </UAccordion>
-  </section>
+  </ParagraphReveal>
 </template>

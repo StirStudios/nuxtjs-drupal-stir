@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
-import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
-import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import {
   resolveBooleanProp,
   resolveUiButtonVariant,
@@ -50,13 +48,6 @@ const tk = useSlotsToolkit(vueSlots)
 const open = ref(false)
 const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
-  useRevealMotionConfig()
-const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
-const motionProps = useRevealMotionProps(
-  effect,
-  () => getRevealDelayMs(staggerIndex.value),
-)
 const linkData = computed(() => {
   const link = props.link
   const url = link?.url ?? link?.props?.url ?? link?.linkResolvableUri ?? link?.linkUri
@@ -111,11 +102,11 @@ const pdfUrl = computed(() =>
 </script>
 
 <template>
-  <RevealMotionElement
-    :key="`button-${id}-${revealMotionKey}`"
+  <ParagraphReveal
+    :id="id"
     as="div"
     :class="['flex w-full', align, spacing, width]"
-    :motion-props="motionProps"
+    :direction="direction"
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid">
       <UButton
@@ -144,7 +135,7 @@ const pdfUrl = computed(() =>
         :variant="btnVariant"
       />
     </EditLink>
-  </RevealMotionElement>
+  </ParagraphReveal>
 
   <LazyUModal
     v-if="hasPdf && theme.showPdf"

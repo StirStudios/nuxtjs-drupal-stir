@@ -9,6 +9,7 @@ defineProps<{
   maxItems?: number
   gridItems?: string
   randomize?: boolean
+  direction?: string
   editLink?: string
 }>()
 
@@ -18,9 +19,11 @@ defineSlots<{
 </script>
 
 <template>
-  <WrapGrid :grid-items="gridItems">
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
-      <slot name="media" />
-    </EditLink>
-  </WrapGrid>
+  <ParagraphReveal :id="id" :direction="direction">
+    <WrapGrid :grid-items="gridItems">
+      <EditLink :link="editLink" :parent-uuid="parentUuid">
+        <slot name="media" />
+      </EditLink>
+    </WrapGrid>
+  </ParagraphReveal>
 </template>
