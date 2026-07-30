@@ -73,7 +73,11 @@ const sectionId = computed(() => {
   return `section-${props.id ?? 'unknown'}`
 })
 const animationScope = computed(() => props.animationScope || 'children')
-const { effect: resolvedLayoutEffect, staggerIndex } =
+const {
+  effect: resolvedLayoutEffect,
+  inheritedStagger,
+  staggerIndex,
+} =
   useRevealMotionScope(() => props.direction)
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
   useRevealMotionConfig()
@@ -83,19 +87,26 @@ const layoutMotionProps = useRevealMotionProps(
     : undefined,
   () => getRevealDelayMs(staggerIndex.value),
 )
+const childRevealScope = provideRevealMotionScope(
+  () => animationScope.value === 'children'
+    ? resolvedLayoutEffect.value
+    : undefined,
+  {
+    stagger: () =>
+      inheritedStagger.value ||
+      resolveBooleanProp(props.animationStagger),
+  },
+)
+// The heading is the first visual child, so reserve the first stagger index
+// before descendant components register themselves during setup.
+const headerStaggerIndex = props.header ? childRevealScope.takeIndex() : 0
 const headerMotionProps = useRevealMotionProps(
   () => animationScope.value === 'children'
     ? resolvedLayoutEffect.value
     : undefined,
-  () => getRevealDelayMs(staggerIndex.value),
+  () => getRevealDelayMs(headerStaggerIndex),
 )
 
-provideRevealMotionScope(
-  () => animationScope.value === 'children'
-    ? resolvedLayoutEffect.value
-    : undefined,
-  { stagger: () => resolveBooleanProp(props.animationStagger) },
-)
 provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
 </script>
 
