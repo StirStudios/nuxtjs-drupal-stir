@@ -3,7 +3,6 @@ import {
   defineEventHandler,
   getCookie,
   readBody,
-  setResponseHeader,
 } from 'h3'
 import {
   LAYER_AUTH_PROTECTED_ACCESS_COOKIE_NAME,
@@ -42,10 +41,9 @@ export default defineEventHandler(async (event) => {
   const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
 
   if (!rateLimit.allowed) {
-    setResponseHeader(
-      event,
+    event.node?.res?.setHeader(
       'Retry-After',
-      rateLimit.retryAfterSeconds,
+      String(rateLimit.retryAfterSeconds),
     )
 
     throw createError({

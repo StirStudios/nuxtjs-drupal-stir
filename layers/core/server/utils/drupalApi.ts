@@ -32,9 +32,9 @@ export const throwDrupalApiError = throwStirDrupalApiError
 export const fetchDrupalCsrfToken = fetchStirDrupalCsrfToken
 
 export async function drupalApiRequest<T>(
-  event: H3Event,
+  event: unknown,
   path: string,
   options: StirDrupalRequestOptions = {},
 ): Promise<T> {
-  return await stirDrupalApiRequest<T>(event, path, options)
+  return await stirDrupalApiRequest<T>(event as H3Event, path, options)
 }
