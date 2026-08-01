@@ -4,6 +4,7 @@ import {
   getRequestURL,
   getResponseHeader,
   proxyRequest,
+  setResponseHeader,
   type H3Event,
 } from 'h3'
 import {
@@ -223,7 +224,8 @@ export const handleStirDrupalProxyResponse = (
     (event.method === 'GET' || event.method === 'HEAD')
     && response.ok
   ) {
-    event.node.res.setHeader(
+    setResponseHeader(
+      event,
       'Cache-Control',
       SHARED_REVALIDATION_CACHE_CONTROL,
     )

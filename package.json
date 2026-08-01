@@ -114,6 +114,7 @@
     "@tiptap/y-tiptap": "^3.0.8",
     "@unhead/vue": "^3.2.3",
     "@vueuse/core": "^14.4.0",
+    "h3": "^1.15.11",
     "jiti": "^2.7.0",
     "motion-v": "^2.3.0",
     "nostics": "^1.2.0",
