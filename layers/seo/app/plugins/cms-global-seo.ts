@@ -1,5 +1,4 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
-import type { Link, Meta, ReactiveHead } from '@unhead/vue'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -8,6 +7,12 @@ type CmsGlobalSeoConfig = {
   drupalRouteNames?: string[]
   lang?: string
 }
+
+type UseHeadFactory = Extract<
+  Parameters<typeof useHead>[0],
+  (...args: never[]) => unknown
+>
+type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
 
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
@@ -54,27 +59,23 @@ function isDrupalRoute(route: ReturnType<typeof useRoute>, config: Required<CmsG
   return config.drupalRouteNames.includes(String(route.name || ''))
 }
 
-function withMetaKeys(tags: Array<Record<string, string>> = []): Meta[] {
+function withMetaKeys(tags: Array<Record<string, string>> = []): Array<Record<string, string>> {
   return tags.flatMap((tag) => {
-    if (!tag.name && !tag.property && !tag.charset && !tag['http-equiv']) {
-      return []
-    }
+    if (!tag.name && !tag.property && !tag.charset && !tag['http-equiv']) return []
 
     const key = tag.name || tag.property || undefined
 
-    return [(key ? { ...tag, key } : tag) as unknown as Meta]
+    return [key ? { ...tag, key } : tag]
   })
 }
 
-function withLinkKeys(tags: Array<Record<string, string>> = []): Link[] {
+function withLinkKeys(tags: Array<Record<string, string>> = []): Array<Record<string, string>> {
   return tags.flatMap((tag) => {
-    if (!tag.rel || !tag.href) {
-      return []
-    }
+    if (!tag.rel || !tag.href) return []
 
     const key = [tag.rel, tag.sizes, tag.href].filter(Boolean).join(':') || undefined
 
-    return [(key ? { ...tag, key } : tag) as unknown as Link]
+    return [key ? { ...tag, key } : tag]
   })
 }
 
@@ -87,7 +88,7 @@ export default defineNuxtPlugin(async () => {
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
-    (): ReactiveHead => {
+    (): ConsumerReactiveHead => {
       const head = {
         htmlAttrs: { lang: lang.value },
       }
@@ -98,14 +99,14 @@ export default defineNuxtPlugin(async () => {
         isIgnoredPath(route.path, config) ||
         isDrupalRoute(route, config)
       ) {
-        return head
+        return head as ConsumerReactiveHead
       }
 
       return {
         ...head,
         link: withLinkKeys(defaults.value.link),
         meta: withMetaKeys(defaults.value.meta),
-      }
+      } as unknown as ConsumerReactiveHead
     },
     {
       tagPriority: 'low',

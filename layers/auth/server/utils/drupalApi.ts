@@ -25,11 +25,11 @@ export const layerAuthExtractDrupalErrorDetail = extractStirDrupalErrorDetail
 export const layerAuthFetchDrupalCsrfToken = fetchStirDrupalCsrfToken
 
 export async function layerAuthDrupalApiRequest<T>(
-  event: H3Event,
+  event: unknown,
   path: string,
   options: StirDrupalRequestOptions = {},
 ): Promise<T> {
-  return await stirDrupalApiRequest<T>(event, path, {
+  return await stirDrupalApiRequest<T>(event as H3Event, path, {
     ...options,
     forwardClientIp: options.forwardClientIp ?? true,
   })

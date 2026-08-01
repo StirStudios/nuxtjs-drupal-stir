@@ -223,7 +223,7 @@ export const handleStirDrupalProxyResponse = (
     (event.method === 'GET' || event.method === 'HEAD')
     && response.ok
   ) {
-    event.node.res.setHeader(
+    event.node?.res?.setHeader(
       'Cache-Control',
       SHARED_REVALIDATION_CACHE_CONTROL,
     )

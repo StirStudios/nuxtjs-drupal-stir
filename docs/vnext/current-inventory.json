@@ -61,6 +61,7 @@
       "@tiptap/y-tiptap",
       "@unhead/vue",
       "@vueuse/core",
+      "h3",
       "jiti",
       "motion-v",
       "nostics",
@@ -197,6 +198,7 @@
       "layers/theme/app/components/Icons/Social.vue",
       "layers/theme/app/components/NavigationPrevNext.vue",
       "layers/theme/app/components/PageRevealScope.vue",
+      "layers/theme/app/components/ParagraphReveal.vue",
       "layers/theme/app/components/RegionArea.vue",
       "layers/theme/app/components/RevealMotion.vue",
       "layers/theme/app/components/RevealMotionElement.vue",
@@ -500,6 +502,7 @@
         "layers/theme/app/components/Icons/Social.vue",
         "layers/theme/app/components/NavigationPrevNext.vue",
         "layers/theme/app/components/PageRevealScope.vue",
+        "layers/theme/app/components/ParagraphReveal.vue",
         "layers/theme/app/components/RegionArea.vue",
         "layers/theme/app/components/RevealMotion.vue",
         "layers/theme/app/components/RevealMotionElement.vue",
@@ -697,22 +700,22 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 118,
+    "components": 119,
     "composables": 63,
     "utils": 46,
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 27,
-    "productionDependencies": 43,
+    "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 126,
+    "tests": 128,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 41,
+      "nuxt": 42,
       "server": 24,
       "unit": 8,
-      "utils": 40
+      "utils": 41
     }
   },
   "tests": [
@@ -754,6 +757,7 @@
     "tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphDefault.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphLayout.nuxt.spec.ts",
+    "tests/nuxt/runtime/ParagraphRevealTargets.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",
@@ -825,6 +829,7 @@
     "tests/utils/nuxtUiProps.spec.ts",
     "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
+    "tests/utils/paragraphRevealOwnership.spec.ts",
     "tests/utils/presentationManifest.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
     "tests/utils/registrationCompletion.spec.ts",

@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
 
   if (!rateLimit.allowed) {
-    event.node.res.setHeader(
+    event.node?.res?.setHeader(
       'Retry-After',
       String(rateLimit.retryAfterSeconds),
     )
