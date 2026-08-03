@@ -121,17 +121,19 @@ provideRevealMotionScope(
   />
 
   <article v-else-if="renderMode === 'article'">
-    <UContainer class="flex justify-end py-4">
-      <ShareLinks
-        :description="props.summary"
-        :title="props.title"
-        variant="menu"
-      />
-    </UContainer>
+    <UContainer>
+      <div class="flex justify-end py-4">
+        <ShareLinks
+          :description="props.summary"
+          :title="props.title"
+          variant="menu"
+        />
+      </div>
 
-    <template v-for="slotName in contentSlotNames" :key="slotName">
-      <slot :name="slotName" />
-    </template>
+      <template v-for="slotName in contentSlotNames" :key="slotName">
+        <slot :name="slotName" />
+      </template>
+    </UContainer>
   </article>
 
   <slot

@@ -23,6 +23,9 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('resolveBooleanProp(props.isArticle)')
     expect(nodeDisplay).toContain('<ShareLinks')
     expect(nodeDisplay).toContain(':title="props.title"')
+    expect(nodeDisplay).toMatch(
+      /<article v-else-if="renderMode === 'article'">\s*<UContainer>/,
+    )
 
     const nodeTypes = source('layers/theme/app/types/Node.ts')
 
