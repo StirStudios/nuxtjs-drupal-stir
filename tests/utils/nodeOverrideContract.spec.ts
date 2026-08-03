@@ -20,10 +20,14 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('\'default\', \'uid\'')
     expect(nodeDisplay).toContain('v-if="renderMode !== \'teaser\'"')
     expect(nodeDisplay).toContain(':link="props.editLink"')
+    expect(nodeDisplay).toContain('resolveBooleanProp(props.isArticle)')
+    expect(nodeDisplay).toContain('<ShareLinks')
+    expect(nodeDisplay).toContain(':title="props.title"')
 
     const nodeTypes = source('layers/theme/app/types/Node.ts')
 
     expect(nodeTypes).toContain('url?: string')
+    expect(nodeTypes).toContain('summary?: string')
   })
 
   it('uses the accessible default layout when Drupal omits page_layout', () => {

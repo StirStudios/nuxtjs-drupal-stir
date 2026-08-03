@@ -29,11 +29,12 @@ defineOptions({
 const { pageLayout } = usePageContext()
 const slots = useSlots()
 const teaser = useNodeTeaser(slots)
+const isArticle = computed(() => resolveBooleanProp(props.isArticle))
 const renderMode = computed<'teaser' | 'article' | 'default'>(() => {
   const type = props.type || ''
 
   if (props.teaserModes.some((mode) => type.includes(mode))) return 'teaser'
-  if (props.isArticle) return 'article'
+  if (isArticle.value) return 'article'
 
   return 'default'
 })
@@ -120,6 +121,14 @@ provideRevealMotionScope(
   />
 
   <article v-else-if="renderMode === 'article'">
+    <UContainer class="flex justify-end py-4">
+      <ShareLinks
+        :description="props.summary"
+        :title="props.title"
+        variant="menu"
+      />
+    </UContainer>
+
     <template v-for="slotName in contentSlotNames" :key="slotName">
       <slot :name="slotName" />
     </template>
