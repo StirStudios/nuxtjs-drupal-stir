@@ -2,7 +2,6 @@
 import type { AccordionItem } from '@nuxt/ui'
 import type { VNode } from 'vue'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
-import { buildFaqPageSchema } from '#stir/utils/structuredData'
 
 defineOptions({
   inheritAttrs: false,
@@ -78,22 +77,6 @@ const accordionItems = computed<FaqAccordionItem[]>(() =>
     }
   }),
 )
-
-const faqSchema = computed(() => buildFaqPageSchema(
-  accordionItems.value.map(item => ({
-    question: item.label ?? '',
-    answerHtml: item.answerHtml,
-  })),
-))
-
-useHead(() => ({
-  script: faqSchema.value
-    ? [{
-        type: 'application/ld+json',
-        innerHTML: JSON.stringify(faqSchema.value),
-      }]
-    : [],
-}))
 </script>
 
 <template>
