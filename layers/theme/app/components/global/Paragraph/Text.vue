@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import type { EditableRichTextProps } from '#stir/types'
 
+defineOptions({
+  inheritAttrs: false,
+})
+
 const props = defineProps<
   EditableRichTextProps & {
     align?: string
     width?: string
     spacing?: string
+    region?: string
+    textEdit?: unknown
   }
 >()
 
@@ -18,6 +24,7 @@ const richTextProps = computed(() => ({
   classes: props.classes,
   direction: props.direction,
   editLink: props.editLink,
+  editTarget: props.editTarget ?? props.textEdit,
 }))
 const wrapStyles = computed(() =>
   [props.width, props.spacing].filter(
