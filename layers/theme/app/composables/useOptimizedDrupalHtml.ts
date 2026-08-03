@@ -4,7 +4,6 @@ import {
 } from '#stir/utils/trustedDrupalHtml'
 import type { MaybeRefOrGetter } from 'vue'
 import { resolveLayoutImageDeliveryProfile } from '#stir/utils/imageDelivery'
-import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
 type HtmlSource = string | null | undefined
 
@@ -16,8 +15,6 @@ export function useOptimizedDrupalHtml(
   containerClass?: MaybeRefOrGetter<string | undefined>,
 ) {
   const appConfig = useAppConfig()
-  const runtimeConfig = useRuntimeConfig()
-  const drupalOrigin = getDrupalOrigin(runtimeConfig.public)
   const $img = useImage()
   const getSizes = $img.getSizes as unknown as (
     source: string,
@@ -45,7 +42,7 @@ export function useOptimizedDrupalHtml(
           ? image.profiles.split
           : image.profiles.container
 
-      return getSizes(toDrupalUrl(canonicalSource, drupalOrigin), {
+      return getSizes(canonicalSource, {
         sizes,
         modifiers: {
           format: image.format,
