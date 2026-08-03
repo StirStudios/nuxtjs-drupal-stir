@@ -12,6 +12,7 @@ export interface DrupalNodeRelatedItem {
 
 export interface NodeCommonProps {
   title: string
+  summary?: string
   url?: string
   type?: string
   isArticle?: boolean | string
