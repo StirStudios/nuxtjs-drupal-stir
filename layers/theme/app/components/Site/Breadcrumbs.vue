@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { buildBreadcrumbListSchema } from '#stir/utils/structuredData'
+
 type CrumbItem = {
   label: string
   url?: string
@@ -24,6 +26,22 @@ const breadcrumbLinks = computed(() =>
     to: crumb.url || undefined,
   })),
 )
+
+const requestUrl = useRequestURL()
+const breadcrumbSchema = computed(() => buildBreadcrumbListSchema(
+  breadcrumbs.value,
+  requestUrl.origin,
+  requestUrl.href,
+))
+
+useHead(() => ({
+  script: breadcrumbSchema.value
+    ? [{
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify(breadcrumbSchema.value),
+      }]
+    : [],
+}))
 </script>
 
 <template>
