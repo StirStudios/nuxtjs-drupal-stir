@@ -206,10 +206,11 @@ export function useRevealMotionConfig() {
     delayMs: number = 0,
     options: RevealMotionOptions = {},
   ): Record<string, unknown> => {
-    const shouldReduceMotion = preferredMotion.value === 'reduce'
+    const shouldReduceMotion =
+      hasMounted.value && preferredMotion.value === 'reduce'
     const shouldUseStaticReveal =
       shouldReduceMotion ||
-      (import.meta.client && !supportsIntersectionObserver.value)
+      (hasMounted.value && !supportsIntersectionObserver.value)
 
     if (shouldUseStaticReveal) {
       return { initial: false }

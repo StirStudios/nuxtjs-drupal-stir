@@ -49,4 +49,25 @@ describe('EditLink layout contract', () => {
 
     expect(shell.get('.editable-field').text()).toBe('Editable text')
   })
+
+  it('keeps the isolated shell stable before edit actions are available', async () => {
+    const wrapper = await mountSuspended(EditLink, {
+      global: {
+        stubs: {
+          EditControls: editControlsStub,
+          LazyEditControls: editControlsStub,
+        },
+      },
+      props: {
+        controlsPlacement: 'isolated',
+      },
+      slots: {
+        default: '<div class="editable-field">Editable text</div>',
+      },
+    })
+
+    const shell = wrapper.get('.admin-ui-edit-shell')
+
+    expect(shell.get('.editable-field').text()).toBe('Editable text')
+  })
 })
