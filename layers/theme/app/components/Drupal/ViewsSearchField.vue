@@ -69,17 +69,15 @@ onScopeDispose(clearSearchTimer)
 </script>
 
 <template>
-  <UFormField :label="label" :ui="{ label: 'sr-only' }">
-    <UInput
-      v-bind="$attrs"
-      :aria-label="label"
-      class="w-full sm:w-48"
-      :disabled="disabled"
-      icon="i-lucide-search"
-      :model-value="inputValue"
-      :placeholder="placeholder || label"
-      type="search"
-      @update:model-value="onUpdate"
-    />
-  </UFormField>
+  <UInput
+    v-bind="$attrs"
+    :aria-label="label"
+    class="w-full sm:w-48"
+    :disabled="disabled"
+    icon="i-lucide-search"
+    :model-value="inputValue"
+    :placeholder="placeholder || label"
+    type="search"
+    @update:model-value="onUpdate"
+  />
 </template>

@@ -152,7 +152,6 @@ const rendersSiblingControls = computed(
 const isolatesControls = computed(
   () =>
     props.controlsPlacement === 'isolated' &&
-    hasActions.value &&
     slots.default !== undefined,
 )
 
