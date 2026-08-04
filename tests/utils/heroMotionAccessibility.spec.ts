@@ -9,6 +9,13 @@ const heroSource = readFileSync(
   ),
   'utf8',
 )
+const heroContentSource = readFileSync(
+  resolve(
+    process.cwd(),
+    'layers/theme/app/components/HeroContent.vue',
+  ),
+  'utf8',
+)
 const pageRouteSource = readFileSync(
   resolve(
     process.cwd(),
@@ -28,6 +35,10 @@ describe('hero reveal accessibility', () => {
   it('keeps explicitly animated hero content visible with reduced motion', () => {
     expect(heroSource).toContain('motion-reduce:!opacity-100')
     expect(heroSource).toContain('motion-reduce:!transform-none')
+  })
+
+  it('does not render an empty subtitle heading', () => {
+    expect(heroContentSource).toContain('<h2 v-if="subtitle"')
   })
 
   it('uses an SSR entrance animation instead of a viewport reveal', () => {

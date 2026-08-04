@@ -24,7 +24,7 @@ defineSlots<{ button?(): unknown }>()
 <template>
   <template v-if="pageTitle && isFront">
     <h1>{{ pageTitle }}</h1>
-    <h2 class="display-h1 text-left">{{ subtitle }}</h2>
+    <h2 v-if="subtitle" class="display-h1 text-left">{{ subtitle }}</h2>
   </template>
 
   <h1 v-else-if="pageTitle" class="mb-0 text-white">
