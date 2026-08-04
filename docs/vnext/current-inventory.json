@@ -708,11 +708,11 @@
     "serverRoutes": 27,
     "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 128,
+    "tests": 129,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 42,
+      "nuxt": 43,
       "server": 24,
       "unit": 8,
       "utils": 41
@@ -765,6 +765,7 @@
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
     "tests/nuxt/runtime/TurnstileConfig.nuxt.spec.ts",
     "tests/nuxt/runtime/ViewsDateRangeFilter.nuxt.spec.ts",
+    "tests/nuxt/runtime/ViewsSearchField.nuxt.spec.ts",
     "tests/nuxt/runtime/Webform.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapDiv.nuxt.spec.ts",
     "tests/nuxt/runtime/WrapGrid.nuxt.spec.ts",
