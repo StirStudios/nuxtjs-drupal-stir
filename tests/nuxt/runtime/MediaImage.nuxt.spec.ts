@@ -4,6 +4,19 @@ import MediaImage from '../../../layers/theme/app/components/global/Media/Image.
 import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
+  it('allows a contextual square-corner override', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Full-width image',
+        roundedClass: 'rounded-none',
+        src: '/image.webp',
+      },
+    })
+
+    expect(wrapper.get('.media').classes()).toContain('rounded-none')
+    expect(wrapper.get('img').classes()).toContain('rounded-none')
+  })
+
   it('accepts a canonical provider source without leaking it into markup', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

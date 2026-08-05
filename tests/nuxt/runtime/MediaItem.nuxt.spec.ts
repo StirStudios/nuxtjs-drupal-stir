@@ -10,6 +10,26 @@ describe('MediaItem (Nuxt runtime)', () => {
     vi.restoreAllMocks()
   })
 
+  it('passes a contextual corner style to visual media', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        roundedClass: 'rounded-none',
+        tk: {
+          propsOf: () => ({
+            alt: 'Full-width image',
+            src: '/full-width.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('.media').classes()).toContain('rounded-none')
+    expect(wrapper.get('img').classes()).toContain('rounded-none')
+  })
+
   it('keeps revealed media visible when reduced motion is requested', async () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(
       (query) => ({
