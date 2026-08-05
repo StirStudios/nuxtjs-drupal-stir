@@ -171,6 +171,7 @@ const handleActionSelect = (key: EditAction['key']) => {
       :select-action="handleActionSelect"
     />
     <LazyEditControls
+      v-if="hasActions"
       :actions="actions"
       @select="handleActionSelect"
     />

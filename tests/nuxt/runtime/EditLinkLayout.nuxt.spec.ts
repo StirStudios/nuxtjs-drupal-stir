@@ -69,5 +69,6 @@ describe('EditLink layout contract', () => {
     const shell = wrapper.get('.admin-ui-edit-shell')
 
     expect(shell.get('.editable-field').text()).toBe('Editable text')
+    expect(shell.find('[data-admin-ui-controls]').exists()).toBe(false)
   })
 })
