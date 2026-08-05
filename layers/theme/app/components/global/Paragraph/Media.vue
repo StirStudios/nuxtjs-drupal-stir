@@ -18,6 +18,7 @@ const props = defineProps<{
   spacing?: string
   width?: string
   widthClass?: string
+  cornerStyle?: 'default' | 'square' | string
   align?: string
   direction?: string
   overlay?: boolean | number | string
@@ -36,6 +37,9 @@ const props = defineProps<{
 }>()
 
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const roundedClass = computed(() =>
+  props.cornerStyle === 'square' ? 'rounded-none' : undefined,
+)
 const overlayEnabled = computed(
   () => props.overlay === true || props.overlay === 1 || props.overlay === '1',
 )
@@ -160,6 +164,7 @@ onMounted(() => {
           :node="node"
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
+          :rounded-class="roundedClass"
           :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"
@@ -185,6 +190,7 @@ onMounted(() => {
           :node="node"
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
+          :rounded-class="roundedClass"
           :tk="tk"
           @edit-action-select="selectAction"
           @open="openModal"

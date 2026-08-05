@@ -54,7 +54,8 @@ describe('WrapGrid (Nuxt runtime)', () => {
 
     expect(inner?.classList.contains('grid')).toBe(true)
     expect(inner?.classList.contains('relative')).toBe(true)
-    expect(outer?.classList.contains('isolate')).toBe(true)
+    expect(outer?.parentElement?.classList.contains('isolate')).toBe(true)
+    expect(wrapper.findComponent({ name: 'UCard' }).exists()).toBe(true)
   })
 
   it('keeps container gutters outside the card surface', async () => {
@@ -71,7 +72,8 @@ describe('WrapGrid (Nuxt runtime)', () => {
     })
     const content = wrapper.find('span')
     const grid = content.element.parentElement
-    const card = grid?.parentElement
+    const cardBody = grid?.parentElement
+    const card = cardBody?.parentElement
     const container = card?.parentElement
 
     expect(grid?.classList.contains('grid')).toBe(true)

@@ -44,6 +44,7 @@ const props = withDefaults(
     pauseWhenHidden?: boolean
     deferEmbed?: boolean
     editActions?: EditAction[]
+    roundedClass?: string
   }>(),
   {
     type: undefined,
@@ -76,11 +77,15 @@ const props = withDefaults(
     pauseWhenHidden: undefined,
     deferEmbed: true,
     editActions: undefined,
+    roundedClass: undefined,
   },
 )
 
 const theme = useAppConfig().stirTheme
 const { media: mediaTheme } = theme
+const resolvedRoundedClass = computed(() =>
+  props.roundedClass || theme.media.rounded,
+)
 const attrs = useAttrs()
 const forwardedAttrs = computed(() => {
   const {
@@ -441,7 +446,7 @@ watch(
       allowfullscreen
       :class="[
         'absolute inset-0 h-full w-full bg-black',
-        theme.media.rounded,
+        resolvedRoundedClass,
       ]"
       :data-mid="mid"
       loading="lazy"
@@ -455,7 +460,7 @@ watch(
       ref="videoElement"
       :class="[
         'absolute inset-0 h-full w-full bg-black object-contain',
-        theme.media.rounded,
+        resolvedRoundedClass,
       ]"
       controls
       playsinline
@@ -471,7 +476,7 @@ watch(
         'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',
         mediaPreviewClasses.overlayBase,
         mediaPreviewClasses.overlayTint40,
-        theme.media.rounded,
+        resolvedRoundedClass,
       ]"
       type="button"
       @click="activateEmbed"

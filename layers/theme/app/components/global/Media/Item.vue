@@ -21,6 +21,7 @@ const props = defineProps<{
   revealMode?: RevealMode
   deliveryProfile?: string
   overlay?: boolean
+  roundedClass?: string
   editActions?: EditAction[]
   tk: Pick<SlotsToolkit, 'propsOf'>
 }>()
@@ -101,10 +102,15 @@ const revealMotionProps = computed(() =>
   }),
 )
 
+const visualRoundedClass = computed(() =>
+  isDocument.value || isAudio.value ? undefined : props.roundedClass,
+)
+
 const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
   ...renderedMediaProps.value,
   ...revealMotionProps.value,
   editActions: props.editActions,
+  roundedClass: visualRoundedClass.value,
   onEditActionSelect: handleEditActionSelect,
 }))
 
@@ -119,6 +125,7 @@ const shouldAnimate = computed(() =>
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
     v-bind="renderedMediaProps"
     :edit-actions="editActions"
+    :rounded-class="visualRoundedClass"
     @edit-action-select="handleEditActionSelect"
   />
 
@@ -133,6 +140,7 @@ const shouldAnimate = computed(() =>
       class="motion-safe:opacity-0"
       v-bind="renderedMediaProps"
       :edit-actions="editActions"
+      :rounded-class="visualRoundedClass"
       @edit-action-select="handleEditActionSelect"
     />
   </RevealMotion>
@@ -157,6 +165,7 @@ const shouldAnimate = computed(() =>
         'group-focus-within:scale-105',
       ]"
       role="button"
+      :rounded-class="visualRoundedClass"
       tabindex="0"
       @click="openOverlay"
       @edit-action-select="handleEditActionSelect"
@@ -169,7 +178,7 @@ const shouldAnimate = computed(() =>
       class="group relative overflow-hidden"
       :class="[
         { 'motion-safe:opacity-0': shouldAnimate },
-        theme.media.rounded,
+        visualRoundedClass || theme.media.rounded,
         'cursor-pointer',
         'grid place-items-center text-white',
         mediaPreviewClasses.overlayBase,
@@ -184,6 +193,7 @@ const shouldAnimate = computed(() =>
       <MediaImage
         v-bind="{ ...mediaProps, hideCredit: true }"
         :edit-actions="editActions"
+        :rounded-class="visualRoundedClass"
         :wrapper-class="[
           mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,

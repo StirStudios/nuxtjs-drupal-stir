@@ -39,6 +39,7 @@ const props = defineProps<{
   isHero?: boolean
   wrapperClass?: unknown
   imageClass?: unknown
+  roundedClass?: string
   editActions?: EditAction[]
 }>()
 
@@ -49,6 +50,9 @@ const emit = defineEmits<{
 const appConfig = useAppConfig()
 const runtimeConfig = useRuntimeConfig()
 const theme = appConfig.stirTheme
+const resolvedRoundedClass = computed(() =>
+  props.roundedClass || theme.media.rounded,
+)
 const attrs = useAttrs()
 const forwardedAttrs = computed(() => {
   const {
@@ -220,7 +224,7 @@ onMounted(() => {
           ]
         : [
             theme.media.base,
-            theme.media.rounded,
+            resolvedRoundedClass,
             'm-auto !object-contain',
             !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
             imageClass,
@@ -246,7 +250,7 @@ onMounted(() => {
     :aria-busy="isSourceDeferred ? 'true' : undefined"
     :class="[
       'media group @container relative block overflow-hidden',
-      theme.media.rounded,
+      resolvedRoundedClass,
       isSourceDeferred && !deferredFrameStyle && 'min-h-64',
       wrapperClass,
     ]"
@@ -263,7 +267,7 @@ onMounted(() => {
       :alt="alt || ''"
       :class="[
         theme.media.base,
-        theme.media.rounded,
+        resolvedRoundedClass,
         platform === 'instagram' ? 'aspect-3/4' : '',
         !isLoaded && 'opacity-0',
         imageClass,
@@ -285,7 +289,7 @@ onMounted(() => {
       :alt="alt || ''"
       :class="[
         theme.media.base,
-        theme.media.rounded,
+        resolvedRoundedClass,
         !isLoaded && 'opacity-0',
         imageClass,
       ]"
