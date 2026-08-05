@@ -10,6 +10,7 @@ const props = defineProps<
   EditableRichTextProps & {
     align?: string
     card?: boolean | string | number
+    cardVariant?: string
     width?: string
     spacing?: string
     region?: string
@@ -34,11 +35,17 @@ const wrapStyles = computed(() =>
   ),
 )
 const isCard = computed(() => resolveBooleanProp(props.card))
+
+const cardVariant = computed(() => {
+  const variants = ['outline', 'solid', 'soft', 'subtle'] as const
+
+  return variants.find((variant) => variant === props.cardVariant) ?? 'outline'
+})
 </script>
 
 <template>
   <WrapDiv :align="align" :styles="wrapStyles">
-    <UCard v-if="isCard" class="h-full">
+    <UCard v-if="isCard" class="h-full" :variant="cardVariant">
       <EditableRichText v-bind="richTextProps" />
     </UCard>
     <EditableRichText v-else v-bind="richTextProps" />
