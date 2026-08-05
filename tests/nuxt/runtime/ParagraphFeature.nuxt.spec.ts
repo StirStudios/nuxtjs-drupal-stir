@@ -16,12 +16,13 @@ describe('ParagraphFeature (Nuxt runtime)', () => {
       },
     })
 
-    const feature = wrapper.getComponent({ name: 'UPageFeature' })
+    const feature = wrapper.getComponent({ name: 'UPageCard' })
 
     expect(feature.props()).toMatchObject({
       icon: 'i-lucide-warehouse',
       orientation: 'vertical',
       to: '/services/ftz-warehousing',
+      variant: 'outline',
     })
     expect(wrapper.get('h3').text()).toBe('Receive imported goods')
     expect(wrapper.text()).toContain('Confirm the inventory before arrival.')
@@ -34,6 +35,38 @@ describe('ParagraphFeature (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.getComponent({ name: 'UPageFeature' }).props('to')).toBeUndefined()
+    expect(wrapper.getComponent({ name: 'UPageCard' }).props('to')).toBeUndefined()
+  })
+
+  it('renders a titled Drupal link as a visible action without nesting links', async () => {
+    const wrapper = await mountSuspended(ParagraphFeature, {
+      props: {
+        header: 'FTZ warehousing',
+        link: {
+          title: 'Explore FTZ warehousing',
+          url: '/services/ftz-warehousing',
+        },
+      },
+    })
+
+    expect(wrapper.getComponent({ name: 'UPageCard' }).props('to')).toBeUndefined()
+    expect(wrapper.getComponent({ name: 'UButton' }).props()).toMatchObject({
+      label: 'Explore FTZ warehousing',
+      to: '/services/ftz-warehousing',
+      trailingIcon: 'i-lucide-arrow-right',
+      variant: 'link',
+    })
+    expect(wrapper.findAll('a')).toHaveLength(1)
+  })
+
+  it('passes supported Drupal card variants to Nuxt UI', async () => {
+    const wrapper = await mountSuspended(ParagraphFeature, {
+      props: {
+        cardVariant: 'solid',
+        header: 'Secure storage',
+      },
+    })
+
+    expect(wrapper.getComponent({ name: 'UPageCard' }).props('variant')).toBe('solid')
   })
 })

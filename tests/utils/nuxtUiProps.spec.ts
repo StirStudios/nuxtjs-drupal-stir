@@ -8,6 +8,7 @@ import {
   resolveUiColor,
   resolveUiFieldNoMaterialVariant,
   resolveUiFieldVariant,
+  resolveUiPageCardVariant,
   resolveUiSize,
 } from '../../layers/theme/app/utils/nuxtUiProps'
 
@@ -60,6 +61,11 @@ describe('nuxtUiProps', () => {
     expect(resolveUiFieldVariant(' material ')).toBe('material')
     expect(resolveUiFieldNoMaterialVariant('material')).toBe('outline')
     expect(resolveUiFieldNoMaterialVariant('soft')).toBe('soft')
+  })
+
+  it('normalizes Nuxt UI page card variants', () => {
+    expect(resolveUiPageCardVariant(undefined)).toBe('outline')
+    expect(resolveUiPageCardVariant(' subtle ')).toBe('subtle')
   })
 
   it('normalizes sizes with configured fallbacks', () => {

@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { resolveDrupalLink, type DrupalLink } from '#stir/utils/drupalLink'
+import { resolveUiPageCardVariant } from '#stir/utils/nuxtUiProps'
 
 defineOptions({
   inheritAttrs: false,
 })
-
-type DrupalLink = {
-  url?: string
-  linkUri?: string
-  linkResolvableUri?: string
-  props?: {
-    url?: string
-  }
-}
 
 const props = defineProps<{
   id?: number | string
@@ -25,29 +18,31 @@ const props = defineProps<{
   headerTag?: string
   text?: string
   link?: DrupalLink
+  cardVariant?: string
   direction?: string
 
   editLink?: string
 }>()
 
 const descriptionHtml = computed(() => trustedDrupalHtml(props.text))
-const linkUrl = computed(() =>
-  props.link?.url
-  ?? props.link?.props?.url
-  ?? props.link?.linkResolvableUri
-  ?? props.link?.linkUri,
-)
+const linkData = computed(() => resolveDrupalLink(props.link))
+const hasAction = computed(() => !!linkData.value.url && !!linkData.value.title)
+const cardLink = computed(() => hasAction.value ? undefined : linkData.value.url)
+const cardVariant = computed(() => resolveUiPageCardVariant(props.cardVariant))
 </script>
 
 <template>
   <ParagraphReveal :id="id" as="div" class="h-full" :direction="direction">
     <EditLink class="h-full" :link="editLink" :parent-uuid="parentUuid">
-      <UPageFeature
+      <UPageCard
         as="article"
-        class="h-full border border-default bg-elevated p-6 lg:p-8"
+        class="paragraph-feature h-full"
         :icon="iconName"
         orientation="vertical"
-        :to="linkUrl"
+        :rel="cardLink && linkData.external ? 'noopener noreferrer' : undefined"
+        :target="cardLink && linkData.external ? '_blank' : undefined"
+        :to="cardLink"
+        :variant="cardVariant"
       >
         <template v-if="header" #title>
           <component :is="headerTag || 'h3'">
@@ -58,7 +53,20 @@ const linkUrl = computed(() =>
         <template v-if="descriptionHtml" #description>
           <div class="prose max-w-none text-muted" v-html="descriptionHtml" />
         </template>
-      </UPageFeature>
+
+        <template v-if="hasAction" #footer>
+          <UButton
+            class="paragraph-feature-action"
+            color="neutral"
+            :label="linkData.title"
+            :rel="linkData.external ? 'noopener noreferrer' : undefined"
+            :target="linkData.external ? '_blank' : undefined"
+            :to="linkData.url"
+            trailing-icon="i-lucide-arrow-right"
+            variant="link"
+          />
+        </template>
+      </UPageCard>
     </EditLink>
   </ParagraphReveal>
 </template>
