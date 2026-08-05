@@ -227,6 +227,7 @@
       "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
       "layers/theme/app/components/global/Paragraph/Faq.vue",
       "layers/theme/app/components/global/Paragraph/FaqItem.vue",
+      "layers/theme/app/components/global/Paragraph/Feature.vue",
       "layers/theme/app/components/global/Paragraph/Hero.vue",
       "layers/theme/app/components/global/Paragraph/Icon.vue",
       "layers/theme/app/components/global/Paragraph/InstagramFeed.vue",
@@ -531,6 +532,7 @@
         "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
         "layers/theme/app/components/global/Paragraph/Faq.vue",
         "layers/theme/app/components/global/Paragraph/FaqItem.vue",
+        "layers/theme/app/components/global/Paragraph/Feature.vue",
         "layers/theme/app/components/global/Paragraph/Hero.vue",
         "layers/theme/app/components/global/Paragraph/Icon.vue",
         "layers/theme/app/components/global/Paragraph/InstagramFeed.vue",
@@ -700,7 +702,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 119,
+    "components": 120,
     "composables": 63,
     "utils": 46,
     "plugins": 6,
@@ -708,11 +710,11 @@
     "serverRoutes": 27,
     "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 129,
+    "tests": 130,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 43,
+      "nuxt": 44,
       "server": 24,
       "unit": 8,
       "utils": 41
@@ -756,6 +758,7 @@
     "tests/nuxt/runtime/OptionValue.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphDefault.nuxt.spec.ts",
+    "tests/nuxt/runtime/ParagraphFeature.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphLayout.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphRevealTargets.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
