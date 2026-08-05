@@ -152,7 +152,6 @@ const rendersSiblingControls = computed(
 const isolatesControls = computed(
   () =>
     props.controlsPlacement === 'isolated' &&
-    hasActions.value &&
     slots.default !== undefined,
 )
 
@@ -172,6 +171,7 @@ const handleActionSelect = (key: EditAction['key']) => {
       :select-action="handleActionSelect"
     />
     <LazyEditControls
+      v-if="hasActions"
       :actions="actions"
       @select="handleActionSelect"
     />

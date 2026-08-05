@@ -209,7 +209,7 @@ export function useRevealMotionConfig() {
     const shouldReduceMotion = preferredMotion.value === 'reduce'
     const shouldUseStaticReveal =
       shouldReduceMotion ||
-      (import.meta.client && !supportsIntersectionObserver.value)
+      (hasMounted.value && !supportsIntersectionObserver.value)
 
     if (shouldUseStaticReveal) {
       return { initial: false }
