@@ -526,6 +526,13 @@ intentionally accepts that performance tradeoff. The Drupal media payload
 remains the source of truth for image loading,
 priority, responsive derivatives, dimensions, and quality.
 
+The Media paragraph can also request square corners for a specific placement.
+That contextual choice is passed to visual media only and overrides
+`stirTheme.media.rounded` for that paragraph; leaving it at **Site default**
+continues to use the global theme setting. This keeps reusable Media entities
+free of layout-specific presentation while allowing edge-to-edge imagery to
+render without project CSS.
+
 For repeatable local mobile performance measurements, let the repository build,
 start, warm, verify compression, test, and stop the production server:
 
