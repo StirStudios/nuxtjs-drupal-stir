@@ -21,12 +21,15 @@ const gridStyles = computed(() => {
 
 const contentWrapperClasses = computed(() => {
   return [
-    props.card ? themeCard.base : null,
     props.classes || null,
     props.width || null,
     props.spacing || null,
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
+const cardUi = computed(() => ({
+  root: themeCard.base,
+  body: 'p-0 sm:p-0',
+}))
 const combinedClasses = computed(() => [
   props.container ? themeContainer : null,
   ...contentWrapperClasses.value,
@@ -36,19 +39,28 @@ const combinedClasses = computed(() => [
 
 <template>
   <WrapDiv v-if="props.card && props.container" :styles="themeContainer">
-    <WrapDiv :styles="contentWrapperClasses">
+    <UCard
+      :class="contentWrapperClasses"
+      :ui="cardUi"
+      variant="solid"
+    >
       <WrapDiv :styles="gridStyles">
         <slot />
       </WrapDiv>
       <LazyCardGradient :layout="props" />
-    </WrapDiv>
+    </UCard>
   </WrapDiv>
-  <WrapDiv v-else-if="props.card" :styles="contentWrapperClasses">
+  <UCard
+    v-else-if="props.card"
+    :class="contentWrapperClasses"
+    :ui="cardUi"
+    variant="solid"
+  >
     <WrapDiv :styles="gridStyles">
       <slot />
     </WrapDiv>
     <LazyCardGradient :layout="props" />
-  </WrapDiv>
+  </UCard>
   <WrapDiv v-else :styles="combinedClasses">
     <slot />
   </WrapDiv>

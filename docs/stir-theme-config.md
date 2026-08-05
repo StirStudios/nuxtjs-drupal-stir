@@ -404,6 +404,13 @@ frontPage: {
 container: 'max-w-(--ui-container) mx-auto px-4 md:px-5 lg:px-8',
 ```
 
+When Drupal enables **Card** on a Layout paragraph, the grid is rendered with
+Nuxt UI `UCard`. The existing `stirTheme.card` classes and optional Drupal
+gradient remain the branded layout surface. When **Card** is enabled on a Text
+paragraph, the text is rendered in a standard `UCard`, so projects can theme
+that reusable surface through Nuxt UI's global `ui.card` configuration. With
+Card disabled, both paragraph renderers retain their existing minimal markup.
+
 ### 🪟 `overlay`
 
 Use this to control Nuxt UI overlay portal behavior for popovers, modals, and select menus.
@@ -655,6 +662,10 @@ gradients: {
   3: 'bg-gradient-to-b from-[#7b2ff7] to-[#e53e3e]',
 },
 ```
+
+These `stirTheme.card` values apply to Layout cards. Standard Text cards use
+Nuxt UI's semantic card tokens and therefore follow the surrounding color mode
+and the project's global `ui.card` overrides.
 
 ### 🖼️ Carousel (StirTheme)
 
