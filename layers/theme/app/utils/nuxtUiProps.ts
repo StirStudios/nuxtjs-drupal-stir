@@ -1,6 +1,7 @@
 import type {
   UButton,
   UInput,
+  UPageCard,
   USelect,
   UTextarea,
 } from '#components'
@@ -9,6 +10,7 @@ type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 
 type ButtonProps = ComponentProps<typeof UButton>
 type InputProps = ComponentProps<typeof UInput>
+type PageCardProps = ComponentProps<typeof UPageCard>
 type SelectProps = ComponentProps<typeof USelect>
 type TextareaProps = ComponentProps<typeof UTextarea>
 
@@ -18,6 +20,7 @@ export type UiFieldVariant = Extract<NonNullable<
   InputProps['variant'] | SelectProps['variant'] | TextareaProps['variant']
 >, string>
 export type UiFieldNoMaterialVariant = Exclude<UiFieldVariant, 'material'>
+export type UiPageCardVariant = Extract<NonNullable<PageCardProps['variant']>, string>
 export type UiSize = Extract<NonNullable<ButtonProps['size']>, string>
 
 export type CarouselArrowButton = {
@@ -63,6 +66,13 @@ export function resolveOptionalUiButtonVariant(value: unknown): UiButtonVariant 
   return typeof value === 'string' && value.trim()
     ? value.trim() as UiButtonVariant
     : undefined
+}
+
+export function resolveUiPageCardVariant(
+  value: unknown,
+  fallback = 'outline' as UiPageCardVariant,
+): UiPageCardVariant {
+  return resolveStringProp(value, fallback)
 }
 
 export function resolveUiFieldVariant(

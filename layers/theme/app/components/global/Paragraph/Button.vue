@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { resolveDrupalLink, type DrupalLink } from '#stir/utils/drupalLink'
 import {
   resolveBooleanProp,
   resolveUiButtonVariant,
@@ -24,21 +25,7 @@ const props = defineProps<{
   icon?: string
   block?: boolean | number | string
 
-  link?: {
-    element?: string
-    title?: string
-    url?: string
-    external?: boolean
-    linkTitle?: string
-    linkUri?: string
-    linkResolvableUri?: string
-    content?: string
-    props?: {
-      label?: string
-      url?: string
-      external?: boolean
-    }
-  }
+  link?: DrupalLink
 
   editLink?: string
 }>()
@@ -48,16 +35,7 @@ const tk = useSlotsToolkit(vueSlots)
 const open = ref(false)
 const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
-const linkData = computed(() => {
-  const link = props.link
-  const url = link?.url ?? link?.props?.url ?? link?.linkResolvableUri ?? link?.linkUri
-
-  return {
-    title: link?.title ?? link?.props?.label ?? link?.linkTitle ?? link?.content,
-    url,
-    external: link?.external ?? link?.props?.external ?? /^https?:\/\//.test(url || ''),
-  }
-})
+const linkData = computed(() => resolveDrupalLink(props.link))
 const isExternal = computed(() => !!linkData.value.external)
 const btnLabel = computed(() => linkData.value.title || 'View link')
 const btnColor = computed(() => resolveUiColor(props.color))

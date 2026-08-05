@@ -354,6 +354,7 @@
       "layers/theme/app/utils/colorMode.ts",
       "layers/theme/app/utils/componentTreeDiagnostics.ts",
       "layers/theme/app/utils/dateUtils.ts",
+      "layers/theme/app/utils/drupalLink.ts",
       "layers/theme/app/utils/drupalMediaTypes.ts",
       "layers/theme/app/utils/drupalUrl.ts",
       "layers/theme/app/utils/drupalViewState.ts",
@@ -659,6 +660,7 @@
         "layers/theme/app/utils/colorMode.ts",
         "layers/theme/app/utils/componentTreeDiagnostics.ts",
         "layers/theme/app/utils/dateUtils.ts",
+        "layers/theme/app/utils/drupalLink.ts",
         "layers/theme/app/utils/drupalMediaTypes.ts",
         "layers/theme/app/utils/drupalUrl.ts",
         "layers/theme/app/utils/drupalViewState.ts",
@@ -704,20 +706,20 @@
   "counts": {
     "components": 120,
     "composables": 63,
-    "utils": 46,
+    "utils": 47,
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 131,
+    "tests": 132,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 45,
       "server": 24,
       "unit": 8,
-      "utils": 41
+      "utils": 42
     }
   },
   "tests": [
@@ -819,6 +821,7 @@
     "tests/utils/dateUtils.spec.ts",
     "tests/utils/drupalContractFixtures.spec.ts",
     "tests/utils/drupalHeaders.spec.ts",
+    "tests/utils/drupalLink.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",
