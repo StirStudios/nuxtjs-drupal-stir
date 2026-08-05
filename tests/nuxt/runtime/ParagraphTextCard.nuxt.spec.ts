@@ -25,4 +25,32 @@ describe('ParagraphText card presentation', () => {
     expect(wrapper.findComponent({ name: 'UCard' }).exists()).toBe(true)
     expect(wrapper.text()).toContain('Card text')
   })
+
+  it('passes a supported semantic card style to Nuxt UI', async () => {
+    const wrapper = await mountSuspended(ParagraphText, {
+      props: {
+        card: true,
+        cardVariant: 'solid',
+        text: '<p>Solid card text</p>',
+      },
+    })
+
+    expect(wrapper.findComponent({ name: 'UCard' }).props('variant')).toBe(
+      'solid',
+    )
+  })
+
+  it('falls back to outline for unsupported values', async () => {
+    const wrapper = await mountSuspended(ParagraphText, {
+      props: {
+        card: true,
+        cardVariant: 'ghost',
+        text: '<p>Safe card text</p>',
+      },
+    })
+
+    expect(wrapper.findComponent({ name: 'UCard' }).props('variant')).toBe(
+      'outline',
+    )
+  })
 })
