@@ -14,6 +14,7 @@ const ownership = {
     'Calendly.vue',
     'Enzuzo.vue',
     'Faq.vue',
+    'Feature.vue',
     'Icon.vue',
     'InstagramFeed.vue',
     'Tabs.vue',
