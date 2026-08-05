@@ -710,11 +710,11 @@
     "serverRoutes": 27,
     "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 130,
+    "tests": 131,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 44,
+      "nuxt": 45,
       "server": 24,
       "unit": 8,
       "utils": 41
@@ -761,6 +761,7 @@
     "tests/nuxt/runtime/ParagraphFeature.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphLayout.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphRevealTargets.nuxt.spec.ts",
+    "tests/nuxt/runtime/ParagraphTextCard.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",

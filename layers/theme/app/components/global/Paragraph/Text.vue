@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EditableRichTextProps } from '#stir/types'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 defineOptions({
   inheritAttrs: false,
@@ -8,6 +9,7 @@ defineOptions({
 const props = defineProps<
   EditableRichTextProps & {
     align?: string
+    card?: boolean | string | number
     width?: string
     spacing?: string
     region?: string
@@ -31,10 +33,14 @@ const wrapStyles = computed(() =>
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )
+const isCard = computed(() => resolveBooleanProp(props.card))
 </script>
 
 <template>
   <WrapDiv :align="align" :styles="wrapStyles">
-    <EditableRichText v-bind="richTextProps" />
+    <UCard v-if="isCard" class="h-full">
+      <EditableRichText v-bind="richTextProps" />
+    </UCard>
+    <EditableRichText v-else v-bind="richTextProps" />
   </WrapDiv>
 </template>
