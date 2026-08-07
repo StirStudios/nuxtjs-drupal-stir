@@ -69,6 +69,7 @@
       "nuxt-vitalizer",
       "nuxtjs-drupal-ce",
       "tailwindcss",
+      "ultrahtml",
       "valibot"
     ],
     "development": [
@@ -710,7 +711,7 @@
     "plugins": 6,
     "middleware": 4,
     "serverRoutes": 27,
-    "productionDependencies": 44,
+    "productionDependencies": 45,
     "developmentDependencies": 27,
     "tests": 134,
     "testsByArea": {

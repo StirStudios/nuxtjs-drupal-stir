@@ -30,6 +30,15 @@ text format, then pass through `trustedDrupalHtml()` to make that trust boundary
 explicit. Never use this helper for browser input, third-party responses, or
 otherwise untrusted HTML.
 
+Stir Tools marks every rendered rich-text media child with
+`stir-rich-text-media-element` plus an element-specific class. The image
+optimizer uses `stir-rich-text-media-image` as its only eligibility contract;
+the enclosing structured `<drupal-media>` supplies canonical delivery metadata.
+Rich text is parsed as an HTML fragment rather than rewritten with tag-matching
+regular expressions. Enhancements must remain opt-in through semantic hooks;
+do not apply broad mutations to arbitrary author markup. Deploy Stir Tools and
+rebuild Drupal caches before updating the Nuxt layer.
+
 Nuxt auto-imports are preferred for framework composables and components in
 normal application code. Keep explicit imports for external packages, types,
 shared utilities, and isolated test components where Nuxt auto-import context is

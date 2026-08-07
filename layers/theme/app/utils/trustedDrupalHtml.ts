@@ -1,3 +1,5 @@
+import { ELEMENT_NODE, parse, renderSync, walkSync } from 'ultrahtml'
+import type { ElementNode, Node } from 'ultrahtml'
 import { versionImageSource } from './imageDelivery'
 
 export interface RichTextImageResolution {
@@ -32,147 +34,132 @@ export function trustedDrupalHtml(html?: string | null): string {
   return html ?? ''
 }
 
-function attribute(tag: string, name: string): string | undefined {
-  const match = tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, 'i'))
-
-  return match?.[1] ?? match?.[2]
+function isElement(node: Node): node is ElementNode {
+  return node.type === ELEMENT_NODE
 }
 
-function numberAttribute(tag: string, name: string): number | undefined {
-  const value = Number(attribute(tag, name))
+function attribute(element: ElementNode | undefined, name: string): string | undefined {
+  return element?.attributes[name]
+}
+
+function numberAttribute(element: ElementNode, name: string): number | undefined {
+  const value = Number(attribute(element, name))
 
   return Number.isFinite(value) && value > 0 ? value : undefined
 }
 
-function escapeAttribute(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('"', '&quot;')
+function removeAttribute(element: ElementNode, name: string): void {
+  Reflect.deleteProperty(element.attributes, name)
 }
 
-function removeAttribute(tag: string, name: string): string {
-  return tag.replace(
-    new RegExp(`\\s${name}=(?:"[^"]*"|'[^']*')`, 'gi'),
-    '',
-  )
+function setAttribute(element: ElementNode, name: string, value: string): void {
+  element.attributes[name] = value
 }
 
-function setAttribute(tag: string, name: string, value: string): string {
-  const withoutAttribute = removeAttribute(tag, name)
-
-  return withoutAttribute.replace(/\s*\/?>(?=\s*$)/, ` ${name}="${escapeAttribute(value)}">`)
-}
-
-function mergeClassAttribute(tag: string, additions: string[]): string {
+function mergeClassAttribute(element: ElementNode, additions: string[]): void {
   const classes = new Set([
-    ...(attribute(tag, 'class') || '').split(/\s+/),
+    ...(attribute(element, 'class') || '').split(/\s+/),
     ...additions.flatMap(value => value.split(/\s+/)),
   ].filter(Boolean))
 
-  return classes.size > 0
-    ? setAttribute(tag, 'class', [...classes].join(' '))
-    : tag
+  if (classes.size > 0) {
+    setAttribute(element, 'class', [...classes].join(' '))
+  }
 }
 
-function hasRoundedClass(tag: string): boolean {
-  return (attribute(tag, 'class') || '')
+function hasUnprefixedRoundedClass(element: ElementNode): boolean {
+  return (attribute(element, 'class') || '')
     .split(/\s+/)
-    .some(value => /^rounded(?:-|$)/.test(value.split(':').at(-1) || ''))
+    .some(value => !value.includes(':') && /^rounded(?:-|$)/.test(value))
 }
 
-function enclosingTag(
-  sourceHtml: string,
-  offset: number,
+function ancestor(
+  element: ElementNode,
   tagName: string,
-): string {
-  const enclosingStart = sourceHtml.lastIndexOf(`<${tagName}`, offset)
-  const enclosingEnd = sourceHtml.lastIndexOf(`</${tagName}>`, offset)
+): ElementNode | undefined {
+  let parent: Node | undefined = element.parent
 
-  return enclosingStart > enclosingEnd
-    ? sourceHtml.slice(
-        enclosingStart,
-        sourceHtml.indexOf('>', enclosingStart) + 1,
-      )
-    : ''
+  while (parent) {
+    if (isElement(parent) && parent.name === tagName) return parent
+    parent = parent.parent
+  }
+
+  return undefined
 }
 
 /**
  * Enhances trusted Drupal rich-text images with the configured image provider.
  *
- * Structured `<drupal-media>` metadata is preferred. Legacy `originalsrc`
- * attributes remain supported during the fleet migration.
+ * Stir Tools' semantic image hook identifies eligible images. Its structured
+ * `<drupal-media>` wrapper supplies canonical delivery metadata.
  */
 export function optimizeDrupalRichTextImages(
   html: string,
   resolve: RichTextImageResolver,
   enhancement: RichTextImageEnhancement = {},
 ): string {
-  return html.replace(/<img\b[^>]*>/gi, (tag, offset, sourceHtml: string) => {
-    const mediaTag = enclosingTag(sourceHtml, offset, 'drupal-media')
-    const containerTag = enclosingTag(sourceHtml, offset, 'div')
-    const isStructuredImage = attribute(mediaTag, 'data-media-type') === 'image'
-    const enhancedTag = isStructuredImage
-      ? mergeClassAttribute(tag, [
-          enhancement.baseClass || '',
-          hasRoundedClass(tag) ? '' : enhancement.roundedClass || '',
-        ])
-      : tag
-    const originalSource = attribute(mediaTag, 'data-original-src')
-      || attribute(tag, 'data-original-src')
-      || attribute(tag, 'originalsrc')
+  if (!html.includes('stir-rich-text-media-image')) {
+    return html
+  }
 
-    if (!originalSource) return enhancedTag
+  const fragment = parse(html)
 
-    const revision = attribute(mediaTag, 'data-original-revision')
-      || attribute(tag, 'data-original-revision')
-      || attribute(tag, 'originalrevision')
-    const canonicalSource = versionImageSource(
-      originalSource.replaceAll('&amp;', '&'),
-      revision,
-    )
+  walkSync(fragment, (node) => {
+    if (!isElement(node) || node.name !== 'img') return
+    const element = node
 
-    if (!canonicalSource) return enhancedTag
+    const media = ancestor(element, 'drupal-media')
+    const container = ancestor(element, 'div')
+    const imageClasses = (attribute(element, 'class') || '').split(/\s+/)
+    const isStructuredImage = imageClasses.includes('stir-rich-text-media-image')
 
-    const alignmentClass = attribute(mediaTag, 'class') || attribute(tag, 'class') || ''
+    if (isStructuredImage) {
+      mergeClassAttribute(element, [
+        enhancement.baseClass || '',
+        hasUnprefixedRoundedClass(element) ? '' : enhancement.roundedClass || '',
+      ])
+    }
+
+    const originalSource = attribute(media, 'data-original-src')
+
+    if (!originalSource) return
+
+    const revision = attribute(media, 'data-original-revision')
+    const canonicalSource = versionImageSource(originalSource, revision)
+
+    if (!canonicalSource) return
+
+    const alignmentClass = attribute(media, 'class') || attribute(element, 'class') || ''
     const alignment = (['left', 'center', 'right'] as const).find(value =>
       alignmentClass.split(/\s+/).includes(`align-${value}`),
     )
-
     const resolved = resolve(
       canonicalSource,
-      numberAttribute(tag, 'width'),
-      numberAttribute(tag, 'height'),
+      numberAttribute(element, 'width'),
+      numberAttribute(element, 'height'),
       {
         alignment,
-        containerClass: attribute(containerTag, 'class'),
-        structured: Boolean(mediaTag),
+        containerClass: attribute(container, 'class'),
+        structured: isStructuredImage,
       },
     )
 
-    if (!resolved.src || !resolved.srcset) return enhancedTag
-
-    let optimized = enhancedTag
+    if (!resolved.src || !resolved.srcset) return
 
     for (const name of [
       'src',
       'srcset',
       'sizes',
-      'originalsrc',
-      'originalrevision',
-      'data-original-src',
-      'data-original-revision',
     ]) {
-      optimized = removeAttribute(optimized, name)
+      removeAttribute(element, name)
     }
 
-    optimized = setAttribute(optimized, 'data-nuxt-img', '')
-    optimized = setAttribute(optimized, 'src', resolved.src)
-    optimized = setAttribute(optimized, 'srcset', resolved.srcset)
+    setAttribute(element, 'data-nuxt-img', '')
+    setAttribute(element, 'src', resolved.src)
+    setAttribute(element, 'srcset', resolved.srcset)
 
-    if (resolved.sizes) {
-      optimized = setAttribute(optimized, 'sizes', resolved.sizes)
-    }
-
-    return optimized
+    if (resolved.sizes) setAttribute(element, 'sizes', resolved.sizes)
   })
+
+  return renderSync(fragment)
 }
