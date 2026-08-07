@@ -230,4 +230,25 @@ describe('Nuxt E2E smoke', async () => {
 
     await page.close()
   })
+
+  it.runIf(browserEnabled)('hydrates without client errors when reduced motion is requested', async () => {
+    const page = await createPage()
+    const clientErrors: string[] = []
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    page.on('console', (message) => {
+      if (message.type() === 'error') clientErrors.push(message.text())
+    })
+    page.on('pageerror', error => clientErrors.push(error.message))
+
+    const response = await page.goto(url('/'), { waitUntil: 'hydration' })
+    const bodyText = await page.locator('body').textContent()
+
+    expect(response?.status()).toBe(200)
+    expect(bodyText).toContain('Fixture page')
+    expect(bodyText).toContain('Direct node body')
+    expect(clientErrors).toEqual([])
+
+    await page.close()
+  })
 })
