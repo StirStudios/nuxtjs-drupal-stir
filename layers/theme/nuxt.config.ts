@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { dirname, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
@@ -20,6 +20,7 @@ import {
   resolveImageCdnBase,
 } from './build/imageCdn'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
+import { writeFileIfChanged } from './build/writeFileIfChanged'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
@@ -151,7 +152,7 @@ export default defineNuxtConfig({
       )
 
       await mkdir(generatedSpaTemplateDir, { recursive: true })
-      await writeFile(
+      await writeFileIfChanged(
         generatedSpaTemplate,
         `${buildSpaLoaderThemeStyle(rootAppConfig)}\n${spaTemplate}`,
       )
@@ -172,7 +173,7 @@ export default defineNuxtConfig({
         const generatedCss = resolvePath(generatedDir, 'compatibility.inline.css')
 
         await mkdir(generatedDir, { recursive: true })
-        await writeFile(generatedCss, compatibilitySource)
+        await writeFileIfChanged(generatedCss, compatibilitySource)
         nuxt.options.alias['#stir-presentation-source'] = generatedCss
         nuxt.options.runtimeConfig.public.stirPresentationBuild = {
           manifestRevision: '',
@@ -208,7 +209,7 @@ export default defineNuxtConfig({
       )
 
       await mkdir(generatedDir, { recursive: true })
-      await writeFile(generatedCss, presentationSource.source)
+      await writeFileIfChanged(generatedCss, presentationSource.source)
       nuxt.options.alias['#stir-presentation-source'] = generatedCss
       nuxt.options.runtimeConfig.public.stirPresentationManifestRevision = manifest.revision
       nuxt.options.runtimeConfig.public.stirPresentationBuild = {

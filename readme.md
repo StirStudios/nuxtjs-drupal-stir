@@ -106,7 +106,7 @@ resolve different revisions of the same layer.
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
-- **[Nuxt 4](https://nuxt.com/)**: `^4.5.1`
+- **[Nuxt 4](https://nuxt.com/)**: `^4.5.2`
 - **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.10.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.3`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.7.0`
