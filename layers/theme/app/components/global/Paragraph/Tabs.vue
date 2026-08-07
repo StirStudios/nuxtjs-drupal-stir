@@ -14,7 +14,6 @@ defineProps<{
 
 const vueSlots = useSlots()
 const active = ref<string>('0')
-const contentRef = ref<HTMLElement | null>(null)
 const tabNodes = computed<VNode[]>(() => {
   const nodes = vueSlots.tab?.()
 
@@ -39,17 +38,6 @@ const activeTabNode = computed(() => {
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const isMobile = breakpoints.smaller('lg')
 const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
-
-watch(active, async () => {
-  if (!isMobile.value) return
-
-  await nextTick()
-
-  contentRef.value?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-  })
-})
 </script>
 
 <template>
@@ -73,7 +61,7 @@ watch(active, async () => {
       variant="link"
     >
       <template #content>
-        <div ref="contentRef" class="tab-content">
+        <div class="tab-content">
           <component :is="activeTabNode" v-if="activeTabNode" />
         </div>
       </template>
