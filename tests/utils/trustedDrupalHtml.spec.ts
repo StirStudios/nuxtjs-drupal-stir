@@ -25,7 +25,10 @@ describe('optimizeDrupalRichTextImages', () => {
       srcset: '/_ipx/f_webp&s_640x427/https://cdn.example/image.jpg?v=42 640w',
     }))
     const html = '<drupal-media class="align-left" data-media-type="image" data-original-src="https://cdn.example/image.jpg" data-original-revision="42"><img src="/styles/1024/image.webp" srcset="/styles/640/image.webp 640w" width="1200" height="800" alt="Example"></drupal-media>'
-    const result = optimizeDrupalRichTextImages(html, resolve)
+    const result = optimizeDrupalRichTextImages(html, resolve, {
+      baseClass: 'relative w-full object-cover',
+      roundedClass: 'rounded-xl',
+    })
 
     expect(resolve).toHaveBeenCalledWith(
       'https://cdn.example/image.jpg?v=42',
@@ -38,9 +41,35 @@ describe('optimizeDrupalRichTextImages', () => {
       },
     )
     expect(result).toContain('data-nuxt-img=""')
+    expect(result).toContain('class="relative w-full object-cover rounded-xl"')
     expect(result).toContain('src="/_ipx/f_webp&amp;s_1200x800/https://cdn.example/image.jpg?v=42"')
     expect(result).not.toContain('/styles/')
     expect(result).not.toContain('originalsrc')
+  })
+
+  it('styles structured images without requiring optimization metadata', () => {
+    const html = '<drupal-media data-media-type="image"><img class="shadow-sm" src="/inline.jpg" alt="Example"></drupal-media>'
+    const result = optimizeDrupalRichTextImages(html, vi.fn(), {
+      baseClass: 'relative w-full object-cover',
+      roundedClass: 'rounded-xl',
+    })
+
+    expect(result).toContain(
+      'class="shadow-sm relative w-full object-cover rounded-xl"',
+    )
+  })
+
+  it('preserves an explicit author-supplied corner style', () => {
+    const html = '<drupal-media data-media-type="image"><img class="shadow-sm md:rounded-none" src="/inline.jpg" alt="Example"></drupal-media>'
+    const result = optimizeDrupalRichTextImages(html, vi.fn(), {
+      baseClass: 'relative w-full object-cover',
+      roundedClass: 'rounded-xl',
+    })
+
+    expect(result).toContain(
+      'class="shadow-sm md:rounded-none relative w-full object-cover"',
+    )
+    expect(result).not.toContain('rounded-xl')
   })
 
   it('supports legacy standalone image metadata during fleet migration', () => {

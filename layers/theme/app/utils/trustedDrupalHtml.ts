@@ -12,6 +12,11 @@ export interface RichTextImageContext {
   structured: boolean
 }
 
+export interface RichTextImageEnhancement {
+  baseClass?: string
+  roundedClass?: string
+}
+
 export type RichTextImageResolver = (
   source: string,
   width?: number,
@@ -58,6 +63,23 @@ function setAttribute(tag: string, name: string, value: string): string {
   return withoutAttribute.replace(/\s*\/?>(?=\s*$)/, ` ${name}="${escapeAttribute(value)}">`)
 }
 
+function mergeClassAttribute(tag: string, additions: string[]): string {
+  const classes = new Set([
+    ...(attribute(tag, 'class') || '').split(/\s+/),
+    ...additions.flatMap(value => value.split(/\s+/)),
+  ].filter(Boolean))
+
+  return classes.size > 0
+    ? setAttribute(tag, 'class', [...classes].join(' '))
+    : tag
+}
+
+function hasRoundedClass(tag: string): boolean {
+  return (attribute(tag, 'class') || '')
+    .split(/\s+/)
+    .some(value => /^rounded(?:-|$)/.test(value.split(':').at(-1) || ''))
+}
+
 function enclosingTag(
   sourceHtml: string,
   offset: number,
@@ -83,15 +105,23 @@ function enclosingTag(
 export function optimizeDrupalRichTextImages(
   html: string,
   resolve: RichTextImageResolver,
+  enhancement: RichTextImageEnhancement = {},
 ): string {
   return html.replace(/<img\b[^>]*>/gi, (tag, offset, sourceHtml: string) => {
     const mediaTag = enclosingTag(sourceHtml, offset, 'drupal-media')
     const containerTag = enclosingTag(sourceHtml, offset, 'div')
+    const isStructuredImage = attribute(mediaTag, 'data-media-type') === 'image'
+    const enhancedTag = isStructuredImage
+      ? mergeClassAttribute(tag, [
+          enhancement.baseClass || '',
+          hasRoundedClass(tag) ? '' : enhancement.roundedClass || '',
+        ])
+      : tag
     const originalSource = attribute(mediaTag, 'data-original-src')
       || attribute(tag, 'data-original-src')
       || attribute(tag, 'originalsrc')
 
-    if (!originalSource) return tag
+    if (!originalSource) return enhancedTag
 
     const revision = attribute(mediaTag, 'data-original-revision')
       || attribute(tag, 'data-original-revision')
@@ -101,7 +131,7 @@ export function optimizeDrupalRichTextImages(
       revision,
     )
 
-    if (!canonicalSource) return tag
+    if (!canonicalSource) return enhancedTag
 
     const alignmentClass = attribute(mediaTag, 'class') || attribute(tag, 'class') || ''
     const alignment = (['left', 'center', 'right'] as const).find(value =>
@@ -119,9 +149,9 @@ export function optimizeDrupalRichTextImages(
       },
     )
 
-    if (!resolved.src || !resolved.srcset) return tag
+    if (!resolved.src || !resolved.srcset) return enhancedTag
 
-    let optimized = tag
+    let optimized = enhancedTag
 
     for (const name of [
       'src',

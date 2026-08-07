@@ -28,29 +28,36 @@ export function useOptimizedDrupalHtml(
     const html = trustedDrupalHtml(toValue(source))
     const image = appConfig.stirTheme.media.image
 
-    return optimizeDrupalRichTextImages(html, (canonicalSource, width, height, context) => {
-      const layoutProfile = resolveLayoutImageDeliveryProfile(
-        undefined,
-        [
-          context?.containerClass,
-          toValue(containerClass),
-        ].filter(Boolean).join(' '),
-      )
-      const sizes = layoutProfile
-        ? image.profiles[layoutProfile]
-        : context?.alignment === 'left' || context?.alignment === 'right'
-          ? image.profiles.split
-          : image.profiles.container
+    return optimizeDrupalRichTextImages(
+      html,
+      (canonicalSource, width, height, context) => {
+        const layoutProfile = resolveLayoutImageDeliveryProfile(
+          undefined,
+          [
+            context?.containerClass,
+            toValue(containerClass),
+          ].filter(Boolean).join(' '),
+        )
+        const sizes = layoutProfile
+          ? image.profiles[layoutProfile]
+          : context?.alignment === 'left' || context?.alignment === 'right'
+            ? image.profiles.split
+            : image.profiles.container
 
-      return getSizes(canonicalSource, {
-        sizes,
-        modifiers: {
-          format: image.format,
-          height,
-          quality: image.quality,
-          width,
-        },
-      })
-    })
+        return getSizes(canonicalSource, {
+          sizes,
+          modifiers: {
+            format: image.format,
+            height,
+            quality: image.quality,
+            width,
+          },
+        })
+      },
+      {
+        baseClass: appConfig.stirTheme.media.base,
+        roundedClass: appConfig.stirTheme.media.rounded,
+      },
+    )
   })
 }
