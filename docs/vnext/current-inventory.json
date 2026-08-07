@@ -712,14 +712,14 @@
     "serverRoutes": 27,
     "productionDependencies": 44,
     "developmentDependencies": 27,
-    "tests": 132,
+    "tests": 134,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 45,
+      "nuxt": 46,
       "server": 24,
       "unit": 8,
-      "utils": 42
+      "utils": 43
     }
   },
   "tests": [
@@ -757,6 +757,7 @@
     "tests/nuxt/runtime/MediaItem.nuxt.spec.ts",
     "tests/nuxt/runtime/MediaVideo.nuxt.spec.ts",
     "tests/nuxt/runtime/NodePage.nuxt.spec.ts",
+    "tests/nuxt/runtime/NodeTeaser.nuxt.spec.ts",
     "tests/nuxt/runtime/OptionValue.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphDefault.nuxt.spec.ts",
@@ -854,7 +855,8 @@
     "tests/utils/webformFieldUtils.spec.ts",
     "tests/utils/webformFileUtils.spec.ts",
     "tests/utils/webformRedirect.spec.ts",
-    "tests/utils/webformScrollToTop.spec.ts"
+    "tests/utils/webformScrollToTop.spec.ts",
+    "tests/utils/writeFileIfChanged.spec.ts"
   ],
   "documentedPublicContract": {
     "schemaVersion": 1,

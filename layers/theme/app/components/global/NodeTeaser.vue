@@ -37,6 +37,7 @@ const { post, orientation } = useTeaserPost(props.teaser, {
 
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
+const theme = useAppConfig().stirTheme
 const trustedDescription = computed(() =>
   trustedDrupalHtml(post.value.description),
 )
@@ -68,6 +69,9 @@ const teaserImageProps = computed<Record<string, unknown>>(() => {
 
   return image && typeof image === 'object' ? image : {}
 })
+const teaserImageRoundedClass = computed(() =>
+  `${theme.media.rounded} rounded-b-none`,
+)
 
 const postUi = computed(() => {
   if (!titleOverlay.value) {
@@ -102,6 +106,7 @@ const postUi = computed(() => {
         <MediaImage
           v-if="teaserImage"
           v-bind="teaserImageProps"
+          :rounded-class="teaserImageRoundedClass"
           :wrapper-class="[
             'h-full w-full transform transition-transform duration-300 group-hover:scale-105 group-hover/blog-post:scale-105',
           ]"
