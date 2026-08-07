@@ -38,7 +38,7 @@
     "slots": {}
   },
   "menu": [
-    { "title": "Home", "url": "/", "below": [] }
+    { "title": "Home", "description": "Return to the homepage", "url": "/", "below": [] }
   ],
   "webform": {
     "webformId": "fixture_form",

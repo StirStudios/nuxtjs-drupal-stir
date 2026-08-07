@@ -14,6 +14,7 @@ export type DrupalMenuItemLink = {
 
 export type DrupalMenuTreeItem = DrupalMenuItemLink & {
   title?: string
+  description?: string
   children?: DrupalMenuTreeItem[]
   below?: DrupalMenuTreeItem[]
   items?: DrupalMenuTreeItem[]
@@ -81,9 +82,11 @@ export function mapDrupalMenuItem(item: DrupalMenuTreeItem): NavigationMenuItem 
   const to = menuItemTo(item)
   const hasChildren = children.length > 0
   const hasHash = typeof to === 'string' && to.includes('#')
+  const description = item.description?.trim() || undefined
 
   return {
     label: item.title ?? '',
+    description,
     to: hasChildren ? undefined : to,
     exact: !hasChildren,
     exactHash: !hasChildren && hasHash,

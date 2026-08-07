@@ -374,6 +374,10 @@ For a centered-logo desktop header, set `navigation.desktopLayout` to
 Items before that marker render to the left of the logo, items after it render
 to the right, and the marker is removed from the mobile menu.
 
+Drupal's optional menu-link description is passed directly to Nuxt UI navigation
+items. Add concise descriptions in Drupal to enrich dropdown children; links
+without descriptions retain the existing compact presentation.
+
 Common downstream override:
 
 ```ts

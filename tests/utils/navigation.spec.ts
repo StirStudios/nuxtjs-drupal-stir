@@ -48,16 +48,23 @@ describe('mapDrupalMenuItem', () => {
   it('maps nested Drupal menu aliases and suppresses parent navigation', () => {
     expect(mapDrupalMenuItem({
       title: 'About',
+      description: 'Learn more about us',
       alias: '/about',
-      below: [{ title: 'Team', alias: '/about/team' }],
+      below: [{
+        title: 'Team',
+        description: 'Meet the people behind our work',
+        alias: '/about/team',
+      }],
     })).toEqual({
       label: 'About',
+      description: 'Learn more about us',
       to: undefined,
       exact: false,
       exactHash: false,
       target: undefined,
       children: [{
         label: 'Team',
+        description: 'Meet the people behind our work',
         to: '/about/team',
         exact: true,
         exactHash: false,
@@ -65,6 +72,14 @@ describe('mapDrupalMenuItem', () => {
         children: undefined,
       }],
     })
+  })
+
+  it('keeps empty Drupal menu descriptions absent', () => {
+    expect(mapDrupalMenuItem({
+      title: 'Contact',
+      description: '   ',
+      alias: '/contact',
+    })).toMatchObject({ description: undefined })
   })
 
   it('preserves external targets and hash matching', () => {
