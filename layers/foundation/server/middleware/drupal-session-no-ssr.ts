@@ -25,8 +25,10 @@ export default defineEventHandler((event) => {
 
   if (!hasDrupalSession) return
 
-  event.context.nuxt ||= {}
-  event.context.nuxt.noSSR = true
+  if (process.env.NODE_ENV === 'production') {
+    event.context.nuxt ||= {}
+    event.context.nuxt.noSSR = true
+  }
 
   setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
 })
