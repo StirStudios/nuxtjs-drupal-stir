@@ -268,7 +268,7 @@ Behavior notes:
 
 - Drupal `/api/auth/config` is the source of truth for account availability, redirects, UI copy, and password policy; frontend values are safe fallbacks only.
 - Client auth state comes from `/api/auth/session` only.
-- In production, requests with Drupal `SESS*`/`SSESS*` cookies skip SSR for page routes. During local development, authenticated routes keep SSR enabled for Nuxt DevTools. Authenticated responses always return `Cache-Control: private, no-store, max-age=0`; anonymous requests keep normal SSR for SEO.
+- Requests with Drupal `SESS*`/`SSESS*` cookies skip SSR for page routes and return `Cache-Control: private, no-store, max-age=0`; anonymous requests keep normal SSR for SEO.
 - Register page visibility follows backend policy (`/api/auth/register-policy`), so Drupal account settings remain the source of truth.
 - Password reset and verification links are backend-signed and validated before submit.
 - Turnstile tokens are required in auth form submissions when enabled by backend policy.

@@ -32,26 +32,14 @@ describe('Drupal session SSR safeguard', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
-    vi.unstubAllEnvs()
   })
 
   it('disables SSR and shared caching for a Drupal session', () => {
-    vi.stubEnv('NODE_ENV', 'production')
     const { event, headers } = createEvent(`${SESSION_NAME}=session-value`)
 
     drupalSessionNoSsr(event as never)
 
     expect(event.context.nuxt).toEqual({ noSSR: true })
-    expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
-  })
-
-  it('keeps SSR enabled locally while preventing shared caching', () => {
-    vi.stubEnv('NODE_ENV', 'development')
-    const { event, headers } = createEvent(`${SESSION_NAME}=session-value`)
-
-    drupalSessionNoSsr(event as never)
-
-    expect(event.context.nuxt).toBeUndefined()
     expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
   })
 
@@ -65,7 +53,6 @@ describe('Drupal session SSR safeguard', () => {
   })
 
   it('supports an explicitly configured custom Drupal session name', () => {
-    vi.stubEnv('NODE_ENV', 'production')
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       drupalSessionCookieNames: ['custom_drupal_session'],
     }))
