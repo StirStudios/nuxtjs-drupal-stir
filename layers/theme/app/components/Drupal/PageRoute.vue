@@ -19,6 +19,7 @@ provide(
 )
 
 const route = useRoute()
+const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
 const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
 
@@ -27,6 +28,17 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
+
+if (page.value?.is_front_page === true && route.path !== '/') {
+  await navigateTo(
+    {
+      path: nuxtApp.$localePath?.('/') || '/',
+      query: route.query,
+    },
+    { redirectCode: 301, replace: true },
+  )
+}
+
 const pageContentProps = computed(() => {
   return (page.value?.content?.props || {}) as {
     pageAnimation?: string
@@ -67,8 +79,16 @@ const seoTitle = computed(() => {
 })
 
 const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld as JsonLdValue))
+const pageHead = computed(() => page.value || {
+  title: '',
+  metatags: {
+    meta: [],
+    link: [],
+    jsonld: [],
+  },
+})
 
-usePageHead(page, ['meta', 'link'])
+usePageHead(pageHead, ['meta', 'link'])
 
 useHead(() => ({
   title: seoTitle.value || page.value?.title || '',
