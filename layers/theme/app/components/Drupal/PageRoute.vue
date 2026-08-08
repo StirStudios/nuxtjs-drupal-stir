@@ -27,6 +27,11 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
+
+if (page.value?.is_front_page === true && route.path !== '/') {
+  await navigateTo('/', { redirectCode: 301, replace: true })
+}
+
 const pageContentProps = computed(() => {
   return (page.value?.content?.props || {}) as {
     pageAnimation?: string

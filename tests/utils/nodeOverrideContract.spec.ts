@@ -36,6 +36,13 @@ describe('node override contract', () => {
     expect(pageRoute).toContain('pageLayout.value || \'default\'')
   })
 
+  it('redirects the configured Drupal front-page alias to the public root', () => {
+    const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
+
+    expect(pageRoute).toContain('page.value?.is_front_page === true && route.path !== \'/\'')
+    expect(pageRoute).toContain('navigateTo(\'/\', { redirectCode: 301, replace: true })')
+  })
+
   it('promotes page fetch failures to the global error page during client rendering', () => {
     const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
 

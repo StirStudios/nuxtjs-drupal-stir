@@ -103,6 +103,13 @@ Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.
 
+### Drupal front-page aliases
+
+Drupal remains the source of truth for the configured front page. When a page
+payload is marked `is_front_page: true`, requests to that page's Drupal alias
+receive a permanent redirect to the public Nuxt root (`/`). This keeps one
+indexable homepage without assuming that the Drupal alias is `/home`.
+
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
