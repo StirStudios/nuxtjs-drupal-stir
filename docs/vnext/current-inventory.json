@@ -70,6 +70,7 @@
       "nuxtjs-drupal-ce",
       "tailwindcss",
       "ultrahtml",
+      "unhead",
       "valibot"
     ],
     "development": [
@@ -352,6 +353,7 @@
       "layers/editorial/app/utils/adminUiTheme.ts",
       "layers/editorial/app/utils/editorDragHandle.ts",
       "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
+      "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
       "layers/theme/app/utils/colorMode.ts",
       "layers/theme/app/utils/componentTreeDiagnostics.ts",
       "layers/theme/app/utils/dateUtils.ts",
@@ -392,6 +394,7 @@
     ],
     "plugins": [
       "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
+      "layers/foundation/app/plugins/nuxt-devtools-unhead-compat.client.ts",
       "layers/integrations/app/plugins/privacy-consent.ts",
       "layers/scripts/app/plugins/userway.client.ts",
       "layers/seo/app/plugins/cms-global-seo.ts",
@@ -658,6 +661,7 @@
         "layers/editorial/app/utils/adminUiTheme.ts",
         "layers/editorial/app/utils/editorDragHandle.ts",
         "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
+        "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
         "layers/theme/app/utils/colorMode.ts",
         "layers/theme/app/utils/componentTreeDiagnostics.ts",
         "layers/theme/app/utils/dateUtils.ts",
@@ -707,20 +711,20 @@
   "counts": {
     "components": 120,
     "composables": 63,
-    "utils": 47,
-    "plugins": 6,
+    "utils": 48,
+    "plugins": 7,
     "middleware": 4,
     "serverRoutes": 27,
-    "productionDependencies": 45,
+    "productionDependencies": 46,
     "developmentDependencies": 27,
-    "tests": 134,
+    "tests": 135,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 46,
       "server": 24,
       "unit": 8,
-      "utils": 43
+      "utils": 44
     }
   },
   "tests": [
@@ -836,6 +840,7 @@
     "tests/utils/layerContract.spec.ts",
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",
+    "tests/utils/nuxtDevtoolsUnheadCompat.spec.ts",
     "tests/utils/nuxtUiProps.spec.ts",
     "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
