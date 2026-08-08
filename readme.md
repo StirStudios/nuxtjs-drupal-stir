@@ -107,8 +107,10 @@ resolve different revisions of the same layer.
 
 Drupal remains the source of truth for the configured front page. When a page
 payload is marked `is_front_page: true`, requests to that page's Drupal alias
-receive a permanent redirect to the public Nuxt root (`/`). This keeps one
-indexable homepage without assuming that the Drupal alias is `/home`.
+receive a permanent redirect to the active locale's root (or `/` when
+localization is not installed). This keeps one indexable homepage without
+assuming that the Drupal alias is `/home`. The redirect preserves query
+parameters so campaign attribution and query-driven state are not lost.
 
 ## 🧱 Tech Stack
 

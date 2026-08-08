@@ -19,6 +19,7 @@ provide(
 )
 
 const route = useRoute()
+const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
 const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
 
@@ -29,7 +30,13 @@ const page = await fetchPage(
 )
 
 if (page.value?.is_front_page === true && route.path !== '/') {
-  await navigateTo('/', { redirectCode: 301, replace: true })
+  await navigateTo(
+    {
+      path: nuxtApp.$localePath?.('/') || '/',
+      query: route.query,
+    },
+    { redirectCode: 301, replace: true },
+  )
 }
 
 const pageContentProps = computed(() => {

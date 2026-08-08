@@ -40,7 +40,10 @@ describe('node override contract', () => {
     const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
 
     expect(pageRoute).toContain('page.value?.is_front_page === true && route.path !== \'/\'')
-    expect(pageRoute).toContain('navigateTo(\'/\', { redirectCode: 301, replace: true })')
+    expect(pageRoute).toContain('const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }')
+    expect(pageRoute).toContain('path: nuxtApp.$localePath?.(\'/\') || \'/\'')
+    expect(pageRoute).toContain('query: route.query')
+    expect(pageRoute).toContain('{ redirectCode: 301, replace: true }')
   })
 
   it('promotes page fetch failures to the global error page during client rendering', () => {
