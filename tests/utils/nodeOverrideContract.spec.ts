@@ -46,6 +46,13 @@ describe('node override contract', () => {
     expect(pageRoute).toContain('{ redirectCode: 301, replace: true }')
   })
 
+  it('keeps page metadata safe while a client-side alias redirect retires its page', () => {
+    const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
+
+    expect(pageRoute).toContain('const pageHead = computed(() => page.value || {')
+    expect(pageRoute).toContain('usePageHead(pageHead, [\'meta\', \'link\'])')
+  })
+
   it('promotes page fetch failures to the global error page during client rendering', () => {
     const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
 

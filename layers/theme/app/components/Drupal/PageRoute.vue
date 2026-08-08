@@ -79,8 +79,16 @@ const seoTitle = computed(() => {
 })
 
 const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld as JsonLdValue))
+const pageHead = computed(() => page.value || {
+  title: '',
+  metatags: {
+    meta: [],
+    link: [],
+    jsonld: [],
+  },
+})
 
-usePageHead(page, ['meta', 'link'])
+usePageHead(pageHead, ['meta', 'link'])
 
 useHead(() => ({
   title: seoTitle.value || page.value?.title || '',
