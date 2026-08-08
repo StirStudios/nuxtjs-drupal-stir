@@ -14,17 +14,17 @@
 
   h1,
   .display-h1 {
-    @apply mb-2 text-center text-[clamp(2rem,5vw,4.5rem)] font-normal;
+    @apply mb-2 text-center text-[clamp(2rem,5vw,4.5rem)] leading-tight font-normal;
   }
 
   h2,
   .display-h2 {
-    @apply mb-5 text-[clamp(1.75rem,4vw,3rem)] font-medium;
+    @apply mb-5 text-[clamp(1.75rem,4vw,3rem)] leading-tight font-medium;
   }
 
   h3,
   .display-h3 {
-    @apply text-[clamp(1.5rem,3vw,2.25rem)];
+    @apply text-[clamp(1.5rem,3vw,2.25rem)] leading-tight;
   }
 
   a,
