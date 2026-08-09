@@ -20,5 +20,5 @@ defineSlots<{
 
 <template>
   <slot />
-  <div v-if="trustedHtml" v-html="trustedHtml" />
+  <div v-if="trustedHtml" v-drupal-markup="trustedHtml" />
 </template>
