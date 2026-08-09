@@ -378,6 +378,12 @@ export function useDrupalViewControls(
     })
   }
 
+  function routePathChanged(fullPath: string, oldFullPath: string): boolean {
+    const pathname = (path: string) => path.split(/[?#]/)[0] || '/'
+
+    return pathname(fullPath) !== pathname(oldFullPath)
+  }
+
   function routeValueForFilter(filter: NormalizedViewFilter, source?: ExposedFilter): string | string[] {
     const routeValue = routeQueryValue(filter.queryParamName)
     const defaultValue = defaultValueForFilter(filter, source)
@@ -593,7 +599,10 @@ export function useDrupalViewControls(
         return
       }
 
-      if (!managedRouteQueryChanged(fullPath, oldFullPath)) return
+      if (
+        !routePathChanged(fullPath, oldFullPath)
+        && !managedRouteQueryChanged(fullPath, oldFullPath)
+      ) return
 
       const page = applyRouteStateToControls()
 

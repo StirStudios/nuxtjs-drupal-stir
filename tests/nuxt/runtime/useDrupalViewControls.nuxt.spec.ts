@@ -81,9 +81,21 @@ const NamespacedViewControlsHarness = defineComponent({
   template: '<div />',
 })
 
-async function resetRoute(query: RouteQuery = {}) {
+const NamespacedLegacyViewControlsHarness = defineComponent({
+  setup() {
+    const { paragraphId: _paragraphId, ...legacyProps } = viewProps
+
+    return useDrupalViewControls({
+      ...legacyProps,
+      queryNamespace: 'articles',
+    })
+  },
+  template: '<div />',
+})
+
+async function resetRoute(query: RouteQuery = {}, path = '/') {
   await useRouter().replace({
-    path: '/',
+    path,
     query,
   })
   await nextTick()
@@ -276,6 +288,21 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     })
 
     expect(state.api).toHaveBeenCalledTimes(callsBeforeForeignChange + 1)
+  })
+
+  it('refreshes a surviving view when the route path changes', async () => {
+    state.legacyApi.mockResolvedValue(viewResponse(1, 'route-row'))
+    await resetRoute({ articles_page: '1' }, '/a')
+    await mountSuspended(NamespacedLegacyViewControlsHarness)
+    await nextTick()
+    await flushPromises()
+
+    await resetRoute({ articles_page: '1' }, '/b')
+
+    expect(state.legacyApi).toHaveBeenCalledWith(
+      '/b?category=events&sort_by=created&sort_order=ASC&page=1',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
   })
 
   it('uses an empty row fallback when the refreshed page does not contain the view', async () => {
