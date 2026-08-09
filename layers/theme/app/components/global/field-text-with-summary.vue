@@ -32,6 +32,6 @@ const trustedHtml = useOptimizedDrupalHtml(
     :summary="summary"
     :value="value"
   >
-    <div v-if="trustedHtml" v-html="trustedHtml" />
+    <div v-if="trustedHtml" v-drupal-markup="trustedHtml" />
   </slot>
 </template>

@@ -635,6 +635,23 @@ describe('layer contract', () => {
     expect(editableRichText).not.toContain('<div class="relative">')
   })
 
+  it('renders Drupal markup through the hydration-safe upstream directive', () => {
+    const drupalMarkup = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/drupal-markup.vue'),
+      'utf8',
+    )
+    const fieldTextWithSummary = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/field-text-with-summary.vue'),
+      'utf8',
+    )
+
+    for (const component of [drupalMarkup, fieldTextWithSummary]) {
+      expect(component).toContain('v-drupal-markup="trustedHtml"')
+      expect(component).not.toContain('v-html="trustedHtml"')
+      expect(component).toContain('useOptimizedDrupalHtml')
+    }
+  })
+
   it('allows top-level blocks and nested list items without unwrapping Drupal structures', () => {
     const textEditor = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
