@@ -42,6 +42,7 @@ interface UseDrupalViewControlsProps {
   viewId?: string
   displayId?: string
   parentUuid?: string
+  queryNamespace?: string
   pager?: ViewPager | unknown
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
@@ -81,7 +82,21 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   }
 
   function routeQueryValue(key: string): string | string[] | undefined {
-    return routeControls.routeQueryValue(key)
+    return routeControls.routeQueryValue(publicQueryKey(key))
+  }
+
+  function publicQueryKey(key: string): string {
+    const namespace = props.queryNamespace?.trim()
+
+    return namespace ? `${namespace}_${key}` : key
+  }
+
+  function publicQueryParams(
+    query: Record<string, string | string[]>,
+  ): Record<string, string | string[]> {
+    return Object.fromEntries(
+      Object.entries(query).map(([key, value]) => [publicQueryKey(key), value]),
+    )
   }
 
   const defaultNoResultsMessage = computed(
@@ -170,7 +185,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
   )
 
   function routePageValue(): number | null {
-    return routeControls.routePageValue()
+    return routeControls.routePageValue(publicQueryKey('page'))
   }
 
   function snapshotCurrentViewState(page = currentPage.value): ViewStateSnapshot {
@@ -319,6 +334,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
   function managedQueryKeys(): string[] {
     return drupalViewManagedQueryKeys(normalizedFilters.value, primarySort.value)
+      .map(publicQueryKey)
   }
 
   function syncUrlQuery(page: number): void {
@@ -328,7 +344,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
     const nextQuery = {
       ...routeControls.routeQueryExcluding(managedQueryKeys()),
-      ...buildQueryParams(page),
+      ...publicQueryParams(buildQueryParams(page)),
     }
 
     saveViewState(page)
