@@ -511,8 +511,18 @@ socials: [
     icon: 'i-social-tiktok',
     iconSize: 'size-10',
   },
+  {
+    title: 'Pinterest',
+    url: '//pinterest.com/CLIENT',
+    icon: 'i-social-pinterest',
+    iconSize: 'size-10',
+  },
 ]
 ```
+
+Social profile entries are opt-in. The shared icon collection currently
+includes Facebook, Instagram, LinkedIn, Pinterest, TikTok, X, YouTube, and
+IMDb; downstream projects should configure only the profiles they maintain.
 
 ### 🖼️ `media`
 
