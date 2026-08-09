@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
+
+const props = defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
@@ -28,6 +30,11 @@ defineProps<{
   carouselIndicators?: boolean
   carouselInterval?: number
 }>()
+
+provide(
+  drupalViewQueryNamespaceKey,
+  computed(() => props.queryNamespace?.trim() || undefined),
+)
 </script>
 
 <template>

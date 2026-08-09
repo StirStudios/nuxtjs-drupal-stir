@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { useDrupalViewControls } from '../../../layers/theme/app/composables/useDrupalViewControls'
 
@@ -18,6 +18,8 @@ mockNuxtImport('useDrupalCe', () => {
 })
 
 mockNuxtImport('$fetch', () => state.api)
+
+enableAutoUnmount(afterEach)
 
 const viewProps = {
   paragraphId: 42,
@@ -254,6 +256,26 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
       sort_order: 'DESC',
     })
     expect(wrapper.vm.currentPage).toBe(2)
+  })
+
+  it('does not refresh when only another view namespace changes', async () => {
+    state.api.mockResolvedValue(viewResponse(1, 'route-row'))
+    await mountSuspended(NamespacedViewControlsHarness)
+    await nextTick()
+    await flushPromises()
+
+    const callsBeforeForeignChange = state.api.mock.calls.length
+
+    await resetRoute({ resources_page: '1' })
+
+    expect(state.api).toHaveBeenCalledTimes(callsBeforeForeignChange)
+
+    await resetRoute({
+      articles_page: '1',
+      resources_page: '1',
+    })
+
+    expect(state.api).toHaveBeenCalledTimes(callsBeforeForeignChange + 1)
   })
 
   it('uses an empty row fallback when the refreshed page does not contain the view', async () => {

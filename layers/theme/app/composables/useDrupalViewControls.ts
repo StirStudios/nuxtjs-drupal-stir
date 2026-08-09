@@ -49,7 +49,10 @@ interface UseDrupalViewControlsProps {
   noResults?: string
 }
 
-export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
+export function useDrupalViewControls(
+  props: UseDrupalViewControlsProps,
+  inheritedQueryNamespace?: MaybeRefOrGetter<string | undefined>,
+) {
   const { $ceApi } = useStirDrupalCe()
   const route = useRoute()
   const routeControls = useRouteListControls()
@@ -87,6 +90,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
 
   function publicQueryKey(key: string): string {
     const namespace = props.queryNamespace?.trim()
+      || toValue(inheritedQueryNamespace)?.trim()
 
     return namespace ? `${namespace}_${key}` : key
   }
@@ -358,6 +362,22 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
     return routeControls.routeHasQuery(managedQueryKeys(), fullPath)
   }
 
+  function managedRouteQueryChanged(fullPath: string, oldFullPath: string): boolean {
+    const queryParams = (path: string) => new URLSearchParams(
+      path.split('?')[1]?.split('#')[0] || '',
+    )
+    const params = queryParams(fullPath)
+    const oldParams = queryParams(oldFullPath)
+
+    return managedQueryKeys().some((key) => {
+      const values = params.getAll(key)
+      const oldValues = oldParams.getAll(key)
+
+      return values.length !== oldValues.length
+        || values.some((value, index) => value !== oldValues[index])
+    })
+  }
+
   function routeValueForFilter(filter: NormalizedViewFilter, source?: ExposedFilter): string | string[] {
     const routeValue = routeQueryValue(filter.queryParamName)
     const defaultValue = defaultValueForFilter(filter, source)
@@ -573,7 +593,7 @@ export function useDrupalViewControls(props: UseDrupalViewControlsProps) {
         return
       }
 
-      if (!routeHasManagedQuery(fullPath) && !routeHasManagedQuery(oldFullPath)) return
+      if (!managedRouteQueryChanged(fullPath, oldFullPath)) return
 
       const page = applyRouteStateToControls()
 
