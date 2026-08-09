@@ -31,6 +31,7 @@ export interface DrupalViewProps {
   paragraphId?: number | string
   paragraphUuid?: string
   parentUuid?: string
+  queryNamespace?: string
   pager?: ViewPager | unknown
   randomize?: boolean | string
   carousel?: boolean

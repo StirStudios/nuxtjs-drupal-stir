@@ -140,3 +140,4 @@ Recommended smoke checks:
 - Main menu endpoint returns JSON.
 - App-context edit links behave correctly for authenticated and anonymous users.
 - A Drupal view block with exposed filters still filters, sorts, paginates, and restores browser history correctly.
+- When multiple Drupal Views share a route, give each View instance a readable `queryNamespace` (for example, `articles` or `resources`) so public controls use independent keys such as `articles_page`; Drupal requests continue to receive their original exposed-filter keys.

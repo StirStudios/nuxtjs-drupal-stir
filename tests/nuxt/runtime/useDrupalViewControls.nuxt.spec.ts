@@ -69,6 +69,16 @@ const LegacyViewControlsHarness = defineComponent({
   template: '<div />',
 })
 
+const NamespacedViewControlsHarness = defineComponent({
+  setup() {
+    return useDrupalViewControls({
+      ...viewProps,
+      queryNamespace: 'articles',
+    })
+  },
+  template: '<div />',
+})
+
 async function resetRoute(query: RouteQuery = {}) {
   await useRouter().replace({
     path: '/',
@@ -191,6 +201,59 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
       },
     ])
     expect(wrapper.vm.currentPage).toBe(0)
+  })
+
+  it('namespaces public route controls without changing Drupal request keys', async () => {
+    state.api.mockResolvedValue(viewResponse(0, 'row-news'))
+
+    const wrapper = await mountSuspended(NamespacedViewControlsHarness)
+
+    await resetRoute({ resources_category: 'events' })
+
+    vi.useFakeTimers()
+    wrapper.vm.onFilterChange({ key: 'category', value: 'news' })
+    await vi.advanceTimersByTimeAsync(200)
+    await nextTick()
+    await flushPromises()
+
+    expect(useRoute().query).toMatchObject({
+      articles_category: 'news',
+      articles_sort_by: 'created',
+      articles_sort_order: 'ASC',
+      resources_category: 'events',
+    })
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/42',
+      expect.objectContaining({
+        query: {
+          category: 'news',
+          sort_by: 'created',
+          sort_order: 'ASC',
+        },
+      }),
+    )
+  })
+
+  it('restores namespaced route controls independently', async () => {
+    state.api.mockResolvedValue(viewResponse(2, 'route-row'))
+    const wrapper = await mountSuspended(NamespacedViewControlsHarness)
+
+    await resetRoute({
+      articles_category: 'news',
+      articles_sort_by: 'created',
+      articles_sort_order: 'DESC',
+      articles_page: '2',
+      resources_page: '4',
+    })
+    await nextTick()
+    await flushPromises()
+
+    expect(wrapper.vm.filterValues).toEqual({ category: 'news' })
+    expect(wrapper.vm.sortValues).toEqual({
+      sort_by: 'created',
+      sort_order: 'DESC',
+    })
+    expect(wrapper.vm.currentPage).toBe(2)
   })
 
   it('uses an empty row fallback when the refreshed page does not contain the view', async () => {
