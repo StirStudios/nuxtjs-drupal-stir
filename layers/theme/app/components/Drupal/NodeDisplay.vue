@@ -121,7 +121,7 @@ provideRevealMotionScope(
   />
 
   <article v-else-if="renderMode === 'article'">
-    <UContainer class="flex justify-end py-4">
+    <UContainer :class="[theme.article.container, 'flex justify-end py-4']">
       <ShareLinks
         :description="props.summary"
         :title="props.title"
