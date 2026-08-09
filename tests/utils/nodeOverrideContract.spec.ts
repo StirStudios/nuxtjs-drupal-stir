@@ -23,6 +23,11 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('resolveBooleanProp(props.isArticle)')
     expect(nodeDisplay).toContain('<ShareLinks')
     expect(nodeDisplay).toContain(':title="props.title"')
+    expect(nodeDisplay).toContain('theme.article.container')
+
+    const appConfig = source('layers/theme/app/app.config.ts')
+
+    expect(appConfig).toContain('container: \'max-w-3xl\'')
 
     const nodeTypes = source('layers/theme/app/types/Node.ts')
 

@@ -361,6 +361,10 @@ type StirThemeAnimationsConfig = {
   reveal?: StirThemeRevealConfig
 } & LooseRecord
 
+type StirThemeArticleConfig = {
+  container?: ClassValue
+} & LooseRecord
+
 type StirThemeConfig = {
   showPdf?: boolean
   showBreadcrumbs?: boolean
@@ -368,6 +372,7 @@ type StirThemeConfig = {
   heading?: ClassValue
   container?: ClassValue
   header?: ClassValue
+  article?: StirThemeArticleConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
   frontPage?: StirThemeFrontPageConfig
@@ -429,6 +434,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   heading: ClassValue
   container: ClassValue
   header: ClassValue
+  article: Required<StirThemeArticleConfig>
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
   frontPage: StirThemeFrontPageConfig

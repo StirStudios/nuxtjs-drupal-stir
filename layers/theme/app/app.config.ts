@@ -25,6 +25,10 @@ export default defineAppConfig({
     container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
     header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
 
+    article: {
+      container: 'max-w-3xl',
+    },
+
     auth: {
       backgroundClass: 'bg-muted/50 dark:bg-default',
       showBackgroundDecoration: true,
