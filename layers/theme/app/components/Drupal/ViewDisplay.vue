@@ -9,6 +9,7 @@ import {
   shouldPersistDrupalViewScroll,
   useDrupalViewScrollRestore,
 } from '#stir/composables/useDrupalViewScrollRestore'
+import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
 
 const props = defineProps<DrupalViewProps>()
 
@@ -28,6 +29,7 @@ defineSlots<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const viewRoot = useTemplateRef<HTMLElement>('viewRoot')
+const inheritedQueryNamespace = inject(drupalViewQueryNamespaceKey, undefined)
 
 const {
   isLoading,
@@ -48,7 +50,7 @@ const {
   onSortChange,
   onPageChange,
   resetControls,
-} = useDrupalViewControls(props)
+} = useDrupalViewControls(props, inheritedQueryNamespace)
 
 const randomizeEnabled = computed(() => {
   if (props.randomize === true) return true
