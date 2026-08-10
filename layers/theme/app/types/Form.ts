@@ -21,6 +21,7 @@ export type InputType =
   | 'range'
   | 'hidden'
   | 'processed_text'
+  | 'webform_markup'
   | 'datetime'
   | 'section'
   | 'file'
@@ -104,6 +105,7 @@ export interface WebformFieldProps {
   '#options'?: Record<string, string>
   '#optionProperties'?: Record<string, WebformOptionProperties>
   '#text'?: string
+  '#markup'?: string
   '#min'?: number
   '#max'?: number
   '#step'?: number

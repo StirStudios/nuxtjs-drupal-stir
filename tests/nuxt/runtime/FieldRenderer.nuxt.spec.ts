@@ -48,4 +48,49 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find('input').exists()).toBe(false)
     expect(wrapper.text().trim()).toBe('')
   })
+
+  it.each([
+    ['processed_text', '#text'],
+    ['webform_markup', '#markup'],
+  ] as const)('renders trusted display content for %s', async (type, contentProperty) => {
+    const field: WebformFieldProps = {
+      '#type': type,
+      '#name': 'privacy_notice',
+      [contentProperty]: '<p>Read our <strong>privacy notice</strong>.</p>',
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'privacy_notice',
+        state: {},
+      },
+    })
+
+    expect(wrapper.text()).toContain('Read our privacy notice.')
+    expect(wrapper.find('strong').text()).toBe('privacy notice')
+  })
+
+  it('keeps a checkbox title visible when help text is present', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'checkbox',
+      '#name': 'privacy_consent',
+      '#title': 'Privacy acknowledgement',
+      '#description': 'See our <a href="/privacy-policy">Privacy Policy</a>.',
+      '#required': true,
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'privacy_consent',
+        state: {},
+      },
+    })
+
+    expect(wrapper.text()).toContain('Privacy acknowledgement')
+    expect(wrapper.text()).toContain('See our Privacy Policy.')
+    expect(wrapper.find('a').attributes('href')).toBe('/privacy-policy')
+    expect(wrapper.find('[data-slot="label"]').classes()).not.toContain('sr-only')
+  })
 })

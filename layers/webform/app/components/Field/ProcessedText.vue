@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const trustedTextHtml = computed(() =>
-  trustedDrupalHtml(String(props.field['#text'] ?? '')),
+  trustedDrupalHtml(String(props.field['#markup'] ?? props.field['#text'] ?? '')),
 )
 </script>
 

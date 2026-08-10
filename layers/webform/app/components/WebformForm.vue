@@ -25,6 +25,7 @@ import type { WebformValidationSchema } from '#stir-webform/utils/buildValidatio
 import {
   normalizeWebformDefinition,
 } from '#stir-webform/utils/webformFieldUtils'
+import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
 
 type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
@@ -175,6 +176,10 @@ const getFieldDefaultValue = (
 
 const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
   for (const [key, field] of Object.entries(fields)) {
+    if (isWebformDisplayElement(field)) {
+      continue
+    }
+
     const composite =
       typeof field['#composite'] === 'object' && field['#composite'] !== null
         ? field['#composite']

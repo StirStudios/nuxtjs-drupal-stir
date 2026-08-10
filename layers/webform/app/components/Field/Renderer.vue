@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
+import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 import {
@@ -51,6 +52,7 @@ const componentMap: Record<string, Component> = {
   date: LazyFieldDate,
   address: LazyFieldAddress,
   processed_text: LazyFieldProcessedText,
+  webform_markup: LazyFieldProcessedText,
   file: LazyFieldFile,
   managed_file: LazyFieldFile,
   webform_document_file: LazyFieldFile,
@@ -73,6 +75,7 @@ const useFloatingLabels = computed(
       : props.field['#floatingLabel'],
 )
 const resolvedFieldType = computed(() => props.field['#type'])
+const isDisplayElement = computed(() => isWebformDisplayElement(props.field))
 
 const resolvedComponent = computed(
   () => componentMap[resolvedFieldType.value] || null,
@@ -89,6 +92,7 @@ const shouldShowLabel = computed(
     resolvedFieldType.value !== 'datetime' &&
     resolvedFieldType.value !== 'date' &&
     resolvedFieldType.value !== 'hidden' &&
+    !isDisplayElement.value &&
     (resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||
       !useFloatingLabels.value),

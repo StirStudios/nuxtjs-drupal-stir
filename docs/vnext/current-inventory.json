@@ -388,6 +388,7 @@
       "layers/webform/app/utils/stateUtils.ts",
       "layers/webform/app/utils/transformUtils.ts",
       "layers/webform/app/utils/visibilityUtils.ts",
+      "layers/webform/app/utils/webformDisplayUtils.ts",
       "layers/webform/app/utils/webformFieldUtils.ts",
       "layers/webform/app/utils/webformFileUtils.ts",
       "layers/webform/app/utils/webformRedirect.ts",
@@ -697,6 +698,7 @@
         "layers/webform/app/utils/stateUtils.ts",
         "layers/webform/app/utils/transformUtils.ts",
         "layers/webform/app/utils/visibilityUtils.ts",
+        "layers/webform/app/utils/webformDisplayUtils.ts",
         "layers/webform/app/utils/webformFieldUtils.ts",
         "layers/webform/app/utils/webformFileUtils.ts",
         "layers/webform/app/utils/webformRedirect.ts",
@@ -713,20 +715,20 @@
   "counts": {
     "components": 120,
     "composables": 63,
-    "utils": 49,
+    "utils": 50,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 46,
     "developmentDependencies": 27,
-    "tests": 136,
+    "tests": 137,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 47,
       "server": 24,
       "unit": 8,
-      "utils": 44
+      "utils": 45
     }
   },
   "tests": [
@@ -861,6 +863,7 @@
     "tests/utils/transformUtils.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",
     "tests/utils/validationErrors.spec.ts",
+    "tests/utils/webformDisplayUtils.spec.ts",
     "tests/utils/webformFieldUtils.spec.ts",
     "tests/utils/webformFileUtils.spec.ts",
     "tests/utils/webformRedirect.spec.ts",

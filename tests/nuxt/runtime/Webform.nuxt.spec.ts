@@ -1,9 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import Webform from '../../../layers/webform/app/components/WebformForm.vue'
 import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
+
+const runtime = vi.hoisted(() => ({
+  fetch: vi.fn(),
+}))
+
+mockNuxtImport('$fetch', () => runtime.fetch)
 
 const webform = {
   schemaVersion: 1,
@@ -65,5 +71,35 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.get('form').element.parentElement?.classList).toContain(
       'lg:max-w-3xl',
     )
+  })
+
+  it('does not submit display-only markup as an empty field', async () => {
+    runtime.fetch.mockResolvedValueOnce(undefined)
+    const displayOnlyWebform: WebformDefinition = {
+      ...webform,
+      fields: {
+        notice: {
+          '#type': 'webform_markup',
+          '#name': 'notice',
+          '#markup': '<p>Privacy notice</p>',
+        },
+      },
+    }
+    const wrapper = await mountSuspended(Webform, {
+      props: { webform: displayOnlyWebform },
+    })
+
+    await flushPromises()
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(runtime.fetch).toHaveBeenCalledOnce()
+    const options = runtime.fetch.mock.calls[0]?.[1] as { body: string }
+
+    expect(JSON.parse(options.body)).toEqual({
+      webform_id: 'contact',
+      turnstile_response: '',
+    })
   })
 })

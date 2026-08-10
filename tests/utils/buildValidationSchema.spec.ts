@@ -15,6 +15,25 @@ function createDateTimeField(
 }
 
 describe('buildValidationSchema', () => {
+  it('excludes display-only elements from validation output', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      notice: {
+        '#type': 'webform_markup',
+        '#name': 'notice',
+        '#markup': '<p>Privacy notice</p>',
+      },
+      name: {
+        '#type': 'textfield',
+        '#name': 'name',
+      },
+    }
+
+    expect(parse(buildValidationSchema(fields, {}), {
+      notice: '',
+      name: 'Alex',
+    })).toEqual({ name: 'Alex' })
+  })
+
   it('enforces required multiple datetime count from API', async () => {
     const fields: Record<string, WebformFieldProps> = {
       eventDate: createDateTimeField({
