@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
+const { id } = useFormField()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const selectUi = computed(() => props.floatingLabel
@@ -57,14 +58,23 @@ const handleButtonClick = (value: string) => {
       />
     </div>
   </template>
-  <USelect
-    v-else
-    v-model="state[fieldName]"
-    :class="['w-full', webform.fieldText]"
-    :items="selectItems"
-    :placeholder="placeholder || 'Select'"
-    :portal="portal"
-    :ui="selectUi"
-    :variant="fieldVariant"
-  />
+  <div v-else class="relative">
+    <USelect
+      :id="id"
+      v-model="state[fieldName]"
+      :class="['w-full', webform.fieldText]"
+      :items="selectItems"
+      :placeholder="placeholder || 'Select'"
+      :portal="portal"
+      :ui="selectUi"
+      :variant="fieldVariant"
+    />
+    <label
+      v-if="floatingLabel"
+      :class="webform.labels.staticFloatingClass"
+      :for="id"
+    >
+      {{ field?.['#title'] }}
+    </label>
+  </div>
 </template>

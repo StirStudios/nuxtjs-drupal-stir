@@ -89,11 +89,10 @@ const resolvedComponentProps = computed(() =>
 const shouldShowLabel = computed(
   () =>
     resolvedFieldType.value !== 'checkbox' &&
+    resolvedFieldType.value !== 'datetime' &&
     resolvedFieldType.value !== 'hidden' &&
     !isDisplayElement.value &&
     (resolvedFieldType.value === 'checkboxes' ||
-      resolvedFieldType.value === 'select' ||
-      resolvedFieldType.value === 'date' ||
       resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||
       !useFloatingLabels.value),

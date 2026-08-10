@@ -58,6 +58,7 @@ const selectedDateLabel = computed(() =>
   <UPopover
     v-model:open="popoverOpen"
     class="w-full"
+    :content="{ align: 'start' }"
     :portal="portal"
   >
     <UButton
@@ -70,11 +71,12 @@ const selectedDateLabel = computed(() =>
       icon="i-lucide-calendar"
       :size="size ?? 'xl'"
       :ui="{
-        base: invalid
-          ? 'text-base font-normal normal-case ring-error'
-          : 'text-base font-normal normal-case',
-        label: model ? 'text-default' : 'text-dimmed',
-        leadingIcon: 'text-dimmed',
+        base: [
+          'text-base font-normal normal-case',
+          invalid ? 'ring-error' : '',
+          model ? 'text-default!' : 'text-dimmed!',
+        ],
+        leadingIcon: ['size-5', 'text-dimmed'],
       }"
       :variant="buttonVariant"
     >

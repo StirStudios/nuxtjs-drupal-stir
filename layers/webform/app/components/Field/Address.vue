@@ -66,9 +66,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       v-for="(fieldData, key) in compositeFields"
       :key="key"
       :label="
-        !useFloatingLabels || key === 'country'
-          ? getCompositeLabel(fieldData, String(key))
-          : ''
+        !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
       "
       :name="`${fieldName}.${key}`"
       :required="field['#required']"
@@ -93,19 +91,27 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         </label>
       </UInput>
 
-      <USelectMenu
-        v-else
-        :id="getFieldId(String(key))"
-        v-model="state[fieldName]!.country"
-        class="w-full"
-        :items="countryOptions"
-        label-key="label"
-        placeholder="Select Country"
-        :portal="portal"
-        :ui="{ base: useFloatingLabels ? webform.compactControlClass : [] }"
-        value-key="value"
-        :variant="fieldVariant"
-      />
+      <div v-else class="relative">
+        <USelectMenu
+          :id="getFieldId(String(key))"
+          v-model="state[fieldName]!.country"
+          class="w-full"
+          :items="countryOptions"
+          label-key="label"
+          placeholder="Select Country"
+          :portal="portal"
+          :ui="{ base: useFloatingLabels ? webform.compactControlClass : [] }"
+          value-key="value"
+          :variant="fieldVariant"
+        />
+        <label
+          v-if="useFloatingLabels"
+          :class="webform.labels.staticFloatingClass"
+          :for="getFieldId(String(key))"
+        >
+          {{ getCompositeLabel(fieldData, String(key)) }}
+        </label>
+      </div>
     </UFormField>
   </div>
 </template>
