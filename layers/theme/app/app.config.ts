@@ -54,6 +54,7 @@ export default defineAppConfig({
       desktopLayout: 'default',
       logoMenuMarker: '--logo--',
       toggleDirection: 'right',
+      toggleIcon: 'size-7',
       header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',

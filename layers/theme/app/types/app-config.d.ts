@@ -118,6 +118,7 @@ type StirThemeNavigationConfig = {
   desktopLayout?: 'default' | 'split-logo' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
+  toggleIcon?: ClassValue
   header?: ClassValue
   splitLogo?: {
     center?: ClassValue

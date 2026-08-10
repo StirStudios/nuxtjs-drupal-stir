@@ -11,6 +11,7 @@ const props = defineProps<{
   field: WebformFieldProps
   fieldName: string
   state: WebformState
+  floatingLabel?: boolean
 }>()
 
 const {
@@ -25,6 +26,9 @@ const {
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
+const compactControlClass = computed(() =>
+  props.floatingLabel ? webform.compactControlClass : [],
+)
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = props.field['#cardinality'] ?? 1
 
@@ -103,7 +107,7 @@ const calendarModel = computed({
   >
     <UButton
       :id="id"
-      class="w-full justify-start"
+      :class="['w-full justify-start', compactControlClass]"
       :color="color ?? 'neutral'"
       :disabled="disabled"
       icon="i-lucide-calendar"

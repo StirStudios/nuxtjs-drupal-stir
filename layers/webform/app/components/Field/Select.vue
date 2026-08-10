@@ -20,6 +20,9 @@ const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
+const selectUi = computed(() => props.floatingLabel
+  ? { base: webform.compactControlClass }
+  : {})
 
 const tabBus = useEventBus<string>('tab-changed')
 
@@ -61,6 +64,7 @@ const handleButtonClick = (value: string) => {
     :items="selectItems"
     :placeholder="placeholder || 'Select'"
     :portal="portal"
+    :ui="selectUi"
     :variant="fieldVariant"
   />
 </template>

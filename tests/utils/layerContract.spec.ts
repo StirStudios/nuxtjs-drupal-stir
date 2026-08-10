@@ -580,6 +580,25 @@ describe('layer contract', () => {
     expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })
 
+  it('sizes both mobile menu toggle positions independently of button defaults', () => {
+    const header = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
+      'utf8',
+    )
+
+    expect(header).not.toContain(':icon="toggleIcon"')
+    expect(header).toContain('toggle: \'size-11 justify-center p-0 lg:hidden\'')
+    expect(header.match(/data-slot="leadingIcon"/g)).toHaveLength(2)
+    expect(header.match(/:class="toggleIconClass"/g)).toHaveLength(2)
+
+    const themeConfig = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+
+    expect(themeConfig).toContain('toggleIcon: \'size-7\'')
+  })
+
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
     const fieldComponents = [
       'DateTime/Select.vue',
