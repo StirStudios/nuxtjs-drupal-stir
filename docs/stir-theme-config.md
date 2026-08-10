@@ -325,6 +325,7 @@ navigation: {
   desktopLayout: 'default', // 'default' or 'split-logo'
   logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'
+  toggleIcon: 'size-7',
   splitLogo: {
 	center: 'flex-1 items-center justify-center',
 	container: 'relative',

@@ -11,6 +11,7 @@ defineProps<{
   titleClass?: string
   toggleClass?: string
   toggleIcon: string
+  toggleIconClass?: string
 }>()
 
 defineEmits<{
@@ -48,7 +49,7 @@ defineEmits<{
       <template #leading>
         <UIcon
           aria-hidden="true"
-          class="size-8"
+          :class="toggleIconClass"
           data-slot="leadingIcon"
           :name="toggleIcon"
         />
