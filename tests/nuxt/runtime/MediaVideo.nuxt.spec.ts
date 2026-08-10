@@ -418,6 +418,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
 
     expect(wrapper.get('div').classes())
       .toContain('h-[clamp(24rem,48vw,42rem)]')
+    expect(wrapper.get('div').classes()).not.toContain('h-full')
     expect(wrapper.get('div').classes()).not.toContain('aspect-[16/9]')
     expect(wrapper.get('div').attributes('style')).toBeUndefined()
   })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '#stir/types'
+import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import { useEventBus } from '@vueuse/core'
 import { transformOptions } from '#stir-webform/utils/transformUtils'
 import {
@@ -14,11 +15,14 @@ const props = defineProps<{
   items?: Record<string, string> | Array<{ label: string; value: string }>
   placeholder?: string
   floatingLabel?: boolean
+  disabled?: boolean
 }>()
 
 const webform = useStirWebformTheme()
 const portal = useOverlayPortal()
-const { id } = useFormField()
+const injectedInputId = inject(inputIdInjectionKey, undefined)
+const fallbackId = useId()
+const id = computed(() => injectedInputId?.value ?? fallbackId)
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const selectUi = computed(() => props.floatingLabel
@@ -63,6 +67,7 @@ const handleButtonClick = (value: string) => {
       :id="id"
       v-model="state[fieldName]"
       :class="['w-full', webform.fieldText]"
+      :disabled="props.disabled"
       :items="selectItems"
       :placeholder="placeholder || 'Select'"
       :portal="portal"

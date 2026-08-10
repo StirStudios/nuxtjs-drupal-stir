@@ -104,7 +104,7 @@ const shouldShowDescription = computed(
     resolvedFieldType.value !== 'hidden',
 )
 
-const { visible, checked } = useEvaluateState(
+const { visible, disabled } = useEvaluateState(
   props.field['#states'] ?? {},
   props.state,
 )
@@ -141,7 +141,6 @@ const fieldUi = computed(() => {
 
   <UFormField
     v-else-if="visible && shouldRender"
-    :disabled="!checked"
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
     :required="field['#required']"
@@ -162,6 +161,7 @@ const fieldUi = computed(() => {
       :is="resolvedComponent"
       v-if="resolvedComponent"
       v-bind="resolvedComponentProps"
+      :disabled="resolvedFieldType === 'select' ? disabled : undefined"
       :field="field"
       :field-name="fieldName"
       :floating-label="

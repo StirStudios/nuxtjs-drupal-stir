@@ -232,6 +232,14 @@ const resolvedWrapperStyle = computed(() =>
   props.wrapperClass ? undefined : wrapperStyle.value,
 )
 
+const resolvedMediaBase = computed(() => {
+  if (!props.wrapperClass || typeof mediaTheme.base !== 'string') {
+    return mediaTheme.base
+  }
+
+  return mediaTheme.base.split(/\s+/).filter(token => token !== 'h-full')
+})
+
 const shouldShowIframe = computed(
   () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
 )
@@ -426,7 +434,7 @@ watch(
     v-bind="forwardedAttrs"
     :class="[
       mediaTheme.video?.wrapper,
-      mediaTheme.base,
+      resolvedMediaBase,
       props.wrapperClass ? undefined : aspectClass,
       props.wrapperClass,
     ]"

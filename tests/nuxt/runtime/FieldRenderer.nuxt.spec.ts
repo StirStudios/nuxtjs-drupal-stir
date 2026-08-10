@@ -145,6 +145,34 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find(`[id="${controlId}"]`).exists()).toBe(true)
   })
 
+  it('preserves the form-field contract for selects', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'select',
+      '#name': 'region',
+      '#title': 'Region',
+      '#options': { west: 'West' },
+      '#states': {
+        disabled: {
+          ':input[name="country"]': { value: 'US' },
+        },
+      },
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'region',
+        state: { country: 'US' },
+      },
+    })
+
+    const select = wrapper.get('button[role="combobox"]')
+
+    expect(select.attributes('disabled')).toBeDefined()
+    expect(select.attributes('id')).toBeTruthy()
+    expect(select.attributes('aria-invalid')).toBe('false')
+  })
+
   it('lets a datetime composite own its date and time labels', async () => {
     const field: WebformFieldProps = {
       '#type': 'datetime',
