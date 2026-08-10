@@ -43,6 +43,7 @@ defineEmits<{
       :class="toggleClass"
       color="neutral"
       :icon="toggleIcon"
+      :ui="{ leadingIcon: 'size-9' }"
       variant="ghost"
       @click="$emit('close')"
     />
