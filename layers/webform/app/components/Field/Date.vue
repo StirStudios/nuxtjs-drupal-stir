@@ -100,33 +100,43 @@ const calendarModel = computed({
 </script>
 
 <template>
-  <UPopover
-    v-model:open="popoverOpen"
-    class="w-full"
-    :portal="portal"
-  >
-    <UButton
-      :id="id"
-      :class="['w-full justify-start', compactControlClass]"
-      :color="color ?? 'neutral'"
-      :disabled="disabled"
-      icon="i-lucide-calendar"
-      :size="size ?? 'xl'"
-      :ui="{
-        base: color === 'error'
-          ? 'text-base font-normal normal-case ring-error'
-          : 'text-base font-normal normal-case',
-        label: models.length ? 'text-default' : 'text-dimmed',
-        leadingIcon: 'text-dimmed',
-      }"
-      :variant="buttonVariant"
-      v-bind="ariaAttrs"
+  <div class="relative">
+    <UPopover
+      v-model:open="popoverOpen"
+      class="w-full"
+      :content="{ align: 'start' }"
+      :portal="portal"
     >
-      <span class="sr-only">{{ field['#title'] }}:</span>
-      {{ selectedDatesLabel }}
-    </UButton>
-    <template #content>
-      <UCalendar v-model="calendarModel" class="p-2" multiple />
-    </template>
-  </UPopover>
+      <UButton
+        :id="id"
+        :class="['w-full justify-start', compactControlClass]"
+        :color="color ?? 'neutral'"
+        :disabled="disabled"
+        icon="i-lucide-calendar"
+        :size="size ?? 'xl'"
+        :ui="{
+          base: [
+            'text-base font-normal normal-case',
+            color === 'error' ? 'ring-error' : '',
+            models.length ? 'text-default!' : 'text-dimmed!',
+          ],
+          leadingIcon: ['size-5', 'text-dimmed'],
+        }"
+        :variant="buttonVariant"
+        v-bind="ariaAttrs"
+      >
+        {{ selectedDatesLabel }}
+      </UButton>
+      <template #content>
+        <UCalendar v-model="calendarModel" class="p-2" multiple />
+      </template>
+    </UPopover>
+    <label
+      v-if="floatingLabel"
+      :class="webform.labels.staticFloatingClass"
+      :for="id"
+    >
+      {{ field['#title'] }}
+    </label>
+  </div>
 </template>

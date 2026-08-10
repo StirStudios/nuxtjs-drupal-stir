@@ -94,11 +94,30 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="label"]').classes()).toContain('sr-only')
   })
 
+  it('keeps the checkboxes label visible when floating labels are enabled', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'checkboxes',
+      '#name': 'example_field',
+      '#title': 'Example field',
+      '#floatingLabel': true,
+      '#options': { first: 'First choice' },
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+
+    expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
+  })
+
   it.each([
-    ['checkboxes', { first: 'First choice' }],
     ['select', { first: 'First choice' }],
     ['date', undefined],
-  ] as const)('keeps the %s label visible when floating labels are enabled', async (type, options) => {
+  ] as const)('associates the floating %s label with its control', async (type, options) => {
     const field: WebformFieldProps = {
       '#type': type,
       '#name': 'example_field',
@@ -115,7 +134,43 @@ describe('FieldRenderer (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
+    const labels = wrapper.findAll('label')
+      .filter(label => label.text() === 'Example field')
+
+    expect(labels).toHaveLength(1)
+
+    const controlId = labels[0]!.attributes('for')
+
+    expect(controlId).toBeTruthy()
+    expect(wrapper.find(`[id="${controlId}"]`).exists()).toBe(true)
+  })
+
+  it('preserves the form-field contract for selects', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'select',
+      '#name': 'region',
+      '#title': 'Region',
+      '#options': { west: 'West' },
+      '#states': {
+        disabled: {
+          ':input[name="country"]': { value: 'US' },
+        },
+      },
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'region',
+        state: { country: 'US' },
+      },
+    })
+
+    const select = wrapper.get('button[role="combobox"]')
+
+    expect(select.attributes('disabled')).toBeDefined()
+    expect(select.attributes('id')).toBeTruthy()
+    expect(select.attributes('aria-invalid')).toBe('false')
   })
 
   it('lets a datetime composite own its date and time labels', async () => {

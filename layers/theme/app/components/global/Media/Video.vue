@@ -45,6 +45,7 @@ const props = withDefaults(
     deferEmbed?: boolean
     editActions?: EditAction[]
     roundedClass?: string
+    wrapperClass?: unknown
   }>(),
   {
     type: undefined,
@@ -78,6 +79,7 @@ const props = withDefaults(
     deferEmbed: true,
     editActions: undefined,
     roundedClass: undefined,
+    wrapperClass: undefined,
   },
 )
 
@@ -226,6 +228,17 @@ const wrapperStyle = computed(() => ({
     : '16 / 9',
   height: 'auto',
 }))
+const resolvedWrapperStyle = computed(() =>
+  props.wrapperClass ? undefined : wrapperStyle.value,
+)
+
+const resolvedMediaBase = computed(() => {
+  if (!props.wrapperClass || typeof mediaTheme.base !== 'string') {
+    return mediaTheme.base
+  }
+
+  return mediaTheme.base.split(/\s+/).filter(token => token !== 'h-full')
+})
 
 const shouldShowIframe = computed(
   () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
@@ -419,8 +432,13 @@ watch(
     v-else
     ref="previewRoot"
     v-bind="forwardedAttrs"
-    :class="[mediaTheme.video?.wrapper, mediaTheme.base, aspectClass]"
-    :style="wrapperStyle"
+    :class="[
+      mediaTheme.video?.wrapper,
+      resolvedMediaBase,
+      props.wrapperClass ? undefined : aspectClass,
+      props.wrapperClass,
+    ]"
+    :style="resolvedWrapperStyle"
   >
     <div
       v-if="isProcessing"

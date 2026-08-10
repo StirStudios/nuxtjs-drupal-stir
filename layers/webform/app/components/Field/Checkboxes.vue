@@ -140,7 +140,7 @@ const handleModelUpdate = (val: unknown) => {
 
 <template>
   <UCheckboxGroup
-    class="form-input w-full"
+    class="form-input w-full pb-2"
     :items="items"
     :model-value="toStringArray(props.state[props.fieldName])"
     @update:model-value="handleModelUpdate"

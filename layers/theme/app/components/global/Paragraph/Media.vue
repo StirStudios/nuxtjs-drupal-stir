@@ -19,6 +19,7 @@ const props = defineProps<{
   width?: string
   widthClass?: string
   cornerStyle?: 'default' | 'square' | string
+  mediaHeight?: 'natural' | 'break' | 'feature' | string
   align?: string
   direction?: string
   overlay?: boolean | number | string
@@ -37,6 +38,12 @@ const props = defineProps<{
 }>()
 
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const theme = useAppConfig().stirTheme
+const mediaHeightClass = computed(() =>
+  theme.media.heights?.[props.mediaHeight || 'natural']
+  || theme.media.heights?.natural
+  || '',
+)
 const roundedClass = computed(() =>
   props.cornerStyle === 'square' ? 'rounded-none' : undefined,
 )
@@ -166,6 +173,7 @@ onMounted(() => {
           :reveal-mode="revealMode"
           :rounded-class="roundedClass"
           :tk="tk"
+          :wrapper-class="mediaHeightClass"
           @edit-action-select="selectAction"
           @open="openModal"
         />
@@ -192,6 +200,7 @@ onMounted(() => {
           :reveal-mode="revealMode"
           :rounded-class="roundedClass"
           :tk="tk"
+          :wrapper-class="mediaHeightClass"
           @edit-action-select="selectAction"
           @open="openModal"
         />

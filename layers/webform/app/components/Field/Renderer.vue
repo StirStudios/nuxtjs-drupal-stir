@@ -89,11 +89,10 @@ const resolvedComponentProps = computed(() =>
 const shouldShowLabel = computed(
   () =>
     resolvedFieldType.value !== 'checkbox' &&
+    resolvedFieldType.value !== 'datetime' &&
     resolvedFieldType.value !== 'hidden' &&
     !isDisplayElement.value &&
     (resolvedFieldType.value === 'checkboxes' ||
-      resolvedFieldType.value === 'select' ||
-      resolvedFieldType.value === 'date' ||
       resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||
       !useFloatingLabels.value),
@@ -105,7 +104,7 @@ const shouldShowDescription = computed(
     resolvedFieldType.value !== 'hidden',
 )
 
-const { visible, checked } = useEvaluateState(
+const { visible, disabled } = useEvaluateState(
   props.field['#states'] ?? {},
   props.state,
 )
@@ -142,7 +141,6 @@ const fieldUi = computed(() => {
 
   <UFormField
     v-else-if="visible && shouldRender"
-    :disabled="!checked"
     :label="shouldShowLabel ? field['#title'] : undefined"
     :name="fieldName"
     :required="field['#required']"
@@ -163,6 +161,7 @@ const fieldUi = computed(() => {
       :is="resolvedComponent"
       v-if="resolvedComponent"
       v-bind="resolvedComponentProps"
+      :disabled="resolvedFieldType === 'select' ? disabled : undefined"
       :field="field"
       :field-name="fieldName"
       :floating-label="
