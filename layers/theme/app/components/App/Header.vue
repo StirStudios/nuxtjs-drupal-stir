@@ -36,7 +36,7 @@ const headerUi = {
   center: 'hidden lg:flex',
   right: 'flex items-center justify-end lg:flex-1 gap-1.5',
   title: 'shrink-0 font-bold text-xl text-highlighted flex items-end gap-1.5',
-  toggle: 'lg:hidden',
+  toggle: 'size-12 justify-center p-0 lg:hidden',
   content: 'lg:hidden sm:max-w-md',
   overlay: 'lg:hidden',
   header: 'flex min-h-(--ui-header-height) shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-6',
@@ -341,6 +341,7 @@ watch(menuOpen, (val) => {
           color="neutral"
           data-slot="toggle"
           :icon="toggleIcon"
+          :ui="{ leadingIcon: 'size-9' }"
           variant="ghost"
           @click="toggleMenu"
         />
