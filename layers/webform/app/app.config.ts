@@ -14,9 +14,9 @@ export default defineAppConfig({
       formClass: '',
       labels: {
         base: [
-          'pointer-events-none absolute z-10 text-sm font-medium text-default transition-all duration-150 ease-out',
-          'peer-placeholder-shown:text-base peer-placeholder-shown:font-normal peer-placeholder-shown:text-dimmed',
-          'peer-focus:text-sm peer-focus:font-medium peer-focus:text-primary',
+          'text-default pointer-events-none absolute z-10 text-sm font-medium transition-all duration-150 ease-out',
+          'peer-placeholder-shown:text-dimmed peer-placeholder-shown:text-base peer-placeholder-shown:font-normal',
+          'peer-focus:text-primary peer-focus:text-sm peer-focus:font-medium',
         ],
       },
       fieldGroupHeader: 'mb-6 text-xl font-semibold',
@@ -24,8 +24,8 @@ export default defineAppConfig({
       fieldInput: 'w-full',
       fieldText: '',
       response: 'bg-muted rounded-lg px-6 py-3 italic',
-      description: 'mb-2 text-sm text-muted',
-      help: 'my-3 text-sm text-muted',
+      description: 'text-muted mb-2 text-sm',
+      help: 'text-muted my-3 text-sm',
       submitAlign: '',
       submitComponent: '',
       buttonClass: '',
