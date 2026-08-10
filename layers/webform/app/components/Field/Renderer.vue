@@ -93,7 +93,6 @@ const shouldShowLabel = computed(
     !isDisplayElement.value &&
     (resolvedFieldType.value === 'checkboxes' ||
       resolvedFieldType.value === 'select' ||
-      resolvedFieldType.value === 'datetime' ||
       resolvedFieldType.value === 'date' ||
       resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||

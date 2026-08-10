@@ -117,4 +117,27 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
   })
+
+  it('lets a datetime composite own its date and time labels', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'datetime',
+      '#name': 'appointment',
+      '#title': 'Appointment',
+      '#floatingLabel': true,
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'appointment',
+        state: {},
+      },
+    })
+
+    const labels = wrapper.findAll('[data-slot="label"]')
+      .map(label => label.text())
+
+    expect(labels.filter(label => label === 'Appointment')).toHaveLength(1)
+    expect(labels).toContain('Time')
+  })
 })
