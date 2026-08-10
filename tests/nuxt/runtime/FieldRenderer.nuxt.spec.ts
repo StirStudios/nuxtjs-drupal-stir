@@ -114,6 +114,29 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
   })
 
+  it('keeps structural floating-label classes independent of app config', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'textfield',
+      '#name': 'example_field',
+      '#title': 'Example field',
+      '#floatingLabel': true,
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+
+    const label = wrapper.get('label')
+
+    expect(label.classes()).toContain('absolute')
+    expect(label.classes()).toContain('pointer-events-none')
+    expect(label.classes()).toContain('z-10')
+  })
+
   it.each([
     ['select', { first: 'First choice' }],
     ['date', undefined],
