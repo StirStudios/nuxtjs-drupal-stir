@@ -71,7 +71,7 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find('strong').text()).toBe('privacy notice')
   })
 
-  it('keeps a checkbox title visible when help text is present', async () => {
+  it('keeps checkbox help visible while using its concise title accessibly', async () => {
     const field: WebformFieldProps = {
       '#type': 'checkbox',
       '#name': 'privacy_consent',
@@ -91,6 +91,30 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.text()).toContain('Privacy acknowledgement')
     expect(wrapper.text()).toContain('See our Privacy Policy.')
     expect(wrapper.find('a').attributes('href')).toBe('/privacy-policy')
-    expect(wrapper.find('[data-slot="label"]').classes()).not.toContain('sr-only')
+    expect(wrapper.find('[data-slot="label"]').classes()).toContain('sr-only')
+  })
+
+  it.each([
+    ['checkboxes', { first: 'First choice' }],
+    ['select', { first: 'First choice' }],
+    ['date', undefined],
+  ] as const)('keeps the %s label visible when floating labels are enabled', async (type, options) => {
+    const field: WebformFieldProps = {
+      '#type': type,
+      '#name': 'example_field',
+      '#title': 'Example field',
+      '#floatingLabel': true,
+      ...(options ? { '#options': options } : {}),
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+
+    expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
   })
 })

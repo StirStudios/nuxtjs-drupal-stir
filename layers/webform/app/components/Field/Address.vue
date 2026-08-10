@@ -66,7 +66,9 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       v-for="(fieldData, key) in compositeFields"
       :key="key"
       :label="
-        !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
+        !useFloatingLabels || key === 'country'
+          ? getCompositeLabel(fieldData, String(key))
+          : ''
       "
       :name="`${fieldName}.${key}`"
       :required="field['#required']"
@@ -100,6 +102,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         label-key="label"
         placeholder="Select Country"
         :portal="portal"
+        :ui="{ base: useFloatingLabels ? webform.compactControlClass : [] }"
         value-key="value"
         :variant="fieldVariant"
       />

@@ -25,6 +25,7 @@ type StirWebformTheme = {
 }
 
 type ResolvedStirWebformTheme = StirWebformTheme & {
+  compactControlClass: string[]
   floatingControlClass: string[]
   labels: NonNullable<StirWebformTheme['labels']> & {
     floatingClass: string[]
@@ -41,7 +42,8 @@ export function useStirWebformTheme(): ResolvedStirWebformTheme {
   return {
     ...webform,
     fieldVariant,
-    floatingControlClass: ['peer', 'pt-4!', 'pb-2.5!'],
+    compactControlClass: ['min-h-12.5', 'px-4!'],
+    floatingControlClass: ['peer', 'px-4!', 'pt-4!', 'pb-2.5!'],
     labels: {
       floating: webform.labels?.floating ?? forms.floatingLabels,
       ...webform.labels,
