@@ -405,6 +405,23 @@ describe('MediaVideo (Nuxt runtime)', () => {
     )
   })
 
+  it('lets a responsive height preset replace the intrinsic aspect ratio', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        height: 1080,
+        mediaEmbed: 'https://example.com/embed/video',
+        src: '/static-preview.webp',
+        width: 1920,
+        wrapperClass: 'h-[clamp(24rem,48vw,42rem)]',
+      },
+    })
+
+    expect(wrapper.get('div').classes())
+      .toContain('h-[clamp(24rem,48vw,42rem)]')
+    expect(wrapper.get('div').classes()).not.toContain('aspect-[16/9]')
+    expect(wrapper.get('div').attributes('style')).toBeUndefined()
+  })
+
   it('uses the standard embed canvas instead of cinematic poster dimensions', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {

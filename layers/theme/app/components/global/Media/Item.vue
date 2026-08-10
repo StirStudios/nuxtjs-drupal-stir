@@ -22,6 +22,7 @@ const props = defineProps<{
   deliveryProfile?: string
   overlay?: boolean
   roundedClass?: string
+  wrapperClass?: unknown
   editActions?: EditAction[]
   tk: Pick<SlotsToolkit, 'propsOf'>
 }>()
@@ -111,6 +112,7 @@ const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
   ...revealMotionProps.value,
   editActions: props.editActions,
   roundedClass: visualRoundedClass.value,
+  wrapperClass: props.wrapperClass,
   onEditActionSelect: handleEditActionSelect,
 }))
 
@@ -126,6 +128,7 @@ const shouldAnimate = computed(() =>
     v-bind="renderedMediaProps"
     :edit-actions="editActions"
     :rounded-class="visualRoundedClass"
+    :wrapper-class="wrapperClass"
     @edit-action-select="handleEditActionSelect"
   />
 
@@ -141,6 +144,7 @@ const shouldAnimate = computed(() =>
       v-bind="renderedMediaProps"
       :edit-actions="editActions"
       :rounded-class="visualRoundedClass"
+      :wrapper-class="wrapperClass"
       @edit-action-select="handleEditActionSelect"
     />
   </RevealMotion>
@@ -167,6 +171,7 @@ const shouldAnimate = computed(() =>
       role="button"
       :rounded-class="visualRoundedClass"
       tabindex="0"
+      :wrapper-class="wrapperClass"
       @click="openOverlay"
       @edit-action-select="handleEditActionSelect"
       @keydown="handleOpenOverlayKeydown"
@@ -195,6 +200,7 @@ const shouldAnimate = computed(() =>
         :edit-actions="editActions"
         :rounded-class="visualRoundedClass"
         :wrapper-class="[
+          wrapperClass,
           mediaPreviewClasses.zoomLayer,
           theme.media.transitions.slow,
           theme.media.effects.scale,

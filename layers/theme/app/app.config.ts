@@ -147,6 +147,11 @@ export default defineAppConfig({
 
     media: {
       base: 'relative h-full w-full overflow-hidden object-cover',
+      heights: {
+        natural: '',
+        break: 'h-[clamp(18rem,34vw,30rem)]',
+        feature: 'h-[clamp(24rem,48vw,42rem)]',
+      },
       image: {
         format: 'webp',
         quality: 75,

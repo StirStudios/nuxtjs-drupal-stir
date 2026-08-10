@@ -30,6 +30,28 @@ describe('MediaItem (Nuxt runtime)', () => {
     expect(wrapper.get('img').classes()).toContain('rounded-none')
   })
 
+  it('applies a responsive height preset to the media wrapper', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        wrapperClass: 'h-[clamp(18rem,34vw,30rem)]',
+        tk: {
+          propsOf: () => ({
+            alt: 'Wide location image',
+            src: '/location.webp',
+            type: 'image',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.get('.media').classes())
+      .toContain('h-[clamp(18rem,34vw,30rem)]')
+    expect(wrapper.get('img').classes()).toContain('h-full')
+    expect(wrapper.get('img').classes()).toContain('object-cover')
+  })
+
   it('keeps revealed media visible when reduced motion is requested', async () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(
       (query) => ({

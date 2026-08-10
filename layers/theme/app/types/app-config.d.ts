@@ -219,6 +219,7 @@ type StirThemeFooterConfig = {
 
 type StirThemeMediaConfig = {
   base?: ClassValue
+  heights?: Record<string, ClassValue>
   rounded?: ClassValue
   image?: {
     format?: 'avif' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
