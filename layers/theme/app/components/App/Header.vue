@@ -340,11 +340,18 @@ watch(menuOpen, (val) => {
           :class="toggleClasses"
           color="neutral"
           data-slot="toggle"
-          :icon="toggleIcon"
-          :ui="{ leadingIcon: 'size-9' }"
           variant="ghost"
           @click="toggleMenu"
-        />
+        >
+          <template #leading>
+            <UIcon
+              aria-hidden="true"
+              class="size-8"
+              data-slot="leadingIcon"
+              :name="toggleIcon"
+            />
+          </template>
+        </UButton>
 
         <ULink
           aria-label="Home"

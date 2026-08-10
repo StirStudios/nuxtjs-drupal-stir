@@ -42,10 +42,17 @@ defineEmits<{
       aria-label="Close navigation menu"
       :class="toggleClass"
       color="neutral"
-      :icon="toggleIcon"
-      :ui="{ leadingIcon: 'size-9' }"
       variant="ghost"
       @click="$emit('close')"
-    />
+    >
+      <template #leading>
+        <UIcon
+          aria-hidden="true"
+          class="size-8"
+          data-slot="leadingIcon"
+          :name="toggleIcon"
+        />
+      </template>
+    </UButton>
   </div>
 </template>
