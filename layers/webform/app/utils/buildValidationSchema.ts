@@ -6,6 +6,7 @@ import {
   type GenericSchema,
 } from 'valibot'
 import { evaluateCondition } from './evaluateUtils'
+import { isWebformDisplayElement } from './webformDisplayUtils'
 import {
   allowsMultipleFiles,
   getFileExtensions,
@@ -55,6 +56,7 @@ function getVisibleEntries(
   state: WebformState,
 ): Array<[string, WebformFieldProps]> {
   return Object.entries(fields).filter(([, field]) =>
+    !isWebformDisplayElement(field) &&
     evaluateCondition(field['#states']?.visible, state, true),
   )
 }
