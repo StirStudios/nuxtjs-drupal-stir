@@ -23,6 +23,7 @@ const ownership = {
   managed: ['Carousel.vue', 'Hero.vue', 'Layout.vue'],
   delegated: ['Media.vue', 'Text.vue', 'View.vue'],
   internal: [
+    'CarouselItem.vue',
     'Default.vue',
     'FaqItem.vue',
     'MediaModal.vue',
