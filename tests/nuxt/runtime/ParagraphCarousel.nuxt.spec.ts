@@ -125,7 +125,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(blur).toHaveBeenCalledOnce()
   })
 
-  it('renders marquee items with one inert visual copy', async () => {
+  it('renders one live marquee tree with a persistent pause control', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
         presentation: 'marquee',
@@ -139,12 +139,35 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       '--stir-marquee-duration: 20000ms',
     )
 
-    const groups = wrapper.findAll('.stir-marquee__group')
+    expect(wrapper.findAll('.stir-marquee__track a')).toHaveLength(2)
+    expect(
+      wrapper.find('.stir-marquee__track [aria-hidden="true"]').exists(),
+    ).toBe(false)
 
-    expect(groups).toHaveLength(2)
-    expect(groups[0]?.findAll('a')).toHaveLength(2)
-    expect(groups[1]?.attributes('aria-hidden')).toBe('true')
-    expect(groups[1]?.attributes()).toHaveProperty('inert')
+    const control = wrapper.get('button')
+
+    expect(control.text()).toContain('Pause animation')
+    expect(control.attributes('aria-pressed')).toBe('false')
+
+    await control.trigger('click')
+
+    expect(wrapper.get('.stir-marquee').classes()).toContain('stir-marquee--paused')
+    expect(control.text()).toContain('Resume animation')
+    expect(control.attributes('aria-pressed')).toBe('true')
+  })
+
+  it('omits the marquee pause control when reduced motion is preferred', async () => {
+    preferredMotion.value = 'reduce'
+
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        presentation: 'marquee',
+        items: [h('article', 'One'), h('article', 'Two')],
+      },
+    })
+
+    expect(wrapper.find('.stir-marquee').exists()).toBe(true)
+    expect(wrapper.find('button').exists()).toBe(false)
   })
 
   it('keeps legacy media when the ordered items slot is empty', async () => {
