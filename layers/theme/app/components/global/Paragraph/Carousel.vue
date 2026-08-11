@@ -22,6 +22,7 @@ const props = defineProps<{
   region?: string
 
   items?: unknown[]
+  presentation?: 'carousel' | 'marquee' | string
   randomize?: boolean
 
   gridItems?: string
@@ -98,7 +99,8 @@ onMounted(() => {
 })
 
 const slides = computed(() => {
-  const slotItems = slots.media?.() ?? []
+  const orderedItems = slots.items?.() ?? []
+  const slotItems = orderedItems.length ? orderedItems : (slots.media?.() ?? [])
   const raw: unknown[] = (props.items?.length ?? 0) > 0 ? (props.items ?? []) : slotItems
 
   return raw.map((vnode, i) => {
@@ -119,7 +121,18 @@ const slides = computed(() => {
   })
 })
 
+const isMarquee = computed(() => props.presentation === 'marquee')
+const marqueeCopies = computed(() =>
+  slides.value.map((slide, index) => ({
+    vnode: cloneVNode(slide.vnode),
+    key: `copy-${String(slide.key ?? index)}`,
+  })),
+)
+
 const interval = computed(() => props.carouselInterval ?? 5000)
+const marqueeDuration = computed(() =>
+  `${Math.max(20000, interval.value * Math.max(slides.value.length, 1))}ms`,
+)
 const autoScrollSpeed = computed(() => {
   const minInterval = 1000
   const maxInterval = 10000
@@ -245,8 +258,43 @@ function releasePointerArrowFocus(event: PointerEvent) {
         {{ header }}
       </component>
 
+      <div
+        v-if="slides.length && isMarquee"
+        :aria-label="carouselLabel"
+        class="stir-marquee overflow-hidden"
+        role="region"
+        :style="{ '--stir-marquee-duration': marqueeDuration }"
+      >
+        <div class="stir-marquee__track flex w-max">
+          <div class="stir-marquee__group flex shrink-0 items-center">
+            <WrapDiv
+              v-for="slide in slides"
+              :key="slide.key"
+              class="shrink-0"
+              :styles="gridItems"
+            >
+              <component :is="slide.vnode" />
+            </WrapDiv>
+          </div>
+          <div
+            aria-hidden="true"
+            class="stir-marquee__group flex shrink-0 items-center"
+            inert
+          >
+            <WrapDiv
+              v-for="slide in marqueeCopies"
+              :key="slide.key"
+              class="shrink-0"
+              :styles="gridItems"
+            >
+              <component :is="slide.vnode" />
+            </WrapDiv>
+          </div>
+        </div>
+      </div>
+
       <UCarousel
-        v-if="slides.length"
+        v-else-if="slides.length"
         ref="carousel"
         v-slot="{ item }"
         :aria-label="carouselLabel"
@@ -277,6 +325,40 @@ function releasePointerArrowFocus(event: PointerEvent) {
 </template>
 
 <style>
+.stir-marquee__group {
+  gap: 2rem;
+  padding-inline-end: 2rem;
+}
+
+.stir-marquee__track {
+  animation: stir-marquee var(--stir-marquee-duration, 30s) linear infinite;
+}
+
+.stir-marquee:hover .stir-marquee__track,
+.stir-marquee:focus-within .stir-marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes stir-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stir-marquee {
+    overflow-x: auto;
+  }
+
+  .stir-marquee__track {
+    animation: none;
+  }
+
+  .stir-marquee__group[aria-hidden="true"] {
+    display: none;
+  }
+}
+
 @media (min-width: 48rem) {
   .stir-carousel:hover [data-slot='prev'],
   .stir-carousel:hover [data-slot='next'],

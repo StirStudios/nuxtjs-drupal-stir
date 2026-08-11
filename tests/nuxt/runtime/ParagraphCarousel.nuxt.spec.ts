@@ -124,4 +124,37 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
 
     expect(blur).toHaveBeenCalledOnce()
   })
+
+  it('renders marquee items with one inert visual copy', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        presentation: 'marquee',
+        carouselInterval: 5000,
+        items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')],
+      },
+    })
+
+    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
+    expect(wrapper.find('.stir-marquee').attributes('style')).toContain(
+      '--stir-marquee-duration: 20000ms',
+    )
+
+    const groups = wrapper.findAll('.stir-marquee__group')
+
+    expect(groups).toHaveLength(2)
+    expect(groups[0]?.findAll('a')).toHaveLength(2)
+    expect(groups[1]?.attributes('aria-hidden')).toBe('true')
+    expect(groups[1]?.attributes()).toHaveProperty('inert')
+  })
+
+  it('keeps legacy media when the ordered items slot is empty', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      slots: {
+        items: () => [],
+        media: () => h('article', 'Legacy media'),
+      },
+    })
+
+    expect(wrapper.text()).toContain('Legacy media')
+  })
 })

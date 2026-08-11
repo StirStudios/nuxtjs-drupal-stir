@@ -225,6 +225,7 @@
       "layers/theme/app/components/global/Paragraph/Calculator.vue",
       "layers/theme/app/components/global/Paragraph/Calendly.vue",
       "layers/theme/app/components/global/Paragraph/Carousel.vue",
+      "layers/theme/app/components/global/Paragraph/CarouselItem.vue",
       "layers/theme/app/components/global/Paragraph/Default.vue",
       "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
       "layers/theme/app/components/global/Paragraph/Faq.vue",
@@ -535,6 +536,7 @@
         "layers/theme/app/components/global/Paragraph/Calculator.vue",
         "layers/theme/app/components/global/Paragraph/Calendly.vue",
         "layers/theme/app/components/global/Paragraph/Carousel.vue",
+        "layers/theme/app/components/global/Paragraph/CarouselItem.vue",
         "layers/theme/app/components/global/Paragraph/Default.vue",
         "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
         "layers/theme/app/components/global/Paragraph/Faq.vue",
@@ -713,7 +715,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 120,
+    "components": 121,
     "composables": 63,
     "utils": 50,
     "plugins": 7,
