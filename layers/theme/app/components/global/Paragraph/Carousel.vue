@@ -43,6 +43,7 @@ const props = withDefaults(defineProps<{
   carouselAutoheight?: boolean
   carouselInterval?: number
 
+  marqueeDuration?: number
   marqueeOrientation?: 'horizontal' | 'vertical'
   marqueeOverlay?: boolean
   marqueePauseOnHover?: boolean
@@ -58,6 +59,7 @@ const props = withDefaults(defineProps<{
   headerTag: undefined,
   id: undefined,
   items: undefined,
+  marqueeDuration: undefined,
   marqueeOrientation: undefined,
   marqueePauseOnHover: true,
   parentUuid: undefined,
@@ -147,6 +149,9 @@ const slides = computed(() => {
 })
 
 const isMarquee = computed(() => props.presentation === 'marquee')
+const marqueeStyle = computed(() => props.marqueeDuration
+  ? { '--duration': `${Math.max(1, props.marqueeDuration)}s` }
+  : undefined)
 
 const interval = computed(() => props.carouselInterval ?? 5000)
 const autoScrollSpeed = computed(() => {
@@ -285,6 +290,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
         :overlay="marqueeOverlay ?? false"
         :pause-on-hover="marqueePauseOnHover"
         :reverse="marqueeReverse ?? false"
+        :style="marqueeStyle"
       >
         <div v-for="item in slides" :key="item.key">
           <component :is="item.vnode" />
