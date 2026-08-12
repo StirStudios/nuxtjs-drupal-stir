@@ -91,6 +91,9 @@ independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
 - `STIR_PRESENTATION_MANIFEST` may override the endpoint with another URL or a
   local JSON file exported with `drush stir-layout:presentation-manifest`.
 - `STIR_PRESENTATION_MANIFEST_API_KEY` may override the API key for that URL.
+- `STIR_PRESENTATION_MANIFEST_FIXTURE=1` explicitly uses the layer's validated,
+  version-matched fixture for downstream quality/test workflows that do not
+  connect to Drupal. Do not set it for deployment builds.
 - `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
   approved local fallback when the primary source is unavailable.
 

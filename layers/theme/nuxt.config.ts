@@ -11,6 +11,7 @@ import { createJiti } from 'jiti'
 import {
   buildPresentationSource,
   loadPresentationManifest,
+  resolvePresentationManifestSource,
 } from './build/presentationManifest'
 import {
   resolveDrupalImageDomains,
@@ -164,12 +165,13 @@ export default defineNuxtConfig({
       const drupalUrl = process.env.DRUPAL_URL?.replace(/\/$/u, '')
       const isRepositoryBuild = nuxt.options.rootDir === repositoryRoot
         || nuxt.options.rootDir.startsWith(`${repositoryRoot}/tests/fixtures/`)
-      const manifestSource = process.env.STIR_PRESENTATION_MANIFEST
-        || (isRepositoryBuild
-          ? repositoryManifestFixture
-          : drupalUrl
-          ? `${drupalUrl}/ce-api/stir-layout-builder/presentation-manifest`
-          : undefined)
+      const manifestSource = resolvePresentationManifestSource({
+        source: process.env.STIR_PRESENTATION_MANIFEST,
+        useFixture: process.env.STIR_PRESENTATION_MANIFEST_FIXTURE === '1',
+        fixturePath: repositoryManifestFixture,
+        repositoryBuild: isRepositoryBuild,
+        drupalUrl,
+      })
       const manifest = await loadPresentationManifest({
         source: manifestSource,
         apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY

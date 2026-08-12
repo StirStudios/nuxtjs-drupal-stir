@@ -34,6 +34,20 @@ const presentationManifestSchema = v.strictObject({
 
 export type PresentationManifest = v.InferOutput<typeof presentationManifestSchema>
 
+export function resolvePresentationManifestSource(options: {
+  source?: string
+  useFixture?: boolean
+  fixturePath: string
+  repositoryBuild?: boolean
+  drupalUrl?: string
+}): string | undefined {
+  if (options.source) return options.source
+  if (options.useFixture || options.repositoryBuild) return options.fixturePath
+  return options.drupalUrl
+    ? `${options.drupalUrl.replace(/\/$/u, '')}/ce-api/stir-layout-builder/presentation-manifest`
+    : undefined
+}
+
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)$/u

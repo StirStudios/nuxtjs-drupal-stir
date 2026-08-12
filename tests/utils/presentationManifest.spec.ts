@@ -6,6 +6,7 @@ import {
   loadPresentationManifest,
   parsePresentationManifest,
   presentationUtilities,
+  resolvePresentationManifestSource,
 } from '../../layers/theme/build/presentationManifest'
 
 function canonicalize(value: unknown): unknown {
@@ -55,6 +56,25 @@ function fixture() {
 }
 
 describe('CMS presentation manifest', () => {
+  it('uses the packaged fixture only when explicitly requested downstream', () => {
+    const fixturePath = '/layer/contracts/presentation-usage-manifest.json'
+
+    expect(resolvePresentationManifestSource({
+      useFixture: true,
+      fixturePath,
+      drupalUrl: 'https://cms.example.com',
+    })).toBe(fixturePath)
+    expect(resolvePresentationManifestSource({
+      fixturePath,
+      drupalUrl: 'https://cms.example.com/',
+    })).toBe('https://cms.example.com/ce-api/stir-layout-builder/presentation-manifest')
+    expect(resolvePresentationManifestSource({
+      source: '/project/manifest.json',
+      useFixture: true,
+      fixturePath,
+    })).toBe('/project/manifest.json')
+  })
+
   it('validates schema and deterministic revision', () => {
     expect(parsePresentationManifest(fixture()).schemaVersion).toBe(2)
     expect(() => parsePresentationManifest({ ...fixture(), revision: '0'.repeat(64) }))

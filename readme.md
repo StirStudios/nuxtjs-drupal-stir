@@ -202,6 +202,10 @@ attributes above; the harness does not depend on project-specific components.
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
 - `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
+- `STIR_PRESENTATION_MANIFEST`: Optional build-time URL or local file override for the CMS presentation manifest; defaults to the protected Drupal endpoint derived from `DRUPAL_URL`
+- `STIR_PRESENTATION_MANIFEST_API_KEY`: Optional API-key override used only when fetching `STIR_PRESENTATION_MANIFEST`
+- `STIR_PRESENTATION_MANIFEST_LAST_KNOWN`: Optional local fallback manifest used only when the primary source is unavailable
+- `STIR_PRESENTATION_MANIFEST_FIXTURE`: Set to `'1'` only in downstream quality/test workflows without Drupal to use the layer's validated, version-matched fixture; never enable it for deployment builds
 - `DRUPAL_SESSION_COOKIE_NAMES`: Optional comma-separated allowlist for deployments that override Drupal's standard session cookie name
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
 - `DRUPAL_TRUST_PROXY`: Set to `'true'` only when a trusted ingress replaces `X-Forwarded-For` and `DRUPAL_FORWARD_CLIENT_IP` is enabled (default: `false`)
