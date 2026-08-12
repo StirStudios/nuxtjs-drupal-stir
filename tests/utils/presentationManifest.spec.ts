@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import {
   buildPresentationSource,
-  compatibilityPresentationUtilities,
   inlinePresentationSource,
   loadPresentationManifest,
   parsePresentationManifest,
@@ -23,7 +22,7 @@ function canonicalize(value: unknown): unknown {
 
 function fixture() {
   const payload = {
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     site: { uuid: 'site-uuid', name: 'Example', theme: 'stir' },
     capabilities: ['layout', 'semantic-presentation'],
     used: {
@@ -36,7 +35,14 @@ function fixture() {
       width: ['w-md'],
       alignment: ['justify_center', 'text_left'],
     },
-    legacyClasses: ['md:gap-4'],
+    legacyClasses: [
+      'border-white/10',
+      'custom-project-class',
+      'group-hover/item:block',
+      'lg:text-left',
+      'md:gap-4',
+      'peer-checked/field:block',
+    ],
     diagnostics: { rejectedLegacyClassCount: 0 },
   }
 
@@ -50,13 +56,13 @@ function fixture() {
 
 describe('CMS presentation manifest', () => {
   it('validates schema and deterministic revision', () => {
-    expect(parsePresentationManifest(fixture()).schemaVersion).toBe(1)
+    expect(parsePresentationManifest(fixture()).schemaVersion).toBe(2)
     expect(() => parsePresentationManifest({ ...fixture(), revision: '0'.repeat(64) }))
       .toThrow(/revision hash mismatch/u)
   })
 
   it('maps semantic usage and the layout reserve to finite utilities', () => {
-    const utilities = presentationUtilities(parsePresentationManifest(fixture()), 'strict')
+    const utilities = presentationUtilities(parsePresentationManifest(fixture()))
 
     expect(utilities).toEqual(expect.arrayContaining([
       'grid-cols-2',
@@ -72,28 +78,13 @@ describe('CMS presentation manifest', () => {
       'md:flex',
       'text-start',
       'md:gap-4',
+      'border-white/10',
+      'custom-project-class',
+      'group-hover/item:block',
+      'lg:text-left',
+      'peer-checked/field:block',
       'lg:grid-cols-[8fr_4fr]',
     ]))
-  })
-
-  it('keeps the transitional compatibility policy finite and centralized', () => {
-    const utilities = compatibilityPresentationUtilities()
-
-    expect(utilities).toEqual(expect.arrayContaining([
-      'grid-cols-12',
-      '2xl:grid-cols-12',
-      'col-span-2',
-      'sm:columns-2',
-      'basis-1/12',
-      '2xl:basis-1/12',
-      'gap-20',
-      '2xl:gap-20',
-      'p-20',
-      'lg:p-20',
-      'lg:grid-cols-[8fr_4fr]',
-    ]))
-    expect(new Set(utilities).size).toBe(utilities.length)
-    expect(utilities.every(utility => !utility.includes('[') || utility.includes('grid-cols-['))).toBe(true)
   })
 
   it('emits literal Tailwind 4 inline sources', () => {
@@ -102,20 +93,17 @@ describe('CMS presentation manifest', () => {
     expect(source).toBe('@source inline("gap-4 grid-cols-2");\n')
   })
 
-  it('gives generated sources a deterministic mode-aware identity', () => {
+  it('gives generated sources a deterministic identity', () => {
     const manifest = parsePresentationManifest(fixture())
-    const strict = buildPresentationSource(manifest, 'strict')
-    const repeated = buildPresentationSource(manifest, 'strict')
-    const hybrid = buildPresentationSource(manifest, 'hybrid')
+    const source = buildPresentationSource(manifest)
+    const repeated = buildPresentationSource(manifest)
 
-    expect(repeated).toEqual(strict)
-    expect(strict.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
-    expect(hybrid.sourceRevision).not.toBe(strict.sourceRevision)
-    expect(hybrid.utilityCount).toBeGreaterThan(strict.utilityCount)
-    expect(strict.manifestUsageCount).toBe(9)
-    expect(strict.legacyUtilityCount).toBe(1)
-    expect(strict.rejectedLegacyUtilityCount).toBe(0)
-    expect(strict.sourceBytes).toBe(Buffer.byteLength(strict.source, 'utf8'))
+    expect(repeated).toEqual(source)
+    expect(source.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
+    expect(source.manifestUsageCount).toBe(14)
+    expect(source.legacyUtilityCount).toBe(6)
+    expect(source.rejectedLegacyUtilityCount).toBe(0)
+    expect(source.sourceBytes).toBe(Buffer.byteLength(source.source, 'utf8'))
   })
 
   it('uses a last-known file only under the explicit availability policy', async () => {
@@ -140,7 +128,7 @@ describe('CMS presentation manifest', () => {
       .update(JSON.stringify(canonicalize(payload)))
       .digest('hex')
 
-    expect(() => presentationUtilities(parsePresentationManifest(input), 'strict'))
+    expect(() => presentationUtilities(parsePresentationManifest(input)))
       .toThrow(/Unsupported semantic width/u)
   })
 
@@ -154,8 +142,22 @@ describe('CMS presentation manifest', () => {
       .update(JSON.stringify(canonicalize(payload)))
       .digest('hex')
 
-    expect(() => presentationUtilities(parsePresentationManifest(input), 'strict'))
+    expect(() => presentationUtilities(parsePresentationManifest(input)))
       .toThrow(/reports 2 rejected legacy utilities/u)
+  })
+
+  it('rejects unsafe class tokens reported by a malformed producer', () => {
+    const input = fixture()
+
+    input.legacyClasses = [['bg-', '[url(evil)]'].join('')]
+    const { revision: _revision, ...payload } = input
+
+    input.revision = createHash('sha256')
+      .update(JSON.stringify(canonicalize(payload)))
+      .digest('hex')
+
+    expect(() => presentationUtilities(parsePresentationManifest(input)))
+      .toThrow(/Rejected CMS presentation class token/u)
   })
 
   it('does not hide an invalid primary manifest behind the availability fallback', async () => {

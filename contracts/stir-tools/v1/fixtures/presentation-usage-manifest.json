@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "site": {
     "uuid": "fixture-site",
     "name": "Fixture",
@@ -25,9 +25,9 @@
     "width": ["w-md"],
     "alignment": ["justify_center"]
   },
-  "legacyClasses": ["md:gap-4"],
+  "legacyClasses": ["border-white/10", "custom-project-class", "group-hover/item:block", "lg:text-left", "md:gap-4", "peer-checked/field:block"],
   "diagnostics": {
     "rejectedLegacyClassCount": 0
   },
-  "revision": "a32d3af365ea11501dbf136f5a93d414cf7e82f6990a66c191250757a2fe0ec8"
+  "revision": "b171351005be6caf9fd7d9cad5db33de2f6654ac114287d1e3c8c8bf0a4ee630"
 }

@@ -2,44 +2,30 @@
   "schemaVersion": 1,
   "fixture": "tests/fixtures/minimal-consumer",
   "manifest": "contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json",
-  "compatibility": {
-    "mode": "compatibility",
-    "bytes": 263425,
-    "gzipBytes": 33806,
+  "presentation": {
+    "bytes": 228047,
+    "gzipBytes": 30082,
     "assets": [
       {
-        "file": "MediaModal.DFKcV8R0.css",
-        "bytes": 213,
-        "gzipBytes": 148
+        "file": "Carousel.-vknDqc8.css",
+        "bytes": 234,
+        "gzipBytes": 127
       },
       {
-        "file": "entry.dLD-JFox.css",
-        "bytes": 263212,
-        "gzipBytes": 33658
-      }
-    ]
-  },
-  "strict": {
-    "mode": "strict",
-    "bytes": 214581,
-    "gzipBytes": 28497,
-    "assets": [
-      {
-        "file": "MediaModal.DFKcV8R0.css",
-        "bytes": 213,
-        "gzipBytes": 148
+        "file": "MediaModal.BtaPd4iw.css",
+        "bytes": 160,
+        "gzipBytes": 145
       },
       {
-        "file": "entry.CZvtBDUZ.css",
-        "bytes": 214368,
-        "gzipBytes": 28349
+        "file": "Tabs.D5X58FDo.css",
+        "bytes": 236,
+        "gzipBytes": 175
+      },
+      {
+        "file": "entry.DVF4FBxG.css",
+        "bytes": 227417,
+        "gzipBytes": 29635
       }
     ]
-  },
-  "reduction": {
-    "bytes": 48844,
-    "gzipBytes": 5309,
-    "percent": 18.54,
-    "gzipPercent": 15.7
   }
 }

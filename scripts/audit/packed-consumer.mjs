@@ -139,6 +139,13 @@ async function main() {
     if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
       throw new Error('Packed layer did not expose the stir-a11y executable.')
     }
+    const presentationManifest = join(
+      consumerDir,
+      'node_modules/@stir/base/contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
+    )
+    const consumerEnvironment = {
+      STIR_PRESENTATION_MANIFEST: presentationManifest,
+    }
     for (const layer of consumerLayers) {
       // Each entry point is an independent consumer contract. Do not let Nuxt's
       // generated component, import, or app-config types leak across them.
@@ -148,8 +155,11 @@ async function main() {
         join(consumerDir, 'nuxt.config.ts'),
         `export default defineNuxtConfig({ extends: ['${layer.specifier}'] })\n`,
       )
-      await run('pnpm', ['typecheck'], consumerDir)
-      await run('pnpm', ['build'], consumerDir, { STIR_PERF_ANALYZE: 'true' })
+      await run('pnpm', ['typecheck'], consumerDir, consumerEnvironment)
+      await run('pnpm', ['build'], consumerDir, {
+        ...consumerEnvironment,
+        STIR_PERF_ANALYZE: 'true',
+      })
       const installedReport = join(
         consumerDir,
         'node_modules/@stir/base/.audit/client-entry-modules.json',

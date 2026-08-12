@@ -25,7 +25,7 @@ function runBuild(environment) {
   })
 }
 
-async function measure(mode, environment) {
+async function measure(environment) {
   await rm(resolve(fixture, '.output'), { recursive: true, force: true })
   await runBuild(environment)
 
@@ -45,48 +45,25 @@ async function measure(mode, environment) {
   }
 
   return {
-    mode,
     bytes: assets.reduce((total, asset) => total + asset.bytes, 0),
     gzipBytes: assets.reduce((total, asset) => total + asset.gzipBytes, 0),
     assets,
   }
 }
 
-const compatibility = await measure('compatibility', {
-  STIR_PRESENTATION_MANIFEST_MODE: 'compatibility',
-})
-const strict = await measure('strict', {
-  STIR_PRESENTATION_MANIFEST_MODE: 'strict',
+const presentation = await measure({
   STIR_PRESENTATION_MANIFEST: manifestPath,
 })
-const reduction = {
-  bytes: compatibility.bytes - strict.bytes,
-  gzipBytes: compatibility.gzipBytes - strict.gzipBytes,
-}
-
-if (reduction.bytes <= 0 || reduction.gzipBytes <= 0) {
-  throw new Error(
-    `Strict presentation CSS did not reduce output: ${JSON.stringify(reduction)}`,
-  )
-}
 
 const report = {
   schemaVersion: 1,
   fixture,
   manifest: 'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
-  compatibility,
-  strict,
-  reduction: {
-    ...reduction,
-    percent: Number(((reduction.bytes / compatibility.bytes) * 100).toFixed(2)),
-    gzipPercent: Number(
-      ((reduction.gzipBytes / compatibility.gzipBytes) * 100).toFixed(2),
-    ),
-  },
+  presentation,
 }
 
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`)
 process.stdout.write(
-  `Presentation CSS reduced ${report.reduction.percent}% (${report.reduction.gzipPercent}% gzip).\n`,
+  `Presentation CSS: ${String(presentation.bytes)} bytes (${String(presentation.gzipBytes)} gzip).\n`,
 )
 process.stdout.write(`Saved: ${reportPath}\n`)
