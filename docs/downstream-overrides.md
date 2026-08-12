@@ -98,7 +98,8 @@ independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
   approved local fallback when the primary source is unavailable.
 
 Builds fail when the manifest is missing, invalid, uses an unknown semantic
-value, contains an unsafe class token, or has a mismatched revision. Ordinary
+value, contains an unsafe accepted class token, or has a mismatched revision.
+Rejected historical class values are omitted and reported as a warning. Ordinary
 Tailwind utilities, responsive/state variants, slash modifiers such as
 `border-white/10`, and project CSS hooks are preserved. Bracket arbitrary
 values remain rejected. The verified Drupal revision remains available in
