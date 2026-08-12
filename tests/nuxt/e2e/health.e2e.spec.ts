@@ -61,9 +61,14 @@ const presentationManifestFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
 ), 'utf8'))
+let presentationManifestApiKey: string | undefined
 
 const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
+
+  if (path === '/ce-api/stir-layout-builder/presentation-manifest') {
+    presentationManifestApiKey = request.headers['x-api-key']
+  }
   const payload = path === '/api/app-context'
     ? {
         blocks: {},
@@ -99,16 +104,20 @@ const drupalFixtureUrl = `http://127.0.0.1:${address.port}`
 const browserEnabled = process.env.CI === 'true'
   || process.env.STIR_E2E_BROWSER === 'true'
 const originalEnvironment = {
+  DRUPAL_API_KEY: process.env.DRUPAL_API_KEY,
   DRUPAL_URL: process.env.DRUPAL_URL,
   NUXT_URL: process.env.NUXT_URL,
   NUXT_INDEXABLE: process.env.NUXT_INDEXABLE,
   PROTECTED_PASSWORD: process.env.PROTECTED_PASSWORD,
+  STIR_PRESENTATION_MANIFEST: process.env.STIR_PRESENTATION_MANIFEST,
 }
 
+process.env.DRUPAL_API_KEY = 'fixture-api-key'
 process.env.DRUPAL_URL = drupalFixtureUrl
 process.env.NUXT_URL = 'http://127.0.0.1'
 process.env.NUXT_INDEXABLE = 'false'
 process.env.PROTECTED_PASSWORD = 'fixture-protected-password'
+process.env.STIR_PRESENTATION_MANIFEST = `${drupalFixtureUrl}/ce-api/stir-layout-builder/presentation-manifest`
 
 afterAll(async () => {
   await new Promise<void>((resolve, reject) => {
@@ -125,10 +134,12 @@ describe('Nuxt E2E smoke', async () => {
   await setup({
     browser: browserEnabled,
     env: {
+      DRUPAL_API_KEY: 'fixture-api-key',
       DRUPAL_URL: drupalFixtureUrl,
       NUXT_URL: 'http://127.0.0.1',
       NUXT_INDEXABLE: 'false',
       PROTECTED_PASSWORD: 'fixture-protected-password',
+      STIR_PRESENTATION_MANIFEST: `${drupalFixtureUrl}/ce-api/stir-layout-builder/presentation-manifest`,
     },
     nuxtConfig: {
       appConfig: {
@@ -165,6 +176,7 @@ describe('Nuxt E2E smoke', async () => {
         theme: 'stir',
       },
     })
+    expect(presentationManifestApiKey).toBe('fixture-api-key')
   })
 
   it('keeps public configuration endpoints available', async () => {
