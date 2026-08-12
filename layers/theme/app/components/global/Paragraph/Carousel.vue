@@ -141,7 +141,7 @@ const autoScrollSpeed = computed(() => {
 
 const autoScrollOptions = computed(() =>
   slides.value.length > 1
-  && (props.carouselAutoscroll || isMarquee.value)
+  && props.carouselAutoscroll
   && preferredMotion.value !== 'reduce'
     ? {
         speed: autoScrollSpeed.value,
@@ -154,7 +154,6 @@ const autoScrollOptions = computed(() =>
 
 const autoplayOptions = computed(() =>
   slides.value.length > 1
-  && !isMarquee.value
   && !props.carouselAutoscroll
   && preferredMotion.value !== 'reduce'
     ? {
@@ -174,6 +173,9 @@ const nextButton = computed(() =>
 )
 const carouselLabel = computed(() =>
   `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
+)
+const marqueeLabel = computed(() =>
+  `Content marquee ${props.id ?? props.uuid ?? ''}`.trim(),
 )
 
 function autoplayPlugin() {
@@ -253,17 +255,29 @@ function releasePointerArrowFocus(event: PointerEvent) {
         {{ header }}
       </component>
 
+      <UMarquee
+        v-if="isMarquee && slides.length"
+        :aria-label="marqueeLabel"
+        class="stir-marquee"
+        :overlay="false"
+        pause-on-hover
+      >
+        <div v-for="item in slides" :key="item.key">
+          <component :is="item.vnode" />
+        </div>
+      </UMarquee>
+
       <UCarousel
-        v-if="slides.length"
+        v-else-if="slides.length"
         ref="carousel"
         v-slot="{ item }"
         :aria-label="carouselLabel"
-        :arrows="mounted && !isMarquee ? carouselArrows : false"
-        :auto-height="isMarquee ? false : carouselAutoheight"
+        :arrows="mounted ? carouselArrows : false"
+        :auto-height="carouselAutoheight"
         :auto-scroll="autoScrollOptions"
         :autoplay="autoplayOptions"
-        :dots="isMarquee ? false : carouselIndicators"
-        :fade="isMarquee ? false : carouselFade"
+        :dots="carouselIndicators"
+        :fade="carouselFade"
         :items="slides"
         loop
         :next="nextButton"
@@ -271,9 +285,9 @@ function releasePointerArrowFocus(event: PointerEvent) {
         :prev="prevButton"
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :ui="{
-          root: isMarquee ? 'stir-marquee' : ['stir-carousel', theme.carousel.root],
+          root: ['stir-carousel', theme.carousel.root],
           container: 'items-center transition-[height]',
-          item: [gridItems, isMarquee ? 'basis-auto' : ''],
+          item: gridItems,
         }"
       >
         <WrapDiv :styles="gridItems">
