@@ -18,7 +18,7 @@ import {
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
@@ -43,8 +43,30 @@ const props = defineProps<{
   carouselAutoheight?: boolean
   carouselInterval?: number
 
+  marqueeOrientation?: 'horizontal' | 'vertical'
+  marqueeOverlay?: boolean
+  marqueePauseOnHover?: boolean
+  marqueeReverse?: boolean
+
   editLink?: string
-}>()
+}>(), {
+  carouselInterval: undefined,
+  direction: undefined,
+  editLink: undefined,
+  gridItems: undefined,
+  header: undefined,
+  headerTag: undefined,
+  id: undefined,
+  items: undefined,
+  marqueeOrientation: undefined,
+  marqueePauseOnHover: true,
+  parentUuid: undefined,
+  presentation: undefined,
+  region: undefined,
+  spacing: undefined,
+  uuid: undefined,
+  width: undefined,
+})
 
 const theme = useAppConfig().stirTheme
 const slots = useSlots()
@@ -259,8 +281,10 @@ function releasePointerArrowFocus(event: PointerEvent) {
         v-if="isMarquee && slides.length"
         :aria-label="marqueeLabel"
         class="stir-marquee"
-        :overlay="false"
-        pause-on-hover
+        :orientation="marqueeOrientation ?? 'horizontal'"
+        :overlay="marqueeOverlay ?? false"
+        :pause-on-hover="marqueePauseOnHover"
+        :reverse="marqueeReverse ?? false"
       >
         <div v-for="item in slides" :key="item.key">
           <component :is="item.vnode" />

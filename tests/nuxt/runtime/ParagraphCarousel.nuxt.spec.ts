@@ -130,6 +130,10 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       props: {
         presentation: 'marquee',
         carouselInterval: 5000,
+        marqueeOrientation: 'vertical',
+        marqueeOverlay: true,
+        marqueePauseOnHover: false,
+        marqueeReverse: true,
         items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')],
       },
     })
@@ -137,9 +141,26 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     const marquee = wrapper.getComponent({ name: 'UMarquee' })
 
     expect(marquee.classes()).toContain('stir-marquee')
+    expect(marquee.props('orientation')).toBe('vertical')
+    expect(marquee.props('overlay')).toBe(true)
+    expect(marquee.props('pauseOnHover')).toBe(false)
+    expect(marquee.props('reverse')).toBe(true)
+    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
+  })
+
+  it('uses backward-compatible marquee defaults', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: {
+        presentation: 'marquee',
+        items: [h('article', 'One'), h('article', 'Two')],
+      },
+    })
+    const marquee = wrapper.getComponent({ name: 'UMarquee' })
+
+    expect(marquee.props('orientation')).toBe('horizontal')
     expect(marquee.props('overlay')).toBe(false)
     expect(marquee.props('pauseOnHover')).toBe(true)
-    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
+    expect(marquee.props('reverse')).toBe(false)
   })
 
   it('omits the marquee pause control when reduced motion is preferred', async () => {
