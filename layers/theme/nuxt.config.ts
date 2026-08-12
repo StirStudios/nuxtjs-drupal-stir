@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import {
   addTypeTemplate,
   findPath,
+  useLogger,
   useNuxt,
 } from '@nuxt/kit'
 import { createJiti } from 'jiti'
@@ -50,6 +51,7 @@ const loadModule = createJiti(import.meta.url, {
   interopDefault: false,
   moduleCache: false,
 })
+const presentationManifestLogger = useLogger('stir:presentation-manifest')
 
 function hasCssEntry(entries: unknown[], path: string): boolean {
   return entries.some((entry) => {
@@ -178,6 +180,12 @@ export default defineNuxtConfig({
           || process.env.DRUPAL_API_KEY,
         lastKnownPath: process.env.STIR_PRESENTATION_MANIFEST_LAST_KNOWN,
       })
+
+      if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
+        presentationManifestLogger.warn(
+          `Ignored ${manifest.diagnostics.rejectedLegacyClassCount} rejected legacy CMS utilities; valid presentation utilities will still be compiled`,
+        )
+      }
       const generatedDir = resolvePath(
         nuxt.options.rootDir,
         'node_modules/.cache/stir-presentation',

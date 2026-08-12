@@ -152,7 +152,7 @@ describe('CMS presentation manifest', () => {
       .toThrow(/Unsupported semantic width/u)
   })
 
-  it('fails optimized builds when Drupal reports rejected legacy classes', () => {
+  it('compiles accepted utilities when Drupal reports rejected legacy classes', () => {
     const input = fixture()
 
     input.diagnostics.rejectedLegacyClassCount = 2
@@ -162,8 +162,8 @@ describe('CMS presentation manifest', () => {
       .update(JSON.stringify(canonicalize(payload)))
       .digest('hex')
 
-    expect(() => presentationUtilities(parsePresentationManifest(input)))
-      .toThrow(/reports 2 rejected legacy utilities/u)
+    expect(presentationUtilities(parsePresentationManifest(input)))
+      .toContain('border-white/10')
   })
 
   it('rejects unsafe class tokens reported by a malformed producer', () => {

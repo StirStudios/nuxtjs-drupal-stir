@@ -153,11 +153,6 @@ function addSpacing(classes: Set<string>, value: string): void {
 export function presentationUtilities(
   manifest: PresentationManifest,
 ): string[] {
-  if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
-    throw new Error(
-      `CMS presentation manifest reports ${manifest.diagnostics.rejectedLegacyClassCount} rejected legacy utilities`,
-    )
-  }
   const classes = new Set<string>()
 
   addLayoutReserve(classes, manifest.capabilities)
