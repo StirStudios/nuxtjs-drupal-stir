@@ -130,6 +130,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       props: {
         presentation: 'marquee',
         carouselInterval: 5000,
+        marqueeDuration: 100,
         marqueeOrientation: 'vertical',
         marqueeOverlay: true,
         marqueePauseOnHover: false,
@@ -141,6 +142,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     const marquee = wrapper.getComponent({ name: 'UMarquee' })
 
     expect(marquee.classes()).toContain('stir-marquee')
+    expect(marquee.attributes('style')).toContain('--duration: 100s')
     expect(marquee.props('orientation')).toBe('vertical')
     expect(marquee.props('overlay')).toBe(true)
     expect(marquee.props('pauseOnHover')).toBe(false)
