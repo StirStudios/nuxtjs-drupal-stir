@@ -125,7 +125,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(blur).toHaveBeenCalledOnce()
   })
 
-  it('renders marquee presentation with continuous Nuxt UI auto-scroll', async () => {
+  it('renders marquee presentation with the native Nuxt UI marquee', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
         presentation: 'marquee',
@@ -134,16 +134,12 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       },
     })
 
-    const carousel = wrapper.getComponent({ name: 'UCarousel' })
+    const marquee = wrapper.getComponent({ name: 'UMarquee' })
 
-    expect(carousel.classes()).toContain('stir-marquee')
-    expect(carousel.props('autoScroll')).toMatchObject({
-      startDelay: 0,
-      stopOnMouseEnter: true,
-      stopOnInteraction: false,
-    })
-    expect(carousel.props('arrows')).toBe(false)
-    expect(carousel.props('dots')).toBe(false)
+    expect(marquee.classes()).toContain('stir-marquee')
+    expect(marquee.props('overlay')).toBe(false)
+    expect(marquee.props('pauseOnHover')).toBe(true)
+    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
   })
 
   it('omits the marquee pause control when reduced motion is preferred', async () => {
@@ -158,7 +154,8 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
 
     expect(wrapper.find('.stir-marquee').exists()).toBe(true)
     expect(wrapper.find('button').exists()).toBe(false)
-    expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
+    expect(wrapper.findComponent({ name: 'UMarquee' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
   })
 
   it('keeps legacy media when the ordered items slot is empty', async () => {
