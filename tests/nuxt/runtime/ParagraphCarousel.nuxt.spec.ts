@@ -125,7 +125,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(blur).toHaveBeenCalledOnce()
   })
 
-  it('renders one live marquee tree with a persistent pause control', async () => {
+  it('renders marquee presentation with continuous Nuxt UI auto-scroll', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
         presentation: 'marquee',
@@ -134,26 +134,16 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
-    expect(wrapper.find('.stir-marquee').attributes('style')).toContain(
-      '--stir-marquee-duration: 20000ms',
-    )
+    const carousel = wrapper.getComponent({ name: 'UCarousel' })
 
-    expect(wrapper.findAll('.stir-marquee__track a')).toHaveLength(2)
-    expect(
-      wrapper.find('.stir-marquee__track [aria-hidden="true"]').exists(),
-    ).toBe(false)
-
-    const control = wrapper.get('button')
-
-    expect(control.text()).toContain('Pause animation')
-    expect(control.attributes('aria-pressed')).toBe('false')
-
-    await control.trigger('click')
-
-    expect(wrapper.get('.stir-marquee').classes()).toContain('stir-marquee--paused')
-    expect(control.text()).toContain('Resume animation')
-    expect(control.attributes('aria-pressed')).toBe('true')
+    expect(carousel.classes()).toContain('stir-marquee')
+    expect(carousel.props('autoScroll')).toMatchObject({
+      startDelay: 0,
+      stopOnMouseEnter: true,
+      stopOnInteraction: false,
+    })
+    expect(carousel.props('arrows')).toBe(false)
+    expect(carousel.props('dots')).toBe(false)
   })
 
   it('omits the marquee pause control when reduced motion is preferred', async () => {
@@ -168,6 +158,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
 
     expect(wrapper.find('.stir-marquee').exists()).toBe(true)
     expect(wrapper.find('button').exists()).toBe(false)
+    expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
   })
 
   it('keeps legacy media when the ordered items slot is empty', async () => {

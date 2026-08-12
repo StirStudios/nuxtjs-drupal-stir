@@ -3,7 +3,6 @@ import { cloneVNode, type VNode } from 'vue'
 import {
   useIntersectionObserver,
   usePreferredReducedMotion,
-  useToggle,
 } from '@vueuse/core'
 import {
   resolveCarouselArrowButton,
@@ -126,12 +125,8 @@ const slides = computed(() => {
 })
 
 const isMarquee = computed(() => props.presentation === 'marquee')
-const [marqueePaused, toggleMarqueePaused] = useToggle(false)
 
 const interval = computed(() => props.carouselInterval ?? 5000)
-const marqueeDuration = computed(() =>
-  `${Math.max(20000, interval.value * Math.max(slides.value.length, 1))}ms`,
-)
 const autoScrollSpeed = computed(() => {
   const minInterval = 1000
   const maxInterval = 10000
@@ -146,7 +141,7 @@ const autoScrollSpeed = computed(() => {
 
 const autoScrollOptions = computed(() =>
   slides.value.length > 1
-  && props.carouselAutoscroll
+  && (props.carouselAutoscroll || isMarquee.value)
   && preferredMotion.value !== 'reduce'
     ? {
         speed: autoScrollSpeed.value,
@@ -159,6 +154,7 @@ const autoScrollOptions = computed(() =>
 
 const autoplayOptions = computed(() =>
   slides.value.length > 1
+  && !isMarquee.value
   && !props.carouselAutoscroll
   && preferredMotion.value !== 'reduce'
     ? {
@@ -178,12 +174,6 @@ const nextButton = computed(() =>
 )
 const carouselLabel = computed(() =>
   `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
-)
-const marqueeRegionId = computed(() =>
-  `stir-marquee-${String(props.id ?? props.uuid ?? 'content')}`,
-)
-const marqueePauseLabel = computed(() =>
-  marqueePaused.value ? 'Resume animation' : 'Pause animation',
 )
 
 function autoplayPlugin() {
@@ -263,58 +253,17 @@ function releasePointerArrowFocus(event: PointerEvent) {
         {{ header }}
       </component>
 
-      <template v-if="slides.length && isMarquee">
-        <div
-          v-if="preferredMotion !== 'reduce'"
-          class="mb-3 flex justify-end"
-        >
-          <UButton
-            :aria-controls="marqueeRegionId"
-            :aria-pressed="marqueePaused"
-            color="neutral"
-            :icon="marqueePaused ? 'i-lucide-play' : 'i-lucide-pause'"
-            :label="marqueePauseLabel"
-            size="sm"
-            variant="soft"
-            @click="toggleMarqueePaused()"
-          />
-        </div>
-
-        <div
-          :id="marqueeRegionId"
-          :aria-label="carouselLabel"
-          class="stir-marquee overflow-hidden"
-          :class="{ 'stir-marquee--paused': marqueePaused }"
-          role="region"
-          :style="{ '--stir-marquee-duration': marqueeDuration }"
-        >
-          <!--
-            Keep one live Vue tree. Repeated component trees can duplicate
-            media requests, analytics, DOM IDs, and keyboard destinations.
-          -->
-          <div class="stir-marquee__track flex w-max items-center">
-            <WrapDiv
-              v-for="slide in slides"
-              :key="slide.key"
-              :styles="gridItems ? ['shrink-0', gridItems] : 'shrink-0'"
-            >
-              <component :is="slide.vnode" />
-            </WrapDiv>
-          </div>
-        </div>
-      </template>
-
       <UCarousel
-        v-else-if="slides.length"
+        v-if="slides.length"
         ref="carousel"
         v-slot="{ item }"
         :aria-label="carouselLabel"
-        :arrows="mounted ? carouselArrows : false"
-        :auto-height="carouselAutoheight"
+        :arrows="mounted && !isMarquee ? carouselArrows : false"
+        :auto-height="isMarquee ? false : carouselAutoheight"
         :auto-scroll="autoScrollOptions"
         :autoplay="autoplayOptions"
-        :dots="carouselIndicators"
-        :fade="carouselFade"
+        :dots="isMarquee ? false : carouselIndicators"
+        :fade="isMarquee ? false : carouselFade"
         :items="slides"
         loop
         :next="nextButton"
@@ -322,9 +271,9 @@ function releasePointerArrowFocus(event: PointerEvent) {
         :prev="prevButton"
         :prev-icon="theme.carousel.arrows?.prevIcon"
         :ui="{
-          root: ['stir-carousel', theme.carousel.root],
+          root: isMarquee ? 'stir-marquee' : ['stir-carousel', theme.carousel.root],
           container: 'items-center transition-[height]',
-          item: gridItems,
+          item: [gridItems, isMarquee ? 'basis-auto' : ''],
         }"
       >
         <WrapDiv :styles="gridItems">
@@ -336,34 +285,6 @@ function releasePointerArrowFocus(event: PointerEvent) {
 </template>
 
 <style>
-.stir-marquee__track {
-  gap: 2rem;
-  padding-inline-end: 2rem;
-  animation: stir-marquee var(--stir-marquee-duration, 30s) linear infinite;
-}
-
-.stir-marquee--paused .stir-marquee__track,
-.stir-marquee:hover .stir-marquee__track,
-.stir-marquee:focus-within .stir-marquee__track {
-  animation-play-state: paused;
-}
-
-@keyframes stir-marquee {
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stir-marquee {
-    overflow-x: auto;
-  }
-
-  .stir-marquee__track {
-    animation: none;
-  }
-}
-
 @media (min-width: 48rem) {
   .stir-carousel:hover [data-slot='prev'],
   .stir-carousel:hover [data-slot='next'],
