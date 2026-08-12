@@ -82,6 +82,9 @@ Every build consumes Drupal's presentation usage manifest and compiles only the
 semantic recipes and safe class tokens that the site currently uses. There is
 no compatibility mode or general-purpose utility safelist.
 
+The widened safe-token grammar is manifest schema version 2. During an
+independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
+
 - By default Nuxt reads
   `${DRUPAL_URL}/ce-api/stir-layout-builder/presentation-manifest` and uses
   `DRUPAL_API_KEY` when configured.

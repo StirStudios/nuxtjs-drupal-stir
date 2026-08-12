@@ -22,7 +22,7 @@
     "fixtures/media-image-lightweight.json": "bc74afe5178cc6ffc5164b939a0f998cf31b4ed4a7fa75fcd690e659c0e5c1e8",
     "fixtures/media-summary.json": "172ae945bd6d6e69703cf2bb66e4872f4ba73dfbbc40a067211664912a0396d1",
     "fixtures/media-video-local.json": "f70d56f2828e5f783838fc046bd1c1189d1b1f7d134755e4c2c757488e906bcb",
-    "fixtures/presentation-usage-manifest.json": "847d229c5bd7c27a18dac8e015055b342d752977ecb0ccf410aed0b6a6ae02c8",
+    "fixtures/presentation-usage-manifest.json": "6d545ee3ed815f27dadf73e096062a974310800d358dbfc7925d649f788f7a8e",
     "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
     "fixtures/webform-calculator.json": "a52a397e845256d8b054411bf9aa630f0d975ee603a59e4c1155f959f6f4b6fa",
     "fixtures/webform-contact.json": "7074c24531e159b3cc479f538832b1087886cc400ac11f8a34be07581d673ee1",
@@ -44,7 +44,7 @@
     "schemas/media-image.schema.json": "bbcf1ecb6924236742c0a1ea1cd39356e1f876df7480546131fd6701a03aaff1",
     "schemas/media-summary.schema.json": "0ca8f31c69eea7760e98cf526cc52c8028092939bdf2b10c763c8770b3759f56",
     "schemas/media-video-local.schema.json": "a9d0c730bde851aa06ad96ac989c5dcf5d572e6e18b16edd7324e30741826a6a",
-    "schemas/presentation-usage-manifest.schema.json": "007be7751bd6a7c7d2b1ed584b0adb6d3a338e3c5a9cefd3c7a87ce9b0b201c9",
+    "schemas/presentation-usage-manifest.schema.json": "46af5644f9c8d40b3d6ac270ca4c8a733fbc16052eaec43a36a5d16973f57381",
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform.schema.json": "0a7e21c7d873c4c2413d7a7d84b690756bbd89dfad9aaedcbfa635760592f24f"

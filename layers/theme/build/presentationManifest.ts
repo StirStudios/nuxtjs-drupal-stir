@@ -8,7 +8,7 @@ const breakpointSchema = v.record(
 )
 
 const presentationManifestSchema = v.strictObject({
-  schemaVersion: v.literal(1),
+  schemaVersion: v.literal(2),
   site: v.strictObject({
     uuid: v.string(),
     name: v.string(),
@@ -37,7 +37,7 @@ export type PresentationManifest = v.InferOutput<typeof presentationManifestSche
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)$/u
-const SAFE_CLASS_TOKEN = /^(?=.{1,80}$)(?:(?:[a-z0-9][a-z0-9_-]*):)*(?:-?[a-z0-9][a-z0-9_.-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?$/u
+const SAFE_CLASS_TOKEN = /^(?=.{1,80}$)(?:(?:[a-z0-9][a-z0-9_-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?:)*(?:-?[a-z0-9][a-z0-9_.-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?$/u
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)

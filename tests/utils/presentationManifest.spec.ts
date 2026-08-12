@@ -22,7 +22,7 @@ function canonicalize(value: unknown): unknown {
 
 function fixture() {
   const payload = {
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     site: { uuid: 'site-uuid', name: 'Example', theme: 'stir' },
     capabilities: ['layout', 'semantic-presentation'],
     used: {
@@ -35,7 +35,14 @@ function fixture() {
       width: ['w-md'],
       alignment: ['justify_center', 'text_left'],
     },
-    legacyClasses: ['border-white/10', 'custom-project-class', 'lg:text-left', 'md:gap-4'],
+    legacyClasses: [
+      'border-white/10',
+      'custom-project-class',
+      'group-hover/item:block',
+      'lg:text-left',
+      'md:gap-4',
+      'peer-checked/field:block',
+    ],
     diagnostics: { rejectedLegacyClassCount: 0 },
   }
 
@@ -49,7 +56,7 @@ function fixture() {
 
 describe('CMS presentation manifest', () => {
   it('validates schema and deterministic revision', () => {
-    expect(parsePresentationManifest(fixture()).schemaVersion).toBe(1)
+    expect(parsePresentationManifest(fixture()).schemaVersion).toBe(2)
     expect(() => parsePresentationManifest({ ...fixture(), revision: '0'.repeat(64) }))
       .toThrow(/revision hash mismatch/u)
   })
@@ -73,7 +80,9 @@ describe('CMS presentation manifest', () => {
       'md:gap-4',
       'border-white/10',
       'custom-project-class',
+      'group-hover/item:block',
       'lg:text-left',
+      'peer-checked/field:block',
       'lg:grid-cols-[8fr_4fr]',
     ]))
   })
@@ -91,8 +100,8 @@ describe('CMS presentation manifest', () => {
 
     expect(repeated).toEqual(source)
     expect(source.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
-    expect(source.manifestUsageCount).toBe(12)
-    expect(source.legacyUtilityCount).toBe(4)
+    expect(source.manifestUsageCount).toBe(14)
+    expect(source.legacyUtilityCount).toBe(6)
     expect(source.rejectedLegacyUtilityCount).toBe(0)
     expect(source.sourceBytes).toBe(Buffer.byteLength(source.source, 'utf8'))
   })

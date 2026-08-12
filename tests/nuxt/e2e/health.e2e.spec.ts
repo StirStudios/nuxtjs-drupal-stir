@@ -173,7 +173,7 @@ describe('Nuxt E2E smoke', async () => {
       presentation: {
         manifestRevision: presentationManifestFixture.revision,
         sourceRevision: expect.stringMatching(/^[a-f0-9]{64}$/u),
-        schemaVersion: 1,
+        schemaVersion: 2,
         siteUuid: 'fixture-site',
         theme: 'stir',
       },
