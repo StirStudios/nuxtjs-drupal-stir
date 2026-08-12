@@ -67,7 +67,9 @@ const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
 
   if (path === '/ce-api/stir-layout-builder/presentation-manifest') {
-    presentationManifestApiKey = request.headers['x-api-key']
+    const apiKey = request.headers['x-api-key']
+
+    presentationManifestApiKey = Array.isArray(apiKey) ? apiKey[0] : apiKey
   }
   const payload = path === '/api/app-context'
     ? {
