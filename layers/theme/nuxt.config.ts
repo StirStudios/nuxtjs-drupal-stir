@@ -10,10 +10,7 @@ import {
 import { createJiti } from 'jiti'
 import {
   buildPresentationSource,
-  compatibilityPresentationUtilities,
-  inlinePresentationSource,
   loadPresentationManifest,
-  type PresentationManifestMode,
 } from './build/presentationManifest'
 import {
   resolveDrupalImageDomains,
@@ -23,6 +20,11 @@ import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
+const repositoryRoot = resolvePath(themeLayerDir, '../..')
+const repositoryManifestFixture = resolvePath(
+  repositoryRoot,
+  'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
+)
 const upstreamThemeCss = resolvePath(themeLayerDir, 'app/assets/css/main.css')
 const appConfigTypes = resolvePath(themeLayerDir, 'app/types/app-config.d.ts')
 const upstreamSpaLoadingTemplate = resolvePath(
@@ -158,54 +160,30 @@ export default defineNuxtConfig({
       )
       nuxt.options.spaLoadingTemplate = generatedSpaTemplate
 
-      const mode = (process.env.STIR_PRESENTATION_MANIFEST_MODE || 'compatibility') as PresentationManifestMode
-
-      if (!['compatibility', 'hybrid', 'strict'].includes(mode)) {
-        throw new Error(`Invalid STIR_PRESENTATION_MANIFEST_MODE: ${mode}`)
-      }
-      if (mode === 'compatibility') {
-        const generatedDir = resolvePath(
-          nuxt.options.rootDir,
-          'node_modules/.cache/stir-presentation',
-        )
-        const compatibilityUtilities = compatibilityPresentationUtilities()
-        const compatibilitySource = inlinePresentationSource(compatibilityUtilities)
-        const generatedCss = resolvePath(generatedDir, 'compatibility.inline.css')
-
-        await mkdir(generatedDir, { recursive: true })
-        await writeFileIfChanged(generatedCss, compatibilitySource)
-        nuxt.options.alias['#stir-presentation-source'] = generatedCss
-        nuxt.options.runtimeConfig.public.stirPresentationBuild = {
-          manifestRevision: '',
-          sourceRevision: '',
-          mode,
-          utilityCount: compatibilityUtilities.length,
-          manifestUsageCount: 0,
-          legacyUtilityCount: compatibilityUtilities.length,
-          rejectedLegacyUtilityCount: 0,
-          sourceBytes: Buffer.byteLength(compatibilitySource, 'utf8'),
-          generationDurationMs: 0,
-          schemaVersion: 0,
-          siteUuid: '',
-          theme: '',
-        }
-        return
-      }
-
       const generationStartedAt = performance.now()
+      const drupalUrl = process.env.DRUPAL_URL?.replace(/\/$/u, '')
+      const isRepositoryBuild = nuxt.options.rootDir === repositoryRoot
+        || nuxt.options.rootDir.startsWith(`${repositoryRoot}/tests/fixtures/`)
+      const manifestSource = process.env.STIR_PRESENTATION_MANIFEST
+        || (isRepositoryBuild
+          ? repositoryManifestFixture
+          : drupalUrl
+          ? `${drupalUrl}/ce-api/stir-layout-builder/presentation-manifest`
+          : undefined)
       const manifest = await loadPresentationManifest({
-        source: process.env.STIR_PRESENTATION_MANIFEST,
-        apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY,
+        source: manifestSource,
+        apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY
+          || process.env.DRUPAL_API_KEY,
         lastKnownPath: process.env.STIR_PRESENTATION_MANIFEST_LAST_KNOWN,
       })
       const generatedDir = resolvePath(
         nuxt.options.rootDir,
         'node_modules/.cache/stir-presentation',
       )
-      const presentationSource = buildPresentationSource(manifest, mode)
+      const presentationSource = buildPresentationSource(manifest)
       const generatedCss = resolvePath(
         generatedDir,
-        `${manifest.revision}.${mode}.${presentationSource.sourceRevision}.inline.css`,
+        `${manifest.revision}.${presentationSource.sourceRevision}.inline.css`,
       )
 
       await mkdir(generatedDir, { recursive: true })
@@ -215,7 +193,6 @@ export default defineNuxtConfig({
       nuxt.options.runtimeConfig.public.stirPresentationBuild = {
         manifestRevision: manifest.revision,
         sourceRevision: presentationSource.sourceRevision,
-        mode,
         utilityCount: presentationSource.utilityCount,
         manifestUsageCount: presentationSource.manifestUsageCount,
         legacyUtilityCount: presentationSource.legacyUtilityCount,

@@ -78,36 +78,33 @@ export default defineAppConfig({
 
 ## CMS presentation manifest
 
-The default `compatibility` mode keeps the complete finite Drupal utility
-safelist while a project is migrated. Set these build variables to compile the
-smaller project-specific source:
+Every build consumes Drupal's presentation usage manifest and compiles only the
+semantic recipes and safe class tokens that the site currently uses. There is
+no compatibility mode or general-purpose utility safelist.
 
-- `STIR_PRESENTATION_MANIFEST_MODE=hybrid` uses the CMS `used` set plus a small
-  editorial reserve. `strict` uses only used values plus structural layout
-  recipes.
-- `STIR_PRESENTATION_MANIFEST` is an authenticated Drupal endpoint URL or a
+- By default Nuxt reads
+  `${DRUPAL_URL}/ce-api/stir-layout-builder/presentation-manifest` and uses
+  `DRUPAL_API_KEY` when configured.
+- `STIR_PRESENTATION_MANIFEST` may override the endpoint with another URL or a
   local JSON file exported with `drush stir-layout:presentation-manifest`.
-- `STIR_PRESENTATION_MANIFEST_API_KEY` is sent only for an HTTP source.
+- `STIR_PRESENTATION_MANIFEST_API_KEY` may override the API key for that URL.
 - `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
   approved local fallback when the primary source is unavailable.
 
-Hybrid and strict builds fail when the manifest is missing, invalid, uses an
-unknown semantic value, contains a rejected legacy utility, or has a mismatched
-revision. The verified Drupal revision remains available in public runtime
-config as `stirPresentationManifestRevision`. `stirPresentationBuild` records
-the manifest and generated-source revisions, generation mode, manifest usage
-count, generated utility count and source bytes, accepted/rejected legacy
-utility counts, generation duration, schema version, site UUID, and Drupal
-theme. The source revision includes the generation mode, so concurrent strict
-and hybrid builds cannot collide in the shared build cache.
+Builds fail when the manifest is missing, invalid, uses an unknown semantic
+value, contains an unsafe class token, or has a mismatched revision. Ordinary
+Tailwind utilities, responsive/state variants, slash modifiers such as
+`border-white/10`, and project CSS hooks are preserved. Bracket arbitrary
+values remain rejected. The verified Drupal revision remains available in
+public runtime config as `stirPresentationManifestRevision`.
+`stirPresentationBuild` records the manifest and generated-source revisions,
+manifest usage count, generated utility count and source bytes,
+accepted/rejected class-token counts, generation duration, schema version,
+site UUID, and Drupal theme.
 
 The same non-secret build identity is exposed at `/api/health` as
 `presentation`. Deployment monitoring can compare its `manifestRevision` with
-Drupal's `ETag` or `X-Stir-Presentation-Revision` header. A difference is an
-observable rebuild signal; the deployment provider remains a downstream
-choice, and the health request does not query Drupal or trigger a deployment.
-
-The checked fixture build reduces the main CSS artifact from approximately
-35.15 kB gzip in compatibility mode to 30.03 kB in strict mode (about 14.6%).
-Each project's result depends on its actual manifest; this fixture is a
-regression measurement, not a promised production size.
+Drupal's `ETag` or `X-Stir-Presentation-Revision` header. A difference means a
+new Nuxt build is required before a newly introduced utility can have compiled
+CSS. Deployment automation should use that revision change as its rebuild
+trigger; the health request itself does not query Drupal or trigger deployment.

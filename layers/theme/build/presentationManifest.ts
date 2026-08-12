@@ -33,13 +33,11 @@ const presentationManifestSchema = v.strictObject({
 })
 
 export type PresentationManifest = v.InferOutput<typeof presentationManifestSchema>
-export type PresentationManifestMode = 'compatibility' | 'hybrid' | 'strict'
 
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)$/u
-const LEGACY_UTILITY = /^(?:(?:xs|sm|md|lg|xl|2xl):)?(?:hidden|block|flex|grid|list-none|aspect-(?:video|square)|text-muted|m-auto|mx-auto|(?:grid-cols|columns|col-span)-[1-9][0-9]*|basis-(?:full|1\/[1-9][0-9]*)|gap-(?:[0-9]|1[0-9]|20)|space-y-(?:[1-9]|10|20)|(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)|(?:max-)?w-(?:xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl))$/u
-const COMPATIBILITY_BREAKPOINTS = ['', 'xs:', 'sm:', 'md:', 'lg:', 'xl:', '2xl:']
+const SAFE_CLASS_TOKEN = /^(?=.{1,80}$)(?:(?:[a-z0-9][a-z0-9_-]*):)*(?:-?[a-z0-9][a-z0-9_.-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?$/u
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)
@@ -138,53 +136,8 @@ function addSpacing(classes: Set<string>, value: string): void {
   classes.add(value)
 }
 
-/**
- * Builds the finite fallback used while a project adopts CMS manifests.
- *
- * Keep this policy beside the exact manifest mapper so Drupal presentation
- * utilities have one source of truth. It replaces the generated checked-in
- * safelist and deliberately covers only values accepted by Stir Tools.
- */
-export function compatibilityPresentationUtilities(): string[] {
-  const classes = new Set<string>([
-    'grid', 'grid-cols-1', 'list-none', 'aspect-video', 'aspect-square',
-    'text-muted', 'm-auto', 'mx-auto',
-    'w-xs', 'w-sm', 'w-md', 'w-lg', 'w-xl', 'w-2xl',
-    'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl',
-    'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl',
-    'justify-start', 'justify-center', 'justify-end',
-    'items-start', 'items-center', 'items-end',
-    'text-start', 'text-center', 'text-end', 'md:flex',
-    'lg:grid-cols-[8fr_4fr]', 'lg:grid-cols-[4fr_8fr]',
-  ])
-  const spacingValues = [0, 1, 2, 3, 4, 5, 10, 15, 20]
-  const spacingAxes = ['', 't', 'r', 'b', 'l', 'x', 'y']
-
-  for (const breakpoint of COMPATIBILITY_BREAKPOINTS) {
-    classes.add(`${breakpoint}hidden`)
-    classes.add(`${breakpoint}block`)
-    classes.add(`${breakpoint}flex`)
-    for (let value = 1; value <= 12; value += 1) {
-      classes.add(`${breakpoint}grid-cols-${value}`)
-      classes.add(`${breakpoint}columns-${value}`)
-      classes.add(`${breakpoint}col-span-${value}`)
-      classes.add(`${breakpoint}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
-    }
-    for (let value = 0; value <= 20; value += 1) classes.add(`${breakpoint}gap-${value}`)
-    for (const value of spacingValues) {
-      for (const axis of spacingAxes) {
-        classes.add(`${breakpoint}p${axis}-${value}`)
-        classes.add(`${breakpoint}m${axis}-${value}`)
-      }
-    }
-  }
-
-  return [...classes].sort()
-}
-
 export function presentationUtilities(
   manifest: PresentationManifest,
-  mode: Exclude<PresentationManifestMode, 'compatibility'> = 'hybrid',
 ): string[] {
   if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
     throw new Error(
@@ -241,16 +194,10 @@ export function presentationUtilities(
   }
 
   for (const utility of manifest.legacyClasses) {
-    if (!LEGACY_UTILITY.test(utility) || utility.includes('[')) {
-      throw new Error(`Rejected legacy presentation utility: ${utility}`)
+    if (!SAFE_CLASS_TOKEN.test(utility)) {
+      throw new Error(`Rejected CMS presentation class token: ${utility}`)
     }
     classes.add(utility)
-  }
-
-  if (mode === 'hybrid') {
-    for (const utility of ['gap-4', 'lg:gap-6', 'p-4', 'py-10', 'lg:py-20', 'mx-auto']) {
-      classes.add(utility)
-    }
   }
   return [...classes].sort()
 }
@@ -265,15 +212,13 @@ export function inlinePresentationSource(classes: string[]): string {
 }
 
 /**
- * Builds the exact Tailwind source artifact and its mode-aware identity.
+ * Builds the exact Tailwind source artifact and its identity.
  *
  * The upstream manifest revision identifies Drupal content usage. The source
- * revision additionally identifies the generation policy, preventing strict
- * and hybrid builds from sharing a cache artifact accidentally.
+ * revision additionally identifies the generated Tailwind source.
  */
 export function buildPresentationSource(
   manifest: PresentationManifest,
-  mode: Exclude<PresentationManifestMode, 'compatibility'>,
 ): {
   source: string
   sourceRevision: string
@@ -283,11 +228,9 @@ export function buildPresentationSource(
   rejectedLegacyUtilityCount: number
   sourceBytes: number
 } {
-  const utilities = presentationUtilities(manifest, mode)
+  const utilities = presentationUtilities(manifest)
   const source = inlinePresentationSource(utilities)
   const sourceRevision = createHash('sha256')
-    .update(mode)
-    .update('\0')
     .update(source)
     .digest('hex')
   const gridUsageCount = Object.values(manifest.used.grid.columns)

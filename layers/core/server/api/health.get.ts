@@ -9,7 +9,6 @@ export default defineEventHandler(() => {
     ? {
         manifestRevision: String(build.manifestRevision || ''),
         sourceRevision: String(build.sourceRevision || ''),
-        mode: String(build.mode || ''),
         schemaVersion: Number(build.schemaVersion || 0),
         siteUuid: String(build.siteUuid || ''),
         theme: String(build.theme || ''),

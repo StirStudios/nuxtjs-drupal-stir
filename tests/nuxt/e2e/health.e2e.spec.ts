@@ -57,6 +57,10 @@ const authUiConfigFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
 ), 'utf8'))
+const presentationManifestFixture = JSON.parse(readFileSync(resolve(
+  __dirname,
+  '../../../contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
+), 'utf8'))
 
 const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
@@ -70,6 +74,8 @@ const drupalFixtureServer = createServer((request, response) => {
       ? authUiConfigFixture
     : path === '/api/seo/global'
       ? { lang: 'en', meta: [], link: [] }
+      : path === '/ce-api/stir-layout-builder/presentation-manifest'
+        ? presentationManifestFixture
       : path.includes('/api/menu_items/')
         ? []
         : pageFixture
@@ -152,12 +158,11 @@ describe('Nuxt E2E smoke', async () => {
       ok: true,
       service: 'nuxtjs-drupal-stir',
       presentation: {
-        manifestRevision: '',
-        sourceRevision: '',
-        mode: 'compatibility',
-        schemaVersion: 0,
-        siteUuid: '',
-        theme: '',
+        manifestRevision: presentationManifestFixture.revision,
+        sourceRevision: expect.stringMatching(/^[a-f0-9]{64}$/u),
+        schemaVersion: 1,
+        siteUuid: 'fixture-site',
+        theme: 'stir',
       },
     })
   })
