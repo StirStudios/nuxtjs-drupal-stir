@@ -44,7 +44,7 @@
     "schemas/media-image.schema.json": "bbcf1ecb6924236742c0a1ea1cd39356e1f876df7480546131fd6701a03aaff1",
     "schemas/media-summary.schema.json": "0ca8f31c69eea7760e98cf526cc52c8028092939bdf2b10c763c8770b3759f56",
     "schemas/media-video-local.schema.json": "a9d0c730bde851aa06ad96ac989c5dcf5d572e6e18b16edd7324e30741826a6a",
-    "schemas/presentation-usage-manifest.schema.json": "46af5644f9c8d40b3d6ac270ca4c8a733fbc16052eaec43a36a5d16973f57381",
+    "schemas/presentation-usage-manifest.schema.json": "1f966aeae3d3474074eaaa33c670a5489c4dd794cc4dd1fea75abe404d2dc95b",
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform.schema.json": "0a7e21c7d873c4c2413d7a7d84b690756bbd89dfad9aaedcbfa635760592f24f"
