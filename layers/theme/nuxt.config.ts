@@ -179,6 +179,9 @@ export default defineNuxtConfig({
         apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY
           || process.env.DRUPAL_API_KEY,
         lastKnownPath: process.env.STIR_PRESENTATION_MANIFEST_LAST_KNOWN,
+        retry: {
+          onRetry: message => presentationManifestLogger.warn(message),
+        },
       })
 
       if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
