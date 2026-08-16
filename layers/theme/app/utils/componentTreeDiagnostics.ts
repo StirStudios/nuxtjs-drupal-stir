@@ -1,3 +1,5 @@
+import { isHTMLTag, isMathMLTag, isSVGTag } from '@vue/shared'
+
 export type ComponentTreeDiagnosticKind =
   | 'invalid-shape'
   | 'missing-component'
@@ -43,6 +45,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
+function isNativeElement(element: string): boolean {
+  return isHTMLTag(element) || isSVGTag(element) || isMathMLTag(element)
+}
+
 function diagnostic(
   element: string,
   kind: ComponentTreeDiagnosticKind,
@@ -70,7 +76,7 @@ export function prepareComponentTreeForDevelopment(
     return diagnostic('', 'invalid-shape')
   }
 
-  if (!resolveComponent(value.element)) {
+  if (!isNativeElement(value.element) && !resolveComponent(value.element)) {
     return diagnostic(
       value.element,
       value.element.startsWith('field-')

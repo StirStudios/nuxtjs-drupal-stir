@@ -103,6 +103,7 @@
     "@tiptap/vue-3": "^3.30.1",
     "@tiptap/y-tiptap": "^3.0.8",
     "@unhead/vue": "^3.3.2",
+    "@vue/shared": "^3.5.41",
     "@vueuse/core": "^14.4.0",
     "h3": "^1.15.11",
     "jiti": "^2.7.0",

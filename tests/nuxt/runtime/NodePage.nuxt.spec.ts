@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import NodePage from '../../../layers/theme/app/components/global/node--page.vue'
+import FieldEntityReference from '../../../layers/theme/app/components/global/field-entity-reference.vue'
 
 describe('NodePage (Nuxt runtime)', () => {
   it('renders configured page content without exposing ownership metadata', async () => {
@@ -10,7 +11,7 @@ describe('NodePage (Nuxt runtime)', () => {
       },
       slots: {
         section: '<section>Page content</section>',
-        uid: '<span>field-entity-reference</span>',
+        uid: FieldEntityReference,
       },
     })
 
