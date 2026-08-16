@@ -1,6 +1,9 @@
 packages:
   - .
 
+overrides:
+  fontless>esbuild: 0.28.2
+
 allowBuilds:
   esbuild: false
   vue-demi: false

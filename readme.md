@@ -96,7 +96,7 @@ should also carry this temporary workspace policy and retain it only while
 
 ```yaml
 overrides:
-  fontless>esbuild: 0.28.1
+  fontless>esbuild: 0.28.2
 ```
 
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
