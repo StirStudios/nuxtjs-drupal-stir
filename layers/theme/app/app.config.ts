@@ -45,6 +45,7 @@ export default defineAppConfig({
       // logoScrolledClass: 'h-[4rem]',
       hidden: false,
       transparentAtTop: false,
+      transparentSurface: 'auto',
       base: 'h-auto transform py-3 duration-500',
       background:
         'bg-default/90 dark:bg-default/70 border-none shadow backdrop-blur-md',
@@ -55,6 +56,7 @@ export default defineAppConfig({
       logoMenuMarker: '--logo--',
       toggleDirection: 'right',
       toggleIcon: 'size-7',
+      toggleTransparentClass: '',
       header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',
