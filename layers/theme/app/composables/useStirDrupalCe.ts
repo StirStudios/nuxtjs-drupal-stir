@@ -3,13 +3,12 @@ import { prepareComponentTreeForDevelopment } from '../utils/componentTreeDiagno
 export function useStirDrupalCe() {
   const drupal = useDrupalCe()
 
-  if (!import.meta.dev) return drupal
-
   const prepare = (content: CustomElementContent): CustomElementContent =>
     typeof drupal.resolveCustomElement === 'function'
       ? prepareComponentTreeForDevelopment(
           content,
           drupal.resolveCustomElement,
+          import.meta.dev,
         ) as CustomElementContent
       : content
 

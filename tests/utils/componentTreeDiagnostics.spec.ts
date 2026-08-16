@@ -20,6 +20,22 @@ describe('componentTreeDiagnostics', () => {
     expect(resolveComponent).toHaveBeenCalledWith('paragraph-text')
   })
 
+  it('converts native component-tree elements into renderable components', () => {
+    const input = {
+      element: 'a',
+      props: { href: '/user/1', type: 'user' },
+      slots: { default: 'admin' },
+    }
+    const resolver = vi.fn()
+
+    expect(prepareComponentTreeForDevelopment(input, resolver)).toEqual({
+      element: 'stir-native-element',
+      props: { href: '/user/1', type: 'user', tag: 'a' },
+      slots: { default: 'admin' },
+    })
+    expect(resolver).not.toHaveBeenCalled()
+  })
+
   it('replaces unresolved components and fields with visible diagnostics', () => {
     expect(prepareComponentTreeForDevelopment({
       element: 'unknown-card',
