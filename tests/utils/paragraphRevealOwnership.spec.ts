@@ -53,7 +53,7 @@ describe('paragraph reveal ownership', () => {
   it('keeps interactive tab panels visible without automatic scrolling', () => {
     const source = readFileSync(resolve(paragraphDir, 'Tabs.vue'), 'utf8')
 
-    expect(source).toContain('provideRevealMotionScope(() => undefined)')
+    expect(source).toContain('<PageRevealScope>')
     expect(source).not.toContain('scrollIntoView')
     expect(source).not.toContain('contentRef')
   })
