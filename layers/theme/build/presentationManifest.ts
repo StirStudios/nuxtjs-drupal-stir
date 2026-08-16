@@ -28,6 +28,7 @@ const presentationManifestSchema = v.strictObject({
   legacyClasses: v.array(v.string()),
   diagnostics: v.strictObject({
     rejectedLegacyClassCount: v.pipe(v.number(), v.integer(), v.minValue(0)),
+    rejectedLegacyClasses: v.optional(v.array(v.string())),
   }),
   revision: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/u)),
 })
@@ -51,7 +52,7 @@ export function resolvePresentationManifestSource(options: {
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|8|10|15|20)$/u
-const SAFE_CLASS_CHARACTERS = /^[a-z0-9_./:%#,+*()!&>~=\-[\]]+$/iu
+const SAFE_CLASS_CHARACTERS = /^[a-z0-9_./:@%#,+*()!&>~=\-[\]]+$/iu
 const UNSAFE_CLASS_SOURCE = /[\s"'`;{}\\]|url\s*\(/iu
 
 function isSafeClassToken(value: string): boolean {
@@ -63,7 +64,7 @@ function isSafeClassToken(value: string): boolean {
   for (const character of value) {
     if (character === '[') bracketDepth += 1
     if (character === ']') bracketDepth -= 1
-    if (bracketDepth < 0 || bracketDepth > 1) return false
+    if (bracketDepth < 0 || bracketDepth > 4) return false
   }
   return bracketDepth === 0
 }
@@ -162,16 +163,32 @@ function addSpacing(
   value: string,
   warn: PresentationWarningHandler,
 ): void {
-  if (!SPACING.test(value)) {
-    warn(`Ignored unsupported semantic spacing value: ${value}`)
-    return
+  for (const utility of value.split(/\s+/u).filter(Boolean)) {
+    if (!isSafeClassToken(utility)) {
+      warn(`Ignored unsafe CMS presentation class token: ${utility}`)
+      continue
+    }
+    if (SPACING.test(utility) && utility.endsWith('-20')) {
+      classes.add(utility.replace(/-20$/u, '-10'))
+      classes.add(`lg:${utility}`)
+      continue
+    }
+    classes.add(utility)
   }
-  if (value.endsWith('-20')) {
-    classes.add(value.replace(/-20$/u, '-10'))
-    classes.add(`lg:${value}`)
-    return
+}
+
+function addLiteralUtilities(
+  classes: Set<string>,
+  value: string,
+  warn: PresentationWarningHandler,
+): void {
+  for (const utility of value.split(/\s+/u).filter(Boolean)) {
+    if (!isSafeClassToken(utility)) {
+      warn(`Ignored unsafe CMS presentation class token: ${utility}`)
+      continue
+    }
+    classes.add(utility)
   }
-  classes.add(value)
 }
 
 export function presentationUtilities(
@@ -229,7 +246,7 @@ export function presentationUtilities(
     const recipe = widthRecipes[value]
 
     if (!recipe) {
-      warn(`Ignored unsupported semantic width value: ${value}`)
+      addLiteralUtilities(classes, value, warn)
       continue
     }
     recipe.forEach(utility => classes.add(utility))
@@ -245,7 +262,7 @@ export function presentationUtilities(
     const utility = alignmentRecipes[value]
 
     if (!utility) {
-      warn(`Ignored unsupported semantic alignment value: ${value}`)
+      addLiteralUtilities(classes, value, warn)
       continue
     }
     classes.add(utility)

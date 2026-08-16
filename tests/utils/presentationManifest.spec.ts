@@ -47,6 +47,10 @@ function fixture() {
       'lg:text-left',
       'md:gap-4',
       'peer-checked/field:block',
+      '@container',
+      '[&_[data-active]]:block',
+      'max-w-none!',
+      'xl:px-[calc((100vw-72rem)/2+1.5rem)]',
     ],
     diagnostics: { rejectedLegacyClassCount: 0 },
   }
@@ -111,6 +115,10 @@ describe('CMS presentation manifest', () => {
       'group-hover/item:block',
       'lg:text-left',
       'peer-checked/field:block',
+      '@container',
+      '[&_[data-active]]:block',
+      'max-w-none!',
+      'xl:px-[calc((100vw-72rem)/2+1.5rem)]',
       'lg:grid-cols-[8fr_4fr]',
     ]))
   })
@@ -128,8 +136,8 @@ describe('CMS presentation manifest', () => {
 
     expect(repeated).toEqual(source)
     expect(source.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
-    expect(source.manifestUsageCount).toBe(18)
-    expect(source.legacyUtilityCount).toBe(10)
+    expect(source.manifestUsageCount).toBe(22)
+    expect(source.legacyUtilityCount).toBe(14)
     expect(source.rejectedLegacyUtilityCount).toBe(0)
     expect(source.sourceBytes).toBe(Buffer.byteLength(source.source, 'utf8'))
   })
@@ -146,12 +154,45 @@ describe('CMS presentation manifest', () => {
     })).rejects.toThrow()
   })
 
-  it('warns and skips unknown semantic values without stopping compilation', () => {
+  it('compiles safe literal CMS values outside the canonical semantic recipes', () => {
     const input = fixture()
     const warnings: string[] = []
 
-    input.used.width = ['w-arbitrary']
-    input.used.spacing = ['mt-8', 'mt-unknown']
+    input.used.width = ['w-3xl', 'w-4xl', 'w-full']
+    input.used.spacing = ['mt-8', 'pt-20 pb-0', 'py-12 lg:py-16', 'py-16']
+    input.used.alignment = ['left']
+    const { revision: _revision, ...payload } = input
+
+    input.revision = createHash('sha256')
+      .update(JSON.stringify(canonicalize(payload)))
+      .digest('hex')
+
+    const utilities = presentationUtilities(parsePresentationManifest(input), {
+      warn: message => warnings.push(message),
+    })
+
+    expect(utilities).toEqual(expect.arrayContaining([
+      'mt-8',
+      'pt-10',
+      'lg:pt-20',
+      'pb-0',
+      'py-12',
+      'lg:py-16',
+      'py-16',
+      'w-3xl',
+      'w-4xl',
+      'w-full',
+      'left',
+    ]))
+    expect(warnings).toEqual([])
+  })
+
+  it('warns and skips malformed semantic class tokens without stopping compilation', () => {
+    const input = fixture()
+    const warnings: string[] = []
+
+    input.used.spacing = ['mt-8 bg-[url(evil)]']
+    input.used.width = ['w-full;@source']
     const { revision: _revision, ...payload } = input
 
     input.revision = createHash('sha256')
@@ -163,12 +204,9 @@ describe('CMS presentation manifest', () => {
     })
 
     expect(utilities).toContain('mt-8')
-    expect(utilities).not.toContain('w-arbitrary')
-    expect(utilities).not.toContain('mt-unknown')
-    expect(warnings).toEqual(expect.arrayContaining([
-      'Ignored unsupported semantic spacing value: mt-unknown',
-      'Ignored unsupported semantic width value: w-arbitrary',
-    ]))
+    expect(utilities).not.toContain('bg-[url(evil)]')
+    expect(utilities).not.toContain('w-full;@source')
+    expect(warnings).toHaveLength(2)
   })
 
   it('compiles accepted utilities when Drupal reports rejected legacy classes', () => {

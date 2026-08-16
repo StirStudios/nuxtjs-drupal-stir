@@ -182,8 +182,11 @@ export default defineNuxtConfig({
       })
 
       if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
+        const rejected = manifest.diagnostics.rejectedLegacyClasses
+        const detail = rejected?.length ? `: ${rejected.join(', ')}` : ''
+
         presentationManifestLogger.warn(
-          `Ignored ${manifest.diagnostics.rejectedLegacyClassCount} rejected legacy CMS utilities; valid presentation utilities will still be compiled`,
+          `Ignored ${manifest.diagnostics.rejectedLegacyClassCount} rejected legacy CMS utilities${detail}; valid presentation utilities will still be compiled`,
         )
       }
       const generatedDir = resolvePath(

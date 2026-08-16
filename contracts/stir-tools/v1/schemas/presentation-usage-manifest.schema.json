@@ -96,8 +96,8 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "maxLength": 80,
-        "pattern": "^(?=.{1,80}$)(?:(?:[a-z0-9][a-z0-9_-]*)(?:/[a-z0-9][a-z0-9_.-]*)?:)*(?:-?[a-z0-9][a-z0-9_.-]*)(?:/[a-z0-9][a-z0-9_.-]*)?$"
+        "maxLength": 120,
+        "pattern": "^[A-Za-z0-9_./:@%#,+*()!&>~=\\[\\]-]+$"
       }
     },
     "diagnostics": {
@@ -108,6 +108,13 @@
         "rejectedLegacyClassCount": {
           "type": "integer",
           "minimum": 0
+        },
+        "rejectedLegacyClasses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
