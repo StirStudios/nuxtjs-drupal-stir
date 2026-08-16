@@ -50,8 +50,23 @@ export function resolvePresentationManifestSource(options: {
 
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
-const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|10|15|20)$/u
-const SAFE_CLASS_TOKEN = /^(?=.{1,80}$)(?:(?:[a-z0-9][a-z0-9_-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?:)*(?:-?[a-z0-9][a-z0-9_.-]*)(?:\/[a-z0-9][a-z0-9_.-]*)?$/u
+const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|8|10|15|20)$/u
+const SAFE_CLASS_CHARACTERS = /^[a-z0-9_./:%#,+*()!&>~=\-[\]]+$/iu
+const UNSAFE_CLASS_SOURCE = /[\s"'`;{}\\]|url\s*\(/iu
+
+function isSafeClassToken(value: string): boolean {
+  if (value.length < 1 || value.length > 120) return false
+  if (!SAFE_CLASS_CHARACTERS.test(value) || UNSAFE_CLASS_SOURCE.test(value)) return false
+
+  let bracketDepth = 0
+
+  for (const character of value) {
+    if (character === '[') bracketDepth += 1
+    if (character === ']') bracketDepth -= 1
+    if (bracketDepth < 0 || bracketDepth > 1) return false
+  }
+  return bracketDepth === 0
+}
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)
@@ -122,9 +137,11 @@ export async function loadPresentationManifest(options: {
   return parsePresentationManifest(JSON.parse(source))
 }
 
-function prefix(breakpoint: string): string {
+type PresentationWarningHandler = (message: string) => void
+
+function prefix(breakpoint: string): string | undefined {
   if (!BREAKPOINTS.has(breakpoint)) {
-    throw new Error(`Unsupported presentation breakpoint: ${breakpoint}`)
+    return undefined
   }
   return breakpoint === 'default' ? '' : `${breakpoint}:`
 }
@@ -140,8 +157,15 @@ function addLayoutReserve(classes: Set<string>, capabilities: string[]): void {
   ]) classes.add(utility)
 }
 
-function addSpacing(classes: Set<string>, value: string): void {
-  if (!SPACING.test(value)) throw new Error(`Unsupported semantic spacing value: ${value}`)
+function addSpacing(
+  classes: Set<string>,
+  value: string,
+  warn: PresentationWarningHandler,
+): void {
+  if (!SPACING.test(value)) {
+    warn(`Ignored unsupported semantic spacing value: ${value}`)
+    return
+  }
   if (value.endsWith('-20')) {
     classes.add(value.replace(/-20$/u, '-10'))
     classes.add(`lg:${value}`)
@@ -152,25 +176,45 @@ function addSpacing(classes: Set<string>, value: string): void {
 
 export function presentationUtilities(
   manifest: PresentationManifest,
+  options: { warn?: PresentationWarningHandler } = {},
 ): string[] {
   const classes = new Set<string>()
+  const warn = options.warn || (() => {})
 
   addLayoutReserve(classes, manifest.capabilities)
 
   for (const [breakpoint, values] of Object.entries(manifest.used.grid.columns)) {
+    const variant = prefix(breakpoint)
+
+    if (variant === undefined) {
+      warn(`Ignored unsupported presentation breakpoint: ${breakpoint}`)
+      continue
+    }
     for (const value of values) {
-      if (value < 1 || value > 12) throw new Error(`Unsupported grid column count: ${value}`)
-      classes.add(`${prefix(breakpoint)}grid-cols-${value}`)
-      classes.add(`${prefix(breakpoint)}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
+      if (value < 1 || value > 12) {
+        warn(`Ignored unsupported grid column count: ${value}`)
+        continue
+      }
+      classes.add(`${variant}grid-cols-${value}`)
+      classes.add(`${variant}${value === 1 ? 'basis-full' : `basis-1/${value}`}`)
     }
   }
   for (const [breakpoint, values] of Object.entries(manifest.used.grid.gap)) {
+    const variant = prefix(breakpoint)
+
+    if (variant === undefined) {
+      warn(`Ignored unsupported presentation breakpoint: ${breakpoint}`)
+      continue
+    }
     for (const value of values) {
-      if (value < 0 || value > 20) throw new Error(`Unsupported grid gap: ${value}`)
-      classes.add(`${prefix(breakpoint)}gap-${value}`)
+      if (value < 0 || value > 20) {
+        warn(`Ignored unsupported grid gap: ${value}`)
+        continue
+      }
+      classes.add(`${variant}gap-${value}`)
     }
   }
-  for (const value of manifest.used.spacing) addSpacing(classes, value)
+  for (const value of manifest.used.spacing) addSpacing(classes, value, warn)
 
   const widthRecipes: Record<string, string[]> = {
     'w-xs': ['m-auto', 'sm:max-w-lg'],
@@ -184,7 +228,10 @@ export function presentationUtilities(
   for (const value of manifest.used.width) {
     const recipe = widthRecipes[value]
 
-    if (!recipe) throw new Error(`Unsupported semantic width value: ${value}`)
+    if (!recipe) {
+      warn(`Ignored unsupported semantic width value: ${value}`)
+      continue
+    }
     recipe.forEach(utility => classes.add(utility))
   }
 
@@ -197,14 +244,18 @@ export function presentationUtilities(
   for (const value of manifest.used.alignment) {
     const utility = alignmentRecipes[value]
 
-    if (!utility) throw new Error(`Unsupported semantic alignment value: ${value}`)
+    if (!utility) {
+      warn(`Ignored unsupported semantic alignment value: ${value}`)
+      continue
+    }
     classes.add(utility)
     if (utility.startsWith('justify-') || utility.startsWith('items-')) classes.add('md:flex')
   }
 
   for (const utility of manifest.legacyClasses) {
-    if (!SAFE_CLASS_TOKEN.test(utility)) {
-      throw new Error(`Rejected CMS presentation class token: ${utility}`)
+    if (!isSafeClassToken(utility)) {
+      warn(`Ignored unsafe CMS presentation class token: ${utility}`)
+      continue
     }
     classes.add(utility)
   }
@@ -228,6 +279,7 @@ export function inlinePresentationSource(classes: string[]): string {
  */
 export function buildPresentationSource(
   manifest: PresentationManifest,
+  options: { warn?: PresentationWarningHandler } = {},
 ): {
   source: string
   sourceRevision: string
@@ -237,7 +289,7 @@ export function buildPresentationSource(
   rejectedLegacyUtilityCount: number
   sourceBytes: number
 } {
-  const utilities = presentationUtilities(manifest)
+  const utilities = presentationUtilities(manifest, options)
   const source = inlinePresentationSource(utilities)
   const sourceRevision = createHash('sha256')
     .update(source)
