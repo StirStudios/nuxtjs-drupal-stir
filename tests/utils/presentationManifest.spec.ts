@@ -37,6 +37,10 @@ function fixture() {
       alignment: ['justify_center', 'text_left'],
     },
     legacyClasses: [
+      'mt-0',
+      'mt-8',
+      'grid-cols-[minmax(0,1fr)_2fr]',
+      'text-[#123456]',
       'border-white/10',
       'custom-project-class',
       'group-hover/item:block',
@@ -98,6 +102,10 @@ describe('CMS presentation manifest', () => {
       'md:flex',
       'text-start',
       'md:gap-4',
+      'mt-0',
+      'mt-8',
+      'grid-cols-[minmax(0,1fr)_2fr]',
+      'text-[#123456]',
       'border-white/10',
       'custom-project-class',
       'group-hover/item:block',
@@ -120,8 +128,8 @@ describe('CMS presentation manifest', () => {
 
     expect(repeated).toEqual(source)
     expect(source.sourceRevision).toMatch(/^[a-f0-9]{64}$/u)
-    expect(source.manifestUsageCount).toBe(14)
-    expect(source.legacyUtilityCount).toBe(6)
+    expect(source.manifestUsageCount).toBe(18)
+    expect(source.legacyUtilityCount).toBe(10)
     expect(source.rejectedLegacyUtilityCount).toBe(0)
     expect(source.sourceBytes).toBe(Buffer.byteLength(source.source, 'utf8'))
   })
@@ -138,18 +146,29 @@ describe('CMS presentation manifest', () => {
     })).rejects.toThrow()
   })
 
-  it('rejects unknown semantic values even with a valid manifest hash', () => {
+  it('warns and skips unknown semantic values without stopping compilation', () => {
     const input = fixture()
+    const warnings: string[] = []
 
     input.used.width = ['w-arbitrary']
+    input.used.spacing = ['mt-8', 'mt-unknown']
     const { revision: _revision, ...payload } = input
 
     input.revision = createHash('sha256')
       .update(JSON.stringify(canonicalize(payload)))
       .digest('hex')
 
-    expect(() => presentationUtilities(parsePresentationManifest(input)))
-      .toThrow(/Unsupported semantic width/u)
+    const utilities = presentationUtilities(parsePresentationManifest(input), {
+      warn: message => warnings.push(message),
+    })
+
+    expect(utilities).toContain('mt-8')
+    expect(utilities).not.toContain('w-arbitrary')
+    expect(utilities).not.toContain('mt-unknown')
+    expect(warnings).toEqual(expect.arrayContaining([
+      'Ignored unsupported semantic spacing value: mt-unknown',
+      'Ignored unsupported semantic width value: w-arbitrary',
+    ]))
   })
 
   it('compiles accepted utilities when Drupal reports rejected legacy classes', () => {
@@ -166,18 +185,32 @@ describe('CMS presentation manifest', () => {
       .toContain('border-white/10')
   })
 
-  it('rejects unsafe class tokens reported by a malformed producer', () => {
+  it('warns and skips unsafe free-form tokens while keeping safe project tokens', () => {
     const input = fixture()
+    const warnings: string[] = []
 
-    input.legacyClasses = [['bg-', '[url(evil)]'].join('')]
+    input.legacyClasses = [
+      'project-card-accent',
+      ['bg-', '[url(evil)]'].join(''),
+      ['before:content-[', String.fromCharCode(34), ');@source', String.fromCharCode(34), ']'].join(''),
+    ]
     const { revision: _revision, ...payload } = input
 
     input.revision = createHash('sha256')
       .update(JSON.stringify(canonicalize(payload)))
       .digest('hex')
 
-    expect(() => presentationUtilities(parsePresentationManifest(input)))
-      .toThrow(/Rejected CMS presentation class token/u)
+    const utilities = presentationUtilities(parsePresentationManifest(input), {
+      warn: message => warnings.push(message),
+    })
+
+    expect(utilities).toContain('project-card-accent')
+    expect(utilities).not.toContain('bg-[url(evil)]')
+    expect(warnings).toHaveLength(2)
+    expect(warnings).toEqual(expect.arrayContaining([
+      'Ignored unsafe CMS presentation class token: bg-[url(evil)]',
+      expect.stringContaining('Ignored unsafe CMS presentation class token: before:content-['),
+    ]))
   })
 
   it('does not hide an invalid primary manifest behind the availability fallback', async () => {

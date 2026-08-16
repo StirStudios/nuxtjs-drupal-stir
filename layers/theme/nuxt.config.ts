@@ -190,7 +190,9 @@ export default defineNuxtConfig({
         nuxt.options.rootDir,
         'node_modules/.cache/stir-presentation',
       )
-      const presentationSource = buildPresentationSource(manifest)
+      const presentationSource = buildPresentationSource(manifest, {
+        warn: message => presentationManifestLogger.warn(message),
+      })
       const generatedCss = resolvePath(
         generatedDir,
         `${manifest.revision}.${presentationSource.sourceRevision}.inline.css`,
