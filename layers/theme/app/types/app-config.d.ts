@@ -110,6 +110,7 @@ type StirThemeNavigationConfig = {
   logoScrolledClass?: ClassValue
   hidden?: boolean
   transparentAtTop?: boolean
+  transparentSurface?: 'auto' | 'light' | 'dark'
   base?: ClassValue
   background?: ClassValue
   container?: ClassValue
@@ -119,6 +120,7 @@ type StirThemeNavigationConfig = {
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   toggleIcon?: ClassValue
+  toggleTransparentClass?: ClassValue
   header?: ClassValue
   splitLogo?: {
     center?: ClassValue

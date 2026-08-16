@@ -46,6 +46,7 @@ const headerUi = {
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
 type DesktopHeaderLayout = 'default' | 'split-logo'
+type LogoSurface = 'auto' | 'light' | 'dark'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
 type SlideoverProps = ComponentProps<typeof USlideoverComponent>
@@ -66,6 +67,8 @@ const toToggleDirection = (value: unknown): ToggleDirection => {
 const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
 const toDesktopHeaderLayout = (value: unknown): DesktopHeaderLayout =>
   value === 'split-logo' ? 'split-logo' : 'default'
+const toLogoSurface = (value: unknown): LogoSurface =>
+  value === 'light' || value === 'dark' ? value : 'auto'
 
 const toStringProp = <T extends string>(value: unknown): T | undefined =>
   typeof value === 'string' && value.trim() ? value.trim() as T : undefined
@@ -105,6 +108,14 @@ const finalIsScrolled = computed(() => {
   if (!hydrated.value) return false
   return isScrolled.value || forceScrolled.value
 })
+const isTransparentHeader = computed(() =>
+  Boolean(theme.navigation.transparentAtTop && !finalIsScrolled.value),
+)
+const logoSurface = computed(() =>
+  isTransparentHeader.value
+    ? toLogoSurface(theme.navigation.transparentSurface)
+    : 'auto',
+)
 const headerMode = computed<HeaderMode>(() => props.mode ?? 'fixed')
 const isFixed = computed(() => headerMode.value === 'fixed')
 const isSticky = computed(() => headerMode.value === 'sticky')
@@ -131,7 +142,7 @@ const headerClasses = computed(() =>
     toClassName(theme.navigation.base),
     headerPositionClasses.value,
     toClassName(
-      theme.navigation.transparentAtTop && !finalIsScrolled.value
+      isTransparentHeader.value
         ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
         : theme.navigation.background,
     ),
@@ -244,7 +255,8 @@ const toggleClasses = computed(() =>
   [
     headerUi.toggle,
     menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
-  ].join(' '),
+    isTransparentHeader.value ? toClassName(theme.navigation.toggleTransparentClass) : '',
+  ].filter(Boolean).join(' '),
 )
 const toggleIcon = computed(() => {
   const icons = (appConfig.ui as { icons?: Partial<Record<'close' | 'menu', string>> } | undefined)?.icons
@@ -365,6 +377,7 @@ watch(menuOpen, (val) => {
           <AppLogo
             v-if="theme.navigation.logo"
             :add-classes="isSplitLogoLayout ? mobileLogoClasses : logoClasses"
+            :surface="logoSurface"
           />
           <template v-else>
             {{ siteTitle }}
@@ -394,7 +407,10 @@ watch(menuOpen, (val) => {
             :class="splitLogoLinkClasses"
             to="/"
           >
-            <AppLogo :add-classes="logoClasses" />
+            <AppLogo
+              :add-classes="logoClasses"
+              :surface="logoSurface"
+            />
           </ULink>
 
           <LazyUNavigationMenu

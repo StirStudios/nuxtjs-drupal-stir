@@ -597,6 +597,9 @@ describe('layer contract', () => {
     )
 
     expect(themeConfig).toContain('toggleIcon: \'size-7\'')
+    expect(header).toContain('theme.navigation.toggleTransparentClass')
+    expect(header).toContain(':surface="logoSurface"')
+    expect(themeConfig).toContain('transparentSurface: \'auto\'')
   })
 
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {

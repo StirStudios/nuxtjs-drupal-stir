@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   addClasses?: string
+  surface?: 'auto' | 'light' | 'dark'
 }>()
 
 const { slotProps } = useAppLogo(props)
