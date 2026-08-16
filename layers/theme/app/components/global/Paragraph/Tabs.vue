@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import type { VNode } from 'vue'
+import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 
 defineProps<{
   id?: number | string
@@ -14,7 +15,6 @@ defineProps<{
 
 const vueSlots = useSlots()
 const active = ref<string>('0')
-const contentRef = ref<HTMLElement | null>(null)
 const tabNodes = computed<VNode[]>(() => {
   const nodes = vueSlots.tab?.()
 
@@ -40,16 +40,8 @@ const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const isMobile = breakpoints.smaller('lg')
 const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
 
-watch(active, async () => {
-  if (!isMobile.value) return
-
-  await nextTick()
-
-  contentRef.value?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-  })
-})
+// The tabs enter as one unit; selecting a panel must not replay page reveals.
+provideRevealMotionScope(() => undefined)
 </script>
 
 <template>
@@ -73,7 +65,7 @@ watch(active, async () => {
       variant="link"
     >
       <template #content>
-        <div ref="contentRef" class="tab-content">
+        <div class="tab-content">
           <component :is="activeTabNode" v-if="activeTabNode" />
         </div>
       </template>
