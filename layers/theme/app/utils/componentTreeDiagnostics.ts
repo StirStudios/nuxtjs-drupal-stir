@@ -49,6 +49,25 @@ function isNativeElement(element: string): boolean {
   return isHTMLTag(element) || isSVGTag(element) || isMathMLTag(element)
 }
 
+function prepareSlots(
+  slots: unknown,
+  resolveComponent: ComponentResolver,
+  diagnoseMissingComponents: boolean,
+): Record<string, unknown> | undefined {
+  if (!isRecord(slots)) return undefined
+
+  return Object.fromEntries(
+    Object.entries(slots).map(([name, content]) => [
+      name,
+      prepareComponentTreeForDevelopment(
+        content,
+        resolveComponent,
+        diagnoseMissingComponents,
+      ),
+    ]),
+  )
+}
+
 function diagnostic(
   element: string,
   kind: ComponentTreeDiagnosticKind,
@@ -63,20 +82,40 @@ function diagnostic(
 export function prepareComponentTreeForDevelopment(
   value: unknown,
   resolveComponent: ComponentResolver,
+  diagnoseMissingComponents = true,
 ): unknown {
   if (value === null || value === undefined || typeof value === 'string') {
     return value
   }
 
   if (Array.isArray(value)) {
-    return value.map(item => prepareComponentTreeForDevelopment(item, resolveComponent))
+    return value.map(item => prepareComponentTreeForDevelopment(
+      item,
+      resolveComponent,
+      diagnoseMissingComponents,
+    ))
   }
 
   if (!isRecord(value) || typeof value.element !== 'string' || !value.element) {
     return diagnostic('', 'invalid-shape')
   }
 
-  if (!isNativeElement(value.element) && !resolveComponent(value.element)) {
+  if (isNativeElement(value.element)) {
+    return {
+      element: 'stir-native-element',
+      props: {
+        ...(isRecord(value.props) ? value.props : {}),
+        tag: value.element,
+      },
+      slots: prepareSlots(
+        value.slots,
+        resolveComponent,
+        diagnoseMissingComponents,
+      ) ?? {},
+    }
+  }
+
+  if (diagnoseMissingComponents && !resolveComponent(value.element)) {
     return diagnostic(
       value.element,
       value.element.startsWith('field-')
@@ -85,15 +124,16 @@ export function prepareComponentTreeForDevelopment(
     )
   }
 
-  if (!isRecord(value.slots)) return value
+  const slots = prepareSlots(
+    value.slots,
+    resolveComponent,
+    diagnoseMissingComponents,
+  )
+
+  if (!slots) return value
 
   return {
     ...value,
-    slots: Object.fromEntries(
-      Object.entries(value.slots).map(([name, content]) => [
-        name,
-        prepareComponentTreeForDevelopment(content, resolveComponent),
-      ]),
-    ),
+    slots,
   }
 }

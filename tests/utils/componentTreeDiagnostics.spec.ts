@@ -20,27 +20,20 @@ describe('componentTreeDiagnostics', () => {
     expect(resolveComponent).toHaveBeenCalledWith('paragraph-text')
   })
 
-  it('preserves native elements nested in authenticated entity references', () => {
+  it('converts native component-tree elements into renderable components', () => {
     const input = {
-      element: 'field-entity-reference',
-      props: {
-        targetId: '1',
-        entity: {
-          element: 'a',
-          props: { href: '/user/1', type: 'user' },
-          slots: { default: 'admin' },
-        },
-      },
-      slots: {},
+      element: 'a',
+      props: { href: '/user/1', type: 'user' },
+      slots: { default: 'admin' },
     }
-    const resolver = vi.fn((element: string) =>
-      element === 'field-entity-reference' ? element : null,
-    )
+    const resolver = vi.fn()
 
-    expect(prepareComponentTreeForDevelopment(input, resolver)).toEqual(input)
-    expect(resolver).toHaveBeenCalledOnce()
-    expect(resolver).toHaveBeenCalledWith('field-entity-reference')
-    expect(resolver).not.toHaveBeenCalledWith('a')
+    expect(prepareComponentTreeForDevelopment(input, resolver)).toEqual({
+      element: 'stir-native-element',
+      props: { href: '/user/1', type: 'user', tag: 'a' },
+      slots: { default: 'admin' },
+    })
+    expect(resolver).not.toHaveBeenCalled()
   })
 
   it('replaces unresolved components and fields with visible diagnostics', () => {

@@ -247,6 +247,7 @@
       "layers/theme/app/components/global/node--default.vue",
       "layers/theme/app/components/global/node--page.vue",
       "layers/theme/app/components/global/option-value.vue",
+      "layers/theme/app/components/global/stir-native-element.vue",
       "layers/theme/app/components/global/user--default.vue",
       "layers/turnstile/app/components/Field/Turnstile.vue",
       "layers/webform/app/components/Field/Address.vue",
@@ -559,6 +560,7 @@
         "layers/theme/app/components/global/node--default.vue",
         "layers/theme/app/components/global/node--page.vue",
         "layers/theme/app/components/global/option-value.vue",
+        "layers/theme/app/components/global/stir-native-element.vue",
         "layers/theme/app/components/global/user--default.vue",
         "layers/turnstile/app/components/Field/Turnstile.vue",
         "layers/webform/app/components/Field/Address.vue",
@@ -708,7 +710,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 122,
+    "components": 123,
     "composables": 63,
     "utils": 50,
     "plugins": 7,
@@ -716,11 +718,11 @@
     "serverRoutes": 27,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 138,
+    "tests": 139,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 48,
+      "nuxt": 49,
       "server": 24,
       "unit": 8,
       "utils": 45
@@ -775,6 +777,7 @@
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",
     "tests/nuxt/runtime/StirMissingComponent.nuxt.spec.ts",
+    "tests/nuxt/runtime/StirNativeElement.nuxt.spec.ts",
     "tests/nuxt/runtime/ThirdPartyScripts.nuxt.spec.ts",
     "tests/nuxt/runtime/TurnstileConfig.nuxt.spec.ts",
     "tests/nuxt/runtime/ViewsDateRangeFilter.nuxt.spec.ts",
