@@ -251,10 +251,15 @@ const headerRightClasses = computed(() =>
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.right) : '',
   ].filter(Boolean).join(' '),
 )
-const toggleClasses = computed(() =>
+const baseToggleClasses = computed(() =>
   [
     headerUi.toggle,
     menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
+  ].join(' '),
+)
+const toggleClasses = computed(() =>
+  [
+    baseToggleClasses.value,
     isTransparentHeader.value ? toClassName(theme.navigation.toggleTransparentClass) : '',
   ].filter(Boolean).join(' '),
 )
@@ -496,7 +501,7 @@ watch(menuOpen, (val) => {
           :show-logo="Boolean(theme.navigation.logo)"
           :site-title="siteTitle"
           :title-class="headerUi.title"
-          :toggle-class="toggleClasses"
+          :toggle-class="baseToggleClasses"
           :toggle-icon="toggleIcon"
           :toggle-icon-class="toggleIconClass"
           @close="menuOpen = false"
