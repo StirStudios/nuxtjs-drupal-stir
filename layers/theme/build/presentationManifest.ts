@@ -51,6 +51,10 @@ export function resolvePresentationManifestSource(options: {
 
 const BREAKPOINTS = new Set(['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'])
 const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
+const DEFAULT_RETRY_ATTEMPTS = 46
+const DEFAULT_RETRY_DELAY_MS = 2_000
+const DEFAULT_RETRY_MAX_WAIT_MS = 90_000
+const RETRYABLE_HTTP_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504])
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|8|10|15|20)$/u
 const SAFE_CLASS_CHARACTERS = /^[a-z0-9_./:@%#,+*()!&>~=\-[\]]+$/iu
 const UNSAFE_CLASS_SOURCE = /[\s"'`;{}\\]|url\s*\(/iu
@@ -101,18 +105,97 @@ export function parsePresentationManifest(input: unknown): PresentationManifest 
   return result.output
 }
 
-async function readSource(source: string, apiKey?: string): Promise<string> {
-  if (/^https?:\/\//u.test(source)) {
-    const response = await fetch(source, {
+type PresentationManifestRetryOptions = {
+  attempts?: number
+  delayMs?: number
+  maxWaitMs?: number
+  onRetry?: (message: string) => void
+}
+
+class PresentationManifestRequestError extends Error {
+  constructor(message: string, readonly retryable: boolean) {
+    super(message)
+  }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function readRemoteSource(
+  source: string,
+  apiKey?: string,
+  timeoutMs = 15_000,
+): Promise<string> {
+  let response: Response
+
+  try {
+    response = await fetch(source, {
       headers: apiKey ? { 'X-API-Key': apiKey } : undefined,
       redirect: 'error',
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(timeoutMs),
     })
+  } catch (error) {
+    const detail = error instanceof Error ? `: ${error.message}` : ''
 
-    if (!response.ok) {
-      throw new Error(`CMS presentation manifest request failed (${response.status})`)
+    throw new PresentationManifestRequestError(
+      `CMS presentation manifest request failed${detail}`,
+      true,
+    )
+  }
+
+  if (!response.ok) {
+    throw new PresentationManifestRequestError(
+      `CMS presentation manifest request failed (${response.status})`,
+      RETRYABLE_HTTP_STATUSES.has(response.status),
+    )
+  }
+  return response.text()
+}
+
+async function readSource(
+  source: string,
+  apiKey?: string,
+  retry: PresentationManifestRetryOptions = {},
+): Promise<string> {
+  if (/^https?:\/\//u.test(source)) {
+    const attempts = Math.max(1, retry.attempts ?? DEFAULT_RETRY_ATTEMPTS)
+    const retryDelayMs = Math.max(0, retry.delayMs ?? DEFAULT_RETRY_DELAY_MS)
+    const maxWaitMs = Math.max(1, retry.maxWaitMs ?? DEFAULT_RETRY_MAX_WAIT_MS)
+    const startedAt = Date.now()
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      const elapsedMs = Date.now() - startedAt
+      const remainingMs = maxWaitMs - elapsedMs
+
+      try {
+        return await readRemoteSource(
+          source,
+          apiKey,
+          Math.max(1, Math.min(15_000, remainingMs)),
+        )
+      } catch (error) {
+        const remainingAfterFailureMs = maxWaitMs - (Date.now() - startedAt)
+        const canRetry = error instanceof PresentationManifestRequestError
+          && error.retryable
+          && attempt < attempts
+          && remainingAfterFailureMs > retryDelayMs
+
+        if (!canRetry) {
+          if (error instanceof PresentationManifestRequestError && error.retryable) {
+            throw new Error(
+              `${error.message} after ${attempt} attempt${attempt === 1 ? '' : 's'}`,
+              { cause: error },
+            )
+          }
+          throw error
+        }
+        retry.onRetry?.(
+          `${error.message}; retrying in ${retryDelayMs}ms (attempt ${attempt + 1}/${attempts})`,
+        )
+        await delay(retryDelayMs)
+      }
     }
-    return response.text()
   }
   return readFile(source, 'utf8')
 }
@@ -121,13 +204,14 @@ export async function loadPresentationManifest(options: {
   source?: string
   apiKey?: string
   lastKnownPath?: string
+  retry?: PresentationManifestRetryOptions
 }): Promise<PresentationManifest> {
   if (!options.source) throw new Error('CMS presentation manifest source is required')
 
   let source: string
 
   try {
-    source = await readSource(options.source, options.apiKey)
+    source = await readSource(options.source, options.apiKey, options.retry)
   } catch (error) {
     if (!options.lastKnownPath) throw error
     source = await readSource(options.lastKnownPath)

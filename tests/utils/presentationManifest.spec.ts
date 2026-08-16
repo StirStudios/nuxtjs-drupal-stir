@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   buildPresentationSource,
   inlinePresentationSource,
@@ -64,6 +64,10 @@ function fixture() {
 }
 
 describe('CMS presentation manifest', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('uses the packaged fixture only when explicitly requested downstream', () => {
     const fixturePath = '/layer/contracts/presentation-usage-manifest.json'
 
@@ -152,6 +156,58 @@ describe('CMS presentation manifest', () => {
     await expect(loadPresentationManifest({
       source: 'tests/fixtures/missing-presentation-manifest.json',
     })).rejects.toThrow()
+  })
+
+  it('retries temporary CMS unavailability and uses the recovered manifest', async () => {
+    const onRetry = vi.fn()
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response('', { status: 503 }))
+      .mockResolvedValueOnce(new Response('', { status: 502 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(fixture()), { status: 200 }))
+
+    const manifest = await loadPresentationManifest({
+      source: 'https://cms.example.com/presentation-manifest',
+      retry: { attempts: 3, delayMs: 0, onRetry },
+    })
+
+    expect(manifest.site.uuid).toBe('site-uuid')
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    expect(onRetry).toHaveBeenCalledTimes(2)
+    expect(onRetry).toHaveBeenLastCalledWith(expect.stringContaining('attempt 3/3'))
+  })
+
+  it('retries temporary network failures', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockRejectedValueOnce(new TypeError('connection reset'))
+      .mockResolvedValueOnce(new Response(JSON.stringify(fixture()), { status: 200 }))
+
+    await expect(loadPresentationManifest({
+      source: 'https://cms.example.com/presentation-manifest',
+      retry: { attempts: 2, delayMs: 0 },
+    })).resolves.toMatchObject({ schemaVersion: 2 })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it.each([401, 403, 404])('fails immediately for permanent HTTP status %i', async (status) => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response('', { status }))
+
+    await expect(loadPresentationManifest({
+      source: 'https://cms.example.com/presentation-manifest',
+      retry: { attempts: 3, delayMs: 0 },
+    })).rejects.toThrow(`CMS presentation manifest request failed (${status})`)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('reports the final transient failure after bounded retries', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response('', { status: 503 }))
+
+    await expect(loadPresentationManifest({
+      source: 'https://cms.example.com/presentation-manifest',
+      retry: { attempts: 3, delayMs: 0 },
+    })).rejects.toThrow('CMS presentation manifest request failed (503) after 3 attempts')
+    expect(fetchMock).toHaveBeenCalledTimes(3)
   })
 
   it('compiles safe literal CMS values outside the canonical semantic recipes', () => {
