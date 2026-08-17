@@ -9,6 +9,7 @@ const isTestEnv =
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isProductionEnv = process.env.NUXT_ENV === 'production'
 const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
+const canvasEnabled = process.env.STIR_CANVAS_ENABLED === 'true'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
@@ -97,11 +98,25 @@ export default defineNuxtConfig({
         menuBaseUrl: drupalUrl,
         exposeAPIRouteRules: true,
         disableFormHandler: true,
-        enableComponentPreview: false,
+        enableComponentPreview: canvasEnabled,
         customErrorPages: true,
       },
     ],
   ] as Array<string | [string, Record<string, unknown>]>,
+
+  componentPreview: {
+    componentIndex: {
+      status: 'experimental',
+      category: 'Stir',
+      include: {
+        directories: ['Stir'],
+      },
+      exclude: {
+        components: ['stir-missing-component'],
+        directories: [],
+      },
+    },
+  },
 
   hooks: {
     'modules:done'() {

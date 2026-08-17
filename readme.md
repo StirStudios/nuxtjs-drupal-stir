@@ -119,6 +119,9 @@ parameters so campaign attribution and query-driven state are not lost.
 - **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.10.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.3`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.8.0`
+- **Drupal Canvas (experimental):** the full preset publishes a governed
+  `Stir*` component index for Canvas External JavaScript Components. See
+  [the Canvas POC guide](docs/canvas-poc.md).
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
 <!-- tech-stack:end -->
 
