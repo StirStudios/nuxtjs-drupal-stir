@@ -45,6 +45,15 @@ describe('Canvas integration', () => {
     expect(component).not.toContain('$fetch')
   })
 
+  it('keeps the Lupus Canvas page transport wrapper through hydration', () => {
+    const component = source(
+      'layers/theme/app/components/global/canvas-page.vue',
+    )
+
+    expect(component).toContain('<slot name="components">')
+    expect(component).toContain('<slot />')
+  })
+
   it.each(['Hero', 'MediaCollection'])('%s supports direct SSR image media', (component) => {
     const componentSource = source(
       `layers/theme/app/components/global/Stir/${component}.vue`,
