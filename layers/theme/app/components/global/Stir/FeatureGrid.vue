@@ -40,12 +40,12 @@ const thirdLink = computed(() => props.thirdLinkUrl
   <ParagraphLayout
     :container="true"
     direction="fade-up"
-    grid-class="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+    grid-class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
     :header="heading"
     header-tag="h2"
     layout="three_column"
     spacing="py-16"
-    width="w-xl"
+    width="w-full"
   >
     <template v-if="intro" #top>
       <div class="prose max-w-none" v-html="trustedDrupalHtml(intro)" />
