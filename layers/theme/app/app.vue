@@ -1,12 +1,16 @@
 <script lang="ts" setup>
 const appConfig = useAppConfig()
+const runtimeConfig = useRuntimeConfig()
+const componentPreviewActive =
+  runtimeConfig.public.componentPreviewActive === true
 const scrollButtonEnabled = computed(
   () => appConfig.stirTheme.scrollButton?.enabled !== false,
 )
 </script>
 
 <template>
-  <UApp>
+  <div v-if="componentPreviewActive" data-stir-component-preview-root />
+  <UApp v-else>
     <NuxtLoadingIndicator
       :color="appConfig.stirTheme.loadingIndicator || undefined"
     />
