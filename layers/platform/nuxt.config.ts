@@ -108,7 +108,10 @@ export default defineNuxtConfig({
     componentIndex: {
       status: 'experimental',
       category: 'Stir',
-      includePackages: ['nuxtjs-drupal-stir'],
+      // pnpm paths are reported through node_modules/.pnpm, so package-name
+      // filtering is unreliable. The Stir directory allow-list below remains
+      // the authoritative boundary for the public Canvas contract.
+      includePackages: true,
       include: {
         directories: ['Stir'],
       },
