@@ -44,13 +44,12 @@ const alignClass = computed(() => ({
     :randomize="randomize"
   >
     <template #media>
-      <slot name="media">
-        <img
-          v-if="imageUrl"
-          :alt="imageAlt || ''"
-          :src="imageUrl"
-        >
-      </slot>
+      <img
+        v-if="imageUrl"
+        :alt="imageAlt || ''"
+        :src="imageUrl"
+      >
+      <slot name="media" />
     </template>
   </ParagraphMedia>
 </template>

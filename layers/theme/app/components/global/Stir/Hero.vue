@@ -31,13 +31,12 @@ defineSlots<{
       <h1>{{ heading }}</h1>
     </template>
     <template #media>
-      <slot name="media">
-        <img
-          v-if="imageUrl"
-          :alt="imageAlt || ''"
-          :src="imageUrl"
-        >
-      </slot>
+      <img
+        v-if="imageUrl"
+        :alt="imageAlt || ''"
+        :src="imageUrl"
+      >
+      <slot name="media" />
     </template>
     <template #button>
       <slot name="actions" />
