@@ -9,7 +9,7 @@ const scrollButtonEnabled = computed(
 </script>
 
 <template>
-  <div v-if="componentPreviewActive" data-stir-component-preview-root />
+  <ComponentPreviewArea v-if="componentPreviewActive" />
   <UApp v-else>
     <NuxtLoadingIndicator
       :color="appConfig.stirTheme.loadingIndicator || undefined"
