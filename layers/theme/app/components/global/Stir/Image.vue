@@ -8,13 +8,14 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
   type?: 'image'
-  src: string
+  src?: string
   alt?: string
   title?: string
   loading?: 'eager' | 'lazy'
 }>(), {
   alt: '',
   loading: 'lazy',
+  src: '',
   title: undefined,
   type: 'image',
 })
