@@ -153,7 +153,9 @@
       "layers/auth/app/components/Auth/AuthCard.vue",
       "layers/auth/app/components/Auth/AuthFormPanel.vue",
       "layers/auth/app/components/Auth/AuthPage.vue",
+      "layers/auth/app/components/Auth/AuthPageCard.vue",
       "layers/auth/app/components/Auth/AuthPasswordField.vue",
+      "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
       "layers/auth/app/components/Auth/AuthStatusPanel.vue",
       "layers/editorial/app/components/Drupal/Tabs.vue",
       "layers/editorial/app/components/Edit/Controls.vue",
@@ -466,7 +468,9 @@
         "layers/auth/app/components/Auth/AuthCard.vue",
         "layers/auth/app/components/Auth/AuthFormPanel.vue",
         "layers/auth/app/components/Auth/AuthPage.vue",
+        "layers/auth/app/components/Auth/AuthPageCard.vue",
         "layers/auth/app/components/Auth/AuthPasswordField.vue",
+        "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
         "layers/auth/app/components/Auth/AuthStatusPanel.vue",
         "layers/editorial/app/components/Drupal/Tabs.vue",
         "layers/editorial/app/components/Edit/Controls.vue",
@@ -710,7 +714,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 123,
+    "components": 125,
     "composables": 63,
     "utils": 50,
     "plugins": 7,

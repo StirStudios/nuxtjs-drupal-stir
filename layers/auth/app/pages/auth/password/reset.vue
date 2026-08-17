@@ -28,11 +28,9 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <UPageCard
+    <AuthSecondaryAction v-if="!isCheckingLink && linkValid" />
+    <AuthPageCard
       v-if="isCheckingLink || !linkValid"
-      class="w-full shadow-lg"
-      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
-      variant="outline"
     >
       <AuthStatusPanel
         :description="linkMessage"
@@ -46,7 +44,7 @@ useSeoMeta({
           Request a new reset link
         </ULink>
       </template>
-    </UPageCard>
+    </AuthPageCard>
     <AuthCard
       v-else
       :description="description"
@@ -72,9 +70,6 @@ useSeoMeta({
           hide-strength
           :password-policy="auth.passwordPolicy"
         />
-      </template>
-      <template #footer>
-        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
       </template>
     </AuthCard>
   </AuthPage>

@@ -137,12 +137,7 @@ defineSlots<{
     </template>
   </AuthFormPanel>
 
-  <UPageCard
-    v-else
-    class="w-full shadow-lg"
-    :ui="{ container: 'p-6 sm:p-6' }"
-    variant="outline"
-  >
+  <AuthPageCard v-else>
     <AuthFormPanel
       v-bind="formPanelProps"
       @error="$emit('error', $event)"
@@ -164,5 +159,5 @@ defineSlots<{
         <slot name="footer" />
       </template>
     </AuthFormPanel>
-  </UPageCard>
+  </AuthPageCard>
 </template>

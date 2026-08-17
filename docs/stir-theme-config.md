@@ -118,6 +118,15 @@ stirTheme: {
     backgroundImage: '/themes/custom/site/auth.jpg',
     imagePosition: 'left',
     showIcon: true,
+    backgroundClass: 'bg-muted/50 dark:bg-default',
+    showBackgroundDecoration: true,
+    card: {
+      class: 'w-full shadow-none ring-0',
+    },
+    secondaryAction: {
+      label: 'Back to login',
+      wrapperClass: 'mb-4 flex',
+    },
     backButton: {
       enabled: false,
     },
@@ -149,6 +158,13 @@ stirTheme: {
   `color`, `variant`, `icon`, and `class`.
 - `pages` also supports `register`, `passwordRequest`, `verify`, and `protectedPage`.
 - Per-page settings override global auth theme settings.
+- `backgroundClass` replaces the default auth canvas classes, while
+  `showBackgroundDecoration` controls the default blurred decoration.
+- `card` controls the shared auth card surface, including its `class`, `ui`,
+  and Nuxt UI `variant`; use it to remove or replace the default shadow.
+- `secondaryAction` controls actions rendered before the card, such as “Back
+  to login”. It accepts `enabled`, `label`, `to`, `class`, `wrapperClass`,
+  `icon`, `color`, and `variant`.
 - `backgroundImage` should reference the original Drupal image. Auth layouts
   automatically deliver it through Nuxt Image/IPX as a 1920px WebP background.
 - Auth layouts and visuals are read only from `stirTheme.auth`, never from
