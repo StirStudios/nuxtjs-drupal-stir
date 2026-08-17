@@ -44,4 +44,14 @@ describe('Canvas integration', () => {
     expect(component).toContain('<slot name="content" />')
     expect(component).not.toContain('$fetch')
   })
+
+  it.each(['Hero', 'MediaCollection'])('%s supports direct SSR image media', (component) => {
+    const componentSource = source(
+      `layers/theme/app/components/global/Stir/${component}.vue`,
+    )
+
+    expect(componentSource).toContain('imageUrl?: string')
+    expect(componentSource).toContain(':src="imageUrl"')
+    expect(componentSource).toContain(':alt="imageAlt || \'\'"')
+  })
 })

@@ -9,6 +9,8 @@
 const props = defineProps<{
   heading?: string
   headingLevel?: 'h2' | 'h3' | 'h4'
+  imageUrl?: string
+  imageAlt?: string
   align?: 'left' | 'center' | 'right'
   columns?: 'one' | 'two' | 'three' | 'four'
   overlay?: boolean
@@ -41,6 +43,14 @@ const alignClass = computed(() => ({
     :overlay="overlay"
     :randomize="randomize"
   >
-    <template #media><slot name="media" /></template>
+    <template #media>
+      <slot name="media">
+        <img
+          v-if="imageUrl"
+          :alt="imageAlt || ''"
+          :src="imageUrl"
+        >
+      </slot>
+    </template>
   </ParagraphMedia>
 </template>

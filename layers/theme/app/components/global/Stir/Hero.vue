@@ -10,6 +10,8 @@ defineProps<{
   eyebrow?: string
   heading?: string
   text?: string
+  imageUrl?: string
+  imageAlt?: string
   animation?: 'none' | 'fade' | 'fade-up' | 'fade-down'
 }>()
 
@@ -29,7 +31,13 @@ defineSlots<{
       <h1>{{ heading }}</h1>
     </template>
     <template #media>
-      <slot name="media" />
+      <slot name="media">
+        <img
+          v-if="imageUrl"
+          :alt="imageAlt || ''"
+          :src="imageUrl"
+        >
+      </slot>
     </template>
     <template #button>
       <slot name="actions" />
