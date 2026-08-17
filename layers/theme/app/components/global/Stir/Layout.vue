@@ -33,10 +33,10 @@ const layoutName = computed(() => ({
   grid: 'grid',
 }[props.layout || 'one-column']))
 const gridClass = computed(() => ({
-  'one-column': 'grid-cols-1',
-  'two-column': 'grid-cols-1 lg:grid-cols-2',
-  'three-column': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-  grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  'one-column': 'grid grid-cols-1 gap-6',
+  'two-column': 'grid grid-cols-1 gap-6 lg:grid-cols-2',
+  'three-column': 'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3',
+  grid: 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3',
 }[props.layout || 'one-column']))
 const widthClass = computed(() => ({
   narrow: 'w-prose',
