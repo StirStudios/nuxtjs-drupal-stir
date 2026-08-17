@@ -1,9 +1,14 @@
-import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
 import type {
   AuthCardConfig,
   AuthPageKey,
   AuthThemeConfig,
 } from '../types/theme'
+
+type AuthRoute = {
+  meta: Record<string, unknown>
+  name?: unknown
+  path: string
+}
 
 const AUTH_PAGE_KEYS = [
   'login',
@@ -19,7 +24,7 @@ const isAuthPageKey = (value: unknown): value is AuthPageKey =>
   typeof value === 'string' && AUTH_PAGE_KEYS.includes(value as AuthPageKey)
 
 export const resolveAuthPageKey = (
-  route: Pick<RouteLocationNormalizedLoadedGeneric, 'meta' | 'name' | 'path'>,
+  route: AuthRoute,
 ): AuthPageKey | null => {
   if (isAuthPageKey(route.meta.authPageKey)) {
     return route.meta.authPageKey
