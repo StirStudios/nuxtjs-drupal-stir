@@ -10,8 +10,8 @@ defineProps<{
   eyebrow?: string
   heading?: string
   text?: string
-  imageUrl?: string
-  imageAlt?: string
+  /** Hero image selected from Drupal's Media Library. */
+  image?: CanvasImage
   animation?: 'none' | 'fade' | 'fade-up' | 'fade-down'
 }>()
 
@@ -34,10 +34,12 @@ const { hero: heroTheme } = useAppConfig().stirTheme
     </template>
     <template #media>
       <img
-        v-if="imageUrl"
-        :alt="imageAlt || ''"
+        v-if="image?.src"
+        :alt="image.alt || ''"
         :class="heroTheme.image?.base"
-        :src="imageUrl"
+        :height="image.height"
+        :src="image.src"
+        :width="image.width"
       >
       <slot name="media" />
     </template>

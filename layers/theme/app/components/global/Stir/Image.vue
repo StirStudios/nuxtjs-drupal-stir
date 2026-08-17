@@ -8,18 +8,13 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
   type?: 'image'
-  /**
-   * Public image URL.
-   * @example https://example.com/image.jpg
-   */
-  src?: string
-  alt?: string
+  /** Image selected from Drupal's Media Library. */
+  image?: CanvasImage
   title?: string
   loading?: 'eager' | 'lazy'
 }>(), {
-  alt: '',
+  image: undefined,
   loading: 'lazy',
-  src: '',
   title: undefined,
   type: 'image',
 })
@@ -27,10 +22,13 @@ withDefaults(defineProps<{
 
 <template>
   <img
-    :alt="alt"
+    v-if="image?.src"
+    :alt="image.alt || ''"
     class="block h-auto max-w-full"
+    :height="image.height"
     :loading="loading"
-    :src="src"
+    :src="image.src"
     :title="title"
+    :width="image.width"
   >
 </template>

@@ -6,7 +6,7 @@
   @category Stir
 -->
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   heading?: string
   presentation?: 'carousel' | 'marquee'
   gridItems?: 'one' | 'two' | 'three' | 'four' | 'five'
@@ -16,17 +16,14 @@ const props = withDefaults(defineProps<{
   indicators?: boolean
   autoplay?: boolean
   interval?: number
-  /** One image URL per line. */
-  images?: string
-  /** One accessible image description per line, in the same order. */
-  imageAlts?: string
+  /** Images selected and reordered through Drupal's Media Library. */
+  images?: CanvasImage[]
 }>(), {
   arrows: true,
   autoplay: false,
   gridItems: 'three',
   heading: undefined,
-  imageAlts: '',
-  images: '',
+  images: () => [],
   indicators: false,
   interval: 5000,
   presentation: 'carousel',
@@ -46,15 +43,6 @@ const gridClasses: Record<string, string> = {
   five: 'basis-1/2 gap-4 md:basis-1/3 lg:basis-1/5 lg:gap-6',
 }
 
-const imageItems = computed(() => {
-  const alts = props.imageAlts.split('\n').map(value => value.trim())
-
-  return props.images
-    .split('\n')
-    .map(value => value.trim())
-    .filter(Boolean)
-    .map((src, index) => ({ src, alt: alts[index] || '' }))
-})
 </script>
 
 <template>
@@ -72,12 +60,14 @@ const imageItems = computed(() => {
   >
     <template #items>
       <img
-        v-for="item in imageItems"
+        v-for="item in images"
         :key="item.src"
-        :alt="item.alt"
+        :alt="item.alt || ''"
         class="block h-auto max-w-full"
+        :height="item.height"
         loading="lazy"
         :src="item.src"
+        :width="item.width"
       >
       <slot name="items" />
     </template>
