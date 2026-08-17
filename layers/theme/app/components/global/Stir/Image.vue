@@ -8,6 +8,10 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
   type?: 'image'
+  /**
+   * Public image URL.
+   * @example https://example.com/image.jpg
+   */
   src?: string
   alt?: string
   title?: string
