@@ -108,6 +108,7 @@ export default defineNuxtConfig({
     componentIndex: {
       status: 'experimental',
       category: 'Stir',
+      includePackages: ['nuxtjs-drupal-stir'],
       include: {
         directories: ['Stir'],
       },

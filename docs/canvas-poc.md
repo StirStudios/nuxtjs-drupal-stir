@@ -16,8 +16,10 @@ cross-origin behavior merely by updating the Stir layer.
 ## Public component contract
 
 Only globally registered components under `components/global/Stir` are
-included in `/nuxt-component-preview/component-index.json`. Internal fallback
-components are excluded. The initial catalogue is:
+included in `/nuxt-component-preview/component-index.json`, including when the
+Stir layer is installed as a dependency of a downstream site. Other package
+components and internal fallback components are excluded. The initial
+catalogue is:
 
 | Canvas component | Purpose | Slots |
 | --- | --- | --- |
