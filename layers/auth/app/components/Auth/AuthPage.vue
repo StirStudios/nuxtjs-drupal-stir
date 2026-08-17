@@ -208,6 +208,12 @@ provide(authLayoutContextKey, layoutContext)
     />
     <main class="flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6 lg:bg-default lg:px-12" role="main">
       <div class="w-full max-w-md">
+        <div
+          v-if="$slots['secondary-action']"
+          class="mb-4 text-left"
+        >
+          <slot name="secondary-action" />
+        </div>
         <slot />
       </div>
     </main>
@@ -241,6 +247,12 @@ provide(authLayoutContextKey, layoutContext)
       :class="isResolvedCardSplit ? 'w-full max-w-5xl' : 'w-full max-w-md'"
       role="main"
     >
+      <div
+        v-if="$slots['secondary-action']"
+        class="mb-4 text-left"
+      >
+        <slot name="secondary-action" />
+      </div>
       <slot />
     </main>
   </div>

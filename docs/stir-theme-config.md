@@ -125,7 +125,6 @@ stirTheme: {
     },
     secondaryAction: {
       label: 'Back to login',
-      wrapperClass: 'mb-4 flex',
     },
     backButton: {
       enabled: false,
@@ -162,9 +161,9 @@ stirTheme: {
   `showBackgroundDecoration` controls the default blurred decoration.
 - `card` controls the shared auth card surface, including its `class`, `ui`,
   and Nuxt UI `variant`; use it to remove or replace the default shadow.
-- `secondaryAction` controls actions rendered before the card, such as “Back
-  to login”. It accepts `enabled`, `label`, `to`, `class`, `wrapperClass`,
-  `icon`, `color`, and `variant`.
+- `secondaryAction` controls page navigation rendered above the card, such as
+  “Back to login”. It accepts `enabled`, `label`, `to`, `class`,
+  `wrapperClass`, `icon`, `color`, and `variant`.
 - `backgroundImage` should reference the original Drupal image. Auth layouts
   automatically deliver it through Nuxt Image/IPX as a 1920px WebP background.
 - Auth layouts and visuals are read only from `stirTheme.auth`, never from

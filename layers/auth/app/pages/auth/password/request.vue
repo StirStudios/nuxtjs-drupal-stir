@@ -32,7 +32,9 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <AuthSecondaryAction />
+    <template #secondary-action>
+      <AuthSecondaryAction />
+    </template>
     <AuthPageCard
       v-if="requestSent"
     >

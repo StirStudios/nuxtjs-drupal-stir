@@ -28,7 +28,9 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <AuthSecondaryAction v-if="!isCheckingLink && linkValid" />
+    <template v-if="!isCheckingLink && linkValid" #secondary-action>
+      <AuthSecondaryAction />
+    </template>
     <AuthPageCard
       v-if="isCheckingLink || !linkValid"
     >

@@ -53,7 +53,9 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <AuthSecondaryAction v-if="registrationComplete" />
+    <template v-if="registrationComplete" #secondary-action>
+      <AuthSecondaryAction />
+    </template>
     <AuthPageCard
       v-if="registrationComplete"
     >

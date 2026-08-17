@@ -82,7 +82,9 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <AuthSecondaryAction />
+    <template #secondary-action>
+      <AuthSecondaryAction />
+    </template>
     <AuthPageCard>
       <AuthStatusPanel
         :description="message"

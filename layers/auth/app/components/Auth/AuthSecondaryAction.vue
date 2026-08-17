@@ -24,7 +24,7 @@ const config = computed(() => ({
 </script>
 
 <template>
-  <div v-if="config.enabled !== false" :class="config.wrapperClass || 'mb-4 flex'">
+  <div v-if="config.enabled !== false" :class="config.wrapperClass || 'flex'">
     <UButton
       :class="config.class"
       :color="resolveUiColor(config.color, 'primary')"
