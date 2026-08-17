@@ -121,7 +121,7 @@ stirTheme: {
     backgroundClass: 'bg-muted/50 dark:bg-default',
     showBackgroundDecoration: true,
     card: {
-      class: 'w-full shadow-none ring-0',
+      class: 'shadow-none ring-0',
     },
     secondaryAction: {
       label: 'Back to login',

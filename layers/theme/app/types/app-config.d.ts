@@ -322,6 +322,8 @@ export type StirThemeAuthConfig = {
   showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
+  card?: StirThemeAuthCardConfig
+  secondaryAction?: StirThemeAuthSecondaryActionConfig
   submitButton?: StirThemeButtonLikeConfig
   pages?: Partial<Record<StirThemeAuthPageKey, StirThemeAuthPageConfig>>
 } & LooseRecord
@@ -343,12 +345,24 @@ export type StirThemeAuthPageConfig = {
   showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: StirThemeAuthBackButtonConfig
+  card?: StirThemeAuthCardConfig
+  secondaryAction?: StirThemeAuthSecondaryActionConfig
 } & LooseRecord
 
 export type StirThemeAuthBackButtonConfig = StirThemeButtonLikeConfig & {
   enabled?: boolean
   label?: string
   to?: string
+}
+
+export type StirThemeAuthSecondaryActionConfig = StirThemeAuthBackButtonConfig & {
+  wrapperClass?: ClassValue
+}
+
+export type StirThemeAuthCardConfig = {
+  class?: ClassValue
+  ui?: Record<string, string>
+  variant?: 'solid' | 'outline' | 'soft' | 'subtle'
 }
 
 type StirThemeRevealConfig = {

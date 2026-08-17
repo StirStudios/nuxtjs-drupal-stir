@@ -26,7 +26,7 @@ type AuthButtonConfig = {
   variant?: UiButtonVariantName
 } & LooseRecord
 
-type AuthPageKey =
+export type AuthPageKey =
   | 'login'
   | 'logout'
   | 'protectedPage'

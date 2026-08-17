@@ -1,4 +1,5 @@
 import type { ComputedRef, InjectionKey } from 'vue'
+import type { AuthCardConfig } from '../types/theme'
 
 export type AuthLayout = 'card' | 'page-split' | 'card-split'
 export type AuthImagePosition = 'left' | 'right'
@@ -11,6 +12,7 @@ export type AuthLayoutContext = {
   imagePosition: AuthImagePosition
   image: string
   showIcon: boolean
+  card: AuthCardConfig
 }
 
 export const resolveAuthLayout = (value: unknown): AuthLayout | undefined => {

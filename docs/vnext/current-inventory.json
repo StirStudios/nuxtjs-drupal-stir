@@ -340,6 +340,7 @@
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",
+      "layers/auth/app/utils/authTheme.ts",
       "layers/auth/app/utils/authValidation.ts",
       "layers/auth/app/utils/fetchError.ts",
       "layers/auth/app/utils/nuxtUiProps.ts",
@@ -655,6 +656,7 @@
       ],
       "autoImportedUtils": [
         "layers/auth/app/utils/authLayout.ts",
+        "layers/auth/app/utils/authTheme.ts",
         "layers/auth/app/utils/authValidation.ts",
         "layers/auth/app/utils/fetchError.ts",
         "layers/auth/app/utils/nuxtUiProps.ts",
@@ -716,20 +718,20 @@
   "counts": {
     "components": 125,
     "composables": 63,
-    "utils": 50,
+    "utils": 51,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 139,
+    "tests": 140,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 49,
       "server": 24,
       "unit": 8,
-      "utils": 45
+      "utils": 46
     }
   },
   "tests": [
@@ -827,6 +829,7 @@
     "tests/unit/layoutEditLinks.spec.ts",
     "tests/unit/paragraphComponentStarter.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
+    "tests/utils/authTheme.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
     "tests/utils/calendlyWidget.spec.ts",

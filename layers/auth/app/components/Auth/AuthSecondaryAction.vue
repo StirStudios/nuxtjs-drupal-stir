@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AuthThemeConfig } from '../../types/theme'
+import { resolveAuthPageKey } from '../../utils/authTheme'
 import { resolveUiButtonVariant, resolveUiColor } from '../../utils/nuxtUiProps'
 
 const {
@@ -15,15 +16,7 @@ const appConfig = useAppConfig()
 const authTheme = computed<AuthThemeConfig>(() =>
   ((appConfig.stirTheme || {}) as { auth?: AuthThemeConfig }).auth || {},
 )
-const pageKey = computed(() => {
-  const path = route.path
-
-  if (path.endsWith('/auth/password/request')) return 'passwordRequest'
-  if (path.endsWith('/auth/password/reset')) return 'passwordReset'
-  if (path.endsWith('/auth/register')) return 'register'
-  if (path.endsWith('/auth/verify')) return 'verify'
-  return undefined
-})
+const pageKey = computed(() => resolveAuthPageKey(route))
 const config = computed(() => ({
   ...authTheme.value.secondaryAction,
   ...(pageKey.value ? authTheme.value.pages?.[pageKey.value]?.secondaryAction : {}),

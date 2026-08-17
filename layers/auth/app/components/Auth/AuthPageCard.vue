@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { AuthThemeConfig } from '../../types/theme'
+import { resolveAuthCardConfig, resolveAuthPageKey } from '../../utils/authTheme'
 
 const props = withDefaults(defineProps<{
   headerFull?: boolean
+  split?: boolean
 }>(), {
   headerFull: false,
+  split: false,
 })
 
 const route = useRoute()
@@ -12,30 +15,13 @@ const appConfig = useAppConfig()
 const authTheme = computed<AuthThemeConfig>(() =>
   ((appConfig.stirTheme || {}) as { auth?: AuthThemeConfig }).auth || {},
 )
-const pageKey = computed(() => {
-  const explicitKey = route.meta.authPageKey
-
-  if (typeof explicitKey === 'string' && explicitKey in (authTheme.value.pages || {})) {
-    return explicitKey as keyof NonNullable<AuthThemeConfig['pages']>
-  }
-
-  const path = route.path
-
-  if (path.endsWith('/auth/password/request')) return 'passwordRequest'
-  if (path.endsWith('/auth/password/reset')) return 'passwordReset'
-  if (path.endsWith('/auth/register')) return 'register'
-  if (path.endsWith('/auth/verify')) return 'verify'
-  if (path.endsWith('/auth/logout')) return 'logout'
-  if (path.endsWith('/auth/protected')) return 'protectedPage'
-  return 'login'
-})
-const cardConfig = computed(() => ({
-  ...authTheme.value.card,
-  ...authTheme.value.pages?.[pageKey.value]?.card,
-}))
-const cardClass = computed(() => cardConfig.value.class || 'w-full shadow-lg')
+const pageKey = computed(() => resolveAuthPageKey(route))
+const cardConfig = computed(() =>
+  resolveAuthCardConfig(authTheme.value, pageKey.value),
+)
+const cardClass = computed(() => cardConfig.value.class || 'shadow-lg')
 const cardUi = computed(() => ({
-  container: 'p-6 sm:p-6',
+  container: props.split ? 'p-0 sm:p-0' : 'p-6 sm:p-6',
   footer: 'text-center text-sm text-muted',
   wrapper: 'w-full',
   ...cardConfig.value.ui,
@@ -45,7 +31,8 @@ const cardUi = computed(() => ({
 
 <template>
   <UPageCard
-    :class="cardClass"
+    class="w-full"
+    :class="[cardClass, { 'overflow-hidden text-left': split }]"
     :ui="cardUi"
     :variant="cardConfig.variant || 'outline'"
   >
