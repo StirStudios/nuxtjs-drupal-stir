@@ -12,8 +12,9 @@ describe('Canvas integration', () => {
     expect(config).toContain('process.env.STIR_CANVAS_ENABLED === \'true\'')
     expect(config).toContain('enableComponentPreview: canvasEnabled')
     expect(config).toContain('includePackages: true')
-    expect(config).toContain('directories: [\'Stir\']')
-    expect(config).toContain('components: [\'stir-missing-component\']')
+    expect(config).toContain('\'!stir-*\'')
+    expect(config).toContain('\'stir-missing-component\'')
+    expect(config).toContain('\'stir-native-element\'')
   })
 
   it.each([

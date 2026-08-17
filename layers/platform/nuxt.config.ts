@@ -108,15 +108,16 @@ export default defineNuxtConfig({
     componentIndex: {
       status: 'experimental',
       category: 'Stir',
-      // pnpm paths are reported through node_modules/.pnpm, so package-name
-      // filtering is unreliable. The Stir directory allow-list below remains
-      // the authoritative boundary for the public Canvas contract.
+      // pnpm paths are reported through node_modules/.pnpm and begin with ../,
+      // which makes the preview module's package and directory filters
+      // unreliable. Restrict the public contract by component identifier.
       includePackages: true,
-      include: {
-        directories: ['Stir'],
-      },
       exclude: {
-        components: ['stir-missing-component'],
+        components: [
+          '!stir-*',
+          'stir-missing-component',
+          'stir-native-element',
+        ],
         directories: [],
       },
     },
