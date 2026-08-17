@@ -53,11 +53,11 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <UPageCard
+    <template v-if="registrationComplete" #secondary-action>
+      <AuthSecondaryAction />
+    </template>
+    <AuthPageCard
       v-if="registrationComplete"
-      class="w-full shadow-lg"
-      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
-      variant="outline"
     >
       <AuthStatusPanel
         :description="registrationMessage"
@@ -65,10 +65,7 @@ useSeoMeta({
         :title="statusTitle"
         :tone="statusTone"
       />
-      <template #footer>
-        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-      </template>
-    </UPageCard>
+    </AuthPageCard>
     <AuthCard
       v-else
       :description="description"

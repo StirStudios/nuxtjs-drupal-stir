@@ -37,8 +37,8 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <UPageCard class="w-full shadow-lg" variant="outline">
+    <AuthPageCard>
       <p>Signing you out...</p>
-    </UPageCard>
+    </AuthPageCard>
   </AuthPage>
 </template>

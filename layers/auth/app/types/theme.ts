@@ -26,7 +26,7 @@ type AuthButtonConfig = {
   variant?: UiButtonVariantName
 } & LooseRecord
 
-type AuthPageKey =
+export type AuthPageKey =
   | 'login'
   | 'logout'
   | 'protectedPage'
@@ -41,6 +41,16 @@ export type AuthBackButtonConfig = AuthButtonConfig & {
   to?: string
 }
 
+export type AuthSecondaryActionConfig = AuthBackButtonConfig & {
+  wrapperClass?: ClassValue
+}
+
+export type AuthCardConfig = {
+  class?: ClassValue
+  ui?: Record<string, string>
+  variant?: 'solid' | 'outline' | 'soft' | 'subtle'
+}
+
 export type AuthPageConfig = {
   backgroundClass?: ClassValue
   backgroundImage?: string
@@ -49,6 +59,8 @@ export type AuthPageConfig = {
   showBackgroundDecoration?: boolean
   showIcon?: boolean
   backButton?: AuthBackButtonConfig
+  card?: AuthCardConfig
+  secondaryAction?: AuthSecondaryActionConfig
 } & LooseRecord
 
 export type AuthThemeConfig = AuthPageConfig & {

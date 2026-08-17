@@ -16,6 +16,10 @@ import type {
   AuthPageConfig,
   AuthThemeConfig,
 } from '../../types/theme'
+import {
+  resolveAuthCardConfig,
+  resolveAuthPageKey,
+} from '../../utils/authTheme'
 
 const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
@@ -31,59 +35,11 @@ const resolveImage = $img as unknown as (
   },
 ) => string
 
-type AuthPageConfigKey =
-  | 'login'
-  | 'logout'
-  | 'protectedPage'
-  | 'register'
-  | 'passwordRequest'
-  | 'passwordReset'
-  | 'verify'
-
-const resolveAuthPageKey = (): AuthPageConfigKey | null => {
-  const explicitKey = route.meta.authPageKey
-
-  if (typeof explicitKey === 'string' && explicitKey.trim()) {
-    switch (explicitKey) {
-      case 'login':
-      case 'logout':
-      case 'protectedPage':
-      case 'register':
-      case 'passwordRequest':
-      case 'passwordReset':
-      case 'verify':
-        return explicitKey
-      default:
-        break
-    }
-  }
-
-  const routeName = typeof route.name === 'string' ? route.name : ''
-
-  if (routeName.includes('auth-login')) return 'login'
-  if (routeName.includes('auth-protected')) return 'protectedPage'
-  if (routeName.includes('auth-register')) return 'register'
-  if (routeName.includes('auth-password-request')) return 'passwordRequest'
-  if (routeName.includes('auth-password-reset')) return 'passwordReset'
-
-  const path = route.path
-
-  if (path.endsWith('/auth/login')) return 'login'
-  if (path.endsWith('/auth/logout')) return 'logout'
-  if (path.endsWith('/auth/protected')) return 'protectedPage'
-  if (path.endsWith('/auth/register')) return 'register'
-  if (path.endsWith('/auth/password/request')) return 'passwordRequest'
-  if (path.endsWith('/auth/password/reset')) return 'passwordReset'
-  if (path.endsWith('/auth/verify')) return 'verify'
-
-  return null
-}
-
 const resolveConfigString = (value: unknown, fallback = ''): string => {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback
 }
 
-const authPageKey = computed(resolveAuthPageKey)
+const authPageKey = computed(() => resolveAuthPageKey(route))
 const themeAuth = computed<AuthThemeConfig>(() => {
   const theme = (appConfig.stirTheme || {}) as {
     auth?: AuthThemeConfig
@@ -145,6 +101,9 @@ const backButtonConfig = computed(() => ({
   ...themeAuth.value.backButton,
   ...themePageConfig.value.backButton,
 }))
+const cardConfig = computed(() =>
+  resolveAuthCardConfig(themeAuth.value, authPageKey.value),
+)
 
 const pageBackgroundImage = computed(() => {
   const themePageImage = themePageConfig.value.backgroundImage?.trim() || ''
@@ -228,6 +187,7 @@ const layoutContext = computed(() => ({
   imagePosition: imagePosition.value,
   image: deliveredBackgroundImage.value,
   showIcon: showIcon.value,
+  card: cardConfig.value,
 }))
 
 provide(authLayoutContextKey, layoutContext)
@@ -248,6 +208,12 @@ provide(authLayoutContextKey, layoutContext)
     />
     <main class="flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6 lg:bg-default lg:px-12" role="main">
       <div class="w-full max-w-md">
+        <div
+          v-if="$slots['secondary-action']"
+          class="mb-4 text-left"
+        >
+          <slot name="secondary-action" />
+        </div>
         <slot />
       </div>
     </main>
@@ -281,6 +247,12 @@ provide(authLayoutContextKey, layoutContext)
       :class="isResolvedCardSplit ? 'w-full max-w-5xl' : 'w-full max-w-md'"
       role="main"
     >
+      <div
+        v-if="$slots['secondary-action']"
+        class="mb-4 text-left"
+      >
+        <slot name="secondary-action" />
+      </div>
       <slot />
     </main>
   </div>

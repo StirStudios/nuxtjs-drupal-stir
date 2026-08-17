@@ -153,7 +153,9 @@
       "layers/auth/app/components/Auth/AuthCard.vue",
       "layers/auth/app/components/Auth/AuthFormPanel.vue",
       "layers/auth/app/components/Auth/AuthPage.vue",
+      "layers/auth/app/components/Auth/AuthPageCard.vue",
       "layers/auth/app/components/Auth/AuthPasswordField.vue",
+      "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
       "layers/auth/app/components/Auth/AuthStatusPanel.vue",
       "layers/editorial/app/components/Drupal/Tabs.vue",
       "layers/editorial/app/components/Edit/Controls.vue",
@@ -338,6 +340,7 @@
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",
+      "layers/auth/app/utils/authTheme.ts",
       "layers/auth/app/utils/authValidation.ts",
       "layers/auth/app/utils/fetchError.ts",
       "layers/auth/app/utils/nuxtUiProps.ts",
@@ -466,7 +469,9 @@
         "layers/auth/app/components/Auth/AuthCard.vue",
         "layers/auth/app/components/Auth/AuthFormPanel.vue",
         "layers/auth/app/components/Auth/AuthPage.vue",
+        "layers/auth/app/components/Auth/AuthPageCard.vue",
         "layers/auth/app/components/Auth/AuthPasswordField.vue",
+        "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
         "layers/auth/app/components/Auth/AuthStatusPanel.vue",
         "layers/editorial/app/components/Drupal/Tabs.vue",
         "layers/editorial/app/components/Edit/Controls.vue",
@@ -651,6 +656,7 @@
       ],
       "autoImportedUtils": [
         "layers/auth/app/utils/authLayout.ts",
+        "layers/auth/app/utils/authTheme.ts",
         "layers/auth/app/utils/authValidation.ts",
         "layers/auth/app/utils/fetchError.ts",
         "layers/auth/app/utils/nuxtUiProps.ts",
@@ -710,22 +716,22 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 123,
+    "components": 125,
     "composables": 63,
-    "utils": 50,
+    "utils": 51,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 139,
+    "tests": 140,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 49,
       "server": 24,
       "unit": 8,
-      "utils": 45
+      "utils": 46
     }
   },
   "tests": [
@@ -823,6 +829,7 @@
     "tests/unit/layoutEditLinks.spec.ts",
     "tests/unit/paragraphComponentStarter.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
+    "tests/utils/authTheme.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
     "tests/utils/calendlyWidget.spec.ts",

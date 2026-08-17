@@ -82,11 +82,10 @@ onMounted(async () => {
 
 <template>
   <AuthPage>
-    <UPageCard
-      class="w-full shadow-lg"
-      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
-      variant="outline"
-    >
+    <template #secondary-action>
+      <AuthSecondaryAction />
+    </template>
+    <AuthPageCard>
       <AuthStatusPanel
         :description="message"
         :icon="isLoading ? 'i-lucide-loader-circle' : verified ? 'i-lucide-check-circle' : 'i-lucide-alert-circle'"
@@ -94,9 +93,6 @@ onMounted(async () => {
         :title="isLoading ? loadingTitle : verified ? successTitle : failedTitle"
         :tone="isLoading ? 'neutral' : verified ? 'success' : 'error'"
       />
-      <template #footer>
-        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-      </template>
-    </UPageCard>
+    </AuthPageCard>
   </AuthPage>
 </template>

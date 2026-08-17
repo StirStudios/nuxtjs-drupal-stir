@@ -32,11 +32,11 @@ useSeoMeta({
 
 <template>
   <AuthPage>
-    <UPageCard
+    <template #secondary-action>
+      <AuthSecondaryAction />
+    </template>
+    <AuthPageCard
       v-if="requestSent"
-      class="w-full shadow-lg"
-      :ui="{ footer: 'text-center text-sm text-muted', wrapper: 'w-full' }"
-      variant="outline"
     >
       <AuthStatusPanel
         :description="sentDescription"
@@ -44,10 +44,7 @@ useSeoMeta({
         :title="sentTitle"
         tone="success"
       />
-      <template #footer>
-        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
-      </template>
-    </UPageCard>
+    </AuthPageCard>
 
     <AuthCard
       v-else
@@ -62,9 +59,6 @@ useSeoMeta({
     >
       <template #validation>
         <FieldTurnstile v-model="turnstileToken" />
-      </template>
-      <template #footer>
-        <ULink class="text-primary" to="/auth/login">Back to login</ULink>
       </template>
     </AuthCard>
   </AuthPage>

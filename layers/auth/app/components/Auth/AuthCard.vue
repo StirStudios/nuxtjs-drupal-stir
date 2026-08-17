@@ -70,45 +70,47 @@ defineSlots<{
 </script>
 
 <template>
-  <div
+  <AuthPageCard
     v-if="isCardSplit"
-    class="grid w-full overflow-hidden rounded-lg bg-default text-left shadow-lg ring ring-default lg:grid-cols-2"
+    split
   >
-    <div
-      v-if="isImageFirst"
-      aria-hidden="true"
-      class="min-h-64 bg-cover bg-center bg-no-repeat lg:min-h-full"
-      :style="cardImageStyle"
-    />
-    <AuthFormPanel
-      :class="['flex h-full w-full flex-col justify-center', authFormPaddingClass]"
-      v-bind="formPanelProps"
-      @error="$emit('error', $event)"
-      @submit="$emit('submit', $event)"
-    >
-      <template #password-field="{ state, field }">
-        <slot :field="field" name="password-field" :state="state" />
-      </template>
-      <template #confirmPassword-field="{ state, field }">
-        <slot :field="field" name="confirmPassword-field" :state="state" />
-      </template>
-      <template #password-hint>
-        <slot name="password-hint" />
-      </template>
-      <template #validation>
-        <slot name="validation" />
-      </template>
-      <template #footer>
-        <slot name="footer" />
-      </template>
-    </AuthFormPanel>
-    <div
-      v-if="!isImageFirst"
-      aria-hidden="true"
-      class="min-h-64 bg-cover bg-center bg-no-repeat lg:min-h-full"
-      :style="cardImageStyle"
-    />
-  </div>
+    <div class="grid w-full bg-default lg:grid-cols-2">
+      <div
+        v-if="isImageFirst"
+        aria-hidden="true"
+        class="min-h-64 bg-cover bg-center bg-no-repeat lg:min-h-full"
+        :style="cardImageStyle"
+      />
+      <AuthFormPanel
+        :class="['flex h-full w-full flex-col justify-center', authFormPaddingClass]"
+        v-bind="formPanelProps"
+        @error="$emit('error', $event)"
+        @submit="$emit('submit', $event)"
+      >
+        <template #password-field="{ state, field }">
+          <slot :field="field" name="password-field" :state="state" />
+        </template>
+        <template #confirmPassword-field="{ state, field }">
+          <slot :field="field" name="confirmPassword-field" :state="state" />
+        </template>
+        <template #password-hint>
+          <slot name="password-hint" />
+        </template>
+        <template #validation>
+          <slot name="validation" />
+        </template>
+        <template #footer>
+          <slot name="footer" />
+        </template>
+      </AuthFormPanel>
+      <div
+        v-if="!isImageFirst"
+        aria-hidden="true"
+        class="min-h-64 bg-cover bg-center bg-no-repeat lg:min-h-full"
+        :style="cardImageStyle"
+      />
+    </div>
+  </AuthPageCard>
 
   <AuthFormPanel
     v-else-if="isPageSplit"
@@ -137,12 +139,7 @@ defineSlots<{
     </template>
   </AuthFormPanel>
 
-  <UPageCard
-    v-else
-    class="w-full shadow-lg"
-    :ui="{ container: 'p-6 sm:p-6' }"
-    variant="outline"
-  >
+  <AuthPageCard v-else>
     <AuthFormPanel
       v-bind="formPanelProps"
       @error="$emit('error', $event)"
@@ -164,5 +161,5 @@ defineSlots<{
         <slot name="footer" />
       </template>
     </AuthFormPanel>
-  </UPageCard>
+  </AuthPageCard>
 </template>
