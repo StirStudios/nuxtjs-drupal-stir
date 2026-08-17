@@ -19,6 +19,8 @@ defineSlots<{
   media?(): unknown
   actions?(): unknown
 }>()
+
+const { hero: heroTheme } = useAppConfig().stirTheme
 </script>
 
 <template>
@@ -34,6 +36,7 @@ defineSlots<{
       <img
         v-if="imageUrl"
         :alt="imageAlt || ''"
+        :class="heroTheme.image?.base"
         :src="imageUrl"
       >
       <slot name="media" />
