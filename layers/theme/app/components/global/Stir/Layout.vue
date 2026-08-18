@@ -6,7 +6,7 @@
   @category Stir
 -->
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   heading?: string
   headingLevel?: 'h2' | 'h3' | 'h4'
   layout?: 'one-column' | 'two-column' | 'three-column' | 'grid'
@@ -15,7 +15,11 @@ const props = defineProps<{
   card?: boolean
   reverseOnMobile?: boolean
   animation?: 'none' | 'fade' | 'fade-up' | 'fade-down'
-}>()
+}>(), {
+  layout: 'three-column',
+  width: 'wide',
+  spacing: 'normal',
+})
 
 defineSlots<{
   top?(): unknown
@@ -66,10 +70,26 @@ const spacingClass = computed(() => ({
     :width="widthClass"
   >
     <template #top><slot name="top" /></template>
-    <template #first><slot name="first" /></template>
-    <template #second><slot name="second" /></template>
-    <template #third><slot name="third" /></template>
+    <template #first>
+      <div class="stir-layout-drop-region"><slot name="first" /></div>
+    </template>
+    <template #second>
+      <div class="stir-layout-drop-region"><slot name="second" /></div>
+    </template>
+    <template #third>
+      <div class="stir-layout-drop-region"><slot name="third" /></div>
+    </template>
     <template #items><slot name="items" /></template>
     <template #bottom><slot name="bottom" /></template>
   </ParagraphLayout>
 </template>
+
+<style scoped>
+/* Keep empty Canvas slots large enough to be visible and accept a drop. */
+.stir-layout-drop-region:empty,
+.stir-layout-drop-region:has(> .canvas--slot-empty-placeholder:only-child) {
+  min-height: 6rem;
+  border: 1px dashed color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.375rem;
+}
+</style>

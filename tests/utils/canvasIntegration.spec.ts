@@ -54,13 +54,27 @@ describe('Canvas integration', () => {
     expect(component).toContain('<slot />')
   })
 
-  it.each(['Hero', 'MediaCollection'])('%s supports direct SSR image media', (component) => {
-    const componentSource = source(
-      `layers/theme/app/components/global/Stir/${component}.vue`,
-    )
+  it('Hero supports Drupal Media Library image objects', () => {
+    const componentSource = source('layers/theme/app/components/global/Stir/Hero.vue')
+
+    expect(componentSource).toContain('image?: CanvasImage')
+    expect(componentSource).toContain(':src="image.src"')
+    expect(componentSource).toContain(':alt="image.alt || \'\'"')
+  })
+
+  it('MediaCollection supports direct SSR image media', () => {
+    const componentSource = source('layers/theme/app/components/global/Stir/MediaCollection.vue')
 
     expect(componentSource).toContain('imageUrl?: string')
     expect(componentSource).toContain(':src="imageUrl"')
     expect(componentSource).toContain(':alt="imageAlt || \'\'"')
+  })
+
+  it('keeps empty Stir Layout columns visible as Canvas drop regions', () => {
+    const componentSource = source('layers/theme/app/components/global/Stir/Layout.vue')
+
+    expect(componentSource).toContain('layout: \'three-column\'')
+    expect(componentSource.match(/class="stir-layout-drop-region"/g)).toHaveLength(3)
+    expect(componentSource).toContain('min-height: 6rem')
   })
 })
