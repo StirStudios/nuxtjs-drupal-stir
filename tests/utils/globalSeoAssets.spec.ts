@@ -12,6 +12,8 @@ const response: GlobalSeoResponse = {
   link: [
     { rel: 'image_src', href: 'https://drupal.example/files/og.jpg' },
     { rel: 'icon', href: 'https://drupal.example/files/favicon.ico' },
+    { rel: 'ICON', href: 'https://drupal.example/files/favicon.svg' },
+    { rel: 'apple-touch-icon', href: 'https://drupal.example/files/touch.png' },
     { rel: 'canonical', href: 'https://www.example.com/' },
   ],
 }
@@ -50,8 +52,29 @@ describe('prepareGlobalSeoAssets', () => {
     expect(result.link).toEqual([
       { rel: 'image_src', href: 'https://drupal.example/files/og.jpg' },
       { rel: 'icon', href: 'https://drupal.example/files/favicon.ico' },
+      { rel: 'ICON', href: 'https://drupal.example/files/favicon.svg' },
+      { rel: 'apple-touch-icon', href: 'https://drupal.example/files/touch.png' },
       { rel: 'canonical', href: 'https://www.example.com/' },
     ])
+  })
+
+  it('routes supported Drupal icons through IPX but preserves ICO sources', () => {
+    const result = prepareGlobalSeoAssets(response, {
+      iconImage: { enabled: true },
+    }, source => `/_ipx/_/${source}`, 'https://www.example.com')
+
+    expect(result.link).toContainEqual({
+      rel: 'icon',
+      href: 'https://drupal.example/files/favicon.ico',
+    })
+    expect(result.link).toContainEqual({
+      rel: 'ICON',
+      href: 'https://www.example.com/_ipx/_/https://drupal.example/files/favicon.svg',
+    })
+    expect(result.link).toContainEqual({
+      rel: 'apple-touch-icon',
+      href: 'https://www.example.com/_ipx/_/https://drupal.example/files/touch.png',
+    })
   })
 
   it('preserves Drupal URLs when asset delivery is not enabled', () => {

@@ -30,6 +30,8 @@ The layer routes Drupal's global
 Image provider. With `NUXT_IMAGE_CDN`, the resulting absolute URL uses the
 pull-CDN `/_ipx/**` origin; without it, the URL uses the current frontend origin.
 
-Drupal's favicon and manifest links pass through unchanged so their metadata and
-files retain one CMS-owned lifecycle. Do not duplicate these assets in the
-consumer's `public/` directory unless that project intentionally takes ownership.
+Drupal remains the source for favicon metadata and files. The layer routes SVG,
+PNG, and other IPX-supported icon URLs through Nuxt Image without duplicating
+them in `public/`. ICO remains a direct Drupal URL because IPX rejects ICO input;
+projects requiring every icon on IPX should remove the ICO relation in Drupal
+and retain its SVG/PNG icon relations. Manifest links pass through unchanged.

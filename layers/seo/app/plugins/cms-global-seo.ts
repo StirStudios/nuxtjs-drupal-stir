@@ -1,4 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
+import type { SeoImageResolver } from '../utils/globalSeoAssets'
 import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
@@ -7,6 +8,9 @@ type CmsGlobalSeoConfig = {
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
   lang?: string
+  iconImage?: {
+    enabled?: boolean
+  }
   socialImage?: {
     enabled?: boolean
     format?: string
@@ -22,11 +26,6 @@ type UseHeadFactory = Extract<
   (...args: never[]) => unknown
 >
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
-type SeoImageResolver = (
-  source: string,
-  modifiers: Record<string, number | string>,
-) => string
-
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
     enabled: config.enabled === true,
@@ -40,6 +39,7 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
     lang: typeof config.lang === 'string' && config.lang.trim() !== ''
       ? config.lang.trim()
       : 'en',
+    iconImage: config.iconImage || {},
     socialImage: config.socialImage || {},
   }
 }

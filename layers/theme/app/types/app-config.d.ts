@@ -88,6 +88,9 @@ type CmsGlobalSeoConfig = {
   ignoredPathPrefixes?: string[]
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
+  iconImage?: {
+    enabled?: boolean
+  }
   socialImage?: {
     enabled?: boolean
     format?: string

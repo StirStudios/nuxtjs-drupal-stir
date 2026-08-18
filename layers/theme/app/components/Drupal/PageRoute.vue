@@ -3,6 +3,12 @@ import {
   buildLayoutEditLinkIndex,
   layoutEditLinksKey,
 } from '../../utils/layoutEditLinks'
+import type {
+  CmsGlobalSeoAssetConfig,
+  SeoImageResolver,
+} from '../../../../seo/app/utils/globalSeoAssets'
+import type { GlobalSeoResponse } from '../../../../seo/shared/types/globalSeo'
+import { prepareGlobalSeoAssets } from '../../../../seo/app/utils/globalSeoAssets'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
@@ -22,6 +28,22 @@ const route = useRoute()
 const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
 const pageRequest = useResolvedPageRequest(route)
 const theme = useAppConfig().stirTheme
+const seoConfig = (useAppConfig().cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
+const image = useImage() as unknown as SeoImageResolver
+const runtimeConfig = useRuntimeConfig()
+const requestOrigin = useRequestURL().origin
+const publicOrigin = (() => {
+  if (import.meta.server && typeof runtimeConfig.siteUrl === 'string') {
+    try {
+      return new URL(runtimeConfig.siteUrl).origin
+    }
+    catch {
+      // Fall back to the request origin for invalid or absent configuration.
+    }
+  }
+
+  return requestOrigin
+})()
 
 const page = await fetchPage(
   pageRequest.path.value,
@@ -79,13 +101,34 @@ const seoTitle = computed(() => {
 })
 
 const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld as JsonLdValue))
-const pageHead = computed(() => page.value || {
-  title: '',
-  metatags: {
-    meta: [],
-    link: [],
-    jsonld: [],
-  },
+const pageHead = computed(() => {
+  const currentPage = page.value || {
+    title: '',
+    metatags: {
+      meta: [],
+      link: [],
+      jsonld: [],
+    },
+  }
+  const metatags = currentPage.metatags
+
+  if (!metatags) return currentPage
+
+  const prepared = prepareGlobalSeoAssets(
+    metatags as GlobalSeoResponse,
+    seoConfig,
+    image,
+    publicOrigin,
+  )
+
+  return {
+    ...currentPage,
+    metatags: {
+      ...metatags,
+      link: prepared.link,
+      meta: prepared.meta,
+    },
+  }
 })
 
 usePageHead(pageHead, ['meta', 'link'])
