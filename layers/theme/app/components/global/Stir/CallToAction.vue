@@ -10,8 +10,17 @@ import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 defineProps<{
   heading?: string
+  /**
+   * Supporting copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   text?: string
   buttonLabel?: string
+  /**
+   * Button destination
+   * @format uri-reference
+   */
   buttonUrl?: string
 }>()
 </script>

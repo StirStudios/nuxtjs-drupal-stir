@@ -10,7 +10,17 @@ import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 defineProps<{
   heading?: string
+  /**
+   * First column copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   firstContent?: string
+  /**
+   * Second column copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   secondContent?: string
   reverseOnMobile?: boolean
 }>()

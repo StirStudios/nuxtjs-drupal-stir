@@ -9,6 +9,11 @@
 defineProps<{
   eyebrow?: string
   heading?: string
+  /**
+   * Hero supporting copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   text?: string
   /** Hero image selected from Drupal's Media Library. */
   image?: CanvasImage

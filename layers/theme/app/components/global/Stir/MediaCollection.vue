@@ -9,8 +9,8 @@
 const props = defineProps<{
   heading?: string
   headingLevel?: 'h2' | 'h3' | 'h4'
-  imageUrl?: string
-  imageAlt?: string
+  /** Image selected from Drupal's Media Library. */
+  image?: CanvasImage
   align?: 'left' | 'center' | 'right'
   columns?: 'one' | 'two' | 'three' | 'four'
   overlay?: boolean
@@ -45,9 +45,11 @@ const alignClass = computed(() => ({
   >
     <template #media>
       <img
-        v-if="imageUrl"
-        :alt="imageAlt || ''"
-        :src="imageUrl"
+        v-if="image?.src"
+        :alt="image.alt || ''"
+        :height="image.height"
+        :src="image.src"
+        :width="image.width"
       >
       <slot name="media" />
     </template>

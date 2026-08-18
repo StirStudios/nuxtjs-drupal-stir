@@ -7,6 +7,11 @@
 -->
 <script setup lang="ts">
 const props = defineProps<{
+  /**
+   * Formatted text
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   text?: string
   align?: 'left' | 'center' | 'right'
   width?: 'narrow' | 'standard' | 'wide' | 'full'

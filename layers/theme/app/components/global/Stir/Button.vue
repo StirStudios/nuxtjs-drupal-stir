@@ -8,6 +8,10 @@
 <script setup lang="ts">
 const props = defineProps<{
   label?: string
+  /**
+   * Link destination
+   * @format uri-reference
+   */
   url?: string
   align?: 'left' | 'center' | 'right'
   color?: 'primary' | 'neutral' | 'success' | 'error'

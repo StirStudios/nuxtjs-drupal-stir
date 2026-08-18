@@ -61,20 +61,30 @@ describe('Canvas integration', () => {
     expect(componentSource).toContain(':alt="image.alt || \'\'"')
   })
 
-  it('MediaCollection supports direct SSR image media', () => {
+  it('MediaCollection uses Drupal Media Library image objects', () => {
     const componentSource = source('layers/theme/app/components/global/Stir/MediaCollection.vue')
 
-    expect(componentSource).toContain('imageUrl?: string')
-    expect(componentSource).toContain(':src="imageUrl"')
-    expect(componentSource).toContain(':alt="imageAlt || \'\'"')
+    expect(componentSource).toContain('image?: CanvasImage')
+    expect(componentSource).toContain(':src="image.src"')
+    expect(componentSource).toContain(':alt="image.alt || \'\'"')
   })
 
   it('keeps empty Stir Layout columns visible as Canvas drop regions', () => {
     const componentSource = source('layers/theme/app/components/global/Stir/Layout.vue')
 
     expect(componentSource).toContain('layout: \'three-column\'')
-    expect(componentSource.match(/stir-layout-drop-region" data-empty-label/g)).toHaveLength(3)
+    expect(componentSource.match(/stir-layout-drop-region"/g)).toHaveLength(3)
     expect(componentSource.match(/<slot name="(first|second|third)"/g)).toHaveLength(3)
     expect(componentSource).toContain('min-height: 6rem')
+    expect(componentSource).not.toContain('data-empty-label')
+  })
+
+  it('declares native Canvas widgets for rich text and links', () => {
+    const richText = source('layers/theme/app/components/global/Stir/RichText.vue')
+    const button = source('layers/theme/app/components/global/Stir/Button.vue')
+
+    expect(richText).toContain('@contentMediaType text/html')
+    expect(richText).toContain('@formattingContext block')
+    expect(button).toContain('@format uri-reference')
   })
 })

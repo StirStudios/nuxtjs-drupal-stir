@@ -67,13 +67,13 @@ const spacingClass = computed(() => ({
       </component>
 
       <div class="region top col-span-full"><slot name="top" /></div>
-      <div class="region first stir-layout-drop-region" data-empty-label="Column 1 — drop content here">
+      <div class="region first stir-layout-drop-region">
         <slot name="first" />
       </div>
-      <div class="region second stir-layout-drop-region" data-empty-label="Column 2 — drop content here">
+      <div class="region second stir-layout-drop-region">
         <slot name="second" />
       </div>
-      <div class="region third stir-layout-drop-region" data-empty-label="Column 3 — drop content here">
+      <div class="region third stir-layout-drop-region">
         <slot name="third" />
       </div>
       <div class="region items"><slot name="items" /></div>
@@ -88,25 +88,10 @@ const spacingClass = computed(() => ({
  * element. An empty wrapper has no box, so it cannot become a visible drop
  * target. Give that actual Canvas-owned slot element physical dimensions.
  */
-.stir-layout-drop-region {
-  position: relative;
-}
-
 .stir-layout-drop-region > div[style*="display: contents"] {
   display: block !important;
   min-height: 6rem;
   border: 1px dashed color-mix(in srgb, currentColor 25%, transparent);
   border-radius: 0.375rem;
-}
-
-.stir-layout-drop-region:has(> div[style*="display: contents"]:empty)::before {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: color-mix(in srgb, currentColor 55%, transparent);
-  font-size: 0.875rem;
-  pointer-events: none;
-  content: attr(data-empty-label);
 }
 </style>

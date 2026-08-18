@@ -8,9 +8,18 @@
 <script setup lang="ts">
 const props = defineProps<{
   heading?: string
+  /**
+   * Feature copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   text?: string
   iconName?: string
   linkLabel?: string
+  /**
+   * Link destination
+   * @format uri-reference
+   */
   linkUrl?: string
   cardVariant?: 'outline' | 'soft' | 'solid' | 'subtle'
   animation?: 'none' | 'fade' | 'fade-up' | 'fade-down'

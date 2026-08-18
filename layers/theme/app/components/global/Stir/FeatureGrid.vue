@@ -10,18 +10,41 @@ import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 const props = defineProps<{
   heading?: string
+  /**
+   * Introductory copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   intro?: string
   firstHeading?: string
+  /**
+   * First feature copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   firstText?: string
   firstLinkLabel?: string
+  /** @format uri-reference */
   firstLinkUrl?: string
   secondHeading?: string
+  /**
+   * Second feature copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   secondText?: string
   secondLinkLabel?: string
+  /** @format uri-reference */
   secondLinkUrl?: string
   thirdHeading?: string
+  /**
+   * Third feature copy
+   * @contentMediaType text/html
+   * @formattingContext block
+   */
   thirdText?: string
   thirdLinkLabel?: string
+  /** @format uri-reference */
   thirdLinkUrl?: string
 }>()
 
