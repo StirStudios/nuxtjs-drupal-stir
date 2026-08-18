@@ -660,6 +660,21 @@ describe('layer contract', () => {
     expect(editableRichText).not.toContain('<div class="relative">')
   })
 
+  it('provides default paragraph rhythm for reusable rich text', () => {
+    const editableRichText = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
+      'utf8',
+    )
+    const baseCss = readFileSync(
+      resolve(rootDir, 'layers/theme/app/assets/css/base.css'),
+      'utf8',
+    )
+
+    expect(editableRichText).toContain("const richTextClass = 'prose max-w-none'")
+    expect(baseCss).toContain(':where(.prose, .admin-editor-prose)')
+    expect(baseCss).toMatch(/:where\(p\)\s*\{\s*@apply my-5 leading-7 text-pretty;/)
+  })
+
   it('renders Drupal markup through the hydration-safe upstream directive', () => {
     const drupalMarkup = readFileSync(
       resolve(rootDir, 'layers/theme/app/components/global/drupal-markup.vue'),
