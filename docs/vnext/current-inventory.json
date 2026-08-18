@@ -351,6 +351,7 @@
       "layers/editorial/app/utils/editorDragHandle.ts",
       "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
       "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
+      "layers/seo/app/utils/globalSeoAssets.ts",
       "layers/theme/app/utils/colorMode.ts",
       "layers/theme/app/utils/componentTreeDiagnostics.ts",
       "layers/theme/app/utils/dateUtils.ts",
@@ -667,6 +668,7 @@
         "layers/editorial/app/utils/editorDragHandle.ts",
         "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
         "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
+        "layers/seo/app/utils/globalSeoAssets.ts",
         "layers/theme/app/utils/colorMode.ts",
         "layers/theme/app/utils/componentTreeDiagnostics.ts",
         "layers/theme/app/utils/dateUtils.ts",
@@ -718,20 +720,20 @@
   "counts": {
     "components": 125,
     "composables": 63,
-    "utils": 51,
+    "utils": 52,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 140,
+    "tests": 141,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 49,
       "server": 24,
       "unit": 8,
-      "utils": 46
+      "utils": 47
     }
   },
   "tests": [
@@ -844,6 +846,7 @@
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
+    "tests/utils/globalSeoAssets.spec.ts",
     "tests/utils/heroMotionAccessibility.spec.ts",
     "tests/utils/heroVideoSource.spec.ts",
     "tests/utils/imageCdn.spec.ts",
