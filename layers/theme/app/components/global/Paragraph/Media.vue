@@ -7,6 +7,7 @@ import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import { resolveMediaGalleryDeliveryProfile } from '../../../utils/imageDelivery'
 
 const props = defineProps<{
   id?: number | string
@@ -120,16 +121,20 @@ const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
-const deliveryProfile = computed(() => {
-  if (!isVisualGallery.value) return undefined
-
-  return slotMediaOrdered.value.length >= 3 ? 'card' : 'split'
-})
 const lanes = computed(() => resolveResponsiveGridValue(
   props.masonry?.lanes,
   viewportWidth.value,
   1,
 ))
+const deliveryProfile = computed(() => {
+  if (!isVisualGallery.value) return undefined
+
+  return resolveMediaGalleryDeliveryProfile(
+    props.gridItems,
+    slotMediaOrdered.value.length,
+    props.masonry ? lanes.value : undefined,
+  )
+})
 
 onMounted(() => {
   hydrated.value = true

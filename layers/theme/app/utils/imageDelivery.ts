@@ -29,6 +29,33 @@ export function resolveLayoutImageDeliveryProfile(
   return undefined
 }
 
+export function resolveMediaGalleryDeliveryProfile(
+  gridItems: string | undefined,
+  itemCount: number,
+  laneCount?: number,
+): string | undefined {
+  if (itemCount <= 1) return undefined
+
+  if (laneCount !== undefined) {
+    if (laneCount >= 3) return 'card'
+    if (laneCount === 2) return 'split'
+    return 'container'
+  }
+
+  const columns = [...(gridItems || '').matchAll(
+    /(?:^|[:\s])(?:grid-cols-|grid_col_|col_?)(\d+)(?:\s|$)/g,
+  )]
+    .map(match => Number(match[1]))
+    .filter(Number.isFinite)
+  const maximumColumns = columns.length > 0 ? Math.max(...columns) : 0
+
+  if (maximumColumns >= 3) return 'card'
+  if (maximumColumns === 2) return 'split'
+  if (maximumColumns === 1) return 'container'
+
+  return itemCount >= 3 ? 'card' : 'split'
+}
+
 export function resolveCarouselImageDeliverySizes(
   gridItems: string | undefined,
   fullProfile: string | undefined,

@@ -159,7 +159,7 @@ Run relevant checks after changes:
 
 Validation policy:
 
-- Default for production-impacting changes: run `pnpm verify:ci`.
+- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts, then run `pnpm verify:ci`.
 - If debugging failures, run the individual commands:
   - `pnpm lint`
   - `pnpm typecheck`
@@ -182,6 +182,12 @@ CI parity:
 - Keep CI tool versions aligned with repository declarations (for example `pnpm/action-setup` version must match `packageManager` in `package.json`).
 
 If checks are skipped, state exactly which were not run and why.
+
+PR readiness:
+
+- After pushing, confirm GitHub reports the PR mergeable and watch every required check to completion; local green checks alone are not completion.
+- Treat review findings about behavior, accessibility, SSR/hydration, or downstream compatibility as regression-test requirements.
+- For shared CMS components, cover blank authored values and accessible naming. Derive responsive media delivery from the active layout configuration rather than settings used by an inactive branch.
 
 ## Release and safety rules
 

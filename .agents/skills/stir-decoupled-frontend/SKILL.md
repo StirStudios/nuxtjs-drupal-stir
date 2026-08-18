@@ -49,11 +49,20 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 1. Run focused unit/component tests for changed logic.
 2. Run Nuxt runtime tests for auto-imports, layers, plugins, composables, SSR and hydration behavior.
 3. Run contract tests when payloads, CE mappings, endpoints, auth, redirects, metadata or Webforms change.
-4. Run lint, typecheck and a production build; use the repository's `verify:ci` as the default production-impacting gate.
+4. Run lint, typecheck and a production build; use `pnpm verify:ci` as the default production-impacting gate because it includes the core and downstream-consumer jobs.
 5. Smoke-test homepage, one inner CE route, menus, errors, and any affected mutation/auth path.
 6. Inspect initial HTML, Nuxt payload, response status/headers and browser console. Verify no hydration mismatch or duplicated request.
 7. Run accessibility checks for UI changes and manual keyboard/focus checks where interaction changes.
 8. For performance claims, compare at least three mobile production runs and report medians for LCP, INP or TBT as available, CLS, transfer and relevant request counts.
+
+## Finish pull requests against CI
+
+1. Merge or rebase the target branch before final verification and resolve conflicts intentionally.
+2. Regenerate tracked inventories and generated contracts, then run their check modes. Never hand-edit generated inventories.
+3. For shared components, test blank or malformed CMS values, accessible names, runtime rendering, SSR or hydration as applicable, and downstream consumer typecheck/build behavior.
+4. Derive responsive media behavior from the configuration used by the active layout, not stale settings from an inactive rendering branch.
+5. Push, confirm GitHub reports the PR mergeable, and watch required checks to completion. Local green tests alone are not completion.
+6. Convert review findings into regression coverage when they describe behavior, compatibility, accessibility, SSR, hydration, or consumer risk.
 
 ## Report clearly
 
