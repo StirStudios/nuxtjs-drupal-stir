@@ -21,17 +21,15 @@ export default defineNuxtConfig({
 `DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_URL`, `NUXT_NAME`,
 `NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration. The
 Robots module is registered only when this SEO capability is selected.
-Global metadata is disabled by default and can be enabled or scoped through
-`cmsGlobalSeo` app config.
+Global metadata and social-image delivery are enabled by default and can be
+scoped or disabled through `cmsGlobalSeo` app config. Non-indexable apps that do
+not publish SEO metadata should set `cmsGlobalSeo.enabled` to `false`.
 
-Consumers may set `cmsGlobalSeo.socialImage.enabled` to route Drupal's global
+The layer routes Drupal's global
 `og:image`, `twitter:image`, and `image_src` source through the configured Nuxt
 Image provider. With `NUXT_IMAGE_CDN`, the resulting absolute URL uses the
 pull-CDN `/_ipx/**` origin; without it, the URL uses the current frontend origin.
-Set `socialImage.version` when a stable Drupal file path is replaced so immutable
-IPX/CDN caches receive a new URL.
 
-Set `cmsGlobalSeo.iconLinks` to frontend-owned favicon and manifest links. When
-present, these replace Drupal-provided icon links while leaving other CMS links
-untouched. Store those small shell assets in the consumer's `public/` directory;
-do not send favicons through IPX.
+Drupal's favicon and manifest links pass through unchanged so their metadata and
+files retain one CMS-owned lifecycle. Do not duplicate these assets in the
+consumer's `public/` directory unless that project intentionally takes ownership.

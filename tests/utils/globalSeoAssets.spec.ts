@@ -39,19 +39,18 @@ describe('prepareGlobalSeoAssets', () => {
     expect(result.meta[0]?.content).toBe('https://www.example.com/_ipx/f_jpeg/og.jpg')
   })
 
-  it('replaces CMS icons only when frontend icon links are configured', () => {
-    const result = prepareGlobalSeoAssets(response, {
-      iconLinks: [
-        { rel: 'icon', href: '/favicon.ico' },
-        { rel: 'manifest', href: '/site.webmanifest' },
-      ],
-    }, source => source, 'https://www.example.com')
+  it('preserves Drupal-owned icon links', () => {
+    const result = prepareGlobalSeoAssets(
+      response,
+      {},
+      source => source,
+      'https://www.example.com',
+    )
 
     expect(result.link).toEqual([
       { rel: 'image_src', href: 'https://drupal.example/files/og.jpg' },
+      { rel: 'icon', href: 'https://drupal.example/files/favicon.ico' },
       { rel: 'canonical', href: 'https://www.example.com/' },
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'manifest', href: '/site.webmanifest' },
     ])
   })
 

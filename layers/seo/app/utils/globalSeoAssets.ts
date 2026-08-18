@@ -10,7 +10,6 @@ export type CmsSocialImageConfig = {
 }
 
 export type CmsGlobalSeoAssetConfig = {
-  iconLinks?: GlobalSeoAttributes[]
   socialImage?: CmsSocialImageConfig
 }
 
@@ -18,8 +17,6 @@ type ImageResolver = (
   source: string,
   modifiers: Record<string, number | string>,
 ) => string
-
-const CMS_ICON_RELS = new Set(['apple-touch-icon', 'icon', 'manifest', 'mask-icon'])
 
 function withVersion(source: string, version?: string): string {
   const revision = version?.trim()
@@ -77,7 +74,6 @@ export function prepareGlobalSeoAssets(
     version: config.socialImage?.version,
     width: config.socialImage?.width || 1200,
   }
-  const iconLinks = Array.isArray(config.iconLinks) ? config.iconLinks : []
   const optimize = (source: string) => optimizeSocialImage(
     source,
     socialImage,
@@ -94,16 +90,12 @@ export function prepareGlobalSeoAssets(
 
       return { ...attributes, content: optimize(attributes.content) }
     }),
-    link: [
-      ...response.link.flatMap((attributes) => {
-        if (iconLinks.length > 0 && CMS_ICON_RELS.has(attributes.rel || '')) return []
-        if (!socialImage.enabled || attributes.rel !== 'image_src' || !attributes.href) {
+    link: response.link.flatMap((attributes) => {
+      if (!socialImage.enabled || attributes.rel !== 'image_src' || !attributes.href) {
           return [attributes]
         }
 
         return [{ ...attributes, href: optimize(attributes.href) }]
       }),
-      ...iconLinks,
-    ],
   }
 }
