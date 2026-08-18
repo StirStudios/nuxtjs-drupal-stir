@@ -88,6 +88,14 @@ type CmsGlobalSeoConfig = {
   ignoredPathPrefixes?: string[]
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
+  socialImage?: {
+    enabled?: boolean
+    format?: string
+    height?: number
+    quality?: number
+    version?: string
+    width?: number
+  }
 } & LooseRecord
 
 type ColorModeConfig = {

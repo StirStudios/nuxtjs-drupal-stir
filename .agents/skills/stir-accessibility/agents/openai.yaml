@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stir Accessibility"
+  short_description: "Build and audit accessible Stir experiences"
+  default_prompt: "Use $stir-accessibility to implement or audit this experience against WCAG 2.2 AA with automated and manual verification."

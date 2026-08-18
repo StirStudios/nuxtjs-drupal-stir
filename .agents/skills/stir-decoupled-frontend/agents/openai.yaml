@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stir Decoupled Frontend"
+  short_description: "Build and audit the Stir Drupal-to-Nuxt frontend"
+  default_prompt: "Use $stir-decoupled-frontend to implement or audit this Drupal-to-Nuxt frontend change and verify SSR, contracts, security, caching, and tests."

@@ -1,4 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
+import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -6,6 +7,14 @@ type CmsGlobalSeoConfig = {
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
   lang?: string
+  socialImage?: {
+    enabled?: boolean
+    format?: string
+    height?: number
+    quality?: number
+    version?: string
+    width?: number
+  }
 }
 
 type UseHeadFactory = Extract<
@@ -13,6 +22,10 @@ type UseHeadFactory = Extract<
   (...args: never[]) => unknown
 >
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
+type SeoImageResolver = (
+  source: string,
+  modifiers: Record<string, number | string>,
+) => string
 
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
@@ -27,6 +40,7 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
     lang: typeof config.lang === 'string' && config.lang.trim() !== ''
       ? config.lang.trim()
       : 'en',
+    socialImage: config.socialImage || {},
   }
 }
 
@@ -79,12 +93,31 @@ function withLinkKeys(tags: Array<Record<string, string>> = []): Array<Record<st
   })
 }
 
+function configuredPublicOrigin(value: unknown, fallback: string): string {
+  if (typeof value !== 'string' || !value.trim()) return fallback
+
+  try {
+    return new URL(value).origin
+  }
+  catch {
+    return fallback
+  }
+}
+
 export default defineNuxtPlugin(async () => {
   const route = useRoute()
   const appConfig = useAppConfig()
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   const defaults = useState<GlobalSeoResponse | null>('cms-global-seo', () => null)
   const lang = computed(() => defaults.value?.lang || config.lang)
+  const image = useImage()
+  const resolveImage = image as unknown as SeoImageResolver
+  const runtimeConfig = useRuntimeConfig()
+  const requestOrigin = useRequestURL().origin
+  const publicOrigin = configuredPublicOrigin(
+    import.meta.server ? runtimeConfig.siteUrl : '',
+    requestOrigin,
+  )
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
@@ -102,10 +135,17 @@ export default defineNuxtPlugin(async () => {
         return head as ConsumerReactiveHead
       }
 
+      const prepared = prepareGlobalSeoAssets(
+        defaults.value,
+        config,
+        resolveImage,
+        publicOrigin,
+      )
+
       return {
         ...head,
-        link: withLinkKeys(defaults.value.link),
-        meta: withMetaKeys(defaults.value.meta),
+        link: withLinkKeys(prepared.link),
+        meta: withMetaKeys(prepared.meta),
       } as unknown as ConsumerReactiveHead
     },
     {
