@@ -10,10 +10,11 @@ export type CmsSocialImageConfig = {
 }
 
 export type CmsGlobalSeoAssetConfig = {
+  enabled?: boolean
   socialImage?: CmsSocialImageConfig
 }
 
-type ImageResolver = (
+export type SeoImageResolver = (
   source: string,
   modifiers: Record<string, number | string>,
 ) => string
@@ -38,22 +39,33 @@ function isSocialImageMeta(attributes: GlobalSeoAttributes): boolean {
   return attributes.property === 'og:image' || attributes.name === 'twitter:image'
 }
 
-function optimizeSocialImage(
+function optimizeImage(
   source: string,
-  config: Required<Omit<CmsSocialImageConfig, 'version'>> & Pick<CmsSocialImageConfig, 'version'>,
-  imageResolver: ImageResolver,
+  modifiers: Record<string, number | string>,
+  imageResolver: SeoImageResolver,
   publicOrigin: string,
 ): string {
   try {
-    return absoluteUrl(
-      imageResolver(withVersion(source, config.version), {
-        format: config.format,
-        height: config.height,
-        quality: config.quality,
-        width: config.width,
-      }),
-      publicOrigin,
-    )
+    return absoluteUrl(imageResolver(source, modifiers), publicOrigin)
+  }
+  catch {
+    return source
+  }
+}
+
+function optimizeSocialImage(
+  source: string,
+  config: Required<Omit<CmsSocialImageConfig, 'version'>> & Pick<CmsSocialImageConfig, 'version'>,
+  imageResolver: SeoImageResolver,
+  publicOrigin: string,
+): string {
+  try {
+    return optimizeImage(withVersion(source, config.version), {
+      format: config.format,
+      height: config.height,
+      quality: config.quality,
+      width: config.width,
+    }, imageResolver, publicOrigin)
   }
   catch {
     return source
@@ -63,9 +75,11 @@ function optimizeSocialImage(
 export function prepareGlobalSeoAssets(
   response: GlobalSeoResponse,
   config: CmsGlobalSeoAssetConfig,
-  imageResolver: ImageResolver,
+  imageResolver: SeoImageResolver,
   publicOrigin: string,
 ): GlobalSeoResponse {
+  if (config.enabled === false) return response
+
   const socialImage = {
     enabled: config.socialImage?.enabled === true,
     format: config.socialImage?.format || 'jpeg',
@@ -92,10 +106,10 @@ export function prepareGlobalSeoAssets(
     }),
     link: response.link.flatMap((attributes) => {
       if (!socialImage.enabled || attributes.rel !== 'image_src' || !attributes.href) {
-          return [attributes]
-        }
+        return [attributes]
+      }
 
-        return [{ ...attributes, href: optimize(attributes.href) }]
-      }),
+      return [{ ...attributes, href: optimize(attributes.href) }]
+    }),
   }
 }

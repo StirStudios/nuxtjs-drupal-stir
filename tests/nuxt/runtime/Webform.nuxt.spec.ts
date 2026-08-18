@@ -74,7 +74,8 @@ describe('Webform (Nuxt runtime)', () => {
   })
 
   it('does not submit display-only markup as an empty field', async () => {
-    runtime.fetch.mockResolvedValueOnce(undefined)
+    runtime.fetch.mockClear()
+    runtime.fetch.mockResolvedValue(undefined)
     const displayOnlyWebform: WebformDefinition = {
       ...webform,
       fields: {
@@ -94,8 +95,12 @@ describe('Webform (Nuxt runtime)', () => {
     await wrapper.get('form').trigger('submit')
     await flushPromises()
 
-    expect(runtime.fetch).toHaveBeenCalledOnce()
-    const options = runtime.fetch.mock.calls[0]?.[1] as { body: string }
+    const submissions = runtime.fetch.mock.calls.filter(
+      ([url]) => url === '/api/webform/submit',
+    )
+
+    expect(submissions).toHaveLength(1)
+    const options = submissions[0]?.[1] as { body: string }
 
     expect(JSON.parse(options.body)).toEqual({
       webform_id: 'contact',

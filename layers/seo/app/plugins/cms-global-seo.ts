@@ -1,4 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
+import type { SeoImageResolver } from '../utils/globalSeoAssets'
 import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
@@ -22,11 +23,6 @@ type UseHeadFactory = Extract<
   (...args: never[]) => unknown
 >
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
-type SeoImageResolver = (
-  source: string,
-  modifiers: Record<string, number | string>,
-) => string
-
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
     enabled: config.enabled === true,
