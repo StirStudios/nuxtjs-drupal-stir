@@ -34,10 +34,48 @@ These components are thin source-independent contracts over the existing Stir
 presentation components. Their props deliberately expose semantic choices,
 not Tailwind classes, Paragraph UUIDs, edit links, or other producer metadata.
 
+## Native authoring contract
+
+Component props must describe the editorial control Canvas should generate.
+Do not replace these controls with Stir-specific forms:
+
+| Content value | Component schema | Canvas control |
+| --- | --- | --- |
+| Short text | `string` | Text input |
+| Formatted copy | `string` with `contentMediaType: text/html` and block formatting context | Drupal/Canvas rich-text editor |
+| Link destination | `string` with `format: uri-reference` | Drupal link widget |
+| Fixed option | `string` with `enum` | Select control |
+| Toggle | `boolean` | Checkbox/switch |
+| Image | `CanvasImage` | Drupal Media Library |
+
+`StirLayout` is structural only. Its named slots are genuine Canvas regions;
+editors can add arbitrary approved components to a region and move them between
+regions using either the page overlay or Layers panel. Composite components
+remain useful for governed sections, but must not replace general page layout.
+
+The expected editing journey is:
+
+1. View the SSR-rendered Nuxt page.
+2. Follow one page-level **Edit this page in Canvas** link.
+3. Add, edit, reorder, and move components in Canvas.
+4. Use Canvas's full-page preview.
+5. Review and publish the autosaved change.
+6. Return to the Nuxt page and verify the published result.
+
+Paragraph-level frontend edit links are not part of Canvas pages. Reusable or
+structured Drupal entities may retain their own entity-edit links.
+
 The integration remains marked experimental while the Canvas component source
 API is unstable. Existing Paragraph custom elements and the normal Lupus page
 route continue to use the same renderer and are not changed by enabling
 preview support.
+
+The proof of concept is a pass only when the workflow above is reliable and the
+combined Drupal/Nuxt implementation is materially simpler than the existing
+Layout Paragraphs integration. Rendering parity alone is insufficient. Active
+upstream slot, preview, or component-source limitations that require a custom
+page-builder layer are a stop condition rather than a reason to recreate those
+features in Stir Tools.
 
 ## Drupal registration
 
