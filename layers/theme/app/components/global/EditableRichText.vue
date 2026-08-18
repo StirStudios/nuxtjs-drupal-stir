@@ -93,7 +93,8 @@ function stopEditing() {
   editSourceText.value = null
 }
 
-async function handleSaved() {
+async function handleSaved(value: string) {
+  renderedText.value = value
   isLoadingEditor.value = true
 
   try {
