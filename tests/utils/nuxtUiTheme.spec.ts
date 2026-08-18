@@ -49,6 +49,10 @@ describe('Nuxt UI theme preset', () => {
     expect(nuxtUiTheme.formField.slots.error).toContain('text-start')
   })
 
+  it('inherits Nuxt UI label styling for consistent field labels', () => {
+    expect(nuxtUiTheme.formField.slots).not.toHaveProperty('label')
+  })
+
   it('uses the same default size for text and number inputs', () => {
     expect(nuxtUiTheme.inputNumber.defaultVariants.size).toBe(
       nuxtUiTheme.input.defaultVariants.size,

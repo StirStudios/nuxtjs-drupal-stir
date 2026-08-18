@@ -135,6 +135,11 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(label.classes()).toContain('absolute')
     expect(label.classes()).toContain('pointer-events-none')
     expect(label.classes()).toContain('z-10')
+    expect(label.classes()).toContain('text-default')
+    expect(label.classes()).toContain('text-sm')
+    expect(label.classes()).toContain('font-medium')
+    expect(label.classes()).toContain('peer-placeholder-shown:text-dimmed')
+    expect(label.classes()).toContain('peer-placeholder-shown:text-base')
   })
 
   it.each([
