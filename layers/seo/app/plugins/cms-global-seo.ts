@@ -8,9 +8,6 @@ type CmsGlobalSeoConfig = {
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
   lang?: string
-  iconImage?: {
-    enabled?: boolean
-  }
   socialImage?: {
     enabled?: boolean
     format?: string
@@ -39,7 +36,6 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
     lang: typeof config.lang === 'string' && config.lang.trim() !== ''
       ? config.lang.trim()
       : 'en',
-    iconImage: config.iconImage || {},
     socialImage: config.socialImage || {},
   }
 }

@@ -58,25 +58,6 @@ describe('prepareGlobalSeoAssets', () => {
     ])
   })
 
-  it('routes supported Drupal icons through IPX but preserves ICO sources', () => {
-    const result = prepareGlobalSeoAssets(response, {
-      iconImage: { enabled: true },
-    }, source => `/_ipx/_/${source}`, 'https://www.example.com')
-
-    expect(result.link).toContainEqual({
-      rel: 'icon',
-      href: 'https://drupal.example/files/favicon.ico',
-    })
-    expect(result.link).toContainEqual({
-      rel: 'ICON',
-      href: 'https://www.example.com/_ipx/_/https://drupal.example/files/favicon.svg',
-    })
-    expect(result.link).toContainEqual({
-      rel: 'apple-touch-icon',
-      href: 'https://www.example.com/_ipx/_/https://drupal.example/files/touch.png',
-    })
-  })
-
   it('preserves Drupal URLs when asset delivery is not enabled', () => {
     expect(prepareGlobalSeoAssets(
       response,

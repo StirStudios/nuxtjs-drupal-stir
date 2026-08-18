@@ -10,9 +10,6 @@ export type CmsSocialImageConfig = {
 }
 
 export type CmsGlobalSeoAssetConfig = {
-  iconImage?: {
-    enabled?: boolean
-  }
   socialImage?: CmsSocialImageConfig
 }
 
@@ -39,21 +36,6 @@ function absoluteUrl(value: string, publicOrigin: string): string {
 
 function isSocialImageMeta(attributes: GlobalSeoAttributes): boolean {
   return attributes.property === 'og:image' || attributes.name === 'twitter:image'
-}
-
-function isIconLink(attributes: GlobalSeoAttributes): boolean {
-  const rel = attributes.rel?.trim().toLowerCase() || ''
-
-  return rel === 'apple-touch-icon' || rel.split(/\s+/).includes('icon')
-}
-
-function isIcoSource(source: string): boolean {
-  try {
-    return new URL(source, 'https://cms.invalid').pathname.toLowerCase().endsWith('.ico')
-  }
-  catch {
-    return source.toLowerCase().split(/[?#]/, 1)[0]?.endsWith('.ico') === true
-  }
 }
 
 function optimizeImage(
@@ -115,18 +97,6 @@ export function prepareGlobalSeoAssets(
       return { ...attributes, content: optimize(attributes.content) }
     }),
     link: response.link.flatMap((attributes) => {
-      if (
-        config.iconImage?.enabled === true &&
-        isIconLink(attributes) &&
-        attributes.href &&
-        !isIcoSource(attributes.href)
-      ) {
-        return [{
-          ...attributes,
-          href: optimizeImage(attributes.href, {}, imageResolver, publicOrigin),
-        }]
-      }
-
       if (!socialImage.enabled || attributes.rel !== 'image_src' || !attributes.href) {
         return [attributes]
       }

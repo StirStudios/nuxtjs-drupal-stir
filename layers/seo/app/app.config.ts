@@ -4,9 +4,6 @@ export default defineAppConfig({
     ignoredPathPrefixes: ['/account', '/auth'],
     ignoredPaths: [],
     drupalRouteNames: ['slug'],
-    iconImage: {
-      enabled: true,
-    },
     socialImage: {
       enabled: true,
       format: 'jpeg',
