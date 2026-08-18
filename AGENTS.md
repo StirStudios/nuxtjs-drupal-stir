@@ -4,6 +4,11 @@ This repository is a **Nuxt 4 layer/base theme** using **Nuxt UI 4 + Tailwind 4*
 **Lupus Decoupled Drupal (Custom Elements)** via **nuxtjs-drupal-ce**.
 Use these rules for all changes.
 
+## Required skills
+
+- For Nuxt, Vue, Nuxt UI, Nitro, Custom Elements, SSR, hydration, frontend caching, proxy, or cross-stack work, use `.agents/skills/stir-decoupled-frontend/SKILL.md`.
+- For components, content, forms, navigation, media, animation, or accessibility audits, also use `.agents/skills/stir-accessibility/SKILL.md`.
+
 ## Primary goals
 
 - Keep the layer production-safe for SSR and reusable across downstream projects.
