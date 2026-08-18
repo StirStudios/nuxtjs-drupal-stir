@@ -71,25 +71,44 @@ const spacingClass = computed(() => ({
   >
     <template #top><slot name="top" /></template>
     <template #first>
-      <div class="stir-layout-drop-region"><slot name="first" /></div>
+      <div class="stir-layout-drop-region" data-empty-label="Column 1 — drop content here"><slot name="first" /></div>
     </template>
     <template #second>
-      <div class="stir-layout-drop-region"><slot name="second" /></div>
+      <div class="stir-layout-drop-region" data-empty-label="Column 2 — drop content here"><slot name="second" /></div>
     </template>
     <template #third>
-      <div class="stir-layout-drop-region"><slot name="third" /></div>
+      <div class="stir-layout-drop-region" data-empty-label="Column 3 — drop content here"><slot name="third" /></div>
     </template>
     <template #items><slot name="items" /></template>
     <template #bottom><slot name="bottom" /></template>
   </ParagraphLayout>
 </template>
 
-<style scoped>
-/* Keep empty Canvas slots large enough to be visible and accept a drop. */
-.stir-layout-drop-region:empty,
-.stir-layout-drop-region:has(> .canvas--slot-empty-placeholder:only-child) {
+<style>
+/*
+ * Canvas wraps every external-component slot in a `display: contents`
+ * element. An empty wrapper has no box, so it cannot become a visible drop
+ * target. Give that actual Canvas-owned slot element physical dimensions.
+ */
+.stir-layout-drop-region {
+  position: relative;
+}
+
+.stir-layout-drop-region > div[style*="display: contents"] {
+  display: block !important;
   min-height: 6rem;
   border: 1px dashed color-mix(in srgb, currentColor 25%, transparent);
   border-radius: 0.375rem;
+}
+
+.stir-layout-drop-region:has(> div[style*="display: contents"]:empty)::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+  font-size: 0.875rem;
+  pointer-events: none;
+  content: attr(data-empty-label);
 }
 </style>
