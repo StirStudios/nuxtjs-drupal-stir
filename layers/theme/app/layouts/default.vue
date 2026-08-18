@@ -24,7 +24,7 @@ const normalizedNavigationMode = computed<HeaderMode>(() => {
   <div class="flex min-h-dvh flex-col">
     <AppHeader :mode="normalizedNavigationMode" />
 
-    <UMain id="main-content" class="flex-1" role="main">
+    <UMain id="main-content" class="flex-1" role="main" tabindex="-1">
       <SiteMessages />
       <slot />
     </UMain>

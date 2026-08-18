@@ -5,7 +5,7 @@ const { hasEditorialAccess } = usePageContext()
 <template>
   <div class="flex min-h-dvh flex-col">
     <LazyDrupalTabs v-if="hasEditorialAccess" />
-    <UMain id="main-content" as="main" class="flex-1" role="main">
+    <UMain id="main-content" as="main" class="flex-1" role="main" tabindex="-1">
       <slot />
     </UMain>
   </div>

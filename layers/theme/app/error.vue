@@ -49,7 +49,7 @@ const safeRedirect = computed(() => (route.path === '/' ? undefined : '/'))
 </script>
 
 <template>
-  <UMain id="main-content" as="main" role="main">
+  <UMain id="main-content" as="main" role="main" tabindex="-1">
     <UError
       :clear="clearAction"
       :error="renderedError"
