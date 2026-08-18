@@ -54,7 +54,9 @@ describe('node override contract', () => {
   it('keeps page metadata safe while a client-side alias redirect retires its page', () => {
     const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
 
-    expect(pageRoute).toContain('const pageHead = computed(() => page.value || {')
+    expect(pageRoute).toContain('const currentPage = page.value || {')
+    expect(pageRoute).toContain('prepareGlobalSeoAssets(')
+    expect(pageRoute).toContain('metatags as GlobalSeoResponse')
     expect(pageRoute).toContain('usePageHead(pageHead, [\'meta\', \'link\'])')
   })
 
