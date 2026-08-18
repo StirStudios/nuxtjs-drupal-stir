@@ -3,6 +3,7 @@ import {
   resolveLayoutImageDeliveryProfile,
   resolveCarouselImageDeliverySizes,
   resolveImageDeliveryProfile,
+  resolveMediaGalleryDeliveryProfile,
   versionImageSource,
 } from '../../layers/theme/app/utils/imageDelivery'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
@@ -29,6 +30,26 @@ describe('versionImageSource', () => {
   it('returns an unversioned source when revision metadata is unavailable', () => {
     expect(versionImageSource('/files/photo.jpg', undefined)).toBe('/files/photo.jpg')
     expect(versionImageSource(undefined, '42-1710000000-293400')).toBeUndefined()
+  })
+})
+
+describe('resolveMediaGalleryDeliveryProfile', () => {
+  it('keeps stacked gallery images on the container profile', () => {
+    expect(resolveMediaGalleryDeliveryProfile('grid grid-cols-1 gap-10', 2))
+      .toBe('container')
+  })
+
+  it('uses split and card profiles for multi-column galleries', () => {
+    expect(resolveMediaGalleryDeliveryProfile('grid grid-cols-2', 2))
+      .toBe('split')
+    expect(resolveMediaGalleryDeliveryProfile('grid md:grid-cols-3', 3))
+      .toBe('card')
+  })
+
+  it('preserves the item-count fallback without authored grid classes', () => {
+    expect(resolveMediaGalleryDeliveryProfile(undefined, 2)).toBe('split')
+    expect(resolveMediaGalleryDeliveryProfile(undefined, 3)).toBe('card')
+    expect(resolveMediaGalleryDeliveryProfile('grid-cols-1', 1)).toBeUndefined()
   })
 })
 
