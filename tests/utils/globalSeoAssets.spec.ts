@@ -41,6 +41,29 @@ describe('prepareGlobalSeoAssets', () => {
     expect(result.meta[0]?.content).toBe('https://www.example.com/_ipx/f_jpeg/og.jpg')
   })
 
+  it('preserves malformed versioned sources instead of aborting head rendering', () => {
+    const malformed: GlobalSeoResponse = {
+      ...response,
+      meta: [{ property: 'og:image', content: 'not a valid absolute URL' }],
+    }
+    const result = prepareGlobalSeoAssets(malformed, {
+      socialImage: { enabled: true, version: 'asset-42' },
+    }, source => `/_ipx/${source}`, 'https://www.example.com')
+
+    expect(result.meta[0]?.content).toBe('not a valid absolute URL')
+  })
+
+  it('honors the top-level SEO disable flag', () => {
+    const image = vi.fn((source: string) => `/_ipx/${source}`)
+    const result = prepareGlobalSeoAssets(response, {
+      enabled: false,
+      socialImage: { enabled: true },
+    }, image, 'https://www.example.com')
+
+    expect(result).toEqual(response)
+    expect(image).not.toHaveBeenCalled()
+  })
+
   it('preserves Drupal-owned icon links', () => {
     const result = prepareGlobalSeoAssets(
       response,

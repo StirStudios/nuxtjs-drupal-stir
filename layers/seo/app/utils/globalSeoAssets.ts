@@ -10,6 +10,7 @@ export type CmsSocialImageConfig = {
 }
 
 export type CmsGlobalSeoAssetConfig = {
+  enabled?: boolean
   socialImage?: CmsSocialImageConfig
 }
 
@@ -58,12 +59,17 @@ function optimizeSocialImage(
   imageResolver: SeoImageResolver,
   publicOrigin: string,
 ): string {
-  return optimizeImage(withVersion(source, config.version), {
-    format: config.format,
-    height: config.height,
-    quality: config.quality,
-    width: config.width,
-  }, imageResolver, publicOrigin)
+  try {
+    return optimizeImage(withVersion(source, config.version), {
+      format: config.format,
+      height: config.height,
+      quality: config.quality,
+      width: config.width,
+    }, imageResolver, publicOrigin)
+  }
+  catch {
+    return source
+  }
 }
 
 export function prepareGlobalSeoAssets(
@@ -72,6 +78,8 @@ export function prepareGlobalSeoAssets(
   imageResolver: SeoImageResolver,
   publicOrigin: string,
 ): GlobalSeoResponse {
+  if (config.enabled === false) return response
+
   const socialImage = {
     enabled: config.socialImage?.enabled === true,
     format: config.socialImage?.format || 'jpeg',
