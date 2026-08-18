@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AccordionItem } from '@nuxt/ui'
-import type { VNode } from 'vue'
+import type { Slots, VNode } from 'vue'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 defineOptions({
@@ -35,6 +35,7 @@ type AccordionItemProps = {
 }
 
 type AccordionEntry = AccordionItem & {
+  buttonNodes: VNode[]
   contentHtml: string
   editLink?: string
   parentUuid?: string
@@ -62,12 +63,14 @@ const accordionNodes = computed<VNode[]>(() => {
 const items = computed<AccordionEntry[]>(() =>
   accordionNodes.value.map((node, index) => {
     const itemProps = (node.props ?? {}) as AccordionItemProps
+    const itemSlots = node.children as Slots | null
     const label = itemProps.header ?? `Item ${index + 1}`
     const value = String(itemProps.uuid ?? itemProps.id ?? index)
 
     return {
       label,
       value,
+      buttonNodes: itemSlots?.buttons?.() ?? [],
       contentHtml: trustedDrupalHtml(itemProps.text),
       editLink: itemProps.editLink,
       parentUuid: itemProps.parentUuid,
@@ -115,6 +118,12 @@ const items = computed<AccordionEntry[]>(() =>
           v-if="item.contentHtml"
           class="prose text-muted max-w-none"
           v-html="item.contentHtml"
+        />
+
+        <component
+          :is="node"
+          v-for="(node, index) in item.buttonNodes"
+          :key="node.key ?? index"
         />
 
         <EditLink :link="item.editLink" :parent-uuid="item.parentUuid" />
