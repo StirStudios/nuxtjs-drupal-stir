@@ -23,3 +23,15 @@ export default defineNuxtConfig({
 Robots module is registered only when this SEO capability is selected.
 Global metadata is disabled by default and can be enabled or scoped through
 `cmsGlobalSeo` app config.
+
+Consumers may set `cmsGlobalSeo.socialImage.enabled` to route Drupal's global
+`og:image`, `twitter:image`, and `image_src` source through the configured Nuxt
+Image provider. With `NUXT_IMAGE_CDN`, the resulting absolute URL uses the
+pull-CDN `/_ipx/**` origin; without it, the URL uses the current frontend origin.
+Set `socialImage.version` when a stable Drupal file path is replaced so immutable
+IPX/CDN caches receive a new URL.
+
+Set `cmsGlobalSeo.iconLinks` to frontend-owned favicon and manifest links. When
+present, these replace Drupal-provided icon links while leaving other CMS links
+untouched. Store those small shell assets in the consumer's `public/` directory;
+do not send favicons through IPX.

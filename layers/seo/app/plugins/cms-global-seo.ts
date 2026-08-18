@@ -1,4 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
+import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -6,6 +7,15 @@ type CmsGlobalSeoConfig = {
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
   lang?: string
+  iconLinks?: Array<Record<string, string>>
+  socialImage?: {
+    enabled?: boolean
+    format?: string
+    height?: number
+    quality?: number
+    version?: string
+    width?: number
+  }
 }
 
 type UseHeadFactory = Extract<
@@ -27,6 +37,8 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
     lang: typeof config.lang === 'string' && config.lang.trim() !== ''
       ? config.lang.trim()
       : 'en',
+    iconLinks: Array.isArray(config.iconLinks) ? config.iconLinks : [],
+    socialImage: config.socialImage || {},
   }
 }
 
@@ -85,6 +97,8 @@ export default defineNuxtPlugin(async () => {
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   const defaults = useState<GlobalSeoResponse | null>('cms-global-seo', () => null)
   const lang = computed(() => defaults.value?.lang || config.lang)
+  const image = useImage()
+  const publicOrigin = useRequestURL().origin
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
@@ -102,10 +116,17 @@ export default defineNuxtPlugin(async () => {
         return head as ConsumerReactiveHead
       }
 
+      const prepared = prepareGlobalSeoAssets(
+        defaults.value,
+        config,
+        (source, modifiers) => image(source, modifiers),
+        publicOrigin,
+      )
+
       return {
         ...head,
-        link: withLinkKeys(defaults.value.link),
-        meta: withMetaKeys(defaults.value.meta),
+        link: withLinkKeys(prepared.link),
+        meta: withMetaKeys(prepared.meta),
       } as unknown as ConsumerReactiveHead
     },
     {
