@@ -51,6 +51,13 @@ describe('resolveMediaGalleryDeliveryProfile', () => {
     expect(resolveMediaGalleryDeliveryProfile(undefined, 3)).toBe('card')
     expect(resolveMediaGalleryDeliveryProfile('grid-cols-1', 1)).toBeUndefined()
   })
+
+  it('uses active masonry lanes instead of retained grid classes', () => {
+    expect(resolveMediaGalleryDeliveryProfile('grid-cols-1', 3, 3))
+      .toBe('card')
+    expect(resolveMediaGalleryDeliveryProfile('grid-cols-4', 3, 1))
+      .toBe('container')
+  })
 })
 
 describe('resolveImageDeliveryProfile', () => {

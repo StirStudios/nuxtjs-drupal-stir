@@ -121,19 +121,20 @@ const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
+const lanes = computed(() => resolveResponsiveGridValue(
+  props.masonry?.lanes,
+  viewportWidth.value,
+  1,
+))
 const deliveryProfile = computed(() => {
   if (!isVisualGallery.value) return undefined
 
   return resolveMediaGalleryDeliveryProfile(
     props.gridItems,
     slotMediaOrdered.value.length,
+    props.masonry ? lanes.value : undefined,
   )
 })
-const lanes = computed(() => resolveResponsiveGridValue(
-  props.masonry?.lanes,
-  viewportWidth.value,
-  1,
-))
 
 onMounted(() => {
   hydrated.value = true

@@ -32,8 +32,15 @@ export function resolveLayoutImageDeliveryProfile(
 export function resolveMediaGalleryDeliveryProfile(
   gridItems: string | undefined,
   itemCount: number,
+  laneCount?: number,
 ): string | undefined {
   if (itemCount <= 1) return undefined
+
+  if (laneCount !== undefined) {
+    if (laneCount >= 3) return 'card'
+    if (laneCount === 2) return 'split'
+    return 'container'
+  }
 
   const columns = [...(gridItems || '').matchAll(
     /(?:^|[:\s])(?:grid-cols-|grid_col_|col_?)(\d+)(?:\s|$)/g,

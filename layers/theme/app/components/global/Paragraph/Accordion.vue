@@ -64,7 +64,7 @@ const items = computed<AccordionEntry[]>(() =>
   accordionNodes.value.map((node, index) => {
     const itemProps = (node.props ?? {}) as AccordionItemProps
     const itemSlots = node.children as Slots | null
-    const label = itemProps.header ?? `Item ${index + 1}`
+    const label = itemProps.header?.trim() || `Item ${index + 1}`
     const value = String(itemProps.uuid ?? itemProps.id ?? index)
 
     return {

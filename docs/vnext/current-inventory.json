@@ -214,6 +214,7 @@
       "layers/theme/app/components/global/Media/Link.vue",
       "layers/theme/app/components/global/Media/Video.vue",
       "layers/theme/app/components/global/NodeTeaser.vue",
+      "layers/theme/app/components/global/Paragraph/Accordion.vue",
       "layers/theme/app/components/global/Paragraph/Button.vue",
       "layers/theme/app/components/global/Paragraph/Calculator.vue",
       "layers/theme/app/components/global/Paragraph/Calendly.vue",
@@ -531,6 +532,7 @@
         "layers/theme/app/components/global/Media/Link.vue",
         "layers/theme/app/components/global/Media/Video.vue",
         "layers/theme/app/components/global/NodeTeaser.vue",
+        "layers/theme/app/components/global/Paragraph/Accordion.vue",
         "layers/theme/app/components/global/Paragraph/Button.vue",
         "layers/theme/app/components/global/Paragraph/Calculator.vue",
         "layers/theme/app/components/global/Paragraph/Calendly.vue",
@@ -718,7 +720,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 125,
+    "components": 126,
     "composables": 63,
     "utils": 52,
     "plugins": 7,
@@ -726,11 +728,11 @@
     "serverRoutes": 27,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 141,
+    "tests": 142,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 49,
+      "nuxt": 50,
       "server": 24,
       "unit": 8,
       "utils": 47
@@ -774,6 +776,7 @@
     "tests/nuxt/runtime/NodePage.nuxt.spec.ts",
     "tests/nuxt/runtime/NodeTeaser.nuxt.spec.ts",
     "tests/nuxt/runtime/OptionValue.nuxt.spec.ts",
+    "tests/nuxt/runtime/ParagraphAccordion.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphDefault.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphFeature.nuxt.spec.ts",
