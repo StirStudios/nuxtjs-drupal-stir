@@ -20,7 +20,6 @@ describe('Canvas integration', () => {
   it.each([
     ['Hero', 'ParagraphHero'],
     ['RichText', 'ParagraphText'],
-    ['Layout', 'ParagraphLayout'],
     ['Button', 'ParagraphButton'],
     ['MediaCollection', 'ParagraphMedia'],
   ])('keeps the %s Canvas contract backed by the shared %s renderer', (
@@ -74,7 +73,8 @@ describe('Canvas integration', () => {
     const componentSource = source('layers/theme/app/components/global/Stir/Layout.vue')
 
     expect(componentSource).toContain('layout: \'three-column\'')
-    expect(componentSource.match(/class="stir-layout-drop-region"/g)).toHaveLength(3)
+    expect(componentSource.match(/stir-layout-drop-region" data-empty-label/g)).toHaveLength(3)
+    expect(componentSource.match(/<slot name="(first|second|third)"/g)).toHaveLength(3)
     expect(componentSource).toContain('min-height: 6rem')
   })
 })

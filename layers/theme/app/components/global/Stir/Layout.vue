@@ -30,12 +30,6 @@ defineSlots<{
   bottom?(): unknown
 }>()
 
-const layoutName = computed(() => ({
-  'one-column': 'one_column',
-  'two-column': 'two_column',
-  'three-column': 'three_column',
-  grid: 'grid',
-}[props.layout || 'one-column']))
 const gridClass = computed(() => ({
   'one-column': 'grid grid-cols-1 gap-6',
   'two-column': 'grid grid-cols-1 gap-6 lg:grid-cols-2',
@@ -57,31 +51,35 @@ const spacingClass = computed(() => ({
 </script>
 
 <template>
-  <ParagraphLayout
-    :card="card"
-    :container="true"
-    :direction="animation === 'none' ? undefined : animation"
-    :grid-class="gridClass"
-    :header="heading"
-    :header-tag="headingLevel"
-    :layout="layoutName"
-    :reverse-mobile="reverseOnMobile"
-    :spacing="spacingClass"
-    :width="widthClass"
-  >
-    <template #top><slot name="top" /></template>
-    <template #first>
-      <div class="stir-layout-drop-region" data-empty-label="Column 1 — drop content here"><slot name="first" /></div>
-    </template>
-    <template #second>
-      <div class="stir-layout-drop-region" data-empty-label="Column 2 — drop content here"><slot name="second" /></div>
-    </template>
-    <template #third>
-      <div class="stir-layout-drop-region" data-empty-label="Column 3 — drop content here"><slot name="third" /></div>
-    </template>
-    <template #items><slot name="items" /></template>
-    <template #bottom><slot name="bottom" /></template>
-  </ParagraphLayout>
+  <section :class="['content', spacingClass]">
+    <WrapGrid
+      :card="card"
+      :container="true"
+      :grid-items="gridClass"
+      :width="widthClass"
+    >
+      <component
+        :is="headingLevel || 'h2'"
+        v-if="heading"
+        class="col-span-full"
+      >
+        {{ heading }}
+      </component>
+
+      <div class="region top col-span-full"><slot name="top" /></div>
+      <div class="region first stir-layout-drop-region" data-empty-label="Column 1 — drop content here">
+        <slot name="first" />
+      </div>
+      <div class="region second stir-layout-drop-region" data-empty-label="Column 2 — drop content here">
+        <slot name="second" />
+      </div>
+      <div class="region third stir-layout-drop-region" data-empty-label="Column 3 — drop content here">
+        <slot name="third" />
+      </div>
+      <div class="region items"><slot name="items" /></div>
+      <div class="region bottom col-span-full"><slot name="bottom" /></div>
+    </WrapGrid>
+  </section>
 </template>
 
 <style>
