@@ -16,7 +16,7 @@ export default defineAppConfig({
       fieldGroup: 'mb-14 space-y-5',
       fieldInput: 'w-full',
       fieldText: '',
-      response: 'bg-muted rounded-lg px-6 py-3 italic',
+      response: 'bg-muted rounded-lg p-6 italic',
       description: 'text-muted mb-2 text-sm',
       help: 'text-muted my-3 text-sm',
       submitAlign: '',
