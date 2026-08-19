@@ -3,12 +3,20 @@ export interface WebformRedirectTarget {
   external: boolean
 }
 
+export type SupportedWebformConfirmationType = 'inline' | 'url'
+
+export function normalizeWebformConfirmationType(
+  confirmationType: unknown,
+): SupportedWebformConfirmationType {
+  return confirmationType === 'url' ? 'url' : 'inline'
+}
+
 export function resolveWebformRedirect(
   confirmationType: unknown,
   redirect: unknown,
 ): WebformRedirectTarget | null {
   if (
-    !['url', 'url_message'].includes(String(confirmationType))
+    normalizeWebformConfirmationType(confirmationType) !== 'url'
     || typeof redirect !== 'string'
   ) {
     return null

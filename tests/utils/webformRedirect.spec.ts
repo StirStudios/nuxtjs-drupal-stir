@@ -1,17 +1,34 @@
 import { describe, expect, it } from 'vitest'
-import { resolveWebformRedirect } from '../../layers/webform/app/utils/webformRedirect'
+import {
+  normalizeWebformConfirmationType,
+  resolveWebformRedirect,
+} from '../../layers/webform/app/utils/webformRedirect'
+
+describe('normalizeWebformConfirmationType', () => {
+  it('preserves the supported confirmation types', () => {
+    expect(normalizeWebformConfirmationType('inline')).toBe('inline')
+    expect(normalizeWebformConfirmationType('url')).toBe('url')
+  })
+
+  it.each([
+    'page',
+    'message',
+    'modal',
+    'url_message',
+    'none',
+    '',
+    null,
+    undefined,
+    'unknown',
+  ])('defaults unsupported confirmation type %s to inline', (type) => {
+    expect(normalizeWebformConfirmationType(type)).toBe('inline')
+  })
+})
 
 describe('resolveWebformRedirect', () => {
   it('accepts a root-relative Drupal confirmation URL', () => {
     expect(resolveWebformRedirect('url', '/thanks')).toEqual({
       to: '/thanks',
-      external: false,
-    })
-  })
-
-  it('maps Drupal url_message front-page redirects to Nuxt root', () => {
-    expect(resolveWebformRedirect('url_message', '<front>')).toEqual({
-      to: '/',
       external: false,
     })
   })
@@ -24,7 +41,12 @@ describe('resolveWebformRedirect', () => {
   })
 
   it.each([
+    ['inline', '/thanks'],
+    ['page', '/thanks'],
     ['message', '/thanks'],
+    ['modal', '/thanks'],
+    ['url_message', '/thanks'],
+    ['none', '/thanks'],
     ['url', 'javascript:alert(1)'],
     ['url', '//example.com/thanks'],
     ['url', 'relative/path'],
