@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { resolvePageRequest } from '../../layers/theme/app/utils/pageRequest'
 
 describe('resolvePageRequest', () => {
+  it('falls back to the homepage while a route path is unavailable', () => {
+    expect(resolvePageRequest({})).toEqual({
+      path: '/',
+      key: '/',
+    })
+  })
+
   it('returns the current route path and a path-scoped cache key by default', () => {
     const resolved = resolvePageRequest({
       path: '/about',
