@@ -32,4 +32,31 @@ describe('Turnstile configuration', () => {
       'Security verification could not be completed',
     )
   })
+
+  it('collapses only inactive Webform spacing', async () => {
+    const wrapper = await mountSuspended(FieldTurnstile, {
+      props: { collapseWhenInactive: true },
+      global: {
+        stubs: {
+          LazyNuxtTurnstile: {
+            name: 'LazyNuxtTurnstile',
+            props: ['modelValue', 'options'],
+            template: '<div />',
+          },
+        },
+      },
+    })
+    const turnstile = wrapper.findComponent({ name: 'NuxtTurnstile' })
+    const options = turnstile.props('options') as Record<string, () => unknown>
+
+    expect(wrapper.classes()).toContain('mb-0!')
+
+    options['before-interactive-callback']?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.classes()).not.toContain('mb-0!')
+
+    options['after-interactive-callback']?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.classes()).toContain('mb-0!')
+  })
 })

@@ -3,13 +3,20 @@ type TurnstileTheme = {
   appearance?: 'always' | 'execute' | 'interaction-only'
 }
 
+const props = withDefaults(defineProps<{
+  collapseWhenInactive?: boolean
+}>(), {
+  collapseWhenInactive: false,
+})
 const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
 const verificationFailed = ref(false)
+const isInteractive = ref(false)
 
 const clearVerification = () => {
   turnstileToken.value = ''
+  isInteractive.value = false
 }
 
 const handleVerificationError = () => {
@@ -18,19 +25,39 @@ const handleVerificationError = () => {
   return true
 }
 
+const handleInteractiveStart = () => {
+  isInteractive.value = true
+}
+
+const handleInteractiveEnd = () => {
+  isInteractive.value = false
+}
+
 watch(turnstileToken, (token) => {
   if (token) verificationFailed.value = false
 })
 </script>
 
 <template>
-  <div :class="['text-sm', { 'pt-8': verificationFailed }]">
+  <div
+    :class="[
+      'text-sm',
+      {
+        'mb-0!':
+          props.collapseWhenInactive &&
+          !isInteractive &&
+          !verificationFailed,
+      },
+    ]"
+  >
     <LazyNuxtTurnstile
       v-model="turnstileToken"
       class="max-w-xs overflow-x-hidden"
       :options="{
         appearance: themeTurnstile.appearance,
         size: 'flexible',
+        'after-interactive-callback': handleInteractiveEnd,
+        'before-interactive-callback': handleInteractiveStart,
         'error-callback': handleVerificationError,
         'expired-callback': clearVerification,
         'timeout-callback': handleVerificationError,

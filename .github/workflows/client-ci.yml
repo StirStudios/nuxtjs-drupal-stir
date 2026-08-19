@@ -1,0 +1,32 @@
+name: Client CI
+
+on:
+  workflow_call:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      STIR_PRESENTATION_MANIFEST_FIXTURE: "1"
+
+    steps:
+      - name: Checkout client
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify lint, types, tests and production build
+        run: pnpm verify:ci
