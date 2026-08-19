@@ -222,8 +222,6 @@
       "layers/theme/app/components/global/Paragraph/CarouselItem.vue",
       "layers/theme/app/components/global/Paragraph/Default.vue",
       "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
-      "layers/theme/app/components/global/Paragraph/Faq.vue",
-      "layers/theme/app/components/global/Paragraph/FaqItem.vue",
       "layers/theme/app/components/global/Paragraph/Feature.vue",
       "layers/theme/app/components/global/Paragraph/Hero.vue",
       "layers/theme/app/components/global/Paragraph/Icon.vue",
@@ -540,8 +538,6 @@
         "layers/theme/app/components/global/Paragraph/CarouselItem.vue",
         "layers/theme/app/components/global/Paragraph/Default.vue",
         "layers/theme/app/components/global/Paragraph/Enzuzo.vue",
-        "layers/theme/app/components/global/Paragraph/Faq.vue",
-        "layers/theme/app/components/global/Paragraph/FaqItem.vue",
         "layers/theme/app/components/global/Paragraph/Feature.vue",
         "layers/theme/app/components/global/Paragraph/Hero.vue",
         "layers/theme/app/components/global/Paragraph/Icon.vue",
@@ -720,7 +716,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 126,
+    "components": 124,
     "composables": 63,
     "utils": 52,
     "plugins": 7,

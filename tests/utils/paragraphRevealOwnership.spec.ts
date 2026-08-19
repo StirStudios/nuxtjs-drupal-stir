@@ -13,7 +13,6 @@ const ownership = {
     'Calculator.vue',
     'Calendly.vue',
     'Enzuzo.vue',
-    'Faq.vue',
     'Accordion.vue',
     'Feature.vue',
     'Icon.vue',
@@ -26,7 +25,6 @@ const ownership = {
   internal: [
     'CarouselItem.vue',
     'Default.vue',
-    'FaqItem.vue',
     'MediaModal.vue',
     'Tab.vue',
     'TimelineItem.vue',
