@@ -12,15 +12,25 @@ const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
 const verificationFailed = ref(false)
+const isInteractive = ref(false)
 
 const clearVerification = () => {
   turnstileToken.value = ''
+  isInteractive.value = false
 }
 
 const handleVerificationError = () => {
   clearVerification()
   verificationFailed.value = true
   return true
+}
+
+const handleInteractiveStart = () => {
+  isInteractive.value = true
+}
+
+const handleInteractiveEnd = () => {
+  isInteractive.value = false
 }
 
 watch(turnstileToken, (token) => {
@@ -33,9 +43,10 @@ watch(turnstileToken, (token) => {
     :class="[
       'text-sm',
       {
-        'absolute has-[iframe]:relative':
-          props.collapseWhenInactive && !verificationFailed,
-        'pt-8': verificationFailed,
+        'mb-0!':
+          props.collapseWhenInactive &&
+          !isInteractive &&
+          !verificationFailed,
       },
     ]"
   >
@@ -45,6 +56,8 @@ watch(turnstileToken, (token) => {
       :options="{
         appearance: themeTurnstile.appearance,
         size: 'flexible',
+        'after-interactive-callback': handleInteractiveEnd,
+        'before-interactive-callback': handleInteractiveStart,
         'error-callback': handleVerificationError,
         'expired-callback': clearVerification,
         'timeout-callback': handleVerificationError,
