@@ -3,6 +3,11 @@ type TurnstileTheme = {
   appearance?: 'always' | 'execute' | 'interaction-only'
 }
 
+const props = withDefaults(defineProps<{
+  collapseWhenInactive?: boolean
+}>(), {
+  collapseWhenInactive: false,
+})
 const turnstileToken = defineModel<string>()
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
@@ -24,7 +29,16 @@ watch(turnstileToken, (token) => {
 </script>
 
 <template>
-  <div :class="['text-sm', { 'pt-8': verificationFailed }]">
+  <div
+    :class="[
+      'text-sm',
+      {
+        'absolute has-[iframe]:relative':
+          props.collapseWhenInactive && !verificationFailed,
+        'pt-8': verificationFailed,
+      },
+    ]"
+  >
     <LazyNuxtTurnstile
       v-model="turnstileToken"
       class="max-w-xs overflow-x-hidden"
