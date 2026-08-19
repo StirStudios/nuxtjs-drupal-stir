@@ -144,6 +144,7 @@ const submitButtonProps = computed(() => ({
     </template>
 
     <FieldTurnstile
+      class="mt-0! has-[iframe]:pt-8"
       :model-value="turnstileToken"
       @update:model-value="emit('update:turnstileToken', String($event ?? ''))"
     />

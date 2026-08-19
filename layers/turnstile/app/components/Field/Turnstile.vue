@@ -24,7 +24,7 @@ watch(turnstileToken, (token) => {
 </script>
 
 <template>
-  <div class="text-sm">
+  <div :class="['text-sm', { 'pt-8': verificationFailed }]">
     <LazyNuxtTurnstile
       v-model="turnstileToken"
       class="max-w-xs overflow-x-hidden"
