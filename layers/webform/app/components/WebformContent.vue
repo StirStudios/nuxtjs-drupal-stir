@@ -49,7 +49,9 @@ const trustedHtml = (value?: string) => trustedDrupalHtml(value)
 const buttonSize = computed<UiSize>(() =>
   resolveUiSize(props.themeWebform.submitButtonSize, 'md'),
 )
-const submitDisabled = computed(() => !props.isSchemaReady || props.isLoading)
+const submitDisabled = computed(
+  () => !props.isSchemaReady || props.isLoading || !props.turnstileToken,
+)
 const nuxtApp = useNuxtApp()
 const submitComponent = computed(() => {
   const componentName = props.themeWebform.submitComponent?.trim()
