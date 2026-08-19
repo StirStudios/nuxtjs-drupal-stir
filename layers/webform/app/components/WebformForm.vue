@@ -290,6 +290,8 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     isFormSubmitted.value = true
   } catch (error) {
     console.error('Submission Error:', error)
+    turnstileToken.value = ''
+    formResetKey.value += 1
     const errorData = (
       error as { response?: { _data?: Record<string, unknown> } }
     )?.response?._data as

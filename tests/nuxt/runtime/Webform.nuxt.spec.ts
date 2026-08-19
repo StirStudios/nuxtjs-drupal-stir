@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
+import WebformContent from '../../../layers/webform/app/components/WebformContent.vue'
 import Webform from '../../../layers/webform/app/components/WebformForm.vue'
 import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
@@ -31,16 +32,35 @@ const webform = {
 } satisfies WebformDefinition
 
 describe('Webform (Nuxt runtime)', () => {
-  it('loads validation when the lazy-hydrated form mounts', async () => {
-    const wrapper = await mountSuspended(Webform, {
-      props: { webform },
+  it('keeps submission disabled until security verification completes', async () => {
+    const wrapper = await mountSuspended(WebformContent, {
+      props: {
+        fields: {},
+        state: {},
+        isFormSubmitted: false,
+        isLoading: false,
+        isSchemaReady: true,
+        orderedFieldNames: [],
+        themeWebform: {},
+        groupedFields: {},
+        shouldRenderGroupContainer: () => false,
+        shouldRenderIndividualField: () => false,
+        getGroupFields: () => [],
+        isContainerVisible: () => true,
+        submitButtonLabel: 'Submit',
+        webformConfirmation: '',
+        turnstileToken: '',
+      },
     })
 
     await flushPromises()
 
-    await vi.waitFor(() => {
-      expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeUndefined()
-    })
+    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
+
+    await wrapper.setProps({ turnstileToken: 'token' })
+    await flushPromises()
+
+    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeUndefined()
   })
 
   it('forwards Drupal props through the lazy hydration boundary', async () => {
