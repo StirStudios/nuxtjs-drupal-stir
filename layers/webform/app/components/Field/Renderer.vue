@@ -61,6 +61,14 @@ const componentMap: Record<string, Component> = {
   webform_video_file: LazyFieldFile,
 }
 
+const materialTextFieldTypes = new Set([
+  'textfield',
+  'email',
+  'number',
+  'tel',
+  'textarea',
+])
+
 const shouldRender = computed(() => {
   return (
     props.bypassRelocatedFilter === true ||
@@ -116,18 +124,41 @@ const helpContent = computed(() =>
   trustedDrupalHtml(String(props.field['#help'] ?? '')),
 )
 const labelClass = computed(() => String(props.field['#class'] ?? ''))
+const fieldContainerClass = computed(() => {
+  if (
+    (resolvedFieldType.value === 'checkboxes' ||
+      resolvedFieldType.value === 'radio') &&
+    shouldShowLabel.value
+  ) {
+    return 'mt-2'
+  }
+
+  if (
+    webform.fieldVariant === 'material' &&
+    materialTextFieldTypes.has(resolvedFieldType.value) &&
+    !useFloatingLabels.value
+  ) {
+    return '-mt-0.5'
+  }
+
+  return undefined
+})
 const fieldUi = computed(() => {
   if (
     resolvedFieldType.value === 'checkbox' ||
     resolvedFieldType.value === 'checkboxes'
   ) {
     return {
+      container: fieldContainerClass.value,
       label: labelClass.value,
       error: 'mt-1 ms-6 text-error',
     }
   }
 
-  return { label: labelClass.value }
+  return {
+    container: fieldContainerClass.value,
+    label: labelClass.value,
+  }
 })
 </script>
 

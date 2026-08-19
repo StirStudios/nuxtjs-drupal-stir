@@ -112,6 +112,92 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     })
 
     expect(wrapper.find('[data-slot="label"]').text()).toBe('Example field')
+    expect(wrapper.find('.form-input').element.parentElement?.classList)
+      .toContain('mt-2')
+  })
+
+  it('adds the same label gap to radio groups', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'radio',
+      '#name': 'example_field',
+      '#title': 'Example field',
+      '#options': { first: 'First choice' },
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+
+    expect(wrapper.find('.form-input').element.parentElement?.classList)
+      .toContain('mt-2')
+  })
+
+  it('does not add a group-label gap to standalone checkboxes', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'checkbox',
+      '#name': 'example_field',
+      '#title': 'Example field',
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+
+    expect(wrapper.find('.form-input').element.parentElement?.classList)
+      .not.toContain('mt-2')
+  })
+
+  it('tightens static material text labels without affecting floating labels', async () => {
+    const appConfig = useAppConfig()
+    const webform = appConfig.stirTheme.webform
+    const previousVariant = webform.fieldVariant
+
+    webform.fieldVariant = 'material'
+
+    try {
+      const staticWrapper = await mountSuspended(FieldRenderer, {
+        props: {
+          field: {
+            '#type': 'textfield',
+            '#name': 'static_field',
+            '#title': 'Static field',
+            '#floatingLabel': false,
+          },
+          fieldName: 'static_field',
+          state: {},
+        },
+      })
+      const floatingWrapper = await mountSuspended(FieldRenderer, {
+        props: {
+          field: {
+            '#type': 'textfield',
+            '#name': 'floating_field',
+            '#title': 'Floating field',
+            '#floatingLabel': true,
+          },
+          fieldName: 'floating_field',
+          state: {},
+        },
+      })
+
+      expect(
+        staticWrapper.find('input').element.parentElement?.parentElement?.classList,
+      ).toContain('-mt-0.5')
+      expect(
+        floatingWrapper.find('input').element.parentElement?.parentElement?.classList,
+      ).not.toContain('-mt-0.5')
+    }
+    finally {
+      webform.fieldVariant = previousVariant
+    }
   })
 
   it('keeps structural floating-label classes independent of app config', async () => {
