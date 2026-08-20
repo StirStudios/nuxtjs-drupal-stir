@@ -3,7 +3,6 @@ import { useWindowScroll } from '@vueuse/core'
 type PopupBehaviorConfig = {
   trigger: string
   delay?: number
-  showOnce?: boolean
   scrollThreshold: number
 }
 
@@ -18,7 +17,6 @@ type PopupBehaviorOptions = {
   config: Ref<PopupBehaviorConfig>
   suppress?: Ref<boolean>
   minDelayMs?: number
-  cookieKey?: string
 }
 
 export const usePopupBehavior = ({
@@ -26,16 +24,11 @@ export const usePopupBehavior = ({
   config,
   suppress,
   minDelayMs = 3000,
-  cookieKey = 'marketing_popup',
 }: PopupBehaviorOptions) => {
   const route = useRoute()
   const { y } = useWindowScroll()
 
   const open = ref(false)
-  const seen = useCookie<boolean | undefined>(cookieKey, {
-    maxAge: 60 * 60 * 24 * 7,
-    sameSite: 'lax',
-  })
   const hasTriggered = ref(false)
   const readyForPopupTriggers = ref(!import.meta.client)
   const isSuppressed = computed(() => suppress?.value === true)
@@ -135,13 +128,15 @@ export const usePopupBehavior = ({
 
   const showModalOnce = () => {
     if (isSuppressed.value) return
-    if (open.value || (config.value.showOnce && seen.value === true)) return
+    if (open.value) return
 
     open.value = true
+  }
 
-    if (config.value.showOnce) {
-      seen.value = true
-    }
+  const startDelayTrigger = () => {
+    const safeDelay = Math.max(config.value.delay ?? 0, minDelayMs)
+
+    delayTimer = setTimeout(showModalOnce, safeDelay)
   }
 
   const handleTrigger = () => {
@@ -153,9 +148,7 @@ export const usePopupBehavior = ({
     hasTriggered.value = true
 
     if (config.value.trigger === 'delay') {
-      const safeDelay = Math.max(config.value.delay ?? 0, minDelayMs)
-
-      delayTimer = setTimeout(showModalOnce, safeDelay)
+      startDelayTrigger()
     }
 
     if (config.value.trigger === 'scroll') {
@@ -179,6 +172,14 @@ export const usePopupBehavior = ({
     }
 
     if (config.value.trigger === 'exit') {
+      const lacksExitIntent = typeof window.matchMedia === 'function'
+        && window.matchMedia('(hover: none), (pointer: coarse)').matches
+
+      if (lacksExitIntent) {
+        startDelayTrigger()
+        return
+      }
+
       onPointerEnteredDocument = () => {
         hasPointerEnteredDocument = true
       }

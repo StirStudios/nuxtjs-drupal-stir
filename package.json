@@ -3,7 +3,8 @@
   "version": "4.4.1",
   "main": "./nuxt.config.ts",
   "bin": {
-    "stir-a11y": "./scripts/a11y/run.mjs"
+    "stir-a11y": "./scripts/a11y/run.mjs",
+    "stir-compliance": "./scripts/compliance/audit.mjs"
   },
   "exports": {
     ".": "./nuxt.config.ts",
@@ -23,6 +24,7 @@
     "layers",
     "presets",
     "scripts/a11y",
+    "scripts/compliance",
     "server",
     "nuxt.config.ts",
     "readme.md"
@@ -40,6 +42,7 @@
     "perf:lighthouse": "node scripts/perf/lighthouse.mjs",
     "perf:lighthouse:local": "node scripts/perf/lighthouse-local.mjs",
     "audit:consumers": "node scripts/audit/consumers.mjs",
+    "audit:compliance": "node scripts/compliance/audit.mjs",
     "audit:preset-matrix": "node scripts/audit/preset-matrix.mjs",
     "audit:preset-components": "node scripts/audit/preset-components.mjs",
     "audit:preset-editorial-output": "node scripts/audit/preset-editorial-output.mjs",

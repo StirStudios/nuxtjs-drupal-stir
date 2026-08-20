@@ -173,10 +173,6 @@ function numberSetting(...values: unknown[]): number | undefined {
   return values.find((value): value is number => typeof value === 'number' && Number.isFinite(value))
 }
 
-function booleanSetting(...values: unknown[]): boolean | undefined {
-  return values.find((value): value is boolean => typeof value === 'boolean')
-}
-
 export const usePopupData = () => {
   const { getPage } = useStirDrupalCe()
   const page = getPage()
@@ -253,7 +249,6 @@ export const usePopupData = () => {
     const p = popup.value?.props ?? {}
     const trigger = stringSetting(p.popupTrigger, p.popup_trigger)
     const delay = numberSetting(p.popupDelay, p.popup_delay)
-    const showOnce = booleanSetting(p.popupOnce, p.popup_once)
     const scrollThreshold = numberSetting(
       p.popupThreshold,
       p.popupScrollThreshold,
@@ -269,7 +264,6 @@ export const usePopupData = () => {
           ? trigger
           : 'delay',
       delay: delay ?? 100,
-      showOnce: showOnce === true,
       scrollThreshold: scrollThreshold ?? 0.25,
     }
   })
