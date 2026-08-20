@@ -115,7 +115,7 @@ describe('componentTree', () => {
         },
       },
       {
-        element: 'paragraph-faq',
+        element: 'paragraph-accordion',
         props: {
           header: 'Frequently asked questions',
           headerTag: 'h2',
@@ -123,12 +123,13 @@ describe('componentTree', () => {
         },
         slots: {
           items: [{
-            element: 'paragraph-faq-item',
+            element: 'paragraph-accordion-item',
             props: {
-              question: 'Can I change my booking?',
+              header: 'Can I change my booking?',
               headerTag: 'h3',
-              answer: '<p>Yes, contact the venue.</p>',
+              text: '<p>Yes, contact the venue.</p>',
             },
+            slots: { buttons: [] },
           }],
         },
       },
