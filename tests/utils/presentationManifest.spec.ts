@@ -161,7 +161,7 @@ describe('CMS presentation manifest', () => {
   it('retries temporary CMS unavailability and uses the recovered manifest', async () => {
     const onRetry = vi.fn()
     const fetchMock = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(new Response('', { status: 503 }))
+      .mockResolvedValueOnce(new Response('', { status: 404 }))
       .mockResolvedValueOnce(new Response('', { status: 502 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(fixture()), { status: 200 }))
 
@@ -188,7 +188,7 @@ describe('CMS presentation manifest', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  it.each([401, 403, 404])('fails immediately for permanent HTTP status %i', async (status) => {
+  it.each([401, 403])('fails immediately for permanent HTTP status %i', async (status) => {
     const fetchMock = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValue(new Response('', { status }))
 

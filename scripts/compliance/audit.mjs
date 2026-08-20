@@ -5,6 +5,7 @@ import { relative, resolve } from 'node:path'
 
 const projectRoot = resolve(process.cwd())
 const configPath = resolve(projectRoot, 'compliance/site.json')
+const reviewPath = resolve(projectRoot, 'compliance/REVIEW.md')
 const siteUrl = process.env.COMPLIANCE_SITE_URL?.replace(/\/$/, '')
 const errors = []
 const warnings = []
@@ -128,6 +129,15 @@ if (config) {
   if (config.version !== 1) error('compliance/site.json must use version 1.')
   if (JSON.stringify(config).includes('REPLACE_')) {
     error('compliance/site.json still contains starter-template REPLACE_* values.')
+  }
+
+  try {
+    const review = await readFile(reviewPath, 'utf8')
+    if (!review.includes('<!-- stir-compliance-discovery:v1 -->')) {
+      error('compliance/REVIEW.md is outdated; run stir-compliance-init to install the current service-discovery checklist.')
+    }
+  } catch (cause) {
+    error(`Unable to read compliance/REVIEW.md: ${cause.message}`)
   }
 
   for (const field of ['legalName', 'brandName', 'domain', 'email', 'address']) {

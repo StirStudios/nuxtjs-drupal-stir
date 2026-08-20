@@ -54,7 +54,7 @@ const MAX_MANIFEST_BYTES = 2 * 1024 * 1024
 const DEFAULT_RETRY_ATTEMPTS = 46
 const DEFAULT_RETRY_DELAY_MS = 2_000
 const DEFAULT_RETRY_MAX_WAIT_MS = 90_000
-const RETRYABLE_HTTP_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504])
+const RETRYABLE_HTTP_STATUSES = new Set([404, 408, 425, 429, 500, 502, 503, 504])
 const SPACING = /^(?:p|m)(?:[trblxy])?-(?:0|[1-5]|8|10|15|20)$/u
 const SAFE_CLASS_CHARACTERS = /^[a-z0-9_./:@%#,+*()!&>~=\-[\]]+$/iu
 const UNSAFE_CLASS_SOURCE = /[\s"'`;{}\\]|url\s*\(/iu
