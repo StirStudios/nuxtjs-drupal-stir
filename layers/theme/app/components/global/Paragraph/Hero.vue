@@ -36,7 +36,7 @@ const { isFront } = usePageContext()
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => pageProps.value?.title || '')
-const pageHide = computed(() => pageProps.value?.hide || false)
+const pageHideTitle = computed(() => pageProps.value?.hideTitle ?? false)
 
 // Only needed in FULL mode
 if (props.mode !== 'simple') {
@@ -44,17 +44,13 @@ if (props.mode !== 'simple') {
 }
 
 const heroSnapshot = useNavLockedSnapshot(computed(() => ({
-  hide: pageHide.value,
+  hideTitle: pageHideTitle.value,
   isFront: isFront.value,
   title: pageTitle.value,
 })))
 const isFrontEffective = computed(() => heroSnapshot.value.isFront)
 const pageTitleEffective = computed(() => heroSnapshot.value.title)
-const pageHideEffective = computed(() => heroSnapshot.value.hide)
-
-const hideHeroSection = computed(
-  () => props.mode !== 'simple' && pageHideEffective.value && !isFrontEffective.value,
-)
+const pageHideTitleEffective = computed(() => Boolean(heroSnapshot.value.hideTitle))
 
 const slotMedia = computed(() => tk.slot('media'))
 const heroMediaNode = computed(() => {
@@ -80,7 +76,7 @@ const h1Classes = computed(() => {
       : heroTheme.text?.heading
     : null
 
-  return [base].filter(Boolean)
+  return [base, pageHideTitleEffective.value && 'sr-only'].filter(Boolean)
 })
 
 const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
@@ -95,8 +91,8 @@ const sectionClasses = computed(() => {
   return [
     heroTheme.base,
 
-    hideHeroSection.value
-      ? `${heroTheme.hide} sr-hide`
+    pageHideTitleEffective.value && !hasHeroContent && !isFrontEffective.value
+      ? heroTheme.hide
       : hasMediaSlot.value
         ? heroTheme.mediaSpacing
         : hasHeroContent
@@ -166,6 +162,7 @@ provideRevealMotionScope(() => undefined)
               <HeroContent
                 v-if="text"
                 :hero-text="text"
+                :hide-title="pageHideTitleEffective"
                 :is-front="isFrontEffective"
                 :page-title="pageTitleEffective"
                 :subtitle="heroSubtitle"

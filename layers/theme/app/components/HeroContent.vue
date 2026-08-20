@@ -6,12 +6,14 @@ const props = withDefaults(
     pageTitle?: string
     subtitle?: string
     heroText?: string
+    hideTitle?: boolean
     isFront?: boolean
   }>(),
   {
     pageTitle: '',
     subtitle: '',
     heroText: '',
+    hideTitle: false,
     isFront: false,
   },
 )
@@ -23,11 +25,15 @@ defineSlots<{ button?(): unknown }>()
 
 <template>
   <template v-if="pageTitle && isFront">
-    <h1>{{ pageTitle }}</h1>
+    <h1 :class="{ 'sr-only': hideTitle }">{{ pageTitle }}</h1>
     <h2 v-if="subtitle" class="display-h1 text-left">{{ subtitle }}</h2>
   </template>
 
-  <h1 v-else-if="pageTitle" class="mb-0 text-white">
+  <h1
+    v-else-if="pageTitle"
+    class="mb-0 text-white"
+    :class="{ 'sr-only': hideTitle }"
+  >
     {{ pageTitle }}
   </h1>
 

@@ -72,7 +72,7 @@ const pageContentProps = computed(() => {
 const pageAnimation = computed(() => pageContentProps.value.pageAnimation)
 const pageAnimationStagger = computed(() =>
   resolveBooleanProp(pageContentProps.value.pageAnimationStagger))
-const layout = computed(() => props.forcedLayout || pageLayout.value || 'default')
+const layout = computed(() => (props.forcedLayout || pageLayout.value || 'default') as 'default')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
   return typeof route.params.slug === 'string' ? route.params.slug : ''

@@ -41,6 +41,13 @@ describe('hero reveal accessibility', () => {
     expect(heroContentSource).toContain('<h2 v-if="subtitle"')
   })
 
+  it('visually hides only the page title while preserving its h1 semantics', () => {
+    expect(heroSource).toContain('pageProps.value?.hideTitle ?? false')
+    expect(heroSource).not.toMatch(/pageProps\.value\?\.hide(?!Title)/)
+    expect(heroSource).not.toContain('sr-hide')
+    expect(heroContentSource).toContain(':class="{ \'sr-only\': hideTitle }"')
+  })
+
   it('uses an SSR entrance animation instead of a viewport reveal', () => {
     expect(heroSource).toContain('ssrVisible: false')
     expect(heroSource).toContain('trigger: \'enter\'')

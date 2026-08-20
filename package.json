@@ -4,7 +4,8 @@
   "main": "./nuxt.config.ts",
   "bin": {
     "stir-a11y": "./scripts/a11y/run.mjs",
-    "stir-compliance": "./scripts/compliance/audit.mjs"
+    "stir-compliance": "./scripts/compliance/audit.mjs",
+    "stir-compliance-init": "./scripts/compliance/init.mjs"
   },
   "exports": {
     ".": "./nuxt.config.ts",
@@ -43,6 +44,7 @@
     "perf:lighthouse:local": "node scripts/perf/lighthouse-local.mjs",
     "audit:consumers": "node scripts/audit/consumers.mjs",
     "audit:compliance": "node scripts/compliance/audit.mjs",
+    "init:compliance": "node scripts/compliance/init.mjs",
     "audit:preset-matrix": "node scripts/audit/preset-matrix.mjs",
     "audit:preset-components": "node scripts/audit/preset-components.mjs",
     "audit:preset-editorial-output": "node scripts/audit/preset-editorial-output.mjs",

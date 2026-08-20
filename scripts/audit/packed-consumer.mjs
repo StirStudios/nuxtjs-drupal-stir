@@ -77,7 +77,8 @@ async function main() {
 
     const unexpectedScripts = archiveEntries.filter(entry =>
       entry.startsWith('package/scripts/')
-      && !entry.startsWith('package/scripts/a11y/'),
+      && !entry.startsWith('package/scripts/a11y/')
+      && !entry.startsWith('package/scripts/compliance/'),
     )
     if (unexpectedScripts.length > 0) {
       throw new Error(
@@ -92,6 +93,10 @@ async function main() {
       'package/presets/minimal/nuxt.config.ts',
       'package/presets/full/nuxt.config.ts',
       'package/scripts/a11y/run.mjs',
+      'package/scripts/compliance/audit.mjs',
+      'package/scripts/compliance/init.mjs',
+      'package/scripts/compliance/templates/site.json',
+      'package/scripts/compliance/templates/REVIEW.md',
       'package/nuxt.config.ts',
     ]) {
       if (!archiveEntries.includes(requiredPath)) {
@@ -138,6 +143,11 @@ async function main() {
     }
     if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
       throw new Error('Packed layer did not expose the stir-a11y executable.')
+    }
+    for (const executable of ['stir-compliance', 'stir-compliance-init']) {
+      if (!await pathExists(join(consumerDir, `node_modules/.bin/${executable}`))) {
+        throw new Error(`Packed layer did not expose the ${executable} executable.`)
+      }
     }
     const presentationManifest = join(
       consumerDir,

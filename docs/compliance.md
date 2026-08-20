@@ -15,8 +15,10 @@ agent-generated edits.
    Accessibility Statement.
 2. Add those Drupal nodes to the footer menu and give them stable URL aliases.
 3. Use native Drupal text components; do not embed a policy vendor.
-4. Add `compliance/site.json` to the downstream Nuxt repository. Record only
-   verified business facts, page locations, technology, and review dates.
+4. Run `pnpm exec stir-compliance-init` in the downstream Nuxt repository. It
+   creates generic `compliance/site.json` and `compliance/REVIEW.md` starters
+   without overwriting existing files. Replace every `REPLACE_*` value with a
+   verified project fact.
 5. Add `"audit:compliance": "stir-compliance"` to downstream scripts and run it
    in CI and during each review.
 
@@ -50,3 +52,7 @@ Use this scheduled task in each downstream repository:
 
 Also run the review whenever a change adds a form, vendor, tracker, embed,
 payment flow, account feature, user content, or browser storage.
+
+The templates are intentionally generic. Business identity, forms, vendors,
+retention, consent rationale, review dates, and public URLs always belong to the
+downstream project and must never be copied from another client.

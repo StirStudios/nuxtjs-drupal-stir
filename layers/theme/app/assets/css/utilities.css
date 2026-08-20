@@ -52,14 +52,6 @@ figure {
   @apply mx-auto mb-5 max-w-sm sm:float-right sm:ms-5;
 }
 
-.sr-hide {
-  @apply visible h-auto opacity-100;
-
-  > div {
-    @apply sr-only;
-  }
-}
-
 .front {
   .hero {
     @apply text-white;

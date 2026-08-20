@@ -19,7 +19,7 @@ export interface NodeCommonProps {
   editLink?: string
   created?: string
   uid?: string | object
-  hide?: boolean | string
+  hideTitle?: boolean | string
   path?: DrupalNodePath
   pageAnimation?: string
   pageAnimationStagger?: boolean | number | string

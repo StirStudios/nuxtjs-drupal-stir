@@ -95,6 +95,7 @@
     ]
   },
   "scripts": [
+    "audit:compliance",
     "audit:consumers",
     "audit:preset-components",
     "audit:preset-editorial-output",
@@ -112,6 +113,7 @@
     "dev:prepare",
     "docs:sync-tech-stack",
     "generate",
+    "init:compliance",
     "lint",
     "lint:fix",
     "perf:lighthouse",
