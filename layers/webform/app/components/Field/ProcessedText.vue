@@ -15,5 +15,11 @@ const trustedTextHtml = computed(() =>
 </script>
 
 <template>
-  <div :class="['prose', fieldName]" v-html="trustedTextHtml" />
+  <div
+    :class="[
+      'prose [&>:first-child]:mt-0! [&>:last-child]:mb-0!',
+      fieldName,
+    ]"
+    v-html="trustedTextHtml"
+  />
 </template>
