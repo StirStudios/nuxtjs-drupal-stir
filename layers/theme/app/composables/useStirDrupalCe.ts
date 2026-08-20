@@ -8,7 +8,7 @@ type DrupalPage = DrupalPageRef['value']
 type StirPageContent = {
   element?: string
   props?: Record<string, unknown> & {
-    hide?: boolean | string
+    hideTitle?: boolean | string
     title?: string
   }
   slots?: Record<string, unknown>
