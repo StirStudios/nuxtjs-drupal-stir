@@ -20,6 +20,8 @@ changes, but do not publish or deploy legal changes without human approval.
 
 ## Required service discovery
 
+<!-- stir-compliance-discovery:v1 -->
+
 Do not rely on the existing inventory alone. Rebuild it from four sources and
 reconcile every difference before approving the review:
 

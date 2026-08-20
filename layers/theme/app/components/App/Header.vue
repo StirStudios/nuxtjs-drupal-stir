@@ -293,6 +293,9 @@ const splitMenu = computed(() => splitMenuAtMarker(
 ))
 const beforeLogo = computed(() => splitMenu.value.before)
 const afterLogo = computed(() => splitMenu.value.after)
+const splitRightNavigationLabel = computed(() =>
+  beforeLogo.value.length ? 'Additional navigation' : 'Primary navigation',
+)
 const mobileNavLinks = computed(() =>
   splitMenu.value.markerIndex > -1
     ? [...beforeLogo.value, ...afterLogo.value]
@@ -420,7 +423,7 @@ watch(menuOpen, (val) => {
 
           <LazyUNavigationMenu
             v-if="afterLogo.length"
-            aria-label="Additional navigation"
+            :aria-label="splitRightNavigationLabel"
             :class="[splitDesktopNavClasses, splitRightNavClasses]"
             :color="headerNavColor"
             :highlight="theme.navigation.highlight.show"

@@ -40,15 +40,24 @@ applicable rules require a choice.
 Use this scheduled task in each downstream repository:
 
 > Audit this repository, its Drupal content, and its production website using
-> compliance/site.json as the verified inventory. Run pnpm audit:compliance and
-> the accessibility checks. Inspect forms, cookies, browser storage, analytics,
-> marketing tags, embeds, payments, accounts, and third-party services. Compare
+> compliance/site.json as the verified inventory, but do not rely on that
+> inventory alone. Query active Drupal content and blocks; inspect enabled
+> modules, Webform handlers, exported configuration, Nuxt app configuration,
+> and environment integration names; then visit every public route and protected
+> entry route to record third-party scripts, frames, requests, cookies, and
+> browser storage. Reconcile every difference before approval. Run pnpm
+> audit:compliance and the accessibility checks. Compare
 > observed behavior with the Drupal Privacy Policy, Terms of Service,
 > Accessibility Statement, menu links, metadata, and consent configuration.
 > Research material legal or platform changes using current authoritative
 > sources. Report verified facts, recommended Drupal edits, owner questions,
 > and items requiring counsel separately. Draft changes when supported, but do
 > not publish or deploy legal changes without human approval.
+
+Existing consumers should rerun `pnpm exec stir-compliance-init` after upgrading.
+The command preserves project-specific content while installing versioned review
+checklist additions. `pnpm audit:compliance` reports an error when that checklist
+is outdated.
 
 Also run the review whenever a change adds a form, vendor, tracker, embed,
 payment flow, account feature, user content, or browser storage.

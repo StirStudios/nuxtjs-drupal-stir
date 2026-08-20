@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { access, copyFile, mkdir } from 'node:fs/promises'
+import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -9,6 +9,8 @@ const templateRoot = fileURLToPath(new URL('./templates/', import.meta.url))
 const files = ['site.json', 'REVIEW.md']
 const created = []
 const preserved = []
+const updated = []
+const discoveryMarker = '<!-- stir-compliance-discovery:v1 -->'
 
 await mkdir(resolve(projectRoot, 'compliance'), { recursive: true })
 
@@ -17,6 +19,32 @@ for (const file of files) {
 
   try {
     await access(destination)
+
+    if (file === 'REVIEW.md') {
+      const existing = await readFile(destination, 'utf8')
+
+      if (!existing.includes(discoveryMarker)) {
+        const template = await readFile(resolve(templateRoot, file), 'utf8')
+        const sectionStart = template.indexOf('## Required service discovery')
+        const sectionEnd = template.indexOf('## Human confirmations')
+
+        if (sectionStart >= 0 && sectionEnd > sectionStart) {
+          const discoverySection = template.slice(sectionStart, sectionEnd)
+          const existingSectionStart = existing.indexOf('## Required service discovery')
+          const insertionPoint = existing.indexOf('## Human confirmations')
+          const migrated = existingSectionStart >= 0 && insertionPoint > existingSectionStart
+            ? `${existing.slice(0, existingSectionStart)}${discoverySection}${existing.slice(insertionPoint)}`
+            : insertionPoint >= 0
+              ? `${existing.slice(0, insertionPoint)}${discoverySection}${existing.slice(insertionPoint)}`
+            : `${existing.trimEnd()}\n\n${discoverySection}`
+
+          await writeFile(destination, migrated)
+          updated.push(file)
+          continue
+        }
+      }
+    }
+
     preserved.push(file)
   }
   catch {
@@ -28,6 +56,7 @@ for (const file of files) {
 
 console.log('Stir compliance setup')
 for (const file of created) console.log(`CREATE compliance/${file}`)
+for (const file of updated) console.log(`UPDATE compliance/${file} (service discovery v1)`)
 for (const file of preserved) console.log(`KEEP   compliance/${file} (already exists)`)
 
 if (created.length) {
