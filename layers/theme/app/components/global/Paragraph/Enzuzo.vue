@@ -17,11 +17,15 @@ const normalizedEmbedUrl = computed(() => {
   return raw.startsWith('http') ? raw : `https://${raw}`
 })
 
+const root = useTemplateRef<HTMLElement>('root')
+
+// Enzuzo inserts the policy beside its script, so keep the script in this root.
 useThirdPartyScript(normalizedEmbedUrl, {
   attrs: {
     crossorigin: 'anonymous',
     referrerpolicy: 'no-referrer',
   },
+  container: root,
   id: '__enzuzo-root-script',
   kind: 'enzuzo',
   requiresConsent: false,
@@ -30,6 +34,6 @@ useThirdPartyScript(normalizedEmbedUrl, {
 
 <template>
   <ParagraphReveal :id="id" :direction="direction">
-    <div id="__enzuzo-root" />
+    <div id="__enzuzo-root" ref="root" />
   </ParagraphReveal>
 </template>

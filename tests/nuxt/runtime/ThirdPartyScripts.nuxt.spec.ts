@@ -40,6 +40,10 @@ mockNuxtImport('useCookie', () => () => consentCookie)
 
 const ScriptHarness = defineComponent({
   props: {
+    container: {
+      type: Boolean,
+      default: false,
+    },
     immediate: {
       type: Boolean,
       default: true,
@@ -55,14 +59,17 @@ const ScriptHarness = defineComponent({
   },
   setup(props) {
     const { accept } = usePrivacyConsent()
+    const container = ref<HTMLElement | null>(null)
 
     const { requestLoad } = useThirdPartyScript(toRef(props, 'src'), {
+      container: props.container ? container : undefined,
       immediate: props.immediate,
       kind: 'enzuzo',
       requiresConsent: props.requiresConsent,
     })
 
     return () => h('div', [
+      h('div', { ref: container, class: 'container' }),
       h('button', { class: 'accept', onClick: accept }, 'Accept'),
       h('button', { class: 'load', onClick: requestLoad }, 'Load'),
     ])
@@ -138,6 +145,19 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
 
     expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
     wrapper.unmount()
+  })
+
+  it('injects a script into its required component container', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/container-test'
+    const wrapper = await mountSuspended(ScriptHarness, {
+      props: { container: true, requiresConsent: false, src },
+    })
+
+    await nextTick()
+
+    expect(wrapper.get('.container').element.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    wrapper.unmount()
+    expect(document.querySelector(`script[src="${src}"]`)).toBeNull()
   })
 
   it('rejects a CMS-provided script from an untrusted origin', async () => {
