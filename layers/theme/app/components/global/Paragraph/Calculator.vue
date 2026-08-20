@@ -80,11 +80,9 @@ watch(
 </script>
 
 <template>
-  <ParagraphReveal :id="id" :direction="direction">
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
-      <ClientOnly>
-        <div v-bind="widgetAttrs" />
-      </ClientOnly>
-    </EditLink>
-  </ParagraphReveal>
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
+    <ClientOnly>
+      <div v-bind="widgetAttrs" />
+    </ClientOnly>
+  </EditLink>
 </template>

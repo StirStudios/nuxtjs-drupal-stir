@@ -6,7 +6,6 @@ export type ThirdPartyScriptKind = 'calculator' | 'enzuzo'
 type ThirdPartyScriptOptions = {
   allowedOrigins?: MaybeRefOrGetter<readonly string[] | undefined>
   attrs?: Record<string, string>
-  container?: MaybeRefOrGetter<HTMLElement | null | undefined>
   id?: string
   immediate?: boolean
   isReady?: () => boolean
@@ -97,10 +96,7 @@ function loadScript(
       script.setAttribute(name, value)
     })
 
-    const container = options.container ? toValue(options.container) : null
-    const parent = container || document.head
-
-    parent.appendChild(script)
+    document.head.appendChild(script)
   })
 
   scriptPromises.set(src, promise)
@@ -118,7 +114,6 @@ export function useThirdPartyScript(
   const isRequested = ref(options.immediate !== false)
   const isLoaded = ref(false)
   const error = shallowRef<Error | null>(null)
-  const loadedScript = shallowRef<HTMLScriptElement | null>(null)
   const configuredOrigins = computed<readonly string[]>(() => {
     if (options.allowedOrigins) return toValue(options.allowedOrigins) || []
     if (!options.kind) return []
@@ -142,15 +137,6 @@ export function useThirdPartyScript(
     isMounted.value = true
   })
 
-  onBeforeUnmount(() => {
-    if (!options.container) return
-
-    const currentSrc = safeSrc.value
-
-    loadedScript.value?.remove()
-    if (currentSrc) scriptPromises.delete(currentSrc)
-  })
-
   function requestLoad(): void {
     isRequested.value = true
   }
@@ -161,7 +147,7 @@ export function useThirdPartyScript(
       if (!allowed || isLoaded.value) return
 
       try {
-        loadedScript.value = await loadScript(safeSrc.value, options)
+        await loadScript(safeSrc.value, options)
         isLoaded.value = true
       } catch (caught) {
         error.value = caught instanceof Error

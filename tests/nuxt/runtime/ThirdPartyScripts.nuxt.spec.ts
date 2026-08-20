@@ -3,6 +3,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, ref, toRef } from 'vue'
 import { usePrivacyConsent } from '../../../layers/integrations/app/composables/usePrivacyConsent'
 import { useThirdPartyScript } from '../../../layers/theme/app/composables/useThirdPartyScript'
+import ParagraphEnzuzo from '../../../layers/theme/app/components/global/Paragraph/Enzuzo.vue'
 
 const consentCookie = ref<boolean | string | null>(null)
 const appConfig = ref({
@@ -40,10 +41,6 @@ mockNuxtImport('useCookie', () => () => consentCookie)
 
 const ScriptHarness = defineComponent({
   props: {
-    container: {
-      type: Boolean,
-      default: false,
-    },
     immediate: {
       type: Boolean,
       default: true,
@@ -59,17 +56,14 @@ const ScriptHarness = defineComponent({
   },
   setup(props) {
     const { accept } = usePrivacyConsent()
-    const container = ref<HTMLElement | null>(null)
 
     const { requestLoad } = useThirdPartyScript(toRef(props, 'src'), {
-      container: props.container ? container : undefined,
       immediate: props.immediate,
       kind: 'enzuzo',
       requiresConsent: props.requiresConsent,
     })
 
     return () => h('div', [
-      h('div', { ref: container, class: 'container' }),
       h('button', { class: 'accept', onClick: accept }, 'Accept'),
       h('button', { class: 'load', onClick: requestLoad }, 'Load'),
     ])
@@ -147,17 +141,22 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
-  it('injects a script into its required component container', async () => {
-    const src = 'https://app.enzuzo.com/scripts/privacy/container-test'
-    const wrapper = await mountSuspended(ScriptHarness, {
-      props: { container: true, requiresConsent: false, src },
+  it('renders the Enzuzo script beside its policy root', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/component-test'
+    const wrapper = await mountSuspended(ParagraphEnzuzo, {
+      attachTo: document.body,
+      props: { embedUrl: src },
     })
 
     await nextTick()
 
-    expect(wrapper.get('.container').element.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    const root = wrapper.get('#__enzuzo-root').element
+    const script = document.getElementById('__enzuzo-root-script')
+
+    expect(script, document.body.innerHTML).not.toBeNull()
+    expect(root.nextElementSibling).toBe(script)
+    expect(script?.getAttribute('src')).toBe(src)
     wrapper.unmount()
-    expect(document.querySelector(`script[src="${src}"]`)).toBeNull()
   })
 
   it('rejects a CMS-provided script from an untrusted origin', async () => {
