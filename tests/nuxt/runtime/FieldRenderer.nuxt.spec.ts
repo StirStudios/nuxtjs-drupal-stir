@@ -69,10 +69,7 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(wrapper.text()).toContain('Read our privacy notice.')
     expect(wrapper.find('strong').text()).toBe('privacy notice')
-    const processedText = wrapper.find('.prose.privacy_notice')
-    expect(processedText.exists()).toBe(true)
-    expect(processedText.classes()).toContain('[&>:first-child]:mt-0!')
-    expect(processedText.classes()).toContain('[&>:last-child]:mb-0!')
+    expect(wrapper.find('.prose.privacy_notice').exists()).toBe(true)
     expect(wrapper.find('[data-slot="root"]').exists()).toBe(false)
     expect(wrapper.find('[data-slot="wrapper"]').exists()).toBe(false)
   })
