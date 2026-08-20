@@ -64,6 +64,28 @@ describe('prepareGlobalSeoAssets', () => {
     expect(image).not.toHaveBeenCalled()
   })
 
+  it('resolves Drupal file links against the Drupal origin', () => {
+    const relative: GlobalSeoResponse = {
+      ...response,
+      link: [
+        { rel: 'icon', href: '/sites/default/files/meta/favicon.ico' },
+        { rel: 'canonical', href: '/privacy-policy' },
+      ],
+    }
+    const result = prepareGlobalSeoAssets(
+      relative,
+      { enabled: false },
+      source => source,
+      'https://www.example.com',
+      'https://cms.example.com',
+    )
+
+    expect(result.link).toEqual([
+      { rel: 'icon', href: 'https://cms.example.com/sites/default/files/meta/favicon.ico' },
+      { rel: 'canonical', href: '/privacy-policy' },
+    ])
+  })
+
   it('preserves Drupal-owned icon links', () => {
     const result = prepareGlobalSeoAssets(
       response,

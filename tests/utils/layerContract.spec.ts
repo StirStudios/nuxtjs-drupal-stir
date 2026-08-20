@@ -475,6 +475,7 @@ describe('layer contract', () => {
     expect(seoConfig).not.toContain('robots: false')
     expect(themeConfig).not.toContain('cmsGlobalSeo:')
     expect(seoAppConfig).toContain('cmsGlobalSeo:')
+    expect(seoAppConfig).toContain('enabled: false')
     expect(existsSync(resolve(
       rootDir,
       'layers/seo/app/plugins/cms-global-seo.ts',

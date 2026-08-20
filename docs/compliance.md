@@ -1,0 +1,52 @@
+# Downstream compliance
+
+Drupal is the single source of truth for legal and accessibility content. Use
+standard published Drupal pages so aliases, revisions, Metatag output, JSON:API,
+and menu links all follow the normal content workflow. Nuxt must not duplicate
+policy content or define competing routes.
+
+The shared package provides a small compliance inventory and audit command. It
+does not generate legal claims, replace accessibility testing, or publish
+agent-generated edits.
+
+## Adopt it
+
+1. Create or reuse Drupal Basic Pages for Privacy Policy, Terms of Service, and
+   Accessibility Statement.
+2. Add those Drupal nodes to the footer menu and give them stable URL aliases.
+3. Use native Drupal text components; do not embed a policy vendor.
+4. Add `compliance/site.json` to the downstream Nuxt repository. Record only
+   verified business facts, page locations, technology, and review dates.
+5. Add `"audit:compliance": "stir-compliance"` to downstream scripts and run it
+   in CI and during each review.
+
+The audit validates the inventory, review schedule, Drupal page contract,
+consent rationale, and common tracker references. Set `COMPLIANCE_SITE_URL` to
+also verify that public pages resolve and no longer contain Enzuzo or UserWay
+claims.
+
+```sh
+COMPLIANCE_SITE_URL=https://www.example.com pnpm audit:compliance
+```
+
+Standard cookieless Plausible Analytics alone normally does not require a
+cookie-consent prompt. Enable consent UI only when the actual technology and
+applicable rules require a choice.
+
+## Six-month review
+
+Use this scheduled task in each downstream repository:
+
+> Audit this repository, its Drupal content, and its production website using
+> compliance/site.json as the verified inventory. Run pnpm audit:compliance and
+> the accessibility checks. Inspect forms, cookies, browser storage, analytics,
+> marketing tags, embeds, payments, accounts, and third-party services. Compare
+> observed behavior with the Drupal Privacy Policy, Terms of Service,
+> Accessibility Statement, menu links, metadata, and consent configuration.
+> Research material legal or platform changes using current authoritative
+> sources. Report verified facts, recommended Drupal edits, owner questions,
+> and items requiring counsel separately. Draft changes when supported, but do
+> not publish or deploy legal changes without human approval.
+
+Also run the review whenever a change adds a form, vendor, tracker, embed,
+payment flow, account feature, user content, or browser storage.

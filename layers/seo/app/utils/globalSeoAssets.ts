@@ -77,8 +77,23 @@ export function prepareGlobalSeoAssets(
   config: CmsGlobalSeoAssetConfig,
   imageResolver: SeoImageResolver,
   publicOrigin: string,
+  drupalOrigin = '',
 ): GlobalSeoResponse {
-  if (config.enabled === false) return response
+  const resolvedResponse = {
+    ...response,
+    link: response.link.map((attributes) => {
+      const href = attributes.href
+      const isDrupalFile = typeof href === 'string'
+        && href.startsWith('/sites/default/files/')
+        && Boolean(drupalOrigin)
+
+      return isDrupalFile
+        ? { ...attributes, href: absoluteUrl(href, drupalOrigin) }
+        : attributes
+    }),
+  }
+
+  if (config.enabled === false) return resolvedResponse
 
   const socialImage = {
     enabled: config.socialImage?.enabled === true,
@@ -97,14 +112,14 @@ export function prepareGlobalSeoAssets(
 
   return {
     ...response,
-    meta: response.meta.map((attributes) => {
+    meta: resolvedResponse.meta.map((attributes) => {
       if (!socialImage.enabled || !isSocialImageMeta(attributes) || !attributes.content) {
         return attributes
       }
 
       return { ...attributes, content: optimize(attributes.content) }
     }),
-    link: response.link.flatMap((attributes) => {
+    link: resolvedResponse.link.flatMap((attributes) => {
       if (!socialImage.enabled || attributes.rel !== 'image_src' || !attributes.href) {
         return [attributes]
       }

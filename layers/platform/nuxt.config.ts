@@ -66,6 +66,14 @@ export default defineNuxtConfig({
           sizeLimitKb: 256,
         }
       : {
+          // Site contact data comes from Drupal, so these icon names cannot be
+          // discovered by static source scanning. Bundle the common set to
+          // keep first render independent of the runtime icon endpoint.
+          icons: [
+            'lucide:mail',
+            'lucide:map-pin-plus-inside',
+            'lucide:phone',
+          ],
           scan: false,
           includeCustomCollections: false,
           sizeLimitKb: 256,

@@ -13,7 +13,7 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 2. Identify the source-of-truth checkout and downstream copies before editing.
 3. Put reusable Nuxt behavior in `nuxtjs-drupal-stir`, generic CE behavior in `nuxtjs-drupal-ce`, portable project assembly in `stir-nuxt`, Drupal producer behavior in `stir-tools`, and client-specific content/brand decisions in the client app.
 4. Search existing Nuxt UI components, layer components, composables, server utilities, and CE helpers before adding abstractions.
-5. Read [current-sources.md](references/current-sources.md) for version-sensitive official guidance and verify live sources for dependency decisions.
+5. Read [current-sources.md](references/current-sources.md) for version-sensitive official guidance and verify live sources for dependency decisions. For inline editing, rich-text schemas, or collaboration, also read [editorial-stack.md](references/editorial-stack.md).
 
 ## Preserve the contract
 
@@ -32,6 +32,8 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 - Never place request-specific mutable refs at module scope. Use SSR-safe state with stable explicit keys.
 - Use typed, serializable runtime configuration. Put only intentionally public values under `runtimeConfig.public`.
 - Prefer semantic Nuxt UI components, theme tokens, variants, and Tailwind utilities before custom wrappers or CSS.
+- Prefer Nuxt Scripts and its registry, triggers, consent, lifecycle and loading-state APIs for third-party scripts. Keep a component-scoped loader only when a verified vendor contract requires DOM placement Nuxt Scripts cannot express; preserve origin allowlisting, cleanup, error state and regression coverage.
+- Declare every package imported by a published layer as its own direct dependency or peer dependency; do not rely on a consumer or another package exposing a transitive install.
 - Preserve accessible native semantics when mapping Drupal custom elements. Unknown elements must fail visibly and diagnostically, not silently disappear.
 
 ## Design data, cache and security

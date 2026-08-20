@@ -10,6 +10,7 @@ import type {
 import type { GlobalSeoResponse } from '../../../../seo/shared/types/globalSeo'
 import { prepareGlobalSeoAssets } from '../../../../seo/app/utils/globalSeoAssets'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import { getDrupalOrigin } from '../../utils/drupalUrl'
 
 const props = defineProps<{
   forcedLayout?: string
@@ -31,6 +32,7 @@ const theme = useAppConfig().stirTheme
 const seoConfig = (useAppConfig().cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
 const image = useImage() as unknown as SeoImageResolver
 const runtimeConfig = useRuntimeConfig()
+const drupalOrigin = getDrupalOrigin(runtimeConfig.public)
 const requestOrigin = useRequestURL().origin
 const publicOrigin = (() => {
   if (import.meta.server && typeof runtimeConfig.siteUrl === 'string') {
@@ -119,6 +121,7 @@ const pageHead = computed(() => {
     seoConfig,
     image,
     publicOrigin,
+    drupalOrigin,
   )
 
   return {
