@@ -55,7 +55,7 @@ defineSlots<{
     @submit="$emit('submit', $event)"
   >
     <template #title>
-      <h1 class="mb-0! text-xl! font-semibold!">{{ title }}</h1>
+      <h1 class="mb-0! text-xl! leading-7! font-semibold!">{{ title }}</h1>
     </template>
     <template v-if="$slots.leading" #leading>
       <slot name="leading" />
