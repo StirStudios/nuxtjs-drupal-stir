@@ -170,6 +170,31 @@ const fieldUi = computed(() => {
     :value="field['#defaultValue']"
   />
 
+  <template
+    v-else-if="visible && shouldRender && isDisplayElement && resolvedComponent"
+  >
+    <LazyButtonModal
+      v-if="field['#modal']"
+      :modal-id="field['#name']"
+    />
+
+    <div
+      v-if="descriptionContent && shouldShowDescription"
+      :class="webform.description"
+      v-html="descriptionContent"
+    />
+
+    <component
+      :is="resolvedComponent"
+      v-bind="resolvedComponentProps"
+      :field="field"
+      :field-name="fieldName"
+      :state="state"
+    />
+
+    <div v-if="helpContent" :class="webform.help" v-html="helpContent" />
+  </template>
+
   <UFormField
     v-else-if="visible && shouldRender"
     :label="shouldShowLabel ? field['#title'] : undefined"

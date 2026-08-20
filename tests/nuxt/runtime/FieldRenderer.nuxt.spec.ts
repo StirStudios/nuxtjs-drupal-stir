@@ -69,6 +69,35 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(wrapper.text()).toContain('Read our privacy notice.')
     expect(wrapper.find('strong').text()).toBe('privacy notice')
+    expect(wrapper.find('.prose.privacy_notice').exists()).toBe(true)
+    expect(wrapper.find('[data-slot="root"]').exists()).toBe(false)
+    expect(wrapper.find('[data-slot="wrapper"]').exists()).toBe(false)
+  })
+
+  it('preserves supporting content for display-only elements without a form-field wrapper', async () => {
+    const field: WebformFieldProps = {
+      '#type': 'processed_text',
+      '#name': 'privacy_notice',
+      '#text': '<p>Privacy notice.</p>',
+      '#description': '<p>Before the notice.</p>',
+      '#help': '<p>After the notice.</p>',
+      '#modal': true,
+    }
+
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'privacy_notice',
+        state: {},
+      },
+    })
+
+    expect(wrapper.text()).toContain('Before the notice.')
+    expect(wrapper.text()).toContain('Privacy notice.')
+    expect(wrapper.text()).toContain('After the notice.')
+    expect(wrapper.find('[data-modal-id="privacy_notice"]').exists()).toBe(true)
+    expect(wrapper.find('[data-slot="root"]').exists()).toBe(false)
+    expect(wrapper.find('[data-slot="wrapper"]').exists()).toBe(false)
   })
 
   it('keeps checkbox help visible while using its concise title accessibly', async () => {
