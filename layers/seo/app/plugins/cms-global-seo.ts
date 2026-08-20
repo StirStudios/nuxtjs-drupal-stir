@@ -23,6 +23,13 @@ type UseHeadFactory = Extract<
   (...args: never[]) => unknown
 >
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
+function drupalOrigin(publicConfig: Record<string, unknown>): string {
+  const drupalCe = publicConfig.drupalCe && typeof publicConfig.drupalCe === 'object'
+    ? publicConfig.drupalCe as Record<string, unknown>
+    : {}
+
+  return String(drupalCe.drupalBaseUrl || publicConfig.api || '').trim().replace(/\/$/, '')
+}
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {
     enabled: config.enabled === true,
@@ -136,6 +143,7 @@ export default defineNuxtPlugin(async () => {
         config,
         resolveImage,
         publicOrigin,
+        drupalOrigin(runtimeConfig.public as Record<string, unknown>),
       )
 
       return {

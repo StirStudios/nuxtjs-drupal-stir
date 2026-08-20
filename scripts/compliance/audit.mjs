@@ -34,6 +34,66 @@ async function collectSourceFiles(directory) {
   return files
 }
 
+async function findDrupalConfigDirectory() {
+  for (const directory of [
+    resolve(projectRoot, 'config/sync'),
+    resolve(projectRoot, '../config/sync'),
+  ]) {
+    try {
+      if ((await stat(directory)).isDirectory()) return directory
+    } catch {
+      // Try the next conventional decoupled-project location.
+    }
+  }
+  return null
+}
+
+async function checkDrupalWebforms() {
+  const directory = await findDrupalConfigDirectory()
+  if (!directory) {
+    warn('Drupal config export was not found; Webform defaults were not verified.')
+    return
+  }
+
+  const settingsPath = resolve(directory, 'webform.settings.yml')
+  try {
+    const settings = await readFile(settingsPath, 'utf8')
+    const disablesIpByDefault = /^\s*default_form_disable_remote_addr:\s*true\s*$/m.test(settings)
+    if (disablesIpByDefault !== (config.dataHandling?.storeSubmitterIpWithSubmission === false)) {
+      error('Drupal Webform IP default conflicts with dataHandling.storeSubmitterIpWithSubmission.')
+    }
+  } catch (cause) {
+    error(`Unable to verify Drupal Webform defaults: ${cause.message}`)
+  }
+
+  const expectedIds = new Set(config.technology?.formIds ?? [])
+  const exportedIds = new Set()
+  for (const entry of await readdir(directory)) {
+    if (!/^webform\.webform\..+\.yml$/.test(entry)) continue
+    const source = await readFile(resolve(directory, entry), 'utf8')
+    const id = source.match(/^id:\s*['"]?([^'"\s]+)['"]?\s*$/m)?.[1]
+    if (!id) continue
+    exportedIds.add(id)
+
+    const disablesIp = /^\s*form_disable_remote_addr:\s*true\s*$/m.test(source)
+    if (config.dataHandling?.storeSubmitterIpWithSubmission === false && !disablesIp) {
+      error(`Drupal Webform ${id} stores the submitter IP contrary to the inventory.`)
+    }
+
+    const purge = source.match(/^\s*purge:\s*([^\s#]+)\s*$/m)?.[1]
+    if (config.dataHandling?.drupalSubmissionRetention === 'indefinite' && purge !== 'none') {
+      error(`Drupal Webform ${id} has automatic purge enabled contrary to indefinite retention.`)
+    }
+  }
+
+  for (const id of expectedIds) {
+    if (!exportedIds.has(id)) error(`Declared Drupal Webform ${id} is missing from the config export.`)
+  }
+  for (const id of exportedIds) {
+    if (!expectedIds.has(id)) error(`Drupal Webform ${id} is not declared in technology.formIds.`)
+  }
+}
+
 async function checkPublicDocument(document) {
   const url = `${siteUrl}${document.path}`
   try {
@@ -106,6 +166,11 @@ if (config) {
   }
   if (typeof config.dataHandling?.storeSubmitterIpWithSubmission !== 'boolean') {
     error('dataHandling.storeSubmitterIpWithSubmission must be true or false.')
+  }
+  if (!Array.isArray(config.technology?.formIds)) {
+    error('technology.formIds must list every exported Drupal Webform ID.')
+  } else {
+    await checkDrupalWebforms()
   }
   if (!/WCAG 2\.2.*AA/i.test(config.accessibility?.target ?? '')) {
     warn('Accessibility target is not WCAG 2.2 Level AA.')
