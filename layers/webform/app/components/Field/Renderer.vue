@@ -170,6 +170,15 @@ const fieldUi = computed(() => {
     :value="field['#defaultValue']"
   />
 
+  <component
+    :is="resolvedComponent"
+    v-else-if="visible && shouldRender && isDisplayElement && resolvedComponent"
+    v-bind="resolvedComponentProps"
+    :field="field"
+    :field-name="fieldName"
+    :state="state"
+  />
+
   <UFormField
     v-else-if="visible && shouldRender"
     :label="shouldShowLabel ? field['#title'] : undefined"

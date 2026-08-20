@@ -69,6 +69,9 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(wrapper.text()).toContain('Read our privacy notice.')
     expect(wrapper.find('strong').text()).toBe('privacy notice')
+    expect(wrapper.find('.prose.privacy_notice').exists()).toBe(true)
+    expect(wrapper.find('[data-slot="root"]').exists()).toBe(false)
+    expect(wrapper.find('[data-slot="wrapper"]').exists()).toBe(false)
   })
 
   it('keeps checkbox help visible while using its concise title accessibly', async () => {
