@@ -18,6 +18,24 @@ Produce a dated report separating verified facts, recommended Drupal edits,
 questions for the business owner, and items requiring counsel. Draft supported
 changes, but do not publish or deploy legal changes without human approval.
 
+## Required service discovery
+
+Do not rely on the existing inventory alone. Rebuild it from four sources and
+reconcile every difference before approving the review:
+
+1. Query active Drupal content for embedded paragraph and block types, including
+   schedulers, maps, video, forms, payments, social feeds, and external scripts.
+2. Inspect enabled Drupal modules, Webform handlers, and exported configuration
+   for security, CAPTCHA, email, analytics, storage, and account services.
+3. Inspect Nuxt app configuration and environment-variable names for enabled
+   analytics, accessibility widgets, consent tools, authentication, and vendors.
+4. Visit every public route and protected entry route, recording third-party
+   scripts, frames, requests, cookies, and browser storage that actually load.
+
+Compare the discovered list with `compliance/site.json` and the published legal
+pages. A service that is configured but unused should be recorded as inactive;
+an active service must appear in both the inventory and the relevant disclosure.
+
 ## Human confirmations
 
 - Confirm the legal operator, trade names, public contact details, and domain.

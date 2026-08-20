@@ -397,7 +397,7 @@ watch(menuOpen, (val) => {
         <template v-if="isSplitLogoLayout">
           <LazyUNavigationMenu
             v-if="beforeLogo.length"
-            aria-label="Site Navigation"
+            aria-label="Primary navigation"
             :class="[splitDesktopNavClasses, splitLeftNavClasses]"
             :color="headerNavColor"
             :highlight="theme.navigation.highlight.show"
@@ -420,7 +420,7 @@ watch(menuOpen, (val) => {
 
           <LazyUNavigationMenu
             v-if="afterLogo.length"
-            aria-label="Site Navigation"
+            aria-label="Additional navigation"
             :class="[splitDesktopNavClasses, splitRightNavClasses]"
             :color="headerNavColor"
             :highlight="theme.navigation.highlight.show"
