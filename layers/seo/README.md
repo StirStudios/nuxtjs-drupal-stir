@@ -21,9 +21,9 @@ export default defineNuxtConfig({
 `DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_URL`, `NUXT_NAME`,
 `NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration. The
 Robots module is registered only when this SEO capability is selected.
-Global metadata and social-image delivery are enabled by default and can be
-scoped or disabled through `cmsGlobalSeo` app config. Non-indexable apps that do
-not publish SEO metadata should set `cmsGlobalSeo.enabled` to `false`.
+The optional global-metadata request is disabled by default because it requires
+downstream Drupal support. Sites that expose `/api/seo/global` can enable it
+through `cmsGlobalSeo.enabled`. Page-level Drupal Metatag output is unaffected.
 
 The layer routes Drupal's global
 `og:image`, `twitter:image`, and `image_src` source through the configured Nuxt
