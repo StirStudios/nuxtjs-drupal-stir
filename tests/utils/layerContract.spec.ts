@@ -576,7 +576,7 @@ describe('layer contract', () => {
     )
 
     expect(authFormPanel).toContain('<template #title>')
-    expect(authFormPanel).toContain('<h1 class="mb-0! text-xl! font-semibold!">{{ title }}</h1>')
+    expect(authFormPanel).toContain('<h1 class="mb-0! text-xl! leading-7! font-semibold!">{{ title }}</h1>')
     expect(themeConfig).toMatch(/class:\s*['"]min-h-12['"]/)
     expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })
