@@ -30,9 +30,12 @@ for (const file of files) {
 
         if (sectionStart >= 0 && sectionEnd > sectionStart) {
           const discoverySection = template.slice(sectionStart, sectionEnd)
+          const existingSectionStart = existing.indexOf('## Required service discovery')
           const insertionPoint = existing.indexOf('## Human confirmations')
-          const migrated = insertionPoint >= 0
-            ? `${existing.slice(0, insertionPoint)}${discoverySection}${existing.slice(insertionPoint)}`
+          const migrated = existingSectionStart >= 0 && insertionPoint > existingSectionStart
+            ? `${existing.slice(0, existingSectionStart)}${discoverySection}${existing.slice(insertionPoint)}`
+            : insertionPoint >= 0
+              ? `${existing.slice(0, insertionPoint)}${discoverySection}${existing.slice(insertionPoint)}`
             : `${existing.trimEnd()}\n\n${discoverySection}`
 
           await writeFile(destination, migrated)

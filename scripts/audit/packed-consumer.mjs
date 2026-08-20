@@ -149,6 +149,29 @@ async function main() {
         throw new Error(`Packed layer did not expose the ${executable} executable.`)
       }
     }
+    const complianceDir = join(consumerDir, 'compliance')
+    const complianceReview = join(complianceDir, 'REVIEW.md')
+    const discoveryMarker = '<!-- stir-compliance-discovery:v1 -->'
+    await mkdir(complianceDir, { recursive: true })
+
+    for (const legacyReview of [
+      '# Compliance Review\n\n## Human confirmations\n\n- Keep this project note.\n',
+      '# Compliance Review\n\n## Required service discovery\n\nOld discovery instructions.\n\n## Human confirmations\n\n- Keep this project note.\n',
+    ]) {
+      await writeFile(complianceReview, legacyReview)
+      await run('pnpm', ['exec', 'stir-compliance-init'], consumerDir)
+      const migratedReview = await readFile(complianceReview, 'utf8')
+
+      if (!migratedReview.includes(discoveryMarker)) {
+        throw new Error('Compliance initialization did not install the discovery migration marker.')
+      }
+      if (migratedReview.split('## Required service discovery').length !== 2) {
+        throw new Error('Compliance initialization duplicated the service-discovery section.')
+      }
+      if (!migratedReview.includes('- Keep this project note.')) {
+        throw new Error('Compliance initialization removed project-specific review content.')
+      }
+    }
     const presentationManifest = join(
       consumerDir,
       'node_modules/@stir/base/contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
