@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { resolveAllowedScriptUrl } from '../../../composables/useThirdPartyScript'
+
 const props = defineProps<{
   id?: number | string
   uuid?: string
@@ -17,23 +19,34 @@ const normalizedEmbedUrl = computed(() => {
   return raw.startsWith('http') ? raw : `https://${raw}`
 })
 
-const root = useTemplateRef<HTMLElement>('root')
+const appConfig = useAppConfig()
+const safeEmbedUrl = computed(() => resolveAllowedScriptUrl(
+  normalizedEmbedUrl.value,
+  appConfig.thirdPartyScripts?.allowedOrigins?.enzuzo || [],
+))
 
-// Enzuzo inserts the policy beside its script, so keep the script in this root.
-useThirdPartyScript(normalizedEmbedUrl, {
-  attrs: {
-    crossorigin: 'anonymous',
-    referrerpolicy: 'no-referrer',
-  },
-  container: root,
-  id: '__enzuzo-root-script',
-  kind: 'enzuzo',
-  requiresConsent: false,
+let script: HTMLScriptElement | null = null
+
+onMounted(() => {
+  const policyRoot = document.getElementById('__enzuzo-root')
+
+  if (!policyRoot || !safeEmbedUrl.value || script) return
+
+  script = document.createElement('script')
+  script.id = '__enzuzo-root-script'
+  script.src = safeEmbedUrl.value
+  script.defer = true
+  script.crossOrigin = 'anonymous'
+  script.referrerPolicy = 'no-referrer'
+
+  policyRoot.insertAdjacentElement('afterend', script)
+})
+
+onBeforeUnmount(() => {
+  script?.remove()
 })
 </script>
 
 <template>
-  <ParagraphReveal :id="id" :direction="direction">
-    <div id="__enzuzo-root" ref="root" />
-  </ParagraphReveal>
+  <div id="__enzuzo-root" />
 </template>

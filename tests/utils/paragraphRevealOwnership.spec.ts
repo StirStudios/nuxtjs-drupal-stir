@@ -10,9 +10,6 @@ const paragraphDir = resolve(
 const ownership = {
   self: [
     'Button.vue',
-    'Calculator.vue',
-    'Calendly.vue',
-    'Enzuzo.vue',
     'Accordion.vue',
     'Feature.vue',
     'Icon.vue',
@@ -20,6 +17,7 @@ const ownership = {
     'Tabs.vue',
     'Timeline.vue',
   ],
+  external: ['Calculator.vue', 'Calendly.vue', 'Enzuzo.vue'],
   managed: ['Carousel.vue', 'Hero.vue', 'Layout.vue'],
   delegated: ['Media.vue', 'Text.vue', 'View.vue'],
   internal: [
@@ -46,6 +44,14 @@ describe('paragraph reveal ownership', () => {
       const source = readFileSync(resolve(paragraphDir, file), 'utf8')
 
       expect(source, file).toContain('<ParagraphReveal')
+    }
+  })
+
+  it('keeps external script mount points outside reveal wrappers', () => {
+    for (const file of ownership.external) {
+      const source = readFileSync(resolve(paragraphDir, file), 'utf8')
+
+      expect(source, file).not.toContain('<ParagraphReveal')
     }
   })
 

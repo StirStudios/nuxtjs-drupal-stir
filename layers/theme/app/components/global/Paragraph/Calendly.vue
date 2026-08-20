@@ -57,13 +57,11 @@ useCalendlyWidget(container, calendlyUrl.value)
 </script>
 
 <template>
-  <ParagraphReveal :id="id" :direction="direction">
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
-      <div
-        ref="container"
-        :class="['m-auto w-full', props.calendlyScheme || 'scheme-normal']"
-        v-bind="$attrs"
-      />
-    </EditLink>
-  </ParagraphReveal>
+  <EditLink :link="editLink" :parent-uuid="parentUuid">
+    <div
+      ref="container"
+      :class="['m-auto w-full', props.calendlyScheme || 'scheme-normal']"
+      v-bind="$attrs"
+    />
+  </EditLink>
 </template>
