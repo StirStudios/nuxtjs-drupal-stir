@@ -43,6 +43,7 @@ describe('hero reveal accessibility', () => {
 
   it('visually hides only the page title while preserving its h1 semantics', () => {
     expect(heroSource).toContain('pageProps.value?.hideTitle ?? false')
+    expect(heroSource).toContain('resolveBooleanProp(heroSnapshot.value.hideTitle)')
     expect(heroSource).not.toMatch(/pageProps\.value\?\.hide(?!Title)/)
     expect(heroSource).not.toContain('sr-hide')
     expect(heroContentSource).toContain(':class="{ \'sr-only\': hideTitle }"')

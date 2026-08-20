@@ -8,6 +8,7 @@ import {
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
@@ -50,7 +51,7 @@ const heroSnapshot = useNavLockedSnapshot(computed(() => ({
 })))
 const isFrontEffective = computed(() => heroSnapshot.value.isFront)
 const pageTitleEffective = computed(() => heroSnapshot.value.title)
-const pageHideTitleEffective = computed(() => Boolean(heroSnapshot.value.hideTitle))
+const pageHideTitleEffective = computed(() => resolveBooleanProp(heroSnapshot.value.hideTitle))
 
 const slotMedia = computed(() => tk.slot('media'))
 const heroMediaNode = computed(() => {
