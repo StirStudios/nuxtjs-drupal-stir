@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "owner": {
+    "legalName": "REPLACE_LEGAL_NAME",
+    "brandName": "REPLACE_BRAND_NAME",
+    "domain": "REPLACE_DOMAIN",
+    "email": "REPLACE_EMAIL",
+    "phone": "REPLACE_PHONE_OR_REMOVE",
+    "address": "REPLACE_PUBLIC_ADDRESS"
+  },
+  "review": {
+    "lastReviewed": "REPLACE_YYYY-MM-DD",
+    "nextReview": "REPLACE_YYYY-MM-DD",
+    "intervalMonths": 6
+  },
+  "documents": {
+    "privacy": { "title": "Privacy Policy", "path": "/privacy-policy", "source": "drupal", "menu": "footer" },
+    "terms": { "title": "Terms of Service", "path": "/terms-service", "source": "drupal", "menu": "footer" },
+    "accessibility": { "title": "Accessibility Statement", "path": "/accessibility-statement", "source": "drupal", "menu": "footer" }
+  },
+  "technology": {
+    "analytics": [],
+    "forms": [],
+    "formIds": [],
+    "vendors": [],
+    "browserStorage": [],
+    "marketingTrackers": []
+  },
+  "consent": {
+    "mode": "REPLACE_NOT_REQUIRED_OR_REQUIRED",
+    "reason": "REPLACE_VERIFIED_REASON"
+  },
+  "dataHandling": {
+    "drupalSubmissionRetention": "REPLACE_INDEFINITE_OR_POSITIVE_DAY_COUNT",
+    "retentionReason": "REPLACE_VERIFIED_REASON",
+    "storeSubmitterIpWithSubmission": false,
+    "popupMarketingChannel": "REPLACE_OR_REMOVE"
+  },
+  "accessibility": {
+    "target": "WCAG 2.2 Level AA",
+    "contact": "REPLACE_EMAIL"
+  }
+}

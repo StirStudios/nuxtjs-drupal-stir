@@ -126,6 +126,9 @@ try {
 
 if (config) {
   if (config.version !== 1) error('compliance/site.json must use version 1.')
+  if (JSON.stringify(config).includes('REPLACE_')) {
+    error('compliance/site.json still contains starter-template REPLACE_* values.')
+  }
 
   for (const field of ['legalName', 'brandName', 'domain', 'email', 'address']) {
     if (!config.owner?.[field]?.trim()) error(`owner.${field} is required.`)
