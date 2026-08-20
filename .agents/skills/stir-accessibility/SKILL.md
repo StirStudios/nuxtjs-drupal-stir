@@ -41,7 +41,7 @@ Target WCAG 2.2 AA and inclusive real-world use. Combine automation with keyboar
 1. Run existing Playwright/axe checks on representative routes and every changed interactive state.
 2. Test keyboard-only operation: skip link, navigation, focus order, activation, escape/close, focus restoration, forms and errors.
 3. Inspect the accessibility tree for names, roles, states, relationships and live announcements.
-4. Test at 200% zoom and responsive reflow; check target sizes, focus visibility and content loss.
+4. Test text resizing at 200% and reflow at a 320-CSS-pixel viewport equivalent (for example, 400% zoom on a 1280px-wide viewport); check horizontal overflow, target sizes, focus visibility and content loss.
 5. Test reduced motion and, when relevant, high contrast/forced colors.
 6. Check Drupal-authored examples including missing/long content, media alternatives, rich text, tables and link text.
 7. Test one practical screen-reader flow for high-risk changes when the environment permits; otherwise state the unverified manual risk.

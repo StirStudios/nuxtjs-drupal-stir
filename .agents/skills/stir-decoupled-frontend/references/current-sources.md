@@ -9,6 +9,7 @@ Verify current versions and experimental status before relying on these sources.
 - Nuxt testing: https://nuxt.com/docs/4.x/getting-started/testing
 - Nuxt deployment: https://nuxt.com/docs/4.x/getting-started/deployment
 - Nuxt module author practices: https://nuxt.com/docs/4.x/guide/modules/best-practices
+- Nuxt Scripts: https://scripts.nuxt.com/docs/getting-started
 - Nitro documentation: https://nitro.build/guide
 - Vue security: https://vuejs.org/guide/best-practices/security
 - Nuxt UI documentation: https://ui.nuxt.com/docs

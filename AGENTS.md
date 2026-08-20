@@ -7,6 +7,7 @@ Use these rules for all changes.
 ## Required skills
 
 - For Nuxt, Vue, Nuxt UI, Nitro, Custom Elements, SSR, hydration, frontend caching, proxy, or cross-stack work, use `.agents/skills/stir-decoupled-frontend/SKILL.md`.
+- For metadata, canonical URLs, robots, sitemaps, redirects, structured data, social previews, or indexing work, also use `.agents/skills/stir-decoupled-seo/SKILL.md`.
 - For components, content, forms, navigation, media, animation, or accessibility audits, also use `.agents/skills/stir-accessibility/SKILL.md`.
 
 ## Primary goals
