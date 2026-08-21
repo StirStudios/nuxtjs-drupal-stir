@@ -604,6 +604,35 @@ describe('layer contract', () => {
     expect(themeConfig).toContain('transparentSurface: \'auto\'')
   })
 
+  it('uses the upstream lifecycle-safe menu request in the app header', () => {
+    const header = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
+      'utf8',
+    )
+
+    expect(header).toContain('const { getPage, useMenu } = useStirDrupalCe()')
+    expect(header).toContain('await useMenu(\'main\')')
+    expect(header).toContain('Array.isArray(mainMenu.value) ? mainMenu.value : []')
+    expect(header).not.toContain('fetchMenu(\'main\')')
+  })
+
+  it('uses the upstream deferred menu lifecycle for the editorial account menu', () => {
+    const tabs = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
+      'utf8',
+    )
+
+    expect(tabs).toContain('useMenu(\'account\', {')
+    expect(tabs).toContain('immediate: false')
+    expect(tabs).toContain('server: false')
+    expect(tabs).toContain('execute: executeAccountMenu')
+    expect(tabs).toContain('() => route.fullPath')
+    expect(tabs).toContain('accountMenuStatus.value !== \'success\'')
+    expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
+    expect(tabs).not.toContain('getAccountMenuUrl')
+    expect(tabs).not.toContain('drupal-tabs-account-menu-loaded')
+  })
+
   it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
     const fieldComponents = [
       'DateTime/Select.vue',

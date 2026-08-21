@@ -8,7 +8,7 @@ import {
   withUnpublishedTask,
 } from '../../utils/adminUiTheme'
 
-const { getPage } = useStirDrupalCe()
+const { getPage, useMenu } = useStirDrupalCe()
 const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()
@@ -38,16 +38,6 @@ type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
 type MenuLink = EditorialTaskLink
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
-type AccountMenuFetchOptions = NonNullable<
-  Parameters<typeof $fetch<AccountMenuItem[]>>[1]
->
-type DrupalCeConfig = {
-  drupalBaseUrl?: string
-  ceApiEndpoint?: string
-  menuEndpoint?: string
-  menuBaseUrl?: string
-  fetchOptions?: AccountMenuFetchOptions
-}
 
 const getValidTo = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
@@ -126,21 +116,20 @@ const editorialTaskLinks = computed(() =>
   withUnpublishedTask(localTaskLinks.value, page.value?.published),
 )
 
-const accountMenu = useState<MenuLink[]>('drupal-tabs-account-menu', () => [])
-const isAccountMenuLoaded = useState<boolean>(
-  'drupal-tabs-account-menu-loaded',
-  () => false,
-)
-const accountMenuUserId = useState<string>(
-  'drupal-tabs-account-menu-user-id',
-  () => '',
-)
+const {
+  clear: clearAccountMenu,
+  data: rawAccountMenu,
+  error: accountMenuError,
+  execute: executeAccountMenu,
+  status: accountMenuStatus,
+} = useMenu('account', {
+  immediate: false,
+  server: false,
+})
+const accountMenuUserId = ref('')
 const currentUserId = computed(() =>
   String(user.value?.id ?? user.value?.uid ?? 'anon'),
 )
-const drupalCeConfig = computed<DrupalCeConfig>(() => {
-  return (config.public.drupalCe || {}) as DrupalCeConfig
-})
 const drupalOrigin = computed(() =>
   getDrupalOrigin(config.public as Record<string, unknown>),
 )
@@ -194,62 +183,50 @@ const normalizeAdminUrl = (value: string): string => {
   )
 }
 
-const getAccountMenuUrl = (): string => {
-  const menuEndpoint = String(
-    drupalCeConfig.value.menuEndpoint || 'api/menu_items/$$$NAME$$$',
-  )
-  const menuPath = menuEndpoint
-    .replace('$$$NAME$$$', 'account')
-    .replace(/^\/+/, '')
+const accountMenu = computed<MenuLink[]>(() =>
+  (Array.isArray(rawAccountMenu.value) ? rawAccountMenu.value : [])
+    .map((item: AccountMenuItem): MenuLink | null => {
+      const label = item.title || ''
+      const rawTo = getValidTo(item.relative || item.url)
 
-  return `/api/menu/${menuPath}`
-}
+      if (!label || !rawTo) return null
+
+      const to = normalizeAdminUrl(rawTo)
+
+      return {
+        label,
+        to,
+        icon: getIconForLabel(label),
+        tooltip: isCompactTabs.value,
+        onSelect: getAdminLinkSelectHandler(to),
+      }
+    })
+    .filter((item): item is MenuLink => item !== null),
+)
 
 const loadAccountMenu = async () => {
   if (accountMenuUserId.value !== currentUserId.value) {
-    accountMenu.value = []
-    isAccountMenuLoaded.value = false
+    clearAccountMenu()
     accountMenuUserId.value = currentUserId.value
   }
 
-  if (!hasEditorialAccess.value || !isAuthenticated.value || isAccountMenuLoaded.value) {
+  if (
+    !hasEditorialAccess.value
+    || !isAuthenticated.value
+    || accountMenuStatus.value === 'pending'
+    || accountMenuStatus.value === 'success'
+  ) {
     return
   }
 
   try {
-    const accountMenuUrl = getAccountMenuUrl()
-    const configuredFetchOptions = (drupalCeConfig.value.fetchOptions ||
-      {}) as AccountMenuFetchOptions
-    const credentials =
-      drupalCeConfig.value.fetchOptions?.credentials || 'include'
-    const rawMenu = await $fetch<AccountMenuItem[]>(accountMenuUrl, {
-      ...configuredFetchOptions,
-      credentials,
-    })
-    const menuItems = Array.isArray(rawMenu) ? rawMenu : []
+    await executeAccountMenu()
 
-    accountMenu.value = menuItems
-      .map((item): MenuLink | null => {
-        const label = item.title || ''
-        const rawTo = getValidTo(item.relative || item.url)
-
-        if (!label || !rawTo) return null
-
-        const to = normalizeAdminUrl(rawTo)
-
-        return {
-          label,
-          to,
-          icon: getIconForLabel(label),
-          tooltip: isCompactTabs.value,
-          onSelect: getAdminLinkSelectHandler(to),
-        }
-      })
-      .filter((item): item is MenuLink => item !== null)
-    isAccountMenuLoaded.value = true
+    if (accountMenuError.value) {
+      console.error('Failed to fetch account menu:', accountMenuError.value)
+    }
   } catch (error) {
     console.error('Failed to fetch account menu:', error)
-    accountMenu.value = []
   }
 }
 
@@ -260,8 +237,7 @@ onMounted(() => {
 watch(
   () => currentUserId.value,
   () => {
-    accountMenu.value = []
-    isAccountMenuLoaded.value = false
+    clearAccountMenu()
     accountMenuUserId.value = currentUserId.value
     if (hasEditorialAccess.value) {
       void loadAccountMenu()
@@ -271,15 +247,22 @@ watch(
 
 watch(hasEditorialAccess, (hasAccess) => {
   if (hasAccess) {
-    isAccountMenuLoaded.value = false
+    clearAccountMenu()
     void loadAccountMenu()
   }
 })
 
+// Editorial tabs persist across route changes. Retry a failed upstream menu
+// request when navigation gives the user another opportunity to load it.
 watch(
   () => route.fullPath,
   () => {
-    if (hasEditorialAccess.value && !isAccountMenuLoaded.value) {
+    if (
+      hasEditorialAccess.value
+      && isAuthenticated.value
+      && accountMenuStatus.value !== 'pending'
+      && accountMenuStatus.value !== 'success'
+    ) {
       void loadAccountMenu()
     }
   },
