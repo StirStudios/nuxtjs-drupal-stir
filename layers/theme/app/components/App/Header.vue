@@ -19,7 +19,7 @@ type HeaderMode = 'fixed' | 'sticky'
 const props = defineProps<{ mode?: HeaderMode }>()
 const attrs = useAttrs()
 const { scrollDirection, atBottom, isScrolled } = useScrollNav()
-const { fetchMenu, getPage } = useStirDrupalCe()
+const { getPage, useMenu } = useStirDrupalCe()
 const page = getPage()
 const { isFront, hasEditorialAccess } = usePageContext()
 const route = useRoute()
@@ -272,7 +272,7 @@ const toggleIconClass = computed(() =>
   toClassName(theme.navigation.toggleIcon) || 'size-7',
 )
 
-const mainMenu = await fetchMenu('main')
+const { data: mainMenu } = await useMenu('main')
 const splitLogoMarker = computed(() => toStringProp(theme.navigation?.logoMenuMarker))
 const splitDesktopNavClasses = computed(() =>
   toClassName(theme.navigation.splitLogo?.desktopNav) || 'hidden lg:flex',
@@ -285,7 +285,8 @@ const slideoverLinkClasses = computed(() => toClassName(theme.navigation.slideov
 const slideoverListClasses = computed(() => toClassName(theme.navigation.slideover?.list))
 
 const navLinks = computed<NavigationMenuItem[]>(() =>
-  mainMenu.value.map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
+  (Array.isArray(mainMenu.value) ? mainMenu.value : [])
+    .map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
 )
 const splitMenu = computed(() => splitMenuAtMarker(
   navLinks.value,
