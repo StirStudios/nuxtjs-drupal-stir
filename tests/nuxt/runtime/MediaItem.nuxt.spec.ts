@@ -101,6 +101,30 @@ describe('MediaItem (Nuxt runtime)', () => {
       .not.toContain('motion-safe:opacity-0')
   })
 
+  it('uses the shared untinted play indicator for modal video triggers', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        overlay: true,
+        tk: {
+          propsOf: () => ({
+            alt: 'Video preview',
+            src: '/video-preview.webp',
+            type: 'video',
+          }),
+        } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    const trigger = wrapper.get('[aria-label="Open video modal"]')
+    const playIcon = trigger.get('.i-lucide\\:play')
+
+    expect(trigger.classes()).not.toContain('after:bg-black/30')
+    expect(playIcon.element.parentElement?.classList).toContain('bg-black/80')
+    expect(playIcon.classes()).toContain('size-9')
+  })
+
   it('uses the contextual delivery profile for gallery images', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {

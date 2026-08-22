@@ -185,10 +185,7 @@ const shouldAnimate = computed(() =>
         { 'motion-safe:opacity-0': shouldAnimate },
         visualRoundedClass || theme.media.rounded,
         'cursor-pointer',
-        'grid place-items-center text-white',
-        mediaPreviewClasses.overlayBase,
-        mediaPreviewClasses.overlayTint30,
-        mediaPreviewClasses.overlayInteractiveTint,
+        'grid place-items-center text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
       ]"
       role="button"
       tabindex="0"
@@ -220,9 +217,7 @@ const shouldAnimate = computed(() =>
         {{ mediaProps.credit }}
       </span>
 
-      <span aria-hidden="true" :class="mediaPreviewClasses.iconLayer">
-        <UIcon name="i-lucide-play-circle" size="60" />
-      </span>
+      <MediaPlayIndicator />
     </div>
   </RevealMotion>
 </template>
