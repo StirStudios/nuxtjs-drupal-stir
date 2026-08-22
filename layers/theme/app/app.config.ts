@@ -169,7 +169,7 @@ export default defineAppConfig({
       video: {
         loadMinWidth: 768,
         loadStrategy: 'after-load',
-        wrapper: 'm-auto max-w-6xl',
+        wrapper: 'w-full',
       },
 
       transitions: {
