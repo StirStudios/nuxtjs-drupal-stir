@@ -491,9 +491,7 @@ watch(
       v-if="!shouldShowIframe && !shouldShowDirectVideo && !isProcessing"
       :aria-label="title ? `Play video: ${title}` : 'Play video'"
       :class="[
-        'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white',
-        mediaPreviewClasses.overlayBase,
-        mediaPreviewClasses.overlayTint40,
+        'group absolute inset-0 z-10 grid h-full w-full place-items-center overflow-hidden bg-black text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         resolvedRoundedClass,
       ]"
       type="button"
@@ -539,10 +537,7 @@ watch(
           :width="width"
         />
       </div>
-      <UIcon
-        :class="[mediaPreviewClasses.iconLayer, 'size-16']"
-        name="i-lucide-play-circle"
-      />
+      <MediaPlayIndicator />
     </button>
 
     <LazyEditControls

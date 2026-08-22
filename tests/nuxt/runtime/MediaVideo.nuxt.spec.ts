@@ -100,6 +100,27 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(poster.attributes('srcset')).not.toContain('/styles/card/')
   })
 
+  it('keeps the poster clear while giving the play control reliable contrast', async () => {
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        mediaEmbed: 'https://player.example/embed/video',
+        src: '/video-poster.webp',
+        title: 'Featured video',
+      },
+    })
+
+    const trigger = wrapper.get('button')
+    const playIcon = trigger.get('.iconify')
+    const playControl = playIcon.element.parentElement
+
+    expect(trigger.classes()).not.toContain('after:bg-black/40')
+    expect(trigger.attributes('aria-label')).toBe('Play video: Featured video')
+    expect(playControl?.classList).toContain('bg-black/80')
+    expect(playControl?.classList).not.toContain('ring-white')
+    expect(playIcon.classes()).toContain('i-lucide:play')
+    expect(playIcon.classes()).toContain('size-9')
+  })
+
   it('renders a responsive hero poster without initial video bytes', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
