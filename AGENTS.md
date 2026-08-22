@@ -65,6 +65,9 @@ Use these rules for all changes.
 - If custom styles in one file grow beyond roughly 80-120 lines or mix unrelated concerns, split them in the same PR.
 - Keep comments minimal and only for non-obvious logic or external constraints.
 - Do not wrap imports in `try/catch` (project-wide rule).
+- Prefer the smallest complete solution. Preserve existing behavior, reuse existing code paths, and add only what the requirement demonstrably needs.
+- Before finishing, remove duplicated logic or markup, unnecessary fallbacks, speculative abstractions, redundant state, superseded paths, and unused dependencies.
+- Do not sacrifice correctness, accessibility, security, readability, maintainability, or proportionate regression coverage merely to reduce line count.
 - Use single-quoted strings in JS/TS/Vue config and code unless escaping would reduce readability; keep style aligned with ESLint/Prettier.
 - In `<script setup>`, group related declarations with a single blank line between logical blocks (imports, props/emits, composables/context, local types, refs/state, computed values, methods/watch/lifecycle). Avoid extra blank lines within a single block.
 - Naming:
