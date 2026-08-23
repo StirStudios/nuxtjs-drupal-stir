@@ -31,6 +31,10 @@ const selectUi = {
   base: 'admin-ui-popover-control',
   content: 'admin-ui admin-ui-scope admin-ui-popover',
 }
+const helpTooltipUi = {
+  content: 'admin-ui-scope admin-ui-tooltip-content max-w-64',
+  arrow: 'admin-ui-tooltip-arrow',
+}
 
 const endpoint = computed(() =>
   `/api/paragraph/${props.action.paragraphId}/presentation`,
@@ -239,9 +243,23 @@ function handleOpen(value: boolean): void {
           <UFormField
             v-for="field in fields"
             :key="field.key"
-            :description="field.description || undefined"
             :label="field.label"
           >
+            <template v-if="field.description" #label>
+              <span class="inline-flex items-center gap-1">
+                <span>{{ field.label }}</span>
+                <UTooltip :text="field.description" :ui="helpTooltipUi">
+                  <UButton
+                    :aria-label="`About ${field.label}`"
+                    color="neutral"
+                    icon="i-lucide-circle-help"
+                    size="xs"
+                    :ui="{ base: '!min-h-0 !p-0 text-muted' }"
+                    variant="link"
+                  />
+                </UTooltip>
+              </span>
+            </template>
             <USwitch
               v-if="field.type === 'boolean'"
               :model-value="field.value as boolean"
