@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
   buildLayoutEditLinkIndex,
+  buildPresentationEditTargetIndex,
   layoutEditLinksKey,
+  presentationEditTargetsKey,
 } from '../../utils/layoutEditLinks'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import type {
@@ -24,6 +26,10 @@ const pageState = getPage()
 provide(
   layoutEditLinksKey,
   computed(() => buildLayoutEditLinkIndex(pageState.value)),
+)
+provide(
+  presentationEditTargetsKey,
+  computed(() => buildPresentationEditTargetIndex(pageState.value)),
 )
 
 const route = useRoute()

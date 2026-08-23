@@ -2,13 +2,51 @@ import type { ComputedRef, InjectionKey } from 'vue'
 
 export interface LayoutEditTarget {
   editLink: string
-  paragraphId?: number
 }
 
 export type LayoutEditLinkIndex = ReadonlyMap<string, LayoutEditTarget>
 
+export interface PresentationEditTarget {
+  paragraphId: number
+}
+
+export type PresentationEditTargetIndex = ReadonlyMap<
+  string,
+  PresentationEditTarget
+>
+
 export const layoutEditLinksKey: InjectionKey<ComputedRef<LayoutEditLinkIndex>> =
   Symbol('stir-layout-edit-links')
+
+export const presentationEditTargetsKey: InjectionKey<
+  ComputedRef<PresentationEditTargetIndex>
+> = Symbol('stir-presentation-edit-targets')
+
+function visitCustomElementNodes(
+  value: unknown,
+  visitor: (node: Record<string, unknown>) => void,
+): void {
+  const visited = new WeakSet<object>()
+
+  const visit = (candidate: unknown): void => {
+    if (!candidate || typeof candidate !== 'object') return
+    if (visited.has(candidate)) return
+
+    visited.add(candidate)
+
+    if (Array.isArray(candidate)) {
+      candidate.forEach(visit)
+      return
+    }
+
+    const node = candidate as Record<string, unknown>
+
+    visitor(node)
+    Object.values(node).forEach(visit)
+  }
+
+  visit(value)
+}
 
 /** Adds the current frontend page as Drupal's trusted post-edit destination. */
 export function withEditorDestination(
@@ -42,20 +80,8 @@ export function withEditorDestination(
 
 export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
   const links = new Map<string, LayoutEditTarget>()
-  const visited = new WeakSet<object>()
 
-  const visit = (candidate: unknown): void => {
-    if (!candidate || typeof candidate !== 'object') return
-    if (visited.has(candidate)) return
-
-    visited.add(candidate)
-
-    if (Array.isArray(candidate)) {
-      candidate.forEach(visit)
-      return
-    }
-
-    const node = candidate as Record<string, unknown>
+  visitCustomElementNodes(value, (node) => {
     const props = node.props && typeof node.props === 'object'
       ? node.props as Record<string, unknown>
       : null
@@ -63,25 +89,40 @@ export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
     const editLink = typeof props?.editLink === 'string'
       ? props.editLink.trim()
       : ''
-    const paragraphId = Number(props?.id)
 
     if (
       node.element === 'paragraph-layout'
       && uuid
       && editLink
     ) {
-      links.set(uuid, {
-        editLink,
-        ...(Number.isInteger(paragraphId) && paragraphId > 0
-          ? { paragraphId }
-          : {}),
-      })
+      links.set(uuid, { editLink })
     }
-
-    Object.values(node).forEach(visit)
-  }
-
-  visit(value)
+  })
 
   return links
+}
+
+export function buildPresentationEditTargetIndex(
+  value: unknown,
+): PresentationEditTargetIndex {
+  const targets = new Map<string, PresentationEditTarget>()
+
+  visitCustomElementNodes(value, (node) => {
+    const props = node.props && typeof node.props === 'object'
+      ? node.props as Record<string, unknown>
+      : null
+    const editLink = typeof props?.editLink === 'string'
+      ? props.editLink.trim()
+      : ''
+    const presentationEdit = props?.presentationEdit
+    const paragraphId = presentationEdit && typeof presentationEdit === 'object'
+      ? Number((presentationEdit as Record<string, unknown>).paragraphId)
+      : 0
+
+    if (editLink && Number.isInteger(paragraphId) && paragraphId > 0) {
+      targets.set(editLink, { paragraphId })
+    }
+  })
+
+  return targets
 }
