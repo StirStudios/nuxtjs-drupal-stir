@@ -3,6 +3,7 @@ import {
   buildLayoutEditLinkIndex,
   layoutEditLinksKey,
 } from '../../utils/layoutEditLinks'
+import { pageRefreshKey } from '../../utils/pageRefresh'
 import type {
   CmsGlobalSeoAssetConfig,
   SeoImageResolver,
@@ -16,7 +17,7 @@ const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
+const { fetchPage, refreshPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
 const { pageLayout, isAuthenticated, isFront } = usePageContext()
 const pageState = getPage()
 
@@ -51,6 +52,11 @@ const page = await fetchPage(
   pageRequest.path.value,
   { query: route.query },
   customPageError,
+)
+
+provide(
+  pageRefreshKey,
+  () => refreshPage(page, pageRequest.path.value, { query: route.query }),
 )
 
 if (page.value?.is_front_page === true && route.path !== '/') {

@@ -3,8 +3,7 @@ import type { AppContextPayload } from '../../../core/shared/types/appContext'
 import type { DrupalNodeRelatedItem } from '../types/Node'
 
 type DrupalComposable = ReturnType<typeof useDrupalCe>
-type DrupalPageRef = ReturnType<DrupalComposable['getPage']>
-type DrupalPage = DrupalPageRef['value']
+type DrupalPage = ReturnType<DrupalComposable['getPage']>['value']
 type DrupalFetchOptions = Parameters<DrupalComposable['$ceApi']>[0]
 type StirPageContent = {
   element?: string
@@ -40,14 +39,17 @@ export function useStirDrupalCe() {
       : content as CustomElementContent
 
   const refreshPage = async (
+    page: Ref<StirDrupalPage>,
     path: string,
     fetchOptions: DrupalFetchOptions = {},
-  ): Promise<DrupalPageRef> => {
-    const page = drupal.getPage() as DrupalPageRef
+  ): Promise<void> => {
+    const key = page.value?.key
     const refreshed = await drupal.$ceApi(fetchOptions)(path) as StirDrupalPage
 
-    Object.assign(page.value, refreshed)
-    return page
+    page.value = {
+      ...refreshed,
+      ...(key ? { key } : {}),
+    }
   }
 
   return {

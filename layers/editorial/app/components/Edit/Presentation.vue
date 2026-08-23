@@ -5,13 +5,13 @@ import type {
   ParagraphPresentationKey,
   ParagraphPresentationResponse,
 } from '#stir/types'
+import { pageRefreshKey } from '#stir/utils/pageRefresh'
 
 const props = defineProps<{
   action: EditAction
 }>()
 
-const { refreshPage } = useStirDrupalCe()
-const route = useRoute()
+const refreshRenderedPage = inject(pageRefreshKey)
 const open = ref(false)
 const loading = ref(false)
 const saving = ref(false)
@@ -48,10 +48,6 @@ const statusIcon = computed(() => {
   if (error.value) return 'i-lucide-circle-alert'
   return saved.value ? 'i-lucide-circle-check' : ''
 })
-
-async function refreshRenderedPage(): Promise<void> {
-  await refreshPage(route.path, { query: route.query })
-}
 
 async function load(): Promise<void> {
   if (loading.value || fields.value.length) return
@@ -117,7 +113,7 @@ async function save(): Promise<void> {
     })
 
     acceptResponse(response)
-    await refreshRenderedPage()
+    await refreshRenderedPage?.()
     saved.value = true
     if (savedTimer) clearTimeout(savedTimer)
     savedTimer = setTimeout(() => {
