@@ -1,8 +1,4 @@
-export type ParagraphPresentationKey =
-  | 'container'
-  | 'card'
-  | 'spacing'
-  | 'width'
+export type ParagraphPresentationKey = string
 
 export interface ParagraphPresentationOption {
   label: string
@@ -13,6 +9,7 @@ export interface ParagraphPresentationField {
   key: ParagraphPresentationKey
   fieldName: string
   label: string
+  description?: string
   type: 'boolean' | 'select' | 'multiselect'
   value: boolean | string | string[]
   options?: ParagraphPresentationOption[]

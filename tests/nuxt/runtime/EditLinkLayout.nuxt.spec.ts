@@ -19,10 +19,14 @@ const editControlsStub = defineComponent({
       .map(action => (action as { key?: string }).key)
       .filter(Boolean)
       .join(','))
+    const actionParagraphIds = computed(() => props.actions
+      .filter(action => (action as { paragraphId?: number }).paragraphId)
+      .map(action => `${(action as { key?: string }).key}:${(action as { paragraphId?: number }).paragraphId}`)
+      .join(','))
 
-    return { actionKeys }
+    return { actionKeys, actionParagraphIds }
   },
-  template: '<div data-admin-ui-controls :data-action-keys="actionKeys" />',
+  template: '<div data-admin-ui-controls :data-action-keys="actionKeys" :data-action-paragraph-ids="actionParagraphIds" />',
 })
 
 describe('EditLink layout contract', () => {
@@ -122,6 +126,7 @@ describe('EditLink layout contract', () => {
           ])),
           [presentationEditTargetsKey as symbol]: computed(() => new Map([
             [editLink, { paragraphId: 42 }],
+            ['https://cms.example/paragraph/9/edit', { paragraphId: 9 }],
           ])),
         },
         stubs: {
@@ -138,5 +143,7 @@ describe('EditLink layout contract', () => {
 
     expect(wrapper.get('[data-admin-ui-controls]').attributes('data-action-keys'))
       .toBe('full,presentation,layout')
+    expect(wrapper.get('[data-admin-ui-controls]').attributes('data-action-paragraph-ids'))
+      .toBe('presentation:42,layout:9')
   })
 })

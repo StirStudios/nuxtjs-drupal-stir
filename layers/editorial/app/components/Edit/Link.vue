@@ -54,37 +54,48 @@ const fullEditLink = computed(() => {
 })
 const hasLink = computed(() => fullEditLink.value.length > 0)
 
-const layoutEditLink = computed(() => {
+const layoutEditTarget = computed(() => {
   const explicitLink =
     typeof props.layoutLink === 'string' ? props.layoutLink.trim() : ''
 
   if (explicitLink) {
-    return withEditorDestination(explicitLink, frontendReturnUrl.value)
+    return { editLink: explicitLink }
   }
 
   const parentUuid =
     typeof props.parentUuid === 'string' ? props.parentUuid.trim() : ''
 
-  if (!parentUuid) return ''
+  if (!parentUuid) return null
 
-  const target = (
+  return (
     providedLayoutEditLinks?.value.get(parentUuid)
     ?? fallbackLayoutEditLinks?.value.get(parentUuid)
     ?? null
   )
-
-  return target
-    ? withEditorDestination(target.editLink, frontendReturnUrl.value)
-    : ''
 })
-const hasLayoutLink = computed(
+const layoutEditLink = computed(() => layoutEditTarget.value
+  ? withEditorDestination(layoutEditTarget.value.editLink, frontendReturnUrl.value)
+  : '',
+)
+const layoutPresentationParagraphId = computed(() => {
+  const editLink = layoutEditTarget.value?.editLink ?? ''
+
+  return editLink
+    ? (
+        providedPresentationEditTargets?.value.get(editLink)
+        ?? fallbackPresentationEditTargets?.value.get(editLink)
+      )?.paragraphId ?? null
+    : null
+})
+const hasLayoutSettings = computed(
   () =>
     layoutEditLink.value.length > 0 &&
-    layoutEditLink.value !== fullEditLink.value,
+    layoutEditLink.value !== fullEditLink.value &&
+    layoutPresentationParagraphId.value !== null,
 )
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
-const layoutEditLabel = computed(() => 'Edit layout')
+const layoutEditLabel = computed(() => 'Layout settings')
 const presentationParagraphId = computed(() => {
   const link = typeof props.link === 'string' ? props.link.trim() : ''
 
@@ -105,7 +116,7 @@ const actions = computed<EditAction[]>(() => {
       Number(hasQuickEdit.value) +
       Number(hasLink.value) +
       Number(presentationParagraphId.value !== null) +
-      Number(hasLayoutLink.value) ===
+      Number(hasLayoutSettings.value) ===
     1
 
   if (hasQuickEdit.value) {
@@ -159,7 +170,7 @@ const actions = computed<EditAction[]>(() => {
     })
   }
 
-  if (hasLayoutLink.value) {
+  if (hasLayoutSettings.value) {
     const tooltip = hasSingleAction
       ? singleActionLabel.value
       : layoutEditLabel.value
@@ -171,8 +182,8 @@ const actions = computed<EditAction[]>(() => {
       icon: 'i-lucide-panels-top-left',
       variant: 'soft',
       buttonClass: actionButtonClass,
-      to: layoutEditLink.value,
-      navigateInPlace: true,
+      paragraphId: layoutPresentationParagraphId.value ?? undefined,
+      fullEditLink: layoutEditLink.value,
     })
   }
 

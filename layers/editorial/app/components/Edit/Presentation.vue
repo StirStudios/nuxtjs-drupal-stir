@@ -15,6 +15,7 @@ const props = defineProps<{
 const refreshRenderedPage = inject<PageRefresh>(pageRefreshKey)
 const toast = useToast()
 const open = ref(false)
+const tooltipOpen = ref(false)
 const loading = ref(false)
 const saving = ref(false)
 const saved = ref(false)
@@ -160,11 +161,14 @@ onBeforeUnmount(() => {
 function handleOpen(value: boolean): void {
   if (!value && dirty.value) {
     fields.value.forEach((field) => {
-      field.value = cloneValue(savedValues.value[field.key])
+      const savedValue = savedValues.value[field.key]
+
+      if (savedValue !== undefined) field.value = cloneValue(savedValue)
     })
   }
 
   open.value = value
+  if (value) tooltipOpen.value = false
   if (value) void load()
 }
 </script>
@@ -176,17 +180,26 @@ function handleOpen(value: boolean): void {
     :ui="popoverUi"
     @update:open="handleOpen"
   >
-    <UButton
-      :aria-label="action.ariaLabel"
-      color="neutral"
-      :icon="action.icon"
-      :title="action.tooltip"
-      :ui="{ base: action.buttonClass }"
-      :variant="action.variant"
-      @click.stop
+    <UTooltip
+      :open="tooltipOpen"
+      :text="action.tooltip"
+      :ui="{
+        content: 'admin-ui-scope admin-ui-tooltip-content',
+        arrow: 'admin-ui-tooltip-arrow',
+      }"
+      @update:open="value => tooltipOpen = value"
     >
-      <span class="sr-only">{{ action.ariaLabel }}</span>
-    </UButton>
+      <UButton
+        :aria-label="action.ariaLabel"
+        color="neutral"
+        :icon="action.icon"
+        :ui="{ base: action.buttonClass }"
+        :variant="action.variant"
+        @click.stop="tooltipOpen = false"
+      >
+        <span class="sr-only">{{ action.ariaLabel }}</span>
+      </UButton>
+    </UTooltip>
 
     <template #content>
       <UCard
@@ -226,6 +239,7 @@ function handleOpen(value: boolean): void {
           <UFormField
             v-for="field in fields"
             :key="field.key"
+            :description="field.description || undefined"
             :label="field.label"
           >
             <USwitch
