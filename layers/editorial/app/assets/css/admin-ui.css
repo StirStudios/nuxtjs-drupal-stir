@@ -127,6 +127,20 @@
   color: var(--admin-text);
 }
 
+.admin-ui-card-header {
+  min-height: 0;
+  padding: 0.75rem;
+}
+
+.admin-ui-card-title {
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
 /*
    * Popovers are teleported outside the component tree. Keep their typography
    * and controls independent from downstream site-level element selectors.
@@ -233,6 +247,23 @@
   line-height: 1.25rem;
   letter-spacing: normal;
   text-transform: none;
+}
+
+.admin-ui-scope .admin-ui-switch-track[data-state='unchecked'] {
+  background-color: var(--admin-z-400);
+  box-shadow: inset 0 0 0 1px var(--admin-border);
+}
+
+.dark .admin-ui-scope .admin-ui-switch-track[data-state='unchecked'] {
+  background-color: var(--admin-z-700);
+}
+
+.admin-ui-scope .admin-ui-switch-thumb[data-state='unchecked'] {
+  background-color: var(--admin-white);
+}
+
+.admin-ui-scope .admin-ui-switch-thumb[data-state='checked'] {
+  background-color: var(--admin-bg);
 }
 
 .admin-ui-settings-separator {

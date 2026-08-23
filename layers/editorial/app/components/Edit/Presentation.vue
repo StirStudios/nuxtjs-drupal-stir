@@ -300,7 +300,7 @@ async function handleArrangementSaved(
             <div>
               <h2
                 ref="quickSettingsHeading"
-                class="text-highlighted font-semibold outline-none"
+                class="admin-ui-card-title text-highlighted outline-none"
                 tabindex="-1"
               >
                 Quick settings
@@ -329,7 +329,7 @@ async function handleArrangementSaved(
           <USkeleton v-for="index in 4" :key="index" class="h-9 w-full" />
         </div>
 
-        <div v-else-if="fields.length || layout" class="space-y-4">
+        <div v-else-if="fields.length || layout" class="space-y-3">
           <UCollapsible
             v-if="layout"
             class="border-muted rounded-md border"
@@ -435,7 +435,7 @@ async function handleArrangementSaved(
             </template>
           </UCollapsible>
 
-          <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
+          <div v-if="fields.length" class="grid grid-cols-2 gap-3">
             <template v-for="(field, index) in fields" :key="field.key">
               <USeparator
                 v-if="index > 0 && field.group !== fields[index - 1]?.group"

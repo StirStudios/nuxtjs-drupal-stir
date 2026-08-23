@@ -53,6 +53,10 @@ type AdminUiTheme = {
     base: string
     content: string
   }
+  switch: {
+    base: string
+    thumb: string
+  }
   modal: {
     overlay: string
     content: string
@@ -138,9 +142,9 @@ export const adminUiTheme = {
     trailingIcon: 'text-current',
   },
   card: {
-    header: 'p-4',
-    body: 'p-4',
-    footer: 'p-4',
+    header: 'admin-ui-card-header',
+    body: 'p-3',
+    footer: 'p-3',
   },
   formField: {
     label: 'admin-ui-form-label',
@@ -165,6 +169,10 @@ export const adminUiTheme = {
   selectMenu: {
     base: 'admin-ui-popover-control',
     content: 'admin-ui admin-ui-scope admin-ui-popover',
+  },
+  switch: {
+    base: 'admin-ui-switch-track',
+    thumb: 'admin-ui-switch-thumb',
   },
   modal: {
     overlay: 'admin-ui-modal-overlay',
