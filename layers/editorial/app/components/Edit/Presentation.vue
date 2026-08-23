@@ -97,6 +97,7 @@ function handleOpen(value: boolean): void {
       :aria-label="action.ariaLabel"
       color="neutral"
       :icon="action.icon"
+      :title="action.tooltip"
       :ui="{ base: action.buttonClass }"
       :variant="action.variant"
       @click.stop
