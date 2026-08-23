@@ -311,7 +311,10 @@ async function handleArrangementSaved(
               class="flex items-center gap-1 text-xs font-medium"
               :class="error ? 'text-error' : 'text-muted'"
             >
-              <UIcon :class="saving ? 'animate-spin' : ''" :name="statusIcon" />
+              <UIcon
+                :class="saving ? 'admin-ui-spinner' : ''"
+                :name="statusIcon"
+              />
               {{ status }}
             </span>
           </div>

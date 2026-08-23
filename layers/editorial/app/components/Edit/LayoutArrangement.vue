@@ -10,6 +10,7 @@ import {
   createParagraphLayoutGrid,
   serializeParagraphLayoutArrangement,
 } from '#stir/utils/paragraphLayoutArrangement'
+import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps<{
@@ -30,6 +31,11 @@ const error = ref('')
 const announcement = ref('')
 const arrangement = ref<Record<string, ParagraphLayoutChild[]>>({})
 const removed = ref<ParagraphLayoutChild[]>([])
+const modalUi = {
+  content: `${adminUiTheme.modal.content} w-[calc(100vw-2rem)] max-w-6xl`,
+  body: 'space-y-5',
+  footer: 'justify-end',
+}
 
 const selectedOption = computed(() => props.contract.options.find(
   option => option.value === selectedLayout.value,
@@ -175,17 +181,14 @@ watch(() => props.open, (value) => {
 </script>
 
 <template>
-  <ClientOnly>
-    <UModal
+  <UTheme :props="adminUiProps" :ui="adminUiTheme">
+    <ClientOnly>
+      <UModal
       description="Choose a layout, then drag or use the move controls to arrange every item. Changes save together."
       :open="open"
       scrollable
       title="Arrange layout content"
-      :ui="{
-        content: 'w-[calc(100vw-2rem)] max-w-6xl',
-        body: 'space-y-5',
-        footer: 'justify-end',
-      }"
+      :ui="modalUi"
       @update:open="emit('update:open', $event)"
     >
       <template #body>
@@ -338,8 +341,9 @@ watch(() => props.open, (value) => {
           />
         </div>
       </template>
-    </UModal>
-  </ClientOnly>
+      </UModal>
+    </ClientOnly>
+  </UTheme>
 </template>
 
 <style src="../../assets/css/admin-ui.css"></style>

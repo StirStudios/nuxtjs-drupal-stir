@@ -438,6 +438,41 @@
   background-color: var(--admin-bg-strong);
 }
 
+.admin-ui-loading-state {
+  display: grid;
+  min-height: 8rem;
+  place-items: center;
+  padding: 1.5rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text-muted);
+}
+
+.admin-ui-scope .admin-ui-loading-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.admin-ui-scope .admin-ui-loading-icon,
+.admin-ui-scope .admin-ui-spinner {
+  animation: admin-ui-spin 1s linear infinite;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-ui-scope .admin-ui-loading-icon,
+  .admin-ui-scope .admin-ui-spinner {
+    animation: none;
+  }
+}
+
+@keyframes admin-ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .admin-ui-tooltip-arrow {
   fill: var(--admin-bg-muted);
   stroke: var(--admin-border);
