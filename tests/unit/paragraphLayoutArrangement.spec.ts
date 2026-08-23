@@ -62,9 +62,9 @@ describe('paragraph layout arrangement', () => {
         { value: 'bottom', label: 'Bottom' },
       ],
       iconMap: [
-        ['top', 'top'],
+        ['top'],
         ['left', 'right'],
-        ['bottom', 'bottom'],
+        ['bottom'],
       ],
     }
 

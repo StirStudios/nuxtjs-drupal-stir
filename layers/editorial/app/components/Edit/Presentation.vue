@@ -419,7 +419,7 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
           <template v-for="(field, index) in fields" :key="field.key">
             <USeparator
               v-if="index > 0 && field.group !== fields[index - 1]?.group"
-              class="col-span-2"
+              class="col-span-2 -my-3"
             />
             <UFormField :label="field.label">
             <template v-if="field.description" #label>

@@ -18,11 +18,13 @@ export function createParagraphLayoutGrid(option: ParagraphLayoutOption): Paragr
     },
     regionAreas: {},
   }
-  const columns = option.iconMap[0]?.length ?? 0
+  const columns = Math.max(0, ...option.iconMap.map(row => row.length))
   const validRegions = new Set(option.regions.map(region => region.value))
 
   if (columns < 1 || option.iconMap.some(
-    row => row.length !== columns || row.some(region => !validRegions.has(region)),
+    row => row.length < 1
+      || columns % row.length !== 0
+      || row.some(region => !validRegions.has(region)),
   )) {
     return fallback
   }
@@ -30,7 +32,12 @@ export function createParagraphLayoutGrid(option: ParagraphLayoutOption): Paragr
   const regionAreas = Object.fromEntries(option.regions.map(
     (region, index) => [region.value, `region${index + 1}`],
   ))
-  const rows = option.iconMap.map(row => `"${row.map(region => regionAreas[region]).join(' ')}"`)
+  const rows = option.iconMap.map((row) => {
+    const span = columns / row.length
+    const areas = row.flatMap(region => Array<string>(span).fill(regionAreas[region]!))
+
+    return `"${areas.join(' ')}"`
+  })
 
   return {
     container: {
