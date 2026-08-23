@@ -1,4 +1,4 @@
-export type EditActionKey = 'quick' | 'full' | 'presentation'
+export type EditActionKey = 'quick' | 'full' | 'presentation' | 'layout'
 
 export interface EditAction {
   key: EditActionKey

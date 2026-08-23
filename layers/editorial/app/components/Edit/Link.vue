@@ -2,7 +2,9 @@
 import type { EditAction } from '#stir/types'
 import {
   buildLayoutEditLinkIndex,
+  buildPresentationEditTargetIndex,
   layoutEditLinksKey,
+  presentationEditTargetsKey,
   withEditorDestination,
 } from '#stir/utils/layoutEditLinks'
 
@@ -33,9 +35,13 @@ const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()
 const providedLayoutEditLinks = inject(layoutEditLinksKey, null)
+const providedPresentationEditTargets = inject(presentationEditTargetsKey, null)
 const fallbackLayoutEditLinks = providedLayoutEditLinks
   ? null
   : computed(() => buildLayoutEditLinkIndex(page.value))
+const fallbackPresentationEditTargets = providedPresentationEditTargets
+  ? null
+  : computed(() => buildPresentationEditTargetIndex(page.value))
 
 const hasQuickEdit = computed(() => props.showQuickEdit === true)
 const frontendReturnUrl = computed(() =>
@@ -71,18 +77,6 @@ const layoutEditLink = computed(() => {
     ? withEditorDestination(target.editLink, frontendReturnUrl.value)
     : ''
 })
-const layoutParagraphId = computed(() => {
-  const parentUuid = typeof props.parentUuid === 'string'
-    ? props.parentUuid.trim()
-    : ''
-
-  return parentUuid
-    ? (
-        providedLayoutEditLinks?.value.get(parentUuid)
-        ?? fallbackLayoutEditLinks?.value.get(parentUuid)
-      )?.paragraphId ?? null
-    : null
-})
 const hasLayoutLink = computed(
   () =>
     layoutEditLink.value.length > 0 &&
@@ -91,20 +85,16 @@ const hasLayoutLink = computed(
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const layoutEditLabel = computed(() => 'Edit layout')
-const presentationEditLink = computed(() =>
-  layoutParagraphId.value !== null
-    ? layoutEditLink.value
-    : fullEditLink.value,
-)
-const presentationParagraphId = computed(() =>
-  presentationEditLink.value
-    ? layoutParagraphId.value ?? (
-        Number.isInteger(Number(props.id)) && Number(props.id) > 0
-          ? Number(props.id)
-          : null
-      )
-    : null,
-)
+const presentationParagraphId = computed(() => {
+  const link = typeof props.link === 'string' ? props.link.trim() : ''
+
+  return link
+    ? (
+        providedPresentationEditTargets?.value.get(link)
+        ?? fallbackPresentationEditTargets?.value.get(link)
+      )?.paragraphId ?? null
+    : null
+})
 const singleActionLabel = computed(() => 'Edit')
 const actionButtonClass =
   'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft'
@@ -112,9 +102,10 @@ const actionButtonClass =
 const actions = computed<EditAction[]>(() => {
   const result: EditAction[] = []
   const hasSingleAction =
-    Number(hasQuickEdit.value) +
+      Number(hasQuickEdit.value) +
       Number(hasLink.value) +
-      Number(presentationParagraphId.value !== null) ===
+      Number(presentationParagraphId.value !== null) +
+      Number(hasLayoutLink.value) ===
     1
 
   if (hasQuickEdit.value) {
@@ -153,9 +144,7 @@ const actions = computed<EditAction[]>(() => {
   }
 
   if (presentationParagraphId.value !== null) {
-    const tooltip = hasSingleAction
-      ? singleActionLabel.value
-      : hasLayoutLink.value ? layoutEditLabel.value : 'Quick settings'
+    const tooltip = hasSingleAction ? singleActionLabel.value : 'Quick settings'
     const ariaLabel = `${tooltip} for this section`
 
     result.push({
@@ -166,7 +155,24 @@ const actions = computed<EditAction[]>(() => {
       variant: 'soft',
       buttonClass: actionButtonClass,
       paragraphId: presentationParagraphId.value,
-      fullEditLink: presentationEditLink.value,
+      fullEditLink: fullEditLink.value,
+    })
+  }
+
+  if (hasLayoutLink.value) {
+    const tooltip = hasSingleAction
+      ? singleActionLabel.value
+      : layoutEditLabel.value
+
+    result.push({
+      key: 'layout',
+      tooltip,
+      ariaLabel: `${tooltip} for this section`,
+      icon: 'i-lucide-panels-top-left',
+      variant: 'soft',
+      buttonClass: actionButtonClass,
+      to: layoutEditLink.value,
+      navigateInPlace: true,
     })
   }
 

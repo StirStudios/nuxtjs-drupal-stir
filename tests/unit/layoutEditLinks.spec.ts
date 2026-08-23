@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildLayoutEditLinkIndex,
+  buildPresentationEditTargetIndex,
   withEditorDestination,
 } from '../../layers/theme/app/utils/layoutEditLinks'
 
@@ -22,8 +23,8 @@ describe('buildLayoutEditLinkIndex', () => {
     })
 
     expect(Object.fromEntries(index)).toEqual({
-      'layout-one': { editLink: '/paragraph/1/edit', paragraphId: 1 },
-      'layout-two': { editLink: '/paragraph/2/edit', paragraphId: 2 },
+      'layout-one': { editLink: '/paragraph/1/edit' },
+      'layout-two': { editLink: '/paragraph/2/edit' },
     })
   })
 
@@ -50,7 +51,6 @@ describe('buildLayoutEditLinkIndex', () => {
 
     expect(buildLayoutEditLinkIndex(cyclic).get('layout')).toEqual({
       editLink: '/edit',
-      paragraphId: 4,
     })
   })
 })
@@ -70,5 +70,36 @@ describe('withEditorDestination', () => {
       .toBe('/node/3/edit')
     expect(withEditorDestination('javascript:alert(1)', 'https://www.example.com/contact'))
       .toBe('javascript:alert(1)')
+  })
+})
+
+describe('buildPresentationEditTargetIndex', () => {
+  it('indexes only Drupal-advertised presentation targets by edit link', () => {
+    const index = buildPresentationEditTargetIndex({
+      content: [
+        {
+          element: 'paragraph-text',
+          props: {
+            editLink: ' /paragraph/42/edit ',
+            presentationEdit: { paragraphId: 42 },
+          },
+        },
+        {
+          element: 'paragraph-accordion-item',
+          props: { id: 43, editLink: '/paragraph/43/edit' },
+        },
+        {
+          element: 'paragraph-text',
+          props: {
+            editLink: '/paragraph/invalid/edit',
+            presentationEdit: { paragraphId: 'invalid' },
+          },
+        },
+      ],
+    })
+
+    expect(Object.fromEntries(index)).toEqual({
+      '/paragraph/42/edit': { paragraphId: 42 },
+    })
   })
 })
