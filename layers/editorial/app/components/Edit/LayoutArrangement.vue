@@ -7,6 +7,7 @@ import type {
 } from '#stir/types'
 import {
   createParagraphLayoutArrangement,
+  createParagraphLayoutGrid,
   serializeParagraphLayoutArrangement,
 } from '#stir/utils/paragraphLayoutArrangement'
 import { VueDraggable } from 'vue-draggable-plus'
@@ -28,10 +29,18 @@ const saving = ref(false)
 const error = ref('')
 const announcement = ref('')
 const arrangement = ref<Record<string, ParagraphLayoutChild[]>>({})
+const removed = ref<ParagraphLayoutChild[]>([])
+const tooltipUi = {
+  content: 'admin-ui-scope admin-ui-tooltip-content',
+  arrow: 'admin-ui-tooltip-arrow',
+}
 
 const selectedOption = computed(() => props.contract.options.find(
   option => option.value === selectedLayout.value,
 ) ?? props.contract.options[0])
+const layoutGrid = computed(() => selectedOption.value
+  ? createParagraphLayoutGrid(selectedOption.value)
+  : { container: {}, regionAreas: {} })
 
 function childrenFor(region: string): ParagraphLayoutChild[] {
   return arrangement.value[region] ?? []
@@ -39,10 +48,36 @@ function childrenFor(region: string): ParagraphLayoutChild[] {
 
 function resetArrangement(option: ParagraphLayoutOption): void {
   arrangement.value = createParagraphLayoutArrangement(props.contract, option)
+  removed.value = []
 }
 
 function updateRegion(region: string, children: ParagraphLayoutChild[]): void {
   arrangement.value[region] = children
+}
+
+function removeChild(child: ParagraphLayoutChild): void {
+  const location = locate(child.uuid)
+
+  if (!location) return
+  const [staged] = childrenFor(location.region).splice(location.index, 1)
+
+  if (!staged) return
+  removed.value.push(staged)
+  announcement.value = `${child.label} will be removed when the arrangement is saved.`
+}
+
+function restoreChild(child: ParagraphLayoutChild): void {
+  const index = removed.value.findIndex(candidate => candidate.uuid === child.uuid)
+
+  if (index < 0 || !selectedOption.value) return
+  removed.value.splice(index, 1)
+  const destination = selectedOption.value.regions.some(region => region.value === child.region)
+    ? child.region
+    : selectedOption.value.defaultRegion
+
+  child.region = destination
+  childrenFor(destination).push(child)
+  announcement.value = `${child.label} restored to the layout.`
 }
 
 function chooseLayout(value: string): void {
@@ -108,6 +143,7 @@ async function save(): Promise<void> {
           target: selectedLayout.value,
           mappings: {},
           regions: regionPayload(),
+          removed: removed.value.map(child => child.uuid),
           expectedOwnerRevisionId: props.contract.ownerRevisionId,
         },
       },
@@ -147,9 +183,10 @@ watch(() => props.open, (value) => {
       scrollable
       title="Arrange layout content"
       :ui="{
-        content: 'admin-ui admin-ui-scope w-[calc(100vw-2rem)] max-w-6xl',
+        content: 'admin-ui admin-ui-scope admin-ui-modal w-[calc(100vw-2rem)] max-w-6xl',
+        title: 'admin-ui-modal-title',
         body: 'space-y-5',
-        footer: 'justify-between',
+        footer: 'justify-end',
       }"
       @update:open="emit('update:open', $event)"
     >
@@ -177,13 +214,14 @@ watch(() => props.open, (value) => {
 
         <div
           v-if="selectedOption"
-          class="grid gap-4"
-          :style="{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(14rem, 100%), 1fr))' }"
+          class="admin-ui-layout-grid grid gap-4"
+          :style="layoutGrid.container"
         >
           <section
             v-for="region in selectedOption.regions"
             :key="region.value"
             class="flex min-h-64 min-w-0 flex-col rounded-lg border border-muted bg-muted/20"
+            :style="layoutGrid.regionAreas[region.value] ? { gridArea: layoutGrid.regionAreas[region.value] } : undefined"
           >
             <h3 class="border-b border-muted px-3 py-2 text-sm font-semibold text-highlighted">
               {{ region.label }}
@@ -236,6 +274,16 @@ watch(() => props.open, (value) => {
                     variant="ghost"
                     @click="moveWithin(child, 1)"
                   />
+                  <UTooltip arrow text="Remove from layout" :ui="tooltipUi">
+                    <UButton
+                      :aria-label="`Remove ${child.label} from layout`"
+                      color="error"
+                      icon="i-lucide-trash-2"
+                      size="xs"
+                      variant="ghost"
+                      @click="removeChild(child)"
+                    />
+                  </UTooltip>
                 </div>
                 <USelect
                   v-if="selectedOption.regions.length > 1"
@@ -252,21 +300,50 @@ watch(() => props.open, (value) => {
           </section>
         </div>
 
+        <UAlert
+          v-if="removed.length"
+          color="warning"
+          icon="i-lucide-trash-2"
+          title="Removed on save"
+          variant="subtle"
+        >
+          <template #description>
+            <ul class="mt-2 space-y-1">
+              <li v-for="child in removed" :key="child.uuid" class="flex items-center justify-between gap-3">
+                <span class="truncate">{{ child.label }}</span>
+                <UButton
+                  :aria-label="`Restore ${child.label}`"
+                  color="neutral"
+                  icon="i-lucide-undo-2"
+                  label="Undo"
+                  size="xs"
+                  variant="ghost"
+                  @click="restoreChild(child)"
+                />
+              </li>
+            </ul>
+          </template>
+        </UAlert>
+
         <p aria-live="polite" class="sr-only">{{ announcement }}</p>
         <UAlert v-if="error" color="error" :description="error" icon="i-lucide-circle-alert" />
       </template>
 
       <template #footer>
-        <UButton color="neutral" label="Cancel" variant="ghost" @click="emit('update:open', false)" />
-        <UButton
-          color="neutral"
-          icon="i-lucide-save"
-          label="Save arrangement"
-          :loading="saving"
-          variant="solid"
-          @click="save"
-        />
+        <UFieldGroup>
+          <UButton color="neutral" label="Cancel" variant="outline" @click="emit('update:open', false)" />
+          <UButton
+            color="neutral"
+            icon="i-lucide-save"
+            label="Save arrangement"
+            :loading="saving"
+            variant="solid"
+            @click="save"
+          />
+        </UFieldGroup>
       </template>
     </UModal>
   </ClientOnly>
 </template>
+
+<style src="../../assets/css/admin-ui.css"></style>

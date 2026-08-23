@@ -30,11 +30,12 @@ editor displays Drupal's suggested destinations and requires an explicit valid
 mapping before Save. Layout and presentation changes share one save request;
 the owning revision token prevents stale overwrites. Region names, icons,
 choices, mapping requirements, permissions, and validation remain Drupal-owned.
-Eligible Layout Paragraphs also expose a visual arranger. Dragging and keyboard
-move controls update only local state; one explicit save submits the complete
-ordered region arrangement with Drupal's owner-revision token. Drupal remains
-the source of truth and rejects stale, incomplete, duplicate, or unauthorized
-arrangements before atomically saving the owning aggregate.
+Eligible Layout Paragraphs also expose a visual arranger. Dragging, keyboard
+move controls, and staged removals update only local state; one explicit save
+submits the complete ordered region arrangement with Drupal's owner-revision
+token. Removed items remain visible with an Undo action until save. Drupal
+remains the source of truth and rejects stale, incomplete, duplicate, or
+unauthorized arrangements before atomically saving the owning aggregate.
 
 The editor keeps Drupal's stored text format unchanged, preserves supported
 Drupal-specific blocks such as `<drupal-media>` and `<stir-cta>`, and exposes a

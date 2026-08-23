@@ -244,6 +244,12 @@ function openArrangement(): void {
   arrangementOpen.value = true
 }
 
+function openFullEditor(): void {
+  if (!props.action.fullEditLink || !import.meta.client) return
+
+  window.location.assign(props.action.fullEditLink)
+}
+
 async function handleArrangementSaved(response: ParagraphPresentationResponse): Promise<void> {
   acceptResponse(response)
   await refreshPageAfterSave()
@@ -293,9 +299,6 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               >
                 Quick settings
               </h2>
-              <p class="text-sm text-muted">
-                Adjust settings, then save once.
-              </p>
             </div>
             <span
               v-if="status"
@@ -413,11 +416,12 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
           </UCollapsible>
 
           <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
-          <UFormField
-            v-for="field in fields"
-            :key="field.key"
-            :label="field.label"
-          >
+          <template v-for="(field, index) in fields" :key="field.key">
+            <USeparator
+              v-if="index > 0 && field.group !== fields[index - 1]?.group"
+              class="col-span-2"
+            />
+            <UFormField :label="field.label">
             <template v-if="field.description" #label>
               <span class="inline-flex items-center gap-1">
                 <span>{{ field.label }}</span>
@@ -465,7 +469,8 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               value-key="value"
               @update:model-value="value => updateMultiselectValue(field, value)"
             />
-          </UFormField>
+            </UFormField>
+          </template>
           </div>
         </div>
 
@@ -495,8 +500,8 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               color="neutral"
               icon="i-lucide-square-pen"
               label="Open full editor"
-              :to="action.fullEditLink"
               variant="soft"
+              @click="openFullEditor"
             />
           </div>
         </template>

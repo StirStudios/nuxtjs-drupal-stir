@@ -10,6 +10,7 @@ export interface ParagraphPresentationField {
   fieldName: string
   label: string
   description?: string
+  group?: string
   type: 'boolean' | 'select' | 'multiselect'
   value: boolean | string | string[]
   options?: ParagraphPresentationOption[]
@@ -56,6 +57,7 @@ export interface ParagraphLayoutUpdate {
   mappings: Record<string, string>
   expectedOwnerRevisionId: number | null
   regions?: Record<string, string[]>
+  removed?: string[]
 }
 
 export interface ParagraphPresentationResponse {

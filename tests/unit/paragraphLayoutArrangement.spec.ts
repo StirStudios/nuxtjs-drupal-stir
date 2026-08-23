@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   createParagraphLayoutArrangement,
+  createParagraphLayoutGrid,
   serializeParagraphLayoutArrangement,
 } from '../../layers/theme/app/utils/paragraphLayoutArrangement'
 import type { ParagraphLayoutContract, ParagraphLayoutOption } from '../../layers/theme/app/types/Presentation'
@@ -48,6 +49,36 @@ describe('paragraph layout arrangement', () => {
     expect(serializeParagraphLayoutArrangement(target, arrangement)).toEqual({
       first: ['a', 'b'],
       second: [],
+    })
+  })
+
+  it('uses Drupal’s icon map to reproduce the selected layout shape', () => {
+    const option: ParagraphLayoutOption = {
+      ...target,
+      regions: [
+        { value: 'top', label: 'Top' },
+        { value: 'left', label: 'Left' },
+        { value: 'right', label: 'Right' },
+        { value: 'bottom', label: 'Bottom' },
+      ],
+      iconMap: [
+        ['top', 'top'],
+        ['left', 'right'],
+        ['bottom', 'bottom'],
+      ],
+    }
+
+    expect(createParagraphLayoutGrid(option)).toEqual({
+      container: {
+        gridTemplateAreas: '"region1 region1" "region2 region3" "region4 region4"',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      },
+      regionAreas: {
+        top: 'region1',
+        left: 'region2',
+        right: 'region3',
+        bottom: 'region4',
+      },
     })
   })
 })

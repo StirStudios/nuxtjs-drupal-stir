@@ -6,6 +6,41 @@ import type {
 
 export type ParagraphLayoutArrangement = Record<string, ParagraphLayoutChild[]>
 
+export interface ParagraphLayoutGrid {
+  container: Record<string, string>
+  regionAreas: Record<string, string>
+}
+
+export function createParagraphLayoutGrid(option: ParagraphLayoutOption): ParagraphLayoutGrid {
+  const fallback = {
+    container: {
+      gridTemplateColumns: 'repeat(auto-fit, minmax(min(14rem, 100%), 1fr))',
+    },
+    regionAreas: {},
+  }
+  const columns = option.iconMap[0]?.length ?? 0
+  const validRegions = new Set(option.regions.map(region => region.value))
+
+  if (columns < 1 || option.iconMap.some(
+    row => row.length !== columns || row.some(region => !validRegions.has(region)),
+  )) {
+    return fallback
+  }
+
+  const regionAreas = Object.fromEntries(option.regions.map(
+    (region, index) => [region.value, `region${index + 1}`],
+  ))
+  const rows = option.iconMap.map(row => `"${row.map(region => regionAreas[region]).join(' ')}"`)
+
+  return {
+    container: {
+      gridTemplateAreas: rows.join(' '),
+      gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+    },
+    regionAreas,
+  }
+}
+
 export function createParagraphLayoutArrangement(
   contract: ParagraphLayoutContract,
   option: ParagraphLayoutOption,
