@@ -249,6 +249,10 @@
   text-transform: inherit;
 }
 
+.admin-ui-switch-track {
+  margin-top: 0.125rem;
+}
+
 .admin-ui-scope .admin-ui-switch-track[data-state='unchecked'] {
   background-color: var(--admin-z-400);
   box-shadow: inset 0 0 0 1px var(--admin-border);
