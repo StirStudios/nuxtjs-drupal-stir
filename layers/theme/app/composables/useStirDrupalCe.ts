@@ -5,6 +5,7 @@ import type { DrupalNodeRelatedItem } from '../types/Node'
 type DrupalComposable = ReturnType<typeof useDrupalCe>
 type DrupalPageRef = ReturnType<DrupalComposable['getPage']>
 type DrupalPage = DrupalPageRef['value']
+type DrupalFetchOptions = Parameters<DrupalComposable['$ceApi']>[0]
 type StirPageContent = {
   element?: string
   props?: Record<string, unknown> & {
@@ -38,12 +39,24 @@ export function useStirDrupalCe() {
         ) as CustomElementContent
       : content as CustomElementContent
 
+  const refreshPage = async (
+    path: string,
+    fetchOptions: DrupalFetchOptions = {},
+  ): Promise<DrupalPageRef> => {
+    const page = drupal.getPage() as DrupalPageRef
+    const refreshed = await drupal.$ceApi(fetchOptions)(path) as StirDrupalPage
+
+    Object.assign(page.value, refreshed)
+    return page
+  }
+
   return {
     ...drupal,
     fetchPage: (...args: Parameters<DrupalComposable['fetchPage']>) =>
       drupal.fetchPage(...args) as Promise<Ref<StirDrupalPage>>,
     getPage: (...args: Parameters<DrupalComposable['getPage']>) =>
       drupal.getPage(...args) as Ref<StirDrupalPage>,
+    refreshPage,
     renderCustomElements: (content: unknown) =>
       drupal.renderCustomElements(prepare(content)),
     renderCustomElementsToVNodes: (content: unknown) =>

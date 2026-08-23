@@ -10,8 +10,8 @@ const props = defineProps<{
   action: EditAction
 }>()
 
-const { getPage } = useStirDrupalCe()
-const page = getPage()
+const { refreshPage } = useStirDrupalCe()
+const route = useRoute()
 const open = ref(false)
 const loading = ref(false)
 const saving = ref(false)
@@ -50,9 +50,7 @@ const statusIcon = computed(() => {
 })
 
 async function refreshRenderedPage(): Promise<void> {
-  const pageKey = typeof page.value?.key === 'string' ? page.value.key : ''
-
-  await refreshNuxtData(pageKey || undefined)
+  await refreshPage(route.path, { query: route.query })
 }
 
 async function load(): Promise<void> {
@@ -78,6 +76,10 @@ async function load(): Promise<void> {
 
 function cloneValue(value: boolean | string | string[]): boolean | string | string[] {
   return Array.isArray(value) ? [...value] : value
+}
+
+function selectableOptions(field: ParagraphPresentationField) {
+  return field.options?.filter(option => option.value !== '') ?? []
 }
 
 function acceptResponse(response: ParagraphPresentationResponse): void {
@@ -174,26 +176,26 @@ function handleOpen(value: boolean): void {
       >
         <template #header>
           <div class="flex items-start justify-between gap-3">
-          <div>
-            <h2 class="font-semibold text-highlighted">
-              Quick settings
-            </h2>
-            <p class="text-sm text-muted">
-              Adjust settings, then save once.
-            </p>
-          </div>
-          <span
-            v-if="status"
-            aria-live="polite"
-            class="flex items-center gap-1 text-xs font-medium"
-            :class="error ? 'text-error' : 'text-muted'"
-          >
-            <UIcon
-              :class="saving ? 'animate-spin' : ''"
-              :name="statusIcon"
-            />
-            {{ status }}
-          </span>
+            <div>
+              <h2 class="font-semibold text-highlighted">
+                Quick settings
+              </h2>
+              <p class="text-sm text-muted">
+                Adjust settings, then save once.
+              </p>
+            </div>
+            <span
+              v-if="status"
+              aria-live="polite"
+              class="flex items-center gap-1 text-xs font-medium"
+              :class="error ? 'text-error' : 'text-muted'"
+            >
+              <UIcon
+                :class="saving ? 'animate-spin' : ''"
+                :name="statusIcon"
+              />
+              {{ status }}
+            </span>
           </div>
         </template>
 
@@ -215,9 +217,10 @@ function handleOpen(value: boolean): void {
             <USelect
               v-else-if="field.type === 'select'"
               class="w-full"
-              :items="field.options"
+              :items="selectableOptions(field)"
               label-key="label"
               :model-value="field.value as string"
+              placeholder="- None -"
               size="sm"
               :ui="selectUi"
               value-key="value"
@@ -226,7 +229,7 @@ function handleOpen(value: boolean): void {
             <USelectMenu
               v-else
               class="w-full"
-              :items="field.options?.filter(option => option.value !== '')"
+              :items="selectableOptions(field)"
               label-key="label"
               :model-value="field.value as string[]"
               multiple
