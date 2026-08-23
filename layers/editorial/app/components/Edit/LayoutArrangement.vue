@@ -30,10 +30,6 @@ const error = ref('')
 const announcement = ref('')
 const arrangement = ref<Record<string, ParagraphLayoutChild[]>>({})
 const removed = ref<ParagraphLayoutChild[]>([])
-const tooltipUi = {
-  content: 'admin-ui-scope admin-ui-tooltip-content',
-  arrow: 'admin-ui-tooltip-arrow',
-}
 
 const selectedOption = computed(() => props.contract.options.find(
   option => option.value === selectedLayout.value,
@@ -186,8 +182,7 @@ watch(() => props.open, (value) => {
       scrollable
       title="Arrange layout content"
       :ui="{
-        content: 'admin-ui admin-ui-scope admin-ui-modal w-[calc(100vw-2rem)] max-w-6xl',
-        title: 'admin-ui-modal-title',
+        content: 'w-[calc(100vw-2rem)] max-w-6xl',
         body: 'space-y-5',
         footer: 'justify-end',
       }"
@@ -275,7 +270,7 @@ watch(() => props.open, (value) => {
                     variant="ghost"
                     @click="moveWithin(child, 1)"
                   />
-                  <UTooltip arrow text="Remove from layout" :ui="tooltipUi">
+                  <UTooltip arrow text="Remove from layout">
                     <UButton
                       :aria-label="`Remove ${child.label} from layout`"
                       color="error"

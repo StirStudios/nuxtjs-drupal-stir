@@ -27,6 +27,22 @@ type AdminUiTheme = {
     content: string
     arrow: string
   }
+  popover: {
+    content: string
+    arrow: string
+  }
+  select: {
+    base: string
+    content: string
+  }
+  selectMenu: {
+    base: string
+    content: string
+  }
+  modal: {
+    content: string
+    title: string
+  }
   editor: {
     root: string
     content?: string
@@ -109,6 +125,22 @@ export const adminUiTheme = {
   tooltip: {
     content: 'admin-ui-scope admin-ui-tooltip-content',
     arrow: 'admin-ui-tooltip-arrow',
+  },
+  popover: {
+    content: 'admin-ui admin-ui-scope admin-ui-popover',
+    arrow: 'admin-ui-tooltip-arrow',
+  },
+  select: {
+    base: 'admin-ui-popover-control',
+    content: 'admin-ui admin-ui-scope admin-ui-popover',
+  },
+  selectMenu: {
+    base: 'admin-ui-popover-control',
+    content: 'admin-ui admin-ui-scope admin-ui-popover',
+  },
+  modal: {
+    content: 'admin-ui admin-ui-scope admin-ui-modal',
+    title: 'admin-ui-modal-title',
   },
   editor: {
     root: 'admin-ui-editor-root',

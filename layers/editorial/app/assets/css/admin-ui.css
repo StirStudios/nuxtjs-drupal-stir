@@ -1,621 +1,513 @@
 @reference '../../../../theme/app/assets/css/main.css';
 
-@layer base {
-  :root {
-    --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);
-  }
+:root {
+  --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);
+}
 
-  .dark {
-    --admin-border: color-mix(in srgb, #3f3f46 45%, transparent);
-  }
+.dark {
+  --admin-border: color-mix(in srgb, #3f3f46 45%, transparent);
+}
 
-  .admin-ui {
-    color-scheme: light dark;
-  }
+.admin-ui {
+  color-scheme: light dark;
+}
 
+.admin-ui-scope {
+  --admin-z-50: #fafafa;
+  --admin-z-100: #f4f4f5;
+  --admin-z-200: #e4e4e7;
+  --admin-z-400: #a1a1aa;
+  --admin-z-700: #3f3f46;
+  --admin-z-800: #27272a;
+  --admin-z-900: #18181b;
+  --admin-z-950: #09090b;
+  --admin-white: #ffffff;
+
+  --admin-amber-50: #fffbeb;
+  --admin-amber-100: #fef3c7;
+  --admin-amber-700: #b45309;
+  --admin-amber-300: #fcd34d;
+  --admin-amber-500: #f59e0b;
+
+  --admin-bg: var(--admin-z-50);
+  --admin-bg-muted: var(--admin-z-100);
+  --admin-bg-strong: var(--admin-z-200);
+  --admin-text: var(--admin-z-900);
+  --admin-text-muted: var(--admin-z-700);
+  --admin-text-strong: var(--admin-z-950);
+  --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);
+
+  --admin-accent-text: var(--admin-amber-700);
+  --admin-accent-bg: color-mix(
+    in srgb,
+    var(--admin-amber-100) 70%,
+    transparent
+  );
+  --admin-accent-bg-subtle: var(--admin-amber-50);
+
+  --ui-bg: var(--admin-bg);
+  --ui-text: var(--admin-text);
+  --ui-text-muted: var(--admin-text-muted);
+  --ui-text-toned: var(--admin-text-muted);
+  --ui-text-highlighted: var(--admin-text-strong);
+  --ui-border: var(--admin-border);
+
+  --admin-status-saving: var(--admin-text-muted);
+  --admin-status-error: #b91c1c;
+  --admin-status-success: #047857;
+}
+
+.app-admin-tabs-font {
+  font-family: var(--font-admin);
+}
+
+.dark {
   .admin-ui-scope {
-    --admin-z-50: #fafafa !important;
-    --admin-z-100: #f4f4f5 !important;
-    --admin-z-200: #e4e4e7 !important;
-    --admin-z-400: #a1a1aa !important;
-    --admin-z-700: #3f3f46 !important;
-    --admin-z-800: #27272a !important;
-    --admin-z-900: #18181b !important;
-    --admin-z-950: #09090b !important;
-    --admin-white: #ffffff !important;
+    --admin-bg: var(--admin-z-950);
+    --admin-bg-muted: var(--admin-z-900);
+    --admin-bg-strong: var(--admin-z-800);
+    --admin-text: #f4f4f5;
+    --admin-text-muted: var(--admin-z-200);
+    --admin-text-strong: var(--admin-white);
+    --admin-border: color-mix(in srgb, #3f3f46 45%, transparent);
 
-    --admin-amber-50: #fffbeb !important;
-    --admin-amber-100: #fef3c7 !important;
-    --admin-amber-700: #b45309 !important;
-    --admin-amber-300: #fcd34d !important;
-    --admin-amber-500: #f59e0b !important;
-
-    --admin-bg: var(--admin-z-50) !important;
-    --admin-bg-muted: var(--admin-z-100) !important;
-    --admin-bg-strong: var(--admin-z-200) !important;
-    --admin-text: var(--admin-z-900) !important;
-    --admin-text-muted: var(--admin-z-700) !important;
-    --admin-text-strong: var(--admin-z-950) !important;
-    --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent) !important;
-
-    --admin-accent-text: var(--admin-amber-700) !important;
+    --admin-accent-text: var(--admin-amber-300);
     --admin-accent-bg: color-mix(
       in srgb,
-      var(--admin-amber-100) 70%,
+      var(--admin-amber-500) 15%,
       transparent
-    ) !important;
-    --admin-accent-bg-subtle: var(--admin-amber-50) !important;
+    );
+    --admin-accent-bg-subtle: color-mix(
+      in srgb,
+      var(--admin-amber-500) 10%,
+      transparent
+    );
 
-    --ui-bg: var(--admin-bg) !important;
-    --ui-text: var(--admin-text) !important;
-    --ui-text-muted: var(--admin-text-muted) !important;
-    --ui-text-toned: var(--admin-text-muted) !important;
-    --ui-text-highlighted: var(--admin-text-strong) !important;
-    --ui-border: var(--admin-border) !important;
+    --admin-status-saving: var(--admin-text-muted);
+    --admin-status-error: #f87171;
+    --admin-status-success: #34d399;
+  }
+}
 
-    --admin-status-saving: var(--admin-text-muted) !important;
-    --admin-status-error: #b91c1c !important;
-    --admin-status-success: #047857 !important;
+:where(*):has(> [data-admin-ui-controls]) {
+  @apply relative;
+
+  &:is(:hover, :focus-within) > [data-admin-ui-controls],
+  > [data-admin-ui-controls]:is(:hover, :focus-within) {
+    @apply pointer-events-auto opacity-100;
   }
 
-  .app-admin-tabs-font {
-    font-family: var(--font-admin);
+  > [data-admin-ui-controls]:has([aria-expanded='true']) {
+    @apply pointer-events-auto opacity-100;
+  }
+}
+
+.admin-ui-panel {
+  @apply border;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+/*
+   * Popovers are teleported outside the component tree. Keep their typography
+   * and controls independent from downstream site-level element selectors.
+   */
+.admin-ui-popover {
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+
+  :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+    font-family: inherit;
+    letter-spacing: normal;
+    text-transform: none;
   }
 
-  .dark {
-    .admin-ui-scope {
-      --admin-bg: var(--admin-z-950) !important;
-      --admin-bg-muted: var(--admin-z-900) !important;
-      --admin-bg-strong: var(--admin-z-800) !important;
-      --admin-text: #f4f4f5 !important;
-      --admin-text-muted: var(--admin-z-200) !important;
-      --admin-text-strong: var(--admin-white) !important;
-      --admin-border: color-mix(in srgb, #3f3f46 45%, transparent) !important;
+  h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
 
-      --admin-accent-text: var(--admin-amber-300) !important;
-      --admin-accent-bg: color-mix(
-        in srgb,
-        var(--admin-amber-500) 15%,
-        transparent
-      ) !important;
-      --admin-accent-bg-subtle: color-mix(
-        in srgb,
-        var(--admin-amber-500) 10%,
-        transparent
-      ) !important;
+  p,
+  label,
+  button,
+  input,
+  [data-slot='label'],
+  [data-slot='item'] {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
 
-      --admin-status-saving: var(--admin-text-muted) !important;
-      --admin-status-error: #f87171 !important;
-      --admin-status-success: #34d399 !important;
+/*
+   * Modals are teleported beside the app root, where downstream element rules
+   * would otherwise restyle their headings and controls.
+   */
+.admin-ui-modal {
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+
+  :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+    font-family: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  :where(p, label, button, input, [data-slot='label'], [data-slot='item']) {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .admin-ui-modal-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .admin-ui-layout-grid {
+    grid-template-areas: none;
+    grid-template-columns: minmax(0, 1fr);
+
+    > * {
+      grid-area: auto;
     }
   }
 }
 
-@layer components {
-  :where(*):has(> [data-admin-ui-controls]) {
-    @apply relative;
+.admin-ui-popover-control {
+  min-height: 2rem;
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
 
-    &:is(:hover, :focus-within) > [data-admin-ui-controls],
-    > [data-admin-ui-controls]:is(:hover, :focus-within) {
-      @apply opacity-100 pointer-events-auto;
-    }
+.admin-ui-settings-separator {
+  margin-block: -0.75rem;
+  max-width: none;
+}
 
-    > [data-admin-ui-controls]:has([aria-expanded='true']) {
-      @apply opacity-100 pointer-events-auto;
-    }
+.admin-ui-toolbar {
+  @apply border-b;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+}
+
+.admin-ui-controls {
+  @apply pointer-events-none border opacity-0;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+}
+
+.admin-ui-edit-shell {
+  @apply relative;
+
+  > :first-child,
+  > :first-child > :first-child {
+    @apply mt-0;
   }
 
-  .admin-ui-panel {
-    @apply border;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg);
-    color: var(--admin-text);
+  > :has(+ [data-admin-ui-controls]),
+  > :has(+ [data-admin-ui-controls]) > :last-child {
+    @apply mb-0;
   }
+}
 
-  /*
-   * Popovers are teleported outside the component tree. Keep their typography
-   * and controls independent from downstream site-level element selectors.
-   */
-  .admin-ui-popover {
-    font-family: var(--font-admin) !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    line-height: 1.25rem !important;
-    letter-spacing: normal !important;
-    text-transform: none !important;
+.admin-ui-nav-root {
+  @apply border-b shadow-sm;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
 
-    :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
-      font-family: inherit !important;
-      letter-spacing: normal !important;
-      text-transform: none !important;
-    }
+.admin-ui-nav-surface {
+  @apply border ring-0;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+}
 
-    h2 {
-      margin: 0 !important;
-      padding: 0 !important;
-      font-size: 1rem !important;
-      font-weight: 600 !important;
-      line-height: 1.5rem !important;
-    }
+.admin-ui-nav-link {
+  color: var(--admin-text-muted);
 
-    p,
-    label,
-    button,
-    input,
-    [data-slot='label'],
-    [data-slot='item'] {
-      font-size: 0.875rem !important;
-      line-height: 1.25rem !important;
-    }
-  }
-
-  /*
-   * Modals are teleported beside the app root, where downstream element rules
-   * would otherwise restyle their headings and controls.
-   */
-  .admin-ui-modal {
-    font-family: var(--font-admin) !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    line-height: 1.25rem !important;
-    letter-spacing: normal !important;
-    text-transform: none !important;
-
-    :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
-      font-family: inherit !important;
-      letter-spacing: normal !important;
-      text-transform: none !important;
-    }
-
-    :where(p, label, button, input, [data-slot='label'], [data-slot='item']) {
-      font-size: 0.875rem !important;
-      line-height: 1.25rem !important;
-    }
-
-    .admin-ui-modal-title {
-      margin: 0 !important;
-      padding: 0 !important;
-      font-size: 1rem !important;
-      font-weight: 600 !important;
-      line-height: 1.5rem !important;
-    }
-  }
-
-  @media (max-width: 639px) {
-    .admin-ui-layout-grid {
-      grid-template-areas: none !important;
-      grid-template-columns: minmax(0, 1fr) !important;
-
-      > * {
-        grid-area: auto !important;
-      }
-    }
-  }
-
-  .admin-ui-popover-control {
-    min-height: 2rem !important;
-    font-family: var(--font-admin) !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    line-height: 1.25rem !important;
-    letter-spacing: normal !important;
-    text-transform: none !important;
-  }
-
-  .admin-ui-settings-separator {
-    margin-block: -0.75rem !important;
-    max-width: none !important;
-  }
-
-  .admin-ui-toolbar {
-    @apply border-b;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg);
-  }
-
-  .admin-ui-controls {
-    @apply pointer-events-none border opacity-0;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg-muted);
-  }
-
-  .admin-ui-edit-shell {
-    @apply relative;
-
-    > :first-child,
-    > :first-child > :first-child {
-      @apply mt-0;
-    }
-
-    > :has(+ [data-admin-ui-controls]),
-    > :has(+ [data-admin-ui-controls]) > :last-child {
-      @apply mb-0;
-    }
-  }
-
-  .admin-ui-nav-root {
-    @apply border-b shadow-sm;
-    border-color: var(--admin-border);
-    background-color: var(--admin-bg);
-    color: var(--admin-text);
-  }
-
-  .admin-ui-nav-surface {
-    @apply !border !ring-0;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg);
-  }
-
-  .admin-ui-nav-link {
-    color: var(--admin-text-muted) !important;
-
-    &:hover {
-      color: var(--admin-text-strong) !important;
-
-      &::before {
-        background-color: color-mix(
-          in srgb,
-          var(--admin-bg-strong) 80%,
-          transparent
-        ) !important;
-      }
-    }
-
-    &[data-state='open'],
-    &[aria-current='page'] {
-      color: var(--admin-accent-text) !important;
-
-      &::before {
-        background-color: var(--admin-accent-bg) !important;
-      }
-    }
-  }
-
-  .admin-ui-unpublished-link {
-    color: var(--admin-accent-text) !important;
+  &:hover {
+    color: var(--admin-text-strong);
 
     &::before {
-      background-color: var(--admin-accent-bg) !important;
-    }
-
-    &:hover::before,
-    &:focus-visible::before {
-      background-color: var(--admin-accent-bg-subtle) !important;
-    }
-  }
-
-  .admin-ui-nav-child-link {
-    @apply p-2 text-sm;
-    color: var(--admin-text-muted) !important;
-
-    &:hover {
       background-color: color-mix(
         in srgb,
         var(--admin-bg-strong) 80%,
         transparent
-      ) !important;
-      color: var(--admin-text-strong) !important;
-    }
-
-    &[aria-current='page'] {
-      background-color: var(--admin-accent-bg-subtle) !important;
-      color: var(--admin-accent-text) !important;
+      );
     }
   }
 
-  .admin-ui-btn-base {
-    @apply !font-medium;
-  }
+  &[data-state='open'],
+  &[aria-current='page'] {
+    color: var(--admin-accent-text);
 
-  .admin-ui-btn-neutral {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text-muted) !important;
-
-    &:hover {
-      background-color: var(--admin-bg-strong) !important;
+    &::before {
+      background-color: var(--admin-accent-bg);
     }
   }
+}
 
-  .admin-ui-btn-soft {
-    @apply ring-1 ring-inset;
-    background-color: var(--admin-bg-muted) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
-    color: var(--admin-text-muted) !important;
+.admin-ui-unpublished-link {
+  color: var(--admin-accent-text);
 
-    &:hover {
-      background-color: var(--admin-bg-strong) !important;
-      color: var(--admin-text-strong) !important;
-    }
+  &::before {
+    background-color: var(--admin-accent-bg);
   }
 
-  .admin-ui-btn-outline {
-    @apply ring-1 ring-inset;
-    background-color: transparent !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
-    color: var(--admin-text-muted) !important;
+  &:hover::before,
+  &:focus-visible::before {
+    background-color: var(--admin-accent-bg-subtle);
+  }
+}
 
-    &:hover {
-      background-color: var(--admin-bg-muted) !important;
-      color: var(--admin-text-strong) !important;
-    }
+.admin-ui-nav-child-link {
+  @apply p-2 text-sm;
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 80%,
+      transparent
+    );
+    color: var(--admin-text-strong);
   }
 
-  .admin-ui-btn-ghost {
-    background-color: transparent !important;
-    color: var(--admin-text-muted) !important;
+  &[aria-current='page'] {
+    background-color: var(--admin-accent-bg-subtle);
+    color: var(--admin-accent-text);
+  }
+}
 
-    &:hover {
+.admin-ui-btn-base {
+  @apply font-medium;
+}
+
+.admin-ui-btn-neutral {
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: var(--admin-bg-strong);
+  }
+}
+
+.admin-ui-btn-soft {
+  @apply ring-1 ring-inset;
+  background-color: var(--admin-bg-muted);
+  border-color: var(--admin-border);
+  --tw-ring-color: var(--admin-border);
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: var(--admin-bg-strong);
+    color: var(--admin-text-strong);
+  }
+}
+
+.admin-ui-btn-outline {
+  @apply ring-1 ring-inset;
+  background-color: transparent;
+  border-color: var(--admin-border);
+  --tw-ring-color: var(--admin-border);
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: var(--admin-bg-muted);
+    color: var(--admin-text-strong);
+  }
+}
+
+.admin-ui-btn-ghost {
+  background-color: transparent;
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 70%,
+      transparent
+    );
+    color: var(--admin-text-strong);
+  }
+}
+
+.admin-ui-btn-solid {
+  background-color: var(--admin-text-strong);
+  color: var(--admin-bg);
+  border-color: var(--admin-text-strong);
+  --tw-ring-color: color-mix(
+    in srgb,
+    var(--admin-text-strong) 35%,
+    transparent
+  );
+
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-text-strong) 85%,
+      white 15%
+    );
+    color: var(--admin-bg);
+  }
+}
+
+.admin-ui-field-group {
+  @apply rounded-md border shadow-lg;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+}
+
+.admin-ui-tooltip-content {
+  @apply border ring ring-inset;
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  --tw-ring-color: var(--admin-border);
+  @apply z-[500];
+}
+
+.admin-ui-tooltip-arrow {
+  fill: var(--admin-bg-muted);
+  stroke: var(--admin-border);
+}
+
+.admin-ui-editor-root {
+  @apply border;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+
+  .ProseMirror,
+  .tiptap {
+    color: var(--admin-text);
+  }
+}
+
+.admin-editor-media-placeholder {
+  @apply my-4 flex min-h-20 flex-col justify-center gap-1 rounded-md border border-dashed px-4 py-3;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text);
+}
+
+.admin-editor-media-placeholder-label {
+  @apply text-sm font-semibold capitalize;
+  color: var(--admin-text-strong);
+}
+
+.admin-editor-media-placeholder-description {
+  @apply text-xs;
+  color: var(--admin-text-muted);
+}
+
+.admin-ui-status-saving {
+  color: var(--admin-status-saving);
+}
+
+.admin-ui-status-error {
+  color: var(--admin-status-error);
+}
+
+.admin-ui-status-success {
+  color: var(--admin-status-success);
+}
+
+.admin-ui-toolbar {
+  [role='group'] > [data-slot='base'],
+  [role='toolbar'] > [data-slot='base'] {
+    color: var(--admin-text-muted);
+    background-color: transparent;
+
+    &:not(:disabled):not([aria-disabled='true']):hover,
+    &:not(:disabled):not([aria-disabled='true']):focus-visible,
+    &:not(:disabled):not([aria-disabled='true']):active {
+      color: var(--admin-text-strong);
       background-color: color-mix(
         in srgb,
         var(--admin-bg-strong) 70%,
         transparent
-      ) !important;
-      color: var(--admin-text-strong) !important;
+      );
+    }
+
+    &[data-state='open'],
+    &[aria-pressed='true'] {
+      color: var(--admin-accent-text);
+      background-color: var(--admin-accent-bg);
     }
   }
 
-  .admin-ui-btn-solid {
-    background-color: var(--admin-text-strong) !important;
-    color: var(--admin-bg) !important;
-    border-color: var(--admin-text-strong) !important;
-    --tw-ring-color: color-mix(
-      in srgb,
-      var(--admin-text-strong) 35%,
-      transparent
-    ) !important;
+  [data-slot='base'] [data-slot='leadingIcon'],
+  [data-slot='base'] [data-slot='trailingIcon'] {
+    color: currentColor;
+  }
+}
 
-    &:hover {
-      background-color: color-mix(
-        in srgb,
-        var(--admin-text-strong) 85%,
-        white 15%
-      ) !important;
-      color: var(--admin-bg) !important;
-    }
+.admin-editor-prose {
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    @apply py-0;
   }
 
-  .admin-ui-field-group {
-    @apply rounded-md border shadow-lg;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-muted);
+  h2 {
+    @apply m-0 text-2xl;
   }
 
-  .admin-ui-tooltip-content {
-    @apply border ring ring-inset;
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
-    @apply z-[500];
+  h3 {
+    @apply text-lg;
   }
 
-  [data-slot='content'].admin-ui-tooltip-content {
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
-    @apply z-[500];
+  h4,
+  h5,
+  h6 {
+    @apply text-base;
   }
 
-  .admin-ui-tooltip-arrow {
-    fill: var(--admin-bg-muted) !important;
-    stroke: var(--admin-border) !important;
+  p,
+  ul > li,
+  ol > li {
+    @apply leading-7;
   }
 
-  [data-slot='arrow'].admin-ui-tooltip-arrow {
-    stroke: var(--admin-border) !important;
+  .list-none > li {
+    @apply ms-0 list-none;
   }
 
-  .dark .admin-ui-tooltip-content {
-    background-color: var(--admin-bg-muted) !important;
-    color: var(--admin-text) !important;
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
+  li > p {
+    @apply p-0;
   }
 
-  .dark [data-slot='content'].admin-ui-tooltip-content {
-    border-color: var(--admin-border) !important;
-    --tw-ring-color: var(--admin-border) !important;
+  a {
+    color: var(--admin-text-muted);
   }
 
-  .dark .admin-ui-tooltip-arrow {
-    fill: var(--admin-bg-muted) !important;
-    stroke: var(--admin-border) !important;
-  }
-
-  .admin-ui-editor-root {
-    @apply border;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg);
-    color: var(--admin-text) !important;
-
-    .ProseMirror,
-    .tiptap {
-      color: var(--admin-text) !important;
-    }
-  }
-
-  .admin-editor-media-placeholder {
-    @apply my-4 flex min-h-20 flex-col justify-center gap-1 rounded-md border border-dashed px-4 py-3;
-    border-color: var(--admin-border) !important;
-    background-color: var(--admin-bg-muted);
-    color: var(--admin-text) !important;
-  }
-
-  .admin-editor-media-placeholder-label {
-    @apply text-sm font-semibold capitalize;
-    color: var(--admin-text-strong) !important;
-  }
-
-  .admin-editor-media-placeholder-description {
-    @apply text-xs;
-    color: var(--admin-text-muted) !important;
-  }
-
-  .admin-ui-status-saving {
-    color: var(--admin-status-saving);
-  }
-
-  .admin-ui-status-error {
-    color: var(--admin-status-error);
-  }
-
-  .admin-ui-status-success {
-    color: var(--admin-status-success);
-  }
-
-  .admin-ui-toolbar {
-    [role='group'] > [data-slot='base'],
-    [role='toolbar'] > [data-slot='base'] {
-      color: var(--admin-text-muted) !important;
-      background-color: transparent !important;
-
-      &:not(:disabled):not([aria-disabled='true']):hover,
-      &:not(:disabled):not([aria-disabled='true']):focus-visible,
-      &:not(:disabled):not([aria-disabled='true']):active {
-        color: var(--admin-text-strong) !important;
-        background-color: color-mix(
-          in srgb,
-          var(--admin-bg-strong) 70%,
-          transparent
-        ) !important;
-      }
-
-      &[data-state='open'],
-      &[aria-pressed='true'] {
-        color: var(--admin-accent-text) !important;
-        background-color: var(--admin-accent-bg) !important;
-      }
-    }
-
-    [data-slot='base'] [data-slot='leadingIcon'],
-    [data-slot='base'] [data-slot='trailingIcon'] {
-      color: currentColor !important;
-    }
-  }
-
-  .admin-ui-controls {
-    [data-slot='base'].admin-ui-btn-base [data-slot='leadingIcon'],
-    [data-slot='base'].admin-ui-btn-base [data-slot='trailingIcon'] {
-      color: currentColor !important;
-    }
-
-    [data-slot='base'].admin-ui-btn-soft {
-      background-color: var(--admin-bg-muted) !important;
-      color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
-
-      &:hover {
-        background-color: var(--admin-bg-strong) !important;
-        color: var(--admin-text-strong) !important;
-      }
-    }
-
-    [data-slot='base'].admin-ui-btn-outline {
-      background-color: transparent !important;
-      color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
-
-      &:hover {
-        background-color: var(--admin-bg-muted) !important;
-        color: var(--admin-text-strong) !important;
-      }
-    }
-  }
-
-  .admin-ui-scope {
-    [data-slot='base'].admin-ui-btn-soft {
-      background-color: var(--admin-bg-muted) !important;
-      color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
-
-      &:hover,
-      &:focus-visible,
-      &:active {
-        background-color: var(--admin-bg-strong) !important;
-        color: var(--admin-text-strong) !important;
-      }
-    }
-
-    [data-slot='base'].admin-ui-btn-outline {
-      background-color: transparent !important;
-      color: var(--admin-text-muted) !important;
-      border-color: var(--admin-border) !important;
-      --tw-ring-color: var(--admin-border) !important;
-
-      &:hover,
-      &:focus-visible,
-      &:active {
-        background-color: var(--admin-bg-muted) !important;
-        color: var(--admin-text-strong) !important;
-      }
-    }
-
-    [data-slot='base'].admin-ui-btn-ghost {
-      background-color: transparent !important;
-      color: var(--admin-text-muted) !important;
-
-      &:hover,
-      &:focus-visible,
-      &:active {
-        background-color: color-mix(
-          in srgb,
-          var(--admin-bg-strong) 70%,
-          transparent
-        ) !important;
-        color: var(--admin-text-strong) !important;
-      }
-    }
-  }
-
-  .admin-editor-prose {
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p {
-      @apply !py-0;
-    }
-
-    h2 {
-      @apply !m-0 !text-2xl;
-    }
-
-    h3 {
-      @apply !text-lg;
-    }
-
-    h4,
-    h5,
-    h6 {
-      @apply !text-base;
-    }
-
-    p,
-    ul > li,
-    ol > li {
-      @apply leading-7;
-    }
-
-    .list-none > li {
-      @apply ms-0 list-none;
-    }
-
-    li > p {
-      @apply p-0;
-    }
-
-    a {
-      color: var(--admin-text-muted) !important;
-    }
-
-    section,
-    header {
-      @apply mb-15;
-    }
+  section,
+  header {
+    @apply mb-15;
   }
 }

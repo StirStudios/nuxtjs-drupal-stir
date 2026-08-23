@@ -792,6 +792,8 @@ describe('layer contract', () => {
     expect(adminCss).toContain(
       '> :has(+ [data-admin-ui-controls]) > :last-child',
     )
+    expect(adminCss).not.toContain('@layer')
+    expect(adminCss).not.toContain('!important')
   })
 
   it('normalizes prose edges through a single Drupal field wrapper', () => {

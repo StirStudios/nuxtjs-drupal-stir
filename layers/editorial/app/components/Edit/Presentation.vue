@@ -35,17 +35,6 @@ const arrangementOpen = ref(false)
 const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
-const popoverUi = {
-  content: 'admin-ui admin-ui-scope admin-ui-popover',
-}
-const selectUi = {
-  base: 'admin-ui-popover-control',
-  content: 'admin-ui admin-ui-scope admin-ui-popover',
-}
-const helpTooltipUi = {
-  content: 'admin-ui-scope admin-ui-tooltip-content max-w-64',
-  arrow: 'admin-ui-tooltip-arrow',
-}
 const popoverContent = {
   align: 'end' as const,
   side: 'bottom' as const,
@@ -260,16 +249,11 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
   <UPopover
     :content="popoverContent"
     :open="open"
-    :ui="popoverUi"
     @update:open="handleOpen"
   >
     <UTooltip
       :open="tooltipOpen"
       :text="action.tooltip"
-      :ui="{
-        content: 'admin-ui-scope admin-ui-tooltip-content',
-        arrow: 'admin-ui-tooltip-arrow',
-      }"
       @update:open="value => tooltipOpen = value"
     >
       <UButton
@@ -394,7 +378,6 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
                           :items="selectedLayoutOption.regions"
                           label-key="label"
                           size="sm"
-                          :ui="selectUi"
                           value-key="value"
                         />
                       </UFormField>
@@ -425,7 +408,7 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
             <template v-if="field.description" #label>
               <span class="inline-flex items-center gap-1">
                 <span>{{ field.label }}</span>
-                <UTooltip :text="field.description" :ui="helpTooltipUi">
+                <UTooltip :text="field.description" :ui="{ content: 'max-w-64' }">
                   <UButton
                     :aria-label="`About ${field.label}`"
                     color="neutral"
@@ -451,7 +434,6 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               :model-value="field.value as string"
               placeholder="- None -"
               size="sm"
-              :ui="selectUi"
               value-key="value"
               @update:model-value="value => updateSelectValue(field, value)"
             />
@@ -465,7 +447,6 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               multiple
               placeholder="- None -"
               size="sm"
-              :ui="selectUi"
               value-key="value"
               @update:model-value="value => updateMultiselectValue(field, value)"
             />
