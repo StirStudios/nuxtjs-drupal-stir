@@ -13,9 +13,19 @@ const props = defineProps<{
 const open = ref(false)
 const loading = ref(false)
 const pendingSaves = ref(0)
+const saved = ref(false)
 const error = ref('')
 const fields = ref<ParagraphPresentationField[]>([])
 let saveQueue = Promise.resolve()
+let savedTimer: ReturnType<typeof setTimeout> | undefined
+
+const popoverUi = {
+  content: 'admin-ui admin-ui-scope admin-ui-popover',
+}
+const selectUi = {
+  base: 'admin-ui-popover-control',
+  content: 'admin-ui admin-ui-scope admin-ui-popover',
+}
 
 const endpoint = computed(() =>
   `/api/paragraph/${props.action.paragraphId}/presentation`,
@@ -24,7 +34,12 @@ const saving = computed(() => pendingSaves.value > 0)
 const status = computed(() => {
   if (saving.value) return 'Saving…'
   if (error.value) return error.value
-  return fields.value.length ? 'Saved' : ''
+  return saved.value ? 'Saved' : ''
+})
+const statusIcon = computed(() => {
+  if (saving.value) return 'i-lucide-loader-circle'
+  if (error.value) return 'i-lucide-circle-alert'
+  return saved.value ? 'i-lucide-circle-check' : ''
 })
 
 async function load(): Promise<void> {
@@ -57,8 +72,10 @@ function updateValue(
   if (!field || field.value === value) return
 
   field.value = value
+  saved.value = false
   error.value = ''
   pendingSaves.value += 1
+  if (savedTimer) clearTimeout(savedTimer)
 
   saveQueue = saveQueue
     .catch(() => undefined)
@@ -70,6 +87,11 @@ function updateValue(
 
       fields.value = response.fields
       await refreshNuxtData()
+      saved.value = true
+      if (savedTimer) clearTimeout(savedTimer)
+      savedTimer = setTimeout(() => {
+        saved.value = false
+      }, 3000)
     })
     .catch((cause) => {
       error.value = cause instanceof Error
@@ -81,6 +103,10 @@ function updateValue(
     })
 }
 
+onBeforeUnmount(() => {
+  if (savedTimer) clearTimeout(savedTimer)
+})
+
 function handleOpen(value: boolean): void {
   open.value = value
   if (value) void load()
@@ -91,6 +117,7 @@ function handleOpen(value: boolean): void {
   <UPopover
     :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
     :open="open"
+    :ui="popoverUi"
     @update:open="handleOpen"
   >
     <UButton
@@ -106,7 +133,7 @@ function handleOpen(value: boolean): void {
     </UButton>
 
     <template #content>
-      <div class="admin-ui admin-ui-scope w-80 max-w-[calc(100vw-2rem)] p-4">
+      <div class="w-80 max-w-[calc(100vw-2rem)] p-4">
         <div class="mb-4 flex items-start justify-between gap-3">
           <div>
             <h2 class="font-semibold text-highlighted">
@@ -117,10 +144,15 @@ function handleOpen(value: boolean): void {
             </p>
           </div>
           <span
+            v-if="status"
             aria-live="polite"
-            class="text-xs"
+            class="flex items-center gap-1 text-xs font-medium"
             :class="error ? 'text-error' : 'text-muted'"
           >
+            <UIcon
+              :class="saving ? 'animate-spin' : ''"
+              :name="statusIcon"
+            />
             {{ status }}
           </span>
         </div>
@@ -146,6 +178,8 @@ function handleOpen(value: boolean): void {
               :items="field.options"
               label-key="label"
               :model-value="field.value as string"
+              size="sm"
+              :ui="selectUi"
               value-key="value"
               @update:model-value="value => updateValue(field.key, value)"
             />
@@ -156,6 +190,8 @@ function handleOpen(value: boolean): void {
               label-key="label"
               :model-value="field.value as string[]"
               multiple
+              size="sm"
+              :ui="selectUi"
               value-key="value"
               @update:model-value="value => updateValue(field.key, value)"
             />

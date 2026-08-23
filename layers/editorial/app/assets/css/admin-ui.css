@@ -108,6 +108,53 @@
     color: var(--admin-text);
   }
 
+  /*
+   * Popovers are teleported outside the component tree. Keep their typography
+   * and controls independent from downstream site-level element selectors.
+   */
+  .admin-ui-popover {
+    font-family: var(--font-admin) !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    line-height: 1.25rem !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+
+    :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+      font-family: inherit !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+    }
+
+    h2 {
+      margin: 0 !important;
+      padding: 0 !important;
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      line-height: 1.5rem !important;
+    }
+
+    p,
+    label,
+    button,
+    input,
+    [data-slot='label'],
+    [data-slot='item'] {
+      font-size: 0.875rem !important;
+      line-height: 1.25rem !important;
+    }
+  }
+
+  .admin-ui-popover-control {
+    min-height: 2rem !important;
+    font-family: var(--font-admin) !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    line-height: 1.25rem !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+  }
+
   .admin-ui-toolbar {
     @apply border-b;
     border-color: var(--admin-border);
