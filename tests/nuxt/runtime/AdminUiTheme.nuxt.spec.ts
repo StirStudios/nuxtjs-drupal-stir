@@ -59,6 +59,8 @@ describe('adminUiTheme', () => {
     expect(wrapper.find('.admin-ui-nav-root').exists()).toBe(true)
     expect(wrapper.find('.admin-ui-scope').exists()).toBe(true)
     expect(wrapper.find('.admin-ui-popover-control').exists()).toBe(true)
+    expect(wrapper.find('.ring-default').exists()).toBe(true)
+    expect(wrapper.find('.admin-ui-control-value').exists()).toBe(true)
     expect(wrapper.find('.admin-ui-btn-base').classes()).toContain('text-xs')
     expect(adminUiTheme.card.header).toBe('admin-ui-card-header')
     expect(adminUiTheme.card.body).toBe('admin-ui-card-body')

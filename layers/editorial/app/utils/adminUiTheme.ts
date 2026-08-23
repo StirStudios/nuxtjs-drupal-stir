@@ -47,10 +47,14 @@ type AdminUiTheme = {
   }
   select: {
     base: string
+    value: string
+    placeholder: string
     content: string
   }
   selectMenu: {
     base: string
+    value: string
+    placeholder: string
     content: string
   }
   switch: {
@@ -163,11 +167,15 @@ export const adminUiTheme = {
     arrow: 'admin-ui-tooltip-arrow',
   },
   select: {
-    base: 'admin-ui-popover-control',
+    base: 'admin-ui-popover-control ring-default',
+    value: 'admin-ui-control-value',
+    placeholder: 'admin-ui-control-value',
     content: 'admin-ui admin-ui-scope admin-ui-popover',
   },
   selectMenu: {
-    base: 'admin-ui-popover-control',
+    base: 'admin-ui-popover-control ring-default',
+    value: 'admin-ui-control-value',
+    placeholder: 'admin-ui-control-value',
     content: 'admin-ui admin-ui-scope admin-ui-popover',
   },
   switch: {
