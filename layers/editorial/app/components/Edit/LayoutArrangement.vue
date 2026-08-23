@@ -236,7 +236,7 @@ watch(() => props.open, (value) => {
               handle=".layout-drag-handle"
               :model-value="childrenFor(region.value)"
               tag="ul"
-              @update:model-value="children => updateRegion(region.value, children)"
+              @update:model-value="(children: ParagraphLayoutChild[]) => updateRegion(region.value, children)"
             >
               <li
                 v-for="(child, index) in childrenFor(region.value)"
