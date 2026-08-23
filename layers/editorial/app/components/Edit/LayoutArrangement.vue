@@ -230,7 +230,7 @@ watch(() => props.open, (value) => {
             <VueDraggable
               :animation="180"
               :aria-label="`${region.label} content`"
-              class="flex min-h-48 flex-1 flex-col gap-2 rounded-b-lg p-2 ring-inset transition-colors has-[.layout-drag-ghost]:bg-primary/10 has-[.layout-drag-ghost]:ring-2 has-[.layout-drag-ghost]:ring-primary"
+              class="flex min-h-48 flex-1 flex-col gap-2 rounded-b-lg p-2 ring-inset transition-colors has-[.layout-drag-ghost]:bg-primary/5 has-[.layout-drag-ghost]:ring-1 has-[.layout-drag-ghost]:ring-primary/50"
               ghost-class="layout-drag-ghost"
               :group="`layout-${contract.ownerRevisionId ?? 'draft'}`"
               handle=".layout-drag-handle"
