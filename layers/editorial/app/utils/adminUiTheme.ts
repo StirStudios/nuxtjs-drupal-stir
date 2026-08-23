@@ -39,6 +39,7 @@ type AdminUiTheme = {
   tooltip: {
     content: string
     arrow: string
+    text: string
   }
   popover: {
     content: string
@@ -53,6 +54,7 @@ type AdminUiTheme = {
     content: string
   }
   modal: {
+    overlay: string
     content: string
     title: string
   }
@@ -148,8 +150,9 @@ export const adminUiTheme = {
     base: 'admin-ui-field-group',
   },
   tooltip: {
-    content: 'admin-ui-scope admin-ui-tooltip-content',
+    content: 'admin-ui admin-ui-scope admin-ui-tooltip-content',
     arrow: 'admin-ui-tooltip-arrow',
+    text: 'admin-ui-tooltip-text',
   },
   popover: {
     content: 'admin-ui admin-ui-scope admin-ui-popover',
@@ -164,6 +167,7 @@ export const adminUiTheme = {
     content: 'admin-ui admin-ui-scope admin-ui-popover',
   },
   modal: {
+    overlay: 'admin-ui-modal-overlay',
     content: 'admin-ui admin-ui-scope admin-ui-modal',
     title: 'admin-ui-modal-title',
   },

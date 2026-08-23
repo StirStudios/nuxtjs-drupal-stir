@@ -168,6 +168,10 @@
    * Modals are teleported beside the app root, where downstream element rules
    * would otherwise restyle their headings and controls.
    */
+.admin-ui-modal-overlay {
+  background-color: rgb(9 9 11 / 75%);
+}
+
 .admin-ui-modal {
   font-family: var(--font-admin);
   font-size: 0.875rem;
@@ -422,6 +426,12 @@
   border-color: var(--admin-border);
   --tw-ring-color: var(--admin-border);
   @apply z-[500];
+}
+
+.admin-ui-tooltip-text {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
 }
 
 .admin-ui-skeleton {
