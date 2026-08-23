@@ -99,6 +99,10 @@
     > [data-admin-ui-controls]:is(:hover, :focus-within) {
       @apply opacity-100 pointer-events-auto;
     }
+
+    > [data-admin-ui-controls]:has([aria-expanded='true']) {
+      @apply opacity-100 pointer-events-auto;
+    }
   }
 
   .admin-ui-panel {

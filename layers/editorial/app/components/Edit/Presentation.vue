@@ -10,13 +10,15 @@ const props = defineProps<{
   action: EditAction
 }>()
 
+const { getPage } = useStirDrupalCe()
+const page = getPage()
 const open = ref(false)
 const loading = ref(false)
-const pendingSaves = ref(0)
+const saving = ref(false)
 const saved = ref(false)
 const error = ref('')
 const fields = ref<ParagraphPresentationField[]>([])
-let saveQueue = Promise.resolve()
+const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
 const popoverUi = {
@@ -30,7 +32,12 @@ const selectUi = {
 const endpoint = computed(() =>
   `/api/paragraph/${props.action.paragraphId}/presentation`,
 )
-const saving = computed(() => pendingSaves.value > 0)
+const changedValues = computed(() => Object.fromEntries(
+  fields.value
+    .filter(field => JSON.stringify(field.value) !== JSON.stringify(savedValues.value[field.key]))
+    .map(field => [field.key, field.value]),
+))
+const dirty = computed(() => Object.keys(changedValues.value).length > 0)
 const status = computed(() => {
   if (saving.value) return 'Saving…'
   if (error.value) return error.value
@@ -42,6 +49,12 @@ const statusIcon = computed(() => {
   return saved.value ? 'i-lucide-circle-check' : ''
 })
 
+async function refreshRenderedPage(): Promise<void> {
+  const pageKey = typeof page.value?.key === 'string' ? page.value.key : ''
+
+  await refreshNuxtData(pageKey || undefined)
+}
+
 async function load(): Promise<void> {
   if (loading.value || fields.value.length) return
 
@@ -51,7 +64,7 @@ async function load(): Promise<void> {
   try {
     const response = await $fetch<ParagraphPresentationResponse>(endpoint.value)
 
-    fields.value = response.fields
+    acceptResponse(response)
   }
   catch (cause) {
     error.value = cause instanceof Error
@@ -61,6 +74,17 @@ async function load(): Promise<void> {
   finally {
     loading.value = false
   }
+}
+
+function cloneValue(value: boolean | string | string[]): boolean | string | string[] {
+  return Array.isArray(value) ? [...value] : value
+}
+
+function acceptResponse(response: ParagraphPresentationResponse): void {
+  fields.value = response.fields
+  savedValues.value = Object.fromEntries(
+    response.fields.map(field => [field.key, cloneValue(field.value)]),
+  ) as Record<ParagraphPresentationKey, boolean | string | string[]>
 }
 
 function updateValue(
@@ -74,33 +98,38 @@ function updateValue(
   field.value = value
   saved.value = false
   error.value = ''
-  pendingSaves.value += 1
   if (savedTimer) clearTimeout(savedTimer)
+}
 
-  saveQueue = saveQueue
-    .catch(() => undefined)
-    .then(async () => {
-      const response = await $fetch<ParagraphPresentationResponse>(endpoint.value, {
-        method: 'POST',
-        body: { values: { [key]: value } },
-      })
+async function save(): Promise<void> {
+  if (saving.value || !dirty.value) return
 
-      fields.value = response.fields
-      await refreshNuxtData()
-      saved.value = true
-      if (savedTimer) clearTimeout(savedTimer)
-      savedTimer = setTimeout(() => {
-        saved.value = false
-      }, 3000)
+  saving.value = true
+  saved.value = false
+  error.value = ''
+
+  try {
+    const response = await $fetch<ParagraphPresentationResponse>(endpoint.value, {
+      method: 'POST',
+      body: { values: changedValues.value },
     })
-    .catch((cause) => {
-      error.value = cause instanceof Error
-        ? cause.message
-        : 'Unable to save quick settings.'
-    })
-    .finally(() => {
-      pendingSaves.value -= 1
-    })
+
+    acceptResponse(response)
+    await refreshRenderedPage()
+    saved.value = true
+    if (savedTimer) clearTimeout(savedTimer)
+    savedTimer = setTimeout(() => {
+      saved.value = false
+    }, 3000)
+  }
+  catch (cause) {
+    error.value = cause instanceof Error
+      ? cause.message
+      : 'Unable to save quick settings.'
+  }
+  finally {
+    saving.value = false
+  }
 }
 
 onBeforeUnmount(() => {
@@ -108,6 +137,12 @@ onBeforeUnmount(() => {
 })
 
 function handleOpen(value: boolean): void {
+  if (!value && dirty.value) {
+    fields.value.forEach((field) => {
+      field.value = cloneValue(savedValues.value[field.key])
+    })
+  }
+
   open.value = value
   if (value) void load()
 }
@@ -133,14 +168,18 @@ function handleOpen(value: boolean): void {
     </UButton>
 
     <template #content>
-      <div class="w-80 max-w-[calc(100vw-2rem)] p-4">
-        <div class="mb-4 flex items-start justify-between gap-3">
+      <UCard
+        class="w-96 max-w-[calc(100vw-2rem)]"
+        :ui="{ header: '!p-4', body: '!p-4', footer: '!p-4' }"
+      >
+        <template #header>
+          <div class="flex items-start justify-between gap-3">
           <div>
             <h2 class="font-semibold text-highlighted">
               Quick settings
             </h2>
             <p class="text-sm text-muted">
-              Changes save automatically.
+              Adjust settings, then save once.
             </p>
           </div>
           <span
@@ -155,13 +194,14 @@ function handleOpen(value: boolean): void {
             />
             {{ status }}
           </span>
-        </div>
+          </div>
+        </template>
 
         <div v-if="loading" aria-label="Loading quick settings" class="space-y-3">
           <USkeleton v-for="index in 4" :key="index" class="h-9 w-full" />
         </div>
 
-        <div v-else-if="fields.length" class="space-y-4">
+        <div v-else-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
           <UFormField
             v-for="field in fields"
             :key="field.key"
@@ -190,6 +230,7 @@ function handleOpen(value: boolean): void {
               label-key="label"
               :model-value="field.value as string[]"
               multiple
+              placeholder="- None -"
               size="sm"
               :ui="selectUi"
               value-key="value"
@@ -202,17 +243,34 @@ function handleOpen(value: boolean): void {
           This section has no quick presentation settings.
         </p>
 
-        <USeparator v-if="action.fullEditLink" class="my-4" />
-        <UButton
-          v-if="action.fullEditLink"
-          block
-          color="neutral"
-          icon="i-lucide-square-pen"
-          label="Open full editor"
-          :to="action.fullEditLink"
-          variant="soft"
-        />
-      </div>
+        <template #footer>
+          <div
+            class="grid gap-2"
+            :class="fields.length && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
+          >
+            <UButton
+              v-if="fields.length"
+              block
+              color="neutral"
+              :disabled="!dirty"
+              icon="i-lucide-save"
+              label="Save changes"
+              :loading="saving"
+              variant="solid"
+              @click="save"
+            />
+            <UButton
+              v-if="action.fullEditLink"
+              block
+              color="neutral"
+              icon="i-lucide-square-pen"
+              label="Open full editor"
+              :to="action.fullEditLink"
+              variant="soft"
+            />
+          </div>
+        </template>
+      </UCard>
     </template>
   </UPopover>
 </template>
