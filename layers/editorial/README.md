@@ -15,13 +15,27 @@ legacy paragraph `id` prop remains a compatibility fallback.
 
 Paragraph edit controls also expose a compact Nuxt UI presentation editor when
 Drupal includes a `presentationEdit` capability for that exact paragraph. Its
-private proxy reads and writes the curated `container`, `card`, `spacing`, and
-`width` contract produced by `stir_layout_builder`; Drupal remains authoritative
-for which fields exist, their labels and options, access checks, validation,
-and revision creation. Parent Layout editing remains a separate action, so a
-nested paragraph's own settings are never silently replaced by its container's
-settings. The full Drupal edit link remains available from the popover for
-every setting outside that deliberately small contract.
+private proxy reads and writes the safe boolean and options fields Drupal places
+in a paragraph form's **Layout** and **Animations** groups; Drupal remains
+authoritative for field keys, labels, descriptions, options, access checks,
+validation, and revision creation. Parent Layout quick settings remain a
+separate popover, so a nested paragraph's own settings are never silently
+replaced by its container's settings. Each popover retains the corresponding
+full Drupal edit link for every setting outside that deliberately small
+contract.
+
+Eligible Layout Paragraphs containers also show Drupal's enabled layout
+plugins as visual radio cards. When a target removes populated regions, the
+editor displays Drupal's suggested destinations and requires an explicit valid
+mapping before Save. Layout and presentation changes share one save request;
+the owning revision token prevents stale overwrites. Region names, icons,
+choices, mapping requirements, permissions, and validation remain Drupal-owned.
+Eligible Layout Paragraphs also expose a visual arranger. Dragging, keyboard
+move controls, and staged removals update only local state; one explicit save
+submits the complete ordered region arrangement with Drupal's owner-revision
+token. Removed items remain visible with an Undo action until save. Drupal
+remains the source of truth and rejects stale, incomplete, duplicate, or
+unauthorized arrangements before atomically saving the owning aggregate.
 
 The editor keeps Drupal's stored text format unchanged, preserves supported
 Drupal-specific blocks such as `<drupal-media>` and `<stir-cta>`, and exposes a

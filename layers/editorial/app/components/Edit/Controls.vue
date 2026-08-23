@@ -76,7 +76,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
     >
       <template v-for="action in actions" :key="action.key">
         <LazyEditPresentation
-          v-if="action.key === 'presentation'"
+          v-if="action.key === 'presentation' || action.key === 'layout'"
           :action="action"
         />
         <UTooltip

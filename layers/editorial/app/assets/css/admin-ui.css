@@ -149,6 +149,49 @@
     }
   }
 
+  /*
+   * Modals are teleported beside the app root, where downstream element rules
+   * would otherwise restyle their headings and controls.
+   */
+  .admin-ui-modal {
+    font-family: var(--font-admin) !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    line-height: 1.25rem !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+
+    :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+      font-family: inherit !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+    }
+
+    :where(p, label, button, input, [data-slot='label'], [data-slot='item']) {
+      font-size: 0.875rem !important;
+      line-height: 1.25rem !important;
+    }
+
+    .admin-ui-modal-title {
+      margin: 0 !important;
+      padding: 0 !important;
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      line-height: 1.5rem !important;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .admin-ui-layout-grid {
+      grid-template-areas: none !important;
+      grid-template-columns: minmax(0, 1fr) !important;
+
+      > * {
+        grid-area: auto !important;
+      }
+    }
+  }
+
   .admin-ui-popover-control {
     min-height: 2rem !important;
     font-family: var(--font-admin) !important;
@@ -157,6 +200,11 @@
     line-height: 1.25rem !important;
     letter-spacing: normal !important;
     text-transform: none !important;
+  }
+
+  .admin-ui-settings-separator {
+    margin-block: -0.75rem !important;
+    max-width: none !important;
   }
 
   .admin-ui-toolbar {

@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import type {
   EditAction,
+  ParagraphLayoutContract,
+  ParagraphLayoutOption,
   ParagraphPresentationField,
   ParagraphPresentationKey,
   ParagraphPresentationResponse,
 } from '#stir/types'
 import { pageRefreshKey } from '#stir/utils/pageRefresh'
 import type { PageRefresh } from '#stir/utils/pageRefresh'
+import {
+  areParagraphLayoutMappingsValid,
+  createParagraphLayoutMappings,
+} from '#stir/utils/paragraphLayoutTransition'
 
 const props = defineProps<{
   action: EditAction
@@ -15,11 +21,17 @@ const props = defineProps<{
 const refreshRenderedPage = inject<PageRefresh>(pageRefreshKey)
 const toast = useToast()
 const open = ref(false)
+const tooltipOpen = ref(false)
+const quickSettingsHeading = ref<HTMLElement | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const saved = ref(false)
 const error = ref('')
 const fields = ref<ParagraphPresentationField[]>([])
+const layout = ref<ParagraphLayoutContract | null>(null)
+const selectedLayout = ref('')
+const layoutMappings = ref<Record<string, string>>({})
+const arrangementOpen = ref(false)
 const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -30,6 +42,16 @@ const selectUi = {
   base: 'admin-ui-popover-control',
   content: 'admin-ui admin-ui-scope admin-ui-popover',
 }
+const helpTooltipUi = {
+  content: 'admin-ui-scope admin-ui-tooltip-content max-w-64',
+  arrow: 'admin-ui-tooltip-arrow',
+}
+const popoverContent = {
+  align: 'end' as const,
+  side: 'bottom' as const,
+  sideOffset: 8,
+  onOpenAutoFocus: handleOpenAutoFocus,
+}
 
 const endpoint = computed(() =>
   `/api/paragraph/${props.action.paragraphId}/presentation`,
@@ -39,7 +61,18 @@ const changedValues = computed(() => Object.fromEntries(
     .filter(field => JSON.stringify(field.value) !== JSON.stringify(savedValues.value[field.key]))
     .map(field => [field.key, field.value]),
 ))
-const dirty = computed(() => Object.keys(changedValues.value).length > 0)
+const selectedLayoutOption = computed(() => layout.value?.options.find(
+  option => option.value === selectedLayout.value,
+) ?? null)
+const layoutSummary = computed(() => selectedLayoutOption.value?.label ?? 'Choose layout')
+const layoutDirty = computed(() => Boolean(
+  layout.value && selectedLayout.value !== layout.value.current,
+))
+const layoutValid = computed(() => !layoutDirty.value || areParagraphLayoutMappingsValid(
+  selectedLayoutOption.value,
+  layoutMappings.value,
+))
+const dirty = computed(() => Object.keys(changedValues.value).length > 0 || layoutDirty.value)
 const status = computed(() => {
   if (saving.value) return 'Saving…'
   if (error.value) return error.value
@@ -98,9 +131,33 @@ async function refreshPageAfterSave(): Promise<void> {
 
 function acceptResponse(response: ParagraphPresentationResponse): void {
   fields.value = response.fields
+  layout.value = response.layout
+  selectedLayout.value = response.layout?.current ?? ''
+  resetLayoutMappings()
   savedValues.value = Object.fromEntries(
     response.fields.map(field => [field.key, cloneValue(field.value)]),
   ) as Record<ParagraphPresentationKey, boolean | string | string[]>
+}
+
+function resetLayoutMappings(): void {
+  layoutMappings.value = createParagraphLayoutMappings(selectedLayoutOption.value)
+}
+
+function updateLayout(value: string): void {
+  selectedLayout.value = value
+  resetLayoutMappings()
+  saved.value = false
+  error.value = ''
+}
+
+function layoutUpdate() {
+  if (!layout.value || !layoutDirty.value) return undefined
+
+  return {
+    target: selectedLayout.value,
+    mappings: layoutMappings.value,
+    expectedOwnerRevisionId: layout.value.ownerRevisionId,
+  }
 }
 
 function updateValue(
@@ -118,16 +175,20 @@ function updateValue(
 }
 
 async function save(): Promise<void> {
-  if (saving.value || !dirty.value) return
+  if (saving.value || !dirty.value || !layoutValid.value) return
 
   saving.value = true
   saved.value = false
   error.value = ''
 
   try {
+    const pendingLayout = layoutUpdate()
     const response = await $fetch<ParagraphPresentationResponse>(endpoint.value, {
       method: 'POST',
-      body: { values: changedValues.value },
+      body: {
+        values: changedValues.value,
+        ...(pendingLayout ? { layout: pendingLayout } : {}),
+      },
     })
 
     acceptResponse(response)
@@ -160,33 +221,68 @@ onBeforeUnmount(() => {
 function handleOpen(value: boolean): void {
   if (!value && dirty.value) {
     fields.value.forEach((field) => {
-      field.value = cloneValue(savedValues.value[field.key])
+      const savedValue = savedValues.value[field.key]
+
+      if (savedValue !== undefined) field.value = cloneValue(savedValue)
     })
+    selectedLayout.value = layout.value?.current ?? ''
+    resetLayoutMappings()
   }
 
   open.value = value
+  if (value) tooltipOpen.value = false
   if (value) void load()
+}
+
+function handleOpenAutoFocus(event: Event): void {
+  event.preventDefault()
+  void nextTick(() => quickSettingsHeading.value?.focus())
+}
+
+function openArrangement(): void {
+  handleOpen(false)
+  arrangementOpen.value = true
+}
+
+function openFullEditor(): void {
+  if (!props.action.fullEditLink || !import.meta.client) return
+
+  window.location.assign(props.action.fullEditLink)
+}
+
+async function handleArrangementSaved(response: ParagraphPresentationResponse): Promise<void> {
+  acceptResponse(response)
+  await refreshPageAfterSave()
 }
 </script>
 
 <template>
   <UPopover
-    :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
+    :content="popoverContent"
     :open="open"
     :ui="popoverUi"
     @update:open="handleOpen"
   >
-    <UButton
-      :aria-label="action.ariaLabel"
-      color="neutral"
-      :icon="action.icon"
-      :title="action.tooltip"
-      :ui="{ base: action.buttonClass }"
-      :variant="action.variant"
-      @click.stop
+    <UTooltip
+      :open="tooltipOpen"
+      :text="action.tooltip"
+      :ui="{
+        content: 'admin-ui-scope admin-ui-tooltip-content',
+        arrow: 'admin-ui-tooltip-arrow',
+      }"
+      @update:open="value => tooltipOpen = value"
     >
-      <span class="sr-only">{{ action.ariaLabel }}</span>
-    </UButton>
+      <UButton
+        :aria-label="action.ariaLabel"
+        color="neutral"
+        :icon="action.icon"
+        :ui="{ base: action.buttonClass }"
+        :variant="action.variant"
+        @click.stop="tooltipOpen = false"
+      >
+        <span class="sr-only">{{ action.ariaLabel }}</span>
+      </UButton>
+    </UTooltip>
 
     <template #content>
       <UCard
@@ -196,12 +292,13 @@ function handleOpen(value: boolean): void {
         <template #header>
           <div class="flex items-start justify-between gap-3">
             <div>
-              <h2 class="font-semibold text-highlighted">
+              <h2
+                ref="quickSettingsHeading"
+                class="font-semibold text-highlighted outline-none"
+                tabindex="-1"
+              >
                 Quick settings
               </h2>
-              <p class="text-sm text-muted">
-                Adjust settings, then save once.
-              </p>
             </div>
             <span
               v-if="status"
@@ -222,12 +319,124 @@ function handleOpen(value: boolean): void {
           <USkeleton v-for="index in 4" :key="index" class="h-9 w-full" />
         </div>
 
-        <div v-else-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
-          <UFormField
-            v-for="field in fields"
-            :key="field.key"
-            :label="field.label"
+        <div v-else-if="fields.length || layout" class="space-y-4">
+          <UCollapsible
+            v-if="layout"
+            class="rounded-md border border-muted"
+            :ui="{ content: 'border-t border-muted' }"
           >
+            <template #default="{ open: layoutOpen }">
+              <UButton
+                block
+                color="neutral"
+                :icon="layoutDirty ? 'i-lucide-layout-dashboard' : 'i-lucide-layout-template'"
+                :label="`Layout · ${layoutSummary}`"
+                :trailing-icon="layoutOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                :ui="{ base: 'justify-between rounded-md px-3 py-2' }"
+                variant="ghost"
+              />
+            </template>
+
+            <template #content>
+              <div class="space-y-3 p-3">
+                <URadioGroup
+                  :items="layout.options"
+                  :model-value="selectedLayout"
+                  orientation="horizontal"
+                  size="sm"
+                  :ui="{
+                    fieldset: 'grid grid-cols-2 gap-2',
+                    item: 'min-w-0',
+                    wrapper: 'min-w-0 w-full',
+                    label: 'w-full',
+                  }"
+                  value-key="value"
+                  variant="card"
+                  @update:model-value="updateLayout"
+                >
+                  <template #label="{ item }">
+                    <span class="flex min-w-0 flex-col gap-1.5">
+                      <span aria-hidden="true" class="flex h-8 flex-col gap-0.5 rounded-sm border border-muted p-1">
+                        <span
+                          v-for="(row, rowIndex) in (item as ParagraphLayoutOption).iconMap"
+                          :key="rowIndex"
+                          class="flex min-h-0 flex-1 gap-0.5"
+                        >
+                          <span
+                            v-for="(region, regionIndex) in row"
+                            :key="`${region}-${regionIndex}`"
+                            class="min-w-0 flex-1 bg-accented"
+                          />
+                        </span>
+                      </span>
+                      <span class="truncate text-xs">{{ item.label }}</span>
+                    </span>
+                  </template>
+                </URadioGroup>
+
+                <UAlert
+                  v-if="layoutDirty && selectedLayoutOption?.moves.length"
+                  color="warning"
+                  icon="i-lucide-move-right"
+                  title="Content movement"
+                  variant="subtle"
+                >
+                  <template #description>
+                    <div class="mt-2 grid gap-3">
+                      <UFormField
+                        v-for="move in selectedLayoutOption.moves"
+                        :key="move.source"
+                        :label="`${move.sourceLabel} (${move.count})`"
+                      >
+                        <USelect
+                          v-model="layoutMappings[move.source]"
+                          class="w-full"
+                          :items="selectedLayoutOption.regions"
+                          label-key="label"
+                          size="sm"
+                          :ui="selectUi"
+                          value-key="value"
+                        />
+                      </UFormField>
+                    </div>
+                  </template>
+                </UAlert>
+
+                <UButton
+                  v-if="layout.children"
+                  block
+                  color="neutral"
+                  icon="i-lucide-panels-top-left"
+                  label="Arrange content"
+                  variant="soft"
+                  @click="openArrangement"
+                />
+              </div>
+            </template>
+          </UCollapsible>
+
+          <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
+          <template v-for="(field, index) in fields" :key="field.key">
+            <USeparator
+              v-if="index > 0 && field.group !== fields[index - 1]?.group"
+              class="admin-ui-settings-separator col-span-2"
+            />
+            <UFormField :label="field.label">
+            <template v-if="field.description" #label>
+              <span class="inline-flex items-center gap-1">
+                <span>{{ field.label }}</span>
+                <UTooltip :text="field.description" :ui="helpTooltipUi">
+                  <UButton
+                    :aria-label="`About ${field.label}`"
+                    color="neutral"
+                    icon="i-lucide-circle-help"
+                    size="xs"
+                    :ui="{ base: '!min-h-0 !p-0 text-muted' }"
+                    variant="link"
+                  />
+                </UTooltip>
+              </span>
+            </template>
             <USwitch
               v-if="field.type === 'boolean'"
               :model-value="field.value as boolean"
@@ -260,7 +469,9 @@ function handleOpen(value: boolean): void {
               value-key="value"
               @update:model-value="value => updateMultiselectValue(field, value)"
             />
-          </UFormField>
+            </UFormField>
+          </template>
+          </div>
         </div>
 
         <p v-else-if="!error" class="text-sm text-muted">
@@ -270,13 +481,13 @@ function handleOpen(value: boolean): void {
         <template #footer>
           <div
             class="grid gap-2"
-            :class="fields.length && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
+            :class="(fields.length || layout) && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
           >
             <UButton
-              v-if="fields.length"
+              v-if="fields.length || layout"
               block
               color="neutral"
-              :disabled="!dirty"
+              :disabled="!dirty || !layoutValid"
               icon="i-lucide-save"
               label="Save changes"
               :loading="saving"
@@ -289,12 +500,20 @@ function handleOpen(value: boolean): void {
               color="neutral"
               icon="i-lucide-square-pen"
               label="Open full editor"
-              :to="action.fullEditLink"
               variant="soft"
+              @click="openFullEditor"
             />
           </div>
         </template>
       </UCard>
     </template>
   </UPopover>
+
+  <EditLayoutArrangement
+    v-if="layout?.children"
+    v-model:open="arrangementOpen"
+    :contract="layout"
+    :endpoint="endpoint"
+    @saved="handleArrangementSaved"
+  />
 </template>

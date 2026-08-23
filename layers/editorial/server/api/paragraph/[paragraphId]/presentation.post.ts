@@ -8,6 +8,7 @@ import {
 import { resolveDrupalCeApiConfig } from '../../../../../core/server/utils/drupalCeApiConfig'
 import { buildDrupalHeaders } from '../../../../../core/server/utils/drupalHeaders'
 import type {
+  ParagraphLayoutUpdate,
   ParagraphPresentationKey,
   ParagraphPresentationResponse,
 } from '#stir/types'
@@ -25,16 +26,22 @@ export default defineEventHandler(async (event) => {
   assertStirSameOrigin(event)
 
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
-  const body = await readBody<{ values?: unknown }>(event)
+  const body = await readBody<{ layout?: unknown, values?: unknown }>(event)
 
-  if (!body?.values || typeof body.values !== 'object' || Array.isArray(body.values)) {
+  const hasValues = body?.values !== undefined
+  const hasLayout = body?.layout !== undefined
+
+  if ((!hasValues && !hasLayout)
+    || (hasValues && (typeof body.values !== 'object' || body.values === null || Array.isArray(body.values)))
+    || (hasLayout && (typeof body.layout !== 'object' || body.layout === null || Array.isArray(body.layout)))) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Presentation values are required.',
+      statusMessage: 'Presentation values or a layout change are required.',
     })
   }
 
-  const values = body.values as PresentationValues
+  const values = (body.values ?? {}) as PresentationValues
+  const layout = body.layout as ParagraphLayoutUpdate | undefined
   const { apiKey, ceApiEndpoint, drupalBaseUrl, requestTimeoutMs }
     = resolveDrupalCeApiConfig(useRuntimeConfig())
   const cookie = getForwardedCookie(event)
@@ -57,7 +64,7 @@ export default defineEventHandler(async (event) => {
       buildParagraphPresentationPath(ceApiEndpoint, paragraphId),
       {
         method: 'POST',
-        body: { values },
+        body: { values, ...(layout ? { layout } : {}) },
         headers: buildDrupalHeaders({
           cookie,
           apiKey,
