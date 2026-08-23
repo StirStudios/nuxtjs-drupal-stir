@@ -143,6 +143,7 @@ onMounted(() => {
 
 <template>
   <EditLink
+    :id="id"
     v-slot="{ actions, selectAction }"
     controls-placement="slot"
     :link="editLink"

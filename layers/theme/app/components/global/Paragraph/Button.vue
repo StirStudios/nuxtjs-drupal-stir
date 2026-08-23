@@ -86,7 +86,7 @@ const pdfUrl = computed(() =>
     :class="['flex w-full', align, spacing, width]"
     :direction="direction"
   >
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
+    <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
       <UButton
         v-if="hasPdf"
         :block="btnBlock"

@@ -87,7 +87,12 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
           (value: boolean) => handleTooltipOpenUpdate(action.key, value)
         "
       >
+        <LazyEditPresentation
+          v-if="action.key === 'presentation'"
+          :action="action"
+        />
         <UButton
+          v-else
           :aria-label="action.ariaLabel"
           color="neutral"
           :disabled="action.disabled"

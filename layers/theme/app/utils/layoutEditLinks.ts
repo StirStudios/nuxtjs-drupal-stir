@@ -1,6 +1,11 @@
 import type { ComputedRef, InjectionKey } from 'vue'
 
-export type LayoutEditLinkIndex = ReadonlyMap<string, string>
+export interface LayoutEditTarget {
+  editLink: string
+  paragraphId: number
+}
+
+export type LayoutEditLinkIndex = ReadonlyMap<string, LayoutEditTarget>
 
 export const layoutEditLinksKey: InjectionKey<ComputedRef<LayoutEditLinkIndex>> =
   Symbol('stir-layout-edit-links')
@@ -36,7 +41,7 @@ export function withEditorDestination(
 }
 
 export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
-  const links = new Map<string, string>()
+  const links = new Map<string, LayoutEditTarget>()
   const visited = new WeakSet<object>()
 
   const visit = (candidate: unknown): void => {
@@ -58,9 +63,16 @@ export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
     const editLink = typeof props?.editLink === 'string'
       ? props.editLink.trim()
       : ''
+    const paragraphId = Number(props?.id)
 
-    if (node.element === 'paragraph-layout' && uuid && editLink) {
-      links.set(uuid, editLink)
+    if (
+      node.element === 'paragraph-layout'
+      && uuid
+      && editLink
+      && Number.isInteger(paragraphId)
+      && paragraphId > 0
+    ) {
+      links.set(uuid, { editLink, paragraphId })
     }
 
     Object.values(node).forEach(visit)

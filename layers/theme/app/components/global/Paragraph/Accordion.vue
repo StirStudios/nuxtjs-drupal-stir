@@ -35,6 +35,7 @@ type AccordionItemProps = {
 }
 
 type AccordionEntry = AccordionItem & {
+  id?: number | string
   buttonNodes: VNode[]
   contentHtml: string
   editLink?: string
@@ -68,6 +69,7 @@ const items = computed<AccordionEntry[]>(() =>
     const value = String(itemProps.uuid ?? itemProps.id ?? index)
 
     return {
+      id: itemProps.id,
       label,
       value,
       buttonNodes: itemSlots?.buttons?.() ?? [],
@@ -86,7 +88,7 @@ const items = computed<AccordionEntry[]>(() =>
     :class="sectionClasses"
     :direction="direction"
   >
-    <EditLink :link="editLink" :parent-uuid="parentUuid" />
+    <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid" />
 
     <div v-if="header || trustedTextHtml" class="space-y-3">
       <component :is="headerTag || 'h2'" v-if="header">
@@ -126,7 +128,7 @@ const items = computed<AccordionEntry[]>(() =>
           :key="node.key ?? index"
         />
 
-        <EditLink :link="item.editLink" :parent-uuid="item.parentUuid" />
+        <EditLink :id="item.id" :link="item.editLink" :parent-uuid="item.parentUuid" />
       </template>
     </UAccordion>
   </ParagraphReveal>
