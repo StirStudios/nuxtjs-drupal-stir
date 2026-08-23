@@ -143,8 +143,8 @@ export const adminUiTheme = {
   },
   card: {
     header: 'admin-ui-card-header',
-    body: 'p-3',
-    footer: 'p-3',
+    body: 'admin-ui-card-body',
+    footer: 'admin-ui-card-footer',
   },
   formField: {
     label: 'admin-ui-form-label',
