@@ -81,4 +81,21 @@ describe('paragraph layout arrangement', () => {
       },
     })
   })
+
+  it('falls back safely when Drupal omits a declared region from the icon map', () => {
+    const option: ParagraphLayoutOption = {
+      ...target,
+      regions: [
+        ...target.regions,
+        { value: 'bottom', label: 'Bottom' },
+      ],
+    }
+
+    expect(createParagraphLayoutGrid(option)).toEqual({
+      container: {
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(14rem, 100%), 1fr))',
+      },
+      regionAreas: {},
+    })
+  })
 })

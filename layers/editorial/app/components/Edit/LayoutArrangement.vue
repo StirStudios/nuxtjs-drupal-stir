@@ -220,7 +220,7 @@ watch(() => props.open, (value) => {
           <section
             v-for="region in selectedOption.regions"
             :key="region.value"
-            class="flex min-h-64 min-w-0 flex-col rounded-lg border border-muted bg-muted/20"
+            class="flex min-h-64 min-w-0 flex-col rounded-lg border border-muted bg-muted/30 transition-colors"
             :style="layoutGrid.regionAreas[region.value] ? { gridArea: layoutGrid.regionAreas[region.value] } : undefined"
           >
             <h3 class="border-b border-muted px-3 py-2 text-sm font-semibold text-highlighted">
@@ -230,8 +230,8 @@ watch(() => props.open, (value) => {
             <VueDraggable
               :animation="180"
               :aria-label="`${region.label} content`"
-              class="flex min-h-48 flex-1 flex-col gap-2 p-2"
-              ghost-class="opacity-50"
+              class="flex min-h-48 flex-1 flex-col gap-2 rounded-b-lg p-2 ring-inset transition-colors has-[.layout-drag-ghost]:bg-primary/10 has-[.layout-drag-ghost]:ring-2 has-[.layout-drag-ghost]:ring-primary"
+              ghost-class="layout-drag-ghost"
               :group="`layout-${contract.ownerRevisionId ?? 'draft'}`"
               handle=".layout-drag-handle"
               :model-value="childrenFor(region.value)"
@@ -330,7 +330,7 @@ watch(() => props.open, (value) => {
       </template>
 
       <template #footer>
-        <UFieldGroup>
+        <div class="flex items-center gap-2">
           <UButton color="neutral" label="Cancel" variant="outline" @click="emit('update:open', false)" />
           <UButton
             color="neutral"
@@ -340,7 +340,7 @@ watch(() => props.open, (value) => {
             variant="solid"
             @click="save"
           />
-        </UFieldGroup>
+        </div>
       </template>
     </UModal>
   </ClientOnly>

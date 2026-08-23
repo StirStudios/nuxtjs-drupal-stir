@@ -20,12 +20,13 @@ export function createParagraphLayoutGrid(option: ParagraphLayoutOption): Paragr
   }
   const columns = Math.max(0, ...option.iconMap.map(row => row.length))
   const validRegions = new Set(option.regions.map(region => region.value))
+  const mappedRegions = new Set(option.iconMap.flat())
 
   if (columns < 1 || option.iconMap.some(
     row => row.length < 1
       || columns % row.length !== 0
       || row.some(region => !validRegions.has(region)),
-  )) {
+  ) || option.regions.some(region => !mappedRegions.has(region.value))) {
     return fallback
   }
 
