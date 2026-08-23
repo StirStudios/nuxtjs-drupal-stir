@@ -87,6 +87,7 @@ describe('EditPresentation focus management', () => {
       layout: {
         current: 'layout_twocol_section',
         ownerRevisionId: 7,
+        children: [],
         options: [{
           value: 'layout_twocol_section',
           label: 'Two column',

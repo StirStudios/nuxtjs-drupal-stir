@@ -62,7 +62,8 @@
       "tailwindcss",
       "ultrahtml",
       "unhead",
-      "valibot"
+      "valibot",
+      "vue-draggable-plus"
     ],
     "development": [
       "@axe-core/playwright",
@@ -161,6 +162,7 @@
       "layers/auth/app/components/Auth/AuthStatusPanel.vue",
       "layers/editorial/app/components/Drupal/Tabs.vue",
       "layers/editorial/app/components/Edit/Controls.vue",
+      "layers/editorial/app/components/Edit/LayoutArrangement.vue",
       "layers/editorial/app/components/Edit/Link.vue",
       "layers/editorial/app/components/Edit/Presentation.vue",
       "layers/editorial/app/components/Edit/Text.vue",
@@ -377,6 +379,7 @@
       "layers/theme/app/utils/nuxtUiProps.ts",
       "layers/theme/app/utils/pageRefresh.ts",
       "layers/theme/app/utils/pageRequest.ts",
+      "layers/theme/app/utils/paragraphLayoutArrangement.ts",
       "layers/theme/app/utils/paragraphLayoutTransition.ts",
       "layers/theme/app/utils/responsiveGrid.ts",
       "layers/theme/app/utils/schedule.ts",
@@ -482,6 +485,7 @@
         "layers/auth/app/components/Auth/AuthStatusPanel.vue",
         "layers/editorial/app/components/Drupal/Tabs.vue",
         "layers/editorial/app/components/Edit/Controls.vue",
+        "layers/editorial/app/components/Edit/LayoutArrangement.vue",
         "layers/editorial/app/components/Edit/Link.vue",
         "layers/editorial/app/components/Edit/Presentation.vue",
         "layers/editorial/app/components/Edit/Text.vue",
@@ -698,6 +702,7 @@
         "layers/theme/app/utils/nuxtUiProps.ts",
         "layers/theme/app/utils/pageRefresh.ts",
         "layers/theme/app/utils/pageRequest.ts",
+        "layers/theme/app/utils/paragraphLayoutArrangement.ts",
         "layers/theme/app/utils/paragraphLayoutTransition.ts",
         "layers/theme/app/utils/responsiveGrid.ts",
         "layers/theme/app/utils/schedule.ts",
@@ -727,21 +732,21 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 126,
+    "components": 127,
     "composables": 63,
-    "utils": 54,
+    "utils": 55,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
-    "productionDependencies": 37,
+    "productionDependencies": 38,
     "developmentDependencies": 27,
-    "tests": 145,
+    "tests": 146,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
       "nuxt": 51,
       "server": 25,
-      "unit": 9,
+      "unit": 10,
       "utils": 47
     }
   },
@@ -842,6 +847,7 @@
     "tests/unit/formattedTextEditTarget.spec.ts",
     "tests/unit/layoutEditLinks.spec.ts",
     "tests/unit/paragraphComponentStarter.spec.ts",
+    "tests/unit/paragraphLayoutArrangement.spec.ts",
     "tests/unit/paragraphLayoutTransition.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
     "tests/utils/authTheme.spec.ts",

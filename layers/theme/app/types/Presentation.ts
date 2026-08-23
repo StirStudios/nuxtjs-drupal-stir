@@ -36,16 +36,26 @@ export interface ParagraphLayoutOption {
   moves: ParagraphLayoutMove[]
 }
 
+export interface ParagraphLayoutChild {
+  uuid: string
+  paragraphId: number
+  bundle: string
+  label: string
+  region: string
+}
+
 export interface ParagraphLayoutContract {
   current: string
   ownerRevisionId: number | null
   options: ParagraphLayoutOption[]
+  children?: ParagraphLayoutChild[]
 }
 
 export interface ParagraphLayoutUpdate {
   target: string
   mappings: Record<string, string>
   expectedOwnerRevisionId: number | null
+  regions?: Record<string, string[]>
 }
 
 export interface ParagraphPresentationResponse {

@@ -31,6 +31,7 @@ const fields = ref<ParagraphPresentationField[]>([])
 const layout = ref<ParagraphLayoutContract | null>(null)
 const selectedLayout = ref('')
 const layoutMappings = ref<Record<string, string>>({})
+const arrangementOpen = ref(false)
 const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -237,6 +238,16 @@ function handleOpenAutoFocus(event: Event): void {
   event.preventDefault()
   void nextTick(() => quickSettingsHeading.value?.focus())
 }
+
+function openArrangement(): void {
+  handleOpen(false)
+  arrangementOpen.value = true
+}
+
+async function handleArrangementSaved(response: ParagraphPresentationResponse): Promise<void> {
+  acceptResponse(response)
+  await refreshPageAfterSave()
+}
 </script>
 
 <template>
@@ -387,6 +398,16 @@ function handleOpenAutoFocus(event: Event): void {
                     </div>
                   </template>
                 </UAlert>
+
+                <UButton
+                  v-if="layout.children"
+                  block
+                  color="neutral"
+                  icon="i-lucide-panels-top-left"
+                  label="Arrange content"
+                  variant="soft"
+                  @click="openArrangement"
+                />
               </div>
             </template>
           </UCollapsible>
@@ -482,4 +503,12 @@ function handleOpenAutoFocus(event: Event): void {
       </UCard>
     </template>
   </UPopover>
+
+  <EditLayoutArrangement
+    v-if="layout?.children"
+    v-model:open="arrangementOpen"
+    :contract="layout"
+    :endpoint="endpoint"
+    @saved="handleArrangementSaved"
+  />
 </template>
