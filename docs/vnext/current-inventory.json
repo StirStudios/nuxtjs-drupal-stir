@@ -733,11 +733,11 @@
     "serverRoutes": 28,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 143,
+    "tests": 144,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
-      "nuxt": 50,
+      "nuxt": 51,
       "server": 25,
       "unit": 8,
       "utils": 47
@@ -766,6 +766,7 @@
     "tests/nuxt/runtime/BlockContentParagraph.nuxt.spec.ts",
     "tests/nuxt/runtime/DateTimeValue.nuxt.spec.ts",
     "tests/nuxt/runtime/EditLinkLayout.nuxt.spec.ts",
+    "tests/nuxt/runtime/EditPresentation.nuxt.spec.ts",
     "tests/nuxt/runtime/EditorialFallback.nuxt.spec.ts",
     "tests/nuxt/runtime/EntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldEntityReference.nuxt.spec.ts",

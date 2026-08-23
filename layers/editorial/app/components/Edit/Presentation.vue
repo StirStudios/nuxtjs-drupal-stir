@@ -16,6 +16,7 @@ const refreshRenderedPage = inject<PageRefresh>(pageRefreshKey)
 const toast = useToast()
 const open = ref(false)
 const tooltipOpen = ref(false)
+const quickSettingsHeading = ref<HTMLElement | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const saved = ref(false)
@@ -34,6 +35,12 @@ const selectUi = {
 const helpTooltipUi = {
   content: 'admin-ui-scope admin-ui-tooltip-content max-w-64',
   arrow: 'admin-ui-tooltip-arrow',
+}
+const popoverContent = {
+  align: 'end' as const,
+  side: 'bottom' as const,
+  sideOffset: 8,
+  onOpenAutoFocus: handleOpenAutoFocus,
 }
 
 const endpoint = computed(() =>
@@ -175,11 +182,16 @@ function handleOpen(value: boolean): void {
   if (value) tooltipOpen.value = false
   if (value) void load()
 }
+
+function handleOpenAutoFocus(event: Event): void {
+  event.preventDefault()
+  void nextTick(() => quickSettingsHeading.value?.focus())
+}
 </script>
 
 <template>
   <UPopover
-    :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
+    :content="popoverContent"
     :open="open"
     :ui="popoverUi"
     @update:open="handleOpen"
@@ -213,7 +225,11 @@ function handleOpen(value: boolean): void {
         <template #header>
           <div class="flex items-start justify-between gap-3">
             <div>
-              <h2 class="font-semibold text-highlighted">
+              <h2
+                ref="quickSettingsHeading"
+                class="font-semibold text-highlighted outline-none"
+                tabindex="-1"
+              >
                 Quick settings
               </h2>
               <p class="text-sm text-muted">
