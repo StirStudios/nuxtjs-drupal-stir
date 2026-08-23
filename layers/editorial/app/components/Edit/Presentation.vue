@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import type {
   EditAction,
+  ParagraphLayoutContract,
+  ParagraphLayoutOption,
   ParagraphPresentationField,
   ParagraphPresentationKey,
   ParagraphPresentationResponse,
 } from '#stir/types'
 import { pageRefreshKey } from '#stir/utils/pageRefresh'
 import type { PageRefresh } from '#stir/utils/pageRefresh'
+import {
+  areParagraphLayoutMappingsValid,
+  createParagraphLayoutMappings,
+} from '#stir/utils/paragraphLayoutTransition'
 
 const props = defineProps<{
   action: EditAction
@@ -22,6 +28,9 @@ const saving = ref(false)
 const saved = ref(false)
 const error = ref('')
 const fields = ref<ParagraphPresentationField[]>([])
+const layout = ref<ParagraphLayoutContract | null>(null)
+const selectedLayout = ref('')
+const layoutMappings = ref<Record<string, string>>({})
 const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -51,7 +60,17 @@ const changedValues = computed(() => Object.fromEntries(
     .filter(field => JSON.stringify(field.value) !== JSON.stringify(savedValues.value[field.key]))
     .map(field => [field.key, field.value]),
 ))
-const dirty = computed(() => Object.keys(changedValues.value).length > 0)
+const selectedLayoutOption = computed(() => layout.value?.options.find(
+  option => option.value === selectedLayout.value,
+) ?? null)
+const layoutDirty = computed(() => Boolean(
+  layout.value && selectedLayout.value !== layout.value.current,
+))
+const layoutValid = computed(() => !layoutDirty.value || areParagraphLayoutMappingsValid(
+  selectedLayoutOption.value,
+  layoutMappings.value,
+))
+const dirty = computed(() => Object.keys(changedValues.value).length > 0 || layoutDirty.value)
 const status = computed(() => {
   if (saving.value) return 'Saving…'
   if (error.value) return error.value
@@ -110,9 +129,33 @@ async function refreshPageAfterSave(): Promise<void> {
 
 function acceptResponse(response: ParagraphPresentationResponse): void {
   fields.value = response.fields
+  layout.value = response.layout
+  selectedLayout.value = response.layout?.current ?? ''
+  resetLayoutMappings()
   savedValues.value = Object.fromEntries(
     response.fields.map(field => [field.key, cloneValue(field.value)]),
   ) as Record<ParagraphPresentationKey, boolean | string | string[]>
+}
+
+function resetLayoutMappings(): void {
+  layoutMappings.value = createParagraphLayoutMappings(selectedLayoutOption.value)
+}
+
+function updateLayout(value: string): void {
+  selectedLayout.value = value
+  resetLayoutMappings()
+  saved.value = false
+  error.value = ''
+}
+
+function layoutUpdate() {
+  if (!layout.value || !layoutDirty.value) return undefined
+
+  return {
+    target: selectedLayout.value,
+    mappings: layoutMappings.value,
+    expectedOwnerRevisionId: layout.value.ownerRevisionId,
+  }
 }
 
 function updateValue(
@@ -130,16 +173,20 @@ function updateValue(
 }
 
 async function save(): Promise<void> {
-  if (saving.value || !dirty.value) return
+  if (saving.value || !dirty.value || !layoutValid.value) return
 
   saving.value = true
   saved.value = false
   error.value = ''
 
   try {
+    const pendingLayout = layoutUpdate()
     const response = await $fetch<ParagraphPresentationResponse>(endpoint.value, {
       method: 'POST',
-      body: { values: changedValues.value },
+      body: {
+        values: changedValues.value,
+        ...(pendingLayout ? { layout: pendingLayout } : {}),
+      },
     })
 
     acceptResponse(response)
@@ -176,6 +223,8 @@ function handleOpen(value: boolean): void {
 
       if (savedValue !== undefined) field.value = cloneValue(savedValue)
     })
+    selectedLayout.value = layout.value?.current ?? ''
+    resetLayoutMappings()
   }
 
   open.value = value
@@ -255,7 +304,73 @@ function handleOpenAutoFocus(event: Event): void {
           <USkeleton v-for="index in 4" :key="index" class="h-9 w-full" />
         </div>
 
-        <div v-else-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
+        <div v-else-if="fields.length || layout" class="space-y-4">
+          <UFormField v-if="layout" label="Layout">
+            <URadioGroup
+              :items="layout.options"
+              :model-value="selectedLayout"
+              orientation="horizontal"
+              size="sm"
+              :ui="{
+                fieldset: 'grid grid-cols-2 gap-2',
+                item: 'min-w-0',
+                wrapper: 'min-w-0 w-full',
+                label: 'w-full',
+              }"
+              value-key="value"
+              variant="card"
+              @update:model-value="updateLayout"
+            >
+              <template #label="{ item }">
+                <span class="flex min-w-0 flex-col gap-1.5">
+                  <span aria-hidden="true" class="flex h-8 flex-col gap-0.5 rounded-sm border border-muted p-1">
+                    <span
+                      v-for="(row, rowIndex) in (item as ParagraphLayoutOption).iconMap"
+                      :key="rowIndex"
+                      class="flex min-h-0 flex-1 gap-0.5"
+                    >
+                      <span
+                        v-for="(region, regionIndex) in row"
+                        :key="`${region}-${regionIndex}`"
+                        class="min-w-0 flex-1 bg-accented"
+                      />
+                    </span>
+                  </span>
+                  <span class="truncate text-xs">{{ item.label }}</span>
+                </span>
+              </template>
+            </URadioGroup>
+          </UFormField>
+
+          <UAlert
+            v-if="layoutDirty && selectedLayoutOption?.moves.length"
+            color="warning"
+            icon="i-lucide-move-right"
+            title="Content movement"
+            variant="subtle"
+          >
+            <template #description>
+              <div class="mt-2 grid gap-3">
+                <UFormField
+                  v-for="move in selectedLayoutOption.moves"
+                  :key="move.source"
+                  :label="`${move.sourceLabel} (${move.count})`"
+                >
+                  <USelect
+                    v-model="layoutMappings[move.source]"
+                    class="w-full"
+                    :items="selectedLayoutOption.regions"
+                    label-key="label"
+                    size="sm"
+                    :ui="selectUi"
+                    value-key="value"
+                  />
+                </UFormField>
+              </div>
+            </template>
+          </UAlert>
+
+          <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
           <UFormField
             v-for="field in fields"
             :key="field.key"
@@ -309,6 +424,7 @@ function handleOpenAutoFocus(event: Event): void {
               @update:model-value="value => updateMultiselectValue(field, value)"
             />
           </UFormField>
+          </div>
         </div>
 
         <p v-else-if="!error" class="text-sm text-muted">
@@ -318,13 +434,13 @@ function handleOpenAutoFocus(event: Event): void {
         <template #footer>
           <div
             class="grid gap-2"
-            :class="fields.length && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
+            :class="(fields.length || layout) && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
           >
             <UButton
-              v-if="fields.length"
+              v-if="fields.length || layout"
               block
               color="neutral"
-              :disabled="!dirty"
+              :disabled="!dirty || !layoutValid"
               icon="i-lucide-save"
               label="Save changes"
               :loading="saving"

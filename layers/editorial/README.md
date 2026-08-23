@@ -18,10 +18,19 @@ Drupal includes a `presentationEdit` capability for that exact paragraph. Its
 private proxy reads and writes the safe boolean and options fields Drupal places
 in a paragraph form's **Layout** and **Animations** groups; Drupal remains
 authoritative for field keys, labels, descriptions, options, access checks,
-validation, and revision creation. Parent Layout quick settings remain a separate popover,
-so a nested paragraph's own settings are never silently replaced by its
-container's settings. Each popover retains the corresponding full Drupal edit
-link for every setting outside that deliberately small contract.
+validation, and revision creation. Parent Layout quick settings remain a
+separate popover, so a nested paragraph's own settings are never silently
+replaced by its container's settings. Each popover retains the corresponding
+full Drupal edit link for every setting outside that deliberately small
+contract.
+
+Eligible Layout Paragraphs containers also show Drupal's enabled layout
+plugins as visual radio cards. When a target removes populated regions, the
+editor displays Drupal's suggested destinations and requires an explicit valid
+mapping before Save. Layout and presentation changes share one save request;
+the owning revision token prevents stale overwrites. Region names, icons,
+choices, mapping requirements, permissions, and validation remain Drupal-owned.
+Frontend drag-and-drop is intentionally outside this first-phase contract.
 
 The editor keeps Drupal's stored text format unchanged, preserves supported
 Drupal-specific blocks such as `<drupal-media>` and `<stir-cta>`, and exposes a
