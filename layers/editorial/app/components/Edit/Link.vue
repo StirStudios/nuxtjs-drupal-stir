@@ -61,13 +61,27 @@ const layoutEditLink = computed(() => {
 
   if (!parentUuid) return ''
 
-  const link = (
+  const target = (
     providedLayoutEditLinks?.value.get(parentUuid)
     ?? fallbackLayoutEditLinks?.value.get(parentUuid)
-    ?? ''
+    ?? null
   )
 
-  return link ? withEditorDestination(link, frontendReturnUrl.value) : ''
+  return target
+    ? withEditorDestination(target.editLink, frontendReturnUrl.value)
+    : ''
+})
+const layoutParagraphId = computed(() => {
+  const parentUuid = typeof props.parentUuid === 'string'
+    ? props.parentUuid.trim()
+    : ''
+
+  return parentUuid
+    ? (
+        providedLayoutEditLinks?.value.get(parentUuid)
+        ?? fallbackLayoutEditLinks?.value.get(parentUuid)
+      )?.paragraphId ?? null
+    : null
 })
 const hasLayoutLink = computed(
   () =>
@@ -77,6 +91,20 @@ const hasLayoutLink = computed(
 const quickEditLabel = computed(() => props.quickEditLabel || 'Quick edit')
 const fullEditLabel = computed(() => props.fullEditLabel || 'Full edit')
 const layoutEditLabel = computed(() => 'Edit layout')
+const presentationEditLink = computed(() =>
+  layoutParagraphId.value !== null
+    ? layoutEditLink.value
+    : fullEditLink.value,
+)
+const presentationParagraphId = computed(() =>
+  presentationEditLink.value
+    ? layoutParagraphId.value ?? (
+        Number.isInteger(Number(props.id)) && Number(props.id) > 0
+          ? Number(props.id)
+          : null
+      )
+    : null,
+)
 const singleActionLabel = computed(() => 'Edit')
 const actionButtonClass =
   'admin-ui-btn-base admin-ui-btn-neutral admin-ui-btn-soft'
@@ -86,7 +114,7 @@ const actions = computed<EditAction[]>(() => {
   const hasSingleAction =
     Number(hasQuickEdit.value) +
       Number(hasLink.value) +
-      Number(hasLayoutLink.value) ===
+      Number(presentationParagraphId.value !== null) ===
     1
 
   if (hasQuickEdit.value) {
@@ -124,21 +152,21 @@ const actions = computed<EditAction[]>(() => {
     })
   }
 
-  if (hasLayoutLink.value) {
+  if (presentationParagraphId.value !== null) {
     const tooltip = hasSingleAction
       ? singleActionLabel.value
-      : layoutEditLabel.value
-    const ariaLabel = `${tooltip} this layout`
+      : hasLayoutLink.value ? layoutEditLabel.value : 'Quick settings'
+    const ariaLabel = `${tooltip} for this section`
 
     result.push({
-      key: 'layout',
+      key: 'presentation',
       tooltip,
       ariaLabel,
       icon: 'i-lucide-layout-template',
       variant: 'soft',
       buttonClass: actionButtonClass,
-      to: layoutEditLink.value,
-      navigateInPlace: true,
+      paragraphId: presentationParagraphId.value,
+      fullEditLink: presentationEditLink.value,
     })
   }
 

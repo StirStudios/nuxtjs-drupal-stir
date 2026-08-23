@@ -21,7 +21,7 @@ defineSlots<{
 <template>
   <ParagraphReveal :id="id" :direction="direction">
     <WrapGrid :grid-items="gridItems">
-      <EditLink :link="editLink" :parent-uuid="parentUuid">
+      <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
         <slot name="media" />
       </EditLink>
     </WrapGrid>

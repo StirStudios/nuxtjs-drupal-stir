@@ -74,9 +74,13 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
       @keydown.stop
       @pointerdown.stop
     >
-      <UTooltip
-        v-for="action in actions"
-        :key="action.key"
+      <template v-for="action in actions" :key="action.key">
+        <LazyEditPresentation
+          v-if="action.key === 'presentation'"
+          :action="action"
+        />
+        <UTooltip
+          v-else
         :open="Boolean(tooltipOpen[action.key])"
         :text="action.tooltip"
         :ui="{
@@ -86,7 +90,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
         @update:open="
           (value: boolean) => handleTooltipOpenUpdate(action.key, value)
         "
-      >
+        >
         <UButton
           :aria-label="action.ariaLabel"
           color="neutral"
@@ -102,7 +106,8 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
         >
           <span class="sr-only">{{ action.ariaLabel }}</span>
         </UButton>
-      </UTooltip>
+        </UTooltip>
+      </template>
     </UFieldGroup>
   </UTheme>
 </template>

@@ -13,6 +13,14 @@ single-value formatted-text fields, so node bodies and paragraph text use the
 same editor without bundle-specific endpoints or downstream coercion. The
 legacy paragraph `id` prop remains a compatibility fallback.
 
+Paragraph edit controls also expose a compact Nuxt UI presentation editor when
+Drupal supplies an editable paragraph identity. Its private proxy reads and
+writes the curated `container`, `card`, `spacing`, and `width` contract produced
+by `stir_layout_builder`; Drupal remains authoritative for which fields exist,
+their labels and options, access checks, validation, and revision creation. The
+full Drupal edit link remains available from the popover for every setting
+outside that deliberately small contract.
+
 The editor keeps Drupal's stored text format unchanged, preserves supported
 Drupal-specific blocks such as `<drupal-media>` and `<stir-cta>`, and exposes a
 Nuxt UI drag handle for safe top-level block reordering. Drupal remains the

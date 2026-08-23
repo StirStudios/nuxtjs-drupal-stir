@@ -10,11 +10,11 @@ describe('buildLayoutEditLinkIndex', () => {
       content: [
         {
           element: 'paragraph-layout',
-          props: { uuid: 'layout-one', editLink: ' /paragraph/1/edit ' },
+          props: { id: 1, uuid: 'layout-one', editLink: ' /paragraph/1/edit ' },
           children: [
             {
               element: 'paragraph-layout',
-              props: { uuid: 'layout-two', editLink: '/paragraph/2/edit' },
+              props: { id: 2, uuid: 'layout-two', editLink: '/paragraph/2/edit' },
             },
           ],
         },
@@ -22,30 +22,36 @@ describe('buildLayoutEditLinkIndex', () => {
     })
 
     expect(Object.fromEntries(index)).toEqual({
-      'layout-one': '/paragraph/1/edit',
-      'layout-two': '/paragraph/2/edit',
+      'layout-one': { editLink: '/paragraph/1/edit', paragraphId: 1 },
+      'layout-two': { editLink: '/paragraph/2/edit', paragraphId: 2 },
     })
   })
 
-  it('ignores non-layout nodes and incomplete links', () => {
+  it('preserves full layout editing when numeric IDs are absent', () => {
     const index = buildLayoutEditLinkIndex([
       { element: 'paragraph-text', props: { uuid: 'text', editLink: '/edit' } },
       { element: 'paragraph-layout', props: { uuid: '', editLink: '/edit' } },
       { element: 'paragraph-layout', props: { uuid: 'missing-link' } },
+      { element: 'paragraph-layout', props: { uuid: 'missing-id', editLink: '/edit' } },
     ])
 
-    expect(index.size).toBe(0)
+    expect(Object.fromEntries(index)).toEqual({
+      'missing-id': { editLink: '/edit' },
+    })
   })
 
   it('does not recurse forever when passed a cyclic extension object', () => {
     const cyclic: Record<string, unknown> = {
       element: 'paragraph-layout',
-      props: { uuid: 'layout', editLink: '/edit' },
+      props: { id: 4, uuid: 'layout', editLink: '/edit' },
     }
 
     cyclic.self = cyclic
 
-    expect(buildLayoutEditLinkIndex(cyclic).get('layout')).toBe('/edit')
+    expect(buildLayoutEditLinkIndex(cyclic).get('layout')).toEqual({
+      editLink: '/edit',
+      paragraphId: 4,
+    })
   })
 })
 

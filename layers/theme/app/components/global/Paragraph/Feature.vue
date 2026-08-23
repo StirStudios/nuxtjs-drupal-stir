@@ -33,7 +33,7 @@ const cardVariant = computed(() => resolveUiPageCardVariant(props.cardVariant))
 
 <template>
   <ParagraphReveal :id="id" as="div" class="h-full" :direction="direction">
-    <EditLink class="h-full" :link="editLink" :parent-uuid="parentUuid">
+    <EditLink :id="id" class="h-full" :link="editLink" :parent-uuid="parentUuid">
       <UPageCard
         as="article"
         class="paragraph-feature h-full"

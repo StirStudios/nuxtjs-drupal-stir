@@ -529,6 +529,17 @@ describe('layer contract', () => {
       rootDir,
       'layers/core/server/utils/paragraphTextApi.ts',
     ))).toBe(false)
+
+    for (const method of ['get', 'post']) {
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/editorial/server/api/paragraph/[paragraphId]/presentation.${method}.ts`,
+      ))).toBe(true)
+      expect(existsSync(resolve(
+        rootDir,
+        `layers/core/server/api/paragraph/[paragraphId]/presentation.${method}.ts`,
+      ))).toBe(false)
+    }
   })
 
   it('exposes auth config and validation helpers from public layer paths', () => {

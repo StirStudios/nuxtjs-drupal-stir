@@ -16,7 +16,7 @@ defineProps<{
 
 <template>
   <ParagraphReveal :id="id" :direction="direction">
-    <EditLink :link="editLink" :parent-uuid="parentUuid">
+    <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
       <WrapDiv :align="align">
         <UIcon
           v-if="iconName"
