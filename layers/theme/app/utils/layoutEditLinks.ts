@@ -48,6 +48,25 @@ function visitCustomElementNodes(
   visit(value)
 }
 
+/** Removes editor-only metadata before Custom Elements renders component props. */
+export function withoutPresentationEditMetadata(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(item => withoutPresentationEditMetadata(item))
+  }
+
+  if (!value || typeof value !== 'object') return value
+
+  const source = value as Record<string, unknown>
+  const result: Record<string, unknown> = {}
+
+  for (const [key, child] of Object.entries(source)) {
+    if (key === 'presentationEdit') continue
+    result[key] = withoutPresentationEditMetadata(child)
+  }
+
+  return result
+}
+
 /** Adds the current frontend page as Drupal's trusted post-edit destination. */
 export function withEditorDestination(
   editLink: string,

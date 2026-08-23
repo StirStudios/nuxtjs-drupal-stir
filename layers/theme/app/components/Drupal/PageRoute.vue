@@ -4,6 +4,7 @@ import {
   buildPresentationEditTargetIndex,
   layoutEditLinksKey,
   presentationEditTargetsKey,
+  withoutPresentationEditMetadata,
 } from '../../utils/layoutEditLinks'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import type {
@@ -60,6 +61,9 @@ const page = await fetchPage(
   customPageError,
 )
 const pageRenderRevision = ref(0)
+const renderablePageContent = computed(() =>
+  withoutPresentationEditMetadata(page.value?.content),
+)
 
 provide(
   pageRefreshKey,
@@ -228,8 +232,8 @@ function getErrorPayload(
       >
         <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
         <component
-          :is="renderCustomElements(page.content)"
-          v-if="page?.content"
+          :is="renderCustomElements(renderablePageContent)"
+          v-if="renderablePageContent"
           :key="pageRenderRevision"
         />
         <LazyRegionArea area="after_main" />

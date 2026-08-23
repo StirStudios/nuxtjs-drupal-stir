@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildLayoutEditLinkIndex,
   buildPresentationEditTargetIndex,
+  withoutPresentationEditMetadata,
   withEditorDestination,
 } from '../../layers/theme/app/utils/layoutEditLinks'
 
@@ -101,5 +102,37 @@ describe('buildPresentationEditTargetIndex', () => {
     expect(Object.fromEntries(index)).toEqual({
       '/paragraph/42/edit': { paragraphId: 42 },
     })
+  })
+})
+
+describe('withoutPresentationEditMetadata', () => {
+  it('removes editor-only markers without mutating the API response', () => {
+    const source = {
+      element: 'paragraph-media',
+      props: {
+        editLink: 'https://cms.example/paragraph/42/edit',
+        presentationEdit: { paragraphId: 42 },
+      },
+      slots: {
+        media: [{
+          element: 'media-image',
+          props: { presentationEdit: { paragraphId: 43 }, src: '/image.jpg' },
+        }],
+      },
+    }
+
+    expect(withoutPresentationEditMetadata(source)).toEqual({
+      element: 'paragraph-media',
+      props: {
+        editLink: 'https://cms.example/paragraph/42/edit',
+      },
+      slots: {
+        media: [{
+          element: 'media-image',
+          props: { src: '/image.jpg' },
+        }],
+      },
+    })
+    expect(source.props.presentationEdit).toEqual({ paragraphId: 42 })
   })
 })

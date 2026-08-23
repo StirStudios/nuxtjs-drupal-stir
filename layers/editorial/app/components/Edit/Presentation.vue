@@ -63,6 +63,7 @@ const changedValues = computed(() => Object.fromEntries(
 const selectedLayoutOption = computed(() => layout.value?.options.find(
   option => option.value === selectedLayout.value,
 ) ?? null)
+const layoutSummary = computed(() => selectedLayoutOption.value?.label ?? 'Choose layout')
 const layoutDirty = computed(() => Boolean(
   layout.value && selectedLayout.value !== layout.value.current,
 ))
@@ -305,70 +306,90 @@ function handleOpenAutoFocus(event: Event): void {
         </div>
 
         <div v-else-if="fields.length || layout" class="space-y-4">
-          <UFormField v-if="layout" label="Layout">
-            <URadioGroup
-              :items="layout.options"
-              :model-value="selectedLayout"
-              orientation="horizontal"
-              size="sm"
-              :ui="{
-                fieldset: 'grid grid-cols-2 gap-2',
-                item: 'min-w-0',
-                wrapper: 'min-w-0 w-full',
-                label: 'w-full',
-              }"
-              value-key="value"
-              variant="card"
-              @update:model-value="updateLayout"
-            >
-              <template #label="{ item }">
-                <span class="flex min-w-0 flex-col gap-1.5">
-                  <span aria-hidden="true" class="flex h-8 flex-col gap-0.5 rounded-sm border border-muted p-1">
-                    <span
-                      v-for="(row, rowIndex) in (item as ParagraphLayoutOption).iconMap"
-                      :key="rowIndex"
-                      class="flex min-h-0 flex-1 gap-0.5"
-                    >
-                      <span
-                        v-for="(region, regionIndex) in row"
-                        :key="`${region}-${regionIndex}`"
-                        class="min-w-0 flex-1 bg-accented"
-                      />
-                    </span>
-                  </span>
-                  <span class="truncate text-xs">{{ item.label }}</span>
-                </span>
-              </template>
-            </URadioGroup>
-          </UFormField>
-
-          <UAlert
-            v-if="layoutDirty && selectedLayoutOption?.moves.length"
-            color="warning"
-            icon="i-lucide-move-right"
-            title="Content movement"
-            variant="subtle"
+          <UCollapsible
+            v-if="layout"
+            class="rounded-md border border-muted"
+            :ui="{ content: 'border-t border-muted' }"
           >
-            <template #description>
-              <div class="mt-2 grid gap-3">
-                <UFormField
-                  v-for="move in selectedLayoutOption.moves"
-                  :key="move.source"
-                  :label="`${move.sourceLabel} (${move.count})`"
+            <template #default="{ open: layoutOpen }">
+              <UButton
+                block
+                color="neutral"
+                :icon="layoutDirty ? 'i-lucide-layout-dashboard' : 'i-lucide-layout-template'"
+                :label="`Layout · ${layoutSummary}`"
+                :trailing-icon="layoutOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                :ui="{ base: 'justify-between rounded-md px-3 py-2' }"
+                variant="ghost"
+              />
+            </template>
+
+            <template #content>
+              <div class="space-y-3 p-3">
+                <URadioGroup
+                  :items="layout.options"
+                  :model-value="selectedLayout"
+                  orientation="horizontal"
+                  size="sm"
+                  :ui="{
+                    fieldset: 'grid grid-cols-2 gap-2',
+                    item: 'min-w-0',
+                    wrapper: 'min-w-0 w-full',
+                    label: 'w-full',
+                  }"
+                  value-key="value"
+                  variant="card"
+                  @update:model-value="updateLayout"
                 >
-                  <USelect
-                    v-model="layoutMappings[move.source]"
-                    class="w-full"
-                    :items="selectedLayoutOption.regions"
-                    label-key="label"
-                    size="sm"
-                    :ui="selectUi"
-                    value-key="value"
-                  />
-                </UFormField>
+                  <template #label="{ item }">
+                    <span class="flex min-w-0 flex-col gap-1.5">
+                      <span aria-hidden="true" class="flex h-8 flex-col gap-0.5 rounded-sm border border-muted p-1">
+                        <span
+                          v-for="(row, rowIndex) in (item as ParagraphLayoutOption).iconMap"
+                          :key="rowIndex"
+                          class="flex min-h-0 flex-1 gap-0.5"
+                        >
+                          <span
+                            v-for="(region, regionIndex) in row"
+                            :key="`${region}-${regionIndex}`"
+                            class="min-w-0 flex-1 bg-accented"
+                          />
+                        </span>
+                      </span>
+                      <span class="truncate text-xs">{{ item.label }}</span>
+                    </span>
+                  </template>
+                </URadioGroup>
+
+                <UAlert
+                  v-if="layoutDirty && selectedLayoutOption?.moves.length"
+                  color="warning"
+                  icon="i-lucide-move-right"
+                  title="Content movement"
+                  variant="subtle"
+                >
+                  <template #description>
+                    <div class="mt-2 grid gap-3">
+                      <UFormField
+                        v-for="move in selectedLayoutOption.moves"
+                        :key="move.source"
+                        :label="`${move.sourceLabel} (${move.count})`"
+                      >
+                        <USelect
+                          v-model="layoutMappings[move.source]"
+                          class="w-full"
+                          :items="selectedLayoutOption.regions"
+                          label-key="label"
+                          size="sm"
+                          :ui="selectUi"
+                          value-key="value"
+                        />
+                      </UFormField>
+                    </div>
+                  </template>
+                </UAlert>
               </div>
             </template>
-          </UAlert>
+          </UCollapsible>
 
           <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
           <UFormField
