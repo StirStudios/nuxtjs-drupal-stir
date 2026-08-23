@@ -142,7 +142,13 @@
   :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
     font-family: inherit;
     letter-spacing: normal;
+    min-height: 0;
     text-transform: none;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    line-height: 1.25rem;
   }
 
   h2 {
@@ -197,6 +203,14 @@
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5rem;
+  }
+
+  .admin-ui-region-title {
+    min-height: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
   }
 }
 
@@ -322,9 +336,12 @@
   }
 }
 
-.admin-ui-btn-base {
+.admin-ui-scope .admin-ui-btn-base {
+  min-height: 0;
+  border-radius: var(--ui-radius);
   font-family: var(--font-admin);
   font-weight: 500;
+  line-height: 1.25rem;
   letter-spacing: normal;
   text-transform: none;
 }

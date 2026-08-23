@@ -224,7 +224,7 @@ watch(() => props.open, (value) => {
             class="flex min-h-32 min-w-0 flex-col rounded-lg border border-muted bg-muted/30 transition-colors"
             :style="layoutGrid.regionAreas[region.value] ? { gridArea: layoutGrid.regionAreas[region.value] } : undefined"
           >
-            <h3 class="border-b border-muted px-3 py-2 text-sm font-semibold text-highlighted">
+            <h3 class="admin-ui-region-title border-b border-muted text-highlighted">
               {{ region.label }}
               <span class="font-normal text-muted">({{ childrenFor(region.value).length }})</span>
             </h3>
@@ -252,8 +252,10 @@ watch(() => props.open, (value) => {
                     <UIcon class="size-4" name="i-lucide-grip-vertical" />
                   </span>
                   <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium text-highlighted">{{ child.label }}</p>
-                    <p class="truncate text-xs text-muted">{{ child.bundle }} · #{{ child.paragraphId }}</p>
+                    <p class="truncate text-sm font-medium text-highlighted">
+                      {{ child.label }}
+                      <span class="font-normal text-muted">· #{{ child.paragraphId }}</span>
+                    </p>
                   </div>
                   <UButton
                     :aria-label="`Move ${child.label} up`"

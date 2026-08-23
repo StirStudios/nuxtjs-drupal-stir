@@ -713,6 +713,8 @@ describe('layer contract', () => {
     expect(layoutArrangement).toContain(
       'content: `${adminUiTheme.modal.content}',
     )
+    expect(layoutArrangement).toContain('admin-ui-region-title')
+    expect(layoutArrangement).not.toContain('{{ child.bundle }} · #')
   })
 
   it('provides default paragraph rhythm for reusable rich text', () => {
