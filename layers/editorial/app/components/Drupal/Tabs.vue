@@ -3,6 +3,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 import {
+  adminUiProps,
   adminUiTheme,
   type EditorialTaskLink,
   withUnpublishedTask,
@@ -211,10 +212,10 @@ const loadAccountMenu = async () => {
   }
 
   if (
-    !hasEditorialAccess.value
-    || !isAuthenticated.value
-    || accountMenuStatus.value === 'pending'
-    || accountMenuStatus.value === 'success'
+    !hasEditorialAccess.value ||
+    !isAuthenticated.value ||
+    accountMenuStatus.value === 'pending' ||
+    accountMenuStatus.value === 'success'
   ) {
     return
   }
@@ -258,10 +259,10 @@ watch(
   () => route.fullPath,
   () => {
     if (
-      hasEditorialAccess.value
-      && isAuthenticated.value
-      && accountMenuStatus.value !== 'pending'
-      && accountMenuStatus.value !== 'success'
+      hasEditorialAccess.value &&
+      isAuthenticated.value &&
+      accountMenuStatus.value !== 'pending' &&
+      accountMenuStatus.value !== 'success'
     ) {
       void loadAccountMenu()
     }
@@ -282,7 +283,9 @@ const links = computed(() => {
     ],
   ]
 
-  const tasks = editorialTaskLinks.value.length ? [editorialTaskLinks.value] : []
+  const tasks = editorialTaskLinks.value.length
+    ? [editorialTaskLinks.value]
+    : []
   const accountTo = normalizeAdminUrl('/user')
   const accountItem = accountMenu.value.length
     ? {
@@ -301,11 +304,10 @@ const links = computed(() => {
 
   return [...baseLinks, ...tasks, [accountItem]]
 })
-
 </script>
 
 <template>
-  <UTheme :ui="adminUiTheme">
+  <UTheme :props="adminUiProps" :ui="adminUiTheme">
     <UNavigationMenu
       aria-label="Drupal administration"
       color="neutral"

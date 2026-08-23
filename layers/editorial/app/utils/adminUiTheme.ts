@@ -1,3 +1,7 @@
+import type { ThemeProps } from '@nuxt/ui/components/Theme.vue'
+
+type AdminUiProps = NonNullable<ThemeProps['props']>
+
 type AdminUiTheme = {
   navigationMenu: {
     root: string
@@ -19,6 +23,15 @@ type AdminUiTheme = {
     base: string
     leadingIcon: string
     trailingIcon: string
+  }
+  card: {
+    header: string
+    body: string
+    footer: string
+  }
+  formField: {
+    label: string
+    description: string
   }
   fieldGroup: {
     base: string
@@ -42,6 +55,9 @@ type AdminUiTheme = {
   modal: {
     content: string
     title: string
+  }
+  skeleton: {
+    base: string
   }
   editor: {
     root: string
@@ -81,7 +97,7 @@ export function withUnpublishedTask(
 ): EditorialTaskLink[] {
   if (published !== false) return links
 
-  return links.map(link =>
+  return links.map((link) =>
     link.label === 'View'
       ? {
           ...link,
@@ -101,23 +117,32 @@ export const adminUiTheme = {
     link: 'app-admin-tabs-font admin-ui-nav-link before:bg-transparent text-sm font-medium dark:before:bg-transparent',
     linkLabel: 'sr-only md:not-sr-only md:block',
     linkLeadingIcon:
-      'text-current group-hover:!text-current group-data-[state=open]:!text-current',
+      'text-current group-hover:text-current group-data-[state=open]:text-current',
     linkTrailingIcon:
-      'text-current group-hover:!text-current group-data-[state=open]:!text-current transition-transform duration-200',
+      'text-current group-hover:text-current group-data-[state=open]:text-current transition-transform duration-200',
     viewport:
       'app-admin-tabs-font relative overflow-hidden rounded-md admin-ui-nav-surface shadow-md',
     content: 'app-admin-tabs-font rounded-md admin-ui-nav-surface p-1',
-    childList: 'space-y-0.5 !ms-0 !border-0',
+    childList: 'space-y-0.5 ms-0 border-0',
     childItem: '',
     childLink: 'app-admin-tabs-font admin-ui-nav-child-link',
     childLinkIcon:
-      'text-current group-hover:!text-current group-aria-[current=page]:!text-current',
+      'text-current group-hover:text-current group-aria-[current=page]:text-current',
     childLinkLabel: 'truncate',
   },
   button: {
     base: 'admin-ui-btn-base',
     leadingIcon: 'text-current',
     trailingIcon: 'text-current',
+  },
+  card: {
+    header: 'p-4',
+    body: 'p-4',
+    footer: 'p-4',
+  },
+  formField: {
+    label: 'admin-ui-form-label',
+    description: 'admin-ui-form-description',
   },
   fieldGroup: {
     base: 'admin-ui-field-group',
@@ -142,13 +167,45 @@ export const adminUiTheme = {
     content: 'admin-ui admin-ui-scope admin-ui-modal',
     title: 'admin-ui-modal-title',
   },
+  skeleton: {
+    base: 'admin-ui-skeleton',
+  },
   editor: {
     root: 'admin-ui-editor-root',
   },
   editorToolbar: {
-    separator: '!bg-[var(--admin-border)]',
+    separator: 'bg-[var(--admin-border)]',
   },
   separator: {
-    border: '!bg-[var(--admin-border)]',
+    border: 'bg-[var(--admin-border)]',
   },
 } as const satisfies AdminUiTheme
+
+export const adminUiProps = {
+  button: {
+    color: 'neutral',
+    size: 'sm',
+    variant: 'ghost',
+  },
+  card: {
+    variant: 'outline',
+  },
+  radioGroup: {
+    color: 'primary',
+    size: 'sm',
+  },
+  select: {
+    color: 'neutral',
+    size: 'sm',
+    variant: 'outline',
+  },
+  selectMenu: {
+    color: 'neutral',
+    size: 'sm',
+    variant: 'outline',
+  },
+  switch: {
+    color: 'primary',
+    size: 'sm',
+  },
+} as const satisfies AdminUiProps

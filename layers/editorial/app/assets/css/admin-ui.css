@@ -32,6 +32,8 @@
   --admin-bg: var(--admin-z-50);
   --admin-bg-muted: var(--admin-z-100);
   --admin-bg-strong: var(--admin-z-200);
+  --admin-bg-inverted: var(--admin-z-900);
+  --admin-text-dimmed: var(--admin-z-400);
   --admin-text: var(--admin-z-900);
   --admin-text-muted: var(--admin-z-700);
   --admin-text-strong: var(--admin-z-950);
@@ -45,12 +47,23 @@
   );
   --admin-accent-bg-subtle: var(--admin-amber-50);
 
+  --ui-primary: var(--admin-amber-700);
+  --ui-radius: 0.25rem;
+  --ui-text-dimmed: var(--admin-text-dimmed);
   --ui-bg: var(--admin-bg);
+  --ui-bg-muted: var(--admin-bg-muted);
+  --ui-bg-elevated: var(--admin-bg-muted);
+  --ui-bg-accented: var(--admin-bg-strong);
+  --ui-bg-inverted: var(--admin-bg-inverted);
   --ui-text: var(--admin-text);
   --ui-text-muted: var(--admin-text-muted);
   --ui-text-toned: var(--admin-text-muted);
   --ui-text-highlighted: var(--admin-text-strong);
+  --ui-text-inverted: var(--admin-white);
   --ui-border: var(--admin-border);
+  --ui-border-muted: var(--admin-border);
+  --ui-border-accented: var(--admin-z-400);
+  --ui-border-inverted: var(--admin-bg-inverted);
 
   --admin-status-saving: var(--admin-text-muted);
   --admin-status-error: #b91c1c;
@@ -66,6 +79,8 @@
     --admin-bg: var(--admin-z-950);
     --admin-bg-muted: var(--admin-z-900);
     --admin-bg-strong: var(--admin-z-800);
+    --admin-bg-inverted: var(--admin-white);
+    --admin-text-dimmed: var(--admin-z-400);
     --admin-text: #f4f4f5;
     --admin-text-muted: var(--admin-z-200);
     --admin-text-strong: var(--admin-white);
@@ -82,6 +97,9 @@
       var(--admin-amber-500) 10%,
       transparent
     );
+
+    --ui-primary: var(--admin-amber-300);
+    --ui-text-inverted: var(--admin-z-950);
 
     --admin-status-saving: var(--admin-text-muted);
     --admin-status-error: #f87171;
@@ -301,7 +319,19 @@
 }
 
 .admin-ui-btn-base {
-  @apply font-medium;
+  font-family: var(--font-admin);
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.admin-ui-form-label {
+  color: var(--admin-text);
+}
+
+.admin-ui-form-description {
+  margin-bottom: 0;
+  color: var(--admin-text-muted);
 }
 
 .admin-ui-btn-neutral {
@@ -381,11 +411,21 @@
 
 .admin-ui-tooltip-content {
   @apply border ring ring-inset;
+  font-family: var(--font-admin);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1rem;
+  letter-spacing: normal;
+  text-transform: none;
   background-color: var(--admin-bg-muted);
   color: var(--admin-text);
   border-color: var(--admin-border);
   --tw-ring-color: var(--admin-border);
   @apply z-[500];
+}
+
+.admin-ui-skeleton {
+  background-color: var(--admin-bg-strong);
 }
 
 .admin-ui-tooltip-arrow {

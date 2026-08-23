@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useEventListener, useWindowScroll } from '@vueuse/core'
 import { useParagraphTextEditor } from '../../composables/useParagraphTextEditor'
-import { adminUiTheme } from '../../utils/adminUiTheme'
+import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 import { editorNestedDragHandleOptions } from '../../utils/editorDragHandle'
 import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSave'
 import type { FormattedTextEditTarget } from '#stir/types'
@@ -161,7 +161,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UTheme :ui="adminUiTheme">
+  <UTheme :props="adminUiProps" :ui="adminUiTheme">
     <div
       ref="editPanelRef"
       class="admin-ui admin-ui-scope admin-ui-panel rounded-lg"

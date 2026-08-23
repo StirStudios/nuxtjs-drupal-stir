@@ -32,7 +32,9 @@ const layout = ref<ParagraphLayoutContract | null>(null)
 const selectedLayout = ref('')
 const layoutMappings = ref<Record<string, string>>({})
 const arrangementOpen = ref(false)
-const savedValues = ref<Record<ParagraphPresentationKey, boolean | string | string[]>>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
+const savedValues = ref<
+  Record<ParagraphPresentationKey, boolean | string | string[]>
+>({} as Record<ParagraphPresentationKey, boolean | string | string[]>)
 let savedTimer: ReturnType<typeof setTimeout> | undefined
 
 const popoverContent = {
@@ -42,26 +44,43 @@ const popoverContent = {
   onOpenAutoFocus: handleOpenAutoFocus,
 }
 
-const endpoint = computed(() =>
-  `/api/paragraph/${props.action.paragraphId}/presentation`,
+const endpoint = computed(
+  () => `/api/paragraph/${props.action.paragraphId}/presentation`,
 )
-const changedValues = computed(() => Object.fromEntries(
-  fields.value
-    .filter(field => JSON.stringify(field.value) !== JSON.stringify(savedValues.value[field.key]))
-    .map(field => [field.key, field.value]),
-))
-const selectedLayoutOption = computed(() => layout.value?.options.find(
-  option => option.value === selectedLayout.value,
-) ?? null)
-const layoutSummary = computed(() => selectedLayoutOption.value?.label ?? 'Choose layout')
-const layoutDirty = computed(() => Boolean(
-  layout.value && selectedLayout.value !== layout.value.current,
-))
-const layoutValid = computed(() => !layoutDirty.value || areParagraphLayoutMappingsValid(
-  selectedLayoutOption.value,
-  layoutMappings.value,
-))
-const dirty = computed(() => Object.keys(changedValues.value).length > 0 || layoutDirty.value)
+const changedValues = computed(() =>
+  Object.fromEntries(
+    fields.value
+      .filter(
+        (field) =>
+          JSON.stringify(field.value) !==
+          JSON.stringify(savedValues.value[field.key]),
+      )
+      .map((field) => [field.key, field.value]),
+  ),
+)
+const selectedLayoutOption = computed(
+  () =>
+    layout.value?.options.find(
+      (option) => option.value === selectedLayout.value,
+    ) ?? null,
+)
+const layoutSummary = computed(
+  () => selectedLayoutOption.value?.label ?? 'Choose layout',
+)
+const layoutDirty = computed(() =>
+  Boolean(layout.value && selectedLayout.value !== layout.value.current),
+)
+const layoutValid = computed(
+  () =>
+    !layoutDirty.value ||
+    areParagraphLayoutMappingsValid(
+      selectedLayoutOption.value,
+      layoutMappings.value,
+    ),
+)
+const dirty = computed(
+  () => Object.keys(changedValues.value).length > 0 || layoutDirty.value,
+)
 const status = computed(() => {
   if (saving.value) return 'Saving…'
   if (error.value) return error.value
@@ -83,30 +102,35 @@ async function load(): Promise<void> {
     const response = await $fetch<ParagraphPresentationResponse>(endpoint.value)
 
     acceptResponse(response)
-  }
-  catch (cause) {
-    error.value = cause instanceof Error
-      ? cause.message
-      : 'Unable to load quick settings.'
-  }
-  finally {
+  } catch (cause) {
+    error.value =
+      cause instanceof Error ? cause.message : 'Unable to load quick settings.'
+  } finally {
     loading.value = false
   }
 }
 
-function cloneValue(value: boolean | string | string[]): boolean | string | string[] {
+function cloneValue(
+  value: boolean | string | string[],
+): boolean | string | string[] {
   return Array.isArray(value) ? [...value] : value
 }
 
 function selectableOptions(field: ParagraphPresentationField) {
-  return field.options?.filter(option => option.value !== '') ?? []
+  return field.options?.filter((option) => option.value !== '') ?? []
 }
 
-function updateSelectValue(field: ParagraphPresentationField, value?: string | null): void {
+function updateSelectValue(
+  field: ParagraphPresentationField,
+  value?: string | null,
+): void {
   updateValue(field.key, value ?? '')
 }
 
-function updateMultiselectValue(field: ParagraphPresentationField, value?: string[] | null): void {
+function updateMultiselectValue(
+  field: ParagraphPresentationField,
+  value?: string[] | null,
+): void {
   updateValue(field.key, value ?? [])
 }
 
@@ -124,12 +148,14 @@ function acceptResponse(response: ParagraphPresentationResponse): void {
   selectedLayout.value = response.layout?.current ?? ''
   resetLayoutMappings()
   savedValues.value = Object.fromEntries(
-    response.fields.map(field => [field.key, cloneValue(field.value)]),
+    response.fields.map((field) => [field.key, cloneValue(field.value)]),
   ) as Record<ParagraphPresentationKey, boolean | string | string[]>
 }
 
 function resetLayoutMappings(): void {
-  layoutMappings.value = createParagraphLayoutMappings(selectedLayoutOption.value)
+  layoutMappings.value = createParagraphLayoutMappings(
+    selectedLayoutOption.value,
+  )
 }
 
 function updateLayout(value: string): void {
@@ -153,7 +179,7 @@ function updateValue(
   key: ParagraphPresentationKey,
   value: boolean | string | string[],
 ): void {
-  const field = fields.value.find(candidate => candidate.key === key)
+  const field = fields.value.find((candidate) => candidate.key === key)
 
   if (!field || field.value === value) return
 
@@ -172,13 +198,16 @@ async function save(): Promise<void> {
 
   try {
     const pendingLayout = layoutUpdate()
-    const response = await $fetch<ParagraphPresentationResponse>(endpoint.value, {
-      method: 'POST',
-      body: {
-        values: changedValues.value,
-        ...(pendingLayout ? { layout: pendingLayout } : {}),
+    const response = await $fetch<ParagraphPresentationResponse>(
+      endpoint.value,
+      {
+        method: 'POST',
+        body: {
+          values: changedValues.value,
+          ...(pendingLayout ? { layout: pendingLayout } : {}),
+        },
       },
-    })
+    )
 
     acceptResponse(response)
     await refreshPageAfterSave()
@@ -192,13 +221,10 @@ async function save(): Promise<void> {
     savedTimer = setTimeout(() => {
       saved.value = false
     }, 3000)
-  }
-  catch (cause) {
-    error.value = cause instanceof Error
-      ? cause.message
-      : 'Unable to save quick settings.'
-  }
-  finally {
+  } catch (cause) {
+    error.value =
+      cause instanceof Error ? cause.message : 'Unable to save quick settings.'
+  } finally {
     saving.value = false
   }
 }
@@ -239,22 +265,20 @@ function openFullEditor(): void {
   window.location.assign(props.action.fullEditLink)
 }
 
-async function handleArrangementSaved(response: ParagraphPresentationResponse): Promise<void> {
+async function handleArrangementSaved(
+  response: ParagraphPresentationResponse,
+): Promise<void> {
   acceptResponse(response)
   await refreshPageAfterSave()
 }
 </script>
 
 <template>
-  <UPopover
-    :content="popoverContent"
-    :open="open"
-    @update:open="handleOpen"
-  >
+  <UPopover :content="popoverContent" :open="open" @update:open="handleOpen">
     <UTooltip
       :open="tooltipOpen"
       :text="action.tooltip"
-      @update:open="value => tooltipOpen = value"
+      @update:open="(value) => (tooltipOpen = value)"
     >
       <UButton
         :aria-label="action.ariaLabel"
@@ -269,16 +293,13 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
     </UTooltip>
 
     <template #content>
-      <UCard
-        class="w-96 max-w-[calc(100vw-2rem)]"
-        :ui="{ header: '!p-4', body: '!p-4', footer: '!p-4' }"
-      >
+      <UCard class="w-96 max-w-[calc(100vw-2rem)]">
         <template #header>
           <div class="flex items-start justify-between gap-3">
             <div>
               <h2
                 ref="quickSettingsHeading"
-                class="font-semibold text-highlighted outline-none"
+                class="text-highlighted font-semibold outline-none"
                 tabindex="-1"
               >
                 Quick settings
@@ -290,32 +311,39 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
               class="flex items-center gap-1 text-xs font-medium"
               :class="error ? 'text-error' : 'text-muted'"
             >
-              <UIcon
-                :class="saving ? 'animate-spin' : ''"
-                :name="statusIcon"
-              />
+              <UIcon :class="saving ? 'animate-spin' : ''" :name="statusIcon" />
               {{ status }}
             </span>
           </div>
         </template>
 
-        <div v-if="loading" aria-label="Loading quick settings" class="space-y-3">
+        <div
+          v-if="loading"
+          aria-label="Loading quick settings"
+          class="space-y-3"
+        >
           <USkeleton v-for="index in 4" :key="index" class="h-9 w-full" />
         </div>
 
         <div v-else-if="fields.length || layout" class="space-y-4">
           <UCollapsible
             v-if="layout"
-            class="rounded-md border border-muted"
+            class="border-muted rounded-md border"
             :ui="{ content: 'border-t border-muted' }"
           >
             <template #default="{ open: layoutOpen }">
               <UButton
                 block
                 color="neutral"
-                :icon="layoutDirty ? 'i-lucide-layout-dashboard' : 'i-lucide-layout-template'"
+                :icon="
+                  layoutDirty
+                    ? 'i-lucide-layout-dashboard'
+                    : 'i-lucide-layout-template'
+                "
                 :label="`Layout · ${layoutSummary}`"
-                :trailing-icon="layoutOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+                :trailing-icon="
+                  layoutOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
+                "
                 :ui="{ base: 'justify-between rounded-md px-3 py-2' }"
                 variant="ghost"
               />
@@ -340,16 +368,21 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
                 >
                   <template #label="{ item }">
                     <span class="flex min-w-0 flex-col gap-1.5">
-                      <span aria-hidden="true" class="flex h-8 flex-col gap-0.5 rounded-sm border border-muted p-1">
+                      <span
+                        aria-hidden="true"
+                        class="border-muted flex h-8 flex-col gap-0.5 rounded-sm border p-1"
+                      >
                         <span
-                          v-for="(row, rowIndex) in (item as ParagraphLayoutOption).iconMap"
+                          v-for="(row, rowIndex) in (
+                            item as ParagraphLayoutOption
+                          ).iconMap"
                           :key="rowIndex"
                           class="flex min-h-0 flex-1 gap-0.5"
                         >
                           <span
                             v-for="(region, regionIndex) in row"
                             :key="`${region}-${regionIndex}`"
-                            class="min-w-0 flex-1 bg-accented"
+                            class="bg-accented min-w-0 flex-1"
                           />
                         </span>
                       </span>
@@ -399,70 +432,81 @@ async function handleArrangementSaved(response: ParagraphPresentationResponse): 
           </UCollapsible>
 
           <div v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-4">
-          <template v-for="(field, index) in fields" :key="field.key">
-            <USeparator
-              v-if="index > 0 && field.group !== fields[index - 1]?.group"
-              class="admin-ui-settings-separator col-span-2"
-            />
-            <UFormField :label="field.label">
-            <template v-if="field.description" #label>
-              <span class="inline-flex items-center gap-1">
-                <span>{{ field.label }}</span>
-                <UTooltip :text="field.description" :ui="{ content: 'max-w-64' }">
-                  <UButton
-                    :aria-label="`About ${field.label}`"
-                    color="neutral"
-                    icon="i-lucide-circle-help"
-                    size="xs"
-                    :ui="{ base: '!min-h-0 !p-0 text-muted' }"
-                    variant="link"
-                  />
-                </UTooltip>
-              </span>
+            <template v-for="(field, index) in fields" :key="field.key">
+              <USeparator
+                v-if="index > 0 && field.group !== fields[index - 1]?.group"
+                class="admin-ui-settings-separator col-span-2"
+              />
+              <UFormField :label="field.label">
+                <template v-if="field.description" #label>
+                  <span class="inline-flex items-center gap-1">
+                    <span>{{ field.label }}</span>
+                    <UTooltip
+                      :text="field.description"
+                      :ui="{ content: 'max-w-64' }"
+                    >
+                      <UButton
+                        :aria-label="`About ${field.label}`"
+                        color="neutral"
+                        icon="i-lucide-circle-help"
+                        size="xs"
+                        :ui="{ base: 'min-h-0 p-0 text-muted' }"
+                        variant="link"
+                      />
+                    </UTooltip>
+                  </span>
+                </template>
+                <USwitch
+                  v-if="field.type === 'boolean'"
+                  :model-value="field.value as boolean"
+                  @update:model-value="(value) => updateValue(field.key, value)"
+                />
+                <USelectMenu
+                  v-else-if="field.type === 'select'"
+                  class="w-full"
+                  clear
+                  :items="selectableOptions(field)"
+                  label-key="label"
+                  :model-value="field.value as string"
+                  placeholder="- None -"
+                  size="sm"
+                  value-key="value"
+                  @update:model-value="
+                    (value) => updateSelectValue(field, value)
+                  "
+                />
+                <USelectMenu
+                  v-else
+                  class="w-full"
+                  clear
+                  :items="selectableOptions(field)"
+                  label-key="label"
+                  :model-value="field.value as string[]"
+                  multiple
+                  placeholder="- None -"
+                  size="sm"
+                  value-key="value"
+                  @update:model-value="
+                    (value) => updateMultiselectValue(field, value)
+                  "
+                />
+              </UFormField>
             </template>
-            <USwitch
-              v-if="field.type === 'boolean'"
-              :model-value="field.value as boolean"
-              @update:model-value="value => updateValue(field.key, value)"
-            />
-            <USelectMenu
-              v-else-if="field.type === 'select'"
-              class="w-full"
-              clear
-              :items="selectableOptions(field)"
-              label-key="label"
-              :model-value="field.value as string"
-              placeholder="- None -"
-              size="sm"
-              value-key="value"
-              @update:model-value="value => updateSelectValue(field, value)"
-            />
-            <USelectMenu
-              v-else
-              class="w-full"
-              clear
-              :items="selectableOptions(field)"
-              label-key="label"
-              :model-value="field.value as string[]"
-              multiple
-              placeholder="- None -"
-              size="sm"
-              value-key="value"
-              @update:model-value="value => updateMultiselectValue(field, value)"
-            />
-            </UFormField>
-          </template>
           </div>
         </div>
 
-        <p v-else-if="!error" class="text-sm text-muted">
+        <p v-else-if="!error" class="text-muted text-sm">
           This section has no quick presentation settings.
         </p>
 
         <template #footer>
           <div
             class="grid gap-2"
-            :class="(fields.length || layout) && action.fullEditLink ? 'grid-cols-2' : 'grid-cols-1'"
+            :class="
+              (fields.length || layout) && action.fullEditLink
+                ? 'grid-cols-2'
+                : 'grid-cols-1'
+            "
           >
             <UButton
               v-if="fields.length || layout"

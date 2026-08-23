@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
-import { adminUiTheme } from '../../utils/adminUiTheme'
+import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 
 const props = defineProps<{
   actions: EditAction[]
@@ -62,7 +62,7 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
 </script>
 
 <template>
-  <UTheme :ui="adminUiTheme">
+  <UTheme :props="adminUiProps" :ui="adminUiTheme">
     <UFieldGroup
       :class="[
         'admin-ui admin-ui-scope admin-ui-controls absolute top-2 right-2 z-100 rounded-md shadow-lg transition-opacity',
@@ -81,27 +81,27 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
         />
         <UTooltip
           v-else
-        :open="Boolean(tooltipOpen[action.key])"
-        :text="action.tooltip"
-        @update:open="
-          (value: boolean) => handleTooltipOpenUpdate(action.key, value)
-        "
+          :open="Boolean(tooltipOpen[action.key])"
+          :text="action.tooltip"
+          @update:open="
+            (value: boolean) => handleTooltipOpenUpdate(action.key, value)
+          "
         >
-        <UButton
-          :aria-label="action.ariaLabel"
-          color="neutral"
-          :disabled="action.disabled"
-          :icon="action.icon"
-          :rel="rendersActionAsButton(action) ? undefined : action.rel"
-          :target="rendersActionAsButton(action) ? undefined : action.target"
-          :to="rendersActionAsButton(action) ? undefined : action.to"
-          :ui="{ base: action.buttonClass }"
-          :variant="action.variant"
-          @click="handleActionClick(action)"
-          @pointerdown="closeAllTooltips()"
-        >
-          <span class="sr-only">{{ action.ariaLabel }}</span>
-        </UButton>
+          <UButton
+            :aria-label="action.ariaLabel"
+            color="neutral"
+            :disabled="action.disabled"
+            :icon="action.icon"
+            :rel="rendersActionAsButton(action) ? undefined : action.rel"
+            :target="rendersActionAsButton(action) ? undefined : action.target"
+            :to="rendersActionAsButton(action) ? undefined : action.to"
+            :ui="{ base: action.buttonClass }"
+            :variant="action.variant"
+            @click="handleActionClick(action)"
+            @pointerdown="closeAllTooltips()"
+          >
+            <span class="sr-only">{{ action.ariaLabel }}</span>
+          </UButton>
         </UTooltip>
       </template>
     </UFieldGroup>
