@@ -13,6 +13,7 @@ const props = defineProps<{
 }>()
 
 const refreshRenderedPage = inject<PageRefresh>(pageRefreshKey)
+const toast = useToast()
 const open = ref(false)
 const loading = ref(false)
 const saving = ref(false)
@@ -131,6 +132,11 @@ async function save(): Promise<void> {
 
     acceptResponse(response)
     await refreshPageAfterSave()
+    toast.add({
+      title: 'Quick settings saved',
+      color: 'success',
+      icon: 'i-lucide-circle-check',
+    })
     saved.value = true
     if (savedTimer) clearTimeout(savedTimer)
     savedTimer = setTimeout(() => {
