@@ -6,12 +6,13 @@ import type {
   ParagraphPresentationResponse,
 } from '#stir/types'
 import { pageRefreshKey } from '#stir/utils/pageRefresh'
+import type { PageRefresh } from '#stir/utils/pageRefresh'
 
 const props = defineProps<{
   action: EditAction
 }>()
 
-const refreshRenderedPage = inject(pageRefreshKey)
+const refreshRenderedPage = inject<PageRefresh>(pageRefreshKey)
 const open = ref(false)
 const loading = ref(false)
 const saving = ref(false)
@@ -78,6 +79,14 @@ function selectableOptions(field: ParagraphPresentationField) {
   return field.options?.filter(option => option.value !== '') ?? []
 }
 
+async function refreshPageAfterSave(): Promise<void> {
+  if (!refreshRenderedPage) {
+    throw new Error('Unable to refresh the rendered page.')
+  }
+
+  await refreshRenderedPage()
+}
+
 function acceptResponse(response: ParagraphPresentationResponse): void {
   fields.value = response.fields
   savedValues.value = Object.fromEntries(
@@ -113,7 +122,7 @@ async function save(): Promise<void> {
     })
 
     acceptResponse(response)
-    await refreshRenderedPage?.()
+    await refreshPageAfterSave()
     saved.value = true
     if (savedTimer) clearTimeout(savedTimer)
     savedTimer = setTimeout(() => {
