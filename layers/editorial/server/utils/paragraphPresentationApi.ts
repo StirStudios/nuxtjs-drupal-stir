@@ -1,10 +1,9 @@
 import { createError } from 'h3'
 
 export function buildParagraphPresentationPath(
-  ceApiEndpoint: string,
   paragraphId: number,
 ): string {
-  return `/api/drupal-ce${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/presentation`
+  return `/api/drupal-ce/stir-layout-builder/paragraph/${paragraphId}/presentation`
 }
 
 export function createUpstreamParagraphPresentationError(error: unknown) {

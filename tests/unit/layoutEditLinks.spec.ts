@@ -27,7 +27,7 @@ describe('buildLayoutEditLinkIndex', () => {
     })
   })
 
-  it('ignores non-layout nodes and incomplete links', () => {
+  it('preserves full layout editing when numeric IDs are absent', () => {
     const index = buildLayoutEditLinkIndex([
       { element: 'paragraph-text', props: { uuid: 'text', editLink: '/edit' } },
       { element: 'paragraph-layout', props: { uuid: '', editLink: '/edit' } },
@@ -35,7 +35,9 @@ describe('buildLayoutEditLinkIndex', () => {
       { element: 'paragraph-layout', props: { uuid: 'missing-id', editLink: '/edit' } },
     ])
 
-    expect(index.size).toBe(0)
+    expect(Object.fromEntries(index)).toEqual({
+      'missing-id': { editLink: '/edit' },
+    })
   })
 
   it('does not recurse forever when passed a cyclic extension object', () => {

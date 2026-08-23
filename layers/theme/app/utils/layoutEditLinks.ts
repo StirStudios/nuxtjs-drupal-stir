@@ -2,7 +2,7 @@ import type { ComputedRef, InjectionKey } from 'vue'
 
 export interface LayoutEditTarget {
   editLink: string
-  paragraphId: number
+  paragraphId?: number
 }
 
 export type LayoutEditLinkIndex = ReadonlyMap<string, LayoutEditTarget>
@@ -69,10 +69,13 @@ export function buildLayoutEditLinkIndex(value: unknown): LayoutEditLinkIndex {
       node.element === 'paragraph-layout'
       && uuid
       && editLink
-      && Number.isInteger(paragraphId)
-      && paragraphId > 0
     ) {
-      links.set(uuid, { editLink, paragraphId })
+      links.set(uuid, {
+        editLink,
+        ...(Number.isInteger(paragraphId) && paragraphId > 0
+          ? { paragraphId }
+          : {}),
+      })
     }
 
     Object.values(node).forEach(visit)
