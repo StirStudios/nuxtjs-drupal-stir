@@ -79,6 +79,14 @@ function selectableOptions(field: ParagraphPresentationField) {
   return field.options?.filter(option => option.value !== '') ?? []
 }
 
+function updateSelectValue(field: ParagraphPresentationField, value?: string | null): void {
+  updateValue(field.key, value ?? '')
+}
+
+function updateMultiselectValue(field: ParagraphPresentationField, value?: string[] | null): void {
+  updateValue(field.key, value ?? [])
+}
+
 async function refreshPageAfterSave(): Promise<void> {
   if (!refreshRenderedPage) {
     throw new Error('Unable to refresh the rendered page.')
@@ -219,9 +227,10 @@ function handleOpen(value: boolean): void {
               :model-value="field.value as boolean"
               @update:model-value="value => updateValue(field.key, value)"
             />
-            <USelect
+            <USelectMenu
               v-else-if="field.type === 'select'"
               class="w-full"
+              clear
               :items="selectableOptions(field)"
               label-key="label"
               :model-value="field.value as string"
@@ -229,11 +238,12 @@ function handleOpen(value: boolean): void {
               size="sm"
               :ui="selectUi"
               value-key="value"
-              @update:model-value="value => updateValue(field.key, value)"
+              @update:model-value="value => updateSelectValue(field, value)"
             />
             <USelectMenu
               v-else
               class="w-full"
+              clear
               :items="selectableOptions(field)"
               label-key="label"
               :model-value="field.value as string[]"
@@ -242,7 +252,7 @@ function handleOpen(value: boolean): void {
               size="sm"
               :ui="selectUi"
               value-key="value"
-              @update:model-value="value => updateValue(field.key, value)"
+              @update:model-value="value => updateMultiselectValue(field, value)"
             />
           </UFormField>
         </div>
