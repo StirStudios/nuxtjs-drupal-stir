@@ -4,7 +4,9 @@ import type { DrupalNodeRelatedItem } from '../types/Node'
 
 type DrupalComposable = ReturnType<typeof useDrupalCe>
 type DrupalPage = ReturnType<DrupalComposable['getPage']>['value']
-type DrupalFetchOptions = Parameters<DrupalComposable['$ceApi']>[0]
+type DrupalFetchOptions = Record<string, unknown> & {
+  query?: Record<string, unknown>
+}
 type StirPageContent = {
   element?: string
   props?: Record<string, unknown> & {
@@ -44,14 +46,20 @@ export function useStirDrupalCe() {
     fetchOptions: DrupalFetchOptions = {},
   ): Promise<void> => {
     const key = page.value?.key
-    const refreshed = await drupal.$ceApi({
+    // Keep Nuxt's generated route union behind this shared adapter. Exposing it
+    // here makes downstream consumer route sets exceed TypeScript's recursion
+    // limit without adding useful type safety to Drupal page requests.
+    const ceApi = drupal.$ceApi as unknown as (
+      options?: DrupalFetchOptions,
+    ) => (requestPath: string) => Promise<StirDrupalPage>
+    const refreshed = await ceApi({
       ...fetchOptions,
       cache: 'no-store',
       query: {
         ...fetchOptions.query,
         _stir_refresh: Date.now(),
       },
-    })(path) as StirDrupalPage
+    })(path)
 
     page.value = {
       ...refreshed,
