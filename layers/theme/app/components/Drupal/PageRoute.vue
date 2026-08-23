@@ -53,10 +53,14 @@ const page = await fetchPage(
   { query: route.query },
   customPageError,
 )
+const pageRenderRevision = ref(0)
 
 provide(
   pageRefreshKey,
-  () => refreshPage(page, pageRequest.path.value, { query: route.query }),
+  async () => {
+    await refreshPage(page, pageRequest.path.value, { query: route.query })
+    pageRenderRevision.value += 1
+  },
 )
 
 if (page.value?.is_front_page === true && route.path !== '/') {
@@ -217,7 +221,11 @@ function getErrorPayload(
         :stagger="pageAnimationStagger"
       >
         <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
-        <component :is="renderCustomElements(page.content)" v-if="page?.content" />
+        <component
+          :is="renderCustomElements(page.content)"
+          v-if="page?.content"
+          :key="pageRenderRevision"
+        />
         <LazyRegionArea area="after_main" />
         <LazyRegionArea
           v-if="theme.footer?.showSubFooterRegion !== false"
