@@ -44,7 +44,14 @@ export function useStirDrupalCe() {
     fetchOptions: DrupalFetchOptions = {},
   ): Promise<void> => {
     const key = page.value?.key
-    const refreshed = await drupal.$ceApi(fetchOptions)(path) as StirDrupalPage
+    const refreshed = await drupal.$ceApi({
+      ...fetchOptions,
+      cache: 'no-store',
+      query: {
+        ...fetchOptions.query,
+        _stir_refresh: Date.now(),
+      },
+    })(path) as StirDrupalPage
 
     page.value = {
       ...refreshed,
