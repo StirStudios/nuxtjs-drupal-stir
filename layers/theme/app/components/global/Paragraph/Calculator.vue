@@ -80,7 +80,7 @@ watch(
 </script>
 
 <template>
-  <EditLink :link="editLink" :parent-uuid="parentUuid">
+  <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
     <ClientOnly>
       <div v-bind="widgetAttrs" />
     </ClientOnly>

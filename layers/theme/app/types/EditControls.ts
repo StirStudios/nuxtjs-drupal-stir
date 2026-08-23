@@ -1,4 +1,4 @@
-export type EditActionKey = 'quick' | 'full' | 'layout'
+export type EditActionKey = 'quick' | 'full' | 'presentation'
 
 export interface EditAction {
   key: EditActionKey
@@ -12,4 +12,6 @@ export interface EditAction {
   navigateInPlace?: boolean
   target?: '_blank'
   rel?: 'noopener noreferrer'
+  paragraphId?: number
+  fullEditLink?: string
 }

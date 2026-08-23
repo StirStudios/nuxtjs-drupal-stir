@@ -3,6 +3,7 @@ import {
   buildLayoutEditLinkIndex,
   layoutEditLinksKey,
 } from '../../utils/layoutEditLinks'
+import { pageRefreshKey } from '../../utils/pageRefresh'
 import type {
   CmsGlobalSeoAssetConfig,
   SeoImageResolver,
@@ -16,7 +17,7 @@ const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
+const { fetchPage, refreshPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
 const { pageLayout, isAuthenticated, isFront } = usePageContext()
 const pageState = getPage()
 
@@ -51,6 +52,15 @@ const page = await fetchPage(
   pageRequest.path.value,
   { query: route.query },
   customPageError,
+)
+const pageRenderRevision = ref(0)
+
+provide(
+  pageRefreshKey,
+  async () => {
+    await refreshPage(page, pageRequest.path.value, { query: route.query })
+    pageRenderRevision.value += 1
+  },
 )
 
 if (page.value?.is_front_page === true && route.path !== '/') {
@@ -211,7 +221,11 @@ function getErrorPayload(
         :stagger="pageAnimationStagger"
       >
         <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
-        <component :is="renderCustomElements(page.content)" v-if="page?.content" />
+        <component
+          :is="renderCustomElements(page.content)"
+          v-if="page?.content"
+          :key="pageRenderRevision"
+        />
         <LazyRegionArea area="after_main" />
         <LazyRegionArea
           v-if="theme.footer?.showSubFooterRegion !== false"

@@ -65,7 +65,7 @@ const timelineColor = computed(() => resolveUiColor(props.color))
 <template>
   <ParagraphReveal :id="id" :direction="direction">
     <WrapDiv :align="align" :styles="wrapperClasses">
-      <EditLink :link="editLink" :parent-uuid="parentUuid">
+      <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
         <UTimeline
           class="max-w-3xl"
           :color="timelineColor"
