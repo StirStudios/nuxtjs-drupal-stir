@@ -202,6 +202,11 @@
     text-transform: none !important;
   }
 
+  .admin-ui-settings-separator {
+    margin-block: -0.75rem !important;
+    max-width: none !important;
+  }
+
   .admin-ui-toolbar {
     @apply border-b;
     border-color: var(--admin-border);

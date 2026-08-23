@@ -169,7 +169,10 @@ watch(() => props.open, (value) => {
   if (!value) return
 
   selectedLayout.value = props.contract.current
-  resetArrangement(selectedOption.value!)
+  const option = selectedOption.value
+
+  if (!option) return
+  resetArrangement(option)
   error.value = ''
   announcement.value = ''
 })
@@ -178,7 +181,7 @@ watch(() => props.open, (value) => {
 <template>
   <ClientOnly>
     <UModal
-      :description="'Choose a layout, then drag or use the move controls to arrange every item. Changes save together.'"
+      description="Choose a layout, then drag or use the move controls to arrange every item. Changes save together."
       :open="open"
       scrollable
       title="Arrange layout content"
@@ -220,7 +223,7 @@ watch(() => props.open, (value) => {
           <section
             v-for="region in selectedOption.regions"
             :key="region.value"
-            class="flex min-h-64 min-w-0 flex-col rounded-lg border border-muted bg-muted/30 transition-colors"
+            class="flex min-h-32 min-w-0 flex-col rounded-lg border border-muted bg-muted/30 transition-colors"
             :style="layoutGrid.regionAreas[region.value] ? { gridArea: layoutGrid.regionAreas[region.value] } : undefined"
           >
             <h3 class="border-b border-muted px-3 py-2 text-sm font-semibold text-highlighted">
@@ -230,7 +233,7 @@ watch(() => props.open, (value) => {
             <VueDraggable
               :animation="180"
               :aria-label="`${region.label} content`"
-              class="flex min-h-48 flex-1 flex-col gap-2 rounded-b-lg p-2 ring-inset transition-colors has-[.layout-drag-ghost]:bg-primary/5 has-[.layout-drag-ghost]:ring-1 has-[.layout-drag-ghost]:ring-primary/50"
+              class="flex min-h-24 flex-1 flex-col gap-2 rounded-b-lg p-2 ring-inset transition-colors has-[.layout-drag-ghost]:bg-primary/5 has-[.layout-drag-ghost]:ring-1 has-[.layout-drag-ghost]:ring-primary/50"
               ghost-class="layout-drag-ghost"
               :group="`layout-${contract.ownerRevisionId ?? 'draft'}`"
               handle=".layout-drag-handle"
@@ -244,14 +247,12 @@ watch(() => props.open, (value) => {
                 class="rounded-md border border-muted bg-default p-2 shadow-sm"
               >
                 <div class="flex items-center gap-2">
-                  <UButton
-                    :aria-label="`Drag ${child.label}`"
-                    class="layout-drag-handle cursor-grab touch-none active:cursor-grabbing"
-                    color="neutral"
-                    icon="i-lucide-grip-vertical"
-                    size="sm"
-                    variant="ghost"
-                  />
+                  <span
+                    aria-hidden="true"
+                    class="layout-drag-handle inline-flex size-8 shrink-0 cursor-grab touch-none items-center justify-center text-muted active:cursor-grabbing"
+                  >
+                    <UIcon class="size-4" name="i-lucide-grip-vertical" />
+                  </span>
                   <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-highlighted">{{ child.label }}</p>
                     <p class="truncate text-xs text-muted">{{ child.bundle }} · #{{ child.paragraphId }}</p>
