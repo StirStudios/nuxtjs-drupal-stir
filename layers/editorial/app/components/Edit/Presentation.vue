@@ -13,6 +13,7 @@ import {
   areParagraphLayoutMappingsValid,
   createParagraphLayoutMappings,
 } from '#stir/utils/paragraphLayoutTransition'
+import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const props = defineProps<{
   action: EditAction
@@ -446,7 +447,9 @@ async function handleArrangementSaved(
                     <span>{{ field.label }}</span>
                     <UTooltip
                       :text="field.description"
-                      :ui="{ content: 'max-w-64' }"
+                      :ui="{
+                        content: `${adminUiTheme.tooltip.content} max-w-64`,
+                      }"
                     >
                       <UButton
                         :aria-label="`About ${field.label}`"

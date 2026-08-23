@@ -715,6 +715,15 @@ describe('layer contract', () => {
     )
     expect(layoutArrangement).toContain('admin-ui-region-title')
     expect(layoutArrangement).not.toContain('{{ child.bundle }} · #')
+
+    const presentation = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Presentation.vue'),
+      'utf8',
+    )
+
+    expect(presentation).toContain(
+      'content: `${adminUiTheme.tooltip.content} max-w-64`',
+    )
   })
 
   it('provides default paragraph rhythm for reusable rich text', () => {
