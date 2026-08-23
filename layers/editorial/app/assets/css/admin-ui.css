@@ -67,7 +67,6 @@
 
   --admin-status-saving: var(--admin-text-muted);
   --admin-status-error: #b91c1c;
-  --admin-status-success: #047857;
 }
 
 .app-admin-tabs-font {
@@ -103,7 +102,6 @@
 
     --admin-status-saving: var(--admin-text-muted);
     --admin-status-error: #f87171;
-    --admin-status-success: #34d399;
   }
 }
 
@@ -412,33 +410,6 @@
   }
 }
 
-.admin-ui-btn-outline {
-  @apply ring-1 ring-inset;
-  background-color: transparent;
-  border-color: var(--admin-border);
-  --tw-ring-color: var(--admin-border);
-  color: var(--admin-text-muted);
-
-  &:hover {
-    background-color: var(--admin-bg-muted);
-    color: var(--admin-text-strong);
-  }
-}
-
-.admin-ui-btn-ghost {
-  background-color: transparent;
-  color: var(--admin-text-muted);
-
-  &:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--admin-bg-strong) 70%,
-      transparent
-    );
-    color: var(--admin-text-strong);
-  }
-}
-
 .admin-ui-btn-solid {
   background-color: var(--admin-text-strong);
   color: var(--admin-bg);
@@ -565,10 +536,6 @@
 
 .admin-ui-status-error {
   color: var(--admin-status-error);
-}
-
-.admin-ui-status-success {
-  color: var(--admin-status-success);
 }
 
 .admin-ui-toolbar {
