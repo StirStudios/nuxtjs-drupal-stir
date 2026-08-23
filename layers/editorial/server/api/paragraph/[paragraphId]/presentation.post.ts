@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const values = body.values as PresentationValues
-  const { apiKey, drupalBaseUrl, requestTimeoutMs }
+  const { apiKey, ceApiEndpoint, drupalBaseUrl, requestTimeoutMs }
     = resolveDrupalCeApiConfig(useRuntimeConfig())
   const cookie = getForwardedCookie(event)
 
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     assertDrupalResponseNotRedirect(csrfResponse)
 
     const response = await $fetch.raw<ParagraphPresentationResponse>(
-      buildParagraphPresentationPath(paragraphId),
+      buildParagraphPresentationPath(ceApiEndpoint, paragraphId),
       {
         method: 'POST',
         body: { values },

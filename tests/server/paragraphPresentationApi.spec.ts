@@ -6,8 +6,8 @@ import {
 
 describe('editorial paragraph presentation API policy', () => {
   it('builds the Drupal CE paragraph presentation endpoint', () => {
-    expect(buildParagraphPresentationPath(42)).toBe(
-      '/api/drupal-ce/stir-layout-builder/paragraph/42/presentation',
+    expect(buildParagraphPresentationPath('/ce-api', 42)).toBe(
+      '/api/drupal-ce/ce-api/stir-layout-builder/paragraph/42/presentation',
     )
   })
 

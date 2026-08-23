@@ -16,7 +16,7 @@ import { parseParagraphId } from '../../../utils/paragraphTextApi'
 
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
-  const { apiKey, requestTimeoutMs }
+  const { apiKey, ceApiEndpoint, requestTimeoutMs }
     = resolveDrupalCeApiConfig(useRuntimeConfig())
   const cookie = getForwardedCookie(event)
 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const response = await $fetch.raw<ParagraphPresentationResponse>(
-      buildParagraphPresentationPath(paragraphId),
+      buildParagraphPresentationPath(ceApiEndpoint, paragraphId),
       {
         headers: buildDrupalHeaders({ cookie, apiKey }),
         redirect: 'manual',
