@@ -127,7 +127,7 @@ const lanes = computed(() => resolveResponsiveGridValue(
   1,
 ))
 const deliveryProfile = computed(() => {
-  if (!isVisualGallery.value) return undefined
+  if (slotMediaOrdered.value.length <= 1) return undefined
 
   return resolveMediaGalleryDeliveryProfile(
     props.gridItems,

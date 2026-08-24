@@ -2,10 +2,16 @@
 
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { attributes, crawlableUrl, hasNoindex } from './html.mjs'
+import { attributes, crawlableUrl, hasNoindex, resolveSiteUrl } from './html.mjs'
 
 const projectRoot = resolve(process.cwd())
-const siteUrl = (process.env.SEO_SITE_URL || process.env.COMPLIANCE_SITE_URL || '').replace(/\/$/, '')
+const compliance = await readFile(resolve(projectRoot, 'compliance/site.json'), 'utf8')
+  .then(value => JSON.parse(value))
+  .catch(() => ({}))
+const siteUrl = resolveSiteUrl(
+  process.env.SEO_SITE_URL || process.env.COMPLIANCE_SITE_URL,
+  compliance,
+)
 const errors = []
 const warnings = []
 const visitedResources = new Map()
@@ -41,15 +47,11 @@ async function fetchResource(url) {
   return visitedResources.get(key)
 }
 
-async function configuredRoutes() {
-  try {
-    const config = JSON.parse(await readFile(resolve(projectRoot, 'compliance/site.json'), 'utf8'))
-    const routes = config.seo?.auditRoutes ?? config.accessibility?.auditRoutes
-    if (Array.isArray(routes)) return routes.filter(route => typeof route === 'string' && route.startsWith('/'))
-  } catch {
-    // The standalone SEO audit only requires SEO_SITE_URL.
-  }
-  return []
+function configuredRoutes() {
+  const routes = compliance.seo?.auditRoutes ?? compliance.accessibility?.auditRoutes
+  return Array.isArray(routes)
+    ? routes.filter(route => typeof route === 'string' && route.startsWith('/'))
+    : []
 }
 
 async function sitemapRoutes() {
@@ -156,7 +158,7 @@ async function auditPage(route, titleOwners, sitemapRouteSet) {
 }
 
 if (!siteUrl || !absoluteUrl(siteUrl, siteUrl)) {
-  console.error('ERROR Set SEO_SITE_URL (or COMPLIANCE_SITE_URL) to the public or local frontend origin.')
+  console.error('ERROR Set owner.domain in compliance/site.json or provide SEO_SITE_URL (or COMPLIANCE_SITE_URL).')
   process.exit(1)
 }
 
@@ -164,7 +166,7 @@ const robots = await fetchResource(new URL('/robots.txt', siteUrl))
 if (robots.cause || !robots.ok) error(`robots.txt could not be read: ${robots.cause?.message ?? `HTTP ${robots.status}`}.`)
 
 const sitemapRouteSet = await sitemapRoutes()
-const routes = [...new Set([...sitemapRouteSet, ...await configuredRoutes(), '/'])]
+const routes = [...new Set([...sitemapRouteSet, ...configuredRoutes(), '/'])]
 const titleOwners = new Map()
 for (const route of routes) await auditPage(route, titleOwners, sitemapRouteSet)
 

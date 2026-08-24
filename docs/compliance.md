@@ -24,14 +24,14 @@ agent-generated edits.
    focused command while iterating and `audit:site` in CI and periodic reviews.
 
 The audit validates the inventory, review schedule, Drupal page contract,
-consent rationale, and common tracker references. Set `COMPLIANCE_SITE_URL` to
-also verify that public pages resolve and no longer contain Enzuzo or UserWay
-claims.
+consent rationale, and common tracker references. SEO audits use `owner.domain`
+from `compliance/site.json` automatically. Set `COMPLIANCE_SITE_URL` or
+`SEO_SITE_URL` only to override that domain, such as when testing locally.
 
 ```sh
-COMPLIANCE_SITE_URL=https://www.example.com pnpm audit:compliance
-SEO_SITE_URL=https://www.example.com pnpm audit:seo
-SEO_SITE_URL=https://www.example.com pnpm audit:site
+pnpm audit:compliance
+pnpm audit:seo
+pnpm audit:site
 ```
 
 Standard cookieless Plausible Analytics alone normally does not require a
