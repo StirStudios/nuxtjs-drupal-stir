@@ -30,6 +30,7 @@ type AdminUiTheme = {
     footer: string
   }
   formField: {
+    container: string
     label: string
     description: string
   }
@@ -151,6 +152,7 @@ export const adminUiTheme = {
     footer: 'admin-ui-card-footer',
   },
   formField: {
+    container: 'mt-2',
     label: 'admin-ui-form-label',
     description: 'admin-ui-form-description',
   },
