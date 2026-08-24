@@ -152,6 +152,7 @@ async function main() {
     const complianceDir = join(consumerDir, 'compliance')
     const complianceReview = join(complianceDir, 'REVIEW.md')
     const discoveryMarker = '<!-- stir-compliance-discovery:v1 -->'
+    const accessibilityMarker = '<!-- stir-compliance-accessibility:v1 -->'
     await mkdir(complianceDir, { recursive: true })
 
     for (const legacyReview of [
@@ -165,8 +166,14 @@ async function main() {
       if (!migratedReview.includes(discoveryMarker)) {
         throw new Error('Compliance initialization did not install the discovery migration marker.')
       }
+      if (!migratedReview.includes(accessibilityMarker)) {
+        throw new Error('Compliance initialization did not install the accessibility migration marker.')
+      }
       if (migratedReview.split('## Required service discovery').length !== 2) {
         throw new Error('Compliance initialization duplicated the service-discovery section.')
+      }
+      if (migratedReview.split('## Required accessibility review').length !== 2) {
+        throw new Error('Compliance initialization duplicated the accessibility-review section.')
       }
       if (!migratedReview.includes('- Keep this project note.')) {
         throw new Error('Compliance initialization removed project-specific review content.')

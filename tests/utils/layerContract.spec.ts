@@ -271,8 +271,19 @@ describe('layer contract', () => {
       'process.env.A11Y_DOCUMENT_MODE !== \'widget\'',
     )
     expect(accessibilitySpec).toContain(
+      'process.env.A11Y_CLICK_SELECTOR ?? \'[data-a11y-scan-click]\'',
+    )
+    expect(accessibilitySpec).toContain(
       'Do not replace a shared brand or semantic color token',
     )
+
+    const accessibilityRunner = readFileSync(
+      resolve(rootDir, 'scripts/a11y/run.mjs'),
+      'utf8',
+    )
+
+    expect(accessibilityRunner).toContain('\'compliance/site.json\'')
+    expect(accessibilityRunner).toContain('compliance.accessibility?.auditRoutes')
 
     const accessibilityConfig = readFileSync(
       resolve(rootDir, 'scripts/a11y/playwright.config.mjs'),

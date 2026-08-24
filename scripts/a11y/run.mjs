@@ -23,6 +23,28 @@ const isPassthrough = passthroughCommands.has(requestedArgs[0] ?? '')
 let temporaryAuditDirectory
 let playwrightArgs = requestedArgs
 
+const configuredRoutes = async () => {
+  if (process.env.A11Y_ROUTES) return process.env.A11Y_ROUTES
+
+  try {
+    const compliance = JSON.parse(
+      await readFile(path.resolve(process.cwd(), 'compliance/site.json'), 'utf8'),
+    )
+    const routes = compliance.accessibility?.auditRoutes
+    if (Array.isArray(routes) && routes.length) {
+      return routes
+        .filter((route) => typeof route === 'string' && route.startsWith('/'))
+        .join(',')
+    }
+  } catch {
+    // Compliance inventory is optional; the accessibility runner still works alone.
+  }
+
+  return '/'
+}
+
+const auditRoutes = await configuredRoutes()
+
 if (!isPassthrough) {
   temporaryAuditDirectory = await mkdtemp(
     path.join(tmpdir(), 'stir-a11y-'),
@@ -68,6 +90,7 @@ const child = spawn(process.execPath, [playwrightCli, ...playwrightArgs], {
     ...process.env,
     STIR_A11Y_SERVER_SCRIPT: serverPath,
     STIR_A11Y_USE_FIXTURE: useFixture ? 'true' : 'false',
+    A11Y_ROUTES: auditRoutes,
   },
   stdio: 'inherit',
 })

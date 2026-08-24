@@ -38,6 +38,13 @@
   },
   "accessibility": {
     "target": "WCAG 2.2 Level AA",
-    "contact": "REPLACE_EMAIL"
+    "contact": "REPLACE_EMAIL",
+    "auditRoutes": [
+      "/",
+      "/privacy-policy",
+      "/terms-service",
+      "/accessibility-statement",
+      "REPLACE_REPRESENTATIVE_FORM_OR_INTERACTIVE_ROUTE"
+    ]
   }
 }
