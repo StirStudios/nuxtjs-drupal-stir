@@ -1,6 +1,29 @@
 {
   "name": "nuxtjs-drupal-stir",
   "version": "4.5.1",
+  "description": "Production-ready Nuxt 4 layer for decoupled Drupal 11 sites with Nuxt UI, Tailwind CSS, SSR, inline editing, accessibility, SEO, and Webforms.",
+  "keywords": [
+    "nuxt",
+    "nuxt4",
+    "drupal",
+    "drupal-11",
+    "decoupled-drupal",
+    "headless-drupal",
+    "nuxt-ui",
+    "tailwindcss",
+    "server-side-rendering",
+    "accessibility",
+    "technical-seo",
+    "webform"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StirStudios/nuxtjs-drupal-stir.git"
+  },
+  "bugs": {
+    "url": "https://github.com/StirStudios/nuxtjs-drupal-stir/issues"
+  },
+  "homepage": "https://github.com/StirStudios/nuxtjs-drupal-stir#readme",
   "type": "module",
   "main": "./nuxt.config.ts",
   "bin": {

@@ -1,11 +1,13 @@
-# Nuxt 4 Drupal Layer (Nuxt UI 4 + Tailwind 4)
+# Nuxt 4 + Drupal 11 Decoupled CMS Layer
 
+[![CI](https://github.com/StirStudios/nuxtjs-drupal-stir/actions/workflows/ci.yml/badge.svg)](https://github.com/StirStudios/nuxtjs-drupal-stir/actions/workflows/ci.yml)
 ![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?logo=nuxt.js&logoColor=white)
 ![Nuxt UI](https://img.shields.io/badge/Nuxt%20UI-4.x-00DC82?logo=nuxt.js&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38BDF8?logo=tailwindcss&logoColor=white)
 
-A production-ready Nuxt 4 layer/base theme for decoupled Drupal (Lupus Custom Elements) sites.
-Built with Nuxt UI 4 and Tailwind CSS 4 for SSR-friendly, SEO-aware, content-driven web apps.
+A production-ready Nuxt 4 layer for decoupled Drupal 11 sites using Lupus Custom Elements.
+It combines Nuxt UI 4 and Tailwind CSS 4 with SSR, inline Drupal editing, Webforms,
+accessibility testing, technical SEO auditing, and reusable downstream presets.
 
 Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, content hubs, and custom page-builder experiences.
 
