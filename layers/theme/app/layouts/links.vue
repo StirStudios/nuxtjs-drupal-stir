@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AppContextSiteInfo } from '#stir/composables/useAppContext'
 import type { SocialIcon } from '#stir/types'
+import { resolveLinkHubHeroImage } from '#stir/utils/linkHubHeroImage'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const { getPage } = useStirDrupalCe()
@@ -12,6 +13,9 @@ const { iconsSocialConfig } = useSocialIcons()
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => pageProps.value.title || page.value?.title || '')
 const hideTitle = computed(() => resolveBooleanProp(pageProps.value.hideTitle))
+const heroImage = computed(() =>
+  resolveLinkHubHeroImage(page.value?.content?.slots?.hero),
+)
 
 const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
   page.value?.site_info && typeof page.value.site_info === 'object'
@@ -53,6 +57,22 @@ const homeLabel = computed(() =>
   <div :class="linkHub.root">
     <LazyDrupalTabs v-if="hasEditorialAccess" />
 
+    <MediaImage
+      v-if="heroImage"
+      v-bind="heroImage"
+      alt=""
+      aria-hidden="true"
+      :class="linkHub.backgroundImage"
+      fetchpriority="high"
+      is-hero
+      loading="eager"
+    />
+    <div
+      v-if="heroImage"
+      aria-hidden="true"
+      :class="linkHub.backgroundOverlay"
+    />
+
     <UMain
       id="main-content"
       as="main"
@@ -60,7 +80,7 @@ const homeLabel = computed(() =>
       role="main"
       tabindex="-1"
     >
-      <UContainer :class="linkHub.container">
+      <div :class="linkHub.container">
         <NuxtLink
           :aria-label="homeLabel"
           :class="linkHub.logoLink"
@@ -102,7 +122,7 @@ const homeLabel = computed(() =>
             {{ email }}
           </ULink>
         </div>
-      </UContainer>
+      </div>
     </UMain>
   </div>
 </template>

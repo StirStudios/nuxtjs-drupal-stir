@@ -182,6 +182,8 @@ type StirThemeFrontPageConfig = {
 
 type StirThemeLinkHubConfig = {
   root?: ClassValue
+  backgroundImage?: ClassValue
+  backgroundOverlay?: ClassValue
   main?: ClassValue
   container?: ClassValue
   logoLink?: ClassValue

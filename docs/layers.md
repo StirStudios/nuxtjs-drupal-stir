@@ -60,5 +60,5 @@ Common override order for downstream projects:
 - Core webform submission fetches Drupal CSRF tokens through shared server utilities and does not require `layers/auth`.
 - Auth and Webforms both extend `layers/turnstile`; neither capability must load the other to render mandatory bot protection.
 - Analytics and Scripts extend `layers/integrations`; the minimal preset loads none of the popup/privacy components, composables, defaults, or consent plugin.
-- Drupal's `page_layout: links` presentation renders an editor-selected page alias as a branded link hub using the existing app logo, social configuration, site email, and Drupal-authored page content. No downstream Nuxt route is required.
+- Drupal's `page_layout: links` presentation renders an editor-selected page alias as a branded link hub using the existing app logo, social configuration, site email, and Drupal-authored page content. An image in the page's hero becomes an optimized decorative background; without one, the normal theme background remains. No downstream Nuxt route is required.
 - `STIR_PERF_ANALYZE=true` selects the diagnostics layer only for builds launched from this repository root. Installed minimal/full consumers never receive its filesystem report writer.
