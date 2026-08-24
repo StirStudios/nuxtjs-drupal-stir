@@ -25,6 +25,8 @@ const editPanelRef = ref<HTMLElement | null>(null)
 const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
+const isPlainText = computed(() => props.editTarget.editorMode === 'plain')
+const plainTextValue = ref(props.sourceText)
 const toolbarClass = 'admin-ui-toolbar sticky top-0 z-10 mb-2 px-2 py-2'
 const shouldShowBubbleToolbar = (payload: {
   view: { hasFocus: () => boolean }
@@ -62,7 +64,9 @@ function closeEditor(event: 'cancel' | 'saved', value = ''): void {
 async function saveInline() {
   if (isSaving.value) return
 
-  const valueToSave = normalizeEditorHtmlForSave(editorValue.value)
+  const valueToSave = isPlainText.value
+    ? plainTextValue.value
+    : normalizeEditorHtmlForSave(editorValue.value)
 
   isSaving.value = true
   resetEditMessages()
@@ -130,6 +134,7 @@ function scrollEditorIntoViewIfNeeded(): void {
 }
 
 onMounted(async () => {
+  plainTextValue.value = sourceTextRef.value
   syncEditorBuffers(sourceTextRef.value)
   await nextTick()
   scrollEditorIntoViewIfNeeded()
@@ -166,7 +171,19 @@ onMounted(async () => {
       ref="editPanelRef"
       class="admin-ui admin-ui-scope admin-ui-panel rounded-lg"
     >
+      <UTextarea
+        v-if="isPlainText"
+        v-model="plainTextValue"
+        :autoresize="true"
+        class="w-full"
+        :rows="8"
+        :ui="{
+          base: 'admin-editor-prose min-h-32 w-full resize-y rounded-lg p-4',
+        }"
+      />
+
       <UEditor
+        v-else
         v-slot="{ editor }"
         v-model="editorValue"
         class="max-h-[60vh] min-h-32 w-full overflow-y-auto rounded-lg"

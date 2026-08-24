@@ -10,12 +10,14 @@ describe('formatted text edit targets', () => {
       entity_type: 'node',
       entity_id: '89',
       field_name: 'body',
+      editor_mode: 'plain',
     })
 
     expect(target).toEqual({
       entityType: 'node',
       entityId: '89',
       fieldName: 'body',
+      editorMode: 'plain',
     })
     expect(formattedTextApiPath(target!)).toBe(
       '/api/formatted-text/node/89/body',
@@ -31,6 +33,7 @@ describe('formatted text edit targets', () => {
       entityType: 'paragraph',
       entityId: '168',
       fieldName: 'field_text',
+      editorMode: 'formatted',
     })
   })
 
