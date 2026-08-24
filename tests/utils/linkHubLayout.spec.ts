@@ -25,7 +25,8 @@ describe('link hub layout contract', () => {
 
     expect(layout).toContain('id="main-content"')
     expect(layout).toContain('aria-label="Social media"')
-    expect(layout).toContain('<AppLogo :add-classes="linkHub.logo" />')
+    expect(layout).toContain('linkHub.logo || navigation.logoClass')
+    expect(layout).toContain('<AppLogo :add-classes="logoClasses" />')
     expect(layout).toContain('v-if="heroImage"')
     expect(layout).toContain('v-bind="heroImage"')
     expect(layout).toContain('aria-hidden="true"')
@@ -37,6 +38,7 @@ describe('link hub layout contract', () => {
     expect(nodeDisplay).toContain('![\'clear\', \'links\'].includes(pageLayout.value)')
     expect(appConfig).toContain('root: \'relative flex min-h-dvh flex-col')
     expect(appConfig).toContain('container: \'flex w-full flex-col items-center\'')
+    expect(appConfig).toContain('logo: \'\'')
     expect(appConfig).toContain('backgroundOverlay: \'after:pointer-events-none after:absolute')
     expect(appConfig).toContain('heading: \'mx-4 mb-6 text-center text-xl leading-7\'')
     expect(appConfig).not.toContain('linkHub: {\n      root: \'flex h-screen')

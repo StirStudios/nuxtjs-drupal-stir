@@ -118,7 +118,7 @@ export default defineAppConfig({
       main: 'relative z-10 flex flex-1 items-center py-10 sm:py-14',
       container: 'flex w-full flex-col items-center',
       logoLink: 'mx-4 mb-8 inline-flex rounded-sm outline-primary focus-visible:outline-2 focus-visible:outline-offset-4',
-      logo: 'h-24 w-auto max-w-full',
+      logo: '',
       heading: 'mx-4 mb-6 text-center text-xl leading-7',
       content: 'w-full',
       contact: 'mt-10 flex flex-col items-center gap-3 px-4 text-center',
