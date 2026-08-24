@@ -174,6 +174,7 @@ onMounted(async () => {
       <UTextarea
         v-if="isPlainText"
         v-model="plainTextValue"
+        aria-label="Edit text"
         :autoresize="true"
         class="w-full"
         :rows="8"
