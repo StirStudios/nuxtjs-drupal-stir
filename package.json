@@ -1,6 +1,7 @@
 {
   "name": "nuxtjs-drupal-stir",
   "version": "4.5.1",
+  "type": "module",
   "main": "./nuxt.config.ts",
   "bin": {
     "stir-a11y": "./scripts/a11y/run.mjs",
