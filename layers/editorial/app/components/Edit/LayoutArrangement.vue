@@ -10,6 +10,7 @@ import {
   createParagraphLayoutGrid,
   serializeParagraphLayoutArrangement,
 } from '#stir/utils/paragraphLayoutArrangement'
+import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps<{
@@ -30,9 +31,10 @@ const error = ref('')
 const announcement = ref('')
 const arrangement = ref<Record<string, ParagraphLayoutChild[]>>({})
 const removed = ref<ParagraphLayoutChild[]>([])
-const tooltipUi = {
-  content: 'admin-ui-scope admin-ui-tooltip-content',
-  arrow: 'admin-ui-tooltip-arrow',
+const modalUi = {
+  content: `${adminUiTheme.modal.content} w-[calc(100vw-2rem)] max-w-6xl`,
+  body: 'space-y-5',
+  footer: 'justify-end',
 }
 
 const selectedOption = computed(() => props.contract.options.find(
@@ -179,18 +181,14 @@ watch(() => props.open, (value) => {
 </script>
 
 <template>
-  <ClientOnly>
-    <UModal
+  <UTheme :props="adminUiProps" :ui="adminUiTheme">
+    <ClientOnly>
+      <UModal
       description="Choose a layout, then drag or use the move controls to arrange every item. Changes save together."
       :open="open"
       scrollable
       title="Arrange layout content"
-      :ui="{
-        content: 'admin-ui admin-ui-scope admin-ui-modal w-[calc(100vw-2rem)] max-w-6xl',
-        title: 'admin-ui-modal-title',
-        body: 'space-y-5',
-        footer: 'justify-end',
-      }"
+      :ui="modalUi"
       @update:open="emit('update:open', $event)"
     >
       <template #body>
@@ -226,7 +224,7 @@ watch(() => props.open, (value) => {
             class="flex min-h-32 min-w-0 flex-col rounded-lg border border-muted bg-muted/30 transition-colors"
             :style="layoutGrid.regionAreas[region.value] ? { gridArea: layoutGrid.regionAreas[region.value] } : undefined"
           >
-            <h3 class="border-b border-muted px-3 py-2 text-sm font-semibold text-highlighted">
+            <h3 class="admin-ui-region-title border-b border-muted text-highlighted">
               {{ region.label }}
               <span class="font-normal text-muted">({{ childrenFor(region.value).length }})</span>
             </h3>
@@ -254,8 +252,10 @@ watch(() => props.open, (value) => {
                     <UIcon class="size-4" name="i-lucide-grip-vertical" />
                   </span>
                   <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium text-highlighted">{{ child.label }}</p>
-                    <p class="truncate text-xs text-muted">{{ child.bundle }} · #{{ child.paragraphId }}</p>
+                    <p class="truncate text-sm font-medium text-highlighted">
+                      {{ child.label }}
+                      <span class="font-normal text-muted">· #{{ child.paragraphId }}</span>
+                    </p>
                   </div>
                   <UButton
                     :aria-label="`Move ${child.label} up`"
@@ -275,7 +275,7 @@ watch(() => props.open, (value) => {
                     variant="ghost"
                     @click="moveWithin(child, 1)"
                   />
-                  <UTooltip arrow text="Remove from layout" :ui="tooltipUi">
+                  <UTooltip arrow text="Remove from layout">
                     <UButton
                       :aria-label="`Remove ${child.label} from layout`"
                       color="error"
@@ -343,8 +343,9 @@ watch(() => props.open, (value) => {
           />
         </div>
       </template>
-    </UModal>
-  </ClientOnly>
+      </UModal>
+    </ClientOnly>
+  </UTheme>
 </template>
 
 <style src="../../assets/css/admin-ui.css"></style>

@@ -693,12 +693,37 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')
+    expect(editableRichText).toContain('<EditLoadingState')
+    expect(editableRichText).not.toContain('animate-spin')
     expect(editableRichText).toContain('async function handleSaved(value: string)')
     expect(editableRichText).toContain('renderedText.value = value')
     expect(editableRichText).not.toContain('controls-placement="slot"')
     expect(editableRichText).not.toContain('<LazyEditControls')
     expect(editableRichText).not.toContain('sticky top-16')
     expect(editableRichText).not.toContain('<div class="relative">')
+
+    const layoutArrangement = readFileSync(
+      resolve(
+        rootDir,
+        'layers/editorial/app/components/Edit/LayoutArrangement.vue',
+      ),
+      'utf8',
+    )
+
+    expect(layoutArrangement).toContain(
+      'content: `${adminUiTheme.modal.content}',
+    )
+    expect(layoutArrangement).toContain('admin-ui-region-title')
+    expect(layoutArrangement).not.toContain('{{ child.bundle }} · #')
+
+    const presentation = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Presentation.vue'),
+      'utf8',
+    )
+
+    expect(presentation).toContain(
+      'content: `${adminUiTheme.tooltip.content} max-w-64`',
+    )
   })
 
   it('provides default paragraph rhythm for reusable rich text', () => {
@@ -792,6 +817,8 @@ describe('layer contract', () => {
     expect(adminCss).toContain(
       '> :has(+ [data-admin-ui-controls]) > :last-child',
     )
+    expect(adminCss).not.toContain('@layer')
+    expect(adminCss).not.toContain('!important')
   })
 
   it('normalizes prose edges through a single Drupal field wrapper', () => {

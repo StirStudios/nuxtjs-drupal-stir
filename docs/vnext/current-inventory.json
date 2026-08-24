@@ -164,6 +164,7 @@
       "layers/editorial/app/components/Edit/Controls.vue",
       "layers/editorial/app/components/Edit/LayoutArrangement.vue",
       "layers/editorial/app/components/Edit/Link.vue",
+      "layers/editorial/app/components/Edit/LoadingState.vue",
       "layers/editorial/app/components/Edit/Presentation.vue",
       "layers/editorial/app/components/Edit/Text.vue",
       "layers/integrations/app/components/App/Integrations.vue",
@@ -487,6 +488,7 @@
         "layers/editorial/app/components/Edit/Controls.vue",
         "layers/editorial/app/components/Edit/LayoutArrangement.vue",
         "layers/editorial/app/components/Edit/Link.vue",
+        "layers/editorial/app/components/Edit/LoadingState.vue",
         "layers/editorial/app/components/Edit/Presentation.vue",
         "layers/editorial/app/components/Edit/Text.vue",
         "layers/integrations/app/components/App/Integrations.vue",
@@ -732,7 +734,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 127,
+    "components": 128,
     "composables": 63,
     "utils": 55,
     "plugins": 7,

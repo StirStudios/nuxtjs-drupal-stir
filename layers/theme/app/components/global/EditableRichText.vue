@@ -124,18 +124,7 @@ watch(
     @quick-edit="startEditing"
   >
     <template v-if="(isEditing || isLoadingEditor) && canInlineEdit">
-      <div
-        v-if="isLoadingEditor"
-        class="border-default bg-elevated grid min-h-32 place-items-center rounded-lg border p-6"
-        role="status"
-      >
-        <UIcon
-          aria-hidden="true"
-          class="text-muted size-5 animate-spin"
-          name="i-lucide-loader-circle"
-        />
-        <span class="sr-only">Loading editor</span>
-      </div>
+      <EditLoadingState v-if="isLoadingEditor" />
       <Suspense v-else>
         <LazyEditText
           :classes="classes"
@@ -146,17 +135,7 @@ watch(
         />
 
         <template #fallback>
-          <div
-            class="border-default bg-elevated grid min-h-32 place-items-center rounded-lg border p-6"
-            role="status"
-          >
-            <UIcon
-              aria-hidden="true"
-              class="text-muted size-5 animate-spin"
-              name="i-lucide-loader-circle"
-            />
-            <span class="sr-only">Loading editor</span>
-          </div>
+          <EditLoadingState />
         </template>
       </Suspense>
     </template>
