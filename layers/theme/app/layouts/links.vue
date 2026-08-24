@@ -54,7 +54,7 @@ const homeLabel = computed(() =>
 </script>
 
 <template>
-  <div :class="linkHub.root">
+  <div :class="[linkHub.root, heroImage && linkHub.backgroundOverlay]">
     <LazyDrupalTabs v-if="hasEditorialAccess" />
 
     <MediaImage
@@ -67,12 +67,6 @@ const homeLabel = computed(() =>
       is-hero
       loading="eager"
     />
-    <div
-      v-if="heroImage"
-      aria-hidden="true"
-      :class="linkHub.backgroundOverlay"
-    />
-
     <UMain
       id="main-content"
       as="main"

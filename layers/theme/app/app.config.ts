@@ -113,8 +113,8 @@ export default defineAppConfig({
 
     linkHub: {
       root: 'relative flex min-h-dvh flex-col overflow-hidden bg-default text-default',
-      backgroundImage: 'absolute inset-0 size-full object-cover',
-      backgroundOverlay: 'absolute inset-0 bg-default/75',
+      backgroundImage: 'absolute inset-0 z-0 size-full object-cover',
+      backgroundOverlay: 'after:pointer-events-none after:absolute after:inset-0 after:z-[1] after:bg-default/75 after:content-[\'\']',
       main: 'relative z-10 flex flex-1 items-center py-10 sm:py-14',
       container: 'flex w-full flex-col items-center',
       logoLink: 'mx-4 mb-8 inline-flex rounded-sm outline-primary focus-visible:outline-2 focus-visible:outline-offset-4',
