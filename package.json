@@ -167,7 +167,8 @@
   "release-it": {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
     "hooks": {
-      "before:init": "pnpm verify:ci"
+      "before:init": "pnpm verify:ci",
+      "after:bump": "pnpm audit:vnext-inventory"
     },
     "github": {
       "release": true,
