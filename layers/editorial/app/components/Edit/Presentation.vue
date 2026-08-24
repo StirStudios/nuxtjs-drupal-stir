@@ -435,7 +435,10 @@ async function handleArrangementSaved(
             </template>
           </UCollapsible>
 
-          <div v-if="fields.length" class="grid grid-cols-2 gap-3">
+          <div
+            v-if="fields.length"
+            class="grid grid-cols-2 gap-x-3 gap-y-4"
+          >
             <template v-for="(field, index) in fields" :key="field.key">
               <USeparator
                 v-if="index > 0 && field.group !== fields[index - 1]?.group"
