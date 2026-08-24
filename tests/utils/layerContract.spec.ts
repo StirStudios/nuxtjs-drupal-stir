@@ -788,6 +788,7 @@ describe('layer contract', () => {
     expect(textEditor).not.toContain(
       ':class="[classes, \'admin-ui admin-ui-scope admin-ui-panel rounded-lg\']"',
     )
+    expect(textEditor).toContain('aria-label="Edit text"')
   })
 
   it('isolates only rich-text controls without wrapping normal output', () => {
