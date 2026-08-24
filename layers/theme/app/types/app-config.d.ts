@@ -186,6 +186,7 @@ type StirThemeLinkHubConfig = {
   container?: ClassValue
   logoLink?: ClassValue
   logo?: ClassValue
+  heading?: ClassValue
   content?: ClassValue
   contact?: ClassValue
   socials?: ClassValue

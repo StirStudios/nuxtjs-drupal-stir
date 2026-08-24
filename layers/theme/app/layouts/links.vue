@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import type { AppContextSiteInfo } from '#stir/composables/useAppContext'
 import type { SocialIcon } from '#stir/types'
+import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 
 const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { hasEditorialAccess } = usePageContext()
 const { linkHub } = useAppConfig().stirTheme
 const { iconsSocialConfig } = useSocialIcons()
+
+const pageProps = computed(() => page.value?.content?.props || {})
+const pageTitle = computed(() => pageProps.value.title || page.value?.title || '')
+const hideTitle = computed(() => resolveBooleanProp(pageProps.value.hideTitle))
 
 const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
   page.value?.site_info && typeof page.value.site_info === 'object'
@@ -63,6 +68,13 @@ const homeLabel = computed(() =>
         >
           <AppLogo :add-classes="linkHub.logo" />
         </NuxtLink>
+
+        <h1
+          v-if="pageTitle"
+          :class="[linkHub.heading, { 'sr-only': hideTitle }]"
+        >
+          {{ pageTitle }}
+        </h1>
 
         <div :class="linkHub.content">
           <slot />

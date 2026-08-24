@@ -117,8 +117,8 @@ export default defineAppConfig({
       container: 'flex w-full max-w-xl flex-col items-center px-4 text-center',
       logoLink: 'mb-8 inline-flex rounded-sm outline-primary focus-visible:outline-2 focus-visible:outline-offset-4',
       logo: 'h-24 w-auto max-w-full',
-      content:
-        'w-full [&_h1:not(.sr-only)]:mb-6 [&_h1:not(.sr-only)]:text-xl [&_h1:not(.sr-only)]:leading-7',
+      heading: 'mb-6 text-xl leading-7',
+      content: 'w-full',
       contact: 'mt-10 flex flex-col items-center gap-3',
       socials: 'flex flex-wrap items-center justify-center gap-3',
       email: 'break-all underline underline-offset-4 transition-colors hover:text-primary',

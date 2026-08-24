@@ -20,15 +20,17 @@ describe('link hub layout contract', () => {
 
   it('renders a scroll-safe, branded, accessible page shell', () => {
     const layout = source('layers/theme/app/layouts/links.vue')
+    const nodeDisplay = source('layers/theme/app/components/Drupal/NodeDisplay.vue')
     const appConfig = source('layers/theme/app/app.config.ts')
 
     expect(layout).toContain('id="main-content"')
     expect(layout).toContain('aria-label="Social media"')
     expect(layout).toContain('<AppLogo :add-classes="linkHub.logo" />')
+    expect(layout).toContain('{ \'sr-only\': hideTitle }')
     expect(layout).toContain('<slot />')
+    expect(nodeDisplay).toContain('![\'clear\', \'links\'].includes(pageLayout.value)')
     expect(appConfig).toContain('root: \'flex min-h-dvh flex-col')
-    expect(appConfig).toContain('[&_h1:not(.sr-only)]:text-xl')
-    expect(appConfig).toContain('[&_h1:not(.sr-only)]:leading-7')
+    expect(appConfig).toContain('heading: \'mb-6 text-xl leading-7\'')
     expect(appConfig).not.toContain('linkHub: {\n      root: \'flex h-screen')
   })
 })
