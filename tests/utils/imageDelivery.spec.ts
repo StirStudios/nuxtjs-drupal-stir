@@ -4,6 +4,7 @@ import {
   resolveCarouselImageDeliverySizes,
   resolveImageDeliveryProfile,
   resolveMediaGalleryDeliveryProfile,
+  resolveStableMediaDeliveryProfile,
   versionImageSource,
 } from '../../layers/theme/app/utils/imageDelivery'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
@@ -57,6 +58,17 @@ describe('resolveMediaGalleryDeliveryProfile', () => {
       .toBe('card')
     expect(resolveMediaGalleryDeliveryProfile('grid-cols-4', 3, 1))
       .toBe('container')
+  })
+})
+
+describe('resolveStableMediaDeliveryProfile', () => {
+  it('uses only server-safe authored layout inputs', () => {
+    expect(resolveStableMediaDeliveryProfile('grid grid-cols-1 sm:grid-cols-3', false))
+      .toBe('card')
+    expect(resolveStableMediaDeliveryProfile('grid grid-cols-2', false))
+      .toBe('split')
+    expect(resolveStableMediaDeliveryProfile(undefined, false)).toBe('container')
+    expect(resolveStableMediaDeliveryProfile('grid grid-cols-4', true)).toBe('container')
   })
 })
 
