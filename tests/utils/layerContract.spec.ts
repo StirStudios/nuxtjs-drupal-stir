@@ -683,6 +683,10 @@ describe('layer contract', () => {
       resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
       'utf8',
     )
+    const textEditor = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
+      'utf8',
+    )
 
     expect(paragraphText).toContain('<WrapDiv')
     expect(paragraphText).toContain('<EditableRichText')
@@ -701,6 +705,9 @@ describe('layer contract', () => {
     expect(editableRichText).not.toContain('<LazyEditControls')
     expect(editableRichText).not.toContain('sticky top-16')
     expect(editableRichText).not.toContain('<div class="relative">')
+    expect(textEditor).toContain('props.editTarget.editorMode === \'plain\'')
+    expect(textEditor).toContain('<UTextarea')
+    expect(textEditor).toContain('<UEditor')
 
     const layoutArrangement = readFileSync(
       resolve(

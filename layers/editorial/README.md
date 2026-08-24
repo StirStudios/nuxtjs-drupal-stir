@@ -8,10 +8,12 @@ remains authoritative for authentication, access checks, and the links or
 tasks exposed to Nuxt.
 
 `EditableRichText` accepts an `editTarget` containing `entityType`, `entityId`,
-and `fieldName`. The matching Drupal formatter emits this metadata beside
-single-value formatted-text fields, so node bodies and paragraph text use the
-same editor without bundle-specific endpoints or downstream coercion. The
-legacy paragraph `id` prop remains a compatibility fallback.
+`fieldName`, and an optional `editorMode`. The matching Drupal formatter emits
+this metadata beside single-value text fields, so node strings, node bodies,
+and paragraph text use the same editor without bundle-specific endpoints or
+downstream coercion. Plain fields use a multiline text control while formatted
+fields retain the HTML editor. The legacy paragraph `id` prop remains a
+compatibility fallback.
 
 Paragraph edit controls also expose a compact Nuxt UI presentation editor when
 Drupal includes a `presentationEdit` capability for that exact paragraph. Its

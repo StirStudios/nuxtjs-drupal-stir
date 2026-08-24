@@ -15,6 +15,10 @@ export function normalizeFormattedTextEditTarget(
   const entityType = stringValue(target.entityType ?? target.entity_type)
   const entityId = stringValue(target.entityId ?? target.entity_id)
   const fieldName = stringValue(target.fieldName ?? target.field_name)
+  const editorModeRaw = stringValue(
+    target.editorMode ?? target.editor_mode,
+  )
+  const editorMode = editorModeRaw === 'plain' ? 'plain' : 'formatted'
 
   if (
     !/^[a-z0-9_]+$/.test(entityType)
@@ -24,7 +28,7 @@ export function normalizeFormattedTextEditTarget(
     return null
   }
 
-  return { entityType, entityId, fieldName }
+  return { entityType, entityId, fieldName, editorMode }
 }
 
 export function formattedTextApiPath(
