@@ -38,6 +38,33 @@ Compare the discovered list with `compliance/site.json` and the published legal
 pages. A service that is configured but unused should be recorded as inactive;
 an active service must appear in both the inventory and the relevant disclosure.
 
+## Required accessibility review
+
+<!-- stir-compliance-accessibility:v1 -->
+
+Maintain `accessibility.auditRoutes` in `compliance/site.json` as the smallest
+representative set that covers every distinct page template and critical flow,
+including forms, authentication, dialogs, menus, legal pages, and any embed.
+Run `pnpm test:a11y`; it reads this route list automatically. Mark reusable
+controls with `data-a11y-scan-hover` or `data-a11y-scan-click` when their opened
+or active state needs a separate automated scan.
+
+Automated results are only one part of approval. On the declared routes, verify:
+
+- complete keyboard operation, visible focus, logical order, Escape behavior,
+  and focus restoration after closing overlays;
+- text resizing to 200%, reflow at 320 CSS pixels (approximately 400% zoom),
+  reduced motion, and forced-colors or equivalent high-contrast behavior;
+- accessible names, roles, states, error handling, and status announcements;
+- one representative flow with a screen reader; and
+- Drupal-authored headings, links, alternative text, tables, and form help.
+
+Record the date, reviewer, routes and states checked, findings, fixes, and any
+remaining limitation in this project file. Fix contrast at the narrowest
+component or interaction state. Do not broadly change primary, semantic, or
+brand color tokens unless every affected use has been visually and accessibly
+reviewed.
+
 ## Human confirmations
 
 - Confirm the legal operator, trade names, public contact details, and domain.

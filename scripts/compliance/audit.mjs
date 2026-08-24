@@ -6,6 +6,10 @@ import { relative, resolve } from 'node:path'
 const projectRoot = resolve(process.cwd())
 const configPath = resolve(projectRoot, 'compliance/site.json')
 const reviewPath = resolve(projectRoot, 'compliance/REVIEW.md')
+const reviewMarkers = [
+  '<!-- stir-compliance-discovery:v1 -->',
+  '<!-- stir-compliance-accessibility:v1 -->',
+]
 const siteUrl = process.env.COMPLIANCE_SITE_URL?.replace(/\/$/, '')
 const errors = []
 const warnings = []
@@ -133,8 +137,8 @@ if (config) {
 
   try {
     const review = await readFile(reviewPath, 'utf8')
-    if (!review.includes('<!-- stir-compliance-discovery:v1 -->')) {
-      error('compliance/REVIEW.md is outdated; run stir-compliance-init to install the current service-discovery checklist.')
+    if (reviewMarkers.some(marker => !review.includes(marker))) {
+      error('compliance/REVIEW.md is outdated; run stir-compliance-init to install the current review checklists.')
     }
   } catch (cause) {
     error(`Unable to read compliance/REVIEW.md: ${cause.message}`)
@@ -190,6 +194,15 @@ if (config) {
   }
   if (config.accessibility?.contact !== config.owner?.email) {
     warn('Accessibility contact differs from the owner contact email.')
+  }
+  if (!Array.isArray(config.accessibility?.auditRoutes) || !config.accessibility.auditRoutes.length) {
+    warn('accessibility.auditRoutes should list representative pages and critical flows for pnpm test:a11y.')
+  } else {
+    for (const route of config.accessibility.auditRoutes) {
+      if (typeof route !== 'string' || !route.startsWith('/')) {
+        error('Every accessibility.auditRoutes entry must be a root-relative route.')
+      }
+    }
   }
 
   const sourceFiles = [

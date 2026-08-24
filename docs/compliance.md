@@ -35,6 +35,19 @@ Standard cookieless Plausible Analytics alone normally does not require a
 cookie-consent prompt. Enable consent UI only when the actual technology and
 applicable rules require a choice.
 
+List the smallest representative set of page templates and critical flows in
+`accessibility.auditRoutes`. `pnpm test:a11y` reads that inventory automatically
+and scans each route across its configured viewport and color-scheme projects.
+Use `data-a11y-scan-hover` and `data-a11y-scan-click` only on safe reusable
+states that need explicit coverage. Complete the keyboard, zoom/reflow,
+reduced-motion, high-contrast, screen-reader, and Drupal-authored-content checks
+in `compliance/REVIEW.md`; automation cannot establish full conformance.
+
+Treat brand preservation as part of remediation. Correct contrast at the
+narrowest component or interaction state. A shared primary, semantic, or brand
+token should change only after every affected use is visually and accessibly
+reviewed.
+
 ## Six-month review
 
 Use this scheduled task in each downstream repository:

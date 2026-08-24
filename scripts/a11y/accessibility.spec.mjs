@@ -15,6 +15,8 @@ const rootSelector = process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'
 const documentMode = process.env.A11Y_DOCUMENT_MODE !== 'widget'
 const hoverSelector =
   process.env.A11Y_HOVER_SELECTOR ?? '[data-a11y-scan-hover]'
+const clickSelector =
+  process.env.A11Y_CLICK_SELECTOR ?? '[data-a11y-scan-click]'
 const opaqueSelector =
   process.env.A11Y_OPAQUE_SELECTOR ?? '[data-a11y-scan-opaque]'
 const configuredStateSettleMs = Number.parseInt(
@@ -317,6 +319,24 @@ test.describe('automated accessibility', () => {
           hoverResults.violations,
           `while hovering target ${index + 1} on ${route}`,
         )
+      }
+      const clickTargets = page.locator(clickSelector)
+      for (let index = 0; index < (await clickTargets.count()); index += 1) {
+        const clickTarget = clickTargets.nth(index)
+        if (!(await clickTarget.isVisible())) continue
+        await clickTarget.click()
+        await page.waitForTimeout(Math.max(stateSettleMs, motionSettleMs))
+        const clickResults = await analyzeStablePage(page)
+        await testInfo.attach(`axe-results-click-target-${index}`, {
+          body: JSON.stringify(clickResults, null, 2),
+          contentType: 'application/json',
+        })
+        assertNoViolations(
+          clickResults.violations,
+          `after activating target ${index + 1} on ${route}`,
+        )
+        await page.keyboard.press('Escape')
+        await page.waitForTimeout(stateSettleMs)
       }
     })
   }

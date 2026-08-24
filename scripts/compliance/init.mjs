@@ -10,7 +10,18 @@ const files = ['site.json', 'REVIEW.md']
 const created = []
 const preserved = []
 const updated = []
-const discoveryMarker = '<!-- stir-compliance-discovery:v1 -->'
+const reviewSections = [
+  {
+    heading: '## Required service discovery',
+    marker: '<!-- stir-compliance-discovery:v1 -->',
+    nextHeading: '## Required accessibility review',
+  },
+  {
+    heading: '## Required accessibility review',
+    marker: '<!-- stir-compliance-accessibility:v1 -->',
+    nextHeading: '## Human confirmations',
+  },
+]
 
 await mkdir(resolve(projectRoot, 'compliance'), { recursive: true })
 
@@ -21,27 +32,39 @@ for (const file of files) {
     await access(destination)
 
     if (file === 'REVIEW.md') {
-      const existing = await readFile(destination, 'utf8')
+      let review = await readFile(destination, 'utf8')
+      const template = await readFile(resolve(templateRoot, file), 'utf8')
+      let changed = false
 
-      if (!existing.includes(discoveryMarker)) {
-        const template = await readFile(resolve(templateRoot, file), 'utf8')
-        const sectionStart = template.indexOf('## Required service discovery')
-        const sectionEnd = template.indexOf('## Human confirmations')
+      for (const section of reviewSections) {
+        if (review.includes(section.marker)) continue
 
-        if (sectionStart >= 0 && sectionEnd > sectionStart) {
-          const discoverySection = template.slice(sectionStart, sectionEnd)
-          const existingSectionStart = existing.indexOf('## Required service discovery')
-          const insertionPoint = existing.indexOf('## Human confirmations')
-          const migrated = existingSectionStart >= 0 && insertionPoint > existingSectionStart
-            ? `${existing.slice(0, existingSectionStart)}${discoverySection}${existing.slice(insertionPoint)}`
-            : insertionPoint >= 0
-              ? `${existing.slice(0, insertionPoint)}${discoverySection}${existing.slice(insertionPoint)}`
-            : `${existing.trimEnd()}\n\n${discoverySection}`
+        const templateStart = template.indexOf(section.heading)
+        const templateEnd = template.indexOf(section.nextHeading, templateStart)
+        if (templateStart < 0 || templateEnd <= templateStart) continue
 
-          await writeFile(destination, migrated)
-          updated.push(file)
-          continue
-        }
+        const currentStart = review.indexOf(section.heading)
+        const nextSectionStart = currentStart >= 0
+          ? review.indexOf('\n## ', currentStart + section.heading.length)
+          : -1
+        const preferredInsertionPoint = review.indexOf(section.nextHeading)
+        const humanConfirmations = review.indexOf('## Human confirmations')
+        const insertionPoint = preferredInsertionPoint >= 0
+          ? preferredInsertionPoint
+          : humanConfirmations
+        const replacement = template.slice(templateStart, templateEnd)
+        review = currentStart >= 0
+          ? `${review.slice(0, currentStart)}${replacement}${review.slice(nextSectionStart >= 0 ? nextSectionStart + 1 : review.length)}`
+          : insertionPoint >= 0
+            ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
+            : `${review.trimEnd()}\n\n${replacement}`
+        changed = true
+      }
+
+      if (changed) {
+        await writeFile(destination, review)
+        updated.push(file)
+        continue
       }
     }
 
@@ -56,7 +79,7 @@ for (const file of files) {
 
 console.log('Stir compliance setup')
 for (const file of created) console.log(`CREATE compliance/${file}`)
-for (const file of updated) console.log(`UPDATE compliance/${file} (service discovery v1)`)
+for (const file of updated) console.log(`UPDATE compliance/${file} (current review checklists)`)
 for (const file of preserved) console.log(`KEEP   compliance/${file} (already exists)`)
 
 if (created.length) {
