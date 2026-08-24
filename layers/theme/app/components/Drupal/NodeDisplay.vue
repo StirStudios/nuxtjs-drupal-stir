@@ -39,7 +39,7 @@ const renderMode = computed<'teaser' | 'article' | 'default'>(() => {
   return 'default'
 })
 const showHero = computed(() =>
-  pageLayout.value !== 'clear' && renderMode.value !== 'teaser',
+  !['clear', 'links'].includes(pageLayout.value) && renderMode.value !== 'teaser',
 )
 // System ownership is useful payload metadata, but it is not page content.
 // Keep ordinary configured node fields renderable while preventing Drupal's

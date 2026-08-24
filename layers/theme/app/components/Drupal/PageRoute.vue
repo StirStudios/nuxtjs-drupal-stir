@@ -92,7 +92,10 @@ const pageContentProps = computed(() => {
 const pageAnimation = computed(() => pageContentProps.value.pageAnimation)
 const pageAnimationStagger = computed(() =>
   resolveBooleanProp(pageContentProps.value.pageAnimationStagger))
-const layout = computed(() => (props.forcedLayout || pageLayout.value || 'default') as 'default')
+const layout = computed(() =>
+  (props.forcedLayout || pageLayout.value || 'default') as 'default' | 'clear' | 'links',
+)
+const isLinkHubLayout = computed(() => layout.value === 'links')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
   return typeof route.params.slug === 'string' ? route.params.slug : ''
@@ -230,15 +233,15 @@ function getErrorPayload(
         :effect="pageAnimation"
         :stagger="pageAnimationStagger"
       >
-        <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs" />
+        <LazySiteBreadcrumbs v-if="theme.showBreadcrumbs && !isLinkHubLayout" />
         <component
           :is="renderCustomElements(renderablePageContent)"
           v-if="renderablePageContent"
           :key="pageRenderRevision"
         />
-        <LazyRegionArea area="after_main" />
+        <LazyRegionArea v-if="!isLinkHubLayout" area="after_main" />
         <LazyRegionArea
-          v-if="theme.footer?.showSubFooterRegion !== false"
+          v-if="!isLinkHubLayout && theme.footer?.showSubFooterRegion !== false"
           area="sub_footer"
           as="aside"
         />
