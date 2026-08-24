@@ -46,5 +46,11 @@
       "/accessibility-statement",
       "REPLACE_REPRESENTATIVE_FORM_OR_INTERACTIVE_ROUTE"
     ]
+  },
+  "seo": {
+    "auditRoutes": [
+      "/",
+      "REPLACE_REPRESENTATIVE_NOINDEX_OR_PROTECTED_ROUTE"
+    ]
   }
 }

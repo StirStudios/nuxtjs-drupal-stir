@@ -19,8 +19,9 @@ agent-generated edits.
    creates generic `compliance/site.json` and `compliance/REVIEW.md` starters
    without overwriting existing files. Replace every `REPLACE_*` value with a
    verified project fact.
-5. Add `"audit:compliance": "stir-compliance"` to downstream scripts and run it
-   in CI and during each review.
+5. The initializer adds separate `audit:compliance` and `audit:seo` scripts plus
+   a combined `audit:site` command without replacing existing scripts. Run the
+   focused command while iterating and `audit:site` in CI and periodic reviews.
 
 The audit validates the inventory, review schedule, Drupal page contract,
 consent rationale, and common tracker references. Set `COMPLIANCE_SITE_URL` to
@@ -29,6 +30,8 @@ claims.
 
 ```sh
 COMPLIANCE_SITE_URL=https://www.example.com pnpm audit:compliance
+SEO_SITE_URL=https://www.example.com pnpm audit:seo
+SEO_SITE_URL=https://www.example.com pnpm audit:site
 ```
 
 Standard cookieless Plausible Analytics alone normally does not require a
@@ -59,7 +62,7 @@ Use this scheduled task in each downstream repository:
 > and environment integration names; then visit every public route and protected
 > entry route to record third-party scripts, frames, requests, cookies, and
 > browser storage. Reconcile every difference before approval. Run pnpm
-> audit:compliance and the accessibility checks. Compare
+> audit:site, including the compliance, SEO, and accessibility checks. Compare
 > observed behavior with the Drupal Privacy Policy, Terms of Service,
 > Accessibility Statement, menu links, metadata, and consent configuration.
 > Research material legal or platform changes using current authoritative

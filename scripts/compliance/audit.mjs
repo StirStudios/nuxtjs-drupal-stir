@@ -9,6 +9,7 @@ const reviewPath = resolve(projectRoot, 'compliance/REVIEW.md')
 const reviewMarkers = [
   '<!-- stir-compliance-discovery:v1 -->',
   '<!-- stir-compliance-accessibility:v1 -->',
+  '<!-- stir-compliance-seo:v1 -->',
 ]
 const siteUrl = process.env.COMPLIANCE_SITE_URL?.replace(/\/$/, '')
 const errors = []

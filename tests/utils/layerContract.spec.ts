@@ -603,6 +603,22 @@ describe('layer contract', () => {
     expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })
 
+  it('keeps the global skip link in a landmark with a focusable auth target', () => {
+    const appShell = readFileSync(
+      resolve(rootDir, 'layers/theme/app/app.vue'),
+      'utf8',
+    )
+    const authPage = readFileSync(
+      resolve(rootDir, 'layers/auth/app/components/Auth/AuthPage.vue'),
+      'utf8',
+    )
+
+    expect(appShell).toContain('<nav aria-label="Skip links">')
+    expect(appShell).toContain('href="#main-content"')
+    expect(authPage.match(/id="main-content"/g)).toHaveLength(1)
+    expect(authPage.match(/tabindex="-1"/g)).toHaveLength(1)
+  })
+
   it('sizes both mobile menu toggle positions independently of button defaults', () => {
     const header = readFileSync(
       resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),

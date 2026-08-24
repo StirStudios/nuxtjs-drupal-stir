@@ -78,7 +78,8 @@ async function main() {
     const unexpectedScripts = archiveEntries.filter(entry =>
       entry.startsWith('package/scripts/')
       && !entry.startsWith('package/scripts/a11y/')
-      && !entry.startsWith('package/scripts/compliance/'),
+      && !entry.startsWith('package/scripts/compliance/')
+      && !entry.startsWith('package/scripts/seo/'),
     )
     if (unexpectedScripts.length > 0) {
       throw new Error(
@@ -97,6 +98,8 @@ async function main() {
       'package/scripts/compliance/init.mjs',
       'package/scripts/compliance/templates/site.json',
       'package/scripts/compliance/templates/REVIEW.md',
+      'package/scripts/seo/audit.mjs',
+      'package/scripts/seo/html.mjs',
       'package/nuxt.config.ts',
     ]) {
       if (!archiveEntries.includes(requiredPath)) {
@@ -144,7 +147,7 @@ async function main() {
     if (!await pathExists(join(consumerDir, 'node_modules/.bin/stir-a11y'))) {
       throw new Error('Packed layer did not expose the stir-a11y executable.')
     }
-    for (const executable of ['stir-compliance', 'stir-compliance-init']) {
+    for (const executable of ['stir-compliance', 'stir-compliance-init', 'stir-seo']) {
       if (!await pathExists(join(consumerDir, `node_modules/.bin/${executable}`))) {
         throw new Error(`Packed layer did not expose the ${executable} executable.`)
       }
@@ -153,6 +156,7 @@ async function main() {
     const complianceReview = join(complianceDir, 'REVIEW.md')
     const discoveryMarker = '<!-- stir-compliance-discovery:v1 -->'
     const accessibilityMarker = '<!-- stir-compliance-accessibility:v1 -->'
+    const seoMarker = '<!-- stir-compliance-seo:v1 -->'
     await mkdir(complianceDir, { recursive: true })
 
     for (const legacyReview of [
@@ -169,11 +173,17 @@ async function main() {
       if (!migratedReview.includes(accessibilityMarker)) {
         throw new Error('Compliance initialization did not install the accessibility migration marker.')
       }
+      if (!migratedReview.includes(seoMarker)) {
+        throw new Error('Compliance initialization did not install the SEO migration marker.')
+      }
       if (migratedReview.split('## Required service discovery').length !== 2) {
         throw new Error('Compliance initialization duplicated the service-discovery section.')
       }
       if (migratedReview.split('## Required accessibility review').length !== 2) {
         throw new Error('Compliance initialization duplicated the accessibility-review section.')
+      }
+      if (migratedReview.split('## Required SEO review').length !== 2) {
+        throw new Error('Compliance initialization duplicated the SEO-review section.')
       }
       if (!migratedReview.includes('- Keep this project note.')) {
         throw new Error('Compliance initialization removed project-specific review content.')

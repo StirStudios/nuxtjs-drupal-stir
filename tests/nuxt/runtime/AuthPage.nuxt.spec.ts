@@ -100,9 +100,15 @@ describe('AuthPage', () => {
     })
 
     const canvas = wrapper.find('[role="presentation"]')
+    const main = wrapper.find('main')
 
     expect(canvas.classes()).toContain('bg-muted/50')
     expect(canvas.findAll('[aria-hidden="true"]')).toHaveLength(2)
+    expect(main.attributes()).toMatchObject({
+      id: 'main-content',
+      role: 'main',
+      tabindex: '-1',
+    })
     wrapper.unmount()
   })
 
