@@ -27,3 +27,15 @@ export function crawlableUrl(value, base) {
 export function hasNoindex(value) {
   return value.toLowerCase().split(/[\s,]+/).includes('noindex')
 }
+
+export function resolveSiteUrl(value, config = {}) {
+  const candidate = value?.trim() || config.seo?.siteUrl?.trim() || config.owner?.domain?.trim()
+  if (!candidate) return ''
+
+  try {
+    const url = new URL(candidate.includes('://') ? candidate : `https://${candidate}`)
+    return ['http:', 'https:'].includes(url.protocol) ? url.origin : ''
+  } catch {
+    return ''
+  }
+}
