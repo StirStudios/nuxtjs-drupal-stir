@@ -168,8 +168,34 @@ const imagePanelStyle = computed(() =>
 
 const isSplitImageFirst = computed(() => imagePosition.value === 'left')
 const hasResolvedBackgroundImage = computed(() => Boolean(resolvedBackgroundImage.value))
+const isResolvedPageSplit = computed(() =>
+  pageLayout.value === 'page-split' && hasResolvedBackgroundImage.value,
+)
 const isResolvedCardSplit = computed(() =>
   pageLayout.value === 'card-split' && hasResolvedBackgroundImage.value,
+)
+
+const pageContainerClass = computed(() =>
+  isResolvedPageSplit.value
+    ? 'grid bg-cover bg-center bg-no-repeat text-left lg:grid-cols-2 lg:bg-none'
+    : [
+        'relative flex flex-col items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-10 text-center',
+        pageBackgroundClass.value,
+        { 'bg-muted': isResolvedCardSplit.value },
+      ],
+)
+
+const pageContainerStyle = computed(() =>
+  isResolvedPageSplit.value ? imagePanelStyle.value : pageStyle.value,
+)
+
+const mainClass = computed(() =>
+  isResolvedPageSplit.value
+    ? 'flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6 lg:bg-default lg:px-12'
+    : [
+        'relative z-10',
+        isResolvedCardSplit.value ? 'w-full max-w-5xl' : 'w-full max-w-md',
+      ],
 )
 
 const backButtonProps = computed(() => ({
@@ -195,19 +221,34 @@ provide(authLayoutContextKey, layoutContext)
 
 <template>
   <div
-    v-if="pageLayout === 'page-split' && hasResolvedBackgroundImage"
-    class="grid min-h-screen w-full bg-cover bg-center bg-no-repeat text-left lg:grid-cols-2 lg:bg-none"
+    class="min-h-screen w-full"
+    :class="pageContainerClass"
     role="presentation"
-    :style="imagePanelStyle"
+    :style="pageContainerStyle"
   >
     <div
-      v-if="isSplitImageFirst"
+      v-if="isResolvedPageSplit && isSplitImageFirst"
       aria-hidden="true"
       class="hidden min-h-screen bg-cover bg-center bg-no-repeat lg:block"
       :style="imagePanelStyle"
     />
-    <main class="flex min-h-screen w-full items-center justify-center px-4 py-10 sm:px-6 lg:bg-default lg:px-12" role="main">
-      <div class="w-full max-w-md">
+    <div
+      v-if="!isResolvedPageSplit && showBackgroundDecoration && !hasResolvedBackgroundImage"
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-32 -left-24 size-80 rounded-full bg-primary/15 blur-3xl sm:size-96"
+    />
+    <div
+      v-if="!isResolvedPageSplit && showBackgroundDecoration && !hasResolvedBackgroundImage"
+      aria-hidden="true"
+      class="pointer-events-none absolute -right-24 -bottom-32 size-80 rounded-full bg-primary/10 blur-3xl sm:size-96"
+    />
+    <main
+      id="main-content"
+      :class="mainClass"
+      role="main"
+      tabindex="-1"
+    >
+      <div :class="{ 'w-full max-w-md': isResolvedPageSplit }">
         <div
           v-if="$slots['secondary-action']"
           class="mb-4 text-left"
@@ -218,43 +259,11 @@ provide(authLayoutContextKey, layoutContext)
       </div>
     </main>
     <div
-      v-if="!isSplitImageFirst"
+      v-if="isResolvedPageSplit && !isSplitImageFirst"
       aria-hidden="true"
       class="hidden min-h-screen bg-cover bg-center bg-no-repeat lg:block"
       :style="imagePanelStyle"
     />
-  </div>
-
-  <div
-    v-else
-    class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-10 text-center"
-    :class="[pageBackgroundClass, { 'bg-muted': isResolvedCardSplit }]"
-    role="presentation"
-    :style="pageStyle"
-  >
-    <div
-      v-if="showBackgroundDecoration && !hasResolvedBackgroundImage"
-      aria-hidden="true"
-      class="pointer-events-none absolute -top-32 -left-24 size-80 rounded-full bg-primary/15 blur-3xl sm:size-96"
-    />
-    <div
-      v-if="showBackgroundDecoration && !hasResolvedBackgroundImage"
-      aria-hidden="true"
-      class="pointer-events-none absolute -right-24 -bottom-32 size-80 rounded-full bg-primary/10 blur-3xl sm:size-96"
-    />
-    <main
-      class="relative z-10"
-      :class="isResolvedCardSplit ? 'w-full max-w-5xl' : 'w-full max-w-md'"
-      role="main"
-    >
-      <div
-        v-if="$slots['secondary-action']"
-        class="mb-4 text-left"
-      >
-        <slot name="secondary-action" />
-      </div>
-      <slot />
-    </main>
   </div>
 
   <UButton

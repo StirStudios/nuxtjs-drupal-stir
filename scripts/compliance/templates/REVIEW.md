@@ -8,8 +8,8 @@ payment flow, account feature, user content, or browser storage.
 
 Audit this repository, its Drupal content, and the production domain declared
 in `compliance/site.json`. Treat that file as the verified technology and review
-inventory. Run `pnpm audit:compliance`, `pnpm test:a11y`, and the project's normal
-verification suite. Inspect forms, cookies, browser storage, analytics,
+inventory. Run `pnpm audit:compliance`, `pnpm audit:seo`, `pnpm test:a11y`, and
+the project's normal verification suite. Inspect forms, cookies, browser storage, analytics,
 marketing tags, embeds, booking or payment services, and the public legal pages.
 Compare observed behavior with the Drupal Privacy Policy, Terms of Service,
 Accessibility Statement, footer menu links, metadata, and consent configuration.
@@ -64,6 +64,20 @@ remaining limitation in this project file. Fix contrast at the narrowest
 component or interaction state. Do not broadly change primary, semantic, or
 brand color tokens unless every affected use has been visually and accessibly
 reviewed.
+
+## Required SEO review
+
+<!-- stir-compliance-seo:v1 -->
+
+Run `pnpm audit:seo` against the public or local frontend origin. It crawls the
+public sitemap plus configured representative routes and checks response status,
+links, images, titles, descriptions, canonical URLs, robots directives, h1s,
+image alt attributes, and JSON-LD syntax. Reconcile blocking findings in Drupal
+or the owning Nuxt layer; review warnings for unavailable third-party links.
+
+Automation validates technical consistency, not search rankings or editorial
+quality. Confirm that page titles, descriptions, link text, image alternatives,
+and structured data accurately describe the visible content.
 
 ## Human confirmations
 

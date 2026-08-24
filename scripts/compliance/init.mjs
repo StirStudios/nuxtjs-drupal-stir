@@ -19,9 +19,19 @@ const reviewSections = [
   {
     heading: '## Required accessibility review',
     marker: '<!-- stir-compliance-accessibility:v1 -->',
+    nextHeading: '## Required SEO review',
+  },
+  {
+    heading: '## Required SEO review',
+    marker: '<!-- stir-compliance-seo:v1 -->',
     nextHeading: '## Human confirmations',
   },
 ]
+const requiredScripts = {
+  'audit:compliance': 'stir-compliance',
+  'audit:seo': 'stir-seo',
+  'audit:site': 'pnpm audit:compliance && pnpm audit:seo && pnpm test:a11y',
+}
 
 await mkdir(resolve(projectRoot, 'compliance'), { recursive: true })
 
@@ -77,9 +87,32 @@ for (const file of files) {
   }
 }
 
+const packagePath = resolve(projectRoot, 'package.json')
+try {
+  const packageJson = JSON.parse(await readFile(packagePath, 'utf8'))
+  packageJson.scripts ??= {}
+  const addedScripts = []
+
+  for (const [name, command] of Object.entries(requiredScripts)) {
+    if (packageJson.scripts[name]) continue
+    packageJson.scripts[name] = command
+    addedScripts.push(name)
+  }
+
+  if (addedScripts.length) {
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
+    updated.push(`package.json scripts: ${addedScripts.join(', ')}`)
+  }
+} catch {
+  preserved.push('package.json scripts (package.json not available)')
+}
+
 console.log('Stir compliance setup')
 for (const file of created) console.log(`CREATE compliance/${file}`)
-for (const file of updated) console.log(`UPDATE compliance/${file} (current review checklists)`)
+for (const file of updated) {
+  const label = file.startsWith('package.json') ? file : `compliance/${file} (current review checklists)`
+  console.log(`UPDATE ${label}`)
+}
 for (const file of preserved) console.log(`KEEP   compliance/${file} (already exists)`)
 
 if (created.length) {

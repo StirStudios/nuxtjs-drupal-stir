@@ -132,8 +132,22 @@ parameters so campaign attribution and query-driven state are not lost.
 - Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
 - Real consumer pilots: `STIR_CONSUMER_RSF=/path/to/rsf-nuxt pnpm audit:consumers rsf --verify` (archives committed source into a disposable directory, installs the packed layer and its declared Nuxt peer, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
+- SEO auditing: `SEO_SITE_URL=https://www.example.com pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`
+
+### Compliance and SEO audits in downstream projects
+
+Run `pnpm exec stir-compliance-init` after installing or updating this layer.
+It preserves the downstream inventory and review notes while adding any missing
+review sections and package scripts. The generated commands remain independent:
+
+- `pnpm audit:compliance` validates the project inventory, Drupal form settings,
+  legal-page contract, consent rationale, and review schedule.
+- `SEO_SITE_URL=https://www.example.com pnpm audit:seo` crawls the public sitemap
+  and representative routes for broken links or images and rendered SEO defects.
+- `SEO_SITE_URL=https://www.example.com pnpm audit:site` runs compliance, SEO,
+  and accessibility together for a periodic or release review.
 
 ### Accessibility audits in downstream projects
 

@@ -5,7 +5,8 @@
   "bin": {
     "stir-a11y": "./scripts/a11y/run.mjs",
     "stir-compliance": "./scripts/compliance/audit.mjs",
-    "stir-compliance-init": "./scripts/compliance/init.mjs"
+    "stir-compliance-init": "./scripts/compliance/init.mjs",
+    "stir-seo": "./scripts/seo/audit.mjs"
   },
   "exports": {
     ".": "./nuxt.config.ts",
@@ -26,6 +27,7 @@
     "presets",
     "scripts/a11y",
     "scripts/compliance",
+    "scripts/seo",
     "server",
     "nuxt.config.ts",
     "readme.md"
@@ -44,6 +46,8 @@
     "perf:lighthouse:local": "node scripts/perf/lighthouse-local.mjs",
     "audit:consumers": "node scripts/audit/consumers.mjs",
     "audit:compliance": "node scripts/compliance/audit.mjs",
+    "audit:seo": "node scripts/seo/audit.mjs",
+    "audit:site": "pnpm audit:compliance && pnpm audit:seo && pnpm test:a11y",
     "init:compliance": "node scripts/compliance/init.mjs",
     "audit:preset-matrix": "node scripts/audit/preset-matrix.mjs",
     "audit:preset-components": "node scripts/audit/preset-components.mjs",
