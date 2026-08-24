@@ -27,6 +27,8 @@ describe('link hub layout contract', () => {
     expect(layout).toContain('<AppLogo :add-classes="linkHub.logo" />')
     expect(layout).toContain('<slot />')
     expect(appConfig).toContain('root: \'flex min-h-dvh flex-col')
+    expect(appConfig).toContain('[&_h1:not(.sr-only)]:text-xl')
+    expect(appConfig).toContain('[&_h1:not(.sr-only)]:leading-7')
     expect(appConfig).not.toContain('linkHub: {\n      root: \'flex h-screen')
   })
 })
