@@ -744,7 +744,7 @@
     "serverRoutes": 28,
     "productionDependencies": 38,
     "developmentDependencies": 27,
-    "tests": 147,
+    "tests": 148,
     "testsByArea": {
       "composables": 12,
       "contracts": 1,
@@ -752,7 +752,7 @@
       "scripts": 1,
       "server": 25,
       "unit": 10,
-      "utils": 47
+      "utils": 48
     }
   },
   "tests": [
@@ -877,6 +877,7 @@
     "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",
     "tests/utils/layerContract.spec.ts",
+    "tests/utils/linkHubLayout.spec.ts",
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",
     "tests/utils/nuxtDevtoolsUnheadCompat.spec.ts",

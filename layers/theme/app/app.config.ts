@@ -111,6 +111,18 @@ export default defineAppConfig({
       main: '',
     },
 
+    linkHub: {
+      root: 'flex min-h-dvh flex-col bg-default text-default',
+      main: 'flex flex-1 items-center py-10 sm:py-14',
+      container: 'flex w-full max-w-xl flex-col items-center px-4 text-center',
+      logoLink: 'mb-8 inline-flex rounded-sm outline-primary focus-visible:outline-2 focus-visible:outline-offset-4',
+      logo: 'h-24 w-auto max-w-full',
+      content: 'w-full',
+      contact: 'mt-10 flex flex-col items-center gap-3',
+      socials: 'flex flex-wrap items-center justify-center gap-3',
+      email: 'break-all underline underline-offset-4 transition-colors hover:text-primary',
+    },
+
     footer: {
       layout: 'default',
       requireSiteName: false,

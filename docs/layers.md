@@ -25,7 +25,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 ## Type Placement
 
 - Keep a type beside the component, composable, route, or utility when it describes only that implementation.
-- Put browser-only public contracts and declaration augmentation in the owning layer's `app/types/*` directory. Theme contracts are imported through `~/types` inside the theme layer.
+- Put browser-only public contracts and declaration augmentation in the owning layer's `app/types/*` directory. Supported Stir-owned contracts are imported through `#stir/types`.
 - Put contracts used by both app and server code in the owning layer's `shared/types/*` directory. Import these explicitly from both sides so ownership stays visible and the browser never reaches into `server/*`.
 - Keep server-only request, storage, and upstream response shapes beside the server code that owns them unless several server files share the contract.
 - Do not create a global type folder for unrelated convenience types, and do not move a one-use props or rendering shape away from its implementation.
@@ -51,7 +51,7 @@ Common override order for downstream projects:
 ## Boundary Guidelines
 
 - Avoid importing internals from another layer's implementation folders.
-- Use the established `~/types`, `~/composables`, `~/utils`, and `~/components` contracts for shared theme-layer APIs.
+- Use the explicit `#stir/types`, `#stir/composables`, `#stir/utils`, and `#stir/components` aliases for supported shared app contracts.
 - Keep server concerns in `core`/`auth` server directories, not in `theme`.
 
 ## Notes
@@ -60,4 +60,5 @@ Common override order for downstream projects:
 - Core webform submission fetches Drupal CSRF tokens through shared server utilities and does not require `layers/auth`.
 - Auth and Webforms both extend `layers/turnstile`; neither capability must load the other to render mandatory bot protection.
 - Analytics and Scripts extend `layers/integrations`; the minimal preset loads none of the popup/privacy components, composables, defaults, or consent plugin.
+- Drupal's `page_layout: links` presentation renders an editor-selected page alias as a branded link hub using the existing app logo, social configuration, site email, and Drupal-authored page content. No downstream Nuxt route is required.
 - `STIR_PERF_ANALYZE=true` selects the diagnostics layer only for builds launched from this repository root. Installed minimal/full consumers never receive its filesystem report writer.

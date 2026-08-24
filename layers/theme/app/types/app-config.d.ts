@@ -180,6 +180,18 @@ type StirThemeFrontPageConfig = {
   main?: ClassValue
 } & LooseRecord
 
+type StirThemeLinkHubConfig = {
+  root?: ClassValue
+  main?: ClassValue
+  container?: ClassValue
+  logoLink?: ClassValue
+  logo?: ClassValue
+  content?: ClassValue
+  contact?: ClassValue
+  socials?: ClassValue
+  email?: ClassValue
+} & LooseRecord
+
 type StirThemeSocialConfig = {
   title?: string
   tooltip?: string
@@ -402,6 +414,7 @@ type StirThemeConfig = {
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
   frontPage?: StirThemeFrontPageConfig
+  linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
   footer?: StirThemeFooterConfig
   media?: StirThemeMediaConfig
@@ -464,6 +477,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
   frontPage: StirThemeFrontPageConfig
+  linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]
   footer: StirThemeFooterConfig
   media: ResolvedStirThemeMediaConfig
