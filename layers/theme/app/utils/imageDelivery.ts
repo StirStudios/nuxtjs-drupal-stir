@@ -56,6 +56,15 @@ export function resolveMediaGalleryDeliveryProfile(
   return itemCount >= 3 ? 'card' : 'split'
 }
 
+export function resolveStableMediaDeliveryProfile(
+  gridItems: string | undefined,
+  isMasonry: boolean,
+): string {
+  if (isMasonry || !gridItems?.trim()) return 'container'
+
+  return resolveMediaGalleryDeliveryProfile(gridItems, 2) || 'container'
+}
+
 export function resolveCarouselImageDeliverySizes(
   gridItems: string | undefined,
   fullProfile: string | undefined,
