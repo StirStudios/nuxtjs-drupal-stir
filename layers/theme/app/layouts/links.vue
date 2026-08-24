@@ -7,7 +7,7 @@ import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 const { getPage } = useStirDrupalCe()
 const page = getPage()
 const { hasEditorialAccess } = usePageContext()
-const { linkHub } = useAppConfig().stirTheme
+const { linkHub, navigation } = useAppConfig().stirTheme
 const { iconsSocialConfig } = useSocialIcons()
 
 const pageProps = computed(() => page.value?.content?.props || {})
@@ -15,6 +15,9 @@ const pageTitle = computed(() => pageProps.value.title || page.value?.title || '
 const hideTitle = computed(() => resolveBooleanProp(pageProps.value.hideTitle))
 const heroImage = computed(() =>
   resolveLinkHubHeroImage(page.value?.content?.slots?.hero),
+)
+const logoClasses = computed(() =>
+  `${linkHub.logo || navigation.logoClass} w-auto max-w-full`,
 )
 
 const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
@@ -80,7 +83,7 @@ const homeLabel = computed(() =>
           :class="linkHub.logoLink"
           to="/"
         >
-          <AppLogo :add-classes="linkHub.logo" />
+          <AppLogo :add-classes="logoClasses" />
         </NuxtLink>
 
         <h1
