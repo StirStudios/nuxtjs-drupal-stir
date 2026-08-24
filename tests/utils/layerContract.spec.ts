@@ -157,8 +157,14 @@ describe('layer contract', () => {
 
   it('documents one installed package as the downstream layer source', () => {
     const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
+    const packageJson = JSON.parse(readFileSync(
+      resolve(rootDir, 'package.json'),
+      'utf8',
+    )) as { version: string }
 
-    expect(readme).toContain('"@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext"')
+    expect(readme).toContain(
+      `"@stir/base": "github:StirStudios/nuxtjs-drupal-stir#${packageJson.version}"`,
+    )
     expect(readme).toContain('extends: [\'@stir/base\']')
     expect(readme).toContain('Pin production projects to a reviewed tag or commit.')
   })
@@ -344,7 +350,7 @@ describe('layer contract', () => {
     expect(readme).toContain(
       '@import \'@stir/base/layers/theme/app/assets/css/main\';',
     )
-    expect(readme).toContain('do not reach into a relative `node_modules` path')
+    expect(readme).not.toContain('@source \'@stir/base\';')
   })
 
   it('owns the Drupal CE proxy boundary without changing its routes', () => {
@@ -385,6 +391,7 @@ describe('layer contract', () => {
     expect(consumerCss).toContain(
       '@import \'@stir/base/layers/theme/app/assets/css/main\';',
     )
+    expect(consumerCss).not.toContain('@source \'@stir/base\';')
   })
 
   it('publishes distinct minimal and full preset fixtures', () => {

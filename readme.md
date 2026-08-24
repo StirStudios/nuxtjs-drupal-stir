@@ -1,11 +1,13 @@
-# Nuxt 4 Drupal Layer (Nuxt UI 4 + Tailwind 4)
+# Nuxt 4 + Drupal 11 Decoupled CMS Layer
 
+[![CI](https://github.com/StirStudios/nuxtjs-drupal-stir/actions/workflows/ci.yml/badge.svg)](https://github.com/StirStudios/nuxtjs-drupal-stir/actions/workflows/ci.yml)
 ![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?logo=nuxt.js&logoColor=white)
 ![Nuxt UI](https://img.shields.io/badge/Nuxt%20UI-4.x-00DC82?logo=nuxt.js&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38BDF8?logo=tailwindcss&logoColor=white)
 
-A production-ready Nuxt 4 layer/base theme for decoupled Drupal (Lupus Custom Elements) sites.
-Built with Nuxt UI 4 and Tailwind CSS 4 for SSR-friendly, SEO-aware, content-driven web apps.
+A production-ready Nuxt 4 layer for decoupled Drupal 11 sites using Lupus Custom Elements.
+It combines Nuxt UI 4 and Tailwind CSS 4 with SSR, inline Drupal editing, Webforms,
+accessibility testing, technical SEO auditing, and reusable downstream presets.
 
 Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, content hubs, and custom page-builder experiences.
 
@@ -15,15 +17,16 @@ Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, 
 - 🎨 **Nuxt UI 4** with customized design tokens, material-style form variants, and Tailwind 4
 - 🧩 **Drupal CE** integration for decoupled content, slot-based layouts, paragraph mapping, and dynamic form rendering
 - 🖼️ Rich media support with overlays, modal/gallery display, and content-driven image handling
-- 🧱 Flexible content patterns including layout sections, carousel/tabs, and masonry-style gallery implementations in downstream themes
+- 🧱 Flexible content patterns including layout sections, carousels, tabs, timelines, Drupal views, and reusable paragraph mappings
 - 📝 Full Drupal webform rendering flow with schema-based validation and SSR-safe behavior
 - 📊 Built-in integrations for Turnstile CAPTCHA, Plausible analytics, Sitemap, and Robots
 - ♿ Accessibility-focused defaults (form labeling, semantics, keyboard-aware UI, contrast-friendly text tokens)
+- ✏️ In-context Drupal editing for content, media, and presentation settings
 - 🌀 Smooth scrolling and page transitions
 - ⚙️ Vitalizer: LCP-focused prefetch and stylesheet optimization
 - 🔐 Unified Drupal auth UI/routes (`/auth/*`) and optional password-protected route gate
 - 🧪 ESLint, TypeScript checks, Vitest, and Release It pre-configured
-- 📁 Cloudflare-optimized asset compression via Nitro
+- 📁 Precompressed public assets via Nitro
 
 ## 👥 Who This Is For
 
@@ -51,8 +54,8 @@ GitHub source in `nuxt.config.ts`.
 ```json
 {
   "dependencies": {
-    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#vnext",
-    "nuxt": "^4.4.8"
+    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#4.5.1",
+    "nuxt": "^4.5.2"
   }
 }
 ```
@@ -64,16 +67,16 @@ export default defineNuxtConfig({
 ```
 
 When an application owns `app/assets/css/main.css`, that file intentionally
-replaces the layer CSS entry. Import the stable package export before project
-styles; do not reach into a relative `node_modules` path:
+replaces the layer CSS entry. Import the stable package export; it already
+includes the shared Tailwind, Nuxt UI, base, utility, and CMS presentation
+sources:
 
 ```css
-@source '@stir/base';
 @import '@stir/base/layers/theme/app/assets/css/main';
-
-@import './base';
-@import './utilities';
 ```
+
+Add project-owned stylesheet imports only when that downstream application
+actually has additional styles.
 
 Tailwind CSS 4 does not support responsive variants inside `@apply`. Put the
 responsive declaration in its media query instead of using, for example,
@@ -115,11 +118,13 @@ parameters so campaign attribution and query-driven state are not lost.
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
+
 - **[Nuxt 4](https://nuxt.com/)**: `^4.5.2`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.10.0`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.11.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.3`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.8.0`
+- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.9.0`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
+
 <!-- tech-stack:end -->
 
 ## ✅ Quality Baseline
@@ -129,7 +134,7 @@ parameters so campaign attribution and query-driven state are not lost.
 - Unit testing: `pnpm test` (Vitest)
 - Nuxt runtime testing: `pnpm test:nuxt` (Nuxt test-utils + Vitest)
 - E2E smoke testing: `pnpm test:e2e` (built Nuxt health/runtime smoke)
-- Consumer compatibility: `pnpm test:consumer` (fixture typecheck + production build)
+- Consumer compatibility: `pnpm test:consumer` (fixture typecheck/build plus packed root, minimal, and full profiles)
 - Real consumer pilots: `STIR_CONSUMER_RSF=/path/to/rsf-nuxt pnpm audit:consumers rsf --verify` (archives committed source into a disposable directory, installs the packed layer and its declared Nuxt peer, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - SEO auditing: `pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
@@ -219,7 +224,7 @@ attributes above; the harness does not depend on project-specific components.
 ## 🔐 Environment Variables
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
-- `DRUPAL_API_KEY`: Optional API key for secured server-side Drupal requests
+- `DRUPAL_API_KEY`: API key for secured server-side Drupal requests; required by standard Stir downstream deployments
 - `STIR_PRESENTATION_MANIFEST`: Optional build-time URL or local file override for the CMS presentation manifest; defaults to the protected Drupal endpoint derived from `DRUPAL_URL`
 - `STIR_PRESENTATION_MANIFEST_API_KEY`: Optional API-key override used only when fetching `STIR_PRESENTATION_MANIFEST`
 - `STIR_PRESENTATION_MANIFEST_LAST_KNOWN`: Optional local fallback manifest used only when the primary source is unavailable
@@ -327,15 +332,15 @@ pnpm typecheck  # Nuxt + Vue TypeScript checks
 pnpm test       # Run unit tests
 pnpm test:nuxt  # Run Nuxt runtime tests
 pnpm test:e2e   # Run built Nuxt E2E smoke tests
-pnpm test:consumer # Typecheck and build the downstream consumer fixture
-pnpm test:all   # Run unit, Nuxt runtime, and E2E tests
+pnpm test:consumer # Verify fixture and packed root/minimal/full consumers
+pnpm test:all   # Run unit, Nuxt runtime, E2E, and accessibility tests
 pnpm test:watch # Run unit tests in watch mode
 pnpm verify:core # Tests, lint, typecheck, and root production build
 pnpm verify:ci  # Full gate, including downstream consumer compatibility
 pnpm perf:presentation     # Compare compatibility and CMS-manifest CSS output
 pnpm perf:report # Build + output top client chunk size report
 pnpm deps:update:safe # Safe dependency update flow
-pnpm release    # Tag + prepare release
+pnpm release    # Verify, version, tag, and create the GitHub release
 ```
 
 ## ✅ Pre-Merge Checks
@@ -352,7 +357,7 @@ downstream consumer checks.
 Use `pnpm deps:update:safe` for routine updates.
 See `docs/dependency-update-policy.md` for the full policy.
 
-## Plausible Migration Note (April 1, 2026)
+## Plausible Analytics
 
 - Plausible tracking now uses `@nuxtjs/plausible`.
 - Consent-deferred initialization uses the direct `@plausible-analytics/tracker` runtime.
