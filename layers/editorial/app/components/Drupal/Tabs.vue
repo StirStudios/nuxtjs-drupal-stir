@@ -270,7 +270,7 @@ watch(
 )
 
 const links = computed(() => {
-  const dashboardTo = normalizeAdminUrl('/admin/content')
+  const dashboardTo = normalizeAdminUrl('/admin/dashboard')
   const baseLinks = [
     [
       {
