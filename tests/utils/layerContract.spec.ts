@@ -673,6 +673,8 @@ describe('layer contract', () => {
     expect(tabs).toContain('execute: executeAccountMenu')
     expect(tabs).toContain('() => route.fullPath')
     expect(tabs).toContain('accountMenuStatus.value !== \'success\'')
+    expect(tabs).toContain('normalizeAdminUrl(\'/admin/dashboard\')')
+    expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/content\')')
     expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
     expect(tabs).not.toContain('getAccountMenuUrl')
     expect(tabs).not.toContain('drupal-tabs-account-menu-loaded')
