@@ -2,8 +2,6 @@ import type { ComputedRef, InjectionKey } from 'vue'
 
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
-export const carouselNestedImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =
-  Symbol('stirCarouselNestedImageDeliveryProfile')
 export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirLayoutImageDeliveryProfile')
 

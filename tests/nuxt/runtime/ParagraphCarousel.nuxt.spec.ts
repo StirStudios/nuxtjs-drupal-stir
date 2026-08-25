@@ -1,7 +1,8 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, inject, ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ParagraphCarousel from '../../../layers/theme/app/components/global/Paragraph/Carousel.vue'
+import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 const preferredMotion = ref<'no-preference' | 'reduce'>('no-preference')
 
@@ -81,18 +82,25 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
   })
 
-  it('passes an explicit card profile to nested Drupal node slides', async () => {
+  it('lets nested Drupal node slides inherit the carousel delivery width', async () => {
     const NodeSlide = defineComponent({
       name: 'NodeSlide',
       props: {
         imageDeliveryProfile: String,
         uid: String,
       },
-      setup: props => () => h(
-        'article',
-        { 'data-delivery-profile': props.imageDeliveryProfile },
-        'Nested node',
-      ),
+      setup: (props) => {
+        const deliverySizes = inject(carouselImageDeliverySizesKey)
+
+        return () => h(
+          'article',
+          {
+            'data-delivery-profile': props.imageDeliveryProfile,
+            'data-delivery-sizes': deliverySizes?.value,
+          },
+          'Nested node',
+        )
+      },
     })
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
@@ -103,8 +111,10 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.find('[data-delivery-profile="card"]').exists()).toBe(true)
-    expect(wrapper.getComponent(NodeSlide).props('imageDeliveryProfile')).toBe('card')
+    expect(wrapper.find('[data-delivery-profile="card"]').exists()).toBe(false)
+    expect(wrapper.getComponent(NodeSlide).props('imageDeliveryProfile')).toBeUndefined()
+    expect(wrapper.get('[data-delivery-sizes]').attributes('data-delivery-sizes'))
+      .toBe('sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw')
   })
 
   it('releases arrow focus after pointer activation', async () => {

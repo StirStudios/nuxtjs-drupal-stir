@@ -10,6 +10,10 @@ import {
   useDrupalViewScrollRestore,
 } from '#stir/composables/useDrupalViewScrollRestore'
 import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
+import {
+  layoutImageDeliveryProfileKey,
+  resolveLayoutImageDeliveryProfile,
+} from '#stir/utils/imageDelivery'
 
 const props = defineProps<DrupalViewProps>()
 
@@ -30,6 +34,18 @@ const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const viewRoot = useTemplateRef<HTMLElement>('viewRoot')
 const inheritedQueryNamespace = inject(drupalViewQueryNamespaceKey, undefined)
+const inheritedImageDeliveryProfile = inject(
+  layoutImageDeliveryProfileKey,
+  undefined,
+)
+const viewImageDeliveryProfile = computed(() =>
+  resolveLayoutImageDeliveryProfile(
+    undefined,
+    [props.gridItems, props.width].filter(Boolean).join(' '),
+  ) || inheritedImageDeliveryProfile?.value,
+)
+
+provide(layoutImageDeliveryProfileKey, viewImageDeliveryProfile)
 
 const {
   isLoading,

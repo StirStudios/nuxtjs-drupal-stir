@@ -33,6 +33,7 @@ describe('useTeaserPost', () => {
     })
     expect(post.value.image).not.toHaveProperty('originalSrc')
     expect(post.value.image).not.toHaveProperty('deliveryProfile')
+    expect(post.value.image).not.toHaveProperty('sizes')
   })
 
   it('prefixes relative Drupal teaser image paths', () => {

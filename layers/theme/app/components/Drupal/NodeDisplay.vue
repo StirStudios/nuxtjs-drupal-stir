@@ -5,7 +5,6 @@ import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import {
   carouselImageDeliverySizesKey,
-  carouselNestedImageDeliveryProfileKey,
   layoutImageDeliveryProfileKey,
 } from '#stir/utils/imageDelivery'
 
@@ -57,18 +56,12 @@ const parentLayoutImageDeliveryProfile = inject(
   layoutImageDeliveryProfileKey,
   undefined,
 )
-const carouselNestedImageDeliveryProfile = inject(
-  carouselNestedImageDeliveryProfileKey,
-  undefined,
-)
 const nestedImageDeliveryProfile = computed(() =>
   props.imageDeliveryProfile
-  || carouselNestedImageDeliveryProfile?.value
   || parentLayoutImageDeliveryProfile?.value,
 )
 const nestedCarouselImageDeliverySizes = computed(() => {
   const profile = props.imageDeliveryProfile
-    || carouselNestedImageDeliveryProfile?.value
 
   return profile
     ? theme.media.image.profiles[profile]

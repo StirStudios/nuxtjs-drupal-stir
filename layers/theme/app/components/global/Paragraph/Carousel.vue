@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cloneVNode, type VNode } from 'vue'
+import type { VNode } from 'vue'
 import {
   useIntersectionObserver,
   usePreferredReducedMotion,
@@ -9,7 +9,6 @@ import {
 } from '#stir/utils/nuxtUiProps'
 import {
   carouselImageDeliverySizesKey,
-  carouselNestedImageDeliveryProfileKey,
   resolveCarouselImageDeliverySizes,
 } from '#stir/utils/imageDelivery'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
@@ -95,11 +94,6 @@ const carouselImageDeliverySizes = computed(() =>
     theme.media.image.profiles.full,
   ),
 )
-const carouselNestedImageDeliveryProfile = computed(() =>
-  carouselImageDeliverySizes.value === theme.media.image.profiles.full
-    ? 'card'
-    : undefined,
-)
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
@@ -109,10 +103,6 @@ const carouselMotionProps = useRevealMotionProps(
 )
 
 provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
-provide(
-  carouselNestedImageDeliveryProfileKey,
-  carouselNestedImageDeliveryProfile,
-)
 // The carousel enters as one unit; its media slides should not double animate.
 provideRevealMotionScope(() => undefined)
 
@@ -132,17 +122,9 @@ const slides = computed(() => {
 
   return raw.map((vnode, i) => {
     const typedNode = vnode as VNode
-    const vnodeProps = typedNode.props as Record<string, unknown> | null
-    const isDrupalNode = vnodeProps !== null && 'uid' in vnodeProps
-    const renderedVNode =
-      isDrupalNode && carouselNestedImageDeliveryProfile.value
-        ? cloneVNode(typedNode, {
-            imageDeliveryProfile: carouselNestedImageDeliveryProfile.value,
-          })
-        : typedNode
 
     return {
-      vnode: renderedVNode,
+      vnode: typedNode,
       key: typedNode.key ?? i,
     }
   })
