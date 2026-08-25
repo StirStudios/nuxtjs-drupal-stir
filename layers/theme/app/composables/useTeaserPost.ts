@@ -99,7 +99,6 @@ export function useTeaserPost(
       alt: typeof media.alt === 'string' ? media.alt : extra.title ?? '',
       width: Number.isFinite(width) ? width : undefined,
       height: Number.isFinite(height) ? height : undefined,
-      sizes: 'sm:100vw md:50vw',
       loading: 'lazy',
       fetchpriority: 'low',
       decoding: 'async',
