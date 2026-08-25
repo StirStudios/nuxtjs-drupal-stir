@@ -14,7 +14,7 @@ const siteUrl = resolveSiteUrl(
 )
 const errors = []
 const warnings = []
-const visitedResources = new Map()
+const checkedTargets = new Map()
 
 const error = message => errors.push(message)
 const warn = message => warnings.push(message)
@@ -33,18 +33,14 @@ function absoluteUrl(value, base) {
 
 
 async function fetchResource(url) {
-  const key = url.toString()
-  if (!visitedResources.has(key)) {
-    visitedResources.set(key, fetch(key, {
-      headers: {
-        connection: 'close',
-        'user-agent': 'Stir site-health audit',
-      },
-      redirect: 'follow',
-      signal: AbortSignal.timeout(15_000),
-    }).catch(cause => ({ cause })))
-  }
-  return visitedResources.get(key)
+  return fetch(url, {
+    headers: {
+      connection: 'close',
+      'user-agent': 'Stir site-health audit',
+    },
+    redirect: 'follow',
+    signal: AbortSignal.timeout(15_000),
+  }).catch(cause => ({ cause }))
 }
 
 function configuredRoutes() {
@@ -68,16 +64,23 @@ async function sitemapRoutes() {
 }
 
 async function checkTarget(url, source, type) {
-  const response = await fetchResource(url)
-  if (response.cause) {
-    const report = url.origin === new URL(siteUrl).origin ? error : warn
-    report(`${type} ${url} from ${source} could not be loaded: ${response.cause.message}`)
-    return
+  const key = url.toString()
+  if (!checkedTargets.has(key)) {
+    checkedTargets.set(key, (async () => {
+      const response = await fetchResource(url)
+      if (response.cause) {
+        const report = url.origin === new URL(siteUrl).origin ? error : warn
+        report(`${type} ${url} from ${source} could not be loaded: ${response.cause.message}`)
+        return
+      }
+      if (!response.ok) {
+        const report = url.origin === new URL(siteUrl).origin ? error : warn
+        report(`${type} ${url} from ${source} returned HTTP ${response.status}.`)
+      }
+      if (response.body && !response.bodyUsed) await response.body.cancel()
+    })())
   }
-  if (!response.ok) {
-    const report = url.origin === new URL(siteUrl).origin ? error : warn
-    report(`${type} ${url} from ${source} returned HTTP ${response.status}.`)
-  }
+  await checkedTargets.get(key)
 }
 
 async function auditPage(route, titleOwners, sitemapRouteSet) {
