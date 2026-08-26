@@ -49,6 +49,16 @@ describe('hero reveal accessibility', () => {
     expect(heroContentSource).toContain(':class="{ \'sr-only\': hideTitle }"')
   })
 
+  it('collapses visual text spacing when the hero only contains a hidden h1', () => {
+    expect(heroSource).toContain('const hasVisibleHeroContent = computed')
+    expect(heroSource).toContain(
+      'hasVisibleHeroContent && heroTheme.text.base',
+    )
+    expect(heroSource).toContain(
+      'hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront',
+    )
+  })
+
   it('uses an SSR entrance animation instead of a viewport reveal', () => {
     expect(heroSource).toContain('ssrVisible: false')
     expect(heroSource).toContain('trigger: \'enter\'')
