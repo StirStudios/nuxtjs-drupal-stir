@@ -53,6 +53,7 @@ const imageDeliveryProfile = computed(() =>
   resolveLayoutImageDeliveryProfile(
     props.layout,
     [props.gridClass, props.width].filter(Boolean).join(' '),
+    props.container,
   ),
 )
 const reversesTwoColumnMobileStack = computed(

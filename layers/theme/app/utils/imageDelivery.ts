@@ -8,6 +8,7 @@ export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | un
 export function resolveLayoutImageDeliveryProfile(
   layout: string | undefined,
   gridClass: string | undefined,
+  contained = true,
 ): string | undefined {
   const values = `${layout || ''} ${gridClass || ''}`
   const columns = [...values.matchAll(
@@ -18,7 +19,9 @@ export function resolveLayoutImageDeliveryProfile(
   const maximumColumns = columns.length > 0 ? Math.max(...columns) : 0
 
   if (maximumColumns >= 3) return 'card'
-  if (maximumColumns === 2 || layout?.startsWith('two_column')) return 'split'
+  if (maximumColumns === 2 || layout?.startsWith('two_column')) {
+    return contained ? 'split' : 'splitFull'
+  }
   if (layout === 'grid') return 'card'
   if (/(?:^|\s)(?:\w+:)*max-w-(?:xs|sm|md|lg|xl|[2-7]xl)(?:\s|$)/.test(values)) {
     return 'split'
