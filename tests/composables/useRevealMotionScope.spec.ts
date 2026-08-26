@@ -32,7 +32,14 @@ describe('resolveScopedRevealEffect', () => {
       staggerMs: 110,
       ease: [0.22, 1, 0.36, 1],
       threshold: 0.1,
-      rootMargin: '-12% 0px -12% 0px',
+      rootMargin: '0px 0px -12% 0px',
     })
+  })
+
+  it('keeps the top viewport boundary stable for repeated upward reveals', () => {
+    const [top, , bottom] = REVEAL_DEFAULTS.rootMargin.split(/\s+/)
+
+    expect(top).toBe('0px')
+    expect(bottom).toBe('-12%')
   })
 })

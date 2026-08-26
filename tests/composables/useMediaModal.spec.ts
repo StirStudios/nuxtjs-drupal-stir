@@ -15,13 +15,14 @@ describe('useMediaModal', () => {
       src: '/small.jpg',
       originalSrc: '/original.jpg',
       originalRevision: '1-2-3',
-      deliveryProfile: 'full',
+      deliveryProfile: 'card',
       title: 'Image',
     })
     const video = h('div', {
       type: 'video',
       mid: '2',
       src: '/video.jpg',
+      deliveryProfile: 'card',
       title: 'Video',
     })
     const modal = useMediaModal(ref([image, video]), {
@@ -41,6 +42,7 @@ describe('useMediaModal', () => {
         key: '2',
         type: 'video',
         src: '/video.jpg',
+        deliveryProfile: 'card',
       },
     ])
   })
