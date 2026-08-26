@@ -81,6 +81,20 @@ const h1Classes = computed(() => {
 })
 
 const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
+const hasVisibleDefaultContent = computed(() =>
+  Boolean(props.text?.trim()) ||
+  Boolean(pageTitleEffective.value && !pageHideTitleEffective.value) ||
+  Boolean(
+    pageTitleEffective.value &&
+    isFrontEffective.value &&
+    heroSubtitle.value,
+  ),
+)
+const hasVisibleHeroContent = computed(() =>
+  tk.slot('title').length > 0 ||
+  tk.slot('button').length > 0 ||
+  hasVisibleDefaultContent.value,
+)
 
 const sectionClasses = computed(() => {
   if (props.mode === 'simple') {
@@ -154,8 +168,8 @@ provideRevealMotionScope(() => undefined)
         >
           <div
             :class="[
-              heroTheme.text.base,
-              isFrontEffective && heroTheme.text.isFront,
+              hasVisibleHeroContent && heroTheme.text.base,
+              hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
               'motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
           >
