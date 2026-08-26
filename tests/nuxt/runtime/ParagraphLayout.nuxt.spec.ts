@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, inject } from 'vue'
 import ParagraphLayout from '../../../layers/theme/app/components/global/Paragraph/Layout.vue'
 import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '../../../layers/theme/app/composables/useRevealMotionScope'
+import { layoutImageDeliveryProfileKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 const RevealScopeProbe = defineComponent({
   setup() {
@@ -16,6 +17,17 @@ const RevealScopeProbe = defineComponent({
       class: 'reveal-scope-probe',
       'data-stagger': String(inheritedStagger.value),
       'data-stagger-index': String(staggerIndex.value),
+    })
+  },
+})
+
+const ImageDeliveryProfileProbe = defineComponent({
+  setup() {
+    const profile = inject(layoutImageDeliveryProfileKey)
+
+    return () => h('span', {
+      class: 'image-delivery-profile-probe',
+      'data-profile': profile?.value,
     })
   },
 })
@@ -62,6 +74,28 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
 
     expect(wrapper.find('.region.first > .first-item').exists()).toBe(true)
     expect(wrapper.find('.region.second .region.first > .nested-item').exists()).toBe(true)
+  })
+
+  it.each([
+    { container: true, expected: 'split' },
+    { container: false, expected: 'splitFull' },
+  ])('provides $expected image delivery for container=$container', async ({
+    container,
+    expected,
+  }) => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: {
+        id: `delivery-${expected}`,
+        layout: 'two_column',
+        container,
+      },
+      slots: {
+        first: () => h(ImageDeliveryProfileProbe),
+      },
+    })
+
+    expect(wrapper.find('.image-delivery-profile-probe').attributes('data-profile'))
+      .toBe(expected)
   })
 
   it('keeps multiple components in an aligned region stacked vertically', async () => {

@@ -177,6 +177,7 @@ export default defineAppConfig({
           full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
           container: 'sm:100vw md:90vw xl:1200px',
           split: 'sm:100vw md:50vw xl:600px',
+          splitFull: 'sm:100vw md:50vw',
           card: 'sm:100vw md:50vw lg:33vw xl:400px',
         },
       },

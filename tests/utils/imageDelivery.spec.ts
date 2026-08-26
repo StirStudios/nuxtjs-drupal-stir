@@ -96,11 +96,19 @@ describe('resolveLayoutImageDeliveryProfile', () => {
     )).toBe('card')
   })
 
-  it('uses split delivery for two-column layouts', () => {
+  it('uses split delivery for contained two-column layouts', () => {
     expect(resolveLayoutImageDeliveryProfile(
       'two_column',
       'grid-cols-1 lg:grid-cols-2',
     )).toBe('split')
+  })
+
+  it('uses full-width split delivery for edge-to-edge two-column layouts', () => {
+    expect(resolveLayoutImageDeliveryProfile(
+      'two_column',
+      'grid-cols-1 lg:grid-cols-2',
+      false,
+    )).toBe('splitFull')
   })
 
   it('does not constrain ordinary one-column content', () => {
