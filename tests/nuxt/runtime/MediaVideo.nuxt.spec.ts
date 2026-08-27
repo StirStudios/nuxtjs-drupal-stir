@@ -192,6 +192,98 @@ describe('MediaVideo (Nuxt runtime)', () => {
     load.mockRestore()
   })
 
+  it('loads background video at mobile widths by default', async () => {
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList)
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        mediaEmbed: '/hero.mp4',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+      },
+    })
+
+    await nextTick()
+
+    expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')
+    expect(matchMedia).not.toHaveBeenCalledWith('(min-width: 0px)')
+    expect(wrapper.get('video').attributes('autoplay')).toBeDefined()
+    expect(wrapper.get('source').attributes('src')).toBe('/hero.mp4')
+    expect(load).toHaveBeenCalledOnce()
+  })
+
+  it('keeps the poster static when reduced motion is preferred', async () => {
+    vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList)
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        mediaEmbed: '/hero.mp4',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+      },
+    })
+
+    await nextTick()
+
+    expect(wrapper.get('img').attributes('src')).toContain('/hero-poster.webp')
+    expect(wrapper.find('source').exists()).toBe(false)
+    expect(wrapper.get('video').attributes('preload')).toBe('none')
+    expect(load).not.toHaveBeenCalled()
+  })
+
+  it('stops an active background video when reduced motion is enabled', async () => {
+    let handleChange: (() => void) | undefined
+    const reducedMotionQuery = {
+      matches: false,
+      addEventListener: vi.fn((event, handler) => {
+        if (event === 'change') handleChange = handler as () => void
+      }),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList
+
+    vi.spyOn(window, 'matchMedia').mockReturnValue(reducedMotionQuery)
+    const load = vi
+      .spyOn(HTMLMediaElement.prototype, 'load')
+      .mockImplementation(() => {})
+    const pause = vi
+      .spyOn(HTMLMediaElement.prototype, 'pause')
+      .mockImplementation(() => {})
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        mediaEmbed: '/hero.mp4',
+        noWrapper: true,
+        src: '/hero-poster.webp',
+      },
+    })
+
+    await nextTick()
+    expect(wrapper.get('source').attributes('src')).toBe('/hero.mp4')
+
+    Object.assign(reducedMotionQuery, { matches: true })
+    handleChange?.()
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.find('source').exists()).toBe(false)
+    expect(pause).toHaveBeenCalled()
+    expect(load).toHaveBeenCalledTimes(2)
+  })
+
   it('plays a Drupal local-video src without treating the MP4 as a poster', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {
@@ -313,8 +405,15 @@ describe('MediaVideo (Nuxt runtime)', () => {
       }),
       removeEventListener: vi.fn(),
     } as unknown as MediaQueryList
-    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(() => {
-      return mediaQuery
+    const reducedMotionQuery = {
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+      return query.includes('prefers-reduced-motion')
+        ? reducedMotionQuery
+        : mediaQuery
     })
     const load = vi
       .spyOn(HTMLMediaElement.prototype, 'load')
@@ -335,7 +434,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
 
     expect(wrapper.get('source').attributes('src')).toBe('/hero.mp4')
     expect(load).toHaveBeenCalledOnce()
-    expect(mediaQuery.removeEventListener).toHaveBeenCalledWith(
+    expect(mediaQuery.addEventListener).toHaveBeenCalledWith(
       'change',
       handleChange,
     )
