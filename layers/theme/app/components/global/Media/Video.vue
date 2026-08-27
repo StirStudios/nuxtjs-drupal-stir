@@ -143,7 +143,7 @@ const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
   return strategy === 'immediate' ? 'immediate' : 'after-load'
 })
 const bareVideoLoadMinWidth = computed(
-  () => props.loadMinWidth ?? mediaTheme.video?.loadMinWidth ?? 768,
+  () => props.loadMinWidth ?? mediaTheme.video?.loadMinWidth ?? 0,
 )
 const { isActive: isBareVideoSourceActive } = useDeferredVideoSource({
   enabled: isBare,
@@ -309,7 +309,7 @@ function deactivateAnimatedPreview(): void {
 function syncDirectBackgroundPlayback(visible: boolean): void {
   if (!pauseWhenHidden.value || !isBare.value || !videoElement.value) return
 
-  if (visible) {
+  if (visible && isBareVideoSourceActive.value) {
     void videoElement.value.play().catch(() => {})
     return
   }
@@ -400,6 +400,7 @@ watch(
       ref="videoElement"
       v-bind="forwardedAttrs"
       aria-hidden="true"
+      autoplay
       class="pointer-events-none absolute inset-0 h-full w-full object-cover"
       disablepictureinpicture
       disableremoteplayback

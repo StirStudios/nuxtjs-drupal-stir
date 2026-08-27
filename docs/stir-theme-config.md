@@ -547,17 +547,18 @@ media: {
   base: 'relative h-full w-full overflow-hidden object-cover',
   rounded: 'rounded-xl',
   video: {
-    loadMinWidth: 768,
+    loadMinWidth: 0,
     loadStrategy: 'after-load',
   },
 },
 ```
 
-Hero and bare background videos keep their poster in the initial HTML. Below
-`media.video.loadMinWidth`, the poster remains static and the video is not
-requested. At or above the breakpoint, the video source URL is deferred until
-after the window load milestone. Set `loadMinWidth` to `0` to allow background
-video at every viewport width. Set
+Hero and bare background videos keep their poster in the initial HTML. By
+default, their source URL is deferred until after the window load milestone at
+every viewport width. When the user prefers reduced motion, the poster remains
+static and the video is not requested. Set `media.video.loadMinWidth` to a
+positive CSS-pixel width only when a project intentionally wants static posters
+below a breakpoint. Set
 `media.video.loadStrategy` to `'immediate'` only when a downstream project
 intentionally accepts that performance tradeoff. The Drupal media payload
 remains the source of truth for image loading,

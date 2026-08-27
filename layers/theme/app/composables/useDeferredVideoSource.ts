@@ -10,7 +10,8 @@ interface DeferredVideoSourceOptions {
 
 export function useDeferredVideoSource(options: DeferredVideoSourceOptions) {
   const isActive = ref(false)
-  let mediaQuery: MediaQueryList | undefined
+  let reducedMotionQuery: MediaQueryList | undefined
+  let widthQuery: MediaQueryList | undefined
   let animationFrame: number | undefined
 
   async function activate(): Promise<void> {
@@ -38,24 +39,26 @@ export function useDeferredVideoSource(options: DeferredVideoSourceOptions) {
     activateOnAnimationFrame()
   }
 
-  function handleMediaQueryChange(event: MediaQueryListEvent): void {
-    if (!event.matches) return
+  function deactivate(): void {
+    if (!isActive.value) return
 
-    mediaQuery?.removeEventListener('change', handleMediaQueryChange)
-    schedule()
+    isActive.value = false
+    options.videoElement?.value?.pause()
+    void nextTick(() => options.videoElement?.value?.load())
   }
 
-  function schedule(): void {
-    const minWidth = toValue(options.minWidth)
+  function isEligible(): boolean {
+    return reducedMotionQuery?.matches !== true
+      && widthQuery?.matches !== false
+  }
 
-    if (minWidth > 0) {
-      mediaQuery = window.matchMedia(`(min-width: ${minWidth}px)`)
-
-      if (!mediaQuery.matches) {
-        mediaQuery.addEventListener('change', handleMediaQueryChange)
-        return
-      }
+  function scheduleActivation(): void {
+    if (!isEligible()) {
+      deactivate()
+      return
     }
+
+    window.removeEventListener('load', handleWindowLoad)
 
     if (
       !toValue(options.enabled)
@@ -73,9 +76,26 @@ export function useDeferredVideoSource(options: DeferredVideoSourceOptions) {
     window.addEventListener('load', handleWindowLoad, { once: true })
   }
 
-  onMounted(schedule)
+  function handleEligibilityChange(): void {
+    scheduleActivation()
+  }
+
+  onMounted(() => {
+    reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reducedMotionQuery.addEventListener('change', handleEligibilityChange)
+
+    const minWidth = toValue(options.minWidth)
+
+    if (minWidth > 0) {
+      widthQuery = window.matchMedia(`(min-width: ${minWidth}px)`)
+      widthQuery.addEventListener('change', handleEligibilityChange)
+    }
+
+    scheduleActivation()
+  })
   onBeforeUnmount(() => {
-    mediaQuery?.removeEventListener('change', handleMediaQueryChange)
+    reducedMotionQuery?.removeEventListener('change', handleEligibilityChange)
+    widthQuery?.removeEventListener('change', handleEligibilityChange)
     window.removeEventListener('load', handleWindowLoad)
 
     if (animationFrame !== undefined) cancelAnimationFrame(animationFrame)

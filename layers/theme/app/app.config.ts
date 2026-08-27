@@ -183,7 +183,7 @@ export default defineAppConfig({
       },
       rounded: 'rounded-xl',
       video: {
-        loadMinWidth: 768,
+        loadMinWidth: 0,
         loadStrategy: 'after-load',
         wrapper: 'w-full',
       },
