@@ -599,10 +599,8 @@ export function useDrupalViewControls(
         return
       }
 
-      if (
-        !routePathChanged(fullPath, oldFullPath)
-        && !managedRouteQueryChanged(fullPath, oldFullPath)
-      ) return
+      if (routePathChanged(fullPath, oldFullPath)) return
+      if (!managedRouteQueryChanged(fullPath, oldFullPath)) return
 
       const page = applyRouteStateToControls()
 
