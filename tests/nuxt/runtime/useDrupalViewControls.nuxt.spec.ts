@@ -290,7 +290,7 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     expect(state.api).toHaveBeenCalledTimes(callsBeforeForeignChange + 1)
   })
 
-  it('refreshes a surviving view when the route path changes', async () => {
+  it('does not refresh the outgoing view when the route path changes', async () => {
     state.legacyApi.mockResolvedValue(viewResponse(1, 'route-row'))
     await resetRoute({ articles_page: '1' }, '/a')
     await mountSuspended(NamespacedLegacyViewControlsHarness)
@@ -299,7 +299,7 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
 
     await resetRoute({ articles_page: '1' }, '/b')
 
-    expect(state.legacyApi).toHaveBeenCalledWith(
+    expect(state.legacyApi).not.toHaveBeenCalledWith(
       '/b?category=events&sort_by=created&sort_order=ASC&page=1',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
