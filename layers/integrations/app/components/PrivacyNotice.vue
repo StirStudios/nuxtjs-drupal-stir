@@ -177,7 +177,7 @@ watchEffect(() => {
           aria-label="Dismiss cookie notice"
           color="neutral"
           icon="i-lucide-x"
-          size="xs"
+          size="sm"
           square
           variant="ghost"
           @click="dismiss"
@@ -226,11 +226,11 @@ watchEffect(() => {
           v-if="isConsentMode"
           color="neutral"
           :label="declineButtonLabel"
-          size="xs"
+          size="sm"
           variant="soft"
           @click="decline"
         />
-        <UButton :label="primaryButtonLabel" size="xs" @click="accept" />
+        <UButton :label="primaryButtonLabel" size="sm" @click="accept" />
       </template>
     </UCard>
   </div>
