@@ -12,9 +12,6 @@ export const nuxtUiTheme = {
   },
 
   button: {
-    slots: {
-      base: 'transition-all duration-300',
-    },
     variants: {
       size: {
         '2xl': {
@@ -27,16 +24,7 @@ export const nuxtUiTheme = {
     },
   },
 
-  modal: {
-    slots: {
-      title: 'mb-0',
-    },
-  },
-
   carousel: {
-    slots: {
-      root: 'relative focus:outline-none',
-    },
     variants: {
       orientation: {
         horizontal: {
@@ -108,7 +96,6 @@ export const nuxtUiTheme = {
     },
     defaultVariants: {
       size: 'xl',
-      variant: 'material',
     },
   },
 } as const
