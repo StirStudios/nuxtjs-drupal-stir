@@ -38,6 +38,9 @@ type PrivacyNoticeConfig = {
 type PopupConfig = {
   enabled?: boolean
   component?: string
+  dismissalTtlDays?: number
+  suppressedPaths?: string[]
+  suppressedPathPrefixes?: string[]
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {
