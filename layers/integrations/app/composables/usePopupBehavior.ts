@@ -8,7 +8,69 @@ type PopupBehaviorConfig = {
 
 type PopupLike = {
   props?: {
+    id?: string | number
     uuid?: string
+  }
+}
+
+type PopupAppConfig = {
+  dismissalTtlDays?: number
+}
+
+const POPUP_DISMISSALS_STORAGE_KEY = 'stir:marketing-popup-dismissals'
+const DEFAULT_DISMISSAL_TTL_DAYS = 14
+const POPUP_COMPLETED = 'completed'
+
+export type PopupSuppression = number | typeof POPUP_COMPLETED
+
+function popupDismissKey(popup: PopupLike | null): string | null {
+  const uuid = popup?.props?.uuid
+
+  if (typeof uuid === 'string' && uuid.trim()) return uuid.trim()
+
+  const id = popup?.props?.id
+
+  return typeof id === 'string' || typeof id === 'number' ? String(id) : null
+}
+
+export function popupUsesPersistentDismissal(popup: PopupLike | null): boolean {
+  return popupDismissKey(popup) !== null
+}
+
+export function popupSuppressionIsActive(
+  suppression: PopupSuppression | undefined,
+  now = Date.now(),
+): boolean {
+  return suppression === POPUP_COMPLETED
+    || (typeof suppression === 'number' && suppression > now)
+}
+
+function readDismissals(now = Date.now()): Record<string, PopupSuppression> {
+  if (!import.meta.client) return {}
+
+  try {
+    const parsed = JSON.parse(localStorage.getItem(POPUP_DISMISSALS_STORAGE_KEY) || '{}') as Record<string, unknown>
+
+    return Object.fromEntries(Object.entries(parsed).filter(
+      (entry): entry is [string, PopupSuppression] => (
+        entry[1] === POPUP_COMPLETED
+        || (typeof entry[1] === 'number' && entry[1] > now)
+      ),
+    ))
+  }
+  catch {
+    return {}
+  }
+}
+
+function writeDismissals(dismissals: Record<string, PopupSuppression>) {
+  if (!import.meta.client) return
+
+  try {
+    localStorage.setItem(POPUP_DISMISSALS_STORAGE_KEY, JSON.stringify(dismissals))
+  }
+  catch {
+    // Storage can be unavailable in restricted browsing contexts.
   }
 }
 
@@ -25,13 +87,28 @@ export const usePopupBehavior = ({
   suppress,
   minDelayMs = 3000,
 }: PopupBehaviorOptions) => {
+  const appConfig = useAppConfig()
   const route = useRoute()
   const { y } = useWindowScroll()
 
   const open = ref(false)
   const hasTriggered = ref(false)
+  const dismissalReady = ref(!import.meta.client)
+  const dismissedPopups = ref<Record<string, PopupSuppression>>({})
   const readyForPopupTriggers = ref(!import.meta.client)
-  const isSuppressed = computed(() => suppress?.value === true)
+  const popupConfig = computed(() => (appConfig.popup || {}) as PopupAppConfig)
+  const dismissalKey = computed(() => popupDismissKey(popup.value))
+  const isPersistentlyDismissed = computed(() => {
+    if (!dismissalKey.value) return false
+    const suppression = dismissedPopups.value[dismissalKey.value]
+
+    return popupSuppressionIsActive(suppression)
+  })
+  const isSuppressed = computed(() => (
+    suppress?.value === true
+    || isPersistentlyDismissed.value
+    || (popupUsesPersistentDismissal(popup.value) && !dismissalReady.value)
+  ))
   const shouldRenderPopupContent = computed(() => open.value)
 
   let delayTimer: ReturnType<typeof setTimeout> | null = null
@@ -41,6 +118,7 @@ export const usePopupBehavior = ({
   let hasPointerEnteredDocument = false
   let idleTimer: ReturnType<typeof setTimeout> | null = null
   let removeReadyListeners: (() => void) | null = null
+  let closeReason: 'completed' | 'dismissed' | 'suppressed' | null = null
 
   const cleanupTriggerHandlers = () => {
     if (delayTimer) {
@@ -131,6 +209,42 @@ export const usePopupBehavior = ({
     if (open.value) return
 
     open.value = true
+  }
+
+  const markPopupDismissed = () => {
+    if (!dismissalKey.value) return
+    if (dismissedPopups.value[dismissalKey.value] === POPUP_COMPLETED) return
+
+    const configuredDays = popupConfig.value.dismissalTtlDays
+    const ttlDays = typeof configuredDays === 'number' && configuredDays > 0
+      ? configuredDays
+      : DEFAULT_DISMISSAL_TTL_DAYS
+
+    dismissedPopups.value = {
+      ...dismissedPopups.value,
+      [dismissalKey.value]: Date.now() + ttlDays * 24 * 60 * 60 * 1000,
+    }
+    writeDismissals(dismissedPopups.value)
+  }
+
+  const markPopupCompleted = () => {
+    if (!dismissalKey.value) return
+
+    dismissedPopups.value = {
+      ...dismissedPopups.value,
+      [dismissalKey.value]: POPUP_COMPLETED,
+    }
+    writeDismissals(dismissedPopups.value)
+  }
+
+  const dismissPopup = () => {
+    closeReason = 'dismissed'
+    open.value = false
+  }
+
+  const completePopup = () => {
+    closeReason = 'completed'
+    open.value = false
   }
 
   const startDelayTrigger = () => {
@@ -242,12 +356,30 @@ export const usePopupBehavior = ({
 
   watch(isSuppressed, (suppressed) => {
     if (suppressed) {
+      if (open.value) closeReason = 'suppressed'
       open.value = false
       cleanupTriggerHandlers()
     }
   })
 
+  watch(open, (value, oldValue) => {
+    if (value && !oldValue) closeReason = null
+
+    if (oldValue && !value) {
+      if (closeReason === 'completed') {
+        markPopupCompleted()
+      }
+      else if (closeReason !== 'suppressed') {
+        markPopupDismissed()
+      }
+
+      closeReason = null
+    }
+  })
+
   onMounted(() => {
+    dismissedPopups.value = readDismissals()
+    dismissalReady.value = true
     setupReadyForPopupTriggers()
   })
 
@@ -257,6 +389,8 @@ export const usePopupBehavior = ({
   })
 
   return {
+    completePopup,
+    dismissPopup,
     open,
     shouldRenderPopupContent,
   }

@@ -22,5 +22,6 @@ export default defineAppConfig({
   popup: {
     enabled: false,
     component: '',
+    dismissalTtlDays: 14,
   },
 } as unknown as AppConfigInput)

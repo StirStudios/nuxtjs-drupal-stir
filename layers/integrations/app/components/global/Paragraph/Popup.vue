@@ -14,6 +14,7 @@ const props = defineProps<{
 
   direction?: string
   onClose?: () => void
+  onComplete?: () => void
 
   editLink?: string
 }>()
@@ -37,7 +38,7 @@ const trustedTextHtml = computed(() => trustedDrupalHtml(props.text))
       />
       <ParagraphWebform
         v-if="props.webform"
-        :on-close="props.onClose"
+        :on-close="props.onComplete"
         :webform="props.webform"
       />
     </div>

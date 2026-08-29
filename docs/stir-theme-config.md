@@ -232,11 +232,15 @@ loader URL. UserWay remains ungated as an accessibility-essential service.
 ```ts
 popup: {
   enabled: false, // global mount switch for <LazyAppPopup />
+  dismissalTtlDays: 14, // days before a dismissed campaign may appear again
 }
 ```
 
 Popup visibility should be controlled in Drupal block visibility settings
 (Show/Hide for listed pages). Nuxt no longer applies route allow/block lists.
+`dismissalTtlDays` accepts a positive number and falls back to 14 when omitted
+or invalid. A successful form completion suppresses that campaign permanently;
+closing it without completing the form uses the timed dismissal.
 
 ### 🍪 `privacyNotice`
 

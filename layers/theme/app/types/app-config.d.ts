@@ -38,6 +38,7 @@ type PrivacyNoticeConfig = {
 type PopupConfig = {
   enabled?: boolean
   component?: string
+  dismissalTtlDays?: number
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {
