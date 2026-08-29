@@ -10,7 +10,6 @@ type PopupLike = {
   props?: {
     id?: string | number
     uuid?: string
-    popupOnce?: boolean
   }
 }
 
@@ -55,6 +54,10 @@ function popupDismissKey(popup: PopupLike | null): string | null {
   const id = popup?.props?.id
 
   return typeof id === 'string' || typeof id === 'number' ? String(id) : null
+}
+
+export function popupUsesPersistentDismissal(popup: PopupLike | null): boolean {
+  return popupDismissKey(popup) !== null
 }
 
 function readDismissals(now = Date.now()): Record<string, number> {
@@ -110,7 +113,7 @@ export const usePopupBehavior = ({
   const popupConfig = computed(() => (appConfig.popup || {}) as PopupAppConfig)
   const dismissalKey = computed(() => popupDismissKey(popup.value))
   const isPersistentlyDismissed = computed(() => {
-    if (popup.value?.props?.popupOnce !== true || !dismissalKey.value) return false
+    if (!dismissalKey.value) return false
     return (dismissedPopups.value[dismissalKey.value] || 0) > Date.now()
   })
   const isRouteSuppressed = computed(() => popupRouteIsSuppressed(
@@ -122,7 +125,7 @@ export const usePopupBehavior = ({
     suppress?.value === true
     || isRouteSuppressed.value
     || isPersistentlyDismissed.value
-    || (popup.value?.props?.popupOnce === true && !dismissalReady.value)
+    || (popupUsesPersistentDismissal(popup.value) && !dismissalReady.value)
   ))
   const shouldRenderPopupContent = computed(() => open.value)
 
@@ -226,7 +229,7 @@ export const usePopupBehavior = ({
   }
 
   const markPopupDismissed = () => {
-    if (popup.value?.props?.popupOnce !== true || !dismissalKey.value) return
+    if (!dismissalKey.value) return
 
     const configuredDays = popupConfig.value.dismissalTtlDays
     const ttlDays = typeof configuredDays === 'number' && configuredDays > 0
