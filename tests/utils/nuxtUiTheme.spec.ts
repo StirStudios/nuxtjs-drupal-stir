@@ -61,7 +61,7 @@ describe('Nuxt UI theme preset', () => {
 
   it('inherits Nuxt UI interaction and default field presentation', () => {
     expect(nuxtUiTheme.button).not.toHaveProperty('slots')
-    expect(nuxtUiTheme).not.toHaveProperty('modal')
+    expect(nuxtUiTheme.modal.slots.title).toBe('text-xl font-semibold')
     expect(nuxtUiTheme.carousel).not.toHaveProperty('slots')
     expect(nuxtUiTheme.textarea.defaultVariants).not.toHaveProperty('variant')
   })
