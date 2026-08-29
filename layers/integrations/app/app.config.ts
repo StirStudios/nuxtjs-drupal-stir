@@ -22,8 +22,6 @@ export default defineAppConfig({
   popup: {
     enabled: false,
     component: '',
-    dismissalTtlDays: 30,
-    suppressedPaths: ['/pricing/checkout'],
-    suppressedPathPrefixes: ['/account', '/auth'],
+    dismissalTtlDays: 14,
   },
 } as unknown as AppConfigInput)

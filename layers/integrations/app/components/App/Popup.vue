@@ -16,7 +16,7 @@ function getPopupProps(node: PopupNode | null): PopupProps {
 const hasPopup = computed(() => !!popup.value)
 const popupProps = computed(() => getPopupProps(popup.value))
 
-const { open, shouldRenderPopupContent } = usePopupBehavior({
+const { completePopup, dismissPopup, open, shouldRenderPopupContent } = usePopupBehavior({
   popup,
   config,
 })
@@ -70,10 +70,6 @@ const popupRenderProps = computed(() => {
 const selectedMedia = ref<PopupMedia | null>(null)
 const portal = useOverlayPortal()
 
-const closeModal = () => {
-  open.value = false
-}
-
 watch(
   () => popup.value?.props?.uuid,
   () => {
@@ -123,14 +119,14 @@ watch(open, (isOpen) => {
             color="neutral"
             icon="i-lucide-x"
             variant="solid"
-            @click="closeModal"
+            @click="dismissPopup"
           />
 
           <component
             :is="popupComponent"
             v-if="popupRenderProps"
             v-bind="popupRenderProps"
-            :on-close="closeModal"
+            :on-close="completePopup"
           >
             <template #media>
               <component
