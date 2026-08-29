@@ -97,6 +97,12 @@ function clearDateRange(): void {
       icon="i-lucide-calendar"
       :label="buttonLabel"
       trailing-icon="i-lucide-chevron-down"
+      :ui="{
+        base: 'min-w-40 justify-between rounded-md px-3 py-2 text-base font-normal gap-2',
+        leadingIcon: 'size-6 text-dimmed',
+        trailingIcon: 'size-6 text-dimmed',
+        label: calendarValue.start ? 'text-highlighted' : 'text-dimmed',
+      }"
       variant="outline"
     />
 

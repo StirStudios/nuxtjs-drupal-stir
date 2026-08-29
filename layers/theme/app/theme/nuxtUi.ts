@@ -88,6 +88,12 @@ export const nuxtUiTheme = {
     },
   },
 
+  modal: {
+    slots: {
+      title: 'text-xl font-semibold',
+    },
+  },
+
   textarea: {
     variants: {
       variant: {
