@@ -126,7 +126,8 @@ watch(open, (isOpen) => {
             :is="popupComponent"
             v-if="popupRenderProps"
             v-bind="popupRenderProps"
-            :on-close="completePopup"
+            :on-close="dismissPopup"
+            :on-complete="completePopup"
           >
             <template #media>
               <component
