@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { defineComponent } from 'vue'
+import { defineComponent, h } from 'vue'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
 
 const NavLockHarness = defineComponent({
@@ -19,16 +19,44 @@ describe('useNavLock', () => {
     const wrapper = await mountSuspended(NavLockHarness)
     const nuxtApp = useNuxtApp()
 
-    await nuxtApp.callHook('page:start')
+    await nuxtApp.callHook('page:loading:start')
     expect(wrapper.vm.locked).toBe(true)
 
-    await nuxtApp.callHook('page:finish')
+    await nuxtApp.callHook('page:loading:end')
     expect(wrapper.vm.locked).toBe(false)
 
-    await nuxtApp.callHook('page:start')
+    await nuxtApp.callHook('page:loading:start')
     await nuxtApp.callHook('app:error', new Error('Navigation failed.'))
     expect(wrapper.vm.locked).toBe(false)
 
+    wrapper.unmount()
+  })
+
+  it('locks before route-derived state changes', async () => {
+    const wrapper = await mountSuspended(NavLockHarness)
+    const router = useRouter()
+    const routeName = 'nav-lock-timing-target'
+    const routePath = '/nav-lock-timing-target'
+    let lockedInsideGuard = false
+
+    router.addRoute({
+      name: routeName,
+      path: routePath,
+      component: defineComponent({
+        render: () => h('div', 'Navigation target'),
+      }),
+    })
+
+    const removeGuard = router.beforeEach(() => {
+      lockedInsideGuard = wrapper.vm.locked
+    })
+
+    await router.push(routePath)
+
+    expect(lockedInsideGuard).toBe(true)
+
+    removeGuard()
+    router.removeRoute(routeName)
     wrapper.unmount()
   })
 
