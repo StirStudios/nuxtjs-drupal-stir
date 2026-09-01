@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
   try {
     return await layerAuthDrupalApiRequest(event, '/api/auth/verify', {
       method: 'POST',
+      forwardCookies: true,
       body: {
         uid,
         timestamp,

@@ -746,13 +746,13 @@
     "serverRoutes": 28,
     "productionDependencies": 38,
     "developmentDependencies": 27,
-    "tests": 151,
+    "tests": 152,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 52,
       "scripts": 1,
-      "server": 25,
+      "server": 26,
       "unit": 10,
       "utils": 49
     }
@@ -830,6 +830,7 @@
     "tests/server/authLogin.spec.ts",
     "tests/server/authSession.spec.ts",
     "tests/server/authUiConfigApi.spec.ts",
+    "tests/server/authVerify.spec.ts",
     "tests/server/componentTree.spec.ts",
     "tests/server/drupalCeProxy.spec.ts",
     "tests/server/drupalOneTimeLoginRedirect.spec.ts",
