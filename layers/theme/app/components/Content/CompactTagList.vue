@@ -74,7 +74,7 @@ function linkAttrs(item: CompactTag) {
       :is="itemComponent(item)"
       v-for="item in visibleItems"
       :key="itemKey(item, 'tag')"
-      class="relative z-20 min-w-0 shrink"
+      class="relative z-20 inline-flex min-h-6 min-w-0 shrink items-center"
       v-bind="linkAttrs(item)"
     >
       <UBadge
