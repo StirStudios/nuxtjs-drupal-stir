@@ -258,7 +258,10 @@ onMounted(() => {
   >
     <USkeleton
       v-if="isSourceDeferred || !isLoaded"
+      aria-hidden="true"
+      aria-live="off"
       class="absolute inset-0 z-0 h-full w-full rounded-none"
+      role="presentation"
     />
 
     <ProviderImage

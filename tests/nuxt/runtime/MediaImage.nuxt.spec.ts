@@ -236,4 +236,25 @@ describe('MediaImage (Nuxt runtime)', () => {
       'aspect-ratio: 600 / 800',
     )
   })
+
+  it('keeps visual image placeholders out of the accessibility tree', async () => {
+    const complete = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get')
+      .mockReturnValue(false)
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        props: {
+          alt: 'Example image',
+          src: '/image.webp',
+        },
+      })
+
+      expect(wrapper.get('[aria-hidden="true"]').classes()).toContain('animate-pulse')
+      expect(wrapper.get('[aria-hidden="true"]').attributes('role')).toBe('presentation')
+      expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+    }
+    finally {
+      complete.mockRestore()
+    }
+  })
 })

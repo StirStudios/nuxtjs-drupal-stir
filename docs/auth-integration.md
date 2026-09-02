@@ -35,6 +35,33 @@ From `stir_account`:
 - UI auth state must always come from `GET /api/auth/session`.
 - Do not maintain parallel client auth stores that can drift from server session state.
 
+## Authenticated rendering and navigation
+
+HTML requests carrying a configured Drupal session cookie are rendered with
+`event.context.nuxt.noSSR = true` and `Cache-Control: private, no-store`. This
+keeps authenticated Drupal output out of shared SSR caches; it does not turn
+internal Nuxt links into document navigations.
+
+Nuxt client navigation follows the framework's native Suspense contract:
+
+- awaited `useAsyncData`/`useFetch` blocks navigation and retains the current
+  page until the destination resolves;
+- `useLazyAsyncData`, `useLazyFetch`, or `lazy: true` commits the destination
+  immediately, so the destination must render a localized pending state;
+- the SPA loading template is only the initial document fallback for a
+  client-rendered response and cannot retain a previous in-memory page.
+
+Shared route-derived presentation must use `useNavLockedSnapshot()`. The
+navigation lock begins at Nuxt's `page:loading:start` hook, before route
+resolution, and ends at `page:loading:end`. Do not replace this with
+`page:start`: that hook represents the later NuxtPage Suspense pending event and
+can allow headers, heroes, or active context to advance while the prior page is
+still visible.
+
+Choose blocking versus lazy data per experience. Do not globally convert
+authenticated data to lazy loading, and do not cache session-bearing responses
+as a substitute for slow Drupal endpoints.
+
 ## Cookie-authenticated CSRF
 
 The shared Nitro Drupal client automatically fetches `/session/token` with the

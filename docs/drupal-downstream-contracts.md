@@ -74,6 +74,13 @@ Validated anonymous responses retain Drupal's public validators and cache
 policy. Personalized, session-bearing, session-setting, upstream-error, and
 invalid-contract responses are always private and `no-store` at the Nuxt edge.
 
+Measure Drupal time-to-first-byte separately from Nuxt route timing. A retained
+page or localized skeleton improves continuity but does not make a slow Drupal
+listing response faster. Optimize the Drupal query, serialization, cache tags,
+and anonymous cacheability at the producer; preserve private/no-store handling
+for requests whose response includes favorites, progress, access, edit links,
+or other user-specific data.
+
 ## Media discovery and rendering
 
 Media helpers normalize supported Drupal media types before consumers inspect or render media nodes.

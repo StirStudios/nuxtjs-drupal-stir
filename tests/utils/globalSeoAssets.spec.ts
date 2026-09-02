@@ -39,6 +39,28 @@ describe('prepareGlobalSeoAssets', () => {
     }, () => '/_ipx/f_jpeg/og.jpg', 'https://www.example.com')
 
     expect(result.meta[0]?.content).toBe('https://www.example.com/_ipx/f_jpeg/og.jpg')
+    expect(result.meta).toContainEqual({ property: 'og:image:type', content: 'image/jpeg' })
+    expect(result.meta).toContainEqual({ property: 'og:image:width', content: '1200' })
+    expect(result.meta).toContainEqual({ property: 'og:image:height', content: '630' })
+  })
+
+  it('replaces stale Drupal dimensions with the published rendition facts', () => {
+    const stale: GlobalSeoResponse = {
+      ...response,
+      meta: [
+        ...response.meta,
+        { property: 'og:image:type', content: 'image/png' },
+        { property: 'og:image:width', content: '180' },
+        { property: 'og:image:height', content: '180' },
+      ],
+    }
+    const result = prepareGlobalSeoAssets(stale, {
+      socialImage: { enabled: true, format: 'webp', width: 1600, height: 900 },
+    }, source => source, 'https://www.example.com')
+
+    expect(result.meta).toContainEqual({ property: 'og:image:type', content: 'image/webp' })
+    expect(result.meta).toContainEqual({ property: 'og:image:width', content: '1600' })
+    expect(result.meta).toContainEqual({ property: 'og:image:height', content: '900' })
   })
 
   it('preserves malformed versioned sources instead of aborting head rendering', () => {
