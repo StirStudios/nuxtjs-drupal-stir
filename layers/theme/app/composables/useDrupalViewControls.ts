@@ -34,15 +34,20 @@ import {
   sanitizeDrupalViewStoredSorts,
 } from '#stir/utils/drupalViewState'
 import type { ViewStateSnapshot } from '#stir/utils/drupalViewState'
+import { resolveDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
 
 export type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 interface UseDrupalViewControlsProps {
+  id?: number | string
+  uuid?: string
   paragraphId?: number | string
+  paragraphUuid?: string
   viewId?: string
   displayId?: string
   parentUuid?: string
   queryNamespace?: string
+  args?: unknown
   pager?: ViewPager | unknown
   exposedFilters?: ExposedFilter[] | unknown[]
   exposedSorts?: ExposedSort[] | unknown[]
@@ -75,12 +80,19 @@ export function useDrupalViewControls(
   let activeAbortController: AbortController | null = null
   let suppressNextRouteRefresh = false
 
+  const resolvedQueryNamespace = computed(() => resolveDrupalViewQueryNamespace({
+    ...props,
+    queryNamespace: props.queryNamespace?.trim()
+      || toValue(inheritedQueryNamespace)?.trim(),
+  }))
+
   function viewStateStorageKeyFor(path = route.path): string {
     return createViewStateStorageKey({
       path,
       viewId: props.viewId,
       displayId: props.displayId,
       parentUuid: props.parentUuid,
+      queryNamespace: resolvedQueryNamespace.value,
     })
   }
 
@@ -89,8 +101,7 @@ export function useDrupalViewControls(
   }
 
   function publicQueryKey(key: string): string {
-    const namespace = props.queryNamespace?.trim()
-      || toValue(inheritedQueryNamespace)?.trim()
+    const namespace = resolvedQueryNamespace.value
 
     return namespace ? `${namespace}_${key}` : key
   }
@@ -612,7 +623,9 @@ export function useDrupalViewControls(
     captureDefaultViewState()
 
     if (routeHasManagedQuery()) {
-      applyRouteStateToControls()
+      const page = applyRouteStateToControls()
+
+      void refreshView(page)
       return
     }
 
@@ -647,6 +660,7 @@ export function useDrupalViewControls(
     sortByOptions,
     sortOrderOptions,
     hasControls,
+    resolvedQueryNamespace,
     refreshView,
     retryCurrentPage,
     onFilterChange,

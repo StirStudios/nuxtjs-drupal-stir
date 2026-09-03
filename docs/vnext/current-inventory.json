@@ -367,6 +367,7 @@
       "layers/theme/app/utils/drupalMediaTypes.ts",
       "layers/theme/app/utils/drupalUrl.ts",
       "layers/theme/app/utils/drupalViewContext.ts",
+      "layers/theme/app/utils/drupalViewQueryNamespace.ts",
       "layers/theme/app/utils/drupalViewState.ts",
       "layers/theme/app/utils/editorialAccess.ts",
       "layers/theme/app/utils/footer.ts",
@@ -692,6 +693,7 @@
         "layers/theme/app/utils/drupalMediaTypes.ts",
         "layers/theme/app/utils/drupalUrl.ts",
         "layers/theme/app/utils/drupalViewContext.ts",
+        "layers/theme/app/utils/drupalViewQueryNamespace.ts",
         "layers/theme/app/utils/drupalViewState.ts",
         "layers/theme/app/utils/editorialAccess.ts",
         "layers/theme/app/utils/footer.ts",
@@ -740,13 +742,13 @@
   "counts": {
     "components": 128,
     "composables": 63,
-    "utils": 56,
+    "utils": 57,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 38,
     "developmentDependencies": 27,
-    "tests": 152,
+    "tests": 153,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -754,7 +756,7 @@
       "scripts": 1,
       "server": 26,
       "unit": 10,
-      "utils": 49
+      "utils": 50
     }
   },
   "tests": [
@@ -872,6 +874,7 @@
     "tests/utils/drupalHeaders.spec.ts",
     "tests/utils/drupalLink.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
+    "tests/utils/drupalViewQueryNamespace.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",

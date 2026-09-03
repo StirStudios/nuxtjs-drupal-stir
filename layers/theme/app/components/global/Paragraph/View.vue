@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
+import { resolveDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
 
 const props = defineProps<{
   id?: number | string
@@ -33,7 +34,19 @@ const props = defineProps<{
 
 provide(
   drupalViewQueryNamespaceKey,
-  computed(() => props.queryNamespace?.trim() || undefined),
+  computed(() => {
+    const hasInstanceIdentity = Boolean(
+      props.queryNamespace
+      || props.paragraphUuid
+      || props.uuid
+      || props.paragraphId
+      || props.id,
+    )
+
+    return hasInstanceIdentity
+      ? resolveDrupalViewQueryNamespace(props)
+      : undefined
+  }),
 )
 </script>
 

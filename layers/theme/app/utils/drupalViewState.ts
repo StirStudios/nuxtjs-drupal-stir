@@ -20,6 +20,7 @@ export interface ViewStateStorageIdentity {
   viewId?: string
   displayId?: string
   parentUuid?: string
+  queryNamespace?: string
 }
 
 export const VIEW_STATE_MAX_AGE_MS = 30 * 60 * 1000
@@ -109,6 +110,7 @@ export function createViewStateStorageKey(
     identity.viewId || '',
     identity.displayId || '',
     identity.parentUuid || '',
+    identity.queryNamespace || '',
   ].join(':')
 }
 

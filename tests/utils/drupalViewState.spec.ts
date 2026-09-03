@@ -44,8 +44,9 @@ describe('Drupal view state', () => {
       viewId: 'articles',
       displayId: 'page_1',
       parentUuid: 'parent',
-    })).toBe('stir:view-controls:/articles:articles:page_1:parent')
-    expect(createViewStateStorageKey({ path: '/' })).toBe('stir:view-controls:/:::')
+      queryNamespace: 'articles_parent',
+    })).toBe('stir:view-controls:/articles:articles:page_1:parent:articles_parent')
+    expect(createViewStateStorageKey({ path: '/' })).toBe('stir:view-controls:/::::')
   })
 
   it('clones array values when taking a snapshot', () => {
