@@ -93,6 +93,77 @@ const NamespacedLegacyViewControlsHarness = defineComponent({
   template: '<div />',
 })
 
+const MultiViewControlsHarness = defineComponent({
+  setup() {
+    const work = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 41,
+      viewId: 'work',
+      displayId: 'work_grid',
+    })
+    const testimonials = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 42,
+      viewId: 'testimonials',
+      displayId: 'carousel',
+      pager: {
+        current: 0,
+        totalPages: 1,
+      },
+    })
+
+    return {
+      changeWorkPage: work.onPageChange,
+      testimonialsPage: testimonials.currentPage,
+      testimonialsNamespace: testimonials.resolvedQueryNamespace,
+      workNamespace: work.resolvedQueryNamespace,
+      workPage: work.currentPage,
+    }
+  },
+  template: '<div />',
+})
+
+const DuplicateViewControlsHarness = defineComponent({
+  setup() {
+    const first = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 51,
+    })
+    const second = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 52,
+    })
+
+    return {
+      firstNamespace: first.resolvedQueryNamespace,
+      secondNamespace: second.resolvedQueryNamespace,
+    }
+  },
+  template: '<div />',
+})
+
+const TwoPaginatedViewsHarness = defineComponent({
+  setup() {
+    const first = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 61,
+      viewId: 'work',
+    })
+    const second = useDrupalViewControls({
+      ...viewProps,
+      paragraphId: 62,
+      viewId: 'work',
+    })
+
+    return {
+      changeFirstPage: first.onPageChange,
+      firstPage: first.currentPage,
+      secondPage: second.currentPage,
+    }
+  },
+  template: '<div />',
+})
+
 async function resetRoute(query: RouteQuery = {}, path = '/') {
   await useRouter().replace({
     path,
@@ -142,10 +213,10 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(ViewControlsHarness)
 
     await resetRoute({
-      category: 'news',
-      sort_by: 'created',
-      sort_order: 'DESC',
-      page: '2',
+      testimonials_p42_category: 'news',
+      testimonials_p42_sort_by: 'created',
+      testimonials_p42_sort_order: 'DESC',
+      testimonials_p42_page: '2',
     })
     await nextTick()
     await flushPromises()
@@ -163,10 +234,10 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(ViewControlsHarness)
 
     await resetRoute({
-      category: 'news?category=events',
-      sort_by: 'created?sort_by=title',
-      sort_order: 'DESC?sort_order=ASC',
-      page: '2',
+      testimonials_p42_category: 'news?category=events',
+      testimonials_p42_sort_by: 'created?sort_by=title',
+      testimonials_p42_sort_order: 'DESC?sort_order=ASC',
+      testimonials_p42_page: '2',
     })
     await nextTick()
     await flushPromises()
@@ -191,9 +262,9 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     await flushPromises()
 
     expect(useRoute().query).toMatchObject({
-      category: 'news',
-      sort_by: 'created',
-      sort_order: 'ASC',
+      testimonials_p42_category: 'news',
+      testimonials_p42_sort_by: 'created',
+      testimonials_p42_sort_order: 'ASC',
     })
     expect(state.api).toHaveBeenCalledWith(
       '/api/view/42',
@@ -246,6 +317,97 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
         },
       }),
     )
+  })
+
+  it('automatically isolates a paginated View from a carousel View', async () => {
+    state.api.mockResolvedValue(viewResponse(1, 'work-page-2'))
+    const wrapper = await mountSuspended(MultiViewControlsHarness)
+
+    await nextTick()
+    await flushPromises()
+    state.api.mockClear()
+
+    wrapper.vm.changeWorkPage(1)
+    await vi.waitFor(() => {
+      expect(useRoute().query).toMatchObject({ work_p41_page: '1' })
+    })
+    await flushPromises()
+
+    expect(wrapper.vm.workNamespace).toBe('work_p41')
+    expect(wrapper.vm.testimonialsNamespace).toBe('testimonials_p42')
+    expect(wrapper.vm.testimonialsPage).toBe(0)
+    expect(useRoute().query).not.toHaveProperty('testimonials_p42_page')
+    expect(state.api).toHaveBeenCalledTimes(1)
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/41',
+      expect.objectContaining({
+        query: {
+          category: 'events',
+          sort_by: 'created',
+          sort_order: 'ASC',
+          page: '1',
+        },
+      }),
+    )
+  })
+
+  it('restores automatic namespaced state from a direct URL', async () => {
+    const wrapper = await mountSuspended(MultiViewControlsHarness, {
+      route: '/?work_p41_category=news&work_p41_page=2&testimonials_p42_page=0',
+    })
+
+    expect(wrapper.vm.workNamespace).toBe('work_p41')
+    expect(useRoute().query).toMatchObject({ work_p41_page: '2' })
+    await vi.waitFor(() => expect(wrapper.vm.workPage).toBe(2))
+
+    expect(wrapper.vm.workPage).toBe(2)
+    expect(wrapper.vm.testimonialsPage).toBe(0)
+  })
+
+  it('keeps repeated displays of the same Drupal View independent', async () => {
+    const wrapper = await mountSuspended(DuplicateViewControlsHarness)
+
+    expect(wrapper.vm.firstNamespace).toBe('testimonials_p51')
+    expect(wrapper.vm.secondNamespace).toBe('testimonials_p52')
+    expect(wrapper.vm.firstNamespace).not.toBe(wrapper.vm.secondNamespace)
+  })
+
+  it('changes only the selected instance when two paginated Views are present', async () => {
+    state.api.mockResolvedValue({ content: [] })
+    const wrapper = await mountSuspended(TwoPaginatedViewsHarness)
+
+    state.api.mockClear()
+
+    wrapper.vm.changeFirstPage(2)
+    await vi.waitFor(() => {
+      expect(useRoute().query).toMatchObject({ work_p61_page: '2' })
+    })
+    await flushPromises()
+
+    expect(wrapper.vm.firstPage).toBe(2)
+    expect(wrapper.vm.secondPage).toBe(0)
+    expect(useRoute().query).not.toHaveProperty('work_p62_page')
+    expect(state.api).toHaveBeenCalledTimes(1)
+    expect(state.api.mock.calls[0]?.[0]).toBe('/api/view/61')
+  })
+
+  it('restores only the matching View during back and forward navigation', async () => {
+    state.api.mockResolvedValue({ content: [] })
+    const wrapper = await mountSuspended(MultiViewControlsHarness)
+    const router = useRouter()
+
+    await router.push({ query: { work_p41_page: '1' } })
+    await vi.waitFor(() => expect(wrapper.vm.workPage).toBe(1))
+    await router.push({ query: { work_p41_page: '2' } })
+    await vi.waitFor(() => expect(wrapper.vm.workPage).toBe(2))
+
+    router.back()
+    await vi.waitFor(() => expect(wrapper.vm.workPage).toBe(1))
+    expect(wrapper.vm.testimonialsPage).toBe(0)
+
+    router.forward()
+    await vi.waitFor(() => expect(wrapper.vm.workPage).toBe(2))
+    expect(wrapper.vm.testimonialsPage).toBe(0)
   })
 
   it('restores namespaced route controls independently', async () => {

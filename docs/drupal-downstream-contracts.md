@@ -147,4 +147,13 @@ Recommended smoke checks:
 - Main menu endpoint returns JSON.
 - App-context edit links behave correctly for authenticated and anonymous users.
 - A Drupal view block with exposed filters still filters, sorts, paginates, and restores browser history correctly.
-- When multiple Drupal Views share a route, give each View instance a readable `queryNamespace` (for example, `articles` or `resources`) so public controls use independent keys such as `articles_page`; Drupal requests continue to receive their original exposed-filter keys.
+- Drupal View controls are automatically namespaced from the stable paragraph
+  UUID/ID. If those identifiers are unavailable, the layer uses a deterministic
+  View ID, display ID, and contextual-arguments fallback. An explicit
+  `queryNamespace` remains available as an override, but downstream
+  `cloneVNode()` workarounds are not required.
+- Public View-control URLs now use namespaced keys such as
+  `work_a0b1c2d3_page=1`. Drupal requests still receive their original keys,
+  such as `page=1`. Existing bookmarks that use unnamespaced keys such as
+  `page=1` should be regenerated or redirected to the corresponding namespaced
+  URL when upgrading.
