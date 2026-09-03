@@ -352,8 +352,9 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
   })
 
   it('restores automatic namespaced state from a direct URL', async () => {
+    state.api.mockResolvedValue({ content: [] })
     const wrapper = await mountSuspended(MultiViewControlsHarness, {
-      route: '/?work_p41_category=news&work_p41_page=2&testimonials_p42_page=0',
+      route: '/?work_p41_category=news&work_p41_page=2',
     })
 
     expect(wrapper.vm.workNamespace).toBe('work_p41')
@@ -362,6 +363,18 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
 
     expect(wrapper.vm.workPage).toBe(2)
     expect(wrapper.vm.testimonialsPage).toBe(0)
+    expect(state.api).toHaveBeenCalledTimes(1)
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/41',
+      expect.objectContaining({
+        query: {
+          category: 'news',
+          sort_by: 'created',
+          sort_order: 'ASC',
+          page: '2',
+        },
+      }),
+    )
   })
 
   it('keeps repeated displays of the same Drupal View independent', async () => {
