@@ -966,6 +966,10 @@ describe('layer contract', () => {
       resolve(rootDir, 'layers/analytics/app/app.config.ts'),
       'utf8',
     )
+    const analyticsNuxtConfig = readFileSync(
+      resolve(rootDir, 'layers/analytics/nuxt.config.ts'),
+      'utf8',
+    )
     const scriptsConfig = readFileSync(
       resolve(rootDir, 'layers/scripts/app/app.config.ts'),
       'utf8',
@@ -980,6 +984,9 @@ describe('layer contract', () => {
     expect(themeConfig).not.toContain('privacyNotice:')
     expect(themeConfig).not.toContain('popup:')
     expect(analyticsConfig).toContain('plausible:')
+    expect(analyticsNuxtConfig).toContain('autoOutboundTracking: true')
+    expect(analyticsNuxtConfig).toContain('fileDownloads: true')
+    expect(analyticsNuxtConfig).toContain('formSubmissions: true')
     expect(scriptsConfig).toContain('userway:')
     expect(integrationsConfig).toContain('privacyNotice:')
     expect(integrationsConfig).toContain('popup:')
