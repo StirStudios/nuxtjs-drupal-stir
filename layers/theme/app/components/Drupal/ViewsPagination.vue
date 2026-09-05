@@ -1,14 +1,21 @@
 <script setup lang="ts">
+interface PaginationDestination {
+  path: string
+  query: Record<string, string | string[]>
+}
+
 const props = withDefaults(
   defineProps<{
     current?: number
     totalPages?: number
     siblingCount?: number
+    to?: (page: number) => PaginationDestination
   }>(),
   {
     current: 0,
     totalPages: 0,
     siblingCount: 1,
+    to: undefined,
   },
 )
 
@@ -34,6 +41,7 @@ const page = computed({
     :items-per-page="1"
     show-edges
     :sibling-count="siblingCount"
+    :to="to"
     :total="totalPages"
     :ui="{
       root: 'mt-8 flex justify-center',

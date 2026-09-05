@@ -61,6 +61,7 @@ const {
   sortByOptions,
   sortOrderOptions,
   hasControls,
+  pageLink,
   retryCurrentPage,
   onFilterChange,
   onSortChange,
@@ -300,6 +301,7 @@ const getRowMotionProps = (index: number) =>
       v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
       class="mt-8"
       :current="currentPage"
+      :to="pageLink"
       :total-pages="effectivePager.totalPages"
       @update:current="onPageChange"
     />

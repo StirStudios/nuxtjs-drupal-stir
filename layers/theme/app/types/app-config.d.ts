@@ -159,6 +159,7 @@ type StirThemeNavigationConfig = {
 
 type StirThemeHeroConfig = {
   base?: ClassValue
+  mediaAppearance?: ClassValue
   mediaSpacing?: ClassValue
   noMediaSpacing?: ClassValue
   noMediaFallback?: ClassValue

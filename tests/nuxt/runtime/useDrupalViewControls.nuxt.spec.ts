@@ -208,6 +208,35 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     await resetRoute()
   })
 
+  it('builds crawlable page links from the active Drupal View state', async () => {
+    const wrapper = await mountSuspended(ViewControlsHarness, {
+      route: '/work?campaign=portfolio',
+    })
+
+    await nextTick()
+
+    expect(wrapper.vm.pageLink(2)).toEqual({
+      path: '/work',
+      query: {
+        campaign: 'portfolio',
+        testimonials_p42_category: 'events',
+        testimonials_p42_sort_by: 'created',
+        testimonials_p42_sort_order: 'ASC',
+        testimonials_p42_page: '1',
+      },
+    })
+
+    expect(wrapper.vm.pageLink(1)).toEqual({
+      path: '/work',
+      query: {
+        campaign: 'portfolio',
+        testimonials_p42_category: 'events',
+        testimonials_p42_sort_by: 'created',
+        testimonials_p42_sort_order: 'ASC',
+      },
+    })
+  })
+
   it('applies safe route query values after route changes', async () => {
     state.api.mockResolvedValue(viewResponse(2, 'route-row'))
     const wrapper = await mountSuspended(ViewControlsHarness)

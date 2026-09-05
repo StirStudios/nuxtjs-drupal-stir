@@ -14,6 +14,7 @@ describe('shared theme typography and containment', () => {
   it('contains page motion without clipping every section', () => {
     expect(source('assets/css/base.css')).not.toContain('overflow-x-clip')
     expect(source('layouts/default.vue')).toContain('flex-col overflow-x-clip')
+    expect(source('layouts/clear.vue')).toContain('flex-col overflow-x-clip')
   })
 
   it('respects reduced motion for menu panels and media zoom', () => {

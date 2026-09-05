@@ -457,6 +457,18 @@ export function useDrupalViewControls(
     })
   }
 
+  function pageLink(page: number) {
+    const pageIndex = Math.max(0, page - 1)
+
+    return {
+      path: route.path,
+      query: {
+        ...routeControls.routeQueryExcluding(managedQueryKeys()),
+        ...publicQueryParams(buildQueryParams(pageIndex)),
+      },
+    }
+  }
+
   async function refreshView(page = currentPage.value) {
     if (!import.meta.client) return
 
@@ -661,6 +673,7 @@ export function useDrupalViewControls(
     sortOrderOptions,
     hasControls,
     resolvedQueryNamespace,
+    pageLink,
     refreshView,
     retryCurrentPage,
     onFilterChange,
