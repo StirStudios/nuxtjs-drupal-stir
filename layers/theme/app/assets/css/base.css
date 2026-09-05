@@ -79,7 +79,7 @@
     }
 
     :where(p) {
-      @apply my-5 leading-7 text-pretty;
+      @apply my-5 leading-normal text-pretty;
     }
 
     :where(p:first-of-type) {
@@ -111,7 +111,7 @@
     }
 
     :where(li) {
-      @apply leading-7;
+      @apply leading-normal;
     }
 
     :where(ul:not(.list-none) > li + li, ol:not(.list-none) > li + li) {
