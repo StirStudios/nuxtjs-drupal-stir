@@ -61,6 +61,10 @@ type PlausibleConfig = {
   enabled?: boolean
   domain?: string
   apiHost?: string
+  autoPageviews?: boolean
+  autoOutboundTracking?: boolean
+  fileDownloads?: boolean | { fileExtensions: string[] }
+  formSubmissions?: boolean
 } & LooseRecord
 
 type AnalyticsConfig = {

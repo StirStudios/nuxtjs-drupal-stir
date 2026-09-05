@@ -16,6 +16,9 @@ export default defineNuxtConfig({
         apiHost:
           process.env.NUXT_PUBLIC_PLAUSIBLE_API_HOST || 'https://plausible.io',
         autoPageviews: true,
+        autoOutboundTracking: true,
+        fileDownloads: true,
+        formSubmissions: true,
         proxy: false,
         proxyBaseEndpoint: '/_plausible',
         ignoredHostnames: ['localhost', '127.0.0.1', '::1', 'local'],
