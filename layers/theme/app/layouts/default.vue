@@ -21,7 +21,7 @@ const normalizedNavigationMode = computed<HeaderMode>(() => {
 </script>
 
 <template>
-  <div class="flex min-h-dvh flex-col">
+  <div class="flex min-h-dvh flex-col overflow-x-clip">
     <AppHeader :mode="normalizedNavigationMode" />
 
     <UMain id="main-content" class="flex-1" role="main" tabindex="-1">

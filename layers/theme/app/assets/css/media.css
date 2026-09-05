@@ -1,0 +1,35 @@
+@layer base {
+  figure {
+    > img {
+      @apply mb-4;
+    }
+    figcaption {
+      @apply text-center italic;
+    }
+  }
+
+  :where(.prose, .admin-editor-prose) drupal-media[data-media-type='image'] {
+    @apply mb-5 block w-full;
+
+    > img {
+      @apply float-none m-0 h-auto w-full max-w-full;
+    }
+  }
+
+  :where(.prose, .admin-editor-prose)
+    drupal-media[data-media-type='image']:is(.align-left, .align-right) {
+    @apply sm:w-[calc(50%-0.625rem)] sm:max-w-none;
+  }
+
+  .align-left {
+    @apply mx-auto mb-5 max-w-sm sm:float-left sm:me-5;
+  }
+
+  .align-center {
+    @apply mx-auto my-10 max-w-sm;
+  }
+
+  .align-right {
+    @apply mx-auto mb-5 max-w-sm sm:float-right sm:ms-5;
+  }
+}

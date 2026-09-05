@@ -748,7 +748,7 @@
     "serverRoutes": 28,
     "productionDependencies": 38,
     "developmentDependencies": 27,
-    "tests": 153,
+    "tests": 154,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -756,7 +756,7 @@
       "scripts": 1,
       "server": 26,
       "unit": 10,
-      "utils": 50
+      "utils": 51
     }
   },
   "tests": [
@@ -903,6 +903,7 @@
     "tests/utils/selectionUtils.spec.ts",
     "tests/utils/spaLoaderTheme.spec.ts",
     "tests/utils/spaLoadingTemplate.spec.ts",
+    "tests/utils/themeTypography.spec.ts",
     "tests/utils/thirdPartyScripts.spec.ts",
     "tests/utils/transformUtils.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",

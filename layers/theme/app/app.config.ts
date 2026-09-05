@@ -87,10 +87,11 @@ export default defineAppConfig({
 
     hero: {
       base: 'hero flex items-center justify-center overflow-hidden',
+      mediaAppearance: 'dark text-default',
       mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
       noMediaSpacing: 'pt-20 lg:pt-54',
       noMediaFallback:
-        'bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
+        'dark text-default bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
         'after:to-bg-black-10 relative after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
       isFront: 'h-screen',
@@ -99,7 +100,7 @@ export default defineAppConfig({
         isFront: 'object-cover',
       },
       text: {
-        heading: 'mb-0 text-white',
+        heading: 'mb-0',
         base: 'relative z-10 max-w-6xl p-5 text-center',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },

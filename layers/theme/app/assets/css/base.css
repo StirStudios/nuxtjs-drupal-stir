@@ -79,7 +79,7 @@
     }
 
     :where(p) {
-      @apply my-5 leading-normal text-pretty;
+      @apply my-[1em] leading-normal text-pretty;
     }
 
     :where(p:first-of-type) {
@@ -177,9 +177,5 @@
     :where(thead th) {
       @apply border-muted border-b-2;
     }
-  }
-
-  section {
-    @apply overflow-x-clip;
   }
 }
