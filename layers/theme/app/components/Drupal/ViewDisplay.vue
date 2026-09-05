@@ -62,12 +62,15 @@ const {
   sortOrderOptions,
   hasControls,
   pageLink,
+  resolveInitialView,
   retryCurrentPage,
   onFilterChange,
   onSortChange,
   onPageChange,
   resetControls,
 } = useDrupalViewControls(props, inheritedQueryNamespace)
+
+await resolveInitialView()
 
 const randomizeEnabled = computed(() => {
   if (props.randomize === true) return true
