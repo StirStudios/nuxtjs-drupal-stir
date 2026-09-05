@@ -781,7 +781,7 @@ describe('layer contract', () => {
 
     expect(editableRichText).toContain('const richTextClass = \'prose max-w-none\'')
     expect(baseCss).toContain(':where(.prose, .admin-editor-prose)')
-    expect(baseCss).toMatch(/:where\(p\)\s*\{\s*@apply my-5 leading-normal text-pretty;/)
+    expect(baseCss).toMatch(/:where\(p\)\s*\{\s*@apply my-\[1em\] leading-normal text-pretty;/)
     expect(baseCss).toMatch(/:where\(li\)\s*\{\s*@apply leading-normal;/)
   })
 

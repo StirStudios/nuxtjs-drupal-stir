@@ -31,7 +31,7 @@ defineSlots<{ button?(): unknown }>()
 
   <h1
     v-else-if="pageTitle"
-    class="mb-0 text-white"
+    class="mb-0"
     :class="{ 'sr-only': hideTitle }"
   >
     {{ pageTitle }}

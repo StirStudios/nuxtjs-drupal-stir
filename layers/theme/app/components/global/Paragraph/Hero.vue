@@ -105,6 +105,7 @@ const sectionClasses = computed(() => {
 
   return [
     heroTheme.base,
+    hasMediaSlot.value && heroTheme.mediaAppearance,
 
     pageHideTitleEffective.value && !hasHeroContent && !isFrontEffective.value
       ? heroTheme.hide

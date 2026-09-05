@@ -2,6 +2,8 @@
 
 @import './base';
 @import './utilities';
+@import './media';
+@import './motion';
 @import '#stir-presentation-source';
 
 @theme static {
