@@ -15,6 +15,7 @@ import type { GlobalSeoResponse } from '../../../../seo/shared/types/globalSeo'
 import { prepareGlobalSeoAssets } from '../../../../seo/app/utils/globalSeoAssets'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { getDrupalOrigin } from '../../utils/drupalUrl'
+import { withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
 
 const props = defineProps<{
   forcedLayout?: string
@@ -36,6 +37,17 @@ provide(
 const route = useRoute()
 const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
 const pageRequest = useResolvedPageRequest(route)
+const drupalPageQuery = computed(() => withoutLegacyDrupalViewPage(route.query))
+
+if ('page' in route.query) {
+  await navigateTo(
+    {
+      path: route.path,
+      query: drupalPageQuery.value,
+    },
+    { redirectCode: 301, replace: true },
+  )
+}
 const theme = useAppConfig().stirTheme
 const seoConfig = (useAppConfig().cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
 const image = useImage() as unknown as SeoImageResolver
@@ -57,7 +69,7 @@ const publicOrigin = (() => {
 
 const page = await fetchPage(
   pageRequest.path.value,
-  { query: route.query },
+  { query: drupalPageQuery.value },
   customPageError,
 )
 const pageRenderRevision = ref(0)
@@ -68,7 +80,7 @@ const renderablePageContent = computed(() =>
 provide(
   pageRefreshKey,
   async () => {
-    await refreshPage(page, pageRequest.path.value, { query: route.query })
+    await refreshPage(page, pageRequest.path.value, { query: drupalPageQuery.value })
     pageRenderRevision.value += 1
   },
 )

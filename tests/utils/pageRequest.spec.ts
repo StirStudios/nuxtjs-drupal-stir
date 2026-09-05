@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { resolvePageRequest } from '../../layers/theme/app/utils/pageRequest'
+import {
+  resolvePageRequest,
+  withoutLegacyDrupalViewPage,
+} from '../../layers/theme/app/utils/pageRequest'
 
 describe('resolvePageRequest', () => {
   it('falls back to the homepage while a route path is unavailable', () => {
@@ -27,5 +30,22 @@ describe('resolvePageRequest', () => {
 
     expect(resolved.path).toBe('/contact')
     expect(resolved.key).toBe('/contact')
+  })
+})
+
+describe('withoutLegacyDrupalViewPage', () => {
+  it('ignores the ambiguous plain Drupal pager parameter', () => {
+    expect(withoutLegacyDrupalViewPage({ page: '1', search: 'dance' })).toEqual({
+      search: 'dance',
+    })
+  })
+
+  it('preserves namespaced View pager parameters', () => {
+    const query = {
+      work_adc46254_page: '1',
+      search: 'dance',
+    }
+
+    expect(withoutLegacyDrupalViewPage(query)).toEqual(query)
   })
 })
