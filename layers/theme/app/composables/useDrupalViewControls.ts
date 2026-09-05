@@ -54,6 +54,8 @@ interface UseDrupalViewControlsProps {
   noResults?: string
 }
 
+type ViewPageFetcher = typeof $fetch
+
 export function useDrupalViewControls(
   props: UseDrupalViewControlsProps,
   inheritedQueryNamespace?: MaybeRefOrGetter<string | undefined>,
@@ -79,6 +81,7 @@ export function useDrupalViewControls(
   let activeRequestId = 0
   let activeAbortController: AbortController | null = null
   let suppressNextRouteRefresh = false
+  let initialViewResolved = false
 
   const resolvedQueryNamespace = computed(() => resolveDrupalViewQueryNamespace({
     ...props,
@@ -457,6 +460,96 @@ export function useDrupalViewControls(
     })
   }
 
+  function pageLink(page: number) {
+    const pageIndex = Math.max(0, page - 1)
+
+    return {
+      path: route.path,
+      query: {
+        ...routeControls.routeQueryExcluding(managedQueryKeys()),
+        ...publicQueryParams(buildQueryParams(pageIndex)),
+      },
+    }
+  }
+
+  async function requestViewPage(
+    page: number,
+    fetcher: ViewPageFetcher = $fetch,
+    signal?: AbortSignal,
+  ): Promise<unknown> {
+    const query = buildQueryParams(page)
+    const paragraphId = Number(props.paragraphId)
+
+    if (Number.isInteger(paragraphId) && paragraphId > 0) {
+      return fetcher(`/api/view/${paragraphId}`, { query, signal })
+    }
+
+    const params = buildDrupalViewSearchParams(query)
+    const queryString = params.toString()
+    const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
+    const api = $ceApi()
+
+    return api(requestPath, { signal })
+  }
+
+  function applyViewPageResponse(pageResponse: unknown, page: number): void {
+    const viewNode = findDrupalViewNodeInResponse(pageResponse, props)
+
+    if (!viewNode) {
+      dynamicRows.value = []
+      dynamicPager.value = {
+        current: page,
+        totalPages: 1,
+      }
+      dynamicFilters.value = effectiveFilters.value
+      dynamicSorts.value = effectiveSorts.value
+      dynamicNoResults.value = defaultNoResultsMessage.value
+      loadError.value = ''
+      return
+    }
+
+    const viewNodeProps = getDrupalViewNodeProps(viewNode)
+
+    dynamicRows.value = getDrupalViewNodeRows(viewNode)
+    dynamicPager.value = normalizeDrupalViewPager(viewNodeProps.pager) ?? {
+      current: page,
+      totalPages: 1,
+    }
+    dynamicFilters.value =
+      (viewNodeProps.exposedFilters as ExposedFilter[]) ??
+      effectiveFilters.value
+    dynamicSorts.value =
+      (viewNodeProps.exposedSorts as ExposedSort[]) ?? effectiveSorts.value
+    dynamicNoResults.value = String(
+      viewNodeProps.noResults ?? viewNodeProps.no_results ?? '',
+    )
+
+    currentPage.value = dynamicPager.value.current
+    loadError.value = ''
+  }
+
+  async function resolveInitialView(): Promise<void> {
+    const page = routePageValue()
+
+    if (page === null || page < 1) return
+
+    const queryString = buildDrupalViewSearchParams(buildQueryParams(page)).toString()
+    const key = `drupal-view:${resolvedQueryNamespace.value}:${route.path}:${queryString}`
+    const requestFetch = useRequestFetch() as ViewPageFetcher
+    const { data, error } = await useAsyncData(
+      key,
+      () => requestViewPage(page, requestFetch),
+    )
+
+    if (error.value) {
+      loadError.value = drupalViewLoadErrorMessage(error.value)
+      return
+    }
+
+    applyViewPageResponse(data.value, page)
+    initialViewResolved = true
+  }
+
   async function refreshView(page = currentPage.value) {
     if (!import.meta.client) return
 
@@ -470,59 +563,14 @@ export function useDrupalViewControls(
     dynamicNoResults.value = defaultNoResultsMessage.value
 
     try {
-      const query = buildQueryParams(page)
-      let pageResponse: unknown
-      const paragraphId = Number(props.paragraphId)
-
-      if (Number.isInteger(paragraphId) && paragraphId > 0) {
-        pageResponse = await $fetch(`/api/view/${paragraphId}`, {
-          query,
-          signal: activeAbortController.signal,
-        })
-      } else {
-        const params = buildDrupalViewSearchParams(query)
-        const queryString = params.toString()
-        const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
-        const api = $ceApi()
-
-        pageResponse = await api(requestPath, {
-          signal: activeAbortController.signal,
-        })
-      }
-      const viewNode = findDrupalViewNodeInResponse(pageResponse, props)
-
-      if (requestId !== activeRequestId) return
-
-      if (!viewNode) {
-        dynamicRows.value = []
-        dynamicPager.value = {
-          current: page,
-          totalPages: 1,
-        }
-        dynamicFilters.value = effectiveFilters.value
-        dynamicSorts.value = effectiveSorts.value
-        dynamicNoResults.value = defaultNoResultsMessage.value
-        loadError.value = ''
-        return
-      }
-
-      const viewNodeProps = getDrupalViewNodeProps(viewNode)
-
-      dynamicRows.value = getDrupalViewNodeRows(viewNode)
-      dynamicPager.value = normalizeDrupalViewPager(viewNodeProps.pager) ?? {
-        current: page,
-        totalPages: 1,
-      }
-      dynamicFilters.value =
-        (viewNodeProps.exposedFilters as ExposedFilter[]) ??
-        effectiveFilters.value
-      dynamicSorts.value =
-        (viewNodeProps.exposedSorts as ExposedSort[]) ?? effectiveSorts.value
-      dynamicNoResults.value = String(
-        viewNodeProps.noResults ?? viewNodeProps.no_results ?? '',
+      const pageResponse = await requestViewPage(
+        page,
+        $fetch,
+        activeAbortController.signal,
       )
 
-      currentPage.value = dynamicPager.value.current
+      if (requestId !== activeRequestId) return
+      applyViewPageResponse(pageResponse, page)
     } catch (error) {
       if (requestId !== activeRequestId) return
 
@@ -625,6 +673,8 @@ export function useDrupalViewControls(
     if (routeHasManagedQuery()) {
       const page = applyRouteStateToControls()
 
+      if (initialViewResolved) return
+
       void refreshView(page)
       return
     }
@@ -661,6 +711,8 @@ export function useDrupalViewControls(
     sortOrderOptions,
     hasControls,
     resolvedQueryNamespace,
+    pageLink,
+    resolveInitialView,
     refreshView,
     retryCurrentPage,
     onFilterChange,

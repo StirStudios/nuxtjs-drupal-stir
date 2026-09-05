@@ -61,12 +61,16 @@ const {
   sortByOptions,
   sortOrderOptions,
   hasControls,
+  pageLink,
+  resolveInitialView,
   retryCurrentPage,
   onFilterChange,
   onSortChange,
   onPageChange,
   resetControls,
 } = useDrupalViewControls(props, inheritedQueryNamespace)
+
+await resolveInitialView()
 
 const randomizeEnabled = computed(() => {
   if (props.randomize === true) return true
@@ -300,6 +304,7 @@ const getRowMotionProps = (index: number) =>
       v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
       class="mt-8"
       :current="currentPage"
+      :to="pageLink"
       :total-pages="effectivePager.totalPages"
       @update:current="onPageChange"
     />

@@ -62,6 +62,17 @@ const ViewControlsHarness = defineComponent({
   template: '<div />',
 })
 
+const InitialViewControlsHarness = defineComponent({
+  async setup() {
+    const controls = useDrupalViewControls(viewProps)
+
+    await controls.resolveInitialView()
+
+    return controls
+  },
+  template: '<div :data-page="currentPage">{{ dynamicRows?.[0]?.props?.id }}</div>',
+})
+
 const LegacyViewControlsHarness = defineComponent({
   setup() {
     const { paragraphId: _paragraphId, ...legacyProps } = viewProps
@@ -206,6 +217,53 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     state.legacyApi.mockReset()
     sessionStorage.clear()
     await resetRoute()
+  })
+
+  it('builds crawlable page links from the active Drupal View state', async () => {
+    const wrapper = await mountSuspended(ViewControlsHarness, {
+      route: '/work?campaign=portfolio',
+    })
+
+    await nextTick()
+
+    expect(wrapper.vm.pageLink(2)).toEqual({
+      path: '/work',
+      query: {
+        campaign: 'portfolio',
+        testimonials_p42_category: 'events',
+        testimonials_p42_sort_by: 'created',
+        testimonials_p42_sort_order: 'ASC',
+        testimonials_p42_page: '1',
+      },
+    })
+
+    expect(wrapper.vm.pageLink(1)).toEqual({
+      path: '/work',
+      query: {
+        campaign: 'portfolio',
+        testimonials_p42_category: 'events',
+        testimonials_p42_sort_by: 'created',
+        testimonials_p42_sort_order: 'ASC',
+      },
+    })
+  })
+
+  it('resolves a direct namespaced page during the initial render', async () => {
+    state.api.mockResolvedValue(viewResponse(2, 'server-page-3'))
+
+    const wrapper = await mountSuspended(InitialViewControlsHarness, {
+      route: '/work?testimonials_p42_page=2',
+    })
+
+    expect(wrapper.attributes('data-page')).toBe('2')
+    expect(wrapper.text()).toBe('server-page-3')
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/42',
+      expect.objectContaining({
+        query: expect.objectContaining({ page: '2' }),
+      }),
+    )
+    expect(state.api).toHaveBeenCalledTimes(1)
   })
 
   it('applies safe route query values after route changes', async () => {
