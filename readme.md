@@ -45,6 +45,8 @@ pnpm dev
 
 Then configure environment variables (see `## 🔐 Environment Variables`) and app-level options in `app/app.config.ts`.
 
+See the [consumer quickstart](docs/consumer-quickstart.md) for profile choice, overrides, common failures and staging checks.
+
 ### Downstream projects
 
 Install the layer once under its package name, then extend that installed
@@ -139,7 +141,9 @@ parameters so campaign attribution and query-driven state are not lost.
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - SEO auditing: `pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
-- Bundle/perf visibility: `pnpm perf:report`
+- Bundle/perf visibility: `pnpm perf:report`; after an analyzed build use `pnpm perf:report --no-build --warn-budget` to reuse it. CI blocks initial editor leakage and reports historical size overruns without hiding them by raising the limits.
+- Coverage: explicit config/server/shared/utility TypeScript (including unimported files); Vue/composable behavior has a separate Nuxt runtime suite. The percentage is not whole-layer coverage.
+- TypeScript: generated Nuxt app/server/shared/node project references; aliases are configured once in the layer, not duplicated in root TypeScript paths.
 
 ### Compliance and SEO audits in downstream projects
 
@@ -259,9 +263,9 @@ Notes:
 - `DRUPAL_API_KEY` is injected automatically only for the internal Drupal CE and menu proxies. Custom server endpoints add it explicitly when calling Drupal; unrelated `/api/*` routes never receive it.
 - Deployed runtime overrides supported by `nuxtjs-drupal-ce` include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
-- The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its Nitro limiter is best-effort and non-atomic; production must independently enforce a persistent, atomic or provider-native edge rule for `POST /api/auth/protected` using a trusted client-IP boundary.
+- The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its limiter atomically reserves attempts within one Nitro process. Multi-instance deployments must provide the shared atomic adapter described in [the auth guide](docs/auth-integration.md#local-protected-page-rate-limiting), or enforce an equivalent shared edge limit using a trusted client-IP boundary.
 - Protected-access cookies are signed with `PROTECTED_PASSWORD`; rotating the password immediately invalidates every existing protected session.
-- H3 buffers multipart bodies before application-level file checks. The Nuxt limits are validation, not a pre-buffer memory cap; production must reject fixed-length and chunked multipart bodies at or below `WEBFORM_MAX_REQUEST_BYTES` before they reach Nitro.
+- Nuxt bounds streamed JSON and multipart request bodies before parsing and returns `413` when the wire-body limit is exceeded. Configure the hosting/ingress upload cap at or below `WEBFORM_MAX_REQUEST_BYTES` too: an adapter or upstream proxy may buffer a request before Nitro receives it.
 - Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
 - When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.
 - `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.

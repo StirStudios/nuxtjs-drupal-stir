@@ -6,6 +6,11 @@ const rootDir = fileURLToPath(new URL('./', import.meta.url))
 export default defineConfig({
   test: {
     environment: 'node',
+    coverage: {
+      // Pure transformations and server boundaries; Vue/composables have a separate runtime suite.
+      include: ['config/**/*.ts', 'layers/*/server/**/*.ts', 'layers/*/shared/**/*.ts', 'layers/*/app/utils/**/*.ts'],
+      exclude: ['**/*.d.ts', '**/types/**'],
+    },
     include: ['tests/**/*.spec.ts'],
     exclude: ['tests/nuxt/**/*.spec.ts'],
   },

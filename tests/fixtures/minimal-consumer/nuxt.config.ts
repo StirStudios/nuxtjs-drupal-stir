@@ -1,3 +1,4 @@
+import { defineNuxtConfig } from 'nuxt/config'
 import { fileURLToPath } from 'node:url'
 
 const rootLayer = fileURLToPath(new URL('../../..', import.meta.url))

@@ -36,6 +36,11 @@ jobs:
 
       - name: Verify Core
         run: pnpm verify:core
+        env:
+          STIR_PERF_ANALYZE: 'true'
+
+      - name: Check initial bundle boundaries and report size budgets
+        run: pnpm perf:report --no-build --warn-budget
 
   consumer-smoke:
     runs-on: ubuntu-latest

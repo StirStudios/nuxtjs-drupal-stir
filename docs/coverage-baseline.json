@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "tolerancePercentagePoints": 0.5,
   "totals": {
-    "lines": 76.34,
-    "statements": 72.98,
-    "functions": 74.73,
-    "branches": 62.31
+    "lines": 76.58,
+    "statements": 74.44,
+    "functions": 80.39,
+    "branches": 66.08
   },
   "criticalModules": {
     "config/runtime.ts": {
@@ -16,6 +16,17 @@
     },
     "layers/theme/app/utils/drupalViewState.ts": {
       "branches": 80
+    },
+    "layers/core/server/utils/drupalCeProxy.ts": {
+      "branches": 77
+    },
+    "layers/auth/server/utils/protectedRateLimit.ts": {
+      "branches": 81
+    },
+    "layers/webform/server/utils/readWebformBody.ts": {
+      "branches": 73
     }
-  }
+  },
+  "scope": "Explicit config, server, shared runtime and app utility TypeScript, including unimported files. Vue and composable runtime tests are separate; this is not whole-layer coverage.",
+  "sourceFiles": 121
 }

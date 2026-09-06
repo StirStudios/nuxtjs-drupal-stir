@@ -8,9 +8,6 @@ export default withNuxt(
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        ...globals.browser,
-        ...globals.node,
-        $nuxt: 'readonly',
       },
     },
     rules: {
@@ -24,7 +21,7 @@ export default withNuxt(
       'vue/no-v-html': 'off',
       'vue/this-in-template': 'off',
       'vue/html-self-closing': 'off',
-      'vue/no-mutating-props': 'off',
+      'vue/no-mutating-props': 'error',
       'vue/no-unused-vars': 'error',
       quotes: ['error', 'single'],
       'vue/multi-word-component-names': 'off',
@@ -35,6 +32,44 @@ export default withNuxt(
       'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
       'no-debugger': 'error',
     },
+  },
+  {
+    files: ['layers/*/server/**/*.ts'],
+    languageOptions: {
+      globals: { ...Object.fromEntries(Object.keys(globals.browser).map(name => [name, 'off'])), ...globals.node },
+      parserOptions: { projectService: true },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+    },
+  },
+  {
+    files: ['layers/*/app/**/*.{js,ts,vue}', 'tests/nuxt/**/*.ts'],
+    languageOptions: { globals: { ...globals.browser, $nuxt: 'readonly' } },
+  },
+  {
+    files: ['**/server/**/*.ts', 'config/**/*.ts', '**/nuxt.config.ts', 'scripts/**/*.{js,mjs,ts}', '*.{ts,mjs}', 'tests/**/*.ts'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    // These fields edit the parent's shared form model; replacing the prop is still forbidden.
+    files: [
+      'layers/auth/app/components/Account/ProfileForm.vue',
+      'layers/webform/app/components/Field/Address.vue',
+      'layers/webform/app/components/Field/Checkbox.vue',
+      'layers/webform/app/components/Field/Checkboxes.vue',
+      'layers/webform/app/components/Field/Date.vue',
+      'layers/webform/app/components/Field/DateTime.vue',
+      'layers/webform/app/components/Field/File.vue',
+      'layers/webform/app/components/Field/Input.vue',
+      'layers/webform/app/components/Field/Input/Number.vue',
+      'layers/webform/app/components/Field/Input/Slider.vue',
+      'layers/webform/app/components/Field/Radio.vue',
+      'layers/webform/app/components/Field/Select.vue',
+      'layers/webform/app/components/Field/Textarea.vue',
+    ],
+    rules: { 'vue/no-mutating-props': ['error', { shallowOnly: true }] },
   },
   {
     files: ['layers/*/app/**/*.{js,ts,vue}'],

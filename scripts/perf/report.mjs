@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
-import { readFile, writeFile } from 'node:fs/promises'
+import { appendFile, readFile, readdir, writeFile } from 'node:fs/promises'
+import { gzipSync } from 'node:zlib'
 import { basename, resolve } from 'node:path'
 
 const arguments_ = process.argv.slice(2)
@@ -9,6 +10,8 @@ const readArgument = name => arguments_
 const buildCwd = readArgument('cwd') || '.'
 const outputPath = readArgument('output') || 'docs/perf-report.latest.json'
 const skipBudget = arguments_.includes('--no-budget')
+const reuseBuild = arguments_.includes('--no-build')
+const warnBudget = arguments_.includes('--warn-budget')
 const budgetPath = 'docs/perf-budget.json'
 const clientManifestPaths = [
   '.output/server/chunks/build/client.precomputed.mjs',
@@ -46,15 +49,13 @@ function assertBudget(report, budget) {
   const initialCss = report.initialClient.assets
     .filter(asset => asset.file.endsWith('.css'))
     .reduce((total, asset) => total + asset.gzipKb, 0)
-  const adminEditor = report.topClientChunks.find(chunk => chunk.role === 'admin-deferred')
-  const revealMotion = report.topClientChunks.find(chunk =>
-    chunk.label === 'theme:app/components/RevealMotion',
-  )
+  const adminEditor = report.editorExclusive.assets[0]
+  const revealMotion = report.revealMotion
   const checks = [
     ['initial client', report.initialClient.gzipKb, budget.maxInitialGzipKb],
     ['initial JavaScript', initialJs, budget.maxInitialJavascriptGzipKb],
     ['initial CSS', initialCss, budget.maxInitialCssGzipKb],
-    ['deferred editor', adminEditor?.gzipKb, budget.maxAdminDeferredGzipKb],
+    ['largest deferred editor chunk (not total)', adminEditor?.gzipKb, budget.maxAdminDeferredGzipKb],
     ['reveal motion', revealMotion?.gzipKb, budget.maxRevealMotionGzipKb],
   ]
   const failures = checks
@@ -64,17 +65,18 @@ function assertBudget(report, budget) {
     .map(([label, actual, maximum]) => `${label}: ${String(actual)} kB > ${maximum} kB`)
 
   if (failures.length) {
-    throw new Error(`Performance budget failed:\n- ${failures.join('\n- ')}`)
+    const message = `Performance budget exceeded:\n- ${failures.join('\n- ')}`
+    if (warnBudget) console.warn(message)
+    else throw new Error(message)
   }
 }
 
-function parseChunkLines(output) {
-  const pattern = /dist\/client\/(_nuxt\/[^ ]+\.(?:js|css))\s+([0-9.,]+)\s+kB\s+│\s+gzip:\s+([0-9.,]+)\s+kB/g
-
-  return [...output.matchAll(pattern)].map((match) => ({
-    file: match[1],
-    sizeKb: Number(match[2].replaceAll(',', '')),
-    gzipKb: Number(match[3].replaceAll(',', '')),
+async function readClientAssets() {
+  const root = resolve(buildCwd, '.output/public')
+  const files = await readdir(resolve(root, '_nuxt'), { recursive: true })
+  return Promise.all(files.filter(file => /\.(?:js|css)$/.test(file)).map(async (file) => {
+    const data = await readFile(resolve(root, '_nuxt', file))
+    return { file: `_nuxt/${file}`, sizeKb: data.byteLength / 1000, gzipKb: gzipSync(data).byteLength / 1000 }
   }))
 }
 
@@ -196,17 +198,24 @@ async function main() {
   const buildArguments = buildCwd === '.'
     ? ['build']
     : ['exec', 'nuxi', 'build', '--cwd', buildCwd]
-  const output = await run('pnpm', buildArguments, { STIR_PERF_ANALYZE: 'true' })
-  const chunks = parseChunkLines(output)
+  const output = reuseBuild ? '' : await run('pnpm', buildArguments, { STIR_PERF_ANALYZE: 'true' })
+  const chunks = await readClientAssets()
   let manifest = ''
   for (const manifestPath of clientManifestPaths) {
     manifest = await readFile(manifestPath, 'utf8').catch(() => '')
     if (manifest) break
   }
   const moduleAnalysis = JSON.parse(
-    await readFile(moduleAnalysisPath, 'utf8').catch(() => '{"chunks":[]}'),
+    await readFile(moduleAnalysisPath, 'utf8'),
   )
   const analyzedChunks = moduleAnalysis.chunks || []
+  const outputFiles = new Set(chunks.map(chunk => chunk.file))
+
+  // Vite removes empty JavaScript facades for CSS-only entries after analysis.
+  if (analyzedChunks.some(chunk => !outputFiles.has(chunk.fileName)
+    && !chunk.facadeModuleId?.endsWith('.css'))) {
+    throw new Error('Module analysis does not match the production assets. Rebuild the target with STIR_PERF_ANALYZE=true.')
+  }
   const owners = mergeAnalyzedOwners(parseChunkOwners(manifest), analyzedChunks)
   const appEntries = analyzedChunks
     .filter(chunk => chunk.isEntry && chunk.modules.some(module =>
@@ -216,8 +225,12 @@ async function main() {
   const editorEntries = analyzedChunks
     .filter(chunk => chunk.facadeModuleId?.includes('/components/Edit/Text.vue'))
     .map(chunk => chunk.fileName)
+  if (!appEntries.length) throw new Error('Missing analyzed app entry. Build with STIR_PERF_ANALYZE=true before using --no-build.')
   const initialFiles = collectStaticClosure(analyzedChunks, appEntries)
   const adminFiles = collectStaticClosure(analyzedChunks, editorEntries)
+  const leakedEditorModules = analyzedChunks.filter(chunk => initialFiles.has(chunk.fileName))
+    .flatMap(chunk => chunk.modules).filter(module => /\/(?:@tiptap|prosemirror-[^/]+)\//.test(module.id))
+  if (leakedEditorModules.length) throw new Error('Editor dependencies entered the anonymous initial static graph.')
   const labeledChunks = chunks
     .map((chunk) => {
       const owner = owners.get(chunk.file)
@@ -230,11 +243,16 @@ async function main() {
     })
     .sort((a, b) => b.gzipKb - a.gzipKb)
   const initialAssets = labeledChunks.filter(chunk => chunk.role === 'initial')
-  const entryModules = analyzedChunks.find(entry =>
-    initialAssets.some(asset => asset.file.endsWith(entry.fileName)),
-  )?.modules?.slice(0, 30) || []
+  const entryModules = analyzedChunks.filter(chunk => initialFiles.has(chunk.fileName))
+    .flatMap(chunk => chunk.modules).sort((a, b) => b.renderedBytes - a.renderedBytes).slice(0, 30)
   const report = {
-    schemaVersion: 3,
+    schemaVersion: 4,
+    measurement: 'Built asset gzip sizes; initial static dependency graph is not a browser route-transfer measurement.',
+    invariants: { editorExcludedFromInitialGraph: true },
+    editorExclusive: {
+      gzipKb: labeledChunks.filter(chunk => chunk.role === 'admin-deferred').reduce((total, chunk) => total + chunk.gzipKb, 0),
+      assets: labeledChunks.filter(chunk => chunk.role === 'admin-deferred'),
+    },
     generatedAt: new Date().toISOString(),
     environment: parseEnvironment(output),
     buildTimings: parseBuildTimings(output),
@@ -242,8 +260,9 @@ async function main() {
       sizeKb: Number(initialAssets.reduce((total, chunk) => total + chunk.sizeKb, 0).toFixed(2)),
       gzipKb: Number(initialAssets.reduce((total, chunk) => total + chunk.gzipKb, 0).toFixed(2)),
       assets: initialAssets,
-      entryModules,
+      entryModules: entryModules.map(module => ({ ...module, id: normalizeModuleLabel(module.id) })),
     },
+    revealMotion: labeledChunks.find(chunk => chunk.label === 'theme:app/components/RevealMotion'),
     topClientChunks: labeledChunks.slice(0, 15),
     totalOutputSize: parseTotalSize(output),
   }
@@ -260,6 +279,17 @@ async function main() {
     console.log(`${chunk.label} [${chunk.role}] | ${chunk.gzipKb.toFixed(2)} kB gzip | ${chunk.file}`)
   }
   console.log(`Saved: ${outputPath}`)
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    await appendFile(process.env.GITHUB_STEP_SUMMARY, [
+      '## Client bundle',
+      '',
+      `Initial static graph: **${report.initialClient.gzipKb.toFixed(2)} kB gzip**.`,
+      `Exclusive editor graph: **${report.editorExclusive.gzipKb.toFixed(2)} kB gzip** (deferred).`,
+      '',
+      'Editor dependencies are absent from the anonymous initial static graph. Historical numeric budget overruns remain visible in the log; route transfer and timing are measured separately with Lighthouse.',
+      '',
+    ].join('\n'))
+  }
 }
 
 main().catch((error) => {
