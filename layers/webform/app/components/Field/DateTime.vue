@@ -101,29 +101,27 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-3">
-    <div class="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
-      <template v-for="(block, i) in blocks" :key="i">
-        <UFormField :label="dateFieldLabel(i)" :required="fieldRequired">
-          <DateTimeCalendar
-            v-model="block.date"
-            :invalid="fieldInvalid"
-            :label="dateFieldLabel(i)"
-            :timezone="siteTimezone"
-            :variant="fieldVariant"
-          />
-        </UFormField>
+  <div class="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
+    <template v-for="(block, i) in blocks" :key="i">
+      <UFormField :label="dateFieldLabel(i)" :required="fieldRequired">
+        <DateTimeCalendar
+          v-model="block.date"
+          :invalid="fieldInvalid"
+          :label="dateFieldLabel(i)"
+          :timezone="siteTimezone"
+          :variant="fieldVariant"
+        />
+      </UFormField>
 
-        <UFormField :label="timeFieldLabel(i)" :required="fieldRequired">
-          <DateTimeSelect
-            v-model="block.start"
-            :invalid="fieldInvalid"
-            :items="timeOptions"
-            placeholder="Select time"
-            :variant="fieldVariant"
-          />
-        </UFormField>
-      </template>
-    </div>
+      <UFormField :label="timeFieldLabel(i)" :required="fieldRequired">
+        <DateTimeSelect
+          v-model="block.start"
+          :invalid="fieldInvalid"
+          :items="timeOptions"
+          placeholder="Select time"
+          :variant="fieldVariant"
+        />
+      </UFormField>
+    </template>
   </div>
 </template>

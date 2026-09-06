@@ -43,9 +43,9 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
 <template>
   <ParagraphReveal :id="id" class="w-full" :direction="direction">
     <PageRevealScope>
-      <div v-if="items.length <= 1">
+      <template v-if="items.length <= 1">
         <component :is="activeTabNode" v-if="activeTabNode" />
-      </div>
+      </template>
 
       <UTabs
         v-else

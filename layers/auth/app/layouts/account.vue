@@ -36,6 +36,7 @@ const toggleSidebar = () => {
 
       <template #footer>
         <UButton
+          aria-label="Back to site"
           class="w-full justify-start overflow-hidden"
           color="neutral"
           icon="i-lucide-arrow-left"
@@ -60,11 +61,11 @@ const toggleSidebar = () => {
           @click="toggleSidebar"
         />
 
-        <span class="text-muted text-sm">{{ pageTitle }}</span>
+        <h1 class="text-muted text-sm">{{ pageTitle }}</h1>
         <div />
       </div>
 
-      <main class="w-full px-4 py-8 md:px-8">
+      <main id="main-content" class="w-full px-4 py-8 md:px-8" tabindex="-1">
         <div class="mx-auto w-full max-w-4xl">
           <slot />
         </div>

@@ -42,6 +42,7 @@ const selectItems = computed(() => {
 const renderAsButtons = computed(() => props.fieldName === 'tabs')
 
 const handleButtonClick = (value: string) => {
+  if (props.disabled) return
   props.state[props.fieldName] = value
   tabBus.emit(value)
 }
@@ -56,6 +57,8 @@ const handleButtonClick = (value: string) => {
         :active="state[fieldName] === item.value"
         active-color="primary"
         active-variant="solid"
+        :aria-pressed="state[fieldName] === item.value"
+        :disabled="props.disabled"
         :label="item.label"
         :variant="buttonVariant"
         @click="handleButtonClick(item.value)"

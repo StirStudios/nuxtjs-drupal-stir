@@ -65,6 +65,7 @@ Use these rules for all changes.
 - If custom styles in one file grow beyond roughly 80-120 lines or mix unrelated concerns, split them in the same PR.
 - Keep comments minimal and only for non-obvious logic or external constraints.
 - Do not wrap imports in `try/catch` (project-wide rule).
+- Reuse existing elements before adding markup. Add a wrapper only when required for correct semantics, layout, or behavior; verify the rendered DOM and preserve native controls.
 - Prefer the smallest complete solution. Preserve existing behavior, reuse existing code paths, and add only what the requirement demonstrably needs.
 - Before finishing, remove duplicated logic or markup, unnecessary fallbacks, speculative abstractions, redundant state, superseded paths, and unused dependencies.
 - Do not sacrifice correctness, accessibility, security, readability, maintainability, or proportionate regression coverage merely to reduce line count.

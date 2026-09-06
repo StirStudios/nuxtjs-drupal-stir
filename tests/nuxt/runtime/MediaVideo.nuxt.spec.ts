@@ -88,6 +88,7 @@ describe('MediaVideo (Nuxt runtime)', () => {
       },
     })
 
+    expect(wrapper.find('button div, button button, button a').exists()).toBe(false)
     const poster = wrapper.get('button img')
 
     expect(poster.attributes('data-nuxt-img')).toBeDefined()

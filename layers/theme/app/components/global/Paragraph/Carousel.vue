@@ -293,36 +293,34 @@ function releasePointerArrowFocus(event: PointerEvent) {
         >
           <div v-for="item in slides" :key="item.key">
             <component :is="item.vnode" />
-        </div>
-      </UMarquee>
+          </div>
+        </UMarquee>
 
-      <UCarousel
-        v-else-if="slides.length"
-        ref="carousel"
-        v-slot="{ item }"
-        :aria-label="carouselLabel"
-        :arrows="mounted ? carouselArrows : false"
-        :auto-height="carouselAutoheight"
-        :auto-scroll="autoScrollOptions"
-        :autoplay="autoplayOptions"
-        :dots="carouselIndicators"
-        :fade="carouselFade"
-        :items="slides"
-        loop
-        :next="nextButton"
-        :next-icon="theme.carousel.arrows?.nextIcon"
-        :prev="prevButton"
-        :prev-icon="theme.carousel.arrows?.prevIcon"
-        :ui="{
-          root: ['stir-carousel', theme.carousel.root],
-          container: 'items-center transition-[height]',
-          item: gridItems,
-        }"
-      >
-        <WrapDiv :styles="gridItems">
+        <UCarousel
+          v-else-if="slides.length"
+          ref="carousel"
+          v-slot="{ item }"
+          :aria-label="carouselLabel"
+          :arrows="mounted ? carouselArrows : false"
+          :auto-height="carouselAutoheight"
+          :auto-scroll="autoScrollOptions"
+          :autoplay="autoplayOptions"
+          :dots="carouselIndicators"
+          :fade="carouselFade"
+          :items="slides"
+          loop
+          :next="nextButton"
+          :next-icon="theme.carousel.arrows?.nextIcon"
+          :prev="prevButton"
+          :prev-icon="theme.carousel.arrows?.prevIcon"
+          :ui="{
+            root: ['stir-carousel', theme.carousel.root],
+            container: 'items-center transition-[height]',
+            item: gridItems,
+          }"
+        >
           <component :is="item.vnode" :key="item.key" />
-        </WrapDiv>
-      </UCarousel>
+        </UCarousel>
       </div>
     </div>
   </RevealMotionElement>

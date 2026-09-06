@@ -85,6 +85,7 @@ const confirmCancel = () => {
         >
           <template #trailing>
             <UButton
+              :aria-label="showCurrentPassword ? 'Hide current password' : 'Show current password'"
               color="neutral"
               :icon="showCurrentPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
               size="xs"

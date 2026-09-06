@@ -1,3 +1,5 @@
+import { defineComponent, h } from 'vue'
+import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
@@ -12,6 +14,21 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.findAll('a')).toHaveLength(1)
     expect(wrapper.find('a a, a button').exists()).toBe(false)
     expect(wrapper.get('a').attributes('href')).toBe('https://www.instagram.com/p/example/')
+    wrapper.unmount()
+  })
+
+  it('keeps edit controls outside the image link', async () => {
+    const wrapper = await mountSuspended(defineComponent({
+      setup: () => () => h(UApp, {}, { default: () => h(MediaImage, {
+        src: '/image.webp', alt: 'Project', link: 'https://example.com/project',
+        editActions: [{ key: 'full', tooltip: 'Edit', ariaLabel: 'Edit image', icon: 'i-lucide-pencil', variant: 'soft', buttonClass: '', to: '/edit' }],
+      }) }),
+    }))
+
+    await vi.waitFor(() => expect(wrapper.find('[aria-label="Edit image"]').exists()).toBe(true))
+    expect(wrapper.get('.media').element.tagName).toBe('DIV')
+    expect(wrapper.find('a a, a button').exists()).toBe(false)
+    expect(wrapper.get('a[aria-label="Project"]').attributes('href')).toBe('https://example.com/project')
     wrapper.unmount()
   })
 

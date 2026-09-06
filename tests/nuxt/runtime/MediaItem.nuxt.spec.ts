@@ -122,8 +122,14 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('[aria-label="Open media modal"]').classes())
-      .not.toContain('motion-safe:opacity-0')
+    const trigger = wrapper.get('button[aria-label="Open media modal"]')
+
+    expect(trigger.find('div, a, button, h1, h2, h3').exists()).toBe(false)
+    expect(trigger.element.parentElement).toBe(wrapper.get('.media').element)
+    expect(wrapper.get('img').element.parentElement).toBe(trigger.element.parentElement)
+    await trigger.trigger('click')
+    expect(wrapper.emitted('open')).toEqual([[0]])
+    expect(trigger.element.parentElement?.classList).not.toContain('motion-safe:opacity-0')
   })
 
   it('uses the shared untinted play indicator for modal video triggers', async () => {
@@ -208,7 +214,7 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('[aria-label="Open media modal"]').classes())
+    expect(wrapper.get('[aria-label="Open media modal"]').element.parentElement?.classList)
       .toContain('motion-safe:opacity-0')
   })
 

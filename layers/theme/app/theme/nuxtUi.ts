@@ -11,6 +11,12 @@ export const nuxtUiTheme = {
     neutral: 'zinc',
   },
 
+  accordion: {
+    slots: {
+      body: 'text-base',
+    },
+  },
+
   button: {
     variants: {
       size: {
