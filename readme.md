@@ -5,11 +5,25 @@
 ![Nuxt UI](https://img.shields.io/badge/Nuxt%20UI-4.x-00DC82?logo=nuxt.js&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38BDF8?logo=tailwindcss&logoColor=white)
 
-A production-ready Nuxt 4 layer for decoupled Drupal 11 sites using Lupus Custom Elements.
-It combines Nuxt UI 4 and Tailwind CSS 4 with SSR, inline Drupal editing, Webforms,
-accessibility testing, technical SEO auditing, and reusable downstream presets.
+Stir's shared frontend for Drupal-managed websites. Editors own content and page settings in Drupal; Nuxt renders them with server-side rendering, Nuxt UI and Tailwind. Optional capabilities add inline editing, accounts, Webforms and integrations.
 
-Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, content hubs, and custom page-builder experiences.
+**See the result:** [StirStudios](https://www.stirstudiosdesign.com/) is an example of a project built with this stack, with its own design and content. This repository is the reusable layer, not a copy of that website.
+
+**Start here:** [run the self-contained example](#try-without-a-private-backend), [understand backend requirements](docs/backend-requirements.md), then [configure a consumer](docs/consumer-quickstart.md).
+
+### License
+
+Copyright (C) 2026 StirStudios. This project is free software: you may redistribute it and/or modify it under the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version (`GPL-2.0-or-later`). See [LICENSE](LICENSE) for the full terms. It is provided without warranty, including any implied warranty of merchantability or fitness for a particular purpose.
+
+Commercial use is permitted. When distributing covered code, preserve the license and notices and meet the GPL's corresponding-source requirements. Third-party dependencies retain their own licenses.
+
+**Stir Tools remains a separate, private backend.** This license covers this repository, including its bundled contract snapshots; it does not grant access to or publish the Stir Tools implementation. Its own declared license is `GPL-2.0-or-later`. Calling a Drupal API is not itself the reason this frontend uses GPL; this is StirStudios' licensing choice for the layer.
+
+### Backend requirements at a glance
+
+Ordinary Drupal/Lupus provides the foundation for Custom Elements delivery. **The complete Stir experience also requires Stir Tools endpoints and payload contracts.** Choosing the minimal preset removes optional frontend capabilities; it does not turn this into a drop-in frontend for every ordinary Drupal installation.
+
+Without the private backend, you can inspect the code and run the self-contained fixture tests below. You cannot reproduce live Drupal editing, Stir account workflows or Stir Webform submissions just by cloning this repository. The [backend requirements](docs/backend-requirements.md) explain the capability boundary and what a compatible backend must provide.
 
 ## 🚀 Features
 
@@ -36,16 +50,25 @@ Use this if you need a reusable Nuxt starter for Drupal-backed marketing sites, 
 
 ## ⚡ Quick Start
 
-Use Node `22.13+`, `24.11+`, or `26+` and the repository-declared pnpm version.
+### Try without a private backend
+
+Clone this repository and use Node `^22.13.0`, `^24.11.0` or `>=26.0.0`, with `pnpm@10.33.1` as declared in `package.json`.
 
 ```bash
-pnpm install
-pnpm dev
+git clone https://github.com/StirStudios/nuxtjs-drupal-stir.git
+cd nuxtjs-drupal-stir
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+STIR_E2E_BROWSER=true pnpm test:e2e
 ```
 
-Then configure environment variables (see `## 🔐 Environment Variables`) and app-level options in `app/app.config.ts`.
+This builds the layer against a temporary local Drupal fixture and opens a headless browser. It checks a page containing “Fixture page”, content fields, public configuration and hydration, then closes the servers/browser. Expect six passing tests. It needs no private Stir Tools checkout, CMS credentials or live Drupal server. It is an executable integration example, not a visual demo server or a production backend.
 
-See the [consumer quickstart](docs/consumer-quickstart.md) for profile choice, overrides, common failures and staging checks.
+The fixture lives in [the E2E smoke test](tests/nuxt/e2e/health.e2e.spec.ts). To explore the implementation after this succeeds, use the [consumer quickstart](docs/consumer-quickstart.md).
+
+### Connect a real backend
+
+First obtain a compatible Drupal/Lupus installation and the Stir Tools capabilities your site uses, or implement the documented contracts independently. Configure `.env` using the [environment reference](#-environment-variables), including a real presentation manifest. Then run `pnpm dev`. A production consumer needs its own Drupal content, settings and credentials; the test manifest is not production configuration.
 
 ### Downstream projects
 
@@ -86,9 +109,9 @@ responsive declaration in its media query instead of using, for example,
 
 Pin production projects to a reviewed tag or commit. A branch reference is
 appropriate while testing vNext, but it should not be the production lock.
-Nuxt is an intentional required peer: every application owns its Nuxt runtime
-version directly, while this repository keeps the same range as a development
-dependency for layer builds and tests.
+This layer declares Nuxt as a dependency. Applications should also declare their
+Nuxt runtime explicitly and use a compatible version so their own development
+and build commands resolve predictably.
 The package uses Nuxt's `dev:prepare` convention and does not run a lifecycle
 build when installed as a dependency. pnpm 11 applications must still keep
 their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native

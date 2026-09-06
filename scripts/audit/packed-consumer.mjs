@@ -15,7 +15,9 @@ const consumerLayers = [
   { label: 'full', specifier: '@stir/base/presets/full' },
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
-const maxArchiveBytes = 300_000
+// Includes a 10 KB allowance for the required GPL text and licensing/onboarding notices.
+// This download-archive limit is separate from the browser JavaScript budgets.
+const maxArchiveBytes = 310_000
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -91,6 +93,7 @@ async function main() {
     }
 
     for (const requiredPath of [
+      'package/LICENSE',
       'package/contracts/stir-tools/v1/manifest.json',
       'package/layers/platform/nuxt.config.ts',
       'package/layers/theme/nuxt.config.ts',
