@@ -13,8 +13,7 @@ import {
 } from '../../utils/protectedAccess'
 import { layerAuthConstantTimeEquals } from '../../utils/protectedAccessToken'
 import {
-  layerAuthCheckProtectedLoginRateLimit,
-  layerAuthRecordProtectedLoginFailure,
+  layerAuthConsumeProtectedLoginAttempt,
   layerAuthResetProtectedLoginRateLimit,
 } from '../../utils/protectedRateLimit'
 import { assertStirSameOrigin } from '../../../../foundation/server/utils/stirRequestSecurity'
@@ -38,7 +37,7 @@ export default defineEventHandler(async (event) => {
     return { protectedAuthenticated: false }
   }
 
-  const rateLimit = await layerAuthCheckProtectedLoginRateLimit(event)
+  const rateLimit = await layerAuthConsumeProtectedLoginAttempt(event)
 
   if (!rateLimit.allowed) {
     event.node?.res?.setHeader(
@@ -58,8 +57,6 @@ export default defineEventHandler(async (event) => {
       : ''
 
   if (!turnstileResponse) {
-    await layerAuthRecordProtectedLoginFailure(event)
-
     throw createError({
       statusCode: 422,
       statusMessage: 'Security challenge is required',
@@ -69,8 +66,6 @@ export default defineEventHandler(async (event) => {
   const turnstileValidation = await verifyTurnstileToken(turnstileResponse, event)
 
   if (!turnstileValidation.success) {
-    await layerAuthRecordProtectedLoginFailure(event)
-
     throw createError({
       statusCode: 403,
       statusMessage: 'Security challenge failed',
@@ -99,8 +94,6 @@ export default defineEventHandler(async (event) => {
     ) {
       layerAuthClearProtectedAccessCookie(event)
     }
-
-    await layerAuthRecordProtectedLoginFailure(event)
 
     throw createError({
       statusCode: 401,

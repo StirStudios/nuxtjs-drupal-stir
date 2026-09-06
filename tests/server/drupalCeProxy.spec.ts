@@ -139,6 +139,37 @@ describe('Drupal CE proxy boundary', () => {
     expect(fetchMock.mock.calls[0]?.[1]?.redirect).toBe('manual')
   })
 
+  it.each(['no-cache', 'public, max-age=0', 'public, max-age=30, s-maxage=10', 'public, max-age=900'])('preserves producer cache policy %s', (policy) => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    responseHeaders.set('cache-control', policy)
+    handleStirDrupalProxyResponse(event, new Response('{}', { headers: { 'cache-control': policy } }))
+    expect(responseHeaders.get('cache-control')).toBe(policy)
+  })
+
+  it('aborts a stalled CE fetch at the shared deadline', async () => {
+    stubRuntimeConfig({ drupalRequestTimeoutMs: 10 })
+    vi.stubGlobal('fetch', vi.fn((_input, init) => new Promise((_resolve, reject) => {
+      init.signal.addEventListener('abort', () => reject(init.signal.reason), { once: true })
+    })))
+    await expect(createStirDrupalProxyFetch(createEvent().event)('https://cms.example.test/ce-api'))
+      .rejects.toMatchObject({ name: 'TimeoutError' })
+  })
+
+  it('preserves caller cancellation', async () => {
+    stubRuntimeConfig()
+    const controller = new AbortController()
+
+    vi.stubGlobal('fetch', vi.fn((_input, init) => new Promise((_resolve, reject) => {
+      init.signal.addEventListener('abort', () => reject(init.signal.reason), { once: true })
+    })))
+    const pending = createStirDrupalProxyFetch(createEvent().event)('https://cms.example.test/ce-api', { signal: controller.signal })
+
+    controller.abort()
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+  })
+
   it('confines proxy and menu paths to their intended endpoints', () => {
     expect(isStirDrupalProxyPathSafe('page/about')).toBe(true)
     expect(isStirDrupalProxyPathSafe('../admin')).toBe(false)

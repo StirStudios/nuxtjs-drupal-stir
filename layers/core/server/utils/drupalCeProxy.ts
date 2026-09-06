@@ -175,7 +175,7 @@ export const createStirDrupalProxyFetch = (
   return async (input, init) => {
     const headers = new Headers(init?.headers)
     const cookie = getStirForwardedCookie(event)
-    const { apiKey } = getStirDrupalApiConfig()
+    const { apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
 
     headers.delete('cookie')
     headers.delete('x-api-key')
@@ -184,10 +184,15 @@ export const createStirDrupalProxyFetch = (
     if (cookie) headers.set('cookie', cookie)
     if (apiKey) headers.set('x-api-key', apiKey)
 
+    const callerSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined)
+
     return await globalThis.fetch(input, {
       ...init,
       headers,
       redirect: 'manual',
+      signal: callerSignal
+        ? AbortSignal.any([callerSignal, AbortSignal.timeout(requestTimeoutMs)])
+        : AbortSignal.timeout(requestTimeoutMs),
     })
   }
 }
@@ -222,6 +227,7 @@ export const handleStirDrupalProxyResponse = (
   if (
     (event.method === 'GET' || event.method === 'HEAD')
     && response.ok
+    && !upstreamCacheControl.trim()
   ) {
     event.node?.res?.setHeader(
       'Cache-Control',

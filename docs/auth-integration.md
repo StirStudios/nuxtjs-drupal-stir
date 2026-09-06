@@ -100,11 +100,34 @@ Suggested defaults:
 
 Return `429` JSON responses when limits are exceeded.
 
-The local protected-password gate also tracks failed attempts through Nitro
-storage. This limiter is best-effort: shared storage gives workers visibility,
-but the counter is not atomic and storage failures fail open. Production must
-independently enforce a persistent, atomic or provider-native edge limit on
-`POST /api/auth/protected` using a trusted client-IP boundary.
+## Local protected-page rate limiting
+
+The local protected-password gate atomically reserves an attempt **before**
+Turnstile/password validation. The default `rate-limiter-flexible` memory limiter
+supports one Node process, using the existing configured attempt/window limits.
+Successful login clears the identifier's window. Concurrent failed attempts can
+no longer overwrite one another. A failed atomic backend returns a safe 503;
+a consumed limit returns 429 with `Retry-After`.
+
+For multiple workers, serverless instances or restart-persistent enforcement,
+use a shared atomic limiter or enforce the equivalent policy at a trusted edge.
+Plain Nitro `getItem`/`setItem` storage is not an atomic limiter. A consumer Nitro
+plugin can set `event.context.stirProtectedRateLimiter` on each request to one
+shared adapter implementing `consume(key): Promise<unknown>` and
+`delete(key): Promise<unknown>`. `consume` must atomically reserve an attempt and
+reject exhausted requests with a finite numeric `msBeforeNext`; reject backend
+failures with an Error. A configured `RateLimiterRedis` instance from
+`rate-limiter-flexible` implements this interface. Use the same points/duration
+as `protectedRateLimit.maxAttempts`/`windowSeconds`, a deployment-specific key
+prefix, and a persistent store. Do not use a non-atomic adapter or silently fall
+back to per-worker memory on backend failure. No Redis service is required for
+a single-process deployment.
+
+Keys contain a SHA-256 hash of the resolved client identifier. The old separate
+check/record helpers and best-effort Nitro storage contract were internal to
+the protected-login route; consumers should use the atomic adapter seam above.
+The [read-only consumer scan](consumer-compatibility-2026-09-06.md) found no callers
+of those old helpers.
 
 `PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only when a
 trusted ingress removes client-supplied forwarding headers and sets

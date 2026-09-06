@@ -1,11 +1,9 @@
-import { readRawBody, type H3Event } from 'h3'
+import type { H3Event } from 'h3'
+import { readWebformBody } from '../../layers/webform/server/utils/readWebformBody'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import webformSubmitHandler from '../../layers/webform/server/api/webform/submit.post'
 
-vi.mock('h3', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('h3')>()),
-  readRawBody: vi.fn(),
-}))
+vi.mock('../../layers/webform/server/utils/readWebformBody', () => ({ readWebformBody: vi.fn() }))
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 
@@ -56,8 +54,42 @@ describe('POST /api/webform/submit', () => {
     vi.unstubAllGlobals()
   })
 
+  it('preserves multipart files and repeated field values', async () => {
+    const form = new FormData()
+
+    form.append('webform_id', 'contact')
+    form.append('turnstile_response', 'token')
+    form.append('topics[]', 'one')
+    form.append('topics[]', 'two')
+    form.append('attachment', new Blob(['hello'], { type: 'text/plain' }), 'sample.txt')
+    const request = new Request('https://example.test', { method: 'POST', body: form })
+
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(await request.arrayBuffer()))
+    const raw = vi.fn().mockResolvedValueOnce({ _data: 'csrf', headers: {}, status: 200 })
+      .mockResolvedValueOnce({ _data: { ok: true }, headers: {}, status: 200 })
+
+    vi.stubGlobal('$fetch', { raw })
+    await webformSubmitHandler(createEvent({ 'content-type': request.headers.get('content-type')! }))
+    const forwarded = raw.mock.calls[1]?.[1].body as FormData
+
+    expect(forwarded.getAll('topics[]')).toEqual(['one', 'two'])
+    expect((forwarded.get('attachment') as File).name).toBe('sample.txt')
+    expect(await (forwarded.get('attachment') as File).text()).toBe('hello')
+  })
+
+  it('rejects a multipart file above its own size cap', async () => {
+    const form = new FormData()
+
+    form.append('attachment', new Blob(['a'.repeat(513)]), 'oversize.txt')
+    const request = new Request('https://example.test', { method: 'POST', body: form })
+
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(await request.arrayBuffer()))
+    await expect(webformSubmitHandler(createEvent({ 'content-type': request.headers.get('content-type')! })))
+      .rejects.toMatchObject({ statusCode: 413 })
+  })
+
   it('uses the same filtered Drupal session cookie for CSRF and submit', async () => {
-    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',
       turnstile_response: 'token',
     })))
@@ -120,13 +152,13 @@ describe('POST /api/webform/submit', () => {
 
     await expect(webformSubmitHandler(event)).rejects.toMatchObject({ statusCode: 413 })
 
-    expect(readRawBody).not.toHaveBeenCalled()
+    expect(readWebformBody).not.toHaveBeenCalled()
     expect(event.node.res.getHeader('cache-control'))
       .toBe('private, no-store, max-age=0')
   })
 
   it('preserves safe Drupal validation details and status', async () => {
-    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',
       turnstile_response: 'token',
     })))
@@ -165,7 +197,7 @@ describe('POST /api/webform/submit', () => {
   })
 
   it('sanitizes resolved upstream server failures', async () => {
-    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',
       turnstile_response: 'token',
     })))
@@ -192,7 +224,7 @@ describe('POST /api/webform/submit', () => {
   })
 
   it('sanitizes upstream failures', async () => {
-    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',
       turnstile_response: 'token',
     })))
@@ -217,7 +249,7 @@ describe('POST /api/webform/submit', () => {
   })
 
   it('sanitizes upstream redirects instead of returning success', async () => {
-    vi.mocked(readRawBody).mockResolvedValue(Buffer.from(JSON.stringify({
+    vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(JSON.stringify({
       webform_id: 'contact',
       turnstile_response: 'token',
     })))
