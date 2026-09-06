@@ -1,5 +1,5 @@
 import type { SlotsToolkit } from '../../../layers/theme/app/composables/useSlotsToolkit'
-import { h, nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import MediaItem from '../../../layers/theme/app/components/global/Media/Item.vue'
@@ -8,6 +8,31 @@ describe('MediaItem (Nuxt runtime)', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
     vi.restoreAllMocks()
+  })
+
+  it('animates a stable element when video renders multiple roots', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        direction: 'fade-up',
+        index: 0,
+        node: h('div'),
+        tk: { propsOf: () => ({ type: 'video', mid: '84' }) } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+      global: {
+        stubs: {
+          MediaVideo: defineComponent({
+            setup: () => () => [h('img', { alt: 'Video poster' }), h('video')],
+          }),
+        },
+      },
+    })
+
+    const poster = wrapper.get('img').element
+
+    expect(poster.parentElement?.tagName).toBe('DIV')
+    expect(poster.parentElement).toBe(wrapper.get('video').element.parentElement)
+    expect(poster.parentElement?.classList.contains('motion-safe:opacity-0')).toBe(true)
+    wrapper.unmount()
   })
 
   it('passes a contextual corner style to visual media', async () => {
