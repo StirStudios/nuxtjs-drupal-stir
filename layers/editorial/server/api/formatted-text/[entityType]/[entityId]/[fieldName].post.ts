@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, readBody } from 'h3'
+import { defineEventHandler, readBody } from 'h3'
 import {
   assertDrupalResponseNotRedirect,
   captureDrupalApiError,
@@ -7,7 +7,7 @@ import {
 } from '../../../../../../core/server/utils/drupalApi'
 import { resolveDrupalCeApiConfig } from '../../../../../../core/server/utils/drupalCeApiConfig'
 import { buildDrupalHeaders } from '../../../../../../core/server/utils/drupalHeaders'
-import { createUpstreamParagraphTextError } from '../../../../utils/paragraphTextApi'
+import { createUpstreamParagraphTextError, parseTextValue } from '../../../../utils/paragraphTextApi'
 import {
   buildFormattedTextPath,
   parseFormattedTextRouteTarget,
@@ -23,12 +23,7 @@ export default defineEventHandler(async (event) => {
   const target = parseFormattedTextRouteTarget(event.context.params)
   const body = await readBody<FormattedTextPayload>(event)
 
-  if (typeof body?.text !== 'string') {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Text is required.',
-    })
-  }
+  const text = parseTextValue(body?.text)
 
   const config = useRuntimeConfig()
   const {
@@ -59,7 +54,7 @@ export default defineEventHandler(async (event) => {
       message?: string
     }>(savePath, {
       method: 'POST',
-      body: { text: body.text.trim() },
+      body: { text },
       headers: buildDrupalHeaders({
         apiKey,
         cookie,

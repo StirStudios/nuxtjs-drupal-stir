@@ -32,6 +32,15 @@ export function createUpstreamParagraphTextError(error: unknown, fallbackMessage
 
   return createError({
     statusCode,
-    statusMessage: fallbackMessage,
+    statusMessage: statusCode === 409
+      ? 'This content has changed or requires editing in Drupal. Reload before trying again.'
+      : fallbackMessage,
   })
+}
+
+export function parseTextValue(value: unknown): string {
+  if (typeof value !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Text is required.' })
+  }
+  return value
 }
