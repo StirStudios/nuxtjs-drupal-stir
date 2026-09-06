@@ -107,15 +107,6 @@ const visualRoundedClass = computed(() =>
   isDocument.value || isAudio.value ? undefined : props.roundedClass,
 )
 
-const animatedMediaMotionProps = computed<Record<string, unknown>>(() => ({
-  ...renderedMediaProps.value,
-  ...revealMotionProps.value,
-  editActions: props.editActions,
-  roundedClass: visualRoundedClass.value,
-  wrapperClass: props.wrapperClass,
-  onEditActionSelect: handleEditActionSelect,
-}))
-
 const shouldAnimate = computed(() =>
   Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
 )
@@ -135,12 +126,11 @@ const shouldAnimate = computed(() =>
   <RevealMotion
     v-else-if="!overlay || isDocument || isAudio"
     :key="`media-${props.index}-${revealMotionKey}`"
-    as-child
-    v-bind="animatedMediaMotionProps"
+    class="motion-safe:opacity-0"
+    v-bind="revealMotionProps"
   >
     <component
       :is="mediaComponent"
-      class="motion-safe:opacity-0"
       v-bind="renderedMediaProps"
       :edit-actions="editActions"
       :rounded-class="visualRoundedClass"
