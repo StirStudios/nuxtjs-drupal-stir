@@ -40,7 +40,7 @@ const renderedError = computed<NuxtError>(() => ({
 const clearAction = computed(() => ({
   label: errorConfig?.label || 'Back to home',
   color: errorConfig?.color || 'primary',
-  size: errorConfig?.size || 'xl',
+  size: errorConfig?.size === '2xl' ? 'xl' : errorConfig?.size || 'xl',
   icon: errorConfig?.icon || 'i-lucide-arrow-left',
   variant: errorConfig?.variant || 'solid',
 }))

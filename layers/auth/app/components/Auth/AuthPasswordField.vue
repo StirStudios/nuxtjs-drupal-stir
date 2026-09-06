@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AuthPasswordPolicy, AuthPasswordRequirement } from '../../types/auth'
 
-const model = defineModel<string | undefined>()
+const model = defineModel<string | undefined>({ default: undefined })
 
 const props = defineProps<{
   field?: {

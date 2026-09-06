@@ -1,18 +1,17 @@
 import { fileURLToPath } from 'node:url'
-import { addComponent, defineNuxtModule } from 'nuxt/kit'
+import { defineNuxtModule } from 'nuxt/kit'
+import { overrideFallbackComponent } from '../../config/componentOverrides'
 
 const integrationMountOverride = defineNuxtModule({
   meta: {
     name: 'stir-integration-mount-override',
   },
   setup() {
-    addComponent({
-      name: 'AppIntegrations',
-      filePath: fileURLToPath(
-        new URL('./app/components/App/Integrations.vue', import.meta.url),
-      ),
-      priority: 100,
-    })
+    overrideFallbackComponent(
+      'AppIntegrations',
+      fileURLToPath(new URL('../theme/app/components/App/Integrations.vue', import.meta.url)),
+      fileURLToPath(new URL('./app/components/App/Integrations.vue', import.meta.url)),
+    )
   },
 })
 

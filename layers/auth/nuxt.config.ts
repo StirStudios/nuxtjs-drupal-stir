@@ -3,6 +3,8 @@ import { positiveIntegerEnvironment } from '../../config/runtime'
 export default defineNuxtConfig({
   extends: ['../turnstile'],
 
+  modules: ['@nuxt/image'],
+
   runtimeConfig: {
     protectedPassword: process.env.PROTECTED_PASSWORD || '',
     protectedRateLimit: {

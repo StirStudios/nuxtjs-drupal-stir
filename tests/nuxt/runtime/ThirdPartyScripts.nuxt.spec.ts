@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, ref, toRef } from 'vue'
 import { usePrivacyConsent } from '../../../layers/integrations/app/composables/usePrivacyConsent'
@@ -57,13 +57,17 @@ const ScriptHarness = defineComponent({
   setup(props) {
     const { accept } = usePrivacyConsent()
 
-    const { requestLoad } = useThirdPartyScript(toRef(props, 'src'), {
+    const { requestLoad, isLoaded, error } = useThirdPartyScript(toRef(props, 'src'), {
+      // Prevent happy-dom from auto-completing disabled external script loads.
+      attrs: { type: 'application/x-stir-test' },
       immediate: props.immediate,
       kind: 'enzuzo',
       requiresConsent: props.requiresConsent,
     })
 
     return () => h('div', [
+      h('span', { class: 'loaded' }, String(isLoaded.value)),
+      h('span', { class: 'error' }, error.value?.message || ''),
       h('button', { class: 'accept', onClick: accept }, 'Accept'),
       h('button', { class: 'load', onClick: requestLoad }, 'Load'),
     ])
@@ -90,7 +94,7 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
     await wrapper.get('.accept').trigger('click')
     await nextTick()
 
-    expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
     wrapper.unmount()
   })
 
@@ -109,7 +113,7 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
     await wrapper.get('.load').trigger('click')
     await nextTick()
 
-    expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
     wrapper.unmount()
   })
 
@@ -122,7 +126,7 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
 
     await nextTick()
 
-    expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
     wrapper.unmount()
   })
 
@@ -137,7 +141,7 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
 
     await nextTick()
 
-    expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
     wrapper.unmount()
   })
 
@@ -156,6 +160,47 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
     expect(script, document.body.innerHTML).not.toBeNull()
     expect(root.nextElementSibling).toBe(script)
     expect(script?.getAttribute('src')).toBe(src)
+    wrapper.unmount()
+  })
+
+  it('loads a changed allowed URL and ignores the previous load completion', async () => {
+    const first = 'https://app.enzuzo.com/scripts/privacy/url-first'
+    const second = 'https://app.enzuzo.com/scripts/privacy/url-second'
+
+    appConfig.value.privacyNotice.mode = 'notice'
+    const wrapper = await mountSuspended(ScriptHarness, { props: { src: first } })
+
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${first}"]`)).not.toBeNull())
+    await wrapper.setProps({ src: second })
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${second}"]`)).not.toBeNull())
+    document.querySelector(`script[src="${first}"]`)!.dispatchEvent(new Event('load'))
+    await nextTick()
+    expect(wrapper.get('.loaded').text()).toBe('false')
+    document.querySelector(`script[src="${second}"]`)!.dispatchEvent(new Event('load'))
+    await vi.waitFor(() => expect(wrapper.get('.loaded').text()).toBe('true'))
+    wrapper.unmount()
+  })
+
+  it('replaces a failed script on explicit retry', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/retry-test'
+
+    appConfig.value.privacyNotice.mode = 'notice'
+    const wrapper = await mountSuspended(ScriptHarness, { props: { src } })
+
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
+    const failed = document.querySelector(`script[src="${src}"]`)!
+
+    failed.dispatchEvent(new Event('error'))
+    await vi.waitFor(() => expect(wrapper.get('.error').text()).not.toBe(''))
+    await wrapper.get('.load').trigger('click')
+    await vi.waitFor(() => {
+      const replacement = document.querySelector(`script[src="${src}"]`)
+
+      expect(replacement).not.toBeNull()
+      expect(replacement).not.toBe(failed)
+    })
+    document.querySelector(`script[src="${src}"]`)!.dispatchEvent(new Event('load'))
+    await vi.waitFor(() => expect(wrapper.get('.loaded').text()).toBe('true'))
     wrapper.unmount()
   })
 

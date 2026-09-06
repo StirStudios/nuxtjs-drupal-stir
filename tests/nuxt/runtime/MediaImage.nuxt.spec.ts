@@ -4,6 +4,17 @@ import MediaImage from '../../../layers/theme/app/components/global/Media/Image.
 import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
+  it('renders linked Instagram media as one interactive link', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { src: '/instagram.webp', alt: 'Studio project', platform: 'instagram', link: 'https://www.instagram.com/p/example/' },
+    })
+
+    expect(wrapper.findAll('a')).toHaveLength(1)
+    expect(wrapper.find('a a, a button').exists()).toBe(false)
+    expect(wrapper.get('a').attributes('href')).toBe('https://www.instagram.com/p/example/')
+    wrapper.unmount()
+  })
+
   it('allows a contextual square-corner override', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

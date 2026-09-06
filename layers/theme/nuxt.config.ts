@@ -69,6 +69,7 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxt/image',
+    '@nuxt/scripts',
     function registerStirAppConfigTypes() {
       addTypeTemplate({
         filename: 'types/stir-app-config.d.ts',
@@ -143,25 +144,27 @@ export default defineNuxtConfig({
         }
       }
 
-      const spaTemplateSource = typeof nuxt.options.spaLoadingTemplate === 'string'
-        ? nuxt.options.spaLoadingTemplate
-        : upstreamSpaLoadingTemplate
-      const spaTemplate = readFileSync(spaTemplateSource, 'utf8')
-      const generatedSpaTemplateDir = resolvePath(
-        nuxt.options.rootDir,
-        'node_modules/.cache/stir-spa-loader',
-      )
-      const generatedSpaTemplate = resolvePath(
-        generatedSpaTemplateDir,
-        'spa-loading-template.html',
-      )
+      if (nuxt.options.spaLoadingTemplate !== false) {
+        const spaTemplateSource = typeof nuxt.options.spaLoadingTemplate === 'string'
+          ? nuxt.options.spaLoadingTemplate
+          : upstreamSpaLoadingTemplate
+        const spaTemplate = readFileSync(spaTemplateSource, 'utf8')
+        const generatedSpaTemplateDir = resolvePath(
+          nuxt.options.rootDir,
+          'node_modules/.cache/stir-spa-loader',
+        )
+        const generatedSpaTemplate = resolvePath(
+          generatedSpaTemplateDir,
+          'spa-loading-template.html',
+        )
 
-      await mkdir(generatedSpaTemplateDir, { recursive: true })
-      await writeFileIfChanged(
-        generatedSpaTemplate,
-        `${buildSpaLoaderThemeStyle(rootAppConfig)}\n${spaTemplate}`,
-      )
-      nuxt.options.spaLoadingTemplate = generatedSpaTemplate
+        await mkdir(generatedSpaTemplateDir, { recursive: true })
+        await writeFileIfChanged(
+          generatedSpaTemplate,
+          `${buildSpaLoaderThemeStyle(rootAppConfig)}\n${spaTemplate}`,
+        )
+        nuxt.options.spaLoadingTemplate = generatedSpaTemplate
+      }
 
       const generationStartedAt = performance.now()
       const drupalUrl = process.env.DRUPAL_URL?.replace(/\/$/u, '')
