@@ -264,7 +264,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
       <UButton
         v-if="slides.length > 1 && preferredMotion !== 'reduce'"
         :aria-controls="contentId"
-        class="mb-2"
+        class="sr-only focus:not-sr-only focus:absolute focus:z-20"
         color="neutral"
         :disabled="!mounted"
         :icon="userPaused ? 'i-lucide-play' : 'i-lucide-pause'"
