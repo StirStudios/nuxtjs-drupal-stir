@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
+import { useAppRegionBlocks } from '../../../layers/theme/app/composables/useAppContext'
 import RegionArea from '../../../layers/theme/app/components/RegionArea.vue'
 
 const state = vi.hoisted(() => ({
@@ -115,6 +116,33 @@ describe('RegionArea app context fallback', () => {
         props: { id: 'ce-region' },
       },
     ])
+  })
+
+  it('handles a failed shared request and permits a successful retry', async () => {
+    unregisterEndpoint?.()
+    let fail = true
+
+    unregisterEndpoint = registerEndpoint('/api/app-context', () => {
+      state.layoutBlockCalls++
+      if (fail) throw new Error('fixture unavailable')
+      return { blocks: { test: [{ element: 'paragraph-text' }] } }
+    })
+    const Harness = defineComponent({
+      async setup() {
+        const result = await useAppRegionBlocks('test')
+
+        return { result }
+      },
+      template: '<div />',
+    })
+    const wrapper = await mountSuspended(Harness)
+
+    expect(wrapper.vm.result.error.value).toBeTruthy()
+    fail = false
+    await wrapper.vm.result.refresh()
+    expect(wrapper.vm.result.error.value).toBeFalsy()
+    expect(wrapper.vm.result.data.value).toEqual([{ element: 'paragraph-text' }])
+    wrapper.unmount()
   })
 
   it('dedupes concurrent layout block requests for the route', async () => {

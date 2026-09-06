@@ -4,6 +4,9 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
 
+import { assertPresetComponents } from './preset-components.mjs'
+import { assertPresetOutput } from './preset-output.mjs'
+
 const rootDir = resolve('.')
 const fixtureDir = resolve('tests/fixtures/consumer-app/app')
 const consumerLayers = [
@@ -206,10 +209,12 @@ async function main() {
         `export default defineNuxtConfig({ extends: ['${layer.specifier}'] })\n`,
       )
       await run('pnpm', ['typecheck'], consumerDir, consumerEnvironment)
+      await assertPresetComponents(consumerDir, layer.label)
       await run('pnpm', ['build'], consumerDir, {
         ...consumerEnvironment,
         STIR_PERF_ANALYZE: 'true',
       })
+      await assertPresetOutput(consumerDir, layer.label)
       const installedReport = join(
         consumerDir,
         'node_modules/@stir/base/.audit/client-entry-modules.json',
@@ -218,6 +223,30 @@ async function main() {
         throw new Error(
           `Packed ${layer.label} consumer registered the repository diagnostics writer.`,
         )
+      }
+      if (layer.label === 'full') {
+        // Check ordinary project and project-layer overrides without another build.
+        for (const owner of ['app', 'custom-layer/app']) {
+          const componentsDir = join(consumerDir, owner, 'components')
+          await mkdir(componentsDir, { recursive: true })
+          for (const name of ['EditLink', 'DrupalTabs', 'AppIntegrations']) {
+            await writeFile(join(componentsDir, `${name}.vue`), '<template><div>Consumer override</div></template>\n')
+          }
+          if (owner.startsWith('custom-layer')) {
+            await writeFile(join(consumerDir, 'custom-layer/nuxt.config.ts'), 'export default defineNuxtConfig({})\n')
+          }
+          await writeFile(join(consumerDir, 'nuxt.config.ts'), `export default defineNuxtConfig({
+            extends: [${owner.startsWith('custom-layer') ? "'./custom-layer', " : ''}'${layer.specifier}'],
+            spaLoadingTemplate: false,
+            hooks: { ready(nuxt) { if (nuxt.options.spaLoadingTemplate !== false) throw new Error('Disabled SPA loader was overwritten') } },
+          })\n`)
+          await run('pnpm', ['exec', 'nuxi', 'prepare'], consumerDir, consumerEnvironment)
+          const declarations = await readFile(join(consumerDir, '.nuxt/components.d.ts'), 'utf8')
+          for (const name of ['EditLink', 'DrupalTabs', 'AppIntegrations']) {
+            if (!declarations.includes(`${owner}/components/${name}.vue`)) throw new Error(`${owner} override lost: ${name}`)
+          }
+          await rm(componentsDir, { recursive: true, force: true })
+        }
       }
       console.log(`Packed ${layer.label} consumer validation passed.`)
     }

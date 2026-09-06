@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   collapseWhenInactive: false,
 })
-const turnstileToken = defineModel<string>()
+const turnstileToken = defineModel<string | undefined>({ default: undefined })
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
 const verificationFailed = ref(false)

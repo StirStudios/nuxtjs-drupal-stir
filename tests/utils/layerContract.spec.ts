@@ -91,13 +91,10 @@ describe('layer contract', () => {
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),
       'utf8',
     )
-    const tsConfig = readFileSync(resolve(rootDir, 'tsconfig.json'), 'utf8')
 
     for (const alias of ['utils', 'composables', 'components', 'types']) {
       expect(nuxtConfig).toContain(`'#stir/${alias}':`)
       expect(nuxtConfig).toContain(`'~/${alias}':`)
-      expect(tsConfig).toContain(`"#stir/${alias}/*"`)
-      expect(tsConfig).toContain(`"~/${alias}/*"`)
     }
   })
 

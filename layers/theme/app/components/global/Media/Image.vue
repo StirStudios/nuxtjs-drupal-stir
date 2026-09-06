@@ -318,9 +318,9 @@ onMounted(() => {
         </div>
         <UButton
           v-if="link"
+          as="span"
           class="mt-5"
           size="sm"
-          :to="link"
           variant="outline"
         >
           View on Instagram

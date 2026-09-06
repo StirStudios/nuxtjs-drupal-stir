@@ -1,4 +1,4 @@
-import { createError, defineEventHandler, readBody } from 'h3'
+import { defineEventHandler, readBody } from 'h3'
 import {
   assertDrupalResponseNotRedirect,
   captureDrupalApiError,
@@ -11,6 +11,7 @@ import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
   parseParagraphId,
+  parseTextValue,
 } from '../../../utils/paragraphTextApi'
 
 interface ParagraphTextPayload {
@@ -23,14 +24,7 @@ export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
 
   const body = await readBody<ParagraphTextPayload>(event)
-  const text = typeof body?.text === 'string' ? body.text.trim() : ''
-
-  if (!text) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Text is required.',
-    })
-  }
+  const text = parseTextValue(body?.text)
 
   const config = useRuntimeConfig()
   const {

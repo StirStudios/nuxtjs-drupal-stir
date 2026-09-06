@@ -40,8 +40,9 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoplay')).toMatchObject({
       delay: 10000,
       playOnInit: false,
-      stopOnInteraction: false,
-      stopOnMouseEnter: true,
+      stopOnInteraction: true,
+      stopOnMouseEnter: false,
+      stopOnFocusIn: false,
     })
   })
 
@@ -158,6 +159,24 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(marquee.props('pauseOnHover')).toBe(false)
     expect(marquee.props('reverse')).toBe(true)
     expect(wrapper.findComponent({ name: 'UCarousel' }).exists()).toBe(false)
+  })
+
+  it.each(['carousel', 'marquee'])('keeps %s paused after focus leaves until explicitly resumed', async (presentation) => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { presentation, items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')] },
+    })
+    const pause = wrapper.get('button[aria-controls]')
+
+    expect(pause.text()).toBe('Pause automatic scrolling')
+    await wrapper.get('a').trigger('focusin')
+    await wrapper.get('a').trigger('focusout')
+    expect(pause.text()).toBe('Start automatic scrolling')
+    await pause.trigger('click')
+    expect(pause.text()).toBe('Pause automatic scrolling')
+    await pause.trigger('click')
+    await wrapper.get('a').trigger('mouseleave')
+    expect(pause.text()).toBe('Start automatic scrolling')
+    wrapper.unmount()
   })
 
   it('uses backward-compatible marquee defaults', async () => {

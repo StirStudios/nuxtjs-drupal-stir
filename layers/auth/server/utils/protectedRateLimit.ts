@@ -1,13 +1,9 @@
-import { getRequestIP, type H3Event } from 'h3'
+import { createError, getRequestIP, type H3Event } from 'h3'
+import { RateLimiterMemory } from 'rate-limiter-flexible'
 
 const DEFAULT_MAX_ATTEMPTS = 5
 const DEFAULT_WINDOW_SECONDS = 15 * 60
 const STORAGE_BASE = 'stir:protected-login'
-
-type ProtectedRateLimitRecord = {
-  failures: number
-  resetAt: number
-}
 
 export type LayerAuthProtectedRateLimitConfig = {
   enabled: boolean
@@ -16,21 +12,40 @@ export type LayerAuthProtectedRateLimitConfig = {
   windowSeconds: number
 }
 
-export type LayerAuthProtectedRateLimitStorage = {
-  getItem: <T>(key: string) => Promise<T | null>
-  setItem: <T>(
-    key: string,
-    value: T,
-    options?: Record<string, unknown>,
-  ) => Promise<void>
-  removeItem: (key: string) => Promise<void>
+/** Consume must atomically reserve an attempt or reject with msBeforeNext. */
+export type LayerAuthProtectedRateLimiter = {
+  consume: (key: string) => Promise<unknown>
+  delete: (key: string) => Promise<unknown>
+}
+
+declare module 'h3' {
+  interface H3EventContext {
+    stirProtectedRateLimiter?: LayerAuthProtectedRateLimiter
+  }
 }
 
 export type LayerAuthProtectedRateLimitDependencies = {
   config?: LayerAuthProtectedRateLimitConfig
   identifier?: string
-  now?: () => number
-  storage?: LayerAuthProtectedRateLimitStorage
+  limiter?: LayerAuthProtectedRateLimiter
+}
+
+let memoryLimiter: { signature: string, limiter: RateLimiterMemory } | undefined
+
+const getMemoryLimiter = (config: LayerAuthProtectedRateLimitConfig) => {
+  const signature = `${config.maxAttempts}:${config.windowSeconds}`
+
+  if (memoryLimiter?.signature !== signature) {
+    memoryLimiter = {
+      signature,
+      limiter: new RateLimiterMemory({
+        points: config.maxAttempts,
+        duration: config.windowSeconds,
+      }),
+    }
+  }
+
+  return memoryLimiter.limiter
 }
 
 export type LayerAuthProtectedRateLimitStatus = {
@@ -110,71 +125,36 @@ const getDependencies = async (
       dependencies.identifier,
       config.trustProxy,
     ),
-    now: dependencies.now?.() ?? Date.now(),
-    storage: dependencies.storage
-      || (config.enabled
-        ? useStorage('cache') as LayerAuthProtectedRateLimitStorage
-        : undefined),
+    limiter: config.enabled
+      ? dependencies.limiter || event.context?.stirProtectedRateLimiter || getMemoryLimiter(config)
+      : undefined,
   }
 }
 
-export const layerAuthCheckProtectedLoginRateLimit = async (
+export const layerAuthConsumeProtectedLoginAttempt = async (
   event: H3Event,
   dependencies: LayerAuthProtectedRateLimitDependencies = {},
 ): Promise<LayerAuthProtectedRateLimitStatus> => {
-  const { config, key, now, storage } = await getDependencies(event, dependencies)
+  const { key, limiter } = await getDependencies(event, dependencies)
 
-  if (!config.enabled) {
-    return { allowed: true, retryAfterSeconds: 0 }
-  }
+  if (!limiter) return { allowed: true, retryAfterSeconds: 0 }
 
   try {
-    if (!storage) return { allowed: true, retryAfterSeconds: 0 }
-
-    const record = await storage.getItem<ProtectedRateLimitRecord>(key)
-
-    if (!record || record.resetAt <= now || record.failures < config.maxAttempts) {
-      return { allowed: true, retryAfterSeconds: 0 }
-    }
-
-    return {
-      allowed: false,
-      retryAfterSeconds: Math.max(1, Math.ceil((record.resetAt - now) / 1000)),
-    }
-  } catch {
+    await limiter.consume(key)
     return { allowed: true, retryAfterSeconds: 0 }
-  }
-}
+  } catch (error) {
+    if (error && typeof error === 'object' && 'msBeforeNext' in error
+      && typeof error.msBeforeNext === 'number' && Number.isFinite(error.msBeforeNext)) {
+      return {
+        allowed: false,
+        retryAfterSeconds: Math.max(1, Math.ceil(error.msBeforeNext / 1000)),
+      }
+    }
 
-export const layerAuthRecordProtectedLoginFailure = async (
-  event: H3Event,
-  dependencies: LayerAuthProtectedRateLimitDependencies = {},
-): Promise<void> => {
-  const { config, key, now, storage } = await getDependencies(event, dependencies)
-
-  if (!config.enabled) return
-
-  try {
-    if (!storage) return
-
-    const existing = await storage.getItem<ProtectedRateLimitRecord>(key)
-    const record = existing && existing.resetAt > now
-      ? existing
-      : {
-          failures: 0,
-          resetAt: now + config.windowSeconds * 1000,
-        }
-
-    await storage.setItem(
-      key,
-      {
-        failures: record.failures + 1,
-        resetAt: record.resetAt,
-      },
-      { ttl: config.windowSeconds },
-    )
-  } catch {
-    // Authentication still fails closed if rate-limit storage is unavailable.
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'Login is temporarily unavailable. Please try again later',
+    })
   }
 }
 
@@ -182,14 +162,10 @@ export const layerAuthResetProtectedLoginRateLimit = async (
   event: H3Event,
   dependencies: LayerAuthProtectedRateLimitDependencies = {},
 ): Promise<void> => {
-  const { config, key, storage } = await getDependencies(event, dependencies)
-
-  if (!config.enabled) return
+  const { key, limiter } = await getDependencies(event, dependencies)
 
   try {
-    if (!storage) return
-
-    await storage.removeItem(key)
+    await limiter?.delete(key)
   } catch {
     // A successful login must not fail because cleanup storage is unavailable.
   }

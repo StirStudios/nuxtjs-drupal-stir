@@ -3,6 +3,7 @@ import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
   parseParagraphId,
+  parseTextValue,
 } from '../../layers/editorial/server/utils/paragraphTextApi'
 
 describe('editorial paragraph text API policy', () => {
@@ -29,5 +30,18 @@ describe('editorial paragraph text API policy', () => {
       { statusCode: 500 },
       'Read failed.',
     )).toMatchObject({ statusCode: 502, statusMessage: 'Read failed.' })
+  })
+})
+
+describe('inline text preservation', () => {
+  it('leaves optional emptiness and whitespace validation to Drupal', () => {
+    expect(parseTextValue('')).toBe('')
+    expect(parseTextValue('  text\n')).toBe('  text\n')
+    expect(() => parseTextValue(null)).toThrow('Text is required.')
+  })
+
+  it('explains revision conflicts without exposing upstream internals', () => {
+    expect(createUpstreamParagraphTextError({ statusCode: 409 }, 'Save failed.'))
+      .toMatchObject({ statusCode: 409, statusMessage: 'This content has changed or requires editing in Drupal. Reload before trying again.' })
   })
 })

@@ -1,29 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { RateLimiterMemory } from 'rate-limiter-flexible'
 import {
-  layerAuthCheckProtectedLoginRateLimit,
+  layerAuthConsumeProtectedLoginAttempt,
   layerAuthGetProtectedRateLimitConfig,
-  layerAuthRecordProtectedLoginFailure,
   layerAuthResetProtectedLoginRateLimit,
   type LayerAuthProtectedRateLimitDependencies,
-  type LayerAuthProtectedRateLimitStorage,
 } from '../../layers/auth/server/utils/protectedRateLimit'
 
-const createMemoryStorage = (): LayerAuthProtectedRateLimitStorage => {
-  const values = new Map<string, unknown>()
-
-  return {
-    getItem: async <T>(key: string) => (values.get(key) as T | undefined) ?? null,
-    setItem: async <T>(key: string, value: T) => {
-      values.set(key, value)
-    },
-    removeItem: async (key: string) => {
-      values.delete(key)
-    },
-  }
-}
-
 describe('protected login rate limit', () => {
-  const event = { node: { req: { headers: {} } } } as never
+  const event = { context: {}, node: { req: { headers: {} } } } as never
+
+  afterEach(() => vi.useRealTimers())
 
   it('does not trust forwarded addresses unless explicitly configured', () => {
     expect(layerAuthGetProtectedRateLimitConfig({
@@ -35,7 +22,7 @@ describe('protected login rate limit', () => {
   })
 
   it('uses the socket address unless trusted-proxy mode is enabled', async () => {
-    const storage = createMemoryStorage()
+    const limiter = new RateLimiterMemory({ points: 1, duration: 60 })
     const firstEvent = {
       context: {},
       node: {
@@ -61,51 +48,56 @@ describe('protected login rate limit', () => {
       windowSeconds: 60,
     }
 
-    await layerAuthRecordProtectedLoginFailure(firstEvent, { config, storage })
+    await layerAuthConsumeProtectedLoginAttempt(firstEvent, { config, limiter })
 
-    await expect(layerAuthCheckProtectedLoginRateLimit(secondEvent, {
+    await expect(layerAuthConsumeProtectedLoginAttempt(secondEvent, {
       config,
-      storage,
+      limiter,
     })).resolves.toEqual({ allowed: true, retryAfterSeconds: 0 })
 
     const trustedProxyConfig = { ...config, trustProxy: true }
 
-    await layerAuthRecordProtectedLoginFailure(firstEvent, {
+    await layerAuthConsumeProtectedLoginAttempt(firstEvent, {
       config: trustedProxyConfig,
-      storage,
+      limiter,
     })
 
-    await expect(layerAuthCheckProtectedLoginRateLimit(secondEvent, {
+    await expect(layerAuthConsumeProtectedLoginAttempt(secondEvent, {
       config: trustedProxyConfig,
-      storage,
+      limiter,
     })).resolves.toEqual({ allowed: false, retryAfterSeconds: 60 })
   })
 
-  it('blocks an identifier after the configured number of failures', async () => {
-    const storage = createMemoryStorage()
+  it('reserves attempts atomically before overlapping validations run', async () => {
     const dependencies: LayerAuthProtectedRateLimitDependencies = {
-      config: {
-        enabled: true,
-        maxAttempts: 2,
-        trustProxy: false,
-        windowSeconds: 60,
-      },
+      config: { enabled: true, maxAttempts: 5, trustProxy: false, windowSeconds: 60 },
       identifier: '192.0.2.10',
-      now: () => 1_000,
-      storage,
+      limiter: new RateLimiterMemory({ points: 5, duration: 60 }),
+    }
+    const results = await Promise.all(Array.from({ length: 20 }, () =>
+      layerAuthConsumeProtectedLoginAttempt(event, dependencies)))
+
+    expect(results.filter(result => result.allowed)).toHaveLength(5)
+    expect(results.filter(result => !result.allowed)).toHaveLength(15)
+    expect(results.filter(result => !result.allowed).every(result => result.retryAfterSeconds === 60)).toBe(true)
+  })
+
+  it('allows another attempt after the window expires', async () => {
+    vi.useFakeTimers()
+    const dependencies: LayerAuthProtectedRateLimitDependencies = {
+      config: { enabled: true, maxAttempts: 1, trustProxy: false, windowSeconds: 60 },
+      identifier: '192.0.2.20',
+      limiter: new RateLimiterMemory({ points: 1, duration: 60 }),
     }
 
-    await layerAuthRecordProtectedLoginFailure(event, dependencies)
-    await expect(layerAuthCheckProtectedLoginRateLimit(event, dependencies))
-      .resolves.toEqual({ allowed: true, retryAfterSeconds: 0 })
-
-    await layerAuthRecordProtectedLoginFailure(event, dependencies)
-    await expect(layerAuthCheckProtectedLoginRateLimit(event, dependencies))
-      .resolves.toEqual({ allowed: false, retryAfterSeconds: 60 })
+    await layerAuthConsumeProtectedLoginAttempt(event, dependencies)
+    expect((await layerAuthConsumeProtectedLoginAttempt(event, dependencies)).allowed).toBe(false)
+    await vi.advanceTimersByTimeAsync(60_001)
+    expect((await layerAuthConsumeProtectedLoginAttempt(event, dependencies)).allowed).toBe(true)
   })
 
   it('clears failures after a successful login', async () => {
-    const storage = createMemoryStorage()
+    const limiter = new RateLimiterMemory({ points: 1, duration: 60 })
     const dependencies: LayerAuthProtectedRateLimitDependencies = {
       config: {
         enabled: true,
@@ -114,33 +106,36 @@ describe('protected login rate limit', () => {
         windowSeconds: 60,
       },
       identifier: '192.0.2.11',
-      now: () => 1_000,
-      storage,
+      limiter,
     }
 
-    await layerAuthRecordProtectedLoginFailure(event, dependencies)
+    await layerAuthConsumeProtectedLoginAttempt(event, dependencies)
     await layerAuthResetProtectedLoginRateLimit(event, dependencies)
 
-    await expect(layerAuthCheckProtectedLoginRateLimit(event, dependencies))
+    await expect(layerAuthConsumeProtectedLoginAttempt(event, dependencies))
       .resolves.toEqual({ allowed: true, retryAfterSeconds: 0 })
   })
 
-  it('fails open when rate-limit storage is unavailable', async () => {
-    const storage: LayerAuthProtectedRateLimitStorage = {
-      getItem: async () => { throw new Error('unavailable') },
-      setItem: async () => { throw new Error('unavailable') },
-      removeItem: async () => { throw new Error('unavailable') },
-    }
-
-    await expect(layerAuthCheckProtectedLoginRateLimit(event, {
-      config: {
-        enabled: true,
-        maxAttempts: 1,
-        trustProxy: false,
-        windowSeconds: 60,
-      },
+  it('fails closed when an atomic backend is unavailable', async () => {
+    await expect(layerAuthConsumeProtectedLoginAttempt(event, {
+      config: { enabled: true, maxAttempts: 1, trustProxy: false, windowSeconds: 60 },
       identifier: '192.0.2.12',
-      storage,
-    })).resolves.toEqual({ allowed: true, retryAfterSeconds: 0 })
+      limiter: {
+        consume: async () => { throw new Error('private backend detail') },
+        delete: async () => true,
+      },
+    })).rejects.toMatchObject({ statusCode: 503 })
+  })
+
+  it('uses the consumer atomic adapter on request context', async () => {
+    const consume = vi.fn().mockResolvedValue({})
+    const request = { context: { stirProtectedRateLimiter: { consume, delete: vi.fn() } } } as never
+
+    await layerAuthConsumeProtectedLoginAttempt(request, {
+      config: { enabled: true, maxAttempts: 1, trustProxy: false, windowSeconds: 60 },
+      identifier: '192.0.2.13',
+    })
+    expect(consume).toHaveBeenCalledOnce()
+    expect(consume.mock.calls[0]?.[0]).not.toContain('192.0.2.13')
   })
 })

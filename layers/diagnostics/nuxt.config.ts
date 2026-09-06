@@ -1,8 +1,5 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const repositoryDir = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+import { resolve } from 'node:path'
 
 type AnalysisOutputOptions = { dir?: string }
 type AnalysisOutputChunk = {
@@ -12,6 +9,7 @@ type AnalysisOutputChunk = {
   fileName: string
   facadeModuleId: string | null
   imports: string[]
+  viteMetadata?: { importedCss?: Set<string> }
   dynamicImports: string[]
   modules: Record<string, { renderedLength: number }>
 }
@@ -22,8 +20,11 @@ type AnalysisOutputBundle = Record<
 >
 
 export default defineNuxtConfig({
-  vite: {
-    plugins: [{
+  modules: [(_options, nuxt) => {
+    const auditDir = resolve(nuxt.options.rootDir, '.audit')
+
+    nuxt.options.vite.plugins ||= []
+    nuxt.options.vite.plugins.push({
       apply: 'build',
       name: 'stir-client-entry-analysis',
       generateBundle(
@@ -39,7 +40,7 @@ export default defineNuxtConfig({
             facadeModuleId: chunk.facadeModuleId,
             isEntry: chunk.isEntry,
             isDynamicEntry: chunk.isDynamicEntry,
-            imports: chunk.imports,
+            imports: [...chunk.imports, ...Array.from(chunk.viteMetadata?.importedCss || [])],
             dynamicImports: chunk.dynamicImports,
             modules: Object.entries(chunk.modules)
               .map(([id, details]) => ({
@@ -51,14 +52,12 @@ export default defineNuxtConfig({
 
         if (!chunks.length) return
 
-        const auditDir = resolve(repositoryDir, '.audit')
-
         mkdirSync(auditDir, { recursive: true })
         writeFileSync(
           resolve(auditDir, 'client-entry-modules.json'),
           `${JSON.stringify({ chunks }, null, 2)}\n`,
         )
       },
-    }],
-  },
+    })
+  }],
 })

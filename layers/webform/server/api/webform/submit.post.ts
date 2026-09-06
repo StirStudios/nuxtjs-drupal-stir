@@ -1,7 +1,5 @@
 import {
   defineEventHandler,
-  readMultipartFormData,
-  readRawBody,
   createError,
   getHeader,
   setHeader,
@@ -19,10 +17,10 @@ import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
 import {
   assertWebformContentLength,
   assertWebformMultipartLimits,
-  assertWebformRawBodySize,
   getWebformSubmissionLimits,
   type WebformSubmissionLimits,
 } from '../../utils/webformLimits'
+import { readWebformBody } from '../../utils/readWebformBody'
 import type { WebformSubmissionResponse } from '../../../shared/types/webformSubmission'
 
 type SubmissionBody = Record<string, unknown>
@@ -77,13 +75,10 @@ async function parseSubmission(
 ): Promise<ParsedSubmission> {
   const contentType = getHeader(event, 'content-type') ?? ''
 
+  const rawBody = await readWebformBody(event, limits)
+
   if (!contentType.toLowerCase().includes('multipart/form-data')) {
-    const rawBody = await readRawBody(event, false)
-    const byteLength = rawBody?.byteLength ?? 0
-
-    assertWebformRawBodySize(byteLength, limits)
-
-    const value = rawBody?.toString() ?? ''
+    const value = new TextDecoder().decode(rawBody)
     let body: SubmissionBody
 
     try {
@@ -113,31 +108,26 @@ async function parseSubmission(
     }
   }
 
-  const parts = await readMultipartFormData(event)
+  let formData: FormData
 
-  assertWebformMultipartLimits(parts ?? [], limits)
+  try {
+    formData = await new Response(new Uint8Array(rawBody), {
+      headers: { 'Content-Type': contentType },
+    }).formData()
+  } catch {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid multipart form submission' })
+  }
+
+  assertWebformMultipartLimits(Array.from(formData.entries(), ([name, value]) => ({
+    name,
+    filename: typeof value === 'string' ? undefined : value.name,
+    data: { byteLength: typeof value === 'string' ? new TextEncoder().encode(value).byteLength : value.size },
+  })), limits)
 
   const body: SubmissionBody = {}
-  const formData = new FormData()
 
-  for (const part of parts ?? []) {
-    if (!part.name) continue
-
-    if (part.filename) {
-      const data = new Uint8Array(part.data)
-      const blob = new Blob([data], {
-        type: part.type || 'application/octet-stream',
-      })
-
-      formData.append(part.name, blob, part.filename)
-      setBodyValue(body, part.name, part.filename)
-      continue
-    }
-
-    const value = new TextDecoder().decode(part.data)
-
-    formData.append(part.name, value)
-    setBodyValue(body, part.name, value)
+  for (const [name, value] of formData) {
+    setBodyValue(body, name, typeof value === 'string' ? value : value.name)
   }
 
   return {

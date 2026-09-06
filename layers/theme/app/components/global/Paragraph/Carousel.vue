@@ -74,13 +74,13 @@ const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
 
+type MotionController = { play: () => void, stop: () => void }
+
 type CarouselController = {
   emblaApi?: {
     plugins: () => {
-      autoplay?: {
-        play: () => void
-        stop: () => void
-      }
+      autoplay?: MotionController
+      autoScroll?: MotionController
     }
   }
 }
@@ -88,6 +88,11 @@ type CarouselController = {
 const carousel = useTemplateRef<CarouselController>('carousel')
 const preferredMotion = usePreferredReducedMotion()
 const carouselIsVisible = ref(false)
+const userPaused = ref(false)
+const hovered = ref(false)
+const contentId = useId()
+const motionPaused = computed(() => userPaused.value || hovered.value
+  || preferredMotion.value === 'reduce' || !carouselIsVisible.value)
 const carouselImageDeliverySizes = computed(() =>
   resolveCarouselImageDeliverySizes(
     props.gridItems,
@@ -155,8 +160,10 @@ const autoScrollOptions = computed(() =>
     ? {
         speed: autoScrollSpeed.value,
         startDelay: 0,
-        stopOnMouseEnter: true,
-        stopOnInteraction: false,
+        playOnInit: false,
+        stopOnMouseEnter: false,
+        stopOnFocusIn: false,
+        stopOnInteraction: true,
       }
     : false,
 )
@@ -168,8 +175,9 @@ const autoplayOptions = computed(() =>
     ? {
         delay: interval.value,
         playOnInit: false,
-        stopOnMouseEnter: true,
-        stopOnInteraction: false,
+        stopOnMouseEnter: false,
+        stopOnFocusIn: false,
+        stopOnInteraction: true,
       }
     : false,
 )
@@ -187,26 +195,15 @@ const marqueeLabel = computed(() =>
   `Content marquee ${props.id ?? props.uuid ?? ''}`.trim(),
 )
 
-function autoplayPlugin() {
-  return carousel.value?.emblaApi?.plugins().autoplay
-}
-
 function syncAutoplay() {
-  if (
-    !mounted.value
-    || slides.value.length <= 1
-    || props.carouselAutoscroll
-    || preferredMotion.value === 'reduce'
-    || !carouselIsVisible.value
-  ) {
-    autoplayPlugin()?.stop()
-    return
-  }
+  const plugins = carousel.value?.emblaApi?.plugins()
+  const activePlugin = props.carouselAutoscroll ? plugins?.autoScroll : plugins?.autoplay
 
-  // The autoplay plugin applies the configured delay before advancing, so
-  // starting it when the carousel enters view preserves Drupal's interval for
-  // the first transition as well as every later one.
-  autoplayPlugin()?.play()
+  if (!mounted.value || slides.value.length <= 1 || motionPaused.value) {
+    activePlugin?.stop()
+  } else {
+    activePlugin?.play()
+  }
 }
 
 const { isSupported: intersectionObserverSupported } = useIntersectionObserver(
@@ -218,7 +215,7 @@ const { isSupported: intersectionObserverSupported } = useIntersectionObserver(
   { threshold: 0.1 },
 )
 
-watch([carousel, preferredMotion, interval], syncAutoplay, { flush: 'post' })
+watch([carousel, motionPaused, interval, () => props.carouselAutoscroll], syncAutoplay, { flush: 'post' })
 
 function restoreFadeViewportPosition() {
   if (!props.carouselFade) return
@@ -264,18 +261,38 @@ function releasePointerArrowFocus(event: PointerEvent) {
         {{ header }}
       </component>
 
-      <UMarquee
-        v-if="isMarquee && slides.length"
-        :aria-label="marqueeLabel"
-        class="stir-marquee"
-        :orientation="marqueeOrientation ?? 'horizontal'"
-        :overlay="marqueeOverlay ?? false"
-        :pause-on-hover="marqueePauseOnHover"
-        :reverse="marqueeReverse ?? false"
-        :style="marqueeStyle"
+      <UButton
+        v-if="slides.length > 1 && preferredMotion !== 'reduce'"
+        :aria-controls="contentId"
+        class="mb-2"
+        color="neutral"
+        :disabled="!mounted"
+        :icon="userPaused ? 'i-lucide-play' : 'i-lucide-pause'"
+        :label="userPaused ? 'Start automatic scrolling' : 'Pause automatic scrolling'"
+        variant="outline"
+        @click="userPaused = !userPaused"
+      />
+
+      <div
+        :id="contentId"
+        @focusin="userPaused = true"
+        @mouseenter="hovered = !isMarquee || marqueePauseOnHover"
+        @mouseleave="hovered = false"
+        @pointerdown="userPaused = true"
       >
-        <div v-for="item in slides" :key="item.key">
-          <component :is="item.vnode" />
+        <UMarquee
+          v-if="isMarquee && slides.length"
+          :aria-label="marqueeLabel"
+          class="stir-marquee"
+          :class="{ 'stir-marquee-paused': motionPaused }"
+          :orientation="marqueeOrientation ?? 'horizontal'"
+          :overlay="marqueeOverlay ?? false"
+          :pause-on-hover="marqueePauseOnHover"
+          :reverse="marqueeReverse ?? false"
+          :style="marqueeStyle"
+        >
+          <div v-for="item in slides" :key="item.key">
+            <component :is="item.vnode" />
         </div>
       </UMarquee>
 
@@ -306,11 +323,16 @@ function releasePointerArrowFocus(event: PointerEvent) {
           <component :is="item.vnode" :key="item.key" />
         </WrapDiv>
       </UCarousel>
+      </div>
     </div>
   </RevealMotionElement>
 </template>
 
 <style>
+.stir-marquee-paused [data-slot='content'] {
+  animation-play-state: paused !important;
+}
+
 @media (min-width: 48rem) {
   .stir-carousel:hover [data-slot='prev'],
   .stir-carousel:hover [data-slot='next'],

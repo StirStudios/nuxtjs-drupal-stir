@@ -84,11 +84,13 @@ async function fetchSharedAppContext(path: string): Promise<AppContextPayload> {
 
   appContextRequests.set(normalizedPath, request)
 
-  request.finally(() => {
+  const clearRequest = () => {
     if (appContextRequests.get(normalizedPath) === request) {
       appContextRequests.delete(normalizedPath)
     }
-  })
+  }
+
+  void request.then(clearRequest, clearRequest)
 
   return request
 }

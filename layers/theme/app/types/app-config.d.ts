@@ -1,10 +1,13 @@
+import type { UiFieldVariantName } from '../../../foundation/app/types/ui'
+
+export type { UiFieldVariantName } from '../../../foundation/app/types/ui'
+
 // Nuxt app config is intentionally extensible so downstream layers can add
 // project-specific keys without augmenting every branch up front.
 type LooseRecord = Record<string, unknown>
 type ClassValue = string
 type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
-export type UiFieldVariantName = 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
 type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 

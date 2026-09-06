@@ -88,7 +88,7 @@ export const assertWebformMultipartLimits = (
   for (const part of parts) {
     totalBytes += part.data.byteLength
 
-    if (part.filename) {
+    if (part.filename !== undefined) {
       fileCount += 1
 
       if (part.data.byteLength > limits.maxFileBytes) {
