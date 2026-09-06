@@ -7,7 +7,6 @@ import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
 } from '../../../utils/drupalMediaTypes'
-import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 
@@ -68,13 +67,6 @@ const isAudio = computed(() => mediaProps.value.type === 'audio')
 const openOverlay = () => {
   if (isDocument.value || isAudio.value) return
   emit('open', props.index)
-}
-
-const handleOpenOverlayKeydown = (event: KeyboardEvent) => {
-  if (event.key !== 'Enter' && event.key !== ' ') return
-
-  event.preventDefault()
-  openOverlay()
 }
 
 const handleEditActionSelect = (key: EditActionKey) => {
@@ -146,68 +138,41 @@ const shouldAnimate = computed(() =>
     v-bind="revealMotionProps"
   >
     <MediaImage
-      v-if="!isVideo"
-      v-bind="overlayImageProps"
-      :aria-label="'Open media modal'"
-      class="cursor-pointer"
+      v-bind="{ ...overlayImageProps, link: undefined, hideCredit: isVideo }"
       :class="{ 'motion-safe:opacity-0': shouldAnimate }"
       :edit-actions="editActions"
       :image-class="[
-        'transition-transform',
-        theme.media.effects.scale,
         theme.media.transitions.slow,
+        theme.media.effects.scale,
         'group-focus-within:scale-105',
       ]"
-      role="button"
+      :is-hero="false"
+      :no-wrapper="false"
       :rounded-class="visualRoundedClass"
-      tabindex="0"
       :wrapper-class="wrapperClass"
-      @click="openOverlay"
       @edit-action-select="handleEditActionSelect"
-      @keydown="handleOpenOverlayKeydown"
-    />
-
-    <div
-      v-else
-      aria-label="Open video modal"
-      class="group relative overflow-hidden"
-      :class="[
-        { 'motion-safe:opacity-0': shouldAnimate },
-        visualRoundedClass || theme.media.rounded,
-        'cursor-pointer',
-        'grid place-items-center text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-      ]"
-      role="button"
-      tabindex="0"
-      @click="openOverlay"
-      @keydown="handleOpenOverlayKeydown"
     >
-      <MediaImage
-        v-bind="{ ...mediaProps, hideCredit: true }"
-        :edit-actions="editActions"
-        :rounded-class="visualRoundedClass"
-        :wrapper-class="[
-          wrapperClass,
-          mediaPreviewClasses.zoomLayer,
-          theme.media.transitions.slow,
-          theme.media.effects.scale,
-          'group-focus-within:scale-105',
-        ]"
-        @edit-action-select="handleEditActionSelect"
-      />
+      <template #overlay>
+        <span
+          v-if="isVideo && mediaProps.credit"
+          :class="[
+            'absolute bottom-0 left-0 w-full bg-black/40 px-2 py-1 text-center text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100',
+            'group-focus-within:opacity-100',
+            theme.media.transitions.fast,
+          ]"
+        >
+          {{ mediaProps.credit }}
+        </span>
 
-      <span
-        v-if="mediaProps.credit"
-        :class="[
-          'absolute bottom-0 left-0 w-full bg-black/40 px-2 py-1 text-center text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100',
-          'group-focus-within:opacity-100',
-          theme.media.transitions.fast,
-        ]"
-      >
-        {{ mediaProps.credit }}
-      </span>
-
-      <MediaPlayIndicator />
-    </div>
+        <button
+          :aria-label="isVideo ? 'Open video modal' : 'Open media modal'"
+          class="absolute inset-0 z-20 grid cursor-pointer place-items-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+          type="button"
+          @click="openOverlay"
+        >
+          <MediaPlayIndicator v-if="isVideo" />
+        </button>
+      </template>
+    </MediaImage>
   </RevealMotion>
 </template>

@@ -500,7 +500,7 @@ watch(
       @mouseenter="activateAnimatedPreview"
       @mouseleave="deactivateAnimatedPreview"
     >
-      <div
+      <span
         v-if="previewSrc"
         :class="[
           mediaPreviewClasses.zoomLayer,
@@ -537,7 +537,7 @@ watch(
           :src="previewSrc"
           :width="width"
         />
-      </div>
+      </span>
       <MediaPlayIndicator />
     </button>
 

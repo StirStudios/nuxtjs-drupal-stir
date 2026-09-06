@@ -104,7 +104,7 @@ const linkAriaLabel = computed(
   () => props.alt || props.title || 'Open media in new tab',
 )
 const rootAttrs = computed(() =>
-  props.link
+  props.link && !hasInlineEditActions.value
     ? {
         ...forwardedAttrs.value,
         href: props.link,
@@ -217,18 +217,18 @@ onMounted(() => {
     :class="
       isHero
         ? [
-            theme.hero.image.base,
-            isFront ? theme.hero.image.isFront : 'max-w-none',
-            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
-            imageClass,
-          ]
+          theme.hero.image.base,
+          isFront ? theme.hero.image.isFront : 'max-w-none',
+          !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+          imageClass,
+        ]
         : [
-            theme.media.base,
-            resolvedRoundedClass,
-            'm-auto !object-contain',
-            !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
-            imageClass,
-          ]
+          theme.media.base,
+          resolvedRoundedClass,
+          'm-auto !object-contain',
+          !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+          imageClass,
+        ]
     "
     :fetchpriority="fetchpriority || undefined"
     :format="theme.media.image.format"
@@ -243,7 +243,7 @@ onMounted(() => {
   />
 
   <component
-    :is="link ? 'a' : 'div'"
+    :is="link && !hasInlineEditActions ? 'a' : 'div'"
     v-else
     ref="imageRoot"
     v-bind="rootAttrs"
@@ -335,10 +335,19 @@ onMounted(() => {
       </span>
     </ClientOnly>
 
+    <slot name="overlay" />
+
+    <a
+      v-if="link && hasInlineEditActions"
+      :aria-label="linkAriaLabel"
+      class="absolute inset-0 z-20 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+      :href="link"
+      rel="noopener noreferrer"
+      target="_blank"
+    />
     <LazyEditControls
       v-if="hasInlineEditActions"
       :actions="editActions ?? []"
-      :render-as-buttons="Boolean(props.link)"
       @select="emit('edit-action-select', $event)"
     />
   </component>
