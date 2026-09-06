@@ -13,6 +13,8 @@ import {
 import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 import { VueDraggable } from 'vue-draggable-plus'
 
+useAdminUiStyles()
+
 const props = defineProps<{
   contract: ParagraphLayoutContract
   endpoint: string
@@ -347,5 +349,3 @@ watch(() => props.open, (value) => {
     </ClientOnly>
   </UTheme>
 </template>
-
-<style src="../../assets/css/admin-ui.css"></style>

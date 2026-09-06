@@ -828,6 +828,39 @@ describe('layer contract', () => {
     expect(textEditor).toContain('aria-label="Edit text"')
   })
 
+  it('loads authenticated editorial assets only when editorial UI mounts', () => {
+    const pageContext = readFileSync(
+      resolve(rootDir, 'layers/theme/app/composables/usePageContext.ts'),
+      'utf8',
+    )
+    const adminStyles = readFileSync(
+      resolve(
+        rootDir,
+        'layers/editorial/app/composables/useAdminUiStyles.ts',
+      ),
+      'utf8',
+    )
+
+    expect(pageContext).not.toContain('fetchSession()')
+    expect(adminStyles).toContain('import(\'../assets/css/admin-ui.css\')')
+
+    for (const component of [
+      'Drupal/Tabs.vue',
+      'Edit/Controls.vue',
+      'Edit/LayoutArrangement.vue',
+      'Edit/LoadingState.vue',
+      'Edit/Text.vue',
+    ]) {
+      const source = readFileSync(
+        resolve(rootDir, 'layers/editorial/app/components', component),
+        'utf8',
+      )
+
+      expect(source).toContain('useAdminUiStyles()')
+      expect(source).not.toContain('<style src="../../assets/css/admin-ui.css">')
+    }
+  })
+
   it('isolates only rich-text controls without wrapping normal output', () => {
     const editLink = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),

@@ -7,6 +7,8 @@ import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSa
 import type { FormattedTextEditTarget } from '#stir/types'
 import { formattedTextApiPath } from '#stir/utils/formattedTextEditTarget'
 
+useAdminUiStyles()
+
 const props = defineProps<{
   editTarget: FormattedTextEditTarget
   sourceText: string
@@ -272,5 +274,3 @@ onMounted(async () => {
     </div>
   </UTheme>
 </template>
-
-<style src="../../assets/css/admin-ui.css"></style>

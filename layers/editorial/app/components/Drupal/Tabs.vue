@@ -10,6 +10,8 @@ import {
 } from '../../utils/adminUiTheme'
 
 const { getPage, useMenu } = useStirDrupalCe()
+
+useAdminUiStyles()
 const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()
@@ -317,5 +319,3 @@ const links = computed(() => {
     />
   </UTheme>
 </template>
-
-<style src="../../assets/css/admin-ui.css"></style>

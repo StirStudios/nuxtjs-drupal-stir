@@ -2,6 +2,8 @@
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 
+useAdminUiStyles()
+
 const props = defineProps<{
   actions: EditAction[]
   containerClass?: string | string[]
@@ -107,5 +109,3 @@ const handleTooltipOpenUpdate = (key: EditActionKey, value: boolean) => {
     </UFieldGroup>
   </UTheme>
 </template>
-
-<style src="../../assets/css/admin-ui.css"></style>
