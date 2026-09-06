@@ -1,6 +1,7 @@
 {
   "name": "nuxtjs-drupal-stir",
   "version": "4.5.1",
+  "license": "GPL-2.0-or-later",
   "description": "Production-ready Nuxt 4 layer for decoupled Drupal 11 sites with Nuxt UI, Tailwind CSS, SSR, inline editing, accessibility, SEO, and Webforms.",
   "keywords": [
     "nuxt",
