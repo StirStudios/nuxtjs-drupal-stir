@@ -164,7 +164,7 @@ const editorToolbarItems = [
           @update:model-value="values[field.name] = $event === true"
         />
 
-        <UEditor
+        <LazyUEditor
           v-else-if="isEditorField(field)"
           v-slot="{ editor }"
           class="min-h-36 w-full overflow-hidden rounded-md ring ring-default"
@@ -175,12 +175,12 @@ const editorToolbarItems = [
           :ui="{ base: 'min-h-28 p-3' }"
           @update:model-value="values[field.name] = String($event ?? '')"
         >
-          <UEditorToolbar
+          <LazyUEditorToolbar
             class="overflow-x-auto border-b border-default px-2 py-1"
             :editor="editor"
             :items="editorToolbarItems"
           />
-        </UEditor>
+        </LazyUEditor>
 
         <UTextarea
           v-else-if="getFieldType(field.type) === 'textarea'"

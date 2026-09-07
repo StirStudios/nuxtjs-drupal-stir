@@ -103,7 +103,7 @@ function onUpdate(value: unknown) {
 
 <template>
   <UFormField :label="label" :ui="{ label: 'sr-only' }">
-    <USelectMenu
+    <LazyUSelectMenu
       v-if="shouldUseSearchableSelect"
       v-bind="$attrs"
       v-model:open="open"
@@ -119,7 +119,7 @@ function onUpdate(value: unknown) {
       @update:model-value="onUpdate"
     />
 
-    <USelect
+    <LazyUSelect
       v-else
       v-bind="$attrs"
       v-model:open="open"

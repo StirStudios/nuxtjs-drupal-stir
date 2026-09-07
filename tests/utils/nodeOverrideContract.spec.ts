@@ -21,7 +21,7 @@ describe('node override contract', () => {
     expect(nodeDisplay).toContain('v-if="renderMode !== \'teaser\'"')
     expect(nodeDisplay).toContain(':link="props.editLink"')
     expect(nodeDisplay).toContain('resolveBooleanProp(props.isArticle)')
-    expect(nodeDisplay).toContain('<ShareLinks')
+    expect(nodeDisplay).toMatch(/<(?:Lazy)?ShareLinks\b/)
     expect(nodeDisplay).toContain(':title="props.title"')
     expect(nodeDisplay).toContain('theme.article.container')
 
