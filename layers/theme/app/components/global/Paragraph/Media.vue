@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
-import { useMediaOrdering } from '#stir/composables/useMediaOrdering'
 import { useMediaModal } from '#stir/composables/useMediaModal'
 import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
-import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
 
 const props = defineProps<{
@@ -72,19 +70,6 @@ const getMediaItemKey = (node: MediaNode, index: number) => {
   return `media-${index}`
 }
 
-const { orderedIndices } = useMediaOrdering(
-  slotMedia,
-  () => resolveBooleanProp(props.randomize),
-  tk,
-)
-const slotMediaOrdered = computed(() =>
-  orderedIndices.value
-    .map((i) => slotMedia.value[i])
-    .filter(
-      (item): item is NonNullable<(typeof slotMedia.value)[number]> => !!item,
-    ),
-)
-
 const {
   open,
   activeIndex,
@@ -92,7 +77,7 @@ const {
   itemsOrdered,
   openModal,
   onSelect: onSelectModal,
-} = useMediaModal(slotMediaOrdered, tk)
+} = useMediaModal(slotMedia, tk)
 
 const { width: viewportWidth } = useWindowSize()
 const gap = computed(() => resolveResponsiveGridValue(
@@ -102,15 +87,15 @@ const gap = computed(() => resolveResponsiveGridValue(
 ))
 const isImageGallery = computed(
   () =>
-    slotMediaOrdered.value.length > 1 &&
-    slotMediaOrdered.value.every(
+    slotMedia.value.length > 1 &&
+    slotMedia.value.every(
       (node) => normalizeDrupalMediaType(tk.propsOf(node).type) === 'image',
     ),
 )
 const isVisualGallery = computed(
   () =>
-    slotMediaOrdered.value.length > 1 &&
-    slotMediaOrdered.value.every((node) => {
+    slotMedia.value.length > 1 &&
+    slotMedia.value.every((node) => {
       const type = normalizeDrupalMediaType(tk.propsOf(node).type)
 
       return type === 'image' || type === 'video'
@@ -152,7 +137,7 @@ onMounted(() => {
         v-if="props.masonry && hydrated"
         v-slot="{ item: node, index: i }"
         class="w-full overflow-hidden"
-        :items="slotMediaOrdered"
+        :items="slotMedia"
         :virtualize="{
           lanes,
           gap,
@@ -186,7 +171,7 @@ onMounted(() => {
         :width="resolvedWidth"
       >
         <MediaItem
-          v-for="(node, i) in slotMediaOrdered"
+          v-for="(node, i) in slotMedia"
           :key="getMediaItemKey(node, i)"
           :defer-load="isImageGallery && i >= 4"
           :delivery-profile="deliveryProfile"
