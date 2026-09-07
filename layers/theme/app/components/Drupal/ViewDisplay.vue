@@ -158,7 +158,7 @@ const getRowMotionProps = (index: number) =>
     <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
       <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 flex-1">
-          <DrupalViewsFilters
+          <LazyDrupalViewsFilters
             :filters="normalizedFilters"
             :values="filterValues"
             @change="onFilterChange"
@@ -166,7 +166,7 @@ const getRowMotionProps = (index: number) =>
         </div>
 
         <div class="flex items-end gap-3">
-          <DrupalViewsSort
+          <LazyDrupalViewsSort
             :sort-by-key="primarySort?.queryParamSortBy"
             :sort-by-label="primarySort?.label"
             :sort-by-options="sortByOptions"
@@ -201,7 +201,6 @@ const getRowMotionProps = (index: number) =>
       :carousel-indicators="carouselIndicators"
       :carousel-interval="carouselInterval"
       :grid-items="gridItems"
-      hydrate-on-visible
       :items="getCarouselRows()"
       :randomize="randomizeEnabled"
       :spacing="spacing"
@@ -300,7 +299,7 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-    <DrupalViewsPagination
+    <LazyDrupalViewsPagination
       v-if="effectivePager && !carousel && effectivePager.totalPages > 1"
       class="mt-8"
       :current="currentPage"

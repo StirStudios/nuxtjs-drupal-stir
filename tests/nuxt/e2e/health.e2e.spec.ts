@@ -53,6 +53,39 @@ const pageFixture = {
   },
 }
 
+const carouselFixture = {
+  ...pageFixture,
+  content: {
+    ...pageFixture.content,
+    slots: {
+      body: [
+        {
+          element: 'drupal-markup',
+          props: { content: '<div style="height:3000px" aria-hidden="true"></div>' },
+          slots: {},
+        },
+        {
+          element: 'drupal-view--default',
+          props: { viewId: 'interaction', displayId: 'block', carousel: true },
+          slots: {
+            rows: [{
+              element: 'paragraph-accordion',
+              props: { id: 'nested-accordion' },
+              slots: {
+                items: [{
+                  element: 'paragraph-text',
+                  props: { id: 'answer', header: 'Open nested answer', text: '<p>Nested answer content</p>' },
+                  slots: {},
+                }],
+              },
+            }],
+          },
+        },
+      ],
+    },
+  },
+}
+
 const authUiConfigFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
@@ -85,7 +118,7 @@ const drupalFixtureServer = createServer((request, response) => {
         ? presentationManifestFixture
       : path.includes('/api/menu_items/')
         ? []
-        : pageFixture
+        : path.endsWith('/carousel-interaction-fixture') ? carouselFixture : pageFixture
 
   response.writeHead(200, { 'content-type': 'application/json' })
   response.end(JSON.stringify(payload))
@@ -231,6 +264,29 @@ describe('Nuxt E2E smoke', async () => {
     expect(publicResponse.headers.get('cache-control')).not.toBe(
       'private, no-store, max-age=0',
     )
+  })
+
+  it.runIf(browserEnabled)('preserves the first keyboard activation in an offscreen View carousel', async () => {
+    const page = await createPage()
+    const clientErrors: string[] = []
+
+    page.on('pageerror', error => clientErrors.push(error.message))
+    await page.route('**/_nuxt/**', async (route) => {
+      if (route.request().url().endsWith('.js')) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+      await route.continue()
+    })
+    await page.goto(url('/carousel-interaction-fixture'), { waitUntil: 'networkidle' })
+    const button = page.getByRole('button', { name: 'Open nested answer' })
+
+    await button.focus()
+    await page.keyboard.press('Enter')
+
+    await page.waitForFunction(() => document.querySelector('button[aria-expanded="true"]') !== null)
+    expect(await button.getAttribute('aria-expanded')).toBe('true')
+    expect(clientErrors).toEqual([])
+    await page.close()
   })
 
   it.runIf(browserEnabled)('hydrates the deterministic homepage without client errors', async () => {

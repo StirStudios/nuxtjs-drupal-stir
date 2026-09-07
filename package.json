@@ -110,7 +110,8 @@
     "deps:verify": "pnpm verify:ci",
     "deps:update:safe": "pnpm deps:update && pnpm docs:sync-tech-stack && pnpm deps:verify",
     "typecheck": "nuxi typecheck",
-    "release": "release-it"
+    "release": "release-it",
+    "perf:imports": "node scripts/perf/import-inventory.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.129",

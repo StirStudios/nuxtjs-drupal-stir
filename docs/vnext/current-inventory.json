@@ -120,6 +120,7 @@
     "init:compliance",
     "lint",
     "lint:fix",
+    "perf:imports",
     "perf:lighthouse",
     "perf:lighthouse:local",
     "perf:presentation",
