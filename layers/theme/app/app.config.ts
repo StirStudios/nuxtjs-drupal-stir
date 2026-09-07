@@ -200,6 +200,7 @@ export default defineAppConfig({
     },
 
     carousel: {
+      marqueeRepeat: { horizontal: 2, vertical: 4 },
       padding: 'pb-12',
       root: '',
       arrows: {

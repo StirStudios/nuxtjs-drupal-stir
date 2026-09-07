@@ -1,3 +1,4 @@
+import { useAppConfig } from '#imports'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, inject, ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -155,6 +156,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(marquee.classes()).toContain('stir-marquee')
     expect(marquee.attributes('style')).toContain('--duration: 100s')
     expect(marquee.props('orientation')).toBe('vertical')
+    expect(marquee.props('repeat')).toBe(4)
     expect(marquee.props('overlay')).toBe(true)
     expect(marquee.props('pauseOnHover')).toBe(false)
     expect(marquee.props('reverse')).toBe(true)
@@ -179,7 +181,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
-  it('uses backward-compatible marquee defaults', async () => {
+  it('uses efficient horizontal marquee defaults', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
         presentation: 'marquee',
@@ -189,9 +191,32 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     const marquee = wrapper.getComponent({ name: 'UMarquee' })
 
     expect(marquee.props('orientation')).toBe('horizontal')
+    expect(marquee.findAll('article')).toHaveLength(4)
     expect(marquee.props('overlay')).toBe(false)
     expect(marquee.props('pauseOnHover')).toBe(true)
     expect(marquee.props('reverse')).toBe(false)
+  })
+
+  it('lets consumers override horizontal repetition without changing vertical defaults', async () => {
+    const theme = useAppConfig().stirTheme
+    const previous = theme.carousel.marqueeRepeat.horizontal
+
+    theme.carousel.marqueeRepeat.horizontal = 3
+
+    try {
+      const wrapper = await mountSuspended(ParagraphCarousel, {
+        props: {
+          presentation: 'marquee',
+          items: [h('article', 'One'), h('article', 'Two')],
+        },
+      })
+
+      expect(wrapper.getComponent({ name: 'UMarquee' }).findAll('article')).toHaveLength(6)
+      expect(theme.carousel.marqueeRepeat.vertical).toBe(4)
+      wrapper.unmount()
+    } finally {
+      theme.carousel.marqueeRepeat.horizontal = previous
+    }
   })
 
   it('omits the marquee pause control when reduced motion is preferred', async () => {

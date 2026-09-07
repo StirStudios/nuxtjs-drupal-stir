@@ -270,6 +270,7 @@ type StirThemeMediaConfig = {
 } & LooseRecord
 
 type StirThemeCarouselConfig = {
+  marqueeRepeat?: Partial<Record<'horizontal' | 'vertical', number>>
   padding?: ClassValue
   root?: ClassValue
   arrows?: {
@@ -464,6 +465,7 @@ type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
 }
 
 type ResolvedStirThemeCarouselConfig = StirThemeCarouselConfig & {
+  marqueeRepeat: Record<'horizontal' | 'vertical', number>
   arrows: NonNullable<StirThemeCarouselConfig['arrows']>
 }
 
