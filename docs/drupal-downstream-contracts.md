@@ -6,6 +6,20 @@ This layer is intended to be reused by downstream Nuxt projects backed by Drupal
 
 App-context requests are made through `/api/app-context` and must preserve the authenticated Drupal request context.
 
+`useAppContext`, `useAppFooterContext`, and `useAppRegionBlocks` share one
+route-keyed Nuxt data entry. Footer and region helpers expose read-only projections
+of that response rather than serializing separate copies. This works independently
+of CE page content, including Nuxt-only routes. Drupal still evaluates visibility.
+
+For conditional initial loading, use `immediate: false` and call `execute()` only
+when the returned `status.value` is not `success`. Both `execute()` and `refresh()`
+remain explicit refresh operations. Downstream footer overrides that call
+`execute()` unconditionally should adopt the same status check to avoid a redundant
+request. Route changes fetch the destination context; authentication actions clear
+and refresh existing app-context entries. Custom authentication integrations must
+likewise invalidate app-context when their session changes. Do not persist this
+response in a cross-user or indefinite client cache.
+
 Required behavior:
 
 - Forward incoming request cookies from Nuxt server routes to Drupal.
@@ -157,3 +171,14 @@ Recommended smoke checks:
   such as `page=1`. Existing bookmarks that use unnamespaced keys such as
   `page=1` should be regenerated or redirected to the corresponding namespaced
   URL when upgrading.
+
+## Page-owned Hero data
+
+`DrupalPageRoute` provides its local page reference through `drupalPageKey`.
+The shared paragraph Hero reads that owner for its title and front-page state,
+so overlapping route transitions do not exchange Hero content. Standalone Hero
+usage retains the existing navigation snapshot fallback. Blank authored titles
+fall back to the Drupal page title; an entirely blank title emits no empty H1.
+A custom title slot owns its heading markup. No wrapper is added by the provider.
+Downstream Hero overrides must adopt the owning-page reference explicitly if they
+currently read the global page state.

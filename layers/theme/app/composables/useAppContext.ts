@@ -20,12 +20,6 @@ export type AppFooterContextPayload = Pick<
   'footer_menu' | 'site_info'
 >
 
-const serverAppContextRequests = new WeakMap<
-  object,
-  Map<string, Promise<AppContextPayload>>
->()
-const appContextRequests = new Map<string, Promise<AppContextPayload>>()
-
 export function appContextQuery(path = '/') {
   return { path: path || '/' }
 }
@@ -42,95 +36,32 @@ export function useAppContext(options: AppContextOptions = {}) {
   })
 }
 
-async function fetchSharedAppContext(path: string): Promise<AppContextPayload> {
-  const normalizedPath = path || '/'
-
-  if (import.meta.server) {
-    const event = useRequestEvent()
-
-    if (event) {
-      let requests = serverAppContextRequests.get(event)
-
-      if (!requests) {
-        requests = new Map<string, Promise<AppContextPayload>>()
-        serverAppContextRequests.set(event, requests)
-      }
-
-      const cached = requests.get(normalizedPath)
-
-      if (cached) {
-        return cached
-      }
-
-      const request = $fetch<AppContextPayload>('/api/app-context', {
-        query: appContextQuery(normalizedPath),
-      })
-
-      requests.set(normalizedPath, request)
-
-      return request
-    }
+function selectAppContext<T>(
+  options: AppContextOptions,
+  select: (payload: AppContextPayload) => T,
+) {
+  const context = useAppContext(options)
+  const data = computed(() => context.data.value ? select(context.data.value) : undefined)
+  const result = {
+    data,
+    pending: context.pending,
+    error: context.error,
+    status: context.status,
+    execute: context.execute,
+    refresh: context.refresh,
+    clear: context.clear,
   }
 
-  const cached = appContextRequests.get(normalizedPath)
-
-  if (cached) {
-    return cached
-  }
-
-  const request = $fetch<AppContextPayload>('/api/app-context', {
-    query: appContextQuery(normalizedPath),
-  })
-
-  appContextRequests.set(normalizedPath, request)
-
-  const clearRequest = () => {
-    if (appContextRequests.get(normalizedPath) === request) {
-      appContextRequests.delete(normalizedPath)
-    }
-  }
-
-  void request.then(clearRequest, clearRequest)
-
-  return request
+  return Object.assign(context.then(() => result), result)
 }
 
 export function useAppFooterContext(options: AppContextOptions = {}) {
-  const route = useRoute()
-  const path = computed(() => route.path || '/')
-
-  return useAsyncData<AppFooterContextPayload>(
-    computed(() => `app-footer-context:${path.value}`),
-    async () => {
-      const payload = await fetchSharedAppContext(path.value)
-
-      return {
-        footer_menu: payload.footer_menu,
-        site_info: payload.site_info,
-      }
-    },
-    {
-      dedupe: 'defer',
-      immediate: options.immediate ?? true,
-    },
-  )
+  return selectAppContext<AppFooterContextPayload>(options, payload => ({
+    footer_menu: payload.footer_menu,
+    site_info: payload.site_info,
+  }))
 }
 
 export function useAppRegionBlocks(area: MaybeRefOrGetter<string>, options: AppContextOptions = {}) {
-  const route = useRoute()
-  const path = computed(() => route.path || '/')
-  const regionArea = computed(() => toValue(area))
-
-  return useAsyncData<AppContextBlock[]>(
-    computed(() => `app-region-blocks:${path.value}:${regionArea.value}`),
-    async () => {
-      const payload = await fetchSharedAppContext(path.value)
-
-      return payload.blocks[regionArea.value] ?? []
-    },
-    {
-      dedupe: 'defer',
-      immediate: options.immediate ?? true,
-    },
-  )
+  return selectAppContext<AppContextBlock[]>(options, payload => payload.blocks[toValue(area)] ?? [])
 }

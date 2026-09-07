@@ -1,0 +1,111 @@
+--- a/dist/runtime/composables/useDrupalCe/index.js
++++ b/dist/runtime/composables/useDrupalCe/index.js
+@@ -86,9 +86,47 @@
+     }
+     return properKey;
+   };
++  const initializePageKeySync = (nuxtApp) => {
++    if (import.meta.server) return;
++    const watcherInitialized = useState("drupal-ce-watcher-init", () => false);
++    if (watcherInitialized.value) return;
++    watcherInitialized.value = true;
++    const router = useRouter();
++    const currentPageKey = useState("drupal-ce-current-page-key", () => "");
++    const pendingPageKey = useState("drupal-ce-pending-page-key", () => "");
++    const requestVersion = useState("drupal-ce-page-request-version", () => 0);
++    const skipProxy = !config.serverApiProxy;
++    const promotePendingPage = () => {
++      const key = pendingPageKey.value;
++      const page = key && nuxtApp.payload.data[key];
++      if (page) {
++        if (!page.redirect) currentPageKey.value = key;
++        pendingPageKey.value = "";
++      }
++    };
++    pendingPageKey.value = computePageKey(skipProxy, nuxtApp);
++    router.afterEach((to, from, failure) => {
++      if (failure || to.fullPath.split("#")[0] === from.fullPath.split("#")[0]) return;
++      requestVersion.value++;
++      pendingPageKey.value = computePageKey(skipProxy, nuxtApp);
++    });
++    nuxtApp.hook("page:finish", promotePendingPage);
++    nuxtApp.hook("app:error", () => {
++      requestVersion.value++;
++      pendingPageKey.value = "";
++    });
++    if (nuxtApp.isHydrating || !currentPageKey.value) {
++      promotePendingPage();
++    }
++  };
+   const fetchPage = async (path, useFetchOptions = {}, overrideErrorHandler, skipDrupalCeApiProxy = false) => {
+     const nuxtApp = useNuxtApp();
+     const currentPageKey = useState("drupal-ce-current-page-key");
++    const pendingPageKey = useState("drupal-ce-pending-page-key", () => "");
++    initializePageKeySync(nuxtApp);
++    const requestVersion = useState("drupal-ce-page-request-version", () => 0);
++    const version = import.meta.client ? ++requestVersion.value : requestVersion.value;
++    const requestRoute = import.meta.client ? nuxtApp.$router.currentRoute.value.fullPath.split("#")[0] : "";
+     const skipProxy = !(config.serverApiProxy && !skipDrupalCeApiProxy);
+     if (!useFetchOptions.key) {
+       useFetchOptions.key = computePageKey(skipProxy, nuxtApp);
+@@ -108,9 +146,14 @@
+       pageRef = result.data;
+       error = result.error.value;
+     }
++    if (import.meta.client && (version !== requestVersion.value || requestRoute !== nuxtApp.$router.currentRoute.value.fullPath.split("#")[0])) {
++      if (pageRef.value) pageRef.value.key = useFetchOptions.key;
++      return pageRef.value ? pageRef : ref(createEmptyPage());
++    }
+     if (pageRef.value?.messages) {
+       pushMessagesToState(pageRef.value.messages);
+     }
++    const hasRedirect = Boolean(pageRef.value?.redirect);
+     if (pageRef.value?.redirect) {
+       const redirect = pageRef.value.redirect;
+       await callWithNuxt(nuxtApp, navigateTo, [
+@@ -135,7 +178,13 @@
+       pageRef.value = createEmptyPage();
+     }
+     pageRef.value.key = useFetchOptions.key;
+-    currentPageKey.value = useFetchOptions.key;
++    if (!hasRedirect) {
++      if (import.meta.server) {
++        currentPageKey.value = useFetchOptions.key;
++      } else {
++        pendingPageKey.value = useFetchOptions.key;
++      }
++    }
+     return pageRef;
+   };
+   const useMenu = (name, useFetchOptions = {}, skipDrupalCeApiProxy = false) => {
+@@ -177,29 +226,7 @@
+     const nuxtApp = useNuxtApp();
+     const currentPageKey = useState("drupal-ce-current-page-key", () => "");
+     if (!customKey && import.meta.client) {
+-      const watcherInitialized = useState("drupal-ce-watcher-init", () => false);
+-      const pendingPageKey = useState("drupal-ce-pending-page-key", () => "");
+-      if (!watcherInitialized.value) {
+-        watcherInitialized.value = true;
+-        try {
+-          const router = useRouter();
+-          const skipProxy = !config.serverApiProxy;
+-          pendingPageKey.value = computePageKey(skipProxy, nuxtApp);
+-          router.afterEach(() => {
+-            pendingPageKey.value = computePageKey(skipProxy, nuxtApp);
+-          });
+-          watch(
+-            () => pendingPageKey.value && nuxtApp.payload.data[pendingPageKey.value],
+-            (page) => {
+-              if (page && pendingPageKey.value) {
+-                currentPageKey.value = pendingPageKey.value;
+-              }
+-            },
+-            { immediate: true }
+-          );
+-        } catch {
+-        }
+-      }
++      initializePageKeySync(nuxtApp);
+     }
+     return computed(() => {
+       const key = customKey || currentPageKey.value;

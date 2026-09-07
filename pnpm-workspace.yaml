@@ -11,3 +11,4 @@ allowBuilds:
 # Remove when the Vite preload bookkeeping fix is available upstream.
 patchedDependencies:
   vite@8.2.2: patches/vite@8.2.2.patch
+  nuxtjs-drupal-ce@2.9.0: patches/nuxtjs-drupal-ce@2.9.0.patch

@@ -9,6 +9,7 @@ import {
   mapDrupalViewSortByOptions,
   mapDrupalViewSortOrderOptions,
   normalizeDrupalViewFilters,
+  normalizeDrupalRandomOrder,
   normalizeDrupalViewPager,
   primaryDrupalViewSort,
 } from '#stir/composables/useDrupalViewQuery'
@@ -39,6 +40,8 @@ import { resolveDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryName
 export type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
 interface UseDrupalViewControlsProps {
+  randomOrder?: unknown
+
   id?: number | string
   uuid?: string
   paragraphId?: number | string
@@ -71,6 +74,7 @@ export function useDrupalViewControls(
   const dynamicFilters = ref<ExposedFilter[] | null>(null)
   const dynamicSorts = ref<ExposedSort[] | null>(null)
   const dynamicNoResults = ref('')
+  const randomOrder = ref(normalizeDrupalRandomOrder(props.randomOrder))
 
   const filterValues = ref<Record<string, string | string[]>>({})
   const sortValues = ref<Record<string, string | string[]>>({})
@@ -106,7 +110,7 @@ export function useDrupalViewControls(
   function publicQueryKey(key: string): string {
     const namespace = resolvedQueryNamespace.value
 
-    return namespace ? `${namespace}_${key}` : key
+    return key.startsWith('stir_order_') ? key : namespace ? `${namespace}_${key}` : key
   }
 
   function publicQueryParams(
@@ -207,11 +211,7 @@ export function useDrupalViewControls(
   }
 
   function snapshotCurrentViewState(page = currentPage.value): ViewStateSnapshot {
-    return createViewStateSnapshot(
-      filterValues.value,
-      sortValues.value,
-      page,
-    )
+    return { ...createViewStateSnapshot(filterValues.value, sortValues.value, page), randomOrder: randomOrder.value ?? undefined }
   }
 
   function defaultViewStateSnapshot(): ViewStateSnapshot {
@@ -341,6 +341,10 @@ export function useDrupalViewControls(
       ...sanitizedSorts,
     }
 
+    const storedOrder = normalizeDrupalRandomOrder(stored.randomOrder)
+
+    if (storedOrder?.key === randomOrder.value?.key) randomOrder.value = storedOrder
+
     const page = typeof stored.page === 'number' && stored.page > 0
       ? stored.page
       : 0
@@ -351,7 +355,7 @@ export function useDrupalViewControls(
   }
 
   function managedQueryKeys(): string[] {
-    return drupalViewManagedQueryKeys(normalizedFilters.value, primarySort.value)
+    return [...drupalViewManagedQueryKeys(normalizedFilters.value, primarySort.value), ...(randomOrder.value ? [randomOrder.value.key] : [])]
       .map(publicQueryKey)
   }
 
@@ -449,7 +453,7 @@ export function useDrupalViewControls(
   }
 
   function buildQueryParams(page: number): Record<string, string | string[]> {
-    return buildDrupalViewControlQuery({
+    const query = buildDrupalViewControlQuery({
       filters: normalizedFilters.value,
       filterValues: filterValues.value,
       sort: primarySort.value,
@@ -458,6 +462,14 @@ export function useDrupalViewControls(
       sortOrderOptions: sortOrderOptions.value,
       page,
     })
+    const token = randomOrder.value
+
+    if (token) {
+      const routeToken = normalizeDrupalRandomOrder({ key: token.key, value: routeQueryValue(token.key) })
+
+      query[token.key] = routeToken?.value ?? token.value
+    }
+    return query
   }
 
   function pageLink(page: number) {
@@ -509,6 +521,8 @@ export function useDrupalViewControls(
     }
 
     const viewNodeProps = getDrupalViewNodeProps(viewNode)
+
+    randomOrder.value = normalizeDrupalRandomOrder(viewNodeProps.randomOrder ?? viewNodeProps.random_order) ?? randomOrder.value
 
     dynamicRows.value = getDrupalViewNodeRows(viewNode)
     dynamicPager.value = normalizeDrupalViewPager(viewNodeProps.pager) ?? {

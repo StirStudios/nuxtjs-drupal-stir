@@ -28,15 +28,16 @@ const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
 
 const {
   data: appContext,
+  status: appContextStatus,
   execute: loadAppFooterContext,
 } = await useAppFooterContext({ immediate: false })
 
-if (!pageSiteInfo.value) {
+if (!pageSiteInfo.value && appContextStatus.value !== 'success') {
   await loadAppFooterContext()
 }
 
 watch(pageSiteInfo, (siteInfo) => {
-  if (!siteInfo) {
+  if (!siteInfo && appContextStatus.value !== 'success') {
     void loadAppFooterContext()
   }
 })

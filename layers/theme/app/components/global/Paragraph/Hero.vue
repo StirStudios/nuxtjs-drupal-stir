@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
+import { drupalPageKey } from '#stir/utils/drupalPage'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
@@ -32,11 +33,16 @@ defineSlots<{
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { getPage } = useStirDrupalCe()
-const page = getPage()
-const { isFront } = usePageContext()
+const owningPage = inject(drupalPageKey, null)
+const page = owningPage ?? getPage()
+const { isFront } = usePageContext(page)
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
-const pageTitle = computed(() => pageProps.value?.title || '')
+const pageTitle = computed(() => {
+  const title = pageProps.value?.title
+
+  return typeof title === 'string' && title.trim() ? title.trim() : page.value?.title?.trim() || ''
+})
 const pageHideTitle = computed(() => pageProps.value?.hideTitle ?? false)
 
 // Only needed in FULL mode
@@ -44,11 +50,13 @@ if (props.mode !== 'simple') {
   provide('isHero', true)
 }
 
-const heroSnapshot = useNavLockedSnapshot(computed(() => ({
+const heroState = computed(() => ({
   hideTitle: pageHideTitle.value,
-  isFront: isFront.value,
+  isFront: owningPage ? owningPage.value?.is_front_page === true : isFront.value,
   title: pageTitle.value,
-})))
+}))
+// Page-owned heroes retain their own data; standalone heroes still use shared navigation protection.
+const heroSnapshot = owningPage ? heroState : useNavLockedSnapshot(heroState)
 const isFrontEffective = computed(() => heroSnapshot.value.isFront)
 const pageTitleEffective = computed(() => heroSnapshot.value.title)
 const pageHideTitleEffective = computed(() => resolveBooleanProp(heroSnapshot.value.hideTitle))
@@ -164,6 +172,7 @@ provideRevealMotionScope(() => undefined)
     <template v-else>
       <section class="relative" :class="sectionClasses">
         <RevealMotion
+          v-if="hasVisibleHeroContent || pageTitleEffective"
           as-child
           v-bind="heroMotionProps"
         >
@@ -184,7 +193,7 @@ provideRevealMotionScope(() => undefined)
                 :subtitle="heroSubtitle"
               />
 
-              <h1 v-else v-bind="h1Classes.length ? { class: h1Classes } : {}">
+              <h1 v-else-if="pageTitleEffective" v-bind="h1Classes.length ? { class: h1Classes } : {}">
                 {{ pageTitleEffective }}
               </h1>
             </slot>
