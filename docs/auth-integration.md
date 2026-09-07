@@ -51,6 +51,12 @@ Nuxt client navigation follows the framework's native Suspense contract:
 - the SPA loading template is only the initial document fallback for a
   client-rendered response and cannot retain a previous in-memory page.
 
+Page-owned layout, page classes and editor target indexes use the ref returned
+by that component's `fetchPage()`. Pass it to `usePageContext(page)` to resolve
+context from the same payload. Calling `usePageContext()` without an argument
+continues to use the shared current Drupal page. This distinction works with
+both current releases and the pending upstream page-commit fix.
+
 Shared route-derived presentation must use `useNavLockedSnapshot()`. The
 navigation lock begins at Nuxt's `page:loading:start` hook, before route
 resolution, and ends at `page:loading:end`. Do not replace this with

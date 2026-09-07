@@ -8,6 +8,9 @@ overrides:
   fontless>esbuild: 0.28.2
 
 patchedDependencies:
+  nuxtjs-drupal-ce@2.9.0:
+    hash: 521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e
+    path: patches/nuxtjs-drupal-ce@2.9.0.patch
   vite@8.2.2:
     hash: 7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c
     path: patches/vite@8.2.2.patch
@@ -113,8 +116,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(magic-string@1.2.3)(magicast@0.5.4)(oxc-parser@0.140.0)(rolldown@1.2.7)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.7)(rollup@4.63.1)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0)))
       nuxtjs-drupal-ce:
-        specifier: ^2.9.0
-        version: 2.9.0(typescript@5.9.3)
+        specifier: 2.9.0
+        version: 2.9.0(patch_hash=521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e)(typescript@5.9.3)
       rate-limiter-flexible:
         specifier: ^11.2.0
         version: 11.2.0
@@ -12863,7 +12866,7 @@ snapshots:
       - xml2js
       - yaml
 
-  nuxtjs-drupal-ce@2.9.0(typescript@5.9.3):
+  nuxtjs-drupal-ce@2.9.0(patch_hash=521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e)(typescript@5.9.3):
     dependencies:
       defu: 6.1.7
       nuxt-component-preview: 1.1.1(typescript@5.9.3)

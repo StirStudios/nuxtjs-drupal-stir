@@ -21,18 +21,7 @@ const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, refreshPage, renderCustomElements, usePageHead, getPage } = useStirDrupalCe()
-const { pageLayout, isAuthenticated, isFront } = usePageContext()
-const pageState = getPage()
-
-provide(
-  layoutEditLinksKey,
-  computed(() => buildLayoutEditLinkIndex(pageState.value)),
-)
-provide(
-  presentationEditTargetsKey,
-  computed(() => buildPresentationEditTargetIndex(pageState.value)),
-)
+const { fetchPage, refreshPage, renderCustomElements, usePageHead } = useStirDrupalCe()
 
 const route = useRoute()
 const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
@@ -72,6 +61,17 @@ const page = await fetchPage(
   { query: drupalPageQuery.value },
   customPageError,
 )
+const { pageLayout, isAuthenticated, isFront } = usePageContext(page)
+
+provide(
+  layoutEditLinksKey,
+  computed(() => buildLayoutEditLinkIndex(page.value)),
+)
+provide(
+  presentationEditTargetsKey,
+  computed(() => buildPresentationEditTargetIndex(page.value)),
+)
+
 const pageRenderRevision = ref(0)
 const renderablePageContent = computed(() =>
   withoutPresentationEditMetadata(page.value?.content),
@@ -121,7 +121,7 @@ const bodyClasses = computed(() =>
     routeSlugClass.value,
     isFront.value ? 'front' : '',
     isAuthenticated.value ? 'logged-in' : '',
-    pageState.value?.content?.element || '',
+    page.value?.content?.element || '',
   ]
     .filter(Boolean)
     .join(' '),

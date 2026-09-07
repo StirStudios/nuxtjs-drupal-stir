@@ -1,8 +1,6 @@
 import { resolveDrupalPageAccess } from '../utils/editorialAccess'
 
-export function usePageContext() {
-  const { getPage } = useStirDrupalCe()
-  const page = getPage()
+export function usePageContext(page = useStirDrupalCe().getPage()) {
   const route = useRoute()
   const isFront = computed(() => {
     const hasDrupalSlugParam = Object.hasOwn(route.params, 'slug')
