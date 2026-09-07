@@ -249,7 +249,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
 
 <template>
   <RevealMotionElement
-    :key="`carousel-${id}-${revealMotionKey}`"
+    :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
     class="relative z-10"
     :class="[theme.carousel.padding, width, spacing]"
     :motion-props="carouselMotionProps"
