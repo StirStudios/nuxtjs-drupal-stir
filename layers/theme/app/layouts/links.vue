@@ -30,17 +30,18 @@ const {
   data: appContext,
   status: appContextStatus,
   execute: loadAppFooterContext,
-} = await useAppFooterContext({ immediate: false })
+} = useAppFooterContext({ immediate: false })
 
-if (!pageSiteInfo.value && appContextStatus.value !== 'success') {
-  await loadAppFooterContext()
+function loadMissingSiteInfo() {
+  if (!pageSiteInfo.value && appContextStatus.value !== 'success') {
+    return loadAppFooterContext()
+  }
 }
 
-watch(pageSiteInfo, (siteInfo) => {
-  if (!siteInfo && appContextStatus.value !== 'success') {
-    void loadAppFooterContext()
-  }
-})
+onServerPrefetch(loadMissingSiteInfo)
+if (import.meta.client) {
+  watch(pageSiteInfo, () => { void loadMissingSiteInfo() }, { immediate: true })
+}
 
 const siteInfo = computed<AppContextSiteInfo | undefined>(() =>
   pageSiteInfo.value ?? appContext.value?.site_info,
