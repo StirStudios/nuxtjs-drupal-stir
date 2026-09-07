@@ -1,3 +1,4 @@
+import { withoutPresentationEditMetadata } from '../utils/layoutEditLinks'
 import { prepareComponentTreeForDevelopment } from '../utils/componentTreeDiagnostics'
 import type { AppContextPayload } from '../../../core/shared/types/appContext'
 import type { DrupalNodeRelatedItem } from '../types/Node'
@@ -31,14 +32,17 @@ type StirDrupalPage = Omit<DrupalPage, 'content'> & Partial<AppContextPayload> &
 export function useStirDrupalCe() {
   const drupal = useDrupalCe()
 
-  const prepare = (content: unknown): CustomElementContent =>
-    typeof drupal.resolveCustomElement === 'function'
+  const prepare = (content: unknown): CustomElementContent => {
+    const renderable = withoutPresentationEditMetadata(content) as CustomElementContent
+
+    return typeof drupal.resolveCustomElement === 'function'
       ? prepareComponentTreeForDevelopment(
-          content as CustomElementContent,
+          renderable,
           drupal.resolveCustomElement,
           import.meta.dev,
         ) as CustomElementContent
-      : content as CustomElementContent
+      : renderable
+  }
 
   const refreshPage = async (
     page: Ref<StirDrupalPage>,

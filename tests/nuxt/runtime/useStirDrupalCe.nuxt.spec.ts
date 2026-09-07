@@ -44,6 +44,32 @@ const Harness = defineComponent({
 })
 
 describe('useStirDrupalCe (Nuxt runtime)', () => {
+  it.each(['renderCustomElements', 'renderCustomElementsToVNodes'] as const)(
+    '%s removes editor metadata from nested region content without mutating its source',
+    async (method) => {
+      const content = [{
+        element: 'node-page',
+        props: { presentationEdit: { paragraphId: 167 }, title: 'Recommendations' },
+        slots: { content: [{
+          element: 'node-page',
+          props: { presentationEdit: { paragraphId: 168 }, title: 'Item' },
+        }] },
+      }]
+      const source = structuredClone(content)
+
+      await mountSuspended(defineComponent({
+        setup() {
+          useStirDrupalCe()[method](content)
+          return () => h('div')
+        },
+      }))
+      expect(JSON.stringify(state.renderedContent)).not.toContain('presentationEdit')
+      expect(JSON.stringify(state.renderedContent)).toContain('Recommendations')
+      expect(JSON.stringify(state.renderedContent)).toContain('Item')
+      expect(content).toEqual(source)
+    },
+  )
+
   it('preserves upstream methods and delegates rendering', async () => {
     await mountSuspended(Harness)
 

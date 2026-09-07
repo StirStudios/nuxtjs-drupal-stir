@@ -4,7 +4,6 @@ import {
   buildPresentationEditTargetIndex,
   layoutEditLinksKey,
   presentationEditTargetsKey,
-  withoutPresentationEditMetadata,
 } from '../../utils/layoutEditLinks'
 import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
@@ -77,7 +76,7 @@ provide(
 
 const pageRenderRevision = ref(0)
 const renderablePageContent = computed(() =>
-  withoutPresentationEditMetadata(page.value?.content),
+  page.value?.content,
 )
 
 provide(
