@@ -288,6 +288,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
           :orientation="marqueeOrientation ?? 'horizontal'"
           :overlay="marqueeOverlay ?? false"
           :pause-on-hover="marqueePauseOnHover"
+          :repeat="theme.carousel.marqueeRepeat[marqueeOrientation ?? 'horizontal']"
           :reverse="marqueeReverse ?? false"
           :style="marqueeStyle"
         >

@@ -48,6 +48,20 @@ Use `#stir/utils`, `#stir/composables`, `#stir/components` and `#stir/types` for
 
 `spaLoadingTemplate: false` now truly disables the loader. A custom template path and the existing themed default remain supported. The loader is an initial document fallback, not a replacement for route-specific pending UI.
 
+Horizontal Drupal marquees render two content copies by default to avoid hydrating unnecessary duplicate descendants. Vertical marquees retain four. Set `stirTheme.carousel.marqueeRepeat` in `app/app.config.ts` only when a project needs different repetition:
+
+```ts
+export default defineAppConfig({
+  stirTheme: {
+    carousel: {
+      marqueeRepeat: { horizontal: 4, vertical: 4 },
+    },
+  },
+})
+```
+
+Use whole-number counts of at least two for continuous scrolling. If overriding Nuxt UI's marquee content width or layout, verify coverage throughout the animation at mobile and wide desktop sizes. Drupal still controls the content, direction and duration; this setting only controls repeated rendering copies.
+
 ## Media and presentation prerequisites
 
 Configure Drupal/CDN image origins, and keep canonical original image URLs plus source revisions in the Drupal payload. Immutable image caching assumes versioned source keys: replacing an image must change its revision/URL. Keep the existing presentation-manifest export available at build time, or provide a reviewed snapshot through `STIR_PRESENTATION_MANIFEST`. Do not use the repository fixture as a production manifest.
