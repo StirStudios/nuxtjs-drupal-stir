@@ -86,6 +86,26 @@ const carouselFixture = {
   },
 }
 
+const pauseControlsFixture = {
+  ...pageFixture,
+  content: {
+    ...pageFixture.content,
+    slots: {
+      body: [0, 1, 2].map(index => ({
+        element: 'paragraph-carousel',
+        props: { id: `pause-${index}`, presentation: 'carousel' },
+        slots: {
+          items: ['One', 'Two'].map(text => ({
+            element: 'paragraph-text',
+            props: { text: `<p>${text}</p>` },
+            slots: {},
+          })),
+        },
+      })),
+    },
+  },
+}
+
 const authUiConfigFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
@@ -118,7 +138,8 @@ const drupalFixtureServer = createServer((request, response) => {
         ? presentationManifestFixture
       : path.includes('/api/menu_items/')
         ? []
-        : path.endsWith('/carousel-interaction-fixture') ? carouselFixture : pageFixture
+        : path.endsWith('/pause-controls-fixture') ? pauseControlsFixture
+          : path.endsWith('/carousel-interaction-fixture') ? carouselFixture : pageFixture
 
   response.writeHead(200, { 'content-type': 'application/json' })
   response.end(JSON.stringify(payload))
@@ -264,6 +285,38 @@ describe('Nuxt E2E smoke', async () => {
     expect(publicResponse.headers.get('cache-control')).not.toBe(
       'private, no-store, max-age=0',
     )
+  })
+
+  it('leaves inactive SSR pause controls unbound until their carousel mounts', async () => {
+    const html = await $fetch<string>('/pause-controls-fixture')
+    const buttons = [...html.matchAll(/<button\b[^>]*>[\s\S]*?<\/button>/g)]
+      .map(match => match[0]).filter(button => button.includes('Pause automatic scrolling'))
+
+    expect(buttons).toHaveLength(3)
+    for (const button of buttons) {
+      expect(button).toContain('disabled')
+      expect(button).not.toContain('aria-controls=')
+    }
+  })
+
+  it.runIf(browserEnabled)('binds mounted pause controls to existing unique carousel targets', async () => {
+    const page = await createPage()
+
+    await page.goto(url('/pause-controls-fixture'), { waitUntil: 'networkidle' })
+    const controls = page.getByRole('button', { name: 'Pause automatic scrolling' })
+
+    await controls.first().waitFor()
+    const targets = await controls.evaluateAll(buttons => buttons.map(button => {
+      const id = button.getAttribute('aria-controls')
+
+      return { enabled: !button.hasAttribute('disabled'), matches: id ? document.querySelectorAll(`[id="${id}"]`).length : 0 }
+    }))
+
+    expect(targets).toEqual(Array.from({ length: 3 }, () => ({ enabled: true, matches: 1 })))
+    await controls.first().focus()
+    await page.keyboard.press('Enter')
+    await page.getByRole('button', { name: 'Start automatic scrolling' }).waitFor()
+    await page.close()
   })
 
   it.runIf(browserEnabled)('preserves the first keyboard activation in an offscreen View carousel', async () => {

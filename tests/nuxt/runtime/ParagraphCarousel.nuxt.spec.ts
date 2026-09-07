@@ -169,6 +169,7 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     })
     const pause = wrapper.get('button[aria-controls]')
 
+    expect(wrapper.findAll(`[id="${pause.attributes('aria-controls')}"]`)).toHaveLength(1)
     expect(pause.text()).toBe('Pause automatic scrolling')
     await wrapper.get('a').trigger('focusin')
     await wrapper.get('a').trigger('focusout')
