@@ -72,18 +72,6 @@ const {
 
 await resolveInitialView()
 
-const randomizeEnabled = computed(() => {
-  if (props.randomize === true) return true
-  if (typeof props.randomize === 'string') {
-    const value = props.randomize.trim().toLowerCase()
-
-    return value === 'true' || value === '1'
-  }
-
-  return false
-})
-
-const randomizeRowsOnClient = ref(false)
 const trustedDynamicNoResults = computed(() =>
   trustedDrupalHtml(dynamicNoResults.value),
 )
@@ -105,10 +93,7 @@ const {
   hasRows,
 } = useDrupalViewRenderedRows({
   dynamicRows,
-  randomizeEnabled,
-  randomizeRowsOnClient,
   resolveSlotRows,
-  shuffleRows: tk.shuffle,
 })
 
 function getCarouselRows(): unknown[] {
@@ -128,9 +113,6 @@ watch(
   },
 )
 
-onMounted(() => {
-  randomizeRowsOnClient.value = true
-})
 const hasMultipleFilters = computed(() => normalizedFilters.value.length > 1)
 const scrollRestoreEnabled = computed(() =>
   !props.carousel && shouldPersistDrupalViewScroll(effectivePager.value?.totalPages),
@@ -202,7 +184,6 @@ const getRowMotionProps = (index: number) =>
       :carousel-interval="carouselInterval"
       :grid-items="gridItems"
       :items="getCarouselRows()"
-      :randomize="randomizeEnabled"
       :spacing="spacing"
       :width="width"
     />

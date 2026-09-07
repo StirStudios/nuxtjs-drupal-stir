@@ -50,7 +50,7 @@ Supported behavior:
 - Static view rows render from the `rows` slot.
 - Dynamic filter/sort/page changes refetch the current route with sanitized query params.
 - Missing refreshed view nodes fall back to empty rows instead of breaking the page.
-- Randomized static rows are stable after client mount and should not reshuffle on unrelated renders.
+- Drupal owns View row ordering, including randomization. Nuxt preserves the supplied order for initial SSR rows and subsequent filter, sort, and pager responses; the legacy `randomize` attribute no longer triggers a second client shuffle. Unpaged/limited Stir Tools Views already randomize in Drupal. Paginated Views retain their configured deterministic ordering to avoid duplicate or missing results between pages. Media paragraph ordering is also owned by the Stir Tools media formatter. Deploy the backend media-ordering update before or alongside this Nuxt update; older backends will retain authored media order. Randomized media output remains cacheable and keeps the same order until its cached output is rebuilt. No new field or environment variable is required. The unused Nuxt `useMediaOrdering`, `shuffleArray`, and slots-toolkit `shuffle`/`hydrateOrder` helpers have been removed. Legacy `randomize` props remain declared to consume existing CE attributes without leaking them onto DOM elements.
 
 Downstream requirements:
 

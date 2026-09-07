@@ -56,48 +56,19 @@ export function withDrupalViewTeaserProps(rows: VNode[]): VNode[] {
   return rows.map((node) => cloneVNode(node, { isHero: false, type: 'teaser' }, true))
 }
 
-function drupalViewRowSignature(rows: VNode[]): string {
-  return rows.map((node, index) => String(node.key ?? index)).join('|')
-}
-
 export function useDrupalViewRenderedRows(options: {
   dynamicRows: Ref<unknown[] | null>
-  randomizeEnabled: Ref<boolean>
-  randomizeRowsOnClient: Ref<boolean>
   resolveSlotRows: () => VNode[]
-  shuffleRows: (rows: VNode[]) => VNode[]
 }) {
-  let randomizedRowsCache: { signature: string, rows: VNode[] } | null = null
-
   const hasDynamicRows = computed(() => options.dynamicRows.value !== null)
   const dynamicRenderedRows = computed(() => normalizeDynamicDrupalViewRows(options.dynamicRows.value))
 
-  function getOrderedStaticRows(rowOptions: { teaser?: boolean } = {}) {
+  function getStaticRows(rowOptions: { teaser?: boolean } = { teaser: true }) {
     const rows = options.resolveSlotRows()
 
     if (!rowOptions.teaser) return rows
 
     return withDrupalViewTeaserProps(rows)
-  }
-
-  function getStaticRows(rowOptions: { teaser?: boolean } = { teaser: true }) {
-    const rows = getOrderedStaticRows(rowOptions)
-
-    if (!options.randomizeEnabled.value || !options.randomizeRowsOnClient.value) {
-      randomizedRowsCache = null
-      return rows
-    }
-
-    const signature = drupalViewRowSignature(rows)
-
-    if (randomizedRowsCache?.signature !== signature) {
-      randomizedRowsCache = {
-        signature,
-        rows: options.shuffleRows(rows),
-      }
-    }
-
-    return randomizedRowsCache.rows
   }
 
   function hasRows(): boolean {

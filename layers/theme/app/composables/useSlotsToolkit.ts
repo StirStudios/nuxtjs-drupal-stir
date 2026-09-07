@@ -1,5 +1,5 @@
 import type { MaybeRefOrGetter, VNode } from 'vue'
-import { Fragment, isVNode, onMounted, ref, computed, toValue } from 'vue'
+import { Fragment, isVNode, computed, toValue } from 'vue'
 
 type SlotMap = Record<string, (() => unknown) | undefined>
 export type VNodePropsRecord = Record<string, unknown>
@@ -186,31 +186,6 @@ export function isVNodeMediaEmbed(vnode: VNode | undefined): boolean {
   return !!props.mediaEmbed
 }
 
-export function shuffleArray<T>(items: T[]): T[] {
-  const arr = [...items]
-
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const current = arr[i]
-    const next = arr[j]
-
-    if (current === undefined || next === undefined) continue
-    arr[i] = next
-    arr[j] = current
-  }
-  return arr
-}
-
-function hydrateOrder<T>(baseFn: () => T[], clientFn: () => T[]) {
-  const clientList = ref<T[] | null>(null)
-
-  onMounted(() => {
-    clientList.value = clientFn()
-  })
-
-  return computed(() => clientList.value ?? baseFn())
-}
-
 export function useSlotsToolkit(slots: unknown) {
   const slot = (name: string): VNode[] => useSlotVNode(slots, name)
   const all = (nodes: VNode[]): VNode[] => getAllVNodes(nodes)
@@ -235,9 +210,7 @@ export function useSlotsToolkit(slots: unknown) {
     propsOf,
     heroMedia,
     mediaItems,
-    shuffle: shuffleArray,
     isMediaEmbed,
-    hydrateOrder,
   }
 }
 

@@ -62,10 +62,7 @@ describe('Drupal view row helpers', () => {
           },
         },
       ]),
-      randomizeEnabled: ref(false),
-      randomizeRowsOnClient: ref(false),
       resolveSlotRows: () => [h('article', { key: 'static' })],
-      shuffleRows: rows => rows,
     })
 
     expect(rows.hasRows()).toBe(true)
@@ -77,18 +74,37 @@ describe('Drupal view row helpers', () => {
     ])
   })
 
-  it('can randomize static rows after client mount', () => {
+  it('preserves Drupal static row order across repeated reads', () => {
     const rows = useDrupalViewRenderedRows({
       dynamicRows: ref(null),
-      randomizeEnabled: ref(true),
-      randomizeRowsOnClient: ref(true),
       resolveSlotRows: () => [
         h('article', { key: 'first' }),
         h('article', { key: 'second' }),
       ],
-      shuffleRows: rows => [...rows].reverse(),
     })
 
-    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['second', 'first'])
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['first', 'second'])
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['first', 'second'])
+  })
+
+  it('preserves each fetched page order and returns to the authored rows on reset', () => {
+    const dynamicRows = ref<unknown[] | null>(null)
+    const staticRows = [h('article', { key: 'third' }), h('article', { key: 'first' })]
+    const rows = useDrupalViewRenderedRows({
+      dynamicRows,
+      resolveSlotRows: () => staticRows,
+    })
+
+    expect(rows.getStaticRows({ teaser: false })).toBe(staticRows)
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['third', 'first'])
+    dynamicRows.value = [
+      { element: 'node-project', props: { id: 7 } },
+      { element: 'node-project', props: { id: 2 } },
+    ]
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['7', '2'])
+    dynamicRows.value = []
+    expect(rows.hasRows()).toBe(false)
+    dynamicRows.value = null
+    expect(rows.getRenderedRows().map(row => row.key)).toEqual(['third', 'first'])
   })
 })
