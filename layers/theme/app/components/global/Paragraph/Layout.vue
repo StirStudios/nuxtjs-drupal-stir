@@ -114,7 +114,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
 <template>
   <RevealMotionElement
     :id="sectionId"
-    :key="`layout-${id}-${revealMotionKey}`"
+    :key="`layout-${id}-${'whileInView' in layoutMotionProps ? revealMotionKey : 0}`"
     as="section"
     :class="[classes || 'content', spacing]"
     :motion-props="layoutMotionProps"

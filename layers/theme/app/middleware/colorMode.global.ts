@@ -10,8 +10,8 @@ export default defineNuxtRouteMiddleware((to) => {
     colorMode.preference = state.effectivePreference
   }
 
-  if (state.routeOverride) {
-    to.meta.colorMode = state.routeOverride
+  if (state.effectivePreference) {
+    to.meta.colorMode = state.effectivePreference
     return
   }
 

@@ -27,7 +27,7 @@ const motionProps = useRevealMotionProps(
 
 <template>
   <RevealMotionElement
-    :key="`paragraph-${id ?? 'unknown'}-${revealMotionKey}`"
+    :key="`paragraph-${id ?? 'unknown'}-${'whileInView' in motionProps ? revealMotionKey : 0}`"
     :as="as"
     :motion-props="motionProps"
     v-bind="attrs"
