@@ -29,4 +29,4 @@ On September 6, 2026, npm listed 8.2.2 as latest stable and Vite main still cont
 
 ## Removal
 
-Remove the entry and patch, reinstall and rebuild once an upstream Vite release includes an equivalent fix. Recheck CSS loading/error behavior and production timings. The source proposal is prepared locally; no upstream issue or pull request has been published yet.
+Remove the entry and patch, reinstall and rebuild once an upstream Vite release includes an equivalent fix. Recheck CSS loading/error behavior and production timings. Upstream source fix and regression test: [vitejs/vite#23446](https://github.com/vitejs/vite/pull/23446). Track its resolution and release before removing this patch.
