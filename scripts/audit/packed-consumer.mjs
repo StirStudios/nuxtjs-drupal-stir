@@ -16,8 +16,9 @@ const consumerLayers = [
 ]
 const keepTemporary = process.argv.includes('--keep-temporary')
 // Includes a 10 KB allowance for the required GPL text and licensing/onboarding notices.
+// Includes 1 KB for the paired Vue SSR dependency repairs and their installation guidance.
 // This download-archive limit is separate from the browser JavaScript budgets.
-const maxArchiveBytes = 310_000
+const maxArchiveBytes = 311_000
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {

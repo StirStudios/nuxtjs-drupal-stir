@@ -103,7 +103,7 @@ patchedDependencies:
   '@vue/server-renderer@3.5.42': patches/@vue__server-renderer@3.5.42.patch
 ```
 
-Reinstall and restart the dev server. Run `node patches/vue-ssr-context-repro.mjs`
+Reinstall and restart the dev server. Run `node scripts/audit/vue-ssr-context-repro.mjs`
 in this layer to verify the installed package behavior. This is a rendering
 correctness fix, not a measured performance claim. Do not suppress Vue warnings.
 Remove both repairs after adopting an upstream release with the equivalent fix;
