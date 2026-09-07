@@ -11,7 +11,7 @@ packageExtensionsChecksum: sha256-LlBPMHC1imeaC2yi3/R5PDNKwW5zfgeMsNH7hh03g5Q=
 
 patchedDependencies:
   '@vue/runtime-core@3.5.42':
-    hash: 12414903bab65572e0c230bc8cec61f3b6fd10a5d7ca4ef2accf4065bff89e02
+    hash: 926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a
     path: patches/@vue__runtime-core@3.5.42.patch
   '@vue/server-renderer@3.5.42':
     hash: f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033
@@ -10421,7 +10421,7 @@ snapshots:
     dependencies:
       '@vue/shared': 3.5.42
 
-  '@vue/runtime-core@3.5.42(patch_hash=12414903bab65572e0c230bc8cec61f3b6fd10a5d7ca4ef2accf4065bff89e02)':
+  '@vue/runtime-core@3.5.42(patch_hash=926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a)':
     dependencies:
       '@vue/reactivity': 3.5.42
       '@vue/shared': 3.5.42
@@ -10429,7 +10429,7 @@ snapshots:
   '@vue/runtime-dom@3.5.42':
     dependencies:
       '@vue/reactivity': 3.5.42
-      '@vue/runtime-core': 3.5.42(patch_hash=12414903bab65572e0c230bc8cec61f3b6fd10a5d7ca4ef2accf4065bff89e02)
+      '@vue/runtime-core': 3.5.42(patch_hash=926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a)
       '@vue/shared': 3.5.42
       csstype: 3.2.3
 

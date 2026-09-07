@@ -1,8 +1,16 @@
 diff --git a/dist/runtime-core.cjs.js b/dist/runtime-core.cjs.js
-index 08899205dfe52109b460e9b8fc9847eb5b3241f7..a2b2377958ae2efd4f8e61a592aa44121f9e3db9 100644
+index 08899205dfe52109b460e9b8fc9847eb5b3241f7..f368de7be5bf9fa0bd8844e961d9af7c3b86467b 100644
 --- a/dist/runtime-core.cjs.js
 +++ b/dist/runtime-core.cjs.js
-@@ -8726,6 +8726,7 @@ const setDevtoolsHook = setDevtoolsHook$1 ;
+@@ -392,6 +392,7 @@ function flushPostFlushCbs(seen) {
+ }
+ const getId = (job) => job.id == null ? job.flags & 2 ? -1 : Infinity : job.id;
+ function flushJobs(seen) {
++  unsetCurrentInstance();
+   {
+     seen = seen || /* @__PURE__ */ new Map();
+   }
+@@ -8726,6 +8727,7 @@ const setDevtoolsHook = setDevtoolsHook$1 ;
  const _ssrUtils = {
    createComponentInstance,
    setupComponent,
@@ -11,10 +19,18 @@ index 08899205dfe52109b460e9b8fc9847eb5b3241f7..a2b2377958ae2efd4f8e61a592aa4412
    setCurrentRenderingInstance,
    isVNode: isVNode,
 diff --git a/dist/runtime-core.cjs.prod.js b/dist/runtime-core.cjs.prod.js
-index 8b2db9c0e26d3d18bf71bbf0922b61c555018708..b1e6a4021aa23fd96d17bd1c2585f27a3f734412 100644
+index 8b2db9c0e26d3d18bf71bbf0922b61c555018708..b392fb0226ded09f66333a12d7141bc9c6ece51c 100644
 --- a/dist/runtime-core.cjs.prod.js
 +++ b/dist/runtime-core.cjs.prod.js
-@@ -6818,6 +6818,7 @@ const setDevtoolsHook = shared.NOOP;
+@@ -251,6 +251,7 @@ function flushPostFlushCbs(seen) {
+ }
+ const getId = (job) => job.id == null ? job.flags & 2 ? -1 : Infinity : job.id;
+ function flushJobs(seen) {
++  unsetCurrentInstance();
+   try {
+     for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+       const job = queue[flushIndex];
+@@ -6818,6 +6819,7 @@ const setDevtoolsHook = shared.NOOP;
  const _ssrUtils = {
    createComponentInstance,
    setupComponent,
@@ -23,10 +39,18 @@ index 8b2db9c0e26d3d18bf71bbf0922b61c555018708..b1e6a4021aa23fd96d17bd1c2585f27a
    setCurrentRenderingInstance,
    isVNode: isVNode,
 diff --git a/dist/runtime-core.esm-bundler.js b/dist/runtime-core.esm-bundler.js
-index f0905f8afe50421feed03b208b19afb26e4bbb73..84df908bfed74a45ec109e315b5ce39c09383b5e 100644
+index f0905f8afe50421feed03b208b19afb26e4bbb73..5f8d259fa96fe5666de2150e1d5657070468efdc 100644
 --- a/dist/runtime-core.esm-bundler.js
 +++ b/dist/runtime-core.esm-bundler.js
-@@ -8801,6 +8801,7 @@ const setDevtoolsHook = !!(process.env.NODE_ENV !== "production") || true ? setD
+@@ -395,6 +395,7 @@ function flushPostFlushCbs(seen) {
+ }
+ const getId = (job) => job.id == null ? job.flags & 2 ? -1 : Infinity : job.id;
+ function flushJobs(seen) {
++  unsetCurrentInstance();
+   if (!!(process.env.NODE_ENV !== "production")) {
+     seen = seen || /* @__PURE__ */ new Map();
+   }
+@@ -8801,6 +8802,7 @@ const setDevtoolsHook = !!(process.env.NODE_ENV !== "production") || true ? setD
  const _ssrUtils = {
    createComponentInstance,
    setupComponent,
