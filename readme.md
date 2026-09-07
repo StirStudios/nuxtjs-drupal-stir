@@ -127,6 +127,10 @@ overrides:
   fontless>esbuild: 0.28.2
 ```
 
+For Vite 8.2.2, see the [temporary preload bookkeeping patch](patches/README.md).
+Its package-manager configuration must be applied in each consumer root; it is
+not inherited by extending the layer.
+
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.

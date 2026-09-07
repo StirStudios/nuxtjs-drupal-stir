@@ -49,6 +49,7 @@
     "contracts/stir-tools/README.md",
     "contracts/stir-tools/v1",
     "layers",
+    "patches",
     "presets",
     "scripts/a11y",
     "scripts/compliance",
