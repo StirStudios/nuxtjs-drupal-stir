@@ -33,6 +33,11 @@ onServerPrefetch(loadMissingBlocks)
 if (import.meta.client) void loadMissingBlocks()
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
+  if (appContextBlocks.value === undefined
+    && (appContextStatus.value === 'idle' || appContextStatus.value === 'pending')) {
+    return []
+  }
+
   return appContextBlocks.value?.length ? appContextBlocks.value : pageBlocks.value
 })
 </script>

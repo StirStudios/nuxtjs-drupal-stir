@@ -130,6 +130,40 @@ describe('RegionArea app context fallback', () => {
     ])
   })
 
+  it.each(['preferred', 'empty', 'error'] as const)(
+    'does not initialize CE fallback while uncached context is pending (%s)',
+    async (outcome) => {
+      const fallback = [{ element: 'paragraph-text', props: { id: 'ce-region' } }]
+
+      state.page.value = { blocks: { top: fallback } }
+      let release!: () => void
+      const pending = new Promise<void>((resolve) => { release = resolve })
+
+      unregisterEndpoint?.()
+      unregisterEndpoint = registerEndpoint('/api/app-context', async () => {
+        state.layoutBlockCalls++
+        await pending
+        if (outcome === 'error') return new Response('Unavailable', { status: 400 })
+        return { blocks: outcome === 'preferred' ? state.appContextBlocks : {} }
+      })
+
+      const wrapper = await mountSuspended(RegionArea, { props: { area: 'top' } })
+
+      wrappers.push(wrapper)
+      try {
+        await vi.waitFor(() => expect(state.layoutBlockCalls).toBe(1))
+        expect(state.renderedBlocks).toEqual([])
+        expect(wrapper.find('.rendered-region').exists()).toBe(false)
+      } finally {
+        release()
+      }
+      await vi.waitFor(() => expect(state.renderedBlocks).toEqual(
+        outcome === 'preferred' ? state.appContextBlocks.top : fallback,
+      ))
+      expect(state.layoutBlockCalls).toBe(1)
+    },
+  )
+
   it('handles a failed shared request and permits a successful retry', async () => {
     unregisterEndpoint?.()
     let fail = true
