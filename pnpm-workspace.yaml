@@ -7,3 +7,7 @@ overrides:
 allowBuilds:
   esbuild: false
   vue-demi: false
+
+# Remove when the Vite preload bookkeeping fix is available upstream.
+patchedDependencies:
+  vite@8.2.2: patches/vite@8.2.2.patch

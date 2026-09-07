@@ -1,0 +1,11 @@
+--- a/dist/node/chunks/node.js
++++ b/dist/node/chunks/node.js
+@@ -28874,7 +28874,7 @@
+ 		const cspNonceMeta = document.querySelector("meta[property=csp-nonce]");
+ 		const cspNonce = cspNonceMeta?.nonce || cspNonceMeta?.getAttribute("nonce");
+ 		function allSettled(promises) {
+-			return Promise.all(promises.map((p) => Promise.resolve(p).then((value) => ({
++			return Promise.all(promises.filter((p) => p !== void 0).map((p) => Promise.resolve(p).then((value) => ({
+ 				status: "fulfilled",
+ 				value
+ 			}), (reason) => ({
