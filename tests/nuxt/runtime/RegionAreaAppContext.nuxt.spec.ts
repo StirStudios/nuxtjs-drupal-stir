@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { clearNuxtData } from '#app'
+import { flushPromises } from '@vue/test-utils'
 import { useAppRegionBlocks } from '../../../layers/theme/app/composables/useAppContext'
 import RegionArea from '../../../layers/theme/app/components/RegionArea.vue'
 
@@ -87,7 +88,8 @@ describe('RegionArea app context fallback', () => {
     })
 
     wrappers.push(wrapper)
-    await vi.waitFor(() => expect(wrapper.vm.$.setupState.appContextStatus).toBe('success'))
+    await vi.waitFor(() => expect(state.layoutBlockCalls).toBe(1))
+    await flushPromises()
     expect(state.layoutBlockCalls).toBe(1)
     expect(state.renderedBlocks).toEqual([
       {
@@ -117,7 +119,8 @@ describe('RegionArea app context fallback', () => {
     })
 
     wrappers.push(wrapper)
-    await vi.waitFor(() => expect(wrapper.vm.$.setupState.appContextStatus).toBe('success'))
+    await vi.waitFor(() => expect(state.layoutBlockCalls).toBe(1))
+    await flushPromises()
     expect(state.layoutBlockCalls).toBe(1)
     expect(state.renderedBlocks).toEqual([
       {
