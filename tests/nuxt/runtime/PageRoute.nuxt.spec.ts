@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, inject, ref } from 'vue'
 import PageRoute from '../../../layers/theme/app/components/Drupal/PageRoute.vue'
+import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
 import { layoutEditLinksKey, presentationEditTargetsKey } from '../../../layers/theme/app/utils/layoutEditLinks'
 
 const state = vi.hoisted(() => ({ fetchPage: vi.fn(), getPage: vi.fn() }))
@@ -16,10 +17,11 @@ mockNuxtImport('useStirDrupalCe', () => () => ({
 
 const Probe = defineComponent({
   setup() {
+    const page = inject(drupalPageKey)
     const layouts = inject(layoutEditLinksKey)
     const presentations = inject(presentationEditTargetsKey)
 
-    return () => h('p', { id: 'edit-targets' }, `${layouts?.value.get('destination')?.editLink}:${presentations?.value.get('/edit/destination')?.paragraphId}`)
+    return () => h('p', { id: 'edit-targets', 'data-page-title': page?.value.title }, `${layouts?.value.get('destination')?.editLink}:${presentations?.value.get('/edit/destination')?.paragraphId}`)
   },
 })
 const Layout = defineComponent({
@@ -47,6 +49,7 @@ describe('Drupal PageRoute ownership', () => {
 
     expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe('clear')
     expect(wrapper.get('#edit-targets').text()).toBe('/edit/destination:42')
+    expect(wrapper.get('#edit-targets').attributes('data-page-title')).toBe('Destination')
     expect(state.getPage).not.toHaveBeenCalled()
     wrapper.unmount()
   })

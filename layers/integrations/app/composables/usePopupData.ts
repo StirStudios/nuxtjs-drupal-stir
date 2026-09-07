@@ -180,7 +180,7 @@ export const usePopupData = () => {
   const popup = ref<PopupNode | null>(null)
   const fallbackLoaded = ref(false)
   let fallbackRequestId = 0
-  const { data: appContext, execute: loadAppContext } = useAppContext({ immediate: false })
+  const { data: appContext, status: appContextStatus, execute: loadAppContext } = useAppContext({ immediate: false })
 
   const contentSource = computed(() => page.value?.content)
   const decoupledSource = computed(() => page.value?.blocks?.decoupled)
@@ -203,7 +203,7 @@ export const usePopupData = () => {
 
   async function loadFallbackPopup() {
     if (!import.meta.client) return
-    if (fallbackLoaded.value) return
+    if (fallbackLoaded.value || appContextStatus.value === 'success') return
 
     fallbackLoaded.value = true
     const requestId = ++fallbackRequestId

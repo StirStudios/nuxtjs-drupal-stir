@@ -5,6 +5,13 @@ import { useAuthSession } from './useAuthSession'
 export function useAuthActions() {
   const authApi = useAuthApi()
   const session = useAuthSession()
+  const nuxtApp = useNuxtApp()
+  const refreshAppContext = () => {
+    const keys = Object.keys(nuxtApp.payload.data).filter(key => key.startsWith('app-context:'))
+
+    clearNuxtData(keys)
+    return refreshNuxtData(keys)
+  }
 
   const login = async (payload: {
     identifier: string
@@ -14,6 +21,7 @@ export function useAuthActions() {
     const response = await authApi.login(payload)
 
     await session.fetchSession({ force: true })
+    await refreshAppContext()
 
     return {
       response,
@@ -26,6 +34,7 @@ export function useAuthActions() {
       await authApi.logout()
     } finally {
       session.clearSession()
+      await refreshAppContext()
     }
   }
 

@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const {
   data: appContextBlocks,
+  status: appContextStatus,
   execute: loadAppContextBlocks,
 } = await useAppRegionBlocks(() => props.area, { immediate: false })
 
@@ -24,7 +25,9 @@ function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
 
 const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
 
-await loadAppContextBlocks()
+if (appContextStatus.value !== 'success') {
+  await loadAppContextBlocks()
+}
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
   return appContextBlocks.value?.length ? appContextBlocks.value : pageBlocks.value

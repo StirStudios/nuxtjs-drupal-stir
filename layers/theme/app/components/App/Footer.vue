@@ -28,6 +28,7 @@ const footerConfig = computed(() =>
 
 const {
   data: appContext,
+  status: appContextStatus,
   execute: loadAppFooterContext,
 } = await useAppFooterContext({ immediate: false })
 
@@ -45,11 +46,11 @@ const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
 
 const needsAppContext = computed(() => !hasPageFooterMenu.value || !pageSiteInfo.value)
 
-if (needsAppContext.value) {
+if (needsAppContext.value && appContextStatus.value !== 'success') {
   await loadAppFooterContext()
 }
 watch(needsAppContext, (active) => {
-  if (active) {
+  if (active && appContextStatus.value !== 'success') {
     void loadAppFooterContext()
   }
 })

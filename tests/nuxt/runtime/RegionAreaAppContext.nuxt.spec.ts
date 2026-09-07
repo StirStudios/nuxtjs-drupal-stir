@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
+import { clearNuxtData } from '#app'
 import { useAppRegionBlocks } from '../../../layers/theme/app/composables/useAppContext'
 import RegionArea from '../../../layers/theme/app/components/RegionArea.vue'
 
@@ -37,6 +38,7 @@ describe('RegionArea app context fallback', () => {
   let unregisterEndpoint: (() => void) | undefined
 
   beforeEach(() => {
+    clearNuxtData()
     state.layoutBlockCalls = 0
     state.renderedBlocks = []
     state.appContextBlocks = {

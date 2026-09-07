@@ -64,6 +64,7 @@ mockNuxtImport('useDrupalCe', () => {
 mockNuxtImport('useAppFooterContext', () => {
   return () => ({
     data: appFooterContextData,
+    status: ref('idle'),
     execute: () => {
       appFooterContextExecuteCalls += 1
     },

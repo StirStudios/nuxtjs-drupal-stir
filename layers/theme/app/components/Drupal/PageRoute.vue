@@ -6,6 +6,7 @@ import {
   presentationEditTargetsKey,
   withoutPresentationEditMetadata,
 } from '../../utils/layoutEditLinks'
+import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import type {
   CmsGlobalSeoAssetConfig,
@@ -61,6 +62,8 @@ const page = await fetchPage(
   { query: drupalPageQuery.value },
   customPageError,
 )
+
+provide(drupalPageKey, page)
 const { pageLayout, isAuthenticated, isFront } = usePageContext(page)
 
 provide(
