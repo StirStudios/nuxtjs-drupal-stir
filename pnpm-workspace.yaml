@@ -12,3 +12,9 @@ allowBuilds:
 patchedDependencies:
   vite@8.2.2: patches/vite@8.2.2.patch
   nuxtjs-drupal-ce@2.9.0: patches/nuxtjs-drupal-ce@2.9.0.patch
+
+# CE 2.9.0 imports H3 without declaring it; Nuxt 4 uses H3 1.
+packageExtensions:
+  nuxtjs-drupal-ce@2.9.0:
+    dependencies:
+      h3: ^1.15.11

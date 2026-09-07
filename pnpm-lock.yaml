@@ -7,6 +7,8 @@ settings:
 overrides:
   fontless>esbuild: 0.28.2
 
+packageExtensionsChecksum: sha256-LlBPMHC1imeaC2yi3/R5PDNKwW5zfgeMsNH7hh03g5Q=
+
 patchedDependencies:
   nuxtjs-drupal-ce@2.9.0:
     hash: 521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e
@@ -12869,6 +12871,7 @@ snapshots:
   nuxtjs-drupal-ce@2.9.0(patch_hash=521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e)(typescript@5.9.3):
     dependencies:
       defu: 6.1.7
+      h3: 1.15.11
       nuxt-component-preview: 1.1.1(typescript@5.9.3)
       ufo: 1.6.4
     transitivePeerDependencies:
