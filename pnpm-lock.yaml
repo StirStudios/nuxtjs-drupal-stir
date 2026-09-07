@@ -10,12 +10,6 @@ overrides:
 packageExtensionsChecksum: sha256-LlBPMHC1imeaC2yi3/R5PDNKwW5zfgeMsNH7hh03g5Q=
 
 patchedDependencies:
-  '@vue/runtime-core@3.5.42':
-    hash: 926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a
-    path: patches/@vue__runtime-core@3.5.42.patch
-  '@vue/server-renderer@3.5.42':
-    hash: f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033
-    path: patches/@vue__server-renderer@3.5.42.patch
   nuxtjs-drupal-ce@2.9.0:
     hash: 521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e
     path: patches/nuxtjs-drupal-ce@2.9.0.patch
@@ -156,7 +150,7 @@ importers:
         version: 4.5.2
       '@nuxt/test-utils':
         specifier: ^4.2.0
-        version: 4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
+        version: 4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
@@ -177,7 +171,7 @@ importers:
         version: 4.1.11(vitest@4.1.11)
       '@vue/test-utils':
         specifier: ^2.5.0
-        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       ajv:
         specifier: 6.15.0
         version: 6.15.0
@@ -8652,7 +8646,7 @@ snapshots:
       rc9: 3.1.0
       std-env: 4.2.0
 
-  '@nuxt/test-utils@4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)':
+  '@nuxt/test-utils@4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)':
     dependencies:
       '@clack/prompts': 1.7.0
       '@nuxt/devtools-kit': 2.7.0(magicast@0.5.4)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))
@@ -8680,11 +8674,11 @@ snapshots:
       tinyexec: 1.3.1
       ufo: 1.6.4
       unplugin: 3.3.0(esbuild@0.28.2)(rolldown@1.2.7)(rollup@4.63.1)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))
-      vitest-environment-nuxt: 2.0.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
+      vitest-environment-nuxt: 2.0.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
       vue: 3.5.42(typescript@5.9.3)
     optionalDependencies:
       '@playwright/test': 1.63.0
-      '@vue/test-utils': 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3))
+      '@vue/test-utils': 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       happy-dom: 20.14.0
       jsdom: 29.1.1(@noble/hashes@2.4.0)
       playwright-core: 1.63.0
@@ -10421,7 +10415,7 @@ snapshots:
     dependencies:
       '@vue/shared': 3.5.42
 
-  '@vue/runtime-core@3.5.42(patch_hash=926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a)':
+  '@vue/runtime-core@3.5.42':
     dependencies:
       '@vue/reactivity': 3.5.42
       '@vue/shared': 3.5.42
@@ -10429,11 +10423,11 @@ snapshots:
   '@vue/runtime-dom@3.5.42':
     dependencies:
       '@vue/reactivity': 3.5.42
-      '@vue/runtime-core': 3.5.42(patch_hash=926956e522de5baaf68e97f7827ace2764ba464cd3a8d7f469bbfbbe7e884f3a)
+      '@vue/runtime-core': 3.5.42
       '@vue/shared': 3.5.42
       csstype: 3.2.3
 
-  '@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033)':
+  '@vue/server-renderer@3.5.42':
     dependencies:
       '@vue/compiler-ssr': 3.5.42
       '@vue/runtime-dom': 3.5.42
@@ -10441,14 +10435,14 @@ snapshots:
 
   '@vue/shared@3.5.42': {}
 
-  '@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3))':
+  '@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))':
     dependencies:
       '@vue/compiler-dom': 3.5.42
       js-beautify: 2.0.3
       vue: 3.5.42(typescript@5.9.3)
       vue-component-type-helpers: 3.3.11
     optionalDependencies:
-      '@vue/server-renderer': 3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033)
+      '@vue/server-renderer': 3.5.42
 
   '@vueuse/core@10.11.1(vue@3.5.42(typescript@5.9.3))':
     dependencies:
@@ -14487,9 +14481,9 @@ snapshots:
       terser: 5.51.2
       yaml: 2.9.0
 
-  vitest-environment-nuxt@2.0.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11):
+  vitest-environment-nuxt@2.0.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11):
     dependencies:
-      '@nuxt/test-utils': 4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033))(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
+      '@nuxt/test-utils': 4.2.0(@playwright/test@1.63.0)(@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3)))(esbuild@0.28.2)(happy-dom@20.14.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(magicast@0.5.4)(playwright-core@1.63.0)(rolldown@1.2.7)(rollup@4.63.1)(typescript@5.9.3)(vite@8.2.2(patch_hash=7f2f446da766564c218ab9967a5333ef98f68988add611854f5ff5610434323c)(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))(vitest@4.1.11)
     transitivePeerDependencies:
       - '@cucumber/cucumber'
       - '@farmfe/core'
@@ -14626,7 +14620,7 @@ snapshots:
       '@vue/compiler-dom': 3.5.42
       '@vue/compiler-sfc': 3.5.42
       '@vue/runtime-dom': 3.5.42
-      '@vue/server-renderer': 3.5.42(patch_hash=f6885fc5f40fc67f6f83a3a50c7919e2301b0f2090456e0fd918e44db8136033)
+      '@vue/server-renderer': 3.5.42
       '@vue/shared': 3.5.42
     optionalDependencies:
       typescript: 5.9.3

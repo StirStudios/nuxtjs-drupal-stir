@@ -13,7 +13,7 @@ const {
   data: appContextBlocks,
   status: appContextStatus,
   execute: loadAppContextBlocks,
-} = await useAppRegionBlocks(() => props.area, { immediate: false })
+} = useAppRegionBlocks(() => props.area, { immediate: false })
 
 function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
   if (Array.isArray(raw)) return raw as AppContextBlock[]
@@ -25,9 +25,12 @@ function normalizeRegionBlocks(raw: unknown): AppContextBlock[] {
 
 const pageBlocks = computed(() => normalizeRegionBlocks(page.value?.blocks?.[props.area]))
 
-if (appContextStatus.value !== 'success') {
-  await loadAppContextBlocks()
+function loadMissingBlocks() {
+  if (appContextStatus.value !== 'success') return loadAppContextBlocks()
 }
+
+onServerPrefetch(loadMissingBlocks)
+if (import.meta.client) void loadMissingBlocks()
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
   return appContextBlocks.value?.length ? appContextBlocks.value : pageBlocks.value

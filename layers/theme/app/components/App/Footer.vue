@@ -30,7 +30,7 @@ const {
   data: appContext,
   status: appContextStatus,
   execute: loadAppFooterContext,
-} = await useAppFooterContext({ immediate: false })
+} = useAppFooterContext({ immediate: false })
 
 const socialIcons = computed<SocialIcon[]>(() => Array.isArray(iconsSocialConfig.value) ? [...iconsSocialConfig.value] : [])
 
@@ -46,14 +46,16 @@ const pageSiteInfo = computed<AppContextSiteInfo | undefined>(() =>
 
 const needsAppContext = computed(() => !hasPageFooterMenu.value || !pageSiteInfo.value)
 
-if (needsAppContext.value && appContextStatus.value !== 'success') {
-  await loadAppFooterContext()
-}
-watch(needsAppContext, (active) => {
-  if (active && appContextStatus.value !== 'success') {
-    void loadAppFooterContext()
+function loadMissingFooter() {
+  if (needsAppContext.value && appContextStatus.value !== 'success') {
+    return loadAppFooterContext()
   }
-})
+}
+
+onServerPrefetch(loadMissingFooter)
+if (import.meta.client) {
+  watch(needsAppContext, () => { void loadMissingFooter() }, { immediate: true })
+}
 
 const footerMenu = computed<AppContextFooterMenuItem[]>(() => {
   if (hasPageFooterMenu.value && pageFooterMenu.value) {

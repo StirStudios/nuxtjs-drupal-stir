@@ -16,7 +16,5 @@ packageExtensions:
 
 # Remove when the Vite preload bookkeeping fix is available upstream.
 patchedDependencies:
-  '@vue/runtime-core@3.5.42': patches/@vue__runtime-core@3.5.42.patch
-  '@vue/server-renderer@3.5.42': patches/@vue__server-renderer@3.5.42.patch
   nuxtjs-drupal-ce@2.9.0: patches/nuxtjs-drupal-ce@2.9.0.patch
   vite@8.2.2: patches/vite@8.2.2.patch

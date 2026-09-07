@@ -81,34 +81,3 @@ not inherited by applications extending the layer. Remove it when upgrading to
 a CE release that declares the compatible runtime dependency.
 
 Upstream fix: [drunomics/nuxtjs-drupal-ce#541](https://github.com/drunomics/nuxtjs-drupal-ce/pull/541).
-
-# Vue 3.5.42 async rendering context repair
-
-The paired `@vue/runtime-core` and `@vue/server-renderer` patches clear a sibling's
-restored async setup instance before the server renderer enters a render subtree.
-Without this, valid slot calls inside render functions can produce false
-"Slot invoked outside of the render function" warnings. The minimal reproduction
-contains only Vue; no Stir, Drupal, Nuxt UI, or scrolling behavior is required.
-
-The runtime patch also clears stale setup context before queued client updates.
-This covers shared-request timing that can otherwise warn during footer rendering
-after navigation, including editor sessions.
-
-The source fixes passed 1,386 Vue runtime/server-renderer tests, including a new
-regression that fails on the unmodified v3.5.42 release. These temporary patches
-cover the Node CJS development/production and ESM bundler distributions used by
-Nuxt; standalone browser SSR bundles are outside this integration's scope.
-
-Apply both together at the app root:
-
-```yaml
-patchedDependencies:
-  '@vue/runtime-core@3.5.42': patches/@vue__runtime-core@3.5.42.patch
-  '@vue/server-renderer@3.5.42': patches/@vue__server-renderer@3.5.42.patch
-```
-
-Reinstall and restart the dev server. Run `node scripts/audit/vue-ssr-context-repro.mjs`
-in this layer to verify the installed package behavior. This is a rendering
-correctness fix, not a measured performance claim. Do not suppress Vue warnings.
-Remove both repairs after adopting an upstream release with the equivalent fix;
-do not apply these files to other versions without source review and tests.
