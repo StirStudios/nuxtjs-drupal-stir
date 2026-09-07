@@ -2,6 +2,7 @@ import { useAppConfig } from '#imports'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, inject, ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
 import ParagraphCarousel from '../../../layers/theme/app/components/global/Paragraph/Carousel.vue'
 import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
 
@@ -28,6 +29,23 @@ vi.mock('@vueuse/core', async (importOriginal) => {
 describe('ParagraphCarousel (Nuxt runtime)', () => {
   beforeEach(() => {
     preferredMotion.value = 'no-preference'
+  })
+
+  it.each(['carousel', 'marquee'])('normalizes original hero media through a nested %s renderer', async (presentation) => {
+    const ProjectTeaser = defineComponent({
+      setup: () => () => h(MediaImage, {
+        src: '/hero.jpg', loading: 'eager', fetchpriority: 'high', noWrapper: true,
+      }),
+    })
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { presentation, items: [h(ProjectTeaser), h(ProjectTeaser)] },
+    })
+
+    expect(wrapper.findAll('img').length).toBeGreaterThanOrEqual(2)
+    for (const image of wrapper.findAll('img')) {
+      expect(image.attributes()).toMatchObject({ loading: 'lazy', fetchpriority: 'auto' })
+    }
+    wrapper.unmount()
   })
 
   it('passes the exact Drupal interval to Nuxt UI without starting off-screen', async () => {

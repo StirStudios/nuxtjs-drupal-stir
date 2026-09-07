@@ -106,6 +106,26 @@ const pauseControlsFixture = {
   },
 }
 
+const imageLoadingFixture = {
+  ...pageFixture,
+  content: {
+    ...pageFixture.content,
+    slots: {
+      body: [{
+        element: 'paragraph-carousel',
+        props: { presentation: 'carousel' },
+        slots: {
+          items: [1, 2].map(index => ({
+            element: 'media-image',
+            props: { src: `/fixture-${index}.jpg`, alt: `Delivery fixture ${index}`, width: 1200, height: 667, loading: 'eager', fetchpriority: 'high', noWrapper: true },
+            slots: {},
+          })),
+        },
+      }],
+    },
+  },
+}
+
 const authUiConfigFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/auth-ui-config.json',
@@ -138,6 +158,7 @@ const drupalFixtureServer = createServer((request, response) => {
         ? presentationManifestFixture
       : path.includes('/api/menu_items/')
         ? []
+        : path.endsWith('/image-loading-fixture') ? imageLoadingFixture
         : path.endsWith('/pause-controls-fixture') ? pauseControlsFixture
           : path.endsWith('/carousel-interaction-fixture') ? carouselFixture : pageFixture
 
@@ -285,6 +306,20 @@ describe('Nuxt E2E smoke', async () => {
     expect(publicResponse.headers.get('cache-control')).not.toBe(
       'private, no-store, max-age=0',
     )
+  })
+
+  it('renders reused hero images with viewport loading before hydration', async () => {
+    const html = await $fetch<string>('/image-loading-fixture')
+    const images = [...html.matchAll(/<img\b[^>]*>/g)]
+      .map(match => match[0]).filter(image => image.includes('Delivery fixture'))
+
+    expect(images).toHaveLength(2)
+    for (const image of images) {
+      expect(image).toContain('loading="lazy"')
+      expect(image).toContain('fetchpriority="auto"')
+      expect(image).toContain('src=')
+      expect(image).not.toContain('data-src=')
+    }
   })
 
   it('leaves inactive SSR pause controls unbound until their carousel mounts', async () => {

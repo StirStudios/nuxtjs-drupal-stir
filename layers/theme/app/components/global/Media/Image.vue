@@ -5,6 +5,7 @@ import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
   carouselImageDeliverySizesKey,
+  viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
   resolveImageDeliveryProfile,
   versionImageSource,
@@ -69,10 +70,14 @@ const forwardedAttrs = computed(() => {
   return safeAttrs
 })
 const { isFront } = usePageContext()
+const viewportLoading = inject(viewportImageLoadingKey, false)
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
-  if (props.loading === 'eager') return 'eager'
+  if (!viewportLoading && props.loading === 'eager') return 'eager'
   return 'lazy'
 })
+const normalizedFetchPriority = computed(() =>
+  viewportLoading ? 'auto' : props.fetchpriority || undefined,
+)
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
 const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
@@ -230,7 +235,7 @@ onMounted(() => {
           imageClass,
         ]
     "
-    :fetchpriority="fetchpriority || undefined"
+    :fetchpriority="normalizedFetchPriority"
     :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
@@ -265,38 +270,17 @@ onMounted(() => {
     />
 
     <ProviderImage
-      v-if="!isSourceDeferred && !isEager"
+      v-if="!isSourceDeferred"
       :ref="setImageElementRef"
       :alt="alt || ''"
       :class="[
         theme.media.base,
         resolvedRoundedClass,
-        platform === 'instagram' ? 'aspect-3/4' : '',
+        !isEager && platform === 'instagram' ? 'aspect-3/4' : '',
         !isLoaded && 'opacity-0',
         imageClass,
       ]"
-      :format="theme.media.image.format"
-      :height="height"
-      :loading="normalizedLoading"
-      :quality="theme.media.image.quality"
-      :sizes="providerSizes"
-      :src="providerSource"
-      :width="width"
-      @error="handleError"
-      @load="handleLoad"
-    />
-
-    <ProviderImage
-      v-else-if="!isSourceDeferred"
-      :ref="setImageElementRef"
-      :alt="alt || ''"
-      :class="[
-        theme.media.base,
-        resolvedRoundedClass,
-        !isLoaded && 'opacity-0',
-        imageClass,
-      ]"
-      fetchpriority="high"
+      :fetchpriority="normalizedFetchPriority"
       :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"

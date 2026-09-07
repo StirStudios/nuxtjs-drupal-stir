@@ -3,9 +3,50 @@ import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { carouselImageDeliverySizesKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
+  it.each([false, true])('uses native viewport loading for reused media (bare: %s)', async (noWrapper) => {
+    const wrapper = await mountSuspended(MediaImage, {
+      global: { provide: { [viewportImageLoadingKey as symbol]: true } },
+      props: { src: '/hero.jpg', loading: 'eager', fetchpriority: 'high', noWrapper },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ loading: 'lazy', fetchpriority: 'auto' })
+    expect(wrapper.findAll('img')).toHaveLength(1)
+    expect(wrapper.findAll('.media')).toHaveLength(noWrapper ? 0 : 1)
+    wrapper.unmount()
+  })
+
+  it('does not treat a source hero flag as priority for every carousel slide', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      global: { provide: { [viewportImageLoadingKey as symbol]: true } },
+      props: { src: '/hero.jpg', isHero: true, loading: 'eager', fetchpriority: 'high' },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ loading: 'lazy', fetchpriority: 'auto' })
+    expect(wrapper.find('.media').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('preserves priority for a real page hero outside a viewport-loading region', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { src: '/hero.jpg', isHero: true, loading: 'eager', fetchpriority: 'high' },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ loading: 'eager', fetchpriority: 'high' })
+    wrapper.unmount()
+  })
+
+  it.each(['auto', 'low'] as const)('honors explicit %s priority for an eager wrapped image', async (fetchpriority) => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { src: '/image.jpg', loading: 'eager', fetchpriority },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ loading: 'eager', fetchpriority })
+    wrapper.unmount()
+  })
+
   it('renders linked Instagram media as one interactive link', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: { src: '/instagram.webp', alt: 'Studio project', platform: 'instagram', link: 'https://www.instagram.com/p/example/' },
