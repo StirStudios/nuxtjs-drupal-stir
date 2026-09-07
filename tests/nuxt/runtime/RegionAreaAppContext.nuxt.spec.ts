@@ -164,6 +164,54 @@ describe('RegionArea app context fallback', () => {
     },
   )
 
+  it.each(['empty', 'error'] as const)(
+    'retains settled fallback while refreshing cached %s context',
+    async (outcome) => {
+      const fallback = [{ element: 'paragraph-text', props: { id: 'ce-region' } }]
+
+      state.page.value = { blocks: { top: fallback } }
+      let release!: () => void
+      const pending = new Promise<void>((resolve) => { release = resolve })
+
+      unregisterEndpoint?.()
+      unregisterEndpoint = registerEndpoint('/api/app-context', async () => {
+        state.layoutBlockCalls++
+        if (state.layoutBlockCalls === 1) {
+          if (outcome === 'error') return new Response('Unavailable', { status: 400 })
+          return { blocks: {} }
+        }
+        await pending
+        return { blocks: state.appContextBlocks }
+      })
+      const Harness = defineComponent({
+        async setup() {
+          const result = await useAppRegionBlocks('top')
+
+          return { result }
+        },
+        template: '<div />',
+      })
+      const harness = await mountSuspended(Harness)
+
+      wrappers.push(harness)
+      const refresh = harness.vm.result.refresh()
+
+      try {
+        await vi.waitFor(() => expect(state.layoutBlockCalls).toBe(2))
+        const region = await mountSuspended(RegionArea, { props: { area: 'top' } })
+
+        wrappers.push(region)
+        expect(state.renderedBlocks).toEqual(fallback)
+        expect(region.find('.rendered-region').exists()).toBe(true)
+      } finally {
+        release()
+        await refresh
+      }
+      await vi.waitFor(() => expect(state.renderedBlocks).toEqual(state.appContextBlocks.top))
+      expect(state.layoutBlockCalls).toBe(2)
+    },
+  )
+
   it('handles a failed shared request and permits a successful retry', async () => {
     unregisterEndpoint?.()
     let fail = true

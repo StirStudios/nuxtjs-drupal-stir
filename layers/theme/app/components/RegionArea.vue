@@ -12,6 +12,7 @@ const props = defineProps<{
 const {
   data: appContextBlocks,
   status: appContextStatus,
+  error: appContextError,
   execute: loadAppContextBlocks,
 } = useAppRegionBlocks(() => props.area, { immediate: false })
 
@@ -33,7 +34,7 @@ onServerPrefetch(loadMissingBlocks)
 if (import.meta.client) void loadMissingBlocks()
 
 const regionBlocks = computed<AppContextBlock[]>(() => {
-  if (appContextBlocks.value === undefined
+  if (appContextBlocks.value === undefined && !appContextError.value
     && (appContextStatus.value === 'idle' || appContextStatus.value === 'pending')) {
     return []
   }
