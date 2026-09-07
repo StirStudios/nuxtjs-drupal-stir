@@ -219,6 +219,29 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     await resetRoute()
   })
 
+  it('carries Drupal rotation state unchanged in page links and requests', async () => {
+    const token = { key: 'stir_order_testimonials_block_1', value: '6000' }
+    const Harness = defineComponent({
+      setup: () => useDrupalViewControls({ ...viewProps, randomOrder: token }),
+      template: '<div />',
+    })
+
+    state.api.mockResolvedValue(viewResponse(1, 'page-two'))
+    const wrapper = await mountSuspended(Harness, { route: '/work' })
+
+    expect(wrapper.vm.pageLink(2).query[token.key]).toBe('6000')
+    wrapper.vm.onPageChange(1)
+    await flushPromises()
+    expect(state.api).toHaveBeenCalledWith('/api/view/42', expect.objectContaining({
+      query: expect.objectContaining({ [token.key]: '6000', page: '1' }),
+    }))
+    expect(wrapper.vm.pageLink(1).query[token.key]).toBe('6000')
+    wrapper.unmount()
+    const restored = await mountSuspended(Harness, { route: '/work' })
+
+    expect(restored.vm.pageLink(2).query[token.key]).toBe('6000')
+  })
+
   it('builds crawlable page links from the active Drupal View state', async () => {
     const wrapper = await mountSuspended(ViewControlsHarness, {
       route: '/work?campaign=portfolio',

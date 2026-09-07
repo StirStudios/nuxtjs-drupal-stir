@@ -246,3 +246,14 @@ export function buildDrupalViewControlQuery(options: {
 
   return query
 }
+
+/** Drupal owns ordering; this validates only its pagination transport token. */
+export function normalizeDrupalRandomOrder(value: unknown): { key: string, value: string } | null {
+  if (!value || typeof value !== 'object') return null
+  const token = value as { key?: unknown, value?: unknown }
+
+  return typeof token.key === 'string' && /^stir_order_[a-z0-9_]{1,110}$/u.test(token.key)
+    && typeof token.value === 'string' && /^[0-9]{1,10}$/u.test(token.value)
+    ? { key: token.key, value: token.value }
+    : null
+}

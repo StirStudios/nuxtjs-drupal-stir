@@ -19,7 +19,14 @@ export interface ExposedSort {
   sortOrderOptions?: Record<string, string>
 }
 
+export interface DrupalRandomOrder {
+  key: string
+  value: string
+}
+
 export interface DrupalViewProps {
+  randomOrder?: DrupalRandomOrder
+
   title?: string
   gridItems?: string
   rowsWrapper?: string

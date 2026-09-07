@@ -9,6 +9,8 @@ import type { ExposedFilter, ExposedSort } from '../types/View'
 export type ViewControlValue = string | string[]
 
 export interface ViewStateSnapshot {
+  randomOrder?: { key: string, value: string }
+
   filters: Record<string, ViewControlValue>
   sorts: Record<string, ViewControlValue>
   page?: number

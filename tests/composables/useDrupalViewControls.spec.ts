@@ -10,6 +10,7 @@ import {
   mapDrupalViewSortByOptions,
   mapDrupalViewSortOrderOptions,
   normalizeDrupalViewFilters,
+  normalizeDrupalRandomOrder,
   normalizeDrupalViewPager,
   normalizeDrupalViewSortOrderValue,
   primaryDrupalViewSort,
@@ -261,5 +262,17 @@ describe('useDrupalViewControls helpers', () => {
   it('returns a specific message for known Drupal memory failures', () => {
     expect(drupalViewLoadErrorMessage(new Error('Allowed memory size exhausted'))).toContain('Drupal ran out of memory')
     expect(drupalViewLoadErrorMessage(new Error('Network failed'))).toBe('Unable to load results. Please try again.')
+  })
+})
+
+
+describe('Drupal random-order token validation', () => {
+  it('retains valid server tokens and rejects malformed state', () => {
+    const token = { key: 'stir_order_work_block_1', value: '6000' }
+
+    expect(normalizeDrupalRandomOrder(token)).toEqual(token)
+    for (const value of [null, undefined, '', 1, {}, { key: 'page', value: '1' }, { key: token.key, value: ['1'] }, { key: token.key, value: '1&sort=x' }, { key: token.key, value: '12345678901' }]) {
+      expect(normalizeDrupalRandomOrder(value)).toBeNull()
+    }
   })
 })
