@@ -1,5 +1,8 @@
 import type { ComputedRef, InjectionKey } from 'vue'
 
+export const viewportImageLoadingKey: InjectionKey<boolean> =
+  Symbol('stirViewportImageLoading')
+
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
 export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =

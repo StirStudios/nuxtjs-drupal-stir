@@ -9,6 +9,7 @@ import {
 } from '#stir/utils/nuxtUiProps'
 import {
   carouselImageDeliverySizesKey,
+  viewportImageLoadingKey,
   resolveCarouselImageDeliverySizes,
 } from '#stir/utils/imageDelivery'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
@@ -108,6 +109,8 @@ const carouselMotionProps = useRevealMotionProps(
 )
 
 provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
+// Source hero hints do not describe a slide's current viewport position.
+provide(viewportImageLoadingKey, true)
 // The carousel enters as one unit; its media slides should not double animate.
 provideRevealMotionScope(() => undefined)
 

@@ -23,6 +23,10 @@ Prefer the Nuxt and Nuxt UI skills, current official documentation and installed
 
 Do not convert every component to an async import. Additional request waterfalls, delayed interaction, SSR changes or extra wrappers can outweigh a size reduction. Preserve Drupal's rendering decisions and downstream component overrides.
 
+## Image delivery
+
+See [image loading and priority](image-loading.md) for the separate native image policy used by carousels and marquees. Async component imports and deferred hydration do not control requests already discoverable in SSR image markup.
+
 ## Regression reporting
 
 The quality CI job generates the source inventory and publishes it as the `source-import-inventory` artifact. It is an informational report; conditional references do not become a new performance failure threshold.
