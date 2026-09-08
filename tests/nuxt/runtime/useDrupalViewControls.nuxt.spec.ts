@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, h, inject, nextTick } from 'vue'
 import { useDrupalViewControls } from '../../../layers/theme/app/composables/useDrupalViewControls'
+
+import ParagraphView from '../../../layers/theme/app/components/global/Paragraph/View.vue'
+import { drupalViewQueryNamespaceKey } from '../../../layers/theme/app/utils/drupalViewContext'
 
 type RouteQuery = Record<string, string | string[] | undefined>
 
@@ -217,6 +220,42 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     state.legacyApi.mockReset()
     sessionStorage.clear()
     await resetRoute()
+  })
+
+  it('reads legacy wrapper UUID links and writes readable instance keys', async () => {
+    const Inner = defineComponent({
+      setup: () => useDrupalViewControls(
+        { ...viewProps, paragraphUuid: 'old-uuid' },
+        inject(drupalViewQueryNamespaceKey, undefined),
+      ),
+      template: '<div />',
+    })
+    const Parent = defineComponent({
+      setup: () => () => h(ParagraphView, { id: 42, uuid: 'old-uuid' }, {
+        content: () => h(Inner),
+      }),
+    })
+
+    state.api.mockResolvedValue(viewResponse(2, 'legacy-row'))
+    const wrapper = await mountSuspended(Parent)
+
+    await resetRoute({ view_old_uuid_page: '2', view_old_uuid_sort_order: 'DESC', other_page: '3' })
+    await nextTick()
+    await flushPromises()
+    const controls = wrapper.findComponent(Inner).vm
+
+    expect(controls.resolvedQueryNamespace).toBe('testimonials_p42')
+    expect(controls.currentPage).toBe(2)
+    expect(controls.sortValues.sort_order).toBe('DESC')
+    expect(controls.pageLink(1).query).toMatchObject({ other_page: '3', testimonials_p42_sort_order: 'DESC' })
+    expect(controls.pageLink(1).query).not.toHaveProperty('view_old_uuid_page')
+    expect(controls.pageLink(1).query).not.toHaveProperty('view_old_uuid_sort_order')
+
+    state.api.mockResolvedValue(viewResponse(1, 'new-key-row'))
+    await resetRoute({ view_old_uuid_page: '2', testimonials_p42_page: '1' })
+    await nextTick()
+    await flushPromises()
+    expect(controls.currentPage).toBe(1)
   })
 
   it('carries Drupal rotation state unchanged in page links and requests', async () => {

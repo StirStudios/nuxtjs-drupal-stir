@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import {
   buildDrupalViewControlQuery,
   buildDrupalViewSearchParams,
@@ -35,7 +35,9 @@ import {
   sanitizeDrupalViewStoredSorts,
 } from '#stir/utils/drupalViewState'
 import type { ViewStateSnapshot } from '#stir/utils/drupalViewState'
-import { resolveDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
+import { resolveDrupalViewQueryNamespace, resolveLegacyDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
+
+import { drupalViewQueryIdentityKey } from '#stir/utils/drupalViewContext'
 
 export type { ExposedFilter, ExposedSort } from '#stir/types/View'
 
@@ -87,11 +89,27 @@ export function useDrupalViewControls(
   let suppressNextRouteRefresh = false
   let initialViewResolved = false
 
-  const resolvedQueryNamespace = computed(() => resolveDrupalViewQueryNamespace({
+  const legacyQueryNamespace = computed(() => resolveLegacyDrupalViewQueryNamespace({
     ...props,
     queryNamespace: props.queryNamespace?.trim()
       || toValue(inheritedQueryNamespace)?.trim(),
   }))
+
+  const inheritedIdentity = inject(drupalViewQueryIdentityKey, undefined)
+  const resolvedQueryNamespace = computed(() => {
+    const parent = inheritedIdentity?.value
+
+    return resolveDrupalViewQueryNamespace({
+      ...parent,
+      ...props,
+      paragraphId: props.paragraphId ?? props.id ?? parent?.paragraphId ?? parent?.id,
+      paragraphUuid: props.paragraphUuid ?? props.uuid ?? parent?.paragraphUuid ?? parent?.uuid,
+      viewId: props.viewId || parent?.viewId,
+      queryNamespace: props.queryNamespace?.trim()
+        || parent?.queryNamespace?.trim()
+        || (parent ? undefined : toValue(inheritedQueryNamespace)?.trim()),
+    })
+  })
 
   function viewStateStorageKeyFor(path = route.path): string {
     return createViewStateStorageKey({
@@ -105,11 +123,10 @@ export function useDrupalViewControls(
 
   function routeQueryValue(key: string): string | string[] | undefined {
     return routeControls.routeQueryValue(publicQueryKey(key))
+      ?? routeControls.routeQueryValue(publicQueryKey(key, legacyQueryNamespace.value))
   }
 
-  function publicQueryKey(key: string): string {
-    const namespace = resolvedQueryNamespace.value
-
+  function publicQueryKey(key: string, namespace = resolvedQueryNamespace.value): string {
     return key.startsWith('stir_order_') ? key : namespace ? `${namespace}_${key}` : key
   }
 
@@ -207,7 +224,11 @@ export function useDrupalViewControls(
   )
 
   function routePageValue(): number | null {
-    return routeControls.routePageValue(publicQueryKey('page'))
+    const key = routeControls.routeQueryValue(publicQueryKey('page')) !== undefined
+      ? publicQueryKey('page')
+      : publicQueryKey('page', legacyQueryNamespace.value)
+
+    return routeControls.routePageValue(key)
   }
 
   function snapshotCurrentViewState(page = currentPage.value): ViewStateSnapshot {
@@ -356,7 +377,7 @@ export function useDrupalViewControls(
 
   function managedQueryKeys(): string[] {
     return [...drupalViewManagedQueryKeys(normalizedFilters.value, primarySort.value), ...(randomOrder.value ? [randomOrder.value.key] : [])]
-      .map(publicQueryKey)
+      .flatMap(key => [publicQueryKey(key), publicQueryKey(key, legacyQueryNamespace.value)])
   }
 
   function syncUrlQuery(page: number): void {

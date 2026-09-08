@@ -60,7 +60,7 @@ function firstIdentityValue(...values: unknown[]): string {
   return ''
 }
 
-export function resolveDrupalViewQueryNamespace(
+export function resolveLegacyDrupalViewQueryNamespace(
   identity: DrupalViewQueryNamespaceIdentity,
 ): string {
   const explicit = sanitizeDrupalViewQueryNamespace(identity.queryNamespace)
@@ -89,4 +89,23 @@ export function resolveDrupalViewQueryNamespace(
     : ''
 
   return sanitizeDrupalViewQueryNamespace(`${view}_${display}${argsSuffix}`)
+}
+
+/** Prefer the Drupal instance ID; UUID-only consumers retain their stable fallback. */
+export function resolveDrupalViewQueryNamespace(
+  identity: DrupalViewQueryNamespaceIdentity,
+): string {
+  const explicit = sanitizeDrupalViewQueryNamespace(identity.queryNamespace)
+
+  if (explicit) return explicit
+
+  const paragraphId = firstIdentityValue(identity.paragraphId, identity.id)
+
+  if (paragraphId) {
+    const view = sanitizeDrupalViewQueryNamespace(identity.viewId) || 'view'
+
+    return sanitizeDrupalViewQueryNamespace(`${view}_p${paragraphId}`)
+  }
+
+  return resolveLegacyDrupalViewQueryNamespace(identity)
 }

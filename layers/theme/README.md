@@ -155,3 +155,13 @@ page composition or product behavior.
 The block-content parent follows the same rule and renders all exposed named
 slots in producer order. Parent renderers must not discard a field merely
 because its machine name was unknown when the shared layer was built.
+
+### View URL parameters
+
+View controls use Drupal's view name and paragraph ID for short, stable query
+namespaces, for example `podcast_p219_page=1`. Repeated views remain independent.
+Explicit `queryNamespace` values remain supported; UUID-only consumers retain
+stable UUID fallbacks. Existing UUID-based links are still read, and generated
+links use the shorter keys. When both forms are present, the new key takes
+precedence. Unrelated view parameters and Drupal random-order tokens are preserved.
+No Drupal fields, configuration changes, or content migration are required.
