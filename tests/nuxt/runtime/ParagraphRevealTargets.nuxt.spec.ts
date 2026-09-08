@@ -35,6 +35,20 @@ describe('paragraph reveal targets (Nuxt runtime)', () => {
     vi.restoreAllMocks()
   })
 
+  it.each([
+    ['fade-up', 'translateY(50px)'],
+    ['flip-left', 'rotateY(-90deg)'],
+    ['zoom-in', 'scale(0.8)'],
+  ])('initializes %s without replacing content', async (direction, transform) => {
+    const wrapper = await mountSuspended(ParagraphReveal, {
+      props: { direction, id: 7 },
+      slots: { default: () => h('p', 'Retained content') },
+    })
+
+    expect(wrapper.find('[style*="transform"]').attributes('style')).toContain(transform)
+    wrapper.unmount()
+  })
+
   it('applies inherited page reveal motion to button paragraphs', async () => {
     const wrapper = await mountSuspended(PageRevealScope, {
       props: { component: ParagraphButton },

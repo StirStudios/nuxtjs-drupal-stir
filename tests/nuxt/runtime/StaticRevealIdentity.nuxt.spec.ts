@@ -6,10 +6,12 @@ import ParagraphReveal from '../../../layers/theme/app/components/ParagraphRevea
 import ParagraphLayout from '../../../layers/theme/app/components/global/Paragraph/Layout.vue'
 
 describe('static reveal content identity', () => {
-  it.each<[string, Component]>([
-    ['paragraph', ParagraphReveal],
-    ['layout', ParagraphLayout],
-  ])('keeps the %s child mounted once', async (_name, component) => {
+  it.each<[string, Component, string]>([
+    ['paragraph', ParagraphReveal, 'none'],
+    ['animated paragraph', ParagraphReveal, 'fade-up'],
+    ['layout', ParagraphLayout, 'none'],
+    ['animated layout', ParagraphLayout, 'fade-up'],
+  ])('keeps the %s child mounted once', async (_name, component, direction) => {
     let mounts = 0
     const Child = defineComponent({
       setup() {
@@ -18,7 +20,7 @@ describe('static reveal content identity', () => {
       },
     })
     const wrapper = await mountSuspended(component, {
-      props: { direction: 'none' },
+      props: { direction, animationScope: 'layout' },
       slots: { default: () => h(Child) },
     })
 

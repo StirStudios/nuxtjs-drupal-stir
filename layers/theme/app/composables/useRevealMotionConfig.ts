@@ -173,11 +173,11 @@ export function useRevealMotionConfig() {
   const preferredMotion = usePreferredReducedMotion()
   const supportsIntersectionObserver = useSupported(() => 'IntersectionObserver' in window)
   const hasMounted = ref(false)
+  // Keep the public key stable: initializing an animation must not remount its content.
   const revealMotionKey = ref(0)
 
   onMounted(() => {
     hasMounted.value = true
-    revealMotionKey.value = 1
   })
 
   const getStaggerDelayMs = (index: number, startIndex: number = 0) => {
@@ -254,9 +254,12 @@ export function useRevealMotionConfig() {
               margin: resolved.value.rootMargin,
             },
           }),
-      style: normalizedEffect.startsWith('flip-')
-        ? { transformStyle: 'preserve-3d' }
-        : undefined,
+      style: {
+        ...(ssrVisible && hasMounted.value ? initial : {}),
+        ...(normalizedEffect.startsWith('flip-')
+          ? { transformStyle: 'preserve-3d' }
+          : {}),
+      },
     }
   }
 
