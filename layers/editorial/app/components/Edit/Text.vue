@@ -5,6 +5,7 @@ import { adminUiProps, adminUiTheme } from '../../utils/adminUiTheme'
 import { editorNestedDragHandleOptions } from '../../utils/editorDragHandle'
 import { normalizeEditorHtmlForSave } from '../../utils/normalizeEditorHtmlForSave'
 import type { FormattedTextEditTarget } from '#stir/types'
+import { headingTextForEditing, headingTextForSave } from '../../utils/headingText'
 import { formattedTextApiPath } from '#stir/utils/formattedTextEditTarget'
 
 useAdminUiStyles()
@@ -27,8 +28,9 @@ const editPanelRef = ref<HTMLElement | null>(null)
 const { y } = useWindowScroll()
 
 const sourceTextRef = computed(() => props.sourceText)
-const isPlainText = computed(() => props.editTarget.editorMode === 'plain')
-const plainTextValue = ref(props.sourceText)
+const isHeading = computed(() => props.editTarget.editorMode === 'heading')
+const isPlainText = computed(() => isHeading.value || props.editTarget.editorMode === 'plain')
+const plainTextValue = ref(isHeading.value ? headingTextForEditing(props.sourceText) : props.sourceText)
 const toolbarClass = 'admin-ui-toolbar sticky top-0 z-10 mb-2 px-2 py-2'
 const shouldShowBubbleToolbar = (payload: {
   view: { hasFocus: () => boolean }
@@ -67,7 +69,7 @@ async function saveInline() {
   if (isSaving.value) return
 
   const valueToSave = isPlainText.value
-    ? plainTextValue.value
+    ? isHeading.value ? headingTextForSave(sourceTextRef.value, plainTextValue.value) : plainTextValue.value
     : normalizeEditorHtmlForSave(editorValue.value)
 
   isSaving.value = true
@@ -136,7 +138,7 @@ function scrollEditorIntoViewIfNeeded(): void {
 }
 
 onMounted(async () => {
-  plainTextValue.value = sourceTextRef.value
+  plainTextValue.value = isHeading.value ? headingTextForEditing(sourceTextRef.value) : sourceTextRef.value
   syncEditorBuffers(sourceTextRef.value)
   await nextTick()
   scrollEditorIntoViewIfNeeded()
@@ -176,7 +178,7 @@ onMounted(async () => {
       <UTextarea
         v-if="isPlainText"
         v-model="plainTextValue"
-        aria-label="Edit text"
+        :aria-label="isHeading ? 'Edit heading' : 'Edit text'"
         :autoresize="true"
         class="w-full"
         :rows="8"

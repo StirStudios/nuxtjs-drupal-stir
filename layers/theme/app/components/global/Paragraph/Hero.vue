@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
 import { slugify } from '#stir/utils/stringUtils'
-import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { drupalPageKey } from '#stir/utils/drupalPage'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
@@ -21,6 +20,7 @@ const props = defineProps<{
   placement?: string
   align?: string
   mediaHeight?: string
+  eyebrow?: string
   headerTag?: string
   text?: string
   editLink?: string
@@ -39,7 +39,6 @@ defineSlots<{
 }>()
 
 const isSection = computed(() => Boolean(props.placement && props.placement !== 'field_hero'))
-const sectionText = computed(() => trustedDrupalHtml(props.text || ''))
 const sectionHeadingTag = computed(() => ['h2', 'h3', 'h4', 'h5', 'h6'].includes(props.headerTag || '') ? props.headerTag : 'h2')
 const minimumHeight = computed(() => ({ break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
@@ -48,7 +47,7 @@ const tk = useSlotsToolkit(vueSlots)
 const { getPage } = useStirDrupalCe()
 const owningPage = inject(drupalPageKey, null)
 const page = owningPage ?? getPage()
-const { isFront } = usePageContext(page)
+const { isFront, isAdministrator } = usePageContext(page)
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => {
@@ -101,7 +100,7 @@ const h1Classes = computed(() => {
 
 const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
 const hasVisibleDefaultContent = computed(() =>
-  Boolean(isSection.value && props.header) ||
+  Boolean(isSection.value && (props.header?.trim() || props.eyebrow?.trim() || (isAdministrator.value && props.id))) ||
   Boolean(props.text?.trim()) ||
   Boolean(pageTitleEffective.value && !pageHideTitleEffective.value) ||
   Boolean(
@@ -200,11 +199,27 @@ provideRevealMotionScope(() => undefined)
           >
             <slot name="title">
               <template v-if="isSection">
-                <component :is="sectionHeadingTag" v-if="header?.trim()" class="hero-heading">{{ header }}</component>
-                <div v-if="sectionText" class="hero-copy prose" v-html="sectionText" />
+                <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="hero-heading-group">
+                  <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
+                <EditableRichText
+                  v-if="header?.trim() || (isAdministrator && id)"
+                  :id="id"
+                  :edit-link="editLink"
+                  :edit-target="{ entityType: 'paragraph', entityId: id, fieldName: 'field_header', editorMode: 'heading' }"
+                  :text="header"
+                  :text-source="headerTag ? `${headerTag}|${header || ''}` : header"
+                >
+                  <component :is="sectionHeadingTag" v-if="header?.trim()" class="hero-heading">{{ header }}</component>
+                </EditableRichText>
+                </div>
+                <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="hero-copy" :edit-link="editLink" :text="text" />
               </template>
               <HeroContent
-                v-else-if="text"
+                v-else-if="text || eyebrow?.trim() || (isAdministrator && id)"
+                :id="id"
+                :edit-link="editLink"
+                :eyebrow="eyebrow"
+                :header-tag="headerTag"
                 :hero-text="text"
                 :hide-title="pageHideTitleEffective"
                 :is-front="isFrontEffective"

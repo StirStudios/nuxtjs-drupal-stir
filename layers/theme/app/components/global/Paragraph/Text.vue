@@ -8,6 +8,7 @@ defineOptions({
 
 const props = defineProps<
   EditableRichTextProps & {
+    eyebrow?: string
     align?: string
     card?: boolean | string | number
     cardVariant?: string
@@ -30,7 +31,7 @@ const richTextProps = computed(() => ({
   editTarget: props.editTarget ?? props.textEdit,
 }))
 const wrapStyles = computed(() =>
-  [props.width, props.spacing].filter(
+  [props.width, props.spacing, props.eyebrow?.trim() && !isCard.value && 'paragraph-text'].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )
@@ -46,8 +47,12 @@ const cardVariant = computed(() => {
 <template>
   <WrapDiv :align="align" :styles="wrapStyles">
     <UCard v-if="isCard" class="h-full" :variant="cardVariant">
+      <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
     </UCard>
-    <EditableRichText v-else v-bind="richTextProps" />
+    <template v-else>
+      <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
+      <EditableRichText v-bind="richTextProps" />
+    </template>
   </WrapDiv>
 </template>

@@ -53,4 +53,18 @@ describe('ParagraphText card presentation', () => {
       'outline',
     )
   })
+  it('keeps an eyebrow and body together as one layout item', async () => {
+    const wrapper = await mountSuspended(ParagraphText, {
+      props: { eyebrow: 'Featured opportunity', text: '<h2>Live entertainment</h2>' },
+    })
+
+    const group = wrapper.get('.paragraph-text')
+
+    expect(group.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    expect(group.get('h2').text()).toBe('Live entertainment')
+    await wrapper.setProps({ eyebrow: ' ' })
+    expect(wrapper.find('.paragraph-eyebrow').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
 })

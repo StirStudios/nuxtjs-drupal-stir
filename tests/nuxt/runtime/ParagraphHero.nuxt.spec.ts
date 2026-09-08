@@ -155,4 +155,18 @@ describe('Drupal Hero page ownership and headings', () => {
     wrapper.unmount()
   })
 
+  it('renders an eyebrow as text rather than another heading', async () => {
+    const wrapper = await mountSuspended(Hero, {
+      props: { placement: 'field_section', header: 'Section', eyebrow: 'Featured opportunity' },
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page')) } },
+    })
+
+    expect(wrapper.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    expect(wrapper.get('.paragraph-eyebrow').text()).toBe('Featured opportunity')
+    expect(wrapper.findAll('h2')).toHaveLength(1)
+    await wrapper.setProps({ eyebrow: ' ' })
+    expect(wrapper.find('.paragraph-eyebrow').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
 })

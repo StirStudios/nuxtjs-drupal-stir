@@ -9,3 +9,7 @@ An existing one-column layout can use `action-group` for wrapping buttons, with 
 No media-grid overrides are needed: use existing asymmetric row layouts and Media height with overlay playback, or a media collection's responsive grid settings for equal columns. Playback is not cropped by these layouts.
 
 Update both the Nuxt layer and Stir Tools, run Drupal database updates, and enable Hero in the desired paragraph reference field. No environment changes are required.
+
+Hero and Text also accept an optional `eyebrow` string, rendered as a plain paragraph above the content. Blank labels are omitted. Drupal supplies this from shared `field_eyebrow` storage; its `eyebrow_fields` update adds missing fields and controls without rewriting existing copy. Projects may style `.paragraph-eyebrow` for their brand.
+
+Hero title wording and intro use the existing `EditableRichText` editor. Heading edit mode preserves Drupal's stored `h2|` (or other heading tag) prefix while showing only the wording to the editor. HTML heading-tag selection remains in the full Drupal form. The page-owned H1 stays separate from the Hero heading. Saves reuse the existing protected text endpoint and revision ownership behavior; no new endpoint or environment setting is introduced.

@@ -179,3 +179,7 @@
     }
   }
 }
+
+@layer components {
+  .paragraph-eyebrow { margin-block: 0 0.5rem; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+}
