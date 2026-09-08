@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   resolveDrupalViewQueryNamespace,
+  resolveLegacyDrupalViewQueryNamespace,
   sanitizeDrupalViewQueryNamespace,
 } from '../../layers/theme/app/utils/drupalViewQueryNamespace'
 
@@ -23,12 +24,22 @@ describe('Drupal View query namespaces', () => {
       paragraphUuid: 'A0B1-C2D3',
       paragraphId: 42,
       viewId: 'Work',
-    })).toBe('work_a0b1_c2d3')
+    })).toBe('work_p42')
 
     expect(resolveDrupalViewQueryNamespace({
       paragraphId: 42,
       viewId: 'Work',
     })).toBe('work_p42')
+  })
+
+  it('retains UUID-only fallbacks and resolves old links separately', () => {
+    const identity = { paragraphUuid: 'A0B1-C2D3', paragraphId: 42, viewId: 'work' }
+
+    expect(resolveLegacyDrupalViewQueryNamespace(identity)).toBe('work_a0b1_c2d3')
+    expect(resolveDrupalViewQueryNamespace({ paragraphUuid: 'A0B1-C2D3', viewId: 'work' }))
+      .toBe('work_a0b1_c2d3')
+    expect(resolveDrupalViewQueryNamespace({ ...identity, paragraphId: 43 }))
+      .toBe('work_p43')
   })
 
   it('falls back deterministically to the View, display, and arguments', () => {

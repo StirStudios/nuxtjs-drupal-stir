@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
-import { resolveDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
+import { drupalViewQueryIdentityKey, drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
+import { resolveLegacyDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
 
 const props = defineProps<{
   id?: number | string
@@ -32,6 +32,8 @@ const props = defineProps<{
   carouselInterval?: number
 }>()
 
+provide(drupalViewQueryIdentityKey, computed(() => props))
+
 provide(
   drupalViewQueryNamespaceKey,
   computed(() => {
@@ -44,7 +46,7 @@ provide(
     )
 
     return hasInstanceIdentity
-      ? resolveDrupalViewQueryNamespace(props)
+      ? resolveLegacyDrupalViewQueryNamespace(props)
       : undefined
   }),
 )
