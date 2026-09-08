@@ -258,6 +258,27 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     expect(controls.currentPage).toBe(1)
   })
 
+  it('omits configured sorting from links but keeps full API state', async () => {
+    const sorts = [{ ...viewProps.exposedSorts[0], defaultSortBy: 'created', defaultOrder: 'ASC', submittedOrder: 'DESC' }]
+    const Harness = defineComponent({
+      setup: () => useDrupalViewControls({ ...viewProps, exposedSorts: sorts }),
+      template: '<div />',
+    })
+
+    state.api.mockResolvedValue(viewResponse(1, 'row'))
+    const wrapper = await mountSuspended(Harness)
+
+    expect(wrapper.vm.sortValues.sort_order).toBe('ASC')
+    expect(wrapper.vm.pageLink(1).query).not.toHaveProperty('testimonials_p42_sort_by')
+    expect(wrapper.vm.pageLink(1).query).not.toHaveProperty('testimonials_p42_sort_order')
+    expect(wrapper.vm.pageLink(2).query).toMatchObject({ testimonials_p42_page: '1' })
+    wrapper.vm.onPageChange(1)
+    await flushPromises()
+    expect(state.api).toHaveBeenCalledWith('/api/view/42', expect.objectContaining({
+      query: expect.objectContaining({ sort_by: 'created', sort_order: 'ASC', page: '1' }),
+    }))
+  })
+
   it('carries Drupal rotation state unchanged in page links and requests', async () => {
     const token = { key: 'stir_order_testimonials_block_1', value: '6000' }
     const Harness = defineComponent({

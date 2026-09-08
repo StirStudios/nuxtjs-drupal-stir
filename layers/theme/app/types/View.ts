@@ -11,6 +11,8 @@ export interface ExposedFilter {
 }
 
 export interface ExposedSort {
+  defaultSortBy?: string
+  defaultOrder?: string
   label?: string
   sortByValue?: string
   submittedOrder?: string

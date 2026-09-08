@@ -1,6 +1,7 @@
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import {
   buildDrupalViewControlQuery,
+  omitDrupalViewSortDefaults,
   buildDrupalViewSearchParams,
   drupalViewManagedQueryKeys,
   isValidDrupalViewFilterValue,
@@ -134,7 +135,8 @@ export function useDrupalViewControls(
     query: Record<string, string | string[]>,
   ): Record<string, string | string[]> {
     return Object.fromEntries(
-      Object.entries(query).map(([key, value]) => [publicQueryKey(key), value]),
+      Object.entries(omitDrupalViewSortDefaults(query, primarySort.value))
+        .map(([key, value]) => [publicQueryKey(key), value]),
     )
   }
 
@@ -252,11 +254,11 @@ export function useDrupalViewControls(
   }
 
   function defaultSortByValue(sort: ExposedSort): string {
-    return sort.sortByValue || ''
+    return sort.defaultSortBy || sort.sortByValue || ''
   }
 
   function defaultSortOrderValue(sort: ExposedSort): string {
-    return sort.submittedOrder || ''
+    return sort.defaultOrder || sort.submittedOrder || ''
   }
 
   function validSortByValue(sort: ExposedSort, value: string): boolean {
