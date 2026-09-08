@@ -73,7 +73,7 @@ const visibleTitle = computed(() =>
 const TitleFrame = defineComponent({
   setup(_, { slots }) {
     return () => visibleTitle.value
-      ? h('figure', { class: ['media-titled', props.roundedClass || theme.media.rounded] }, slots.default?.())
+      ? h('figure', { class: ['media-titled', titleOverPreview.value && 'media-titled--over', props.roundedClass || theme.media.rounded] }, slots.default?.())
       : slots.default?.()
   },
 })
@@ -203,20 +203,22 @@ const shouldAnimate = computed(() =>
 
 <style>
 .media-titled { position: relative; margin: 0; min-width: 0; }
+.media-titled--over { overflow: hidden; }
 .media-item-title { margin-block-start: 0.75rem; overflow-wrap: anywhere; }
 .media-item-title--over {
   position: absolute;
-  inset-inline-start: 1rem;
-  bottom: 1rem;
+  inset-inline-start: 0;
+  bottom: 0;
   width: fit-content;
-  max-width: calc(100% - 2rem);
+  max-width: 100%;
   text-align: start;
   z-index: 10;
   margin: 0;
   padding: 0.5rem 0.75rem;
   color: white;
   background: rgb(0 0 0 / 65%);
-  border-radius: var(--ui-radius, 0.25rem);
+  border-radius: 0;
+  border-start-end-radius: var(--ui-radius, 0.25rem);
   pointer-events: none;
 }
 </style>
