@@ -6,6 +6,27 @@ import MediaImage from '../../../layers/theme/app/components/global/Media/Image.
 import { carouselImageDeliverySizesKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
+  it('reports the cached responsive source without waiting for another load event', async () => {
+    const source = 'https://images.example/cached-640.webp'
+    const complete = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
+    const width = vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(640)
+    const currentSrc = vi.spyOn(HTMLImageElement.prototype, 'currentSrc', 'get').mockReturnValue(source)
+
+    try {
+      const wrapper = await mountSuspended(MediaImage, {
+        props: { src: '/poster.jpg', noWrapper: true },
+      })
+
+      expect(wrapper.emitted('resolved-src')).toContainEqual([source])
+      wrapper.unmount()
+    }
+    finally {
+      complete.mockRestore()
+      width.mockRestore()
+      currentSrc.mockRestore()
+    }
+  })
+
   it.each([false, true])('uses native viewport loading for reused media (bare: %s)', async (noWrapper) => {
     const wrapper = await mountSuspended(MediaImage, {
       global: { provide: { [viewportImageLoadingKey as symbol]: true } },

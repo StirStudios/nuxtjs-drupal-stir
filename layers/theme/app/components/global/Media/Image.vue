@@ -46,6 +46,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
+  (e: 'resolved-src', source: string | undefined): void
 }>()
 
 const appConfig = useAppConfig()
@@ -184,6 +185,7 @@ function syncLoadedFromImageElement() {
   if (!img) return
   if (img.complete) {
     isLoaded.value = true
+    emit('resolved-src', img.naturalWidth ? img.currentSrc || img.src : undefined)
   }
 }
 
@@ -191,6 +193,7 @@ watch(
   () => [providerSource.value, providerSizes.value, props.width, props.height],
   () => {
     isLoaded.value = !hasImageSource.value
+    emit('resolved-src', undefined)
     nextTick(syncLoadedFromImageElement)
   },
   { immediate: true },
@@ -198,10 +201,12 @@ watch(
 
 function handleLoad() {
   isLoaded.value = true
+  syncLoadedFromImageElement()
 }
 
 function handleError() {
   isLoaded.value = true
+  emit('resolved-src', undefined)
 }
 
 onMounted(() => {
