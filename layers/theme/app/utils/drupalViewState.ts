@@ -175,11 +175,11 @@ export function createDefaultDrupalViewState(options: {
   const sorts: Record<string, ViewControlValue> = {}
 
   if (options.sort?.queryParamSortBy) {
-    sorts[options.sort.queryParamSortBy] = options.sort.sortByValue || ''
+    sorts[options.sort.queryParamSortBy] = options.sort.defaultSortBy || options.sort.sortByValue || ''
   }
 
   if (options.sort?.queryParamSortOrder) {
-    sorts[options.sort.queryParamSortOrder] = options.sort.submittedOrder || ''
+    sorts[options.sort.queryParamSortOrder] = options.sort.defaultOrder || options.sort.submittedOrder || ''
   }
 
   return { filters, sorts, page: 0, savedAt: options.savedAt ?? Date.now() }
@@ -230,7 +230,7 @@ export function sanitizeDrupalViewStoredSorts(options: {
       sort.queryParamSortBy,
     )
       ? firstViewControlString(options.sorts?.[sort.queryParamSortBy])
-      : sort.sortByValue || ''
+      : sort.defaultSortBy || sort.sortByValue || ''
 
     if (!isValidDrupalViewSortByValue(value, options.sortByOptions)) return null
 
@@ -243,7 +243,7 @@ export function sanitizeDrupalViewStoredSorts(options: {
       sort.queryParamSortOrder,
     )
       ? firstViewControlString(options.sorts?.[sort.queryParamSortOrder])
-      : sort.submittedOrder || ''
+      : sort.defaultOrder || sort.submittedOrder || ''
 
     if (!isValidDrupalViewSortOrderValue(sort, value, options.sortOrderOptions)) {
       return null

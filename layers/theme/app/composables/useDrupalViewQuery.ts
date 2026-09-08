@@ -257,3 +257,22 @@ export function normalizeDrupalRandomOrder(value: unknown): { key: string, value
     ? { key: token.key, value: token.value }
     : null
 }
+
+/** Only Drupal-declared defaults may be omitted from shareable URLs. */
+export function omitDrupalViewSortDefaults(
+  query: Record<string, string | string[]>,
+  sort: ExposedSort | null,
+): Record<string, string | string[]> {
+  const result = { ...query }
+  const by = sort?.queryParamSortBy
+  const order = sort?.queryParamSortOrder
+
+  if (!by || !sort.defaultSortBy || result[by] !== sort.defaultSortBy) return result
+
+  const omitOrder = Boolean(order && sort.defaultOrder && typeof result[order] === 'string'
+    && normalizeDrupalViewSortOrderValue(result[order]) === normalizeDrupalViewSortOrderValue(sort.defaultOrder))
+
+  return Object.fromEntries(Object.entries(result).filter(([key]) =>
+    key !== by && !(omitOrder && key === order),
+  ))
+}

@@ -758,7 +758,7 @@
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 167,
+    "tests": 168,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -766,7 +766,7 @@
       "scripts": 1,
       "server": 27,
       "unit": 10,
-      "utils": 52
+      "utils": 53
     }
   },
   "tests": [
@@ -896,6 +896,7 @@
     "tests/utils/drupalHeaders.spec.ts",
     "tests/utils/drupalLink.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
+    "tests/utils/drupalViewPublicQuery.spec.ts",
     "tests/utils/drupalViewQueryNamespace.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",

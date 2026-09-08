@@ -1,24 +1,10 @@
 # Theme Layer
 
-`layers/theme` contains reusable visual and design-system defaults for `nuxtjs-drupal-stir`.
-
-Included in this layer:
-
-- Nuxt app theme config (`app/app.config.ts`)
-- Private Nuxt UI theme defaults (`app/theme/nuxtUi.ts`)
-- Deprecated UI variant aliases for downstream compatibility (`app/utils/uiVariants.ts`)
-- Theme/shell components (`App/*`, `Site/*`, `Icons/*`, `Wrap/*`)
-- Presentation components (`Drupal/*`, `Field/*`, `StirPdfViewer.client.vue`)
-- Default app rendering shell (`app/layouts/*`, `app/pages/[...slug].vue`, `app/error.vue`)
-- Reusable visual CE components (`global/*`, `global/Media/*`, most `global/Paragraph/*`)
-- Theme assets and client plugins (`app/assets/*`, `app/plugins/*`, `app/middleware/colorMode.global.ts`)
-- UI composables, UI utilities, and app-local type shims (`app/composables/*`, `app/utils/*`, `app/types/*`)
-
-The base repository enables this layer from root `nuxt.config.ts`:
-
-```ts
-  extends: ['./layers/platform', './layers/seo', './layers/listing', './layers/editorial', './layers/integrations', './layers/analytics', './layers/scripts', './layers/webform', './layers/auth']
-```
+`layers/theme` owns shared presentation: Nuxt UI defaults (`app/theme/nuxtUi.ts`),
+public app configuration, the rendering shell, visual Custom Elements, media,
+layout components, assets and UI composables. Projects customize it through
+Nuxt layer and app-config merging. Deprecated UI variant aliases remain in
+`app/utils/uiVariants.ts` for compatibility.
 
 ## Boundary guidance
 
@@ -79,16 +65,13 @@ Keep outside `layers/theme`:
 
 ### Clean wrapper markup
 
-`WrapDiv` is an optional element boundary: it renders its slot directly when no
-non-empty alignment or class value is present. `WrapGrid` follows the same rule
-and combines layout, width, spacing, and grid classes on one element for normal
-grids. Card grids deliberately retain separate outer and content layers because
-the gradient is a sibling behind the grid content. Do not add unconditional
-wrapper elements around these components merely to make styling convenient.
+`WrapDiv` and `WrapGrid` render slots without a wrapper when alignment and
+classes are empty. Normal grids combine layout classes on one element; card
+grids retain a separate content layer for their sibling gradient. Do not add
+wrappers solely for styling convenience.
 
-Editorial `EditLink` adds a positioning shell only when administrative controls
-are present. Anonymous production markup remains wrapper-free, while each
-editable field owns the positioning context for its controls.
+`EditLink` adds a positioning shell only for administrative controls. Anonymous
+output stays wrapper-free; editable fields own their control positioning.
 
 ### Nuxt Image delivery
 
@@ -158,10 +141,13 @@ because its machine name was unknown when the shared layer was built.
 
 ### View URL parameters
 
-View controls use Drupal's view name and paragraph ID for short, stable query
-namespaces, for example `podcast_p219_page=1`. Repeated views remain independent.
-Explicit `queryNamespace` values remain supported; UUID-only consumers retain
-stable UUID fallbacks. Existing UUID-based links are still read, and generated
-links use the shorter keys. When both forms are present, the new key takes
-precedence. Unrelated view parameters and Drupal random-order tokens are preserved.
-No Drupal fields, configuration changes, or content migration are required.
+Views use Drupal names and paragraph IDs, e.g. `podcast_p219_page=1`, to keep
+instances independent. `queryNamespace` overrides and UUID-only fallbacks remain
+supported. Old UUID links still work; new keys take precedence and replace old
+keys in generated links. Other views and random-order tokens are preserved.
+
+Drupal's optional `defaultSortBy` and `defaultOrder` identify configured defaults
+to omit from public URLs. Submitted values never define defaults. Filters,
+nondefault sorting, pagination and rotation tokens stay explicit; API requests
+send full state. Older backends keep existing URLs. Update Stir Tools and rebuild
+Drupal caches to enable omission; no content migration is required.
