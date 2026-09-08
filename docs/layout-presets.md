@@ -20,4 +20,4 @@ Main and section heroes use this same variable for their content flow. A hero co
 
 Eyebrow spacing uses `--stir-eyebrow-gap` (12px default). This also controls the visible page-title label above the front-page Hero heading, keeping that group separate from content-to-actions spacing.
 
-Media paragraphs accept `titleDisplay`: `hidden` (default), `below`, or `over`. This labels each image/video using its existing media title; the paragraph heading remains above the collection. Blank titles render nothing. Over-preview uses a dark 80% backdrop with white text; inline video falls back to below so controls remain clear. Run Drupal database updates to install the optional control on existing sites.
+Media paragraphs accept `titleDisplay`: `hidden` (default), `below`, or `over`. This labels each image/video using its existing media title; the paragraph heading remains above the collection. Blank titles render nothing. Over-preview uses a compact, left-aligned 65% black backing with white text; inline video falls back to below so controls remain clear. Run Drupal database updates to install the optional control on existing sites.

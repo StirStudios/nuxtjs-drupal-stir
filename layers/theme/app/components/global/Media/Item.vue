@@ -206,15 +206,17 @@ const shouldAnimate = computed(() =>
 .media-item-title { margin-block-start: 0.75rem; overflow-wrap: anywhere; }
 .media-item-title--over {
   position: absolute;
-  inset-inline: 0;
-  bottom: 0;
+  inset-inline-start: 1rem;
+  bottom: 1rem;
+  width: fit-content;
+  max-width: calc(100% - 2rem);
+  text-align: start;
   z-index: 10;
   margin: 0;
-  padding: 1rem;
+  padding: 0.5rem 0.75rem;
   color: white;
-  background: rgb(0 0 0 / 80%);
-  border-end-start-radius: inherit;
-  border-end-end-radius: inherit;
+  background: rgb(0 0 0 / 65%);
+  border-radius: var(--ui-radius, 0.25rem);
   pointer-events: none;
 }
 </style>
