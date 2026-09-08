@@ -10,6 +10,46 @@ describe('MediaItem (Nuxt runtime)', () => {
     vi.restoreAllMocks()
   })
 
+  it('hides titles by default and preserves alt text when a title is enabled', async () => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        tk: { propsOf: () => ({ type: 'image', src: '/photo.webp', title: 'Public title', alt: 'Image description' }) } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.find('figcaption').exists()).toBe(false)
+    await wrapper.setProps({ titleDisplay: 'below' })
+    expect(wrapper.get('figcaption').text()).toBe('Public title')
+    expect(wrapper.get('img').attributes('alt')).toBe('Image description')
+    await wrapper.setProps({ titleDisplay: 'over' })
+    expect(wrapper.get('figcaption').classes()).toContain('media-item-title--over')
+    await wrapper.setProps({ titleDisplay: 'hidden' })
+    expect(wrapper.find('figure').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it.each([
+    ['video', false, 'Video title', false, true],
+    ['video', true, 'Video title', true, true],
+    ['image', false, '   ', false, false],
+  ])('handles %s preview titles with overlay=%s', async (type, overlay, title, over, visible) => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 0,
+        node: h('div'),
+        titleDisplay: 'over',
+        overlay,
+        tk: { propsOf: () => ({ type, title, src: '/preview.webp' }) } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    expect(wrapper.find('figcaption').exists()).toBe(visible)
+    if (visible) expect(wrapper.get('figcaption').classes().includes('media-item-title--over')).toBe(over)
+    wrapper.unmount()
+  })
+
   it('animates a stable element when video renders multiple roots', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {

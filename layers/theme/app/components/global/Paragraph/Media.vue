@@ -18,6 +18,7 @@ const props = defineProps<{
   width?: string
   widthClass?: string
   cornerStyle?: 'default' | 'square' | string
+  titleDisplay?: string
   mediaHeight?: 'natural' | 'break' | 'feature' | string
   align?: string
   direction?: string
@@ -157,6 +158,7 @@ onMounted(() => {
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
           :rounded-class="roundedClass"
+          :title-display="titleDisplay"
           :tk="tk"
           :wrapper-class="mediaHeightClass"
           @edit-action-select="selectAction"
@@ -184,6 +186,7 @@ onMounted(() => {
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
           :rounded-class="roundedClass"
+          :title-display="titleDisplay"
           :tk="tk"
           :wrapper-class="mediaHeightClass"
           @edit-action-select="selectAction"

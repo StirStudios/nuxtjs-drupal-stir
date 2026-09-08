@@ -17,3 +17,7 @@ Hero title wording and intro use the existing `EditableRichText` editor. Heading
 Normal paragraph layouts use one theme setting, `--stir-content-action-gap` (default `1.5rem`, 24px), when text is followed by a Button paragraph or action group. Button-only content receives no leading gap. Individual Button paragraphs no longer add their own vertical margins; the group owns inter-button spacing. Set the CSS variable once in the client theme to adjust this default. Explicit authored spacing remains available for exceptional layouts.
 
 Main and section heroes use this same variable for their content flow. A hero containing only actions has no leading gap. Button-to-button spacing remains independent.
+
+Eyebrow spacing uses `--stir-eyebrow-gap` (12px default). This also controls the visible page-title label above the front-page Hero heading, keeping that group separate from content-to-actions spacing.
+
+Media paragraphs accept `titleDisplay`: `hidden` (default), `below`, or `over`. This labels each image/video using its existing media title; the paragraph heading remains above the collection. Blank titles render nothing. Over-preview uses a dark 80% backdrop with white text; inline video falls back to below so controls remain clear. Run Drupal database updates to install the optional control on existing sites.
