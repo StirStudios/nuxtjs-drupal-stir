@@ -2,7 +2,7 @@ export interface FormattedTextEditTarget {
   entityType: string
   entityId: number | string
   fieldName: string
-  editorMode?: 'formatted' | 'plain'
+  editorMode?: 'formatted' | 'plain' | 'heading'
 }
 
 export interface EditableRichTextProps {

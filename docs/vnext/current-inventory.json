@@ -361,6 +361,7 @@
       "layers/auth/app/utils/validationErrors.ts",
       "layers/editorial/app/utils/adminUiTheme.ts",
       "layers/editorial/app/utils/editorDragHandle.ts",
+      "layers/editorial/app/utils/headingText.ts",
       "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
       "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
       "layers/foundation/app/utils/nuxtUiProps.ts",
@@ -691,6 +692,7 @@
         "layers/auth/app/utils/validationErrors.ts",
         "layers/editorial/app/utils/adminUiTheme.ts",
         "layers/editorial/app/utils/editorDragHandle.ts",
+        "layers/editorial/app/utils/headingText.ts",
         "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
         "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
         "layers/foundation/app/utils/nuxtUiProps.ts",
@@ -752,21 +754,21 @@
   "counts": {
     "components": 128,
     "composables": 65,
-    "utils": 59,
+    "utils": 60,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 168,
+    "tests": 170,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 63,
+      "nuxt": 64,
       "scripts": 1,
       "server": 27,
       "unit": 10,
-      "utils": 53
+      "utils": 54
     }
   },
   "tests": [
@@ -784,6 +786,7 @@
     "tests/composables/useTeaserPost.spec.ts",
     "tests/composables/useValidation.spec.ts",
     "tests/contracts/stirToolsContract.spec.ts",
+    "tests/nuxt/e2e/actionSpacing.e2e.spec.ts",
     "tests/nuxt/e2e/health.e2e.spec.ts",
     "tests/nuxt/runtime/AccountProfileForm.nuxt.spec.ts",
     "tests/nuxt/runtime/AccountSecurityForm.nuxt.spec.ts",
@@ -903,6 +906,7 @@
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/globalSeoAssets.spec.ts",
+    "tests/utils/headingText.spec.ts",
     "tests/utils/heroMotionAccessibility.spec.ts",
     "tests/utils/heroVideoSource.spec.ts",
     "tests/utils/imageCdn.spec.ts",

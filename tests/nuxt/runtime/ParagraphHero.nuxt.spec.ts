@@ -86,6 +86,27 @@ describe('Drupal Hero page ownership and headings', () => {
     wrapper.unmount()
   })
 
+  it('preserves both action links and omits the group when no actions are supplied', async () => {
+    const options = { global: { provide: { [drupalPageKey as symbol]: ref(makePage('Hero')) } } }
+    const empty = await mountSuspended(Hero, options)
+
+    expect(empty.find('.hero-actions').exists()).toBe(false)
+    empty.unmount()
+    const wrapper = await mountSuspended(Hero, {
+      ...options,
+      slots: { button: () => [
+        h('div', { class: 'flex w-full' }, [h('a', { href: '/work' }, 'Explore the work')]),
+        h('div', { class: 'flex w-full' }, [h('a', { href: '/contact' }, 'Discuss an opportunity')]),
+      ] },
+    })
+
+    expect(wrapper.get('.hero-actions').findAll('a').map(link => [link.text(), link.attributes('href')])).toEqual([
+      ['Explore the work', '/work'],
+      ['Discuss an opportunity', '/contact'],
+    ])
+    wrapper.unmount()
+  })
+
   it('keeps simple mode as supplied slot content without adding a heading', async () => {
     const wrapper = await mountSuspended(Hero, {
       props: { mode: 'simple' },
@@ -97,4 +118,55 @@ describe('Drupal Hero page ownership and headings', () => {
     expect(wrapper.find('section').exists()).toBe(false)
     wrapper.unmount()
   })
+  it.each(['field_section', 'field_content'])('uses authored section headings in %s without the page title', async (placement) => {
+    const wrapper = await mountSuspended(Hero, {
+      props: { placement, header: 'Section title', headerTag: 'h3', label: 'Contact', mediaHeight: 'feature', align: 'justify-end items-end text-right' },
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page title')) } },
+    })
+
+    expect(wrapper.find('h1').exists()).toBe(false)
+    expect(wrapper.get('h3').text()).toBe('Section title')
+    expect(wrapper.get('section').attributes('id')).toBe('contact')
+    expect(wrapper.get('.hero-content-aligned').classes()).toContain('items-end')
+    expect(wrapper.get('section').attributes('style')).toContain('min-height')
+    await wrapper.setProps({ headerTag: 'h1' })
+    expect(wrapper.get('h2').text()).toBe('Section title')
+    wrapper.unmount()
+  })
+
+  it.each([
+    { header: 'Only title', text: '', button: false },
+    { header: '', text: '<p>Only intro</p>', button: false },
+    { header: '', text: '', button: true },
+    { header: 'Title and button', text: '', button: true },
+    { header: '  ', text: '', button: false },
+  ])('renders only supplied section content: %j', async ({ header, text, button }) => {
+    const wrapper = await mountSuspended(Hero, {
+      props: { placement: 'field_section', header, text },
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page title')) } },
+      slots: button ? { button: () => h('a', { href: '/contact' }, 'Contact') } : {},
+    })
+
+    expect(wrapper.find('h1').exists()).toBe(false)
+    expect(wrapper.find('h2').exists()).toBe(Boolean(header.trim()))
+    expect(wrapper.find('.hero-copy').exists()).toBe(Boolean(text))
+    expect(wrapper.find('.hero-actions').exists()).toBe(button)
+    expect(wrapper.text()).not.toContain('Page title')
+    wrapper.unmount()
+  })
+
+  it('renders an eyebrow as text rather than another heading', async () => {
+    const wrapper = await mountSuspended(Hero, {
+      props: { placement: 'field_section', header: 'Section', eyebrow: 'Featured opportunity' },
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page')) } },
+    })
+
+    expect(wrapper.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    expect(wrapper.get('.paragraph-eyebrow').text()).toBe('Featured opportunity')
+    expect(wrapper.findAll('h2')).toHaveLength(1)
+    await wrapper.setProps({ eyebrow: ' ' })
+    expect(wrapper.find('.paragraph-eyebrow').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
 })

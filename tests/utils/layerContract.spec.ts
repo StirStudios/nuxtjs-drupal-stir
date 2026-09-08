@@ -822,7 +822,7 @@ describe('layer contract', () => {
     expect(textEditor).not.toContain(
       ':class="[classes, \'admin-ui admin-ui-scope admin-ui-panel rounded-lg\']"',
     )
-    expect(textEditor).toContain('aria-label="Edit text"')
+    expect(textEditor).toContain('isHeading ? \'Edit heading\' : \'Edit text\'')
   })
 
   it('loads authenticated editorial assets only when editorial UI mounts', () => {

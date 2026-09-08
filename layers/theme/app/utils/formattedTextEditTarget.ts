@@ -18,7 +18,7 @@ export function normalizeFormattedTextEditTarget(
   const editorModeRaw = stringValue(
     target.editorMode ?? target.editor_mode,
   )
-  const editorMode = editorModeRaw === 'plain' ? 'plain' : 'formatted'
+  const editorMode = editorModeRaw === 'heading' ? 'heading' : editorModeRaw === 'plain' ? 'plain' : 'formatted'
 
   if (
     !/^[a-z0-9_]+$/.test(entityType)

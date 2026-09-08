@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
+import { slugify } from '#stir/utils/stringUtils'
 import { drupalPageKey } from '#stir/utils/drupalPage'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { useNavLockedSnapshot } from '#stir/composables/useNavLockedSnapshot'
@@ -14,6 +15,13 @@ import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 
 const props = defineProps<{
   mode?: 'full' | 'simple'
+  id?: string | number
+  label?: string
+  placement?: string
+  align?: string
+  mediaHeight?: string
+  eyebrow?: string
+  headerTag?: string
   text?: string
   editLink?: string
   direction?: string
@@ -30,12 +38,16 @@ defineSlots<{
   title?(): unknown
 }>()
 
+const isSection = computed(() => Boolean(props.placement && props.placement !== 'field_hero'))
+const sectionHeadingTag = computed(() => ['h2', 'h3', 'h4', 'h5', 'h6'].includes(props.headerTag || '') ? props.headerTag : 'h2')
+const minimumHeight = computed(() => ({ break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'break' | 'feature'])
+const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { getPage } = useStirDrupalCe()
 const owningPage = inject(drupalPageKey, null)
 const page = owningPage ?? getPage()
-const { isFront } = usePageContext(page)
+const { isFront, isAdministrator } = usePageContext(page)
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => {
@@ -45,7 +57,6 @@ const pageTitle = computed(() => {
 })
 const pageHideTitle = computed(() => pageProps.value?.hideTitle ?? false)
 
-// Only needed in FULL mode
 if (props.mode !== 'simple') {
   provide('isHero', true)
 }
@@ -55,10 +66,9 @@ const heroState = computed(() => ({
   isFront: owningPage ? owningPage.value?.is_front_page === true : isFront.value,
   title: pageTitle.value,
 }))
-// Page-owned heroes retain their own data; standalone heroes still use shared navigation protection.
 const heroSnapshot = owningPage ? heroState : useNavLockedSnapshot(heroState)
-const isFrontEffective = computed(() => heroSnapshot.value.isFront)
-const pageTitleEffective = computed(() => heroSnapshot.value.title)
+const isFrontEffective = computed(() => !isSection.value && heroSnapshot.value.isFront)
+const pageTitleEffective = computed(() => isSection.value ? '' : heroSnapshot.value.title)
 const pageHideTitleEffective = computed(() => resolveBooleanProp(heroSnapshot.value.hideTitle))
 
 const slotMedia = computed(() => tk.slot('media'))
@@ -90,6 +100,7 @@ const h1Classes = computed(() => {
 
 const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
 const hasVisibleDefaultContent = computed(() =>
+  Boolean(isSection.value && (props.header?.trim() || props.eyebrow?.trim() || (isAdministrator.value && props.id))) ||
   Boolean(props.text?.trim()) ||
   Boolean(pageTitleEffective.value && !pageHideTitleEffective.value) ||
   Boolean(
@@ -108,6 +119,8 @@ const sectionClasses = computed(() => {
   if (props.mode === 'simple') {
     return props.classes || ''
   }
+
+  if (isSection.value) return ['hero hero-section relative overflow-hidden', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
 
   const hasHeroContent = hasHero.value
 
@@ -146,8 +159,7 @@ const heroMotionProps = useRevealMotionProps(
   },
 )
 
-// Page-wide scroll reveals should never hide above-the-fold hero descendants.
-// Editors can still animate the hero text by choosing an explicit direction.
+// Keep inherited scroll reveals off hero content.
 provideRevealMotionScope(() => undefined)
 </script>
 
@@ -170,7 +182,7 @@ provideRevealMotionScope(() => undefined)
     </template>
 
     <template v-else>
-      <section class="relative" :class="sectionClasses">
+      <section :id="isSection ? (label ? slugify(label) : id ? `hero-${id}` : undefined) : undefined" class="relative" :class="sectionClasses" :style="minimumHeight ? { minHeight: minimumHeight, height: 'auto' } : undefined">
         <RevealMotion
           v-if="hasVisibleHeroContent || pageTitleEffective"
           as-child
@@ -178,14 +190,36 @@ provideRevealMotionScope(() => undefined)
         >
           <div
             :class="[
-              hasVisibleHeroContent && heroTheme.text.base,
-              hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
-              'motion-reduce:!opacity-100 motion-reduce:!transform-none',
+              hasVisibleHeroContent && !customContent && heroTheme.text.base,
+              customContent && ['hero-content-aligned relative z-10 w-full p-8 lg:p-24', align || 'justify-center items-center text-center'],
+              hasVisibleHeroContent && isFrontEffective && !customContent && heroTheme.text.isFront,
+              'hero-content-flow motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
+            :style="minimumHeight ? { minHeight: minimumHeight } : undefined"
           >
             <slot name="title">
+              <template v-if="isSection">
+                <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="hero-heading-group">
+                  <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
+                <EditableRichText
+                  v-if="header?.trim() || (isAdministrator && id)"
+                  :id="id"
+                  :edit-link="editLink"
+                  :edit-target="{ entityType: 'paragraph', entityId: id, fieldName: 'field_header', editorMode: 'heading' }"
+                  :text="header"
+                  :text-source="headerTag ? `${headerTag}|${header || ''}` : header"
+                >
+                  <component :is="sectionHeadingTag" v-if="header?.trim()" class="hero-heading">{{ header }}</component>
+                </EditableRichText>
+                </div>
+                <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="hero-copy" :edit-link="editLink" :text="text" />
+              </template>
               <HeroContent
-                v-if="text"
+                v-else-if="text || eyebrow?.trim() || (isAdministrator && id)"
+                :id="id"
+                :edit-link="editLink"
+                :eyebrow="eyebrow"
+                :header-tag="headerTag"
                 :hero-text="text"
                 :hide-title="pageHideTitleEffective"
                 :is-front="isFrontEffective"
@@ -198,7 +232,9 @@ provideRevealMotionScope(() => undefined)
               </h1>
             </slot>
 
-            <slot name="button" />
+            <div v-if="tk.slot('button').length" class="hero-actions" :class="heroTheme.actions">
+              <slot name="button" />
+            </div>
           </div>
         </RevealMotion>
 
@@ -213,3 +249,10 @@ provideRevealMotionScope(() => undefined)
     </template>
   </EditLink>
 </template>
+
+<style>
+.hero-content-aligned > :not(.hero-actions) { max-width: 48rem; }
+.hero-content-aligned :is(h1, h2, h3, h4, h5, h6, .hero-copy) { text-align: inherit; }
+.hero.hero-section > :is(.media, img) { position: absolute; inset: 0; height: 100%; width: 100%; }
+.hero.hero-section > .media img { height: 100%; width: 100%; object-fit: cover; }
+</style>

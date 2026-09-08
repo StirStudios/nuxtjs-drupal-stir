@@ -83,14 +83,13 @@ const pdfUrl = computed(() =>
   <ParagraphReveal
     :id="id"
     as="div"
-    :class="['flex w-full', align, spacing, width]"
+    :class="['paragraph-button flex w-full', align, spacing, width]"
     :direction="direction"
   >
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
       <UButton
         v-if="hasPdf"
         :block="btnBlock"
-        class="my-2"
         :color="btnColor"
         :icon="iconName ?? 'i-lucide-file-text'"
         :label="pdfTitle"
@@ -102,7 +101,6 @@ const pdfUrl = computed(() =>
       <UButton
         v-else-if="hasLink"
         :block="btnBlock"
-        class="my-2"
         :color="btnColor"
         :icon="iconName"
         :label="btnLabel"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Component, VNode } from 'vue'
+import { defineComponent, h } from 'vue'
 import type { SlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import type { NormalizedDrupalMediaNodeProps } from '#stir/types'
@@ -19,6 +20,7 @@ const props = defineProps<{
   direction?: string
   revealMode?: RevealMode
   deliveryProfile?: string
+  titleDisplay?: string
   overlay?: boolean
   roundedClass?: string
   wrapperClass?: unknown
@@ -60,6 +62,25 @@ const renderedMediaProps = computed(() =>
     ? { ...mediaProps.value, deferSource: true }
     : mediaProps.value,
 )
+const visibleTitle = computed(() =>
+  ['below', 'over'].includes(props.titleDisplay || '')
+  && ['image', 'video'].includes(mediaProps.value.type)
+  && typeof mediaProps.value.title === 'string'
+    ? mediaProps.value.title.trim()
+    : '',
+)
+// Keep captions clear of inline video playback controls.
+const TitleFrame = defineComponent({
+  setup(_, { slots }) {
+    return () => visibleTitle.value
+      ? h('figure', { class: ['media-titled', titleOverPreview.value && 'media-titled--over', props.roundedClass || theme.media.rounded] }, slots.default?.())
+      : slots.default?.()
+  },
+})
+
+const titleOverPreview = computed(() => props.titleDisplay === 'over'
+  && (mediaProps.value.type === 'image' || props.overlay))
+
 const isVideo = computed(() => mediaProps.value.type === 'video')
 const isDocument = computed(() => mediaProps.value.type === 'document')
 const isAudio = computed(() => mediaProps.value.type === 'audio')
@@ -105,6 +126,7 @@ const shouldAnimate = computed(() =>
 </script>
 
 <template>
+  <TitleFrame>
   <component
     :is="mediaComponent"
     v-if="(!overlay || isDocument || isAudio) && !shouldAnimate"
@@ -175,4 +197,28 @@ const shouldAnimate = computed(() =>
       </template>
     </MediaImage>
   </RevealMotion>
+    <figcaption v-if="visibleTitle" class="media-item-title" :class="{ 'media-item-title--over': titleOverPreview }">{{ visibleTitle }}</figcaption>
+  </TitleFrame>
 </template>
+
+<style>
+.media-titled { position: relative; margin: 0; min-width: 0; }
+.media-titled--over { overflow: hidden; }
+.media-item-title { margin-block-start: 0.75rem; overflow-wrap: anywhere; }
+.media-item-title--over {
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: fit-content;
+  max-width: 100%;
+  text-align: start;
+  z-index: 10;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  color: white;
+  background: rgb(0 0 0 / 65%);
+  border-radius: 0;
+  border-start-end-radius: var(--ui-radius, 0.25rem);
+  pointer-events: none;
+}
+</style>

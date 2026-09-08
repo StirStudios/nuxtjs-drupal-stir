@@ -165,6 +165,7 @@ type StirThemeNavigationConfig = {
 } & LooseRecord
 
 type StirThemeHeroConfig = {
+  actions?: ClassValue
   base?: ClassValue
   mediaAppearance?: ClassValue
   mediaSpacing?: ClassValue
