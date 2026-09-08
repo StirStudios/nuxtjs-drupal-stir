@@ -31,7 +31,7 @@ const richTextProps = computed(() => ({
   editTarget: props.editTarget ?? props.textEdit,
 }))
 const wrapStyles = computed(() =>
-  [props.width, props.spacing, props.eyebrow?.trim() && !isCard.value && 'paragraph-text'].filter(
+  [props.width, props.spacing].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )
@@ -50,9 +50,10 @@ const cardVariant = computed(() => {
       <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
     </UCard>
-    <template v-else>
-      <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
+    <div v-else-if="eyebrow?.trim()" class="paragraph-text">
+      <p class="paragraph-eyebrow">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
-    </template>
+    </div>
+    <EditableRichText v-else v-bind="richTextProps" />
   </WrapDiv>
 </template>

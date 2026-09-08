@@ -191,9 +191,9 @@ provideRevealMotionScope(() => undefined)
           <div
             :class="[
               hasVisibleHeroContent && !customContent && heroTheme.text.base,
-              customContent && ['hero-content-aligned relative z-10 flex w-full flex-col gap-8 p-8 lg:p-24', align || 'justify-center items-center text-center'],
+              customContent && ['hero-content-aligned relative z-10 w-full p-8 lg:p-24', align || 'justify-center items-center text-center'],
               hasVisibleHeroContent && isFrontEffective && !customContent && heroTheme.text.isFront,
-              'motion-reduce:!opacity-100 motion-reduce:!transform-none',
+              'hero-content-flow motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
             :style="minimumHeight ? { minHeight: minimumHeight } : undefined"
           >

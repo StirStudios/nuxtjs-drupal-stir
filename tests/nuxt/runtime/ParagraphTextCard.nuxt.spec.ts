@@ -55,11 +55,12 @@ describe('ParagraphText card presentation', () => {
   })
   it('keeps an eyebrow and body together as one layout item', async () => {
     const wrapper = await mountSuspended(ParagraphText, {
-      props: { eyebrow: 'Featured opportunity', text: '<h2>Live entertainment</h2>' },
+      props: { align: 'md:flex justify-center items-start text-start', eyebrow: 'Featured opportunity', text: '<h2>Live entertainment</h2>' },
     })
 
     const group = wrapper.get('.paragraph-text')
 
+    expect(group.element.parentElement?.children).toHaveLength(1)
     expect(group.get('.paragraph-eyebrow').element.tagName).toBe('P')
     expect(group.get('h2').text()).toBe('Live entertainment')
     await wrapper.setProps({ eyebrow: ' ' })

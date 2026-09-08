@@ -1,5 +1,17 @@
 /* Layout preset: one-column layout containing existing Button paragraphs. */
 @layer utilities {
+  /* One contextual gap; button-only layouts and adjacent buttons stay unspaced. */
+  :where(.region) > :where(.prose, :has(.prose)) + :where(.paragraph-button, .action-group) {
+    margin-block-start: var(--stir-content-action-gap, 1.5rem);
+  }
+
+  /* The same content rhythm applies to both page and section heroes. */
+  .hero-content-flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stir-content-action-gap, 1.5rem);
+  }
+
   .action-group > div > .region {
     display: flex;
     flex-direction: row;
