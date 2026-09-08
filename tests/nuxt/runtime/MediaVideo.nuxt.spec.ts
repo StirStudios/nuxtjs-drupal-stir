@@ -75,6 +75,32 @@ describe('MediaVideo (Nuxt runtime)', () => {
     await vi.waitFor(() => expect(play).toHaveBeenCalled())
   })
 
+  it('reuses the selected responsive image as the native background poster', async () => {
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {})
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: { isHero: true, src: '/poster.jpg', mediaEmbed: '/hero.mp4' },
+    })
+    const image = wrapper.get('img')
+    const selected = 'https://images.example/poster-640.webp'
+
+    Object.defineProperties(image.element, {
+      complete: { configurable: true, value: true },
+      naturalWidth: { configurable: true, value: 640 },
+      currentSrc: { configurable: true, value: selected },
+    })
+    await image.trigger('load')
+    expect(wrapper.get('video').attributes('poster')).toBe(selected)
+    expect(wrapper.findAll('img')).toHaveLength(1)
+
+    await image.trigger('error')
+    expect(wrapper.get('video').attributes('poster')).toBeUndefined()
+    await image.trigger('load')
+    await wrapper.setProps({ src: undefined })
+    expect(wrapper.get('video').attributes('poster')).toBeUndefined()
+    wrapper.unmount()
+  })
+
   it('uses Nuxt Image for a versioned static video poster', async () => {
     const wrapper = await mountSuspended(MediaVideo, {
       props: {

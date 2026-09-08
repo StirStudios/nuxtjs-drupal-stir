@@ -110,6 +110,7 @@ const isHero = computed(() =>
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
+const resolvedPosterSrc = ref<string>()
 const iframeElement = ref<HTMLIFrameElement | null>(null)
 const backgroundPlayerId = useId()
 const backgroundPlayerKey = computed(() =>
@@ -261,6 +262,9 @@ const previewSrc = computed(() => {
 
   return localVideoSrc.value ? undefined : props.src
 })
+
+watch(previewSrc, () => { resolvedPosterSrc.value = undefined })
+
 const staticPosterOriginalSrc = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.originalSrc,
 )
@@ -393,6 +397,7 @@ watch(
       :original-src="staticPosterOriginalSrc"
       :src="previewSrc"
       :width="width"
+      @resolved-src="resolvedPosterSrc = $event"
     />
 
     <video
@@ -407,6 +412,7 @@ watch(
       loop
       muted
       playsinline
+      :poster="resolvedPosterSrc"
       :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
       tabindex="-1"
     >
