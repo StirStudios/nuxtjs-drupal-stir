@@ -205,10 +205,3 @@ function closeModal(): void {
   </LazyUModal>
 </template>
 
-<style>
-@layer components {
-  .media-modal img {
-    @apply max-h-[80vh] object-contain;
-  }
-}
-</style>
