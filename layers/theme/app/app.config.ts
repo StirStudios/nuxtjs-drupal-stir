@@ -86,6 +86,7 @@ export default defineAppConfig({
     },
 
     hero: {
+      actions: 'flex flex-wrap gap-x-6 gap-y-3 [&>div]:w-auto',
       base: 'hero flex items-center justify-center overflow-hidden',
       mediaAppearance: 'dark text-default',
       mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',

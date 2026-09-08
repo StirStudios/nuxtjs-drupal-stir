@@ -45,7 +45,6 @@ const pageTitle = computed(() => {
 })
 const pageHideTitle = computed(() => pageProps.value?.hideTitle ?? false)
 
-// Only needed in FULL mode
 if (props.mode !== 'simple') {
   provide('isHero', true)
 }
@@ -55,7 +54,6 @@ const heroState = computed(() => ({
   isFront: owningPage ? owningPage.value?.is_front_page === true : isFront.value,
   title: pageTitle.value,
 }))
-// Page-owned heroes retain their own data; standalone heroes still use shared navigation protection.
 const heroSnapshot = owningPage ? heroState : useNavLockedSnapshot(heroState)
 const isFrontEffective = computed(() => heroSnapshot.value.isFront)
 const pageTitleEffective = computed(() => heroSnapshot.value.title)
@@ -146,8 +144,7 @@ const heroMotionProps = useRevealMotionProps(
   },
 )
 
-// Page-wide scroll reveals should never hide above-the-fold hero descendants.
-// Editors can still animate the hero text by choosing an explicit direction.
+// Keep inherited scroll reveals off hero content.
 provideRevealMotionScope(() => undefined)
 </script>
 
@@ -198,7 +195,9 @@ provideRevealMotionScope(() => undefined)
               </h1>
             </slot>
 
-            <slot name="button" />
+            <div v-if="tk.slot('button').length" class="hero-actions" :class="heroTheme.actions">
+              <slot name="button" />
+            </div>
           </div>
         </RevealMotion>
 

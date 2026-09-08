@@ -86,6 +86,27 @@ describe('Drupal Hero page ownership and headings', () => {
     wrapper.unmount()
   })
 
+  it('preserves both action links and omits the group when no actions are supplied', async () => {
+    const options = { global: { provide: { [drupalPageKey as symbol]: ref(makePage('Hero')) } } }
+    const empty = await mountSuspended(Hero, options)
+
+    expect(empty.find('.hero-actions').exists()).toBe(false)
+    empty.unmount()
+    const wrapper = await mountSuspended(Hero, {
+      ...options,
+      slots: { button: () => [
+        h('div', { class: 'flex w-full' }, [h('a', { href: '/work' }, 'Explore the work')]),
+        h('div', { class: 'flex w-full' }, [h('a', { href: '/contact' }, 'Discuss an opportunity')]),
+      ] },
+    })
+
+    expect(wrapper.get('.hero-actions').findAll('a').map(link => [link.text(), link.attributes('href')])).toEqual([
+      ['Explore the work', '/work'],
+      ['Discuss an opportunity', '/contact'],
+    ])
+    wrapper.unmount()
+  })
+
   it('keeps simple mode as supplied slot content without adding a heading', async () => {
     const wrapper = await mountSuspended(Hero, {
       props: { mode: 'simple' },
