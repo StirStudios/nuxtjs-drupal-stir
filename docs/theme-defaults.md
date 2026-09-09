@@ -27,3 +27,9 @@ statistics variants remain downstream responsibilities.
 Migration: remove redundant paragraph leading/margin overrides after updating the
 layer. Keep `text-base` on content accordion bodies where Nuxt UI's compact
 `text-sm` default is unsuitable. No Drupal payload or environment changes.
+
+Layout container alignment accepts the existing Drupal horizontal alignment values.
+None preserves the theme default; Left, Center and Right position the constrained
+layout using margins without changing text alignment or its grid. A full-width
+layout has no spare horizontal space to move within. Existing layouts need no
+content changes; run the Stir Tools database updates to expose the CMS control.

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { tv } from '@nuxt/ui/utils/tv'
+
 const props = defineProps<{
+  align?: string
   classes?: string
   gridClasses?: string
   spacing?: string
@@ -19,28 +22,36 @@ const gridStyles = computed(() => {
   )
 })
 
+const containerAlignment = computed(() => {
+  const align = props.align?.split(/\s+/) || []
+
+  if (align.includes('justify-start')) return 'mx-0 ms-0 me-auto'
+  if (align.includes('justify-end')) return 'mx-0 ms-auto me-0'
+  return align.includes('justify-center') ? 'mx-auto' : ''
+})
 const contentWrapperClasses = computed(() => {
   return [
     props.classes || null,
     props.width || null,
     props.spacing || null,
+    containerAlignment.value,
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
 const cardUi = computed(() => ({
   root: themeCard.base,
   body: 'p-0 sm:p-0',
 }))
-const combinedClasses = computed(() => [
+const combinedClasses = computed(() => tv({ base: [
   props.container ? themeContainer : null,
   ...contentWrapperClasses.value,
   ...gridStyles.value,
-].filter((value): value is string => typeof value === 'string' && value.length > 0))
+] })())
 </script>
 
 <template>
   <WrapDiv v-if="props.card && props.container" :styles="themeContainer">
     <UCard
-      :class="contentWrapperClasses"
+      :class="tv({ base: contentWrapperClasses })()"
       :ui="cardUi"
       variant="solid"
     >
@@ -52,7 +63,7 @@ const combinedClasses = computed(() => [
   </WrapDiv>
   <UCard
     v-else-if="props.card"
-    :class="contentWrapperClasses"
+    :class="tv({ base: contentWrapperClasses })()"
     :ui="cardUi"
     variant="solid"
   >
