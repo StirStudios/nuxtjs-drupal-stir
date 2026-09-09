@@ -55,6 +55,29 @@ describe('Drupal Hero page ownership and headings', () => {
     }
   })
 
+  it.each(['start', 'center', 'end'].flatMap(horizontal =>
+    ['start', 'center', 'end'].map(vertical => ({ horizontal, vertical })),
+  ))('aligns the main hero $horizontal/$vertical without dropping theme classes', async ({ horizontal, vertical }) => {
+    const page = ref(makePage('Page title'))
+
+    page.value.is_front_page = true
+    const wrapper = await mountSuspended(Hero, {
+      props: { align: `justify-${horizontal} items-${vertical}`, header: 'Heading', text: '<p>Intro</p>' },
+      slots: { button: () => h('button', 'Action') },
+      global: { provide: { [drupalPageKey as symbol]: page } },
+    })
+    const content = wrapper.get('.hero-content-aligned')
+
+    expect(wrapper.get('section').classes()).toContain(`items-${vertical}`)
+    expect(content.classes()).toContain(`items-${horizontal}`)
+    expect(content.classes()).toContain(`text-${horizontal}`)
+    expect(content.classes()).toContain('relative')
+    expect(content.classes()).not.toContain('absolute')
+    expect(content.classes()).toContain('lg:p-24')
+    expect(wrapper.get('.hero-actions').classes()).toContain(`justify-${horizontal}`)
+    wrapper.unmount()
+  })
+
   it.each([true, false])('uses one authored main H1 with an independent eyebrow (front=%s)', async (front) => {
     const page = ref(makePage('Drupal page title'))
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cloneVNode } from 'vue'
+import { tv } from '@nuxt/ui/utils/tv'
 import { slugify } from '#stir/utils/stringUtils'
 import { drupalPageKey } from '#stir/utils/drupalPage'
 import { usePageContext } from '#stir/composables/usePageContext'
@@ -42,6 +43,16 @@ const isSection = computed(() => Boolean(props.placement && props.placement !== 
 const sectionHeadingTag = computed(() => ['h2', 'h3', 'h4', 'h5', 'h6'].includes(props.headerTag || '') ? props.headerTag : 'h2')
 const minimumHeight = computed(() => ({ break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
+const alignment = computed(() => {
+  const tokens = props.align?.split(/\s+/) || []
+
+  return {
+    vertical: tokens.includes('items-end') ? 'items-end' : tokens.includes('items-start') ? 'items-start' : 'items-center',
+    horizontal: tokens.includes('justify-start') ? 'items-start' : tokens.includes('justify-end') ? 'items-end' : 'items-center',
+    text: tokens.includes('text-start') || tokens.includes('text-left') ? 'text-start' : tokens.includes('text-end') || tokens.includes('text-right') ? 'text-end' : tokens.includes('justify-start') ? 'text-start' : tokens.includes('justify-end') ? 'text-end' : 'text-center',
+    actions: tokens.includes('justify-start') ? 'justify-start' : tokens.includes('justify-end') ? 'justify-end' : 'justify-center',
+  }
+})
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const { getPage } = useStirDrupalCe()
@@ -174,20 +185,20 @@ provideRevealMotionScope(() => undefined)
     </template>
 
     <template v-else>
-      <section :id="isSection ? (label ? slugify(label) : id ? `hero-${id}` : undefined) : undefined" class="relative" :class="sectionClasses" :style="minimumHeight ? { minHeight: minimumHeight, height: 'auto' } : undefined">
+      <section :id="isSection ? (label ? slugify(label) : id ? `hero-${id}` : undefined) : undefined" class="relative" :class="tv({ base: [sectionClasses, customContent && 'flex flex-row', customContent && alignment.vertical] })()" :style="minimumHeight ? { minHeight: minimumHeight, height: 'auto' } : undefined">
         <RevealMotion
           v-if="hasVisibleHeroContent || pageTitleEffective"
           as-child
           v-bind="heroMotionProps"
         >
           <div
-            :class="[
-              hasVisibleHeroContent && !customContent && heroTheme.text.base,
-              customContent && ['hero-content-aligned relative z-10 w-full p-8 lg:p-24 [&>:not(.hero-actions)]:max-w-3xl [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', align || 'justify-center items-center text-center'],
-              hasVisibleHeroContent && isFrontEffective && !customContent && heroTheme.text.isFront,
+            :class="tv({ base: [
+              hasVisibleHeroContent && !isSection && heroTheme.text.base,
+              isSection && 'relative z-10 w-full p-8 lg:p-24',
+              hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
+              customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&>*]:max-w-3xl [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', alignment.horizontal, alignment.text],
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
-            ]"
-            :style="minimumHeight ? { minHeight: minimumHeight } : undefined"
+            ] })()"
           >
             <slot name="title">
               <template v-if="isSection">
@@ -221,7 +232,7 @@ provideRevealMotionScope(() => undefined)
 
             </slot>
 
-            <div v-if="tk.slot('button').length" class="hero-actions" :class="heroTheme.actions">
+            <div v-if="tk.slot('button').length" class="hero-actions" :class="tv({ base: [heroTheme.actions, customContent && alignment.actions] })()">
               <slot name="button" />
             </div>
           </div>
