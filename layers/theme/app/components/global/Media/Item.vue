@@ -197,6 +197,6 @@ const shouldAnimate = computed(() =>
       </template>
     </MediaImage>
   </RevealMotion>
-    <figcaption v-if="visibleTitle" class="media-item-title [overflow-wrap:anywhere]" :class="titleOverPreview ? 'media-item-title--over absolute start-0 bottom-0 z-10 m-0 w-fit max-w-full px-3 py-2 text-start text-white bg-[rgb(0_0_0/65%)] rounded-none rounded-se-[var(--ui-radius,0.25rem)] pointer-events-none' : 'mt-3'">{{ visibleTitle }}</figcaption>
+    <figcaption v-if="visibleTitle" class="media-item-title [overflow-wrap:anywhere]" :class="titleOverPreview ? 'media-item-title--over absolute start-0 bottom-0 z-10 m-0 w-full max-w-full px-5 pt-16 pb-5 text-start font-sans text-sm leading-5 font-semibold tracking-[0.12em] text-white uppercase italic bg-linear-to-t from-black/90 via-black/70 via-40% to-transparent rounded-none pointer-events-none' : 'mt-3'">{{ visibleTitle }}</figcaption>
   </TitleFrame>
 </template>
