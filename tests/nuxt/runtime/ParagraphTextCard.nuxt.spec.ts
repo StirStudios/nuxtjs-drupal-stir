@@ -61,10 +61,10 @@ describe('ParagraphText card presentation', () => {
     const group = wrapper.get('.paragraph-text')
 
     expect(group.element.parentElement?.children).toHaveLength(1)
-    expect(group.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    expect(group.get('.eyebrow').element.tagName).toBe('P')
     expect(group.get('h2').text()).toBe('Live entertainment')
     await wrapper.setProps({ eyebrow: ' ' })
-    expect(wrapper.find('.paragraph-eyebrow').exists()).toBe(false)
+    expect(wrapper.find('.eyebrow').exists()).toBe(false)
     wrapper.unmount()
   })
 
