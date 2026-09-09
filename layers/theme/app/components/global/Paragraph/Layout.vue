@@ -43,6 +43,9 @@ const props = defineProps<{
   editLink?: string
 }>()
 
+const classNames = computed(() => props.classes?.split(/\s+/) || [])
+const isActionGroup = computed(() => classNames.value.includes('action-group'))
+
 const vueSlots = useSlots()
 const orderedSlots = computed(() => Object.entries(vueSlots))
 const isGridLayout = computed(
@@ -140,7 +143,10 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
         <div
           v-if="!hasGridItems || slotName !== 'items'"
           :class="[
-            'region flex-col',
+            'region [&>:where(.prose,:has(.prose))+:where(.paragraph-button,.action-group)]:mt-[var(--stir-content-action-gap,1.5rem)]',
+            isActionGroup ? 'flex flex-row flex-wrap items-center gap-x-6 gap-y-3 [&>div]:w-auto [&>div]:max-w-full' : 'flex-col',
+            isActionGroup && classNames.includes('action-group--center') && 'justify-center',
+            isActionGroup && classNames.includes('action-group--right') && 'justify-end',
             slotName,
             props.regionAlign?.[slotName],
             mobileRegionOrderClass(slotName),

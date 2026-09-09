@@ -33,6 +33,7 @@
   }
 
   :where(.prose, .admin-editor-prose) {
+    @apply leading-7;
     & > :first-child {
       @apply mt-0;
     }
@@ -79,7 +80,7 @@
     }
 
     :where(p) {
-      @apply my-[1em] leading-normal text-pretty;
+      @apply my-[1em] text-pretty;
     }
 
     :where(p:first-of-type) {
@@ -110,10 +111,6 @@
       @apply my-0 list-none;
     }
 
-    :where(li) {
-      @apply leading-normal;
-    }
-
     :where(ul:not(.list-none) > li + li, ol:not(.list-none) > li + li) {
       @apply mt-1.5;
     }
@@ -132,9 +129,6 @@
 
     :where(blockquote) {
       @apply border-accented my-5 border-s-4 ps-4 italic;
-      p {
-        @apply !my-0;
-      }
     }
 
     :where(hr) {
@@ -178,9 +172,4 @@
       @apply border-muted border-b-2;
     }
   }
-}
-
-@layer components {
-  .hero-page-label:not(.sr-only):has(+ *) { margin-block: 0 var(--stir-eyebrow-gap, 0.75rem); }
-  .paragraph-eyebrow { margin-block: 0 var(--stir-eyebrow-gap, 0.75rem); font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
 }

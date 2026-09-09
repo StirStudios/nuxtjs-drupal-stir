@@ -3,7 +3,6 @@
 @import './base';
 @import './utilities';
 @import './media';
-@import './layout-presets';
 @import './motion';
 @import '#stir-presentation-source';
 

@@ -83,7 +83,7 @@ function closeModal(): void {
   <LazyUModal
     v-if="items.length > 0"
     v-model:open="open"
-    class="media-modal"
+    class="media-modal [&_img]:max-h-[80vh] [&_img]:object-contain"
     :close="false"
     :description="modalAccessibleDescription"
     fullscreen
@@ -205,10 +205,3 @@ function closeModal(): void {
   </LazyUModal>
 </template>
 
-<style>
-@layer components {
-  .media-modal img {
-    @apply max-h-[80vh] object-contain;
-  }
-}
-</style>
