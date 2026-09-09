@@ -22,6 +22,7 @@ const props = defineProps<{
   region?: string
 
   layout?: string
+  align?: string
   container?: boolean
   card?: boolean
 
@@ -123,6 +124,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
     :motion-props="layoutMotionProps"
   >
     <WrapGrid
+      :align="align"
       :card="card"
       :container="container"
       :grid-items="gridClass"
