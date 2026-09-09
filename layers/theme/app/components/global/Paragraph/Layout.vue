@@ -21,6 +21,7 @@ const props = defineProps<{
   parentUuid?: string
   region?: string
 
+  layoutTag?: string
   layout?: string
   align?: string
   container?: boolean
@@ -43,6 +44,9 @@ const props = defineProps<{
   animationStagger?: boolean | number | string
   editLink?: string
 }>()
+
+// Older payloads retain their existing section wrapper.
+const layoutTag = computed(() => props.layoutTag === 'div' ? 'div' : 'section')
 
 const classNames = computed(() => props.classes?.split(/\s+/) || [])
 const isActionGroup = computed(() => classNames.value.includes('action-group'))
@@ -119,7 +123,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
   <RevealMotionElement
     :id="sectionId"
     :key="`layout-${id}-${'whileInView' in layoutMotionProps ? revealMotionKey : 0}`"
-    as="section"
+    :as="layoutTag"
     :class="[classes || 'content', spacing]"
     :motion-props="layoutMotionProps"
   >

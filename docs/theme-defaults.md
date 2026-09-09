@@ -40,3 +40,11 @@ Video previews with a visible overlaid media title use a compact corner play
 indicator. Hidden, empty and below-preview titles retain the centered indicator.
 The entire preview remains the keyboard-accessible playback trigger; no CMS
 configuration or update hook is needed.
+
+Drupal supplies `layout_tag` (`layoutTag` in Vue): root layouts use `section`,
+layouts owned by another paragraph use `div`. Nuxt renders only these two tags;
+missing or unsupported values retain the legacy `section` default. Headings do
+not determine the wrapper. Project exceptions use the existing Drupal field
+processing hook, without another editorial setting. IDs, classes and editing
+controls are unchanged. Target classes/IDs instead of assuming every layout is
+a `section`. Deploy this consumer before the producer and rebuild Drupal caches.
