@@ -196,7 +196,7 @@ provideRevealMotionScope(() => undefined)
               hasVisibleHeroContent && !isSection && heroTheme.text.base,
               isSection && 'relative z-10 w-full p-8 lg:p-24',
               hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
-              customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&>*]:max-w-3xl [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', alignment.horizontal, alignment.text],
+              customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', alignment.horizontal, alignment.text],
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ] })()"
           >
