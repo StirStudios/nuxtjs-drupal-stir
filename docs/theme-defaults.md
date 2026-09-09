@@ -33,3 +33,8 @@ None preserves the theme default; Left, Center and Right position the constraine
 layout using margins without changing text alignment or its grid. A full-width
 layout has no spare horizontal space to move within. Existing layouts need no
 content changes; run the Stir Tools database updates to expose the CMS control.
+
+Video previews with a visible overlaid media title use a compact corner play
+indicator. Hidden, empty and below-preview titles retain the centered indicator.
+The entire preview remains the keyboard-accessible playback trigger; no CMS
+configuration or update hook is needed.

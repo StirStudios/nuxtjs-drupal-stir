@@ -192,11 +192,11 @@ const shouldAnimate = computed(() =>
           type="button"
           @click="openOverlay"
         >
-          <MediaPlayIndicator v-if="isVideo" />
+          <MediaPlayIndicator v-if="isVideo" :corner="Boolean(visibleTitle && titleOverPreview)" />
         </button>
       </template>
     </MediaImage>
   </RevealMotion>
-    <figcaption v-if="visibleTitle" class="media-item-title [overflow-wrap:anywhere]" :class="titleOverPreview ? 'media-item-title--over absolute start-0 bottom-0 z-10 m-0 w-full max-w-full px-5 pt-16 pb-5 text-start font-sans text-sm leading-5 font-semibold tracking-[0.12em] text-white uppercase italic bg-linear-to-t from-black/90 via-black/70 via-40% to-transparent rounded-none pointer-events-none' : 'mt-3'">{{ visibleTitle }}</figcaption>
+    <figcaption v-if="visibleTitle" class="media-item-title [overflow-wrap:anywhere]" :class="[isVideo && titleOverPreview && 'pe-14', titleOverPreview ? 'media-item-title--over absolute start-0 bottom-0 z-10 m-0 w-full max-w-full px-5 pt-16 pb-5 text-start font-sans text-sm leading-5 font-semibold tracking-[0.12em] text-white uppercase italic bg-linear-to-t from-black/90 via-black/70 via-40% to-transparent rounded-none pointer-events-none' : 'mt-3']">{{ visibleTitle }}</figcaption>
   </TitleFrame>
 </template>

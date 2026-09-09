@@ -50,6 +50,34 @@ describe('MediaItem (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
+  it.each([
+    ['over', 'Video title', true],
+    ['below', 'Video title', false],
+    ['hidden', 'Video title', false],
+    ['over', '   ', false],
+  ])('uses a corner play indicator only for a visible overlay title (%s, %s)', async (titleDisplay, title, corner) => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index: 2,
+        node: h('div'),
+        overlay: true,
+        titleDisplay,
+        tk: { propsOf: () => ({ type: 'video', title, src: '/preview.webp' }) } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+    const trigger = wrapper.get('button[aria-label="Open video modal"]')
+    const icon = trigger.get('.i-lucide\\:play')
+
+    expect(icon.classes()).toContain(corner ? 'size-6' : 'size-9')
+    expect(icon.element.parentElement?.classList.contains('end-5')).toBe(corner)
+    expect(trigger.classes()).toContain('inset-0')
+    expect(trigger.classes()).toContain('focus-visible:outline-2')
+    if (corner) expect(wrapper.get('figcaption').classes()).toContain('pe-14')
+    await trigger.trigger('click')
+    expect(wrapper.emitted('open')).toEqual([[2]])
+    wrapper.unmount()
+  })
+
   it('animates a stable element when video renders multiple roots', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {
