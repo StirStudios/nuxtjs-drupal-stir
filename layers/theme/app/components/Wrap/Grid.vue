@@ -31,6 +31,7 @@ const containerAlignment = computed(() => {
 })
 const contentWrapperClasses = computed(() => {
   return [
+    props.container ? 'mx-auto' : null,
     props.classes || null,
     props.width || null,
     props.spacing || null,
@@ -42,15 +43,15 @@ const cardUi = computed(() => ({
   body: 'p-0 sm:p-0',
 }))
 const combinedClasses = computed(() => tv({ base: [
-  props.container ? themeContainer : null,
   ...contentWrapperClasses.value,
   ...gridStyles.value,
 ] })())
 </script>
 
 <template>
-  <WrapDiv v-if="props.card && props.container" :styles="themeContainer">
+  <WrapDiv :styles="props.container ? themeContainer : undefined">
     <UCard
+      v-if="props.card"
       :class="tv({ base: contentWrapperClasses })()"
       :ui="cardUi"
       variant="solid"
@@ -60,19 +61,8 @@ const combinedClasses = computed(() => tv({ base: [
       </WrapDiv>
       <LazyCardGradient :layout="props" />
     </UCard>
-  </WrapDiv>
-  <UCard
-    v-else-if="props.card"
-    :class="tv({ base: contentWrapperClasses })()"
-    :ui="cardUi"
-    variant="solid"
-  >
-    <WrapDiv :styles="gridStyles">
+    <WrapDiv v-else :styles="combinedClasses">
       <slot />
     </WrapDiv>
-    <LazyCardGradient :layout="props" />
-  </UCard>
-  <WrapDiv v-else :styles="combinedClasses">
-    <slot />
   </WrapDiv>
 </template>

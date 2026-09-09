@@ -33,6 +33,34 @@ const ImageDeliveryProfileProbe = defineComponent({
 })
 
 describe('ParagraphLayout (Nuxt runtime)', () => {
+  it.each([
+    { layoutTag: 'section', header: '', tag: 'SECTION' },
+    { layoutTag: 'div', header: 'Child heading', tag: 'DIV' },
+    { layoutTag: undefined, header: '', tag: 'SECTION' },
+    { layoutTag: 'script', header: '', tag: 'SECTION' },
+  ])('uses $tag for a layout with heading "$header"', async ({ layoutTag, header, tag }) => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: { id: 'semantics', layoutTag, header, classes: 'showcase-row', gridClass: 'grid' },
+      slots: { first: '<h3>Independent child heading</h3>' },
+    })
+
+    expect(wrapper.get('#section-semantics').element.tagName).toBe(tag)
+    expect(wrapper.get('#section-semantics').classes()).toContain('showcase-row')
+    expect(wrapper.find('h2').exists()).toBe(Boolean(header))
+    expect(wrapper.get('h3').text()).toBe('Independent child heading')
+    wrapper.unmount()
+  })
+
+  it('allows headed subsections inside a headed layout', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: { id: 'outer', header: 'Collection' },
+      slots: { first: () => h(ParagraphLayout, { id: 'inner', layoutTag: 'section', header: 'Part one', headerTag: 'h3' }) },
+    })
+
+    expect(wrapper.get('section#section-outer section#section-inner h3').text()).toBe('Part one')
+    wrapper.unmount()
+  })
+
   it('renders repeatable grid items directly for grid layouts', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: {
