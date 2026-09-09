@@ -33,10 +33,3 @@
     @apply mx-auto mb-5 max-w-sm sm:float-right sm:ms-5;
   }
 }
-
-/* Keep modal styles in the main stylesheet so dev loading cannot reorder layers. */
-@layer components {
-  .media-modal img {
-    @apply max-h-[80vh] object-contain;
-  }
-}

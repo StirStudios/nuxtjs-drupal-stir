@@ -73,7 +73,7 @@ const visibleTitle = computed(() =>
 const TitleFrame = defineComponent({
   setup(_, { slots }) {
     return () => visibleTitle.value
-      ? h('figure', { class: ['media-titled', titleOverPreview.value && 'media-titled--over', props.roundedClass || theme.media.rounded] }, slots.default?.())
+      ? h('figure', { class: ['media-titled relative m-0 min-w-0', titleOverPreview.value && 'overflow-hidden', props.roundedClass || theme.media.rounded] }, slots.default?.())
       : slots.default?.()
   },
 })
@@ -197,28 +197,6 @@ const shouldAnimate = computed(() =>
       </template>
     </MediaImage>
   </RevealMotion>
-    <figcaption v-if="visibleTitle" class="media-item-title" :class="{ 'media-item-title--over': titleOverPreview }">{{ visibleTitle }}</figcaption>
+    <figcaption v-if="visibleTitle" class="media-item-title [overflow-wrap:anywhere]" :class="titleOverPreview ? 'media-item-title--over absolute start-0 bottom-0 z-10 m-0 w-fit max-w-full px-3 py-2 text-start text-white bg-[rgb(0_0_0/65%)] rounded-none rounded-se-[var(--ui-radius,0.25rem)] pointer-events-none' : 'mt-3'">{{ visibleTitle }}</figcaption>
   </TitleFrame>
 </template>
-
-<style>
-.media-titled { position: relative; margin: 0; min-width: 0; }
-.media-titled--over { overflow: hidden; }
-.media-item-title { margin-block-start: 0.75rem; overflow-wrap: anywhere; }
-.media-item-title--over {
-  position: absolute;
-  inset-inline-start: 0;
-  bottom: 0;
-  width: fit-content;
-  max-width: 100%;
-  text-align: start;
-  z-index: 10;
-  margin: 0;
-  padding: 0.5rem 0.75rem;
-  color: white;
-  background: rgb(0 0 0 / 65%);
-  border-radius: 0;
-  border-start-end-radius: var(--ui-radius, 0.25rem);
-  pointer-events: none;
-}
-</style>

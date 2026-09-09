@@ -55,6 +55,29 @@ describe('Drupal Hero page ownership and headings', () => {
     }
   })
 
+  it.each([true, false])('uses one authored main H1 with an independent eyebrow (front=%s)', async (front) => {
+    const page = ref(makePage('Drupal page title'))
+
+    page.value.is_front_page = front
+    const wrapper = await mountSuspended(Hero, {
+      props: { header: 'Authored heading', eyebrow: 'Eyebrow', headerTag: 'h2' },
+      global: { provide: { [drupalPageKey as symbol]: page } },
+    })
+
+    expect(wrapper.findAll('h1')).toHaveLength(1)
+    expect(wrapper.get('h1').text()).toBe('Authored heading')
+    expect(wrapper.find('h2').exists()).toBe(false)
+    expect(wrapper.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    page.value.content = { props: { title: 'Drupal page title', hideTitle: true } }
+    await nextTick()
+    expect(wrapper.get('h1').classes()).toContain('sr-only')
+    expect(wrapper.get('h1').text()).toBe('Authored heading')
+    await wrapper.setProps({ header: '  ' })
+    expect(wrapper.get('h1').text()).toBe('Drupal page title')
+    expect(wrapper.findAll('h1')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it('uses the Drupal page title when the content title is blank and preserves a hidden H1', async () => {
     const page = ref(makePage('Page title'))
 

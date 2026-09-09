@@ -88,19 +88,11 @@ const containsVideo = computed(() =>
     ),
 )
 
-const h1Classes = computed(() => {
-  const base = hasMediaSlot.value
-    ? isFrontEffective.value
-      ? heroTheme.text?.isFront
-      : heroTheme.text?.heading
-    : null
-
-  return [base, pageHideTitleEffective.value && 'sr-only'].filter(Boolean)
-})
-
-const heroSubtitle = computed(() => props.header || props.siteSlogan || '')
+const heroSubtitle = computed(() => props.header?.trim() || '')
 const hasVisibleDefaultContent = computed(() =>
   Boolean(isSection.value && (props.header?.trim() || props.eyebrow?.trim() || (isAdministrator.value && props.id))) ||
+  Boolean(props.header?.trim()) ||
+  Boolean(props.eyebrow?.trim()) ||
   Boolean(props.text?.trim()) ||
   Boolean(pageTitleEffective.value && !pageHideTitleEffective.value) ||
   Boolean(
@@ -120,7 +112,7 @@ const sectionClasses = computed(() => {
     return props.classes || ''
   }
 
-  if (isSection.value) return ['hero hero-section relative overflow-hidden', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
+  if (isSection.value) return ['hero hero-section relative overflow-hidden [&>:is(.media,img)]:absolute [&>:is(.media,img)]:inset-0 [&>:is(.media,img)]:h-full [&>:is(.media,img)]:w-full [&>.media_img]:h-full [&>.media_img]:w-full [&>.media_img]:object-cover', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
 
   const hasHeroContent = hasHero.value
 
@@ -191,16 +183,16 @@ provideRevealMotionScope(() => undefined)
           <div
             :class="[
               hasVisibleHeroContent && !customContent && heroTheme.text.base,
-              customContent && ['hero-content-aligned relative z-10 w-full p-8 lg:p-24', align || 'justify-center items-center text-center'],
+              customContent && ['hero-content-aligned relative z-10 w-full p-8 lg:p-24 [&>:not(.hero-actions)]:max-w-3xl [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', align || 'justify-center items-center text-center'],
               hasVisibleHeroContent && isFrontEffective && !customContent && heroTheme.text.isFront,
-              'hero-content-flow motion-reduce:!opacity-100 motion-reduce:!transform-none',
+              'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ]"
             :style="minimumHeight ? { minHeight: minimumHeight } : undefined"
           >
             <slot name="title">
               <template v-if="isSection">
                 <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="hero-heading-group">
-                  <p v-if="eyebrow?.trim()" class="paragraph-eyebrow">{{ eyebrow }}</p>
+                  <p v-if="eyebrow?.trim()" class="paragraph-eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
                 <EditableRichText
                   v-if="header?.trim() || (isAdministrator && id)"
                   :id="id"
@@ -215,7 +207,7 @@ provideRevealMotionScope(() => undefined)
                 <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="hero-copy" :edit-link="editLink" :text="text" />
               </template>
               <HeroContent
-                v-else-if="text || eyebrow?.trim() || (isAdministrator && id)"
+                v-else
                 :id="id"
                 :edit-link="editLink"
                 :eyebrow="eyebrow"
@@ -227,9 +219,6 @@ provideRevealMotionScope(() => undefined)
                 :subtitle="heroSubtitle"
               />
 
-              <h1 v-else-if="pageTitleEffective" v-bind="h1Classes.length ? { class: h1Classes } : {}">
-                {{ pageTitleEffective }}
-              </h1>
             </slot>
 
             <div v-if="tk.slot('button').length" class="hero-actions" :class="heroTheme.actions">
@@ -249,10 +238,3 @@ provideRevealMotionScope(() => undefined)
     </template>
   </EditLink>
 </template>
-
-<style>
-.hero-content-aligned > :not(.hero-actions) { max-width: 48rem; }
-.hero-content-aligned :is(h1, h2, h3, h4, h5, h6, .hero-copy) { text-align: inherit; }
-.hero.hero-section > :is(.media, img) { position: absolute; inset: 0; height: 100%; width: 100%; }
-.hero.hero-section > .media img { height: 100%; width: 100%; object-fit: cover; }
-</style>

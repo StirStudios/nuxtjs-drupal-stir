@@ -179,8 +179,3 @@
     }
   }
 }
-
-@layer components {
-  .hero-page-label:not(.sr-only):has(+ *) { margin-block: 0 var(--stir-eyebrow-gap, 0.75rem); }
-  .paragraph-eyebrow { margin-block: 0 var(--stir-eyebrow-gap, 0.75rem); font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
-}
