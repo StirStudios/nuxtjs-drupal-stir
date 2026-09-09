@@ -21,3 +21,7 @@ Main and section heroes use this same variable for their content flow. A hero co
 Eyebrow spacing uses `--stir-eyebrow-gap` (12px default). Eyebrows remain separate from the main H1 and content-to-actions spacing.
 
 Media paragraphs accept `titleDisplay`: `hidden` (default), `below`, or `over`. This labels each image/video using its existing media title; the paragraph heading remains above the collection. Blank titles render nothing. Over-preview uses small, italic uppercase white text over a bottom gradient; inline video falls back to below so controls remain clear. Run Drupal database updates to install the optional control on existing sites.
+
+Main hero width is configured through `stirTheme.hero.text`: `base` defaults to a full-width container with children limited to `max-w-3xl` for readable lines. Projects may add `max-w-(--ui-container)` to `isFront` to match page edges, or omit it for full width. Override the child limit with `[&>*]:max-w-*` in the same setting. CMS alignment positions that content within the container; padding controls the edge inset.
+
+The Small media-height preset uses `clamp(12rem,22vw,18rem)`. Applying it to adjacent Media paragraphs gives their previews equal height despite different column widths, using the existing crop behaviour. Hero also supports Small as a minimum height. Upgrade Stir Tools and run database updates to expose the new option.
