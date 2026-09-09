@@ -52,10 +52,10 @@ describe('hero reveal accessibility', () => {
   it('collapses visual text spacing when the hero only contains a hidden h1', () => {
     expect(heroSource).toContain('const hasVisibleHeroContent = computed')
     expect(heroSource).toContain(
-      'hasVisibleHeroContent && !customContent && heroTheme.text.base',
+      'hasVisibleHeroContent && !isSection && heroTheme.text.base',
     )
     expect(heroSource).toContain(
-      'hasVisibleHeroContent && isFrontEffective && !customContent && heroTheme.text.isFront',
+      'hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront',
     )
   })
 
