@@ -196,14 +196,14 @@ provideRevealMotionScope(() => undefined)
               hasVisibleHeroContent && !isSection && heroTheme.text.base,
               isSection && 'relative z-10 w-full p-8 lg:p-24',
               hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
-              customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&_:is(h1,h2,h3,h4,h5,h6,.hero-copy)]:[text-align:inherit]', alignment.horizontal, alignment.text],
+              customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&_:is(h1,h2,h3,h4,h5,h6,.lead)]:[text-align:inherit]', alignment.horizontal, alignment.text],
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ] })()"
           >
             <slot name="title">
               <template v-if="isSection">
-                <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="hero-heading-group">
-                  <p v-if="eyebrow?.trim()" class="paragraph-eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
+                <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="heading-group">
+                  <p v-if="eyebrow?.trim()" class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
                 <EditableRichText
                   v-if="header?.trim() || (isAdministrator && id)"
                   :id="id"
@@ -212,10 +212,10 @@ provideRevealMotionScope(() => undefined)
                   :text="header"
                   :text-source="headerTag ? `${headerTag}|${header || ''}` : header"
                 >
-                  <component :is="sectionHeadingTag" v-if="header?.trim()" class="hero-heading">{{ header }}</component>
+                  <component :is="sectionHeadingTag" v-if="header?.trim()" class="heading">{{ header }}</component>
                 </EditableRichText>
                 </div>
-                <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="hero-copy" :edit-link="editLink" :text="text" />
+                <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="lead" :edit-link="editLink" :text="text" />
               </template>
               <HeroContent
                 v-else

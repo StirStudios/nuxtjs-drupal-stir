@@ -90,7 +90,7 @@ describe('Drupal Hero page ownership and headings', () => {
     expect(wrapper.findAll('h1')).toHaveLength(1)
     expect(wrapper.get('h1').text()).toBe('Authored heading')
     expect(wrapper.find('h2').exists()).toBe(false)
-    expect(wrapper.get('.paragraph-eyebrow').element.tagName).toBe('P')
+    expect(wrapper.get('.eyebrow').element.tagName).toBe('P')
     page.value.content = { props: { title: 'Drupal page title', hideTitle: true } }
     await nextTick()
     expect(wrapper.get('h1').classes()).toContain('sr-only')
@@ -195,7 +195,7 @@ describe('Drupal Hero page ownership and headings', () => {
 
     expect(wrapper.find('h1').exists()).toBe(false)
     expect(wrapper.find('h2').exists()).toBe(Boolean(header.trim()))
-    expect(wrapper.find('.hero-copy').exists()).toBe(Boolean(text))
+    expect(wrapper.find('.lead').exists()).toBe(Boolean(text))
     expect(wrapper.find('.hero-actions').exists()).toBe(button)
     expect(wrapper.text()).not.toContain('Page title')
     wrapper.unmount()
@@ -207,11 +207,11 @@ describe('Drupal Hero page ownership and headings', () => {
       global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page')) } },
     })
 
-    expect(wrapper.get('.paragraph-eyebrow').element.tagName).toBe('P')
-    expect(wrapper.get('.paragraph-eyebrow').text()).toBe('Featured opportunity')
+    expect(wrapper.get('.eyebrow').element.tagName).toBe('P')
+    expect(wrapper.get('.eyebrow').text()).toBe('Featured opportunity')
     expect(wrapper.findAll('h2')).toHaveLength(1)
     await wrapper.setProps({ eyebrow: ' ' })
-    expect(wrapper.find('.paragraph-eyebrow').exists()).toBe(false)
+    expect(wrapper.find('.eyebrow').exists()).toBe(false)
     wrapper.unmount()
   })
 

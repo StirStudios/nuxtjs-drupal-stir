@@ -47,11 +47,11 @@ const cardVariant = computed(() => {
 <template>
   <WrapDiv :align="align" :styles="wrapStyles">
     <UCard v-if="isCard" class="h-full" :variant="cardVariant">
-      <p v-if="eyebrow?.trim()" class="paragraph-eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
+      <p v-if="eyebrow?.trim()" class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
     </UCard>
     <div v-else-if="eyebrow?.trim()" class="paragraph-text">
-      <p class="paragraph-eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
+      <p class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
     </div>
     <EditableRichText v-else v-bind="richTextProps" />
