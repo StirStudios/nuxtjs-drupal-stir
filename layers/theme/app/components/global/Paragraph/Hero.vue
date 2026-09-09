@@ -41,7 +41,7 @@ defineSlots<{
 
 const isSection = computed(() => Boolean(props.placement && props.placement !== 'field_hero'))
 const sectionHeadingTag = computed(() => ['h2', 'h3', 'h4', 'h5', 'h6'].includes(props.headerTag || '') ? props.headerTag : 'h2')
-const minimumHeight = computed(() => ({ break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'break' | 'feature'])
+const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const alignment = computed(() => {
   const tokens = props.align?.split(/\s+/) || []

@@ -4,10 +4,11 @@ import { describe, expect, it } from 'vitest'
 import ParagraphMedia from '../../../layers/theme/app/components/global/Paragraph/Media.vue'
 
 const Item = defineComponent({
-  props: ['node', 'index'],
+  props: ['node', 'index', 'wrapperClass'],
   emits: ['open'],
   setup: (props, { emit }) => () => h('button', {
     'data-media-id': props.node.props.mid,
+    'data-height': props.wrapperClass,
     'onClick': () => emit('open', props.index),
   }, props.node.props.mid),
 })
@@ -20,6 +21,18 @@ const Modal = defineComponent({
 })
 
 describe('Drupal media ordering', () => {
+  it('passes the Small preset to image and video previews', async () => {
+    const wrapper = await mountSuspended(ParagraphMedia, {
+      props: { mediaHeight: 'small', overlay: true },
+      slots: { media: () => ['image', 'video'].map(type => h('div', { mid: type, type })) },
+      global: { stubs: { MediaItem: Item, ParagraphMediaModal: Modal } },
+    })
+
+    expect(wrapper.findAll('[data-media-id]').map(item => item.attributes('data-height')))
+      .toEqual(['h-[clamp(12rem,22vw,18rem)]', 'h-[clamp(12rem,22vw,18rem)]'])
+    wrapper.unmount()
+  })
+
   it('preserves supplied order with a legacy randomize flag and opens the matching modal item', async () => {
     const wrapper = await mountSuspended(ParagraphMedia, {
       props: { randomize: true, overlay: true },

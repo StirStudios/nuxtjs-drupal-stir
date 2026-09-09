@@ -19,7 +19,7 @@ const props = defineProps<{
   widthClass?: string
   cornerStyle?: 'default' | 'square' | string
   titleDisplay?: string
-  mediaHeight?: 'natural' | 'break' | 'feature' | string
+  mediaHeight?: 'natural' | 'small' | 'break' | 'feature' | string
   align?: string
   direction?: string
   overlay?: boolean | number | string

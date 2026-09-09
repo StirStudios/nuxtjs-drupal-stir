@@ -102,7 +102,7 @@ export default defineAppConfig({
       },
       text: {
         heading: 'mb-0',
-        base: 'relative z-10 max-w-6xl p-5 text-center',
+        base: 'relative z-10 w-full items-center p-5 text-center [&>*]:max-w-3xl',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
       hide: 'pt-15 lg:pt-30',
@@ -168,6 +168,7 @@ export default defineAppConfig({
       base: 'relative h-full w-full overflow-hidden object-cover',
       heights: {
         natural: '',
+        small: 'h-[clamp(12rem,22vw,18rem)]',
         break: 'h-[clamp(18rem,34vw,30rem)]',
         feature: 'h-[clamp(24rem,48vw,42rem)]',
       },
