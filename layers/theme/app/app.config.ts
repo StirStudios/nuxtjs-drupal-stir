@@ -102,7 +102,7 @@ export default defineAppConfig({
       },
       text: {
         heading: 'mb-0',
-        base: 'relative z-10 w-full items-center p-5 text-center [&>*]:max-w-3xl',
+        base: 'relative z-10 w-full items-center p-5 text-center [&>*]:max-w-4xl',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
       hide: 'pt-15 lg:pt-30',
@@ -114,18 +114,21 @@ export default defineAppConfig({
     },
 
     linkHub: {
-      root: 'relative flex min-h-dvh flex-col overflow-hidden bg-default text-default',
+      root: 'bg-default text-default relative flex min-h-dvh flex-col overflow-hidden',
       backgroundImage: 'absolute inset-0 z-0 size-full object-cover',
-      backgroundOverlay: 'after:pointer-events-none after:absolute after:inset-0 after:z-[1] after:bg-default/75 after:content-[\'\']',
+      backgroundOverlay:
+        "after:bg-default/75 after:pointer-events-none after:absolute after:inset-0 after:z-[1] after:content-['']",
       main: 'relative z-10 flex flex-1 items-center py-10 sm:py-14',
       container: 'flex w-full flex-col items-center',
-      logoLink: 'mx-4 mb-8 inline-flex rounded-sm outline-primary focus-visible:outline-2 focus-visible:outline-offset-4',
+      logoLink:
+        'outline-primary mx-4 mb-8 inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4',
       logo: '',
       heading: 'mx-4 mb-6 text-center text-xl leading-7',
       content: 'w-full',
       contact: 'mt-10 flex flex-col items-center gap-3 px-4 text-center',
       socials: 'flex flex-wrap items-center justify-center gap-3',
-      email: 'break-all underline underline-offset-4 transition-colors hover:text-primary',
+      email:
+        'hover:text-primary break-all underline underline-offset-4 transition-colors',
     },
 
     footer: {
