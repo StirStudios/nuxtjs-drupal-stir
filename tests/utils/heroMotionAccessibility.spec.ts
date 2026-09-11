@@ -38,7 +38,7 @@ describe('hero reveal accessibility', () => {
   })
 
   it('does not render an empty subtitle heading', () => {
-    expect(heroContentSource).toContain('<h1 v-if="heading"')
+    expect(heroContentSource).toMatch(/<h1\s+v-if="heading"/)
   })
 
   it('visually hides only the page title while preserving its h1 semantics', () => {

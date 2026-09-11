@@ -117,7 +117,7 @@ export default defineAppConfig({
       root: 'bg-default text-default relative flex min-h-dvh flex-col overflow-hidden',
       backgroundImage: 'absolute inset-0 z-0 size-full object-cover',
       backgroundOverlay:
-        "after:bg-default/75 after:pointer-events-none after:absolute after:inset-0 after:z-[1] after:content-['']",
+        'after:bg-default/75 after:pointer-events-none after:absolute after:inset-0 after:z-[1] after:content-[\'\']',
       main: 'relative z-10 flex flex-1 items-center py-10 sm:py-14',
       container: 'flex w-full flex-col items-center',
       logoLink:
