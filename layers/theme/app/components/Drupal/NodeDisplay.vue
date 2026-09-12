@@ -29,6 +29,8 @@ const { pageLayout } = usePageContext()
 const slots = useSlots()
 const teaser = useNodeTeaser(slots)
 const isArticle = computed(() => resolveBooleanProp(props.isArticle))
+// Opt-in: Drupal must explicitly enable sharing per node/content type.
+const showShareLinks = computed(() => resolveBooleanProp(props.shareLinks))
 const renderMode = computed<'teaser' | 'article' | 'default'>(() => {
   const type = props.type || ''
 
@@ -90,6 +92,17 @@ provideRevealMotionScope(
     :link="props.editLink"
   />
 
+  <UContainer
+    v-if="renderMode !== 'teaser' && showShareLinks"
+    :class="[theme.article.container, 'flex justify-end py-4']"
+  >
+    <LazyShareLinks
+      :description="props.summary"
+      :title="props.title"
+      variant="menu"
+    />
+  </UContainer>
+
   <slot
     v-if="renderMode === 'teaser' && slots.teaser"
     name="teaser"
@@ -114,14 +127,6 @@ provideRevealMotionScope(
   />
 
   <article v-else-if="renderMode === 'article'">
-    <UContainer :class="[theme.article.container, 'flex justify-end py-4']">
-      <LazyShareLinks
-        :description="props.summary"
-        :title="props.title"
-        variant="menu"
-      />
-    </UContainer>
-
     <template v-for="slotName in contentSlotNames" :key="slotName">
       <slot :name="slotName" />
     </template>
