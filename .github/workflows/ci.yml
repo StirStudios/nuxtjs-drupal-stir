@@ -39,8 +39,11 @@ jobs:
         continue-on-error: true
         id: stir_tools
         with:
-          repository: StirStudios/stir_tools
+          repository: StirStudios/stir-tools
           path: .stir-tools-contracts
+          # A private producer repo needs a token with read access here;
+          # without one the checkout fails and the drift gate is skipped.
+          token: ${{ secrets.STIR_TOOLS_CONTRACTS_TOKEN || github.token }}
 
       - name: Check Stir Tools contract drift
         if: steps.stir_tools.outcome == 'success'
