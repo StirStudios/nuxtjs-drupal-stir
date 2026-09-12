@@ -34,5 +34,5 @@ export function buildFormattedTextPath(
 ): string {
   const { entityType, entityId, fieldName } = target
 
-  return `/api/drupal-ce${ceApiEndpoint}/stir-layout-builder/entity/${entityType}/${entityId}/${fieldName}/text`
+  return `${ceApiEndpoint}/stir-layout-builder/entity/${entityType}/${entityId}/${fieldName}/text`
 }

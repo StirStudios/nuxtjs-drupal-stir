@@ -13,6 +13,7 @@ const routes = (process.env.A11Y_ROUTES ?? '/')
   .filter(Boolean)
 const rootSelector = process.env.A11Y_ROOT_SELECTOR ?? '#__nuxt'
 const documentMode = process.env.A11Y_DOCUMENT_MODE !== 'widget'
+const usesFixture = process.env.STIR_A11Y_USE_FIXTURE === 'true'
 const hoverSelector =
   process.env.A11Y_HOVER_SELECTOR ?? '[data-a11y-scan-hover]'
 const clickSelector =
@@ -264,6 +265,19 @@ test.describe('automated accessibility', () => {
       await page.locator('main').first().waitFor({ state: 'attached' })
       if (documentMode) {
         await page.locator('h1').first().waitFor({ state: 'attached' })
+      }
+      if (usesFixture) {
+        // The layer fixture exists to put the interactive custom elements in
+        // front of Axe. A clean pass over a page that silently rendered none
+        // of them would be meaningless, so assert they are present.
+        await expect(
+          page.getByRole('button', { name: 'First question' }),
+          'Expected the fixture accordion to render',
+        ).toBeVisible()
+        await expect(
+          page.getByRole('tablist'),
+          'Expected the fixture tabs to render',
+        ).toBeVisible()
       }
       // Measure stable rendered colors rather than a midpoint from a theme,
       // hover, carousel, or hydration transition.

@@ -1,9 +1,9 @@
 import { createError, defineEventHandler } from 'h3'
-import { layerAuthFetchDrupalCsrfToken } from '../../utils/drupalApi'
+import { fetchStirDrupalCsrfToken } from '../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   try {
-    const csrfToken = await layerAuthFetchDrupalCsrfToken(event)
+    const csrfToken = await fetchStirDrupalCsrfToken(event)
 
     return { csrfToken }
   } catch {

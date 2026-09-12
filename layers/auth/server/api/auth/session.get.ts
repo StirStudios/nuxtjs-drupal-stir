@@ -1,12 +1,10 @@
 import { defineEventHandler } from 'h3'
-import {
-  layerAuthDrupalApiRequest,
-  layerAuthThrowDrupalApiError,
-} from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../utils/drupalApi'
 import {
   layerAuthGetProtectedAccessSecret,
   layerAuthIsProtectedAccessAuthenticated,
 } from '../../utils/protectedAccess'
+import { throwStirDrupalApiError } from '../../../../foundation/server/utils/stirDrupalApi'
 
 type AuthSessionResponse = {
   authenticated?: boolean
@@ -63,6 +61,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    layerAuthThrowDrupalApiError(error, 'Session fetch failed')
+    throwStirDrupalApiError(error, 'Session fetch failed')
   }
 })

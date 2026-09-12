@@ -1,5 +1,6 @@
 import { defineEventHandler } from 'h3'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../utils/drupalApi'
+import { throwStirDrupalApiError } from '../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   assertStirSameOrigin(event)
@@ -11,6 +12,6 @@ export default defineEventHandler(async (event) => {
       forwardSetCookies: true,
     })
   } catch (error: unknown) {
-    layerAuthThrowDrupalApiError(error, 'Logout failed')
+    throwStirDrupalApiError(error, 'Logout failed')
   }
 })

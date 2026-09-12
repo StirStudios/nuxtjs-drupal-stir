@@ -5,12 +5,12 @@ import {
   setResponseHeader,
 } from 'h3'
 import {
-  assertDrupalResponseNotRedirect,
-  captureDrupalApiError,
-  getForwardedCookie,
-  markPrivateResponse,
-} from '../../../../core/server/utils/drupalApi'
-import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
+  assertStirDrupalResponseNotRedirect,
+  buildStirDrupalHeaders,
+  captureStirDrupalApiError,
+  getStirForwardedCookie,
+  markStirPrivateResponse,
+} from '../../../../foundation/server/utils/stirDrupalApi'
 import { resolveDrupalCeApiConfig } from '../../../../core/server/utils/drupalCeApiConfig'
 import {
   buildParagraphViewPath,
@@ -23,27 +23,30 @@ const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as co
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphViewId(event.context.params?.paragraphId)
   const query = normalizeParagraphViewQuery(getQuery(event))
-  const config = useRuntimeConfig()
   const {
     apiKey,
     ceApiEndpoint,
+    drupalBaseUrl,
     requestTimeoutMs,
-  } = resolveDrupalCeApiConfig(config)
+  } = resolveDrupalCeApiConfig(useRuntimeConfig())
   const requestPath = buildParagraphViewPath(ceApiEndpoint, paragraphId)
-  const cookie = getForwardedCookie(event)
+  const cookie = getStirForwardedCookie(event)
 
-  if (cookie) markPrivateResponse(event)
+  if (cookie) markStirPrivateResponse(event)
 
   try {
-    const response = await $fetch.raw<Record<string, unknown>>(requestPath, {
-      method: 'GET',
-      query,
-      headers: buildDrupalHeaders({ cookie, apiKey }),
-      redirect: 'manual',
-      timeout: requestTimeoutMs,
-    })
+    const response = await $fetch.raw<Record<string, unknown>>(
+      `${drupalBaseUrl}${requestPath}`,
+      {
+        method: 'GET',
+        query,
+        headers: buildStirDrupalHeaders({ cookie, apiKey }),
+        redirect: 'manual',
+        timeout: requestTimeoutMs,
+      },
+    )
 
-    assertDrupalResponseNotRedirect(response)
+    assertStirDrupalResponseNotRedirect(response)
 
     if (!cookie) {
       for (const header of FORWARDED_CACHE_HEADERS) {
@@ -55,7 +58,7 @@ export default defineEventHandler(async (event) => {
 
     return response._data
   } catch (error) {
-    captureDrupalApiError(event, error)
+    captureStirDrupalApiError(event, error)
 
     const upstreamStatus = Number(
       (error as { statusCode?: unknown; status?: unknown })?.statusCode

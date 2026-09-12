@@ -5,22 +5,20 @@ import {
   setResponseHeader,
 } from 'h3'
 import {
-  appendDrupalSetCookies,
-  assertDrupalResponseNotRedirect,
-  captureDrupalApiError,
-  getDrupalApiConfig,
-  getForwardedCookie,
-  markPrivateResponse,
-} from '../../../../core/server/utils/drupalApi'
-import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
-import {
   isPrivateStirListingResponse,
   parseStirListingId,
   parseStirListingResponse,
 } from '../../utils/listingApi'
 import {
+  appendStirDrupalSetCookies,
+  assertStirDrupalResponseNotRedirect,
+  buildStirDrupalHeaders,
+  captureStirDrupalApiError,
   filterStirDrupalSetCookies,
+  getStirDrupalApiConfig,
   getStirDrupalSetCookies,
+  getStirForwardedCookie,
+  markStirPrivateResponse,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 
 const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
@@ -37,10 +35,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { apiKey, baseUrl, requestTimeoutMs } = getDrupalApiConfig()
-  const cookie = getForwardedCookie(event)
+  const { apiKey, baseUrl, requestTimeoutMs } = getStirDrupalApiConfig()
+  const cookie = getStirForwardedCookie(event)
 
-  if (cookie) markPrivateResponse(event)
+  if (cookie) markStirPrivateResponse(event)
 
   try {
     const response = await $fetch.raw<unknown>(
@@ -48,26 +46,26 @@ export default defineEventHandler(async (event) => {
       {
         method: 'GET',
         query: getQuery(event),
-        headers: buildDrupalHeaders({ apiKey, cookie }),
+        headers: buildStirDrupalHeaders({ apiKey, cookie }),
         redirect: 'manual',
         timeout: requestTimeoutMs,
       },
     )
 
-    assertDrupalResponseNotRedirect(response)
+    assertStirDrupalResponseNotRedirect(response)
     const payload = parseStirListingResponse(response._data)
     const setsSession = filterStirDrupalSetCookies(
       getStirDrupalSetCookies(response.headers),
     ).length > 0
 
-    appendDrupalSetCookies(event, response)
+    appendStirDrupalSetCookies(event, response)
 
     if (isPrivateStirListingResponse({
       hasRequestCookie: Boolean(cookie),
       setsSessionCookie: setsSession,
       personalized: payload.meta.personalized,
     })) {
-      markPrivateResponse(event)
+      markStirPrivateResponse(event)
     } else {
       for (const header of FORWARDED_CACHE_HEADERS) {
         const value = response.headers.get(header)
@@ -81,8 +79,8 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     // Upstream and contract failures are operational state, not cacheable
     // listing representations. Never let a CDN retain them as public output.
-    markPrivateResponse(event)
-    captureDrupalApiError(event, error)
+    markStirPrivateResponse(event)
+    captureStirDrupalApiError(event, error)
     const upstreamStatus = Number(
       (error as { statusCode?: unknown; status?: unknown })?.statusCode
       ?? (error as { status?: unknown }).status,

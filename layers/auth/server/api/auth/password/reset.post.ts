@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../../utils/drupalApi'
+import { throwStirDrupalApiError } from '../../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -31,6 +32,6 @@ export default defineEventHandler(async (event) => {
       },
     })
   } catch (error: unknown) {
-    layerAuthThrowDrupalApiError(error, 'Password reset failed')
+    throwStirDrupalApiError(error, 'Password reset failed')
   }
 })

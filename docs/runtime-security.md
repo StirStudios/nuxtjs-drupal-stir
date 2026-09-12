@@ -50,6 +50,17 @@ Cookie-authenticated account mutations and paragraph updates enforce the
 Public login, registration, password-request, and Webform routes keep their
 existing Turnstile/token contracts.
 
+Non-`GET` requests through `/api/drupal-ce` enforce the same origin policy.
+The proxy fronts the same Drupal paths as the dedicated editorial routes, so
+without this it could be used to reach them while skipping their guard. Reads
+are unaffected. Drupal independently enforces `_entity_access` and
+`_csrf_request_header_token` on those routes.
+
+Editorial paragraph and formatted-text routes call Drupal directly through the
+shared request primitive rather than looping back through the Nitro CE proxy.
+Cookie forwarding, CSRF, upstream redirect rejection and error normalization
+are unchanged; the saved hop is one internal request per edit.
+
 Drupal `stir_account` Flood limits use Symfony's resolved client IP. To avoid
 collapsing all visitors onto the Nitro proxy address, auth/account calls can
 forward one normalized IP with:
@@ -61,6 +72,14 @@ forward one normalized IP with:
 Symfony/Drupal must trust only the Nuxt proxy address before it consumes the
 forwarded header. Leave forwarding disabled until both proxy boundaries are
 configured. The raw inbound `X-Forwarded-For` header is never copied directly.
+
+While forwarding is disabled, Drupal's `stir_account` skips its per-IP auth
+flood buckets rather than pooling every visitor onto the proxy address, where
+one attacker exhausting the login IP limit would lock out the whole site.
+Per-identifier limits and Turnstile still apply. After enabling forwarding and
+proxy trust, turn on "Drupal receives the real visitor IP"
+(`flood_client_ip_trusted`) on the Stir Account settings form to restore per-IP
+limits. Drupal reports a status warning while it is off.
 
 ## Protected-Page Access
 

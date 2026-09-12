@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { buildDrupalHeaders } from '../../layers/core/server/utils/drupalHeaders'
+import { buildStirDrupalHeaders } from '../../layers/foundation/server/utils/stirDrupalApi'
 
-describe('buildDrupalHeaders', () => {
+describe('buildStirDrupalHeaders', () => {
   it('builds only the requested headers', () => {
-    const headers = buildDrupalHeaders({
+    const headers = buildStirDrupalHeaders({
       apiKey: 'abc123',
       cookie: 'session=value',
       csrfToken: 'csrf-token',
@@ -17,7 +17,7 @@ describe('buildDrupalHeaders', () => {
   })
 
   it('omits blank values', () => {
-    const headers = buildDrupalHeaders({
+    const headers = buildStirDrupalHeaders({
       apiKey: ' ',
       cookie: '',
       csrfToken: '\n',

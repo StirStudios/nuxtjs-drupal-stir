@@ -83,6 +83,7 @@
     "audit:vnext-inventory": "node scripts/audit/vnext-inventory.mjs",
     "audit:vnext-inventory:check": "node scripts/audit/vnext-inventory.mjs --check",
     "contracts:sync": "node scripts/contracts/sync-stir-tools.mjs",
+    "contracts:check": "node scripts/contracts/sync-stir-tools.mjs --check",
     "docs:sync-tech-stack": "node scripts/docs/sync-tech-stack.mjs",
     "test": "vitest run",
     "test:coverage": "node scripts/audit/coverage-ratchet.mjs",

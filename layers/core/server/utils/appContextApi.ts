@@ -1,4 +1,8 @@
-import { drupalApiRequest } from './drupalApi'
+import type { H3Event } from 'h3'
+import {
+  captureStirDrupalApiError,
+  stirDrupalApiRequest,
+} from '../../../foundation/server/utils/stirDrupalApi'
 import type {
   AppContextBlock,
   AppContextFooterMenuItem,
@@ -106,7 +110,11 @@ export function buildAppContextEndpoint(path = '') {
     : '/api/app-context'
 }
 
-export function logAppContextFetchError(path: string, error: unknown) {
+export function logAppContextFetchError(
+  event: H3Event,
+  path: string,
+  error: unknown,
+) {
   const errorRecord = error && typeof error === 'object'
     ? error as Record<string, unknown>
     : {}
@@ -124,18 +132,21 @@ export function logAppContextFetchError(path: string, error: unknown) {
     : typeof responseRecord.statusText === 'string'
       ? responseRecord.statusText
       : undefined
+  const upstream = [statusCode, statusMessage].filter(Boolean).join(' ')
 
-  console.error('Failed to fetch Drupal app context', {
-    path,
-    message,
-    statusCode,
-    statusMessage,
-  })
+  captureStirDrupalApiError(
+    event,
+    new Error(
+      `Failed to fetch Drupal app context at ${path || '/'}: ${message}`
+      + (upstream ? ` (upstream ${upstream})` : ''),
+      { cause: error },
+    ),
+  )
 }
 
-export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>[0], path = '') {
+export async function fetchAppContext(event: H3Event, path = '') {
   try {
-    const response = await drupalApiRequest<unknown>(event, buildAppContextEndpoint(path), {
+    const response = await stirDrupalApiRequest<unknown>(event, buildAppContextEndpoint(path), {
       method: 'GET',
       forwardCookies: true,
     })
@@ -143,7 +154,7 @@ export async function fetchAppContext(event: Parameters<typeof drupalApiRequest>
     return parseAppContextResponse(response)
   }
   catch (error) {
-    logAppContextFetchError(path, error)
+    logAppContextFetchError(event, path, error)
 
     return emptyAppContext()
   }

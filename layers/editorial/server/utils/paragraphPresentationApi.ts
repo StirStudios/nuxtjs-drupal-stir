@@ -4,7 +4,7 @@ export function buildParagraphPresentationPath(
   ceApiEndpoint: string,
   paragraphId: number,
 ): string {
-  return `/api/drupal-ce${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/presentation`
+  return `${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/presentation`
 }
 
 export function createUpstreamParagraphPresentationError(error: unknown) {

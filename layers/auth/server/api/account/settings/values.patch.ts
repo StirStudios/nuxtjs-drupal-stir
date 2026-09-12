@@ -3,7 +3,8 @@ import type {
   AccountSettingsUpdateResponse,
   AccountSettingsValuesPayload,
 } from '../../../../shared/types/accountSettings'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../../utils/drupalApi'
+import { throwStirDrupalApiError } from '../../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   assertStirSameOrigin(event)
@@ -27,6 +28,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    layerAuthThrowDrupalApiError(error, 'Failed to update account settings')
+    throwStirDrupalApiError(error, 'Failed to update account settings')
   }
 })

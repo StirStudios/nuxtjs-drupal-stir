@@ -34,6 +34,18 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Check out Stir Tools contracts
+        uses: actions/checkout@v7
+        continue-on-error: true
+        id: stir_tools
+        with:
+          repository: StirStudios/stir_tools
+          path: .stir-tools-contracts
+
+      - name: Check Stir Tools contract drift
+        if: steps.stir_tools.outcome == 'success'
+        run: pnpm contracts:check .stir-tools-contracts/contracts/v1
+
       - name: Inventory source imports
         run: pnpm perf:imports
 
