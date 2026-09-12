@@ -80,8 +80,8 @@
     "audit:preset-editorial-output": "node scripts/audit/preset-editorial-output.mjs",
     "audit:preset:auth-output": "node scripts/audit/preset-auth-output.mjs",
     "audit:preset-integrations-output": "node scripts/audit/preset-integrations-output.mjs",
-    "audit:vnext-inventory": "node scripts/audit/vnext-inventory.mjs",
-    "audit:vnext-inventory:check": "node scripts/audit/vnext-inventory.mjs --check",
+    "audit:inventory": "node scripts/audit/inventory.mjs",
+    "audit:inventory:check": "node scripts/audit/inventory.mjs --check",
     "contracts:sync": "node scripts/contracts/sync-stir-tools.mjs",
     "contracts:check": "node scripts/contracts/sync-stir-tools.mjs --check",
     "docs:sync-tech-stack": "node scripts/docs/sync-tech-stack.mjs",
@@ -106,7 +106,7 @@
     "test:nuxt": "pnpm test:nuxt:runtime",
     "test:all": "pnpm test:coverage && pnpm test:nuxt && pnpm test:e2e && pnpm test:a11y",
     "test:watch": "vitest",
-    "verify:core": "pnpm dev:prepare && pnpm audit:vnext-inventory:check && pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
+    "verify:core": "pnpm dev:prepare && pnpm audit:inventory:check && pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
     "verify:ci": "pnpm verify:core && pnpm test:consumer",
     "deps:update": "pnpm update",
     "deps:verify": "pnpm verify:ci",
@@ -201,7 +201,7 @@
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
     "hooks": {
       "before:init": "pnpm verify:ci",
-      "after:bump": "pnpm audit:vnext-inventory"
+      "after:bump": "pnpm audit:inventory"
     },
     "github": {
       "release": true,

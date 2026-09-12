@@ -6,7 +6,6 @@ on:
       - dev
       - main
       - master
-      - vnext
       - release/**
   pull_request:
 

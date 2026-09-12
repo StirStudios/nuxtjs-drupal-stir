@@ -99,6 +99,8 @@
   "scripts": [
     "audit:compliance",
     "audit:consumers",
+    "audit:inventory",
+    "audit:inventory:check",
     "audit:preset-components",
     "audit:preset-editorial-output",
     "audit:preset-integrations-output",
@@ -106,8 +108,6 @@
     "audit:preset:auth-output",
     "audit:seo",
     "audit:site",
-    "audit:vnext-inventory",
-    "audit:vnext-inventory:check",
     "build",
     "contracts:check",
     "contracts:sync",
@@ -299,8 +299,15 @@
       "layers/auth/app/composables/auth/useProtectedActions.ts",
       "layers/auth/app/composables/auth/useProtectedLogin.ts",
       "layers/auth/app/composables/auth/useProtectedSession.ts",
+      "layers/auth/app/composables/useAuthActions.ts",
       "layers/auth/app/composables/useAuthConfig.ts",
+      "layers/auth/app/composables/useAuthLogin.ts",
+      "layers/auth/app/composables/useAuthRegister.ts",
       "layers/auth/app/composables/useAuthSession.ts",
+      "layers/auth/app/composables/usePasswordRequest.ts",
+      "layers/auth/app/composables/usePasswordReset.ts",
+      "layers/auth/app/composables/useProtectedActions.ts",
+      "layers/auth/app/composables/useProtectedLogin.ts",
       "layers/editorial/app/composables/useAdminUiStyles.ts",
       "layers/editorial/app/composables/useParagraphTextEditor.ts",
       "layers/foundation/app/composables/useOverlayPortal.ts",
@@ -353,6 +360,7 @@
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",
+      "layers/auth/app/utils/authRedirect.ts",
       "layers/auth/app/utils/authTheme.ts",
       "layers/auth/app/utils/authValidation.ts",
       "layers/auth/app/utils/fetchError.ts",
@@ -475,7 +483,16 @@
         "./*"
       ],
       "composables": [
-        "useStirListing"
+        "useStirListing",
+        "useAuthActions",
+        "useAuthConfig",
+        "useAuthLogin",
+        "useAuthRegister",
+        "useAuthSession",
+        "usePasswordRequest",
+        "usePasswordReset",
+        "useProtectedActions",
+        "useProtectedLogin"
       ]
     },
     "compatibility": {
@@ -630,8 +647,15 @@
         "layers/auth/app/composables/auth/useProtectedActions.ts",
         "layers/auth/app/composables/auth/useProtectedLogin.ts",
         "layers/auth/app/composables/auth/useProtectedSession.ts",
+        "layers/auth/app/composables/useAuthActions.ts",
         "layers/auth/app/composables/useAuthConfig.ts",
+        "layers/auth/app/composables/useAuthLogin.ts",
+        "layers/auth/app/composables/useAuthRegister.ts",
         "layers/auth/app/composables/useAuthSession.ts",
+        "layers/auth/app/composables/usePasswordRequest.ts",
+        "layers/auth/app/composables/usePasswordReset.ts",
+        "layers/auth/app/composables/useProtectedActions.ts",
+        "layers/auth/app/composables/useProtectedLogin.ts",
         "layers/editorial/app/composables/useAdminUiStyles.ts",
         "layers/editorial/app/composables/useParagraphTextEditor.ts",
         "layers/foundation/app/composables/useOverlayPortal.ts",
@@ -684,6 +708,7 @@
       ],
       "autoImportedUtils": [
         "layers/auth/app/utils/authLayout.ts",
+        "layers/auth/app/utils/authRedirect.ts",
         "layers/auth/app/utils/authTheme.ts",
         "layers/auth/app/utils/authValidation.ts",
         "layers/auth/app/utils/fetchError.ts",
@@ -754,22 +779,22 @@
   },
   "counts": {
     "components": 128,
-    "composables": 65,
-    "utils": 60,
+    "composables": 72,
+    "utils": 61,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 173,
+    "tests": 175,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 65,
+      "nuxt": 66,
       "scripts": 2,
       "server": 28,
       "unit": 10,
-      "utils": 54
+      "utils": 55
     }
   },
   "tests": [
@@ -847,6 +872,7 @@
     "tests/nuxt/runtime/drupalPageCommit.nuxt.spec.ts",
     "tests/nuxt/runtime/useAccountSettings.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthConfig.nuxt.spec.ts",
+    "tests/nuxt/runtime/useAuthLogin.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthSession.nuxt.spec.ts",
     "tests/nuxt/runtime/useDrupalViewControls.nuxt.spec.ts",
     "tests/nuxt/runtime/useNavLock.nuxt.spec.ts",
@@ -892,6 +918,7 @@
     "tests/unit/paragraphLayoutArrangement.spec.ts",
     "tests/unit/paragraphLayoutTransition.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
+    "tests/utils/authRedirect.spec.ts",
     "tests/utils/authTheme.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
@@ -1015,7 +1042,16 @@
       "/api/account/**"
     ],
     "publicComposables": [
-      "useStirListing"
+      "useStirListing",
+      "useAuthActions",
+      "useAuthConfig",
+      "useAuthLogin",
+      "useAuthRegister",
+      "useAuthSession",
+      "usePasswordRequest",
+      "usePasswordReset",
+      "useProtectedActions",
+      "useProtectedLogin"
     ],
     "runtimeConfigEnvironment": [
       "DRUPAL_URL",

@@ -99,10 +99,15 @@ only the Vue route would leave the page payload fetchable directly from
 proxy: a request for a configured protected path must carry a valid
 protected-access cookie, or a Drupal session when
 `protectedRoutes.allowAuthenticatedUserBypass` is enabled, and is answered with
-`403` otherwise. `protectedRoutes.requireLoginPaths` stays the single authoring
-surface in `app.config.ts`; it is mirrored into runtime config at build time
-because Nitro cannot read app config at runtime. Downstream applications need
-no new configuration.
+`403` otherwise. The bypass calls Drupal's `/api/auth/session` to confirm the
+session is actually authenticated rather than trusting the shape of the
+session cookie's name, since this gate exists specifically for content Drupal
+still serves anonymously. `protectedRoutes.requireLoginPaths` stays the single
+authoring surface in `app.config.ts`; it is mirrored into runtime config at
+build time because Nitro cannot read app config at runtime, and the mirror
+reads every extended layer's `app.config.ts` (not just the consuming
+project's), so a shared layer can also configure protected paths. Downstream
+applications need no new configuration.
 
 Protected-page access remains a Nuxt-local gate, not Drupal access control. It
 hides content that Drupal itself still serves anonymously, so anything that

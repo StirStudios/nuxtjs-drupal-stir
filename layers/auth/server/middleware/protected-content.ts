@@ -13,6 +13,7 @@ import {
   layerAuthGetProtectedAccessSecret,
   layerAuthIsProtectedAccessAuthenticated,
 } from '../utils/protectedAccess'
+import { layerAuthDrupalApiRequest } from '../utils/drupalApi'
 import {
   isStirProtectedPath,
   normalizeStirProtectedPaths,
@@ -33,9 +34,27 @@ const protectedRoutePathFor = (requestPath: string): string | undefined => {
   if (requestPath === CE_PROXY_PREFIX) return '/'
   if (!requestPath.startsWith(`${CE_PROXY_PREFIX}/`)) return undefined
 
-  const routePath = requestPath.slice(CE_PROXY_PREFIX.length)
+  // Mirrors normalizeProxyPath()'s leading-slash collapse in drupalCeProxy.ts:
+  // the two must agree on the canonical path, or a request such as
+  // /api/drupal-ce//private/report evades this prefix match while still
+  // reaching the protected Drupal path once the proxy normalizes it.
+  return requestPath.slice(CE_PROXY_PREFIX.length).replace(/^\/+/, '/')
+}
 
-  return routePath.startsWith('/') ? routePath : `/${routePath}`
+type DrupalSessionResponse = { authenticated?: boolean }
+
+const isAuthenticatedDrupalSession = async (event: unknown): Promise<boolean> => {
+  try {
+    const response = await layerAuthDrupalApiRequest<DrupalSessionResponse>(
+      event,
+      '/api/auth/session',
+      { method: 'GET', forwardCookies: true },
+    )
+
+    return Boolean(response?.authenticated)
+  } catch {
+    return false
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -64,14 +83,17 @@ export default defineEventHandler(async (event) => {
 
   if (protectedRoutes.allowAuthenticatedUserBypass !== false) {
     const configuredNames = getStirDrupalSessionCookieNames()
-    const hasDrupalSession = Object.keys(parseCookies(event)).some(cookieName =>
+    const hasDrupalSessionCookie = Object.keys(parseCookies(event)).some(cookieName =>
       isStirDrupalSessionCookieName(cookieName, configuredNames),
     )
 
-    // A Drupal session only bypasses the gate as far as Drupal allows; the
-    // proxied request still carries that session and Drupal enforces its own
-    // access on the content.
-    if (hasDrupalSession) return
+    // The cookie name alone proves nothing: this gate exists specifically for
+    // content Drupal still serves anonymously, so a forged cookie of the
+    // right shape would otherwise bypass it for free. Confirm Drupal actually
+    // authenticates the session before granting the bypass.
+    if (hasDrupalSessionCookie && await isAuthenticatedDrupalSession(event)) {
+      return
+    }
   }
 
   throw createError({
