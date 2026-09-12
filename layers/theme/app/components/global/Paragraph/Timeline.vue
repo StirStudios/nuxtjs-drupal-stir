@@ -71,6 +71,12 @@ const timelineColor = computed(() => resolveUiColor(props.color))
           :color="timelineColor"
           :default-value="timelineItems.length - 1"
           :items="timelineItems"
+          :ui="{
+            // Nuxt UI's default text-dimmed date is 3.67:1 at 12px on the dark
+            // surface. text-muted clears 4.5:1 at the same size, as the sibling
+            // description already does.
+            date: 'text-muted',
+          }"
         >
           <template #rich-description="{ item }: { item: UITimelineItem }">
             <div class="prose max-w-none" v-html="item.description" />

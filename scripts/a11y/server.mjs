@@ -108,6 +108,98 @@ const pageFixture = {
           },
         },
         {
+          element: 'paragraph-carousel',
+          props: {
+            uuid: '00000000-0000-4000-8000-0000000000d1',
+            header: 'Carousel section',
+            headerTag: 'h2',
+            carouselArrows: true,
+            carouselIndicators: true,
+          },
+          slots: {
+            items: [
+              {
+                element: 'paragraph-carousel-item',
+                props: {
+                  uuid: '00000000-0000-4000-8000-0000000000d2',
+                  label: 'First slide',
+                },
+                slots: {},
+              },
+              {
+                element: 'paragraph-carousel-item',
+                props: {
+                  uuid: '00000000-0000-4000-8000-0000000000d3',
+                  label: 'Second slide',
+                },
+                slots: {},
+              },
+            ],
+          },
+        },
+        {
+          element: 'paragraph-timeline',
+          props: { uuid: '00000000-0000-4000-8000-0000000000e1' },
+          slots: {
+            timeline: [
+              {
+                element: 'paragraph-timeline-item',
+                props: {
+                  uuid: '00000000-0000-4000-8000-0000000000e2',
+                  date: '2026',
+                  header: 'Timeline milestone',
+                  headerTag: 'h3',
+                  text: '<p>Milestone detail.</p>',
+                },
+                slots: {},
+              },
+            ],
+          },
+        },
+        {
+          // Form controls carry label, required-state and error-text risk.
+          element: 'paragraph-webform',
+          props: {
+            uuid: '00000000-0000-4000-8000-0000000000f1',
+            webform: {
+              schemaVersion: 1,
+              webformId: 'contact',
+              webformTitle: 'Contact',
+              fields: {
+                name: {
+                  '#type': 'textfield',
+                  '#title': 'Your name',
+                  '#name': 'name',
+                  '#required': true,
+                },
+                email: {
+                  '#type': 'email',
+                  '#title': 'Email',
+                  '#name': 'email',
+                  '#required': true,
+                },
+                message: {
+                  '#type': 'textarea',
+                  '#title': 'Message',
+                  '#name': 'message',
+                },
+              },
+              actions: [
+                {
+                  '#type': 'webform_actions',
+                  '#title': 'Submit',
+                  '#submitLabel': 'Send',
+                },
+              ],
+              webformConfirmation: 'Thanks',
+              webformConfirmationType: 'url_message',
+              webformRedirect: '<front>',
+              webformSubmissions: null,
+            },
+          },
+          slots: {},
+        },
+        {
           element: 'paragraph-layout',
           props: {
             uuid: '00000000-0000-4000-8000-0000000000c1',

@@ -274,9 +274,24 @@ test.describe('automated accessibility', () => {
           page.getByRole('button', { name: 'First question' }),
           'Expected the fixture accordion to render',
         ).toBeVisible()
+        // The carousel indicators also expose a tablist, so scope to the
+        // first one rather than asserting a single match.
         await expect(
-          page.getByRole('tablist'),
+          page.getByRole('tab', { name: 'First tab' }),
           'Expected the fixture tabs to render',
+        ).toBeVisible()
+        await expect(
+          page.getByRole('heading', { name: 'Carousel section' }),
+          'Expected the fixture carousel to render',
+        ).toBeVisible()
+        // UTimeline renders its title as plain text, not a heading.
+        await expect(
+          page.getByText('Timeline milestone'),
+          'Expected the fixture timeline to render',
+        ).toBeVisible()
+        await expect(
+          page.getByLabel('Your name'),
+          'Expected the fixture webform fields to render',
         ).toBeVisible()
       }
       // Measure stable rendered colors rather than a midpoint from a theme,

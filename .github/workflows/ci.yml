@@ -34,20 +34,25 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      # stir-tools is private and this repository is public, so the default
+      # GITHUB_TOKEN cannot read the producer. Without STIR_TOOLS_CONTRACTS_TOKEN
+      # the drift gate cannot run; say so loudly rather than passing silently.
       - name: Check out Stir Tools contracts
+        if: ${{ secrets.STIR_TOOLS_CONTRACTS_TOKEN != '' }}
         uses: actions/checkout@v7
-        continue-on-error: true
         id: stir_tools
         with:
           repository: StirStudios/stir-tools
           path: .stir-tools-contracts
-          # A private producer repo needs a token with read access here;
-          # without one the checkout fails and the drift gate is skipped.
-          token: ${{ secrets.STIR_TOOLS_CONTRACTS_TOKEN || github.token }}
+          token: ${{ secrets.STIR_TOOLS_CONTRACTS_TOKEN }}
 
       - name: Check Stir Tools contract drift
         if: steps.stir_tools.outcome == 'success'
         run: pnpm contracts:check .stir-tools-contracts/contracts/v1
+
+      - name: Report skipped contract drift gate
+        if: steps.stir_tools.outcome != 'success'
+        run: echo "::warning title=Contract drift gate skipped::STIR_TOOLS_CONTRACTS_TOKEN is not set, so the contract snapshot was not compared against the producer. Add a read-scoped token for StirStudios/stir-tools, or run 'pnpm contracts:check <stir-tools>/contracts/v1' locally."
 
       - name: Inventory source imports
         run: pnpm perf:imports
