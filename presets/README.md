@@ -1,4 +1,4 @@
-# Stir vNext presets
+# Stir presets
 
 The presets make capability selection explicit without breaking existing
 consumers.
@@ -8,5 +8,4 @@ consumers.
 - `full` preserves the existing root-layer behaviour and remains the
   compatibility path while optional capabilities are separated.
 
-The repository root continues to behave as the full preset during the vNext
-migration.
+The repository root continues to behave as the full preset.

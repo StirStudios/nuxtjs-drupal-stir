@@ -99,6 +99,8 @@
   "scripts": [
     "audit:compliance",
     "audit:consumers",
+    "audit:inventory",
+    "audit:inventory:check",
     "audit:preset-components",
     "audit:preset-editorial-output",
     "audit:preset-integrations-output",
@@ -106,8 +108,6 @@
     "audit:preset:auth-output",
     "audit:seo",
     "audit:site",
-    "audit:vnext-inventory",
-    "audit:vnext-inventory:check",
     "build",
     "contracts:check",
     "contracts:sync",

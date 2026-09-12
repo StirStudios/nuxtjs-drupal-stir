@@ -3,7 +3,7 @@ import { dirname, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const output = resolve(root, 'docs/vnext/current-inventory.json')
+const output = resolve(root, 'docs/current-inventory.json')
 
 function normalize(path) {
   return path.replaceAll('\\', '/')
@@ -157,7 +157,7 @@ if (process.argv.includes('--check')) {
   const current = existsSync(output) ? readFileSync(output, 'utf8') : ''
 
   if (current !== serialized) {
-    console.error(`${normalize(relative(root, output))} is stale. Run pnpm audit:vnext-inventory.`)
+    console.error(`${normalize(relative(root, output))} is stale. Run pnpm audit:inventory.`)
     process.exit(1)
   }
 
