@@ -287,7 +287,6 @@
     "composables": [
       "layers/auth/app/composables/account/useAccountNav.ts",
       "layers/auth/app/composables/account/useAccountSettings.ts",
-      "layers/auth/app/composables/auth/useAuthAccount.ts",
       "layers/auth/app/composables/auth/useAuthActions.ts",
       "layers/auth/app/composables/auth/useAuthApi.ts",
       "layers/auth/app/composables/auth/useAuthConfig.ts",
@@ -635,7 +634,6 @@
       "autoImportedComposables": [
         "layers/auth/app/composables/account/useAccountNav.ts",
         "layers/auth/app/composables/account/useAccountSettings.ts",
-        "layers/auth/app/composables/auth/useAuthAccount.ts",
         "layers/auth/app/composables/auth/useAuthActions.ts",
         "layers/auth/app/composables/auth/useAuthApi.ts",
         "layers/auth/app/composables/auth/useAuthConfig.ts",
@@ -779,7 +777,7 @@
   },
   "counts": {
     "components": 128,
-    "composables": 72,
+    "composables": 71,
     "utils": 61,
     "plugins": 7,
     "middleware": 4,

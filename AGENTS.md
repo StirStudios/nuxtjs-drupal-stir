@@ -198,6 +198,17 @@ PR readiness:
 
 - Do **not** run `pnpm release` unless explicitly requested.
 - Do not introduce breaking changes to shared layer contracts without approval.
+- Before removing or renaming an exported symbol, run `pnpm audit:consumers`
+  with the relevant `STIR_CONSUMER_*` paths set. It packs the layer and runs
+  each consumer's typecheck and build against it. A grep of this repository
+  proves only that the layer does not use a symbol; it says nothing about
+  downstream projects, which is how a rename-only cleanup has already broken a
+  consumer's typecheck.
+- Record consumer-affecting changes in `CHANGELOG.md`: removed or renamed
+  exports, changed public composable or component contracts, new or altered
+  server routes, behavioural changes, and new required environment variables.
+  Downstream projects track this repository as a git branch, so a GitHub
+  release is not a signal they receive.
 
 ## PR / handoff expectations
 
