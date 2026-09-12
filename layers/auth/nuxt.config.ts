@@ -1,6 +1,5 @@
-import { resolve as resolvePath } from 'node:path'
 import { createJiti } from 'jiti'
-import { findPath, useNuxt } from '@nuxt/kit'
+import { useNuxt } from '@nuxt/kit'
 import { positiveIntegerEnvironment } from '../../config/runtime'
 
 const loadModule = createJiti(import.meta.url, {
@@ -45,14 +44,12 @@ export default defineNuxtConfig({
   },
 
   hooks: {
-    async 'modules:done'() {
+    // 'app:resolve' fires after Nuxt has collected every layer's app.config
+    // path onto app.configs (project root first, most-extended layer last).
+    // Reading only the project's own srcDir file here would silently drop
+    // protectedRoutes defined by an extended layer instead of the project.
+    async 'app:resolve'(app) {
       const nuxt = useNuxt()
-      const appConfigPath = await findPath(
-        resolvePath(nuxt.options.srcDir, 'app.config'),
-      )
-
-      if (!appConfigPath) return
-
       const globals = globalThis as typeof globalThis & {
         defineAppConfig?: (config: unknown) => unknown
       }
@@ -60,14 +57,18 @@ export default defineNuxtConfig({
 
       globals.defineAppConfig = config => config
 
-      let appConfig: ProtectedRoutesAppConfig
+      let protectedRouteSources: NonNullable<ProtectedRoutesAppConfig['protectedRoutes']>[]
 
       try {
-        const loaded = await loadModule.import<{
-          default?: ProtectedRoutesAppConfig
-        }>(appConfigPath)
+        const loaded = await Promise.all(
+          app.configs.map(appConfigPath =>
+            loadModule.import<{ default?: ProtectedRoutesAppConfig }>(appConfigPath),
+          ),
+        )
 
-        appConfig = loaded.default || {}
+        protectedRouteSources = loaded
+          .map(module => module.default?.protectedRoutes)
+          .filter((routes): routes is NonNullable<ProtectedRoutesAppConfig['protectedRoutes']> => Boolean(routes))
       } finally {
         if (previousDefineAppConfig) {
           globals.defineAppConfig = previousDefineAppConfig
@@ -76,22 +77,31 @@ export default defineNuxtConfig({
         }
       }
 
-      const protectedRoutes = appConfig.protectedRoutes
+      const inlineProtectedRoutes = (nuxt.options.appConfig as ProtectedRoutesAppConfig | undefined)
+        ?.protectedRoutes
 
-      if (!protectedRoutes) return
+      if (inlineProtectedRoutes) protectedRouteSources.push(inlineProtectedRoutes)
+
+      if (protectedRouteSources.length === 0) return
+
+      const requireLoginPaths = [...new Set(
+        protectedRouteSources.flatMap(routes =>
+          Array.isArray(routes.requireLoginPaths) ? routes.requireLoginPaths : [],
+        ),
+      )].filter(
+        (path): path is string =>
+          typeof path === 'string' && path.trim().length > 0,
+      )
+      const allowAuthenticatedUserBypassSource = protectedRouteSources.find(
+        routes => typeof routes.allowAuthenticatedUserBypass !== 'undefined',
+      )
 
       const runtimeConfig = nuxt.options.runtimeConfig as Record<string, unknown>
 
       runtimeConfig.stirProtectedRoutes = {
-        requireLoginPaths: (Array.isArray(protectedRoutes.requireLoginPaths)
-          ? protectedRoutes.requireLoginPaths
-          : []
-        ).filter(
-          (path): path is string =>
-            typeof path === 'string' && path.trim().length > 0,
-        ),
+        requireLoginPaths,
         allowAuthenticatedUserBypass:
-          protectedRoutes.allowAuthenticatedUserBypass !== false,
+          allowAuthenticatedUserBypassSource?.allowAuthenticatedUserBypass !== false,
       }
     },
   },
