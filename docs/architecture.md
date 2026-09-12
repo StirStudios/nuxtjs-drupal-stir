@@ -1,4 +1,15 @@
-# Stir decoupled platform: vNext architecture review
+# Stir decoupled platform architecture
+
+> **This is the design record behind the current architecture, kept for the
+> reasoning rather than as an open plan.** It was written in July 2026 as a
+> forward-looking review of a restructuring that has since been delivered, so
+> it still reads in the future tense ("should", "recommended", "vNext"). The
+> capability layers, minimal/full presets, producer-owned contracts,
+> Drupal 11+ baseline, and `#stir/*` import surface it argues for are all
+> built and in production across the consumer fleet. Read it for *why* the
+> platform is shaped this way; read the repository itself for what exists.
+> The delivery checklists that tracked this work were removed once complete
+> and remain in git history.
 
 Nuxt layer reviewed branch/commit: `dev` refreshed at `f5912d9fad118f8fc5d4439a73270c3010fed9d7` (original full-review baseline `a8bb7aab1c1849c3710df37191278855692c0e0e`)
 Stir Tools reviewed branch/commit: `dev` at `395686036c01ced16dec74d3febdae05e9e90985`

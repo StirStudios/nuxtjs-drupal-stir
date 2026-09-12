@@ -1,6 +1,6 @@
 # Stir platform layer
 
-This is the vNext Drupal website rendering platform. It composes the shared
+This is the Drupal website rendering platform. It composes the shared
 foundation with Drupal Custom Elements proxy routes, page/app context, theme,
 and website-shell defaults.
 

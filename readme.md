@@ -108,7 +108,8 @@ responsive declaration in its media query instead of using, for example,
 `@apply text-3xl sm:text-5xl`.
 
 Pin production projects to a reviewed tag or commit. A branch reference is
-appropriate while testing vNext, but it should not be the production lock.
+appropriate while testing an upcoming change, but it should not be the
+production lock.
 This layer declares Nuxt as a dependency. Applications should also declare their
 Nuxt runtime explicitly and use a compatible version so their own development
 and build commands resolve predictably.

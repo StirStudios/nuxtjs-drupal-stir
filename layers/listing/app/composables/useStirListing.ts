@@ -5,7 +5,7 @@ import {
 } from './useApiListing'
 
 /**
- * Fetches the vNext provider-neutral listing contract through Nuxt's server.
+ * Fetches the provider-neutral listing contract through Nuxt's server.
  */
 export function useStirListing<
   TItem extends Record<string, unknown> = Record<string, unknown>,
