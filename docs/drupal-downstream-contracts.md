@@ -182,3 +182,19 @@ fall back to the Drupal page title; an entirely blank title emits no empty H1.
 A custom title slot owns its heading markup. No wrapper is added by the provider.
 Downstream Hero overrides must adopt the owning-page reference explicitly if they
 currently read the global page state.
+
+## Node share links (opt-in per content type)
+
+`DrupalNodeDisplay` renders a `ShareLinks` menu for any full node render (article
+or default; not teasers) when the node payload sets a truthy `shareLinks` prop.
+This is off by default for any node that omits the field or sends a falsy value.
+
+- Drupal exposes this as a boolean custom-element attribute (kebab-case, e.g.
+  `share-links`), which the Custom Elements runtime maps to the `shareLinks`
+  prop on `NodeCommonProps` the same way `hide-title` maps to `hideTitle`.
+- Any content type can opt in by adding the same boolean field/attribute to its
+  display and enabling it per node; no article-specific coupling remains.
+- Downstream `article`/`default` slot overrides in `DrupalNodeDisplay` still
+  receive the shared share-links container above the slot, since it renders
+  once for any non-teaser mode rather than only inside the default `<article>`
+  markup.
