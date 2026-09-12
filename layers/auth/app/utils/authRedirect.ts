@@ -67,3 +67,26 @@ export function safeStirAuthRedirect(candidate: unknown): string | undefined {
 
   return value && isSafeInternalPath(value) ? value : undefined
 }
+
+/**
+ * Builds the account-login target for a visitor bounced off a guarded route.
+ *
+ * `useAuthLogin()` returns the visitor to `?redirect=`, so whatever sends them
+ * to the login page has to carry their destination. Omits the parameter when
+ * there is nothing useful to return to, rather than round-tripping the login
+ * page into itself.
+ */
+export function stirAuthLoginTarget(
+  fullPath: unknown,
+  loginPath: string = '/auth/login',
+): { path: string, query?: { redirect: string } } {
+  const redirect = safeStirAuthRedirect(fullPath)
+
+  if (!redirect) return { path: loginPath }
+
+  const [pathOnly] = redirect.split('?')
+
+  if (pathOnly === loginPath) return { path: loginPath }
+
+  return { path: loginPath, query: { redirect } }
+}

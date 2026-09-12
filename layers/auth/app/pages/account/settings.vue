@@ -2,6 +2,7 @@
 import { useAccountSettings } from '../../composables/account/useAccountSettings'
 import { useAuthConfig } from '../../composables/auth/useAuthConfig'
 import { useAuthSession } from '../../composables/auth/useAuthSession'
+import { stirAuthLoginTarget } from '../../utils/authRedirect'
 import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { validateForm } from '../../utils/validationErrors'
 
@@ -12,6 +13,7 @@ definePageMeta({
 })
 
 const toast = useToast()
+const route = useRoute()
 const session = useAuthSession()
 const { auth } = useAuthConfig()
 const {
@@ -69,7 +71,9 @@ onMounted(async () => {
   await session.fetchSession()
 
   if (!session.loggedIn.value) {
-    await navigateTo('/auth/login')
+    // Carry the destination so sign-in returns here rather than dropping the
+    // visitor at the site-wide loginRedirectPath.
+    await navigateTo(stirAuthLoginTarget(route.fullPath))
     return
   }
 
