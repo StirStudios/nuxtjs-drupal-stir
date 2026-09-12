@@ -6,6 +6,7 @@ import {
   proxyRequest,
   type H3Event,
 } from 'h3'
+import { assertStirSameOrigin } from '../../../foundation/server/utils/stirRequestSecurity'
 import {
   filterStirDrupalSetCookies,
   getStirDrupalSetCookies,
@@ -245,6 +246,13 @@ export const proxyStirDrupalCeRequest = async (
   event: H3Event,
   path = '',
 ) => {
+  // Mutations reaching Drupal through this proxy must clear the same origin
+  // policy the dedicated editorial routes enforce, so the proxy cannot be used
+  // to skip that guard.
+  if (event.method !== 'GET' && event.method !== 'HEAD') {
+    assertStirSameOrigin(event)
+  }
+
   const { ceBaseUrl } = getStirDrupalCeProxyTargets()
   const target = assertContainedProxyTarget(
     ceBaseUrl,

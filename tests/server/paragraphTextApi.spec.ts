@@ -17,7 +17,7 @@ describe('editorial paragraph text API policy', () => {
 
   it('builds the Drupal CE paragraph text endpoint', () => {
     expect(buildParagraphTextPath('/ce-api', 42)).toBe(
-      '/api/drupal-ce/ce-api/stir-layout-builder/paragraph/42/text',
+      '/ce-api/stir-layout-builder/paragraph/42/text',
     )
   })
 

@@ -1,4 +1,4 @@
-import { getDrupalApiConfig } from './drupalApi'
+import { getStirDrupalApiConfig } from '../../../foundation/server/utils/stirDrupalApi'
 
 function normalizeEndpoint(value: unknown): string {
   const raw = typeof value === 'string' ? value.trim() : ''
@@ -23,7 +23,7 @@ export function resolveDrupalCeApiConfig(
     config.public.drupalCe && typeof config.public.drupalCe === 'object'
       ? (config.public.drupalCe as Record<string, unknown>)
       : {}
-  const drupalApi = getDrupalApiConfig()
+  const drupalApi = getStirDrupalApiConfig()
 
   return {
     apiKey: drupalApi.apiKey,

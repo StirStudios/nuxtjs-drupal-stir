@@ -49,8 +49,8 @@ jobs:
         env:
           STIR_PERF_ANALYZE: 'true'
 
-      - name: Check initial bundle boundaries and report size budgets
-        run: pnpm perf:report --no-build --warn-budget
+      - name: Check initial bundle boundaries and enforce size budgets
+        run: pnpm perf:report --no-build
 
   consumer-smoke:
     runs-on: ubuntu-latest

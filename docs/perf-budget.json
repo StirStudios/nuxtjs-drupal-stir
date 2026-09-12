@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "units": "gzip-kilobytes",
-  "maxInitialGzipKb": 229,
-  "maxInitialJavascriptGzipKb": 192.5,
+  "maxInitialGzipKb": 237,
+  "maxInitialJavascriptGzipKb": 204,
   "maxInitialCssGzipKb": 36.5,
   "maxAdminDeferredGzipKb": 170,
   "maxRevealMotionGzipKb": 28,
-  "initialBudgetRationale": "Nuxt 4.5 with Vite 8/Rolldown renders fewer initial module bytes and builds about twice as fast, but splits the static entry graph into separately compressed chunks. These caps tightly ratchet the measured graph-aware Nuxt 4.5 baseline; revisit them after downstream transfer and Lighthouse validation."
+  "initialBudgetRationale": "Re-baselined to the measured Nuxt 4.5 graph (235.95 kB initial, 202.69 kB JavaScript) plus about 1 kB of headroom, and CI now enforces these caps instead of warning. The previous 229 / 192.5 caps were set during the Nuxt 4.5 adoption before the graph was re-measured; the build had exceeded them ever since while CI only warned, so they described an intention rather than the build and caught no regression. An enforced cap at the real number protects against the next regression; ratchet it back down as bytes are recovered. docs/perf-initial-graph.md records the measured composition and the candidate levers, none of which clear the old cap on their own."
 }

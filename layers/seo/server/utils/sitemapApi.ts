@@ -11,7 +11,7 @@ import {
   string,
 } from 'valibot'
 import type { SitemapProducerPayload } from '../../shared/types/sitemap'
-import { drupalApiRequest } from '../../../core/server/utils/drupalApi'
+import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
 
 const sitemapSchema = array(strictObject({
   loc: pipe(string(), minLength(1)),
@@ -38,9 +38,9 @@ export function parseSitemapResponse(value: unknown): SitemapProducerPayload {
 }
 
 export async function fetchSitemap(
-  event: Parameters<typeof drupalApiRequest>[0],
+  event: Parameters<typeof stirDrupalApiRequest>[0],
 ): Promise<SitemapProducerPayload> {
-  const response = await drupalApiRequest<unknown>(event, '/api/sitemap', {
+  const response = await stirDrupalApiRequest<unknown>(event, '/api/sitemap', {
     method: 'GET',
   })
 

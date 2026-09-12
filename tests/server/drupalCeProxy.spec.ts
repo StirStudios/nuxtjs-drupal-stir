@@ -6,6 +6,7 @@ import {
   handleStirDrupalProxyResponse,
   isStirDrupalMenuProxyPathAllowed,
   isStirDrupalProxyPathSafe,
+  proxyStirDrupalCeRequest,
   proxyStirDrupalMenuRequest,
 } from '../../layers/core/server/utils/drupalCeProxy'
 import { replaceStirDrupalSetCookies } from '../../layers/foundation/server/utils/stirDrupalApi'
@@ -17,18 +18,27 @@ vi.mock('h3', async (importOriginal) => ({
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
 
-const createEvent = (cookie = '', url = '/') => {
+const createEvent = (
+  cookie = '',
+  url = '/',
+  options: { method?: string, origin?: string } = {},
+) => {
   const responseHeaders = new Map<string, string | string[]>()
+  const method = options.method ?? 'GET'
+  const headers: Record<string, string> = {}
+
+  if (cookie) headers.cookie = cookie
+  if (options.origin) headers.origin = options.origin
 
   return {
     event: {
       context: {},
-      method: 'GET',
+      method,
       path: url,
       node: {
         req: {
-          headers: cookie ? { cookie } : {},
-          method: 'GET',
+          headers,
+          method,
           url,
         },
         res: {
@@ -67,6 +77,53 @@ describe('Drupal CE proxy boundary', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+  })
+
+  it('rejects a cross-origin mutation sent through the CE proxy', async () => {
+    stubRuntimeConfig({ siteUrl: 'https://site.example.test' })
+    vi.mocked(proxyRequest).mockClear()
+
+    const { event } = createEvent('', '/', {
+      method: 'POST',
+      origin: 'https://attacker.example.test',
+    })
+
+    await expect(
+      proxyStirDrupalCeRequest(
+        event,
+        'ce-api/stir-layout-builder/paragraph/42/text',
+      ),
+    ).rejects.toMatchObject({ statusCode: 403 })
+
+    expect(proxyRequest).not.toHaveBeenCalled()
+  })
+
+  it('allows a same-origin mutation through the CE proxy', async () => {
+    stubRuntimeConfig({ siteUrl: 'https://site.example.test' })
+    vi.mocked(proxyRequest).mockClear()
+
+    const { event } = createEvent('', '/', {
+      method: 'POST',
+      origin: 'https://site.example.test',
+    })
+
+    await proxyStirDrupalCeRequest(
+      event,
+      'ce-api/stir-layout-builder/paragraph/42/text',
+    )
+
+    expect(proxyRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not require an origin for CE proxy reads', async () => {
+    stubRuntimeConfig({ siteUrl: 'https://site.example.test' })
+    vi.mocked(proxyRequest).mockClear()
+
+    const { event } = createEvent()
+
+    await proxyStirDrupalCeRequest(event, 'ce-api/node/1')
+
+    expect(proxyRequest).toHaveBeenCalledTimes(1)
   })
 
   it('resolves the configured CE and menu targets', () => {

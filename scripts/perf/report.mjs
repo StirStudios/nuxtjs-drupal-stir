@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { appendFile, readFile, readdir, writeFile } from 'node:fs/promises'
 import { gzipSync } from 'node:zlib'
 import { basename, resolve } from 'node:path'
+import { describeGrowth } from './growth.mjs'
 
 const arguments_ = process.argv.slice(2)
 const readArgument = name => arguments_
@@ -42,7 +43,7 @@ function run(command, args, environment = {}) {
   })
 }
 
-function assertBudget(report, budget) {
+function assertBudget(report, budget, previous) {
   const initialJs = report.initialClient.assets
     .filter(asset => asset.file.endsWith('.js'))
     .reduce((total, asset) => total + asset.gzipKb, 0)
@@ -66,6 +67,11 @@ function assertBudget(report, budget) {
 
   if (failures.length) {
     const message = `Performance budget exceeded:\n- ${failures.join('\n- ')}`
+      + describeGrowth(report, previous)
+      + '\n\nEither recover the bytes (see docs/perf-initial-graph.md) or, if the'
+      + '\nincrease is intended, re-baseline deliberately: update the caps in'
+      + '\ndocs/perf-budget.json with a rationale, move the matching ratchet in'
+      + '\ntests/utils/layerContract.spec.ts, and say why in the commit.'
     if (warnBudget) console.warn(message)
     else throw new Error(message)
   }
@@ -267,10 +273,16 @@ async function main() {
     totalOutputSize: parseTotalSize(output),
   }
 
+  // Read the committed baseline before overwriting it, so a failure can
+  // attribute the growth rather than only report the total.
+  const previousReport = await readFile(outputPath, 'utf8')
+    .then(contents => JSON.parse(contents))
+    .catch(() => undefined)
+
   await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`)
   if (!skipBudget) {
     const budget = JSON.parse(await readFile(budgetPath, 'utf8'))
-    assertBudget(report, budget)
+    assertBudget(report, budget, previousReport)
   }
 
   console.log('\n=== Stable client bundle report ===')

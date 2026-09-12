@@ -1,19 +1,19 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { drupalApiRequest } from '../../layers/core/server/utils/drupalApi'
+import { stirDrupalApiRequest } from '../../layers/foundation/server/utils/stirDrupalApi'
 import {
   fetchGlobalSeo,
   parseGlobalSeoResponse,
 } from '../../layers/seo/server/utils/globalSeoApi'
 
-vi.mock('../../layers/core/server/utils/drupalApi', () => ({
-  drupalApiRequest: vi.fn(),
+vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
+  stirDrupalApiRequest: vi.fn(),
 }))
 
 describe('globalSeoApi', () => {
   beforeEach(() => {
-    vi.mocked(drupalApiRequest).mockReset()
+    vi.mocked(stirDrupalApiRequest).mockReset()
   })
 
   it('parses the synchronized producer fixture through the production boundary', () => {
@@ -36,17 +36,17 @@ describe('globalSeoApi', () => {
   it('returns the contract payload from Drupal', async () => {
     const payload = { lang: 'en', meta: [], link: [] }
 
-    vi.mocked(drupalApiRequest).mockResolvedValue(payload)
+    vi.mocked(stirDrupalApiRequest).mockResolvedValue(payload)
     const event = {} as Parameters<typeof fetchGlobalSeo>[0]
 
     await expect(fetchGlobalSeo(event)).resolves.toEqual(payload)
-    expect(drupalApiRequest).toHaveBeenCalledWith(event, '/api/seo/global', {
+    expect(stirDrupalApiRequest).toHaveBeenCalledWith(event, '/api/seo/global', {
       method: 'GET',
     })
   })
 
   it('preserves the stable optional-provider fallback', async () => {
-    vi.mocked(drupalApiRequest).mockRejectedValue(new Error('Unavailable'))
+    vi.mocked(stirDrupalApiRequest).mockRejectedValue(new Error('Unavailable'))
     const event = {} as Parameters<typeof fetchGlobalSeo>[0]
 
     await expect(fetchGlobalSeo(event)).resolves.toEqual({

@@ -1,8 +1,6 @@
 import { createError, defineEventHandler, readBody } from 'h3'
-import {
-  layerAuthDrupalApiRequest,
-  layerAuthThrowDrupalApiError,
-} from '../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../utils/drupalApi'
+import { throwStirDrupalApiError } from '../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   assertStirSameOrigin(event)
@@ -52,6 +50,6 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    layerAuthThrowDrupalApiError(error, 'Invalid credentials', 401)
+    throwStirDrupalApiError(error, 'Invalid credentials', 401)
   }
 })

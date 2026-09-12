@@ -3,7 +3,7 @@ import type {
   GlobalSeoProducerPayload,
   GlobalSeoResponse,
 } from '../../shared/types/globalSeo'
-import { drupalApiRequest } from '../../../core/server/utils/drupalApi'
+import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -43,10 +43,10 @@ export function parseGlobalSeoResponse(value: unknown): GlobalSeoProducerPayload
 }
 
 export async function fetchGlobalSeo(
-  event: Parameters<typeof drupalApiRequest>[0],
+  event: Parameters<typeof stirDrupalApiRequest>[0],
 ): Promise<GlobalSeoResponse> {
   try {
-    const response = await drupalApiRequest<unknown>(event, '/api/seo/global', {
+    const response = await stirDrupalApiRequest<unknown>(event, '/api/seo/global', {
       method: 'GET',
     })
 

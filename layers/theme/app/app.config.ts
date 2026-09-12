@@ -23,7 +23,7 @@ export default defineAppConfig({
 
     heading: 'mb-12 text-center text-6xl lg:mb-20',
     container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
-    header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
+    header: 'fixed top-0 z-30 w-full !p-0',
 
     article: {
       container: 'max-w-3xl',

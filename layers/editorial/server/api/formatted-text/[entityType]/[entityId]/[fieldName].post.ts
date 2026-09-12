@@ -1,12 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
-import {
-  assertDrupalResponseNotRedirect,
-  captureDrupalApiError,
-  getForwardedCookie,
-  markPrivateResponse,
-} from '../../../../../../core/server/utils/drupalApi'
+import { stirDrupalApiRequest } from '../../../../../../foundation/server/utils/stirDrupalApi'
 import { resolveDrupalCeApiConfig } from '../../../../../../core/server/utils/drupalCeApiConfig'
-import { buildDrupalHeaders } from '../../../../../../core/server/utils/drupalHeaders'
 import { createUpstreamParagraphTextError, parseTextValue } from '../../../../utils/paragraphTextApi'
 import {
   buildFormattedTextPath,
@@ -22,60 +16,22 @@ export default defineEventHandler(async (event) => {
 
   const target = parseFormattedTextRouteTarget(event.context.params)
   const body = await readBody<FormattedTextPayload>(event)
-
   const text = parseTextValue(body?.text)
-
-  const config = useRuntimeConfig()
-  const {
-    apiKey,
-    ceApiEndpoint,
-    drupalBaseUrl,
-    requestTimeoutMs,
-  } = resolveDrupalCeApiConfig(config)
-  const savePath = buildFormattedTextPath(ceApiEndpoint, target)
-  const cookie = getForwardedCookie(event)
-
-  if (cookie) markPrivateResponse(event)
+  const { ceApiEndpoint } = resolveDrupalCeApiConfig(useRuntimeConfig())
 
   try {
-    const csrfResponse = await $fetch.raw<string>(
-      `${drupalBaseUrl}/session/token`,
+    return await stirDrupalApiRequest<{ ok: boolean, message?: string }>(
+      event,
+      buildFormattedTextPath(ceApiEndpoint, target),
       {
-        headers: buildDrupalHeaders({ cookie, apiKey }),
-        redirect: 'manual',
-        timeout: requestTimeoutMs,
+        method: 'POST',
+        body: { text },
+        enforceSameOrigin: false,
+        forwardCookies: true,
       },
     )
-
-    assertDrupalResponseNotRedirect(csrfResponse)
-
-    const saveResponse = await $fetch.raw<{
-      ok: boolean
-      message?: string
-    }>(savePath, {
-      method: 'POST',
-      body: { text },
-      headers: buildDrupalHeaders({
-        apiKey,
-        cookie,
-        csrfToken: csrfResponse._data
-          ? String(csrfResponse._data)
-          : undefined,
-      }),
-      redirect: 'manual',
-      timeout: requestTimeoutMs,
-    })
-
-    assertDrupalResponseNotRedirect(saveResponse)
-
-    return saveResponse._data
   }
   catch (error) {
-    captureDrupalApiError(event, error)
-
-    throw createUpstreamParagraphTextError(
-      error,
-      'Failed to save formatted text.',
-    )
+    throw createUpstreamParagraphTextError(error, 'Failed to save formatted text.')
   }
 })

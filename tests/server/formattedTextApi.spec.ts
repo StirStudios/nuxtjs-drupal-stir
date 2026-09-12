@@ -36,7 +36,7 @@ describe('editorial formatted-text API policy', () => {
       entityId: 27826,
       fieldName: 'body',
     })).toBe(
-      '/api/drupal-ce/ce-api/stir-layout-builder/entity/node/27826/body/text',
+      '/ce-api/stir-layout-builder/entity/node/27826/body/text',
     )
   })
 })

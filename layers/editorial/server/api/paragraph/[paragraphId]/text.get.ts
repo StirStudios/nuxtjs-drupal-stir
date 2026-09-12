@@ -1,12 +1,6 @@
 import { defineEventHandler } from 'h3'
-import {
-  assertDrupalResponseNotRedirect,
-  captureDrupalApiError,
-  getForwardedCookie,
-  markPrivateResponse,
-} from '../../../../../core/server/utils/drupalApi'
+import { stirDrupalApiRequest } from '../../../../../foundation/server/utils/stirDrupalApi'
 import { resolveDrupalCeApiConfig } from '../../../../../core/server/utils/drupalCeApiConfig'
-import { buildDrupalHeaders } from '../../../../../core/server/utils/drupalHeaders'
 import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
@@ -15,40 +9,20 @@ import {
 
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
-
-  const config = useRuntimeConfig()
-  const {
-    apiKey,
-    ceApiEndpoint,
-    requestTimeoutMs,
-  } = resolveDrupalCeApiConfig(config)
-  const readPath = buildParagraphTextPath(ceApiEndpoint, paragraphId)
-  const cookie = getForwardedCookie(event)
-
-  if (cookie) markPrivateResponse(event)
+  const { ceApiEndpoint } = resolveDrupalCeApiConfig(useRuntimeConfig())
 
   try {
-    const response = await $fetch.raw<{
+    return await stirDrupalApiRequest<{
       ok: boolean
       text?: string
       format?: string
       message?: string
-    }>(readPath, {
+    }>(event, buildParagraphTextPath(ceApiEndpoint, paragraphId), {
       method: 'GET',
-      headers: buildDrupalHeaders({
-        cookie,
-        apiKey,
-      }),
-      redirect: 'manual',
-      timeout: requestTimeoutMs,
+      forwardCookies: true,
     })
-
-    assertDrupalResponseNotRedirect(response)
-
-    return response._data
-  } catch (error) {
-    captureDrupalApiError(event, error)
-
+  }
+  catch (error) {
     throw createUpstreamParagraphTextError(error, 'Failed to read paragraph text.')
   }
 })

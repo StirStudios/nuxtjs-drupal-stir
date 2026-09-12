@@ -10,7 +10,6 @@ vi.mock('h3', async (importOriginal) => ({
 
 vi.mock('../../layers/auth/server/utils/drupalApi', () => ({
   layerAuthDrupalApiRequest: vi.fn(),
-  layerAuthThrowDrupalApiError: vi.fn(),
 }))
 
 describe('POST /api/auth/verify', () => {

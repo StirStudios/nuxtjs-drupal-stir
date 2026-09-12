@@ -70,5 +70,5 @@ export function buildParagraphViewPath(
   ceApiEndpoint: string,
   paragraphId: number,
 ): string {
-  return `/api/drupal-ce${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/view`
+  return `${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/view`
 }

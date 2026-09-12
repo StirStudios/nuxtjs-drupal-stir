@@ -8,7 +8,7 @@ import {
 describe('paragraph View API helpers', () => {
   it('builds the paragraph-bound Drupal route', () => {
     expect(buildParagraphViewPath('/ce-api', 42)).toBe(
-      '/api/drupal-ce/ce-api/stir-layout-builder/paragraph/42/view',
+      '/ce-api/stir-layout-builder/paragraph/42/view',
     )
   })
 

@@ -1,6 +1,7 @@
 import { defineEventHandler } from 'h3'
 import type { AccountSettingsValuesResponse } from '../../../../shared/types/accountSettings'
-import { layerAuthDrupalApiRequest, layerAuthThrowDrupalApiError } from '../../../utils/drupalApi'
+import { layerAuthDrupalApiRequest } from '../../../utils/drupalApi'
+import { throwStirDrupalApiError } from '../../../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,6 +14,6 @@ export default defineEventHandler(async (event) => {
       },
     )
   } catch (error: unknown) {
-    layerAuthThrowDrupalApiError(error, 'Failed to load account settings')
+    throwStirDrupalApiError(error, 'Failed to load account settings')
   }
 })

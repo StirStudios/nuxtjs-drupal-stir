@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { drupalApiRequest } from '../../layers/core/server/utils/drupalApi'
+import {
+  captureStirDrupalApiError,
+  stirDrupalApiRequest,
+} from '../../layers/foundation/server/utils/stirDrupalApi'
 import {
   appContextQuery,
   buildAppContextEndpoint,
@@ -9,13 +12,15 @@ import {
   parseAppContextResponse,
 } from '../../layers/core/server/utils/appContextApi'
 
-vi.mock('../../layers/core/server/utils/drupalApi', () => ({
-  drupalApiRequest: vi.fn(),
+vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
+  stirDrupalApiRequest: vi.fn(),
+  captureStirDrupalApiError: vi.fn(),
 }))
 
 describe('appContextApi', () => {
   beforeEach(() => {
-    vi.mocked(drupalApiRequest).mockReset()
+    vi.mocked(stirDrupalApiRequest).mockReset()
+    vi.mocked(captureStirDrupalApiError).mockReset()
   })
 
   it('builds the Drupal app context endpoint with route path context', () => {
@@ -88,7 +93,7 @@ describe('appContextApi', () => {
   })
 
   it('forwards cookies so Drupal can include authenticated app context edit links', async () => {
-    vi.mocked(drupalApiRequest).mockResolvedValue({
+    vi.mocked(stirDrupalApiRequest).mockResolvedValue({
       blocks: {},
       footer_menu: [],
       site_info: { name: '', mail: '', slogan: '' },
@@ -98,7 +103,7 @@ describe('appContextApi', () => {
 
     await fetchAppContext(event, '/')
 
-    expect(drupalApiRequest).toHaveBeenCalledWith(event, '/api/app-context?path=%2F', {
+    expect(stirDrupalApiRequest).toHaveBeenCalledWith(event, '/api/app-context?path=%2F', {
       method: 'GET',
       forwardCookies: true,
     })
@@ -118,9 +123,7 @@ describe('appContextApi', () => {
       },
     })
 
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    vi.mocked(drupalApiRequest).mockRejectedValue(error)
+    vi.mocked(stirDrupalApiRequest).mockRejectedValue(error)
 
     const event = {} as Parameters<typeof fetchAppContext>[0]
 
@@ -129,13 +132,22 @@ describe('appContextApi', () => {
       footer_menu: [],
       site_info: { name: '', mail: '', slogan: '' },
     })
-    expect(consoleError).toHaveBeenCalledWith('Failed to fetch Drupal app context', {
-      path: '/broken',
-      message: 'Drupal unavailable',
-      statusCode: 503,
-      statusMessage: 'Service Unavailable',
-    })
 
-    consoleError.mockRestore()
+    expect(captureStirDrupalApiError).toHaveBeenCalledTimes(1)
+
+    const [capturedEvent, capturedError] = vi.mocked(
+      captureStirDrupalApiError,
+    ).mock.calls[0] as [unknown, Error]
+
+    expect(capturedEvent).toBe(event)
+    expect(capturedError.message).toBe(
+      'Failed to fetch Drupal app context at /broken: Drupal unavailable'
+      + ' (upstream 503 Service Unavailable)',
+    )
+    expect(capturedError.cause).toBe(error)
+
+    // The captured message must never carry forwarded request credentials.
+    expect(capturedError.message).not.toContain('SSESS=secret')
+    expect(capturedError.message).not.toContain('secret-key')
   })
 })

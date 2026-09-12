@@ -7,14 +7,6 @@ import {
   type H3Event,
 } from 'h3'
 import {
-  assertDrupalResponseNotRedirect,
-  captureDrupalApiError,
-  fetchDrupalCsrfToken,
-  getDrupalApiConfig,
-  getForwardedCookie,
-} from '../../../../core/server/utils/drupalApi'
-import { buildDrupalHeaders } from '../../../../core/server/utils/drupalHeaders'
-import {
   assertWebformContentLength,
   assertWebformMultipartLimits,
   getWebformSubmissionLimits,
@@ -22,6 +14,14 @@ import {
 } from '../../utils/webformLimits'
 import { readWebformBody } from '../../utils/readWebformBody'
 import type { WebformSubmissionResponse } from '../../../shared/types/webformSubmission'
+import {
+  assertStirDrupalResponseNotRedirect,
+  buildStirDrupalHeaders,
+  captureStirDrupalApiError,
+  fetchStirDrupalCsrfToken,
+  getStirDrupalApiConfig,
+  getStirForwardedCookie,
+} from '../../../../foundation/server/utils/stirDrupalApi'
 
 type SubmissionBody = Record<string, unknown>
 type ParsedSubmission = {
@@ -162,9 +162,9 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const { baseUrl, apiKey, requestTimeoutMs } = getDrupalApiConfig()
-    const csrfToken = await fetchDrupalCsrfToken(event)
-    const cookie = getForwardedCookie(event)
+    const { baseUrl, apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
+    const csrfToken = await fetchStirDrupalCsrfToken(event)
+    const cookie = getStirForwardedCookie(event)
 
     const drupalApiUrl = `${baseUrl}/api/stir_webform_rest/submit`
     const origin = getHeader(event, 'origin')
@@ -178,7 +178,7 @@ export default defineEventHandler(async (event) => {
           ? { 'Content-Type': submission.contentType }
           : {}),
         Accept: 'application/json',
-        ...buildDrupalHeaders({ apiKey, cookie, csrfToken }),
+        ...buildStirDrupalHeaders({ apiKey, cookie, csrfToken }),
         ...(origin ? { Origin: origin } : {}),
         ...(referer ? { Referer: referer } : {}),
         ...(userAgent ? { 'User-Agent': userAgent } : {}),
@@ -189,7 +189,7 @@ export default defineEventHandler(async (event) => {
       ignoreResponseError: true,
     })
 
-    assertDrupalResponseNotRedirect(response)
+    assertStirDrupalResponseNotRedirect(response)
 
     if (response.status >= 400 && response.status < 500) {
       setResponseStatus(event, response.status)
@@ -202,7 +202,7 @@ export default defineEventHandler(async (event) => {
 
     return response._data
   } catch (error) {
-    captureDrupalApiError(event, error)
+    captureStirDrupalApiError(event, error)
 
     throw createError({
       statusCode: normalizeUpstreamErrorStatus(error),

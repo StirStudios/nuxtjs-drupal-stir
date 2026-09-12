@@ -14,7 +14,7 @@ export function parseParagraphId(value: unknown): number {
 }
 
 export function buildParagraphTextPath(ceApiEndpoint: string, paragraphId: number): string {
-  return `/api/drupal-ce${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/text`
+  return `${ceApiEndpoint}/stir-layout-builder/paragraph/${paragraphId}/text`
 }
 
 export function createUpstreamParagraphTextError(error: unknown, fallbackMessage: string) {
