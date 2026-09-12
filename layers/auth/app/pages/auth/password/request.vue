@@ -6,14 +6,14 @@ const { fields, turnstileToken, validate, onSubmit, isLoading, requestSent } =
   usePasswordRequest()
 const { auth } = useAuthConfig()
 
-const title = computed(() => auth.value.passwordRequest?.title || 'Reset Password')
+const title = computed(() => auth.value.passwordRequest?.title || 'Reset password')
 const description = computed(
   () =>
     auth.value.passwordRequest?.description ||
     'Enter your email or username to receive reset instructions.',
 )
 const submitLabel = computed(
-  () => auth.value.passwordRequest?.submitLabel || 'Send Reset Instructions',
+  () => auth.value.passwordRequest?.submitLabel || 'Send reset link',
 )
 const sentTitle = computed(
   () => auth.value.passwordRequest?.sentTitle || 'Check your inbox',

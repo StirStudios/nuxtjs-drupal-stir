@@ -6,12 +6,12 @@ const { fields, validate, onSubmit, isLoading, isCheckingLink, linkValid, linkMe
   usePasswordReset()
 const { auth } = useAuthConfig()
 
-const title = computed(() => auth.value.passwordReset?.title || 'Choose a New Password')
+const title = computed(() => auth.value.passwordReset?.title || 'Reset your password')
 const description = computed(
   () => auth.value.passwordReset?.description || 'Set a new password for your account.',
 )
 const submitLabel = computed(
-  () => auth.value.passwordReset?.submitLabel || 'Update Password',
+  () => auth.value.passwordReset?.submitLabel || 'Update password',
 )
 const checkingTitle = computed(
   () => auth.value.passwordReset?.checkingTitle || 'Checking reset link',

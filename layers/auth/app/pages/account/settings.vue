@@ -84,8 +84,8 @@ const onSubmitSettings = async () => {
 
     if ('no_changes' in response && response.no_changes) {
       toast.add({
-        title: 'No changes',
-        description: 'There is nothing new to save.',
+        title: 'Nothing to save',
+        description: 'There are no changes to save.',
         color: 'neutral',
       })
       return
@@ -93,8 +93,8 @@ const onSubmitSettings = async () => {
 
     if (response?.updated) {
       toast.add({
-        title: 'Settings updated',
-        description: 'Your changes were saved.',
+        title: 'Saved',
+        description: 'We saved your changes.',
         color: 'success',
       })
     }
@@ -142,7 +142,7 @@ const onChangePassword = async () => {
     newPassword.value = ''
     toast.add({
       title: 'Password updated',
-      description: 'Your password was changed successfully.',
+      description: 'Your password\'s been updated.',
       color: 'success',
     })
   } catch (error: unknown) {
@@ -168,7 +168,7 @@ const onCancelAccount = async () => {
     cancelModalOpen.value = false
     toast.add({
       title: 'Account canceled',
-      description: 'Your account has been disabled.',
+      description: 'We\'ve disabled your account.',
       color: 'success',
     })
     await navigateTo('/auth/logout')

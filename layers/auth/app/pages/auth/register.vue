@@ -16,12 +16,12 @@ const {
   useAuthRegister()
 const { auth } = useAuthConfig()
 
-const title = computed(() => auth.value.register?.title || 'Create Account')
+const title = computed(() => auth.value.register?.title || 'Create account')
 const description = computed(
   () => auth.value.register?.description || 'Create your account to continue.',
 )
 const submitLabel = computed(
-  () => auth.value.register?.submitLabel || 'Create Account',
+  () => auth.value.register?.submitLabel || 'Create account',
 )
 const verificationTitle = computed(
   () => auth.value.register?.complete?.verificationTitle || 'Verify your email',

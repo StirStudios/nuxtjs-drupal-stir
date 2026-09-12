@@ -6,11 +6,11 @@ const { fields, turnstileToken, validate, onSubmit, onError, isLoading } =
   useAuthLogin()
 const { auth } = useAuthConfig()
 
-const title = computed(() => auth.value.login?.title || 'Login')
+const title = computed(() => auth.value.login?.title || 'Sign in')
 const description = computed(
   () => auth.value.login?.description || 'Sign in to continue.',
 )
-const submitLabel = computed(() => auth.value.login?.submitLabel || 'Continue')
+const submitLabel = computed(() => auth.value.login?.submitLabel || 'Sign in')
 
 useSeoMeta({
   title: () => title.value,

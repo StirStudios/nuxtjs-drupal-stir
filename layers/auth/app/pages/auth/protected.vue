@@ -13,7 +13,7 @@ const {
 const { auth } = useAuthConfig()
 
 const title = computed(
-  () => auth.value.protectedPage?.title || 'Protected Access',
+  () => auth.value.protectedPage?.title || 'Protected access',
 )
 const description = computed(
   () =>

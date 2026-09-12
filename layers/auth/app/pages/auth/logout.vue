@@ -27,7 +27,7 @@ onMounted(async () => {
 
   toast.add({
     title: 'Signed out',
-    description: 'You have been logged out.',
+    description: 'You\'ve been signed out.',
     color: 'success',
   })
 

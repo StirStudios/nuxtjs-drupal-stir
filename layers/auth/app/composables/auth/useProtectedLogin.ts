@@ -48,7 +48,7 @@ export function useProtectedLogin() {
     } catch {
       toast.add({
         title: 'Access denied',
-        description: 'Invalid password.',
+        description: 'That password isn\'t right. Try again.',
         color: 'error',
       })
     } finally {
