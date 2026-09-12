@@ -19,6 +19,7 @@ export const stirListingResponseSchema = v.strictObject({
     page: nonNegativeInteger,
     pageSize: v.pipe(positiveInteger, v.maxValue(100)),
     total: v.nullable(nonNegativeInteger),
+    totalUnfiltered: v.nullable(nonNegativeInteger),
     totalPages: v.nullable(nonNegativeInteger),
     hasNext: v.boolean(),
   }),

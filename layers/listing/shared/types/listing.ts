@@ -2,6 +2,7 @@ export interface StirListingPager {
   page: number
   pageSize: number
   total: number | null
+  totalUnfiltered: number | null
   totalPages: number | null
   hasNext: boolean
 }

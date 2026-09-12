@@ -15,6 +15,7 @@
     "page": 0,
     "pageSize": 12,
     "total": 1,
+    "totalUnfiltered": 900,
     "totalPages": 1,
     "hasNext": false
   },

@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<{
   heading: undefined,
   requiresCurrentPassword: false,
   submitClass: undefined,
-  submitLabel: 'Save Changes',
+  submitLabel: 'Save changes',
   subheading: undefined,
   twoColumns: false,
 })
@@ -235,7 +235,7 @@ const editorToolbarItems = [
       </UFormField>
 
       <div v-if="editableFieldsCount === 0" class="text-muted text-sm">
-        No editable profile fields are currently available.
+        There's nothing here to edit yet.
       </div>
 
       <UButton

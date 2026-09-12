@@ -64,7 +64,7 @@ export function useAuthLogin() {
 
       if (loginResult.loggedIn) {
         toast.add({
-          title: auth.value.login?.successToast?.title || 'Success',
+          title: auth.value.login?.successToast?.title || 'Signed in',
           description:
             auth.value.login?.successToast?.description ||
             'Signed in successfully.',
@@ -81,8 +81,8 @@ export function useAuthLogin() {
             ? 'Session cookie missing'
             : 'Sign-in incomplete',
           description: backendAuthenticated
-            ? 'Credentials were accepted, but no browser session cookie is active. Check domain/cookie settings.'
-            : 'Signed in but no active session was detected.',
+            ? 'Your credentials were accepted, but no browser session cookie is active. Check domain/cookie settings.'
+            : 'Signed in, but no active session was detected.',
           color: 'warning',
         })
       }

@@ -10,6 +10,7 @@ export type ApiListingPager = {
   itemsPerPage: number
   totalItems: number
   totalPages: number
+  totalUnfiltered?: number
 }
 
 export type ApiListingResponse<TItem = unknown, TFilters extends ApiListingFilters = ApiListingFilters> = {

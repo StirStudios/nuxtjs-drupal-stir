@@ -108,15 +108,15 @@ const confirmCancel = () => {
         :loading="props.changingPassword"
         type="submit"
       >
-        Update Password
+        Update password
       </UButton>
     </UForm>
 
     <div class="border-error/30 bg-error/5 mt-10 space-y-4 rounded-lg border p-4">
       <div class="space-y-1">
-        <h3 class="text-highlighted text-base font-semibold">Cancel Account</h3>
+        <h3 class="text-highlighted text-base font-semibold">Cancel account</h3>
         <p class="text-muted text-sm">
-          Cancellation method: disable your account and keep existing content.
+          This disables your account and keeps your existing content.
         </p>
       </div>
       <UButton
@@ -126,24 +126,23 @@ const confirmCancel = () => {
         variant="soft"
         @click="openCancelModal"
       >
-        Cancel Account
+        Cancel account
       </UButton>
     </div>
   </div>
 
   <ClientOnly>
     <UModal
-      :description="'This will disable your account and keep existing content.'"
+      :description="'This disables your account and keeps your existing content.'"
       :open="props.cancelModalOpen"
       :portal="props.portal"
-      title="Cancel Account?"
+      title="Cancel your account?"
       @update:open="emit('update:cancelModalOpen', $event)"
     >
       <template #body>
         <div class="space-y-3 p-4">
           <p class="text-muted text-sm">
-            You will be logged out after cancellation. You can contact support
-            to reactivate if needed.
+            You'll be signed out right away. Contact us if you want to reactivate later.
           </p>
           <div class="flex items-center gap-3">
             <UButton
@@ -152,7 +151,7 @@ const confirmCancel = () => {
               :loading="props.cancelingAccount"
               @click="confirmCancel"
             >
-              Yes, cancel account
+              Cancel account
             </UButton>
             <UButton
               :disabled="props.cancelingAccount"
