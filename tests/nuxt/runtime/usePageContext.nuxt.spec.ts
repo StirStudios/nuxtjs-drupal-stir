@@ -4,8 +4,18 @@ import { defineComponent, h, ref } from 'vue'
 import { usePageContext } from '../../../layers/theme/app/composables/usePageContext'
 
 const shared = vi.hoisted(() => ({ getPage: vi.fn() }))
+const hoistedFetchSession = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 
 mockNuxtImport('useStirDrupalCe', () => () => ({ getPage: shared.getPage }))
+vi.mock('../../../layers/auth/app/composables/useAuthSession', () => ({
+  useAuthSession: () => authSession,
+}))
+
+const authSession = {
+  fetchSession: hoistedFetchSession,
+  loggedIn: ref(false),
+  user: ref<{ uid: string, roles: string[] } | null>(null),
+}
 
 describe('page-local Drupal context', () => {
   it('uses the supplied page and follows its refresh without reading shared page state', async () => {
@@ -53,6 +63,25 @@ describe('page-local Drupal context', () => {
 
     expect(wrapper.text()).toBe('default')
     expect(shared.getPage).toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('keeps editorial access for an administrator session on a mixed route with no local tasks', async () => {
+    authSession.loggedIn.value = true
+    authSession.user.value = { uid: '1', roles: ['administrator'] }
+    const localPage = ref({ current_user: { authenticated: false } })
+    const Harness = defineComponent({
+      setup() {
+        const context = usePageContext(localPage)
+
+        return () => h('p', `${context.isAdministrator.value}:${context.hasEditorialAccess.value}`)
+      },
+    })
+
+    const wrapper = await mountSuspended(Harness)
+
+    expect(wrapper.text()).toBe('true:true')
+    expect(authSession.fetchSession).toHaveBeenCalled()
     wrapper.unmount()
   })
 })

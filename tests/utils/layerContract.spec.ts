@@ -848,10 +848,6 @@ describe('layer contract', () => {
   })
 
   it('loads authenticated editorial assets only when editorial UI mounts', () => {
-    const pageContext = readFileSync(
-      resolve(rootDir, 'layers/theme/app/composables/usePageContext.ts'),
-      'utf8',
-    )
     const adminStyles = readFileSync(
       resolve(
         rootDir,
@@ -860,7 +856,6 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(pageContext).not.toContain('fetchSession()')
     expect(adminStyles).toContain('import(\'../assets/css/admin-ui.css\')')
 
     for (const component of [
