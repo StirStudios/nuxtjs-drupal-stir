@@ -121,9 +121,44 @@ match Drupal's configured copy word-for-word.
 Downstream projects with local auth page overrides can use the auth layer's
 public auto-import surface instead of importing from nested layer internals:
 
+- `useAuthActions`
 - `useAuthConfig`
+- `useAuthLogin`
+- `useAuthRegister`
+- `useAuthSession`
+- `usePasswordRequest`
+- `usePasswordReset`
+- `useProtectedActions`
+- `useProtectedLogin`
 - `createLoginValidationSchema`
 - `createPasswordRequestValidationSchema`
 - `createRegisterValidationSchema`
 - `createPasswordResetValidationSchema`
 - `createAccountPasswordChangeValidationSchema`
+
+### Post-login destination
+
+`useAuthLogin()` sends the visitor to `?redirect=` when it is a safe same-site
+path, and otherwise to Drupal's `loginRedirectPath`. Both are checked, so a
+protocol-relative or absolute URL from either source falls back to `/` rather
+than navigating off-site.
+
+A page that has to decide the destination itself — because it depends on the
+account that just signed in — passes a callback instead of reimplementing the
+form:
+
+```ts
+const { fields, validate, onSubmit } = useAuthLogin({
+  redirectTo: async ({ redirect, fallback }) => {
+    if (redirect) return redirect
+    if (await needsOnboarding()) return '/onboarding'
+
+    return fallback
+  },
+})
+```
+
+The callback runs after the session resolves. Its return value is used as
+given, so pass a query parameter through `redirect` from the context rather
+than reading one yourself. Return `false` to navigate nowhere and let the page
+take over.

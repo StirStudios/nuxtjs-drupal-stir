@@ -1,5 +1,6 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import { useProtectedActions } from './useProtectedActions'
+import { resolveStirAuthRedirect } from '../../utils/authRedirect'
 
 export function useProtectedLogin() {
   const toast = useToast()
@@ -37,13 +38,12 @@ export function useProtectedLogin() {
       const hasAccess = await login(event.data.password, turnstileToken.value)
 
       if (hasAccess) {
-        const redirectTarget =
-          typeof route.query.redirect === 'string' &&
-          route.query.redirect.startsWith('/')
-            ? route.query.redirect
-            : protectedFallbackRedirectPath
-
-        await navigateTo(redirectTarget)
+        await navigateTo(
+          resolveStirAuthRedirect(
+            route.query.redirect,
+            protectedFallbackRedirectPath,
+          ),
+        )
       }
     } catch {
       toast.add({

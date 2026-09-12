@@ -1,8 +1,26 @@
 {
   "schemaVersion": 1,
   "compatibilityPolicy": "preserve-within-major",
-  "layers": ["core", "theme", "platform", "editorial", "analytics", "scripts", "webform", "auth"],
-  "layerOrder": ["core", "theme", "platform", "editorial", "analytics", "scripts", "webform", "auth"],
+  "layers": [
+    "core",
+    "theme",
+    "platform",
+    "editorial",
+    "analytics",
+    "scripts",
+    "webform",
+    "auth"
+  ],
+  "layerOrder": [
+    "core",
+    "theme",
+    "platform",
+    "editorial",
+    "analytics",
+    "scripts",
+    "webform",
+    "auth"
+  ],
   "packageExports": [
     ".",
     "./presets/minimal",
@@ -20,8 +38,18 @@
     "~/components",
     "~/types"
   ],
-  "preferredAliases": ["#stir/utils", "#stir/composables", "#stir/components", "#stir/types"],
-  "compatibilityAliases": ["~/utils", "~/composables", "~/components", "~/types"],
+  "preferredAliases": [
+    "#stir/utils",
+    "#stir/composables",
+    "#stir/components",
+    "#stir/types"
+  ],
+  "compatibilityAliases": [
+    "~/utils",
+    "~/composables",
+    "~/components",
+    "~/types"
+  ],
   "componentConventions": {
     "customElements": "kebab-case 1:1 filenames under components/global",
     "fallbackSuffix": "--default"
@@ -38,7 +66,16 @@
     "/api/account/**"
   ],
   "publicComposables": [
-    "useStirListing"
+    "useStirListing",
+    "useAuthActions",
+    "useAuthConfig",
+    "useAuthLogin",
+    "useAuthRegister",
+    "useAuthSession",
+    "usePasswordRequest",
+    "usePasswordReset",
+    "useProtectedActions",
+    "useProtectedLogin"
   ],
   "runtimeConfigEnvironment": [
     "DRUPAL_URL",

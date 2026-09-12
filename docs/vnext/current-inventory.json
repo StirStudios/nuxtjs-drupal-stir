@@ -360,6 +360,7 @@
     ],
     "utils": [
       "layers/auth/app/utils/authLayout.ts",
+      "layers/auth/app/utils/authRedirect.ts",
       "layers/auth/app/utils/authTheme.ts",
       "layers/auth/app/utils/authValidation.ts",
       "layers/auth/app/utils/fetchError.ts",
@@ -482,7 +483,16 @@
         "./*"
       ],
       "composables": [
-        "useStirListing"
+        "useStirListing",
+        "useAuthActions",
+        "useAuthConfig",
+        "useAuthLogin",
+        "useAuthRegister",
+        "useAuthSession",
+        "usePasswordRequest",
+        "usePasswordReset",
+        "useProtectedActions",
+        "useProtectedLogin"
       ]
     },
     "compatibility": {
@@ -698,6 +708,7 @@
       ],
       "autoImportedUtils": [
         "layers/auth/app/utils/authLayout.ts",
+        "layers/auth/app/utils/authRedirect.ts",
         "layers/auth/app/utils/authTheme.ts",
         "layers/auth/app/utils/authValidation.ts",
         "layers/auth/app/utils/fetchError.ts",
@@ -769,21 +780,21 @@
   "counts": {
     "components": 128,
     "composables": 72,
-    "utils": 60,
+    "utils": 61,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 173,
+    "tests": 175,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 65,
+      "nuxt": 66,
       "scripts": 2,
       "server": 28,
       "unit": 10,
-      "utils": 54
+      "utils": 55
     }
   },
   "tests": [
@@ -861,6 +872,7 @@
     "tests/nuxt/runtime/drupalPageCommit.nuxt.spec.ts",
     "tests/nuxt/runtime/useAccountSettings.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthConfig.nuxt.spec.ts",
+    "tests/nuxt/runtime/useAuthLogin.nuxt.spec.ts",
     "tests/nuxt/runtime/useAuthSession.nuxt.spec.ts",
     "tests/nuxt/runtime/useDrupalViewControls.nuxt.spec.ts",
     "tests/nuxt/runtime/useNavLock.nuxt.spec.ts",
@@ -906,6 +918,7 @@
     "tests/unit/paragraphLayoutArrangement.spec.ts",
     "tests/unit/paragraphLayoutTransition.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
+    "tests/utils/authRedirect.spec.ts",
     "tests/utils/authTheme.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
@@ -1029,7 +1042,16 @@
       "/api/account/**"
     ],
     "publicComposables": [
-      "useStirListing"
+      "useStirListing",
+      "useAuthActions",
+      "useAuthConfig",
+      "useAuthLogin",
+      "useAuthRegister",
+      "useAuthSession",
+      "usePasswordRequest",
+      "usePasswordReset",
+      "useProtectedActions",
+      "useProtectedLogin"
     ],
     "runtimeConfigEnvironment": [
       "DRUPAL_URL",

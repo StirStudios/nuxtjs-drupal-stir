@@ -570,6 +570,28 @@ describe('layer contract', () => {
     )
 
     expect(authConfigComposable).toContain('export { useAuthConfig }')
+
+    // The page-level composables are auto-imported through these shims, so a
+    // downstream override depends on them existing.
+    for (const composable of [
+      'useAuthActions',
+      'useAuthLogin',
+      'useAuthRegister',
+      'useAuthSession',
+      'usePasswordRequest',
+      'usePasswordReset',
+      'useProtectedActions',
+      'useProtectedLogin',
+    ]) {
+      const shimPath = resolve(
+        rootDir,
+        `layers/auth/app/composables/${composable}.ts`,
+      )
+
+      expect(existsSync(shimPath)).toBe(true)
+      expect(readFileSync(shimPath, 'utf8')).toContain(`export { ${composable} }`)
+    }
+
     expect(authValidation).toContain('export function createLoginValidationSchema')
     expect(authValidation).toContain('export function createPasswordRequestValidationSchema')
     expect(authValidation).toContain('export function createRegisterValidationSchema')
