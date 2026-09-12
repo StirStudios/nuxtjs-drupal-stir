@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   mergeDrupalPageAccess,
+  resolveAuthSessionAccess,
   resolveDrupalPageAccess,
 } from '../../layers/theme/app/utils/editorialAccess'
 
@@ -55,6 +56,27 @@ describe('resolveDrupalPageAccess', () => {
       current_user: { uid: 0, roles: ['anonymous'] },
       local_tasks: { primary: [{ label: 'View', url: '/node/1' }] },
     }).hasEditorialAccess).toBe(false)
+  })
+})
+
+describe('resolveAuthSessionAccess', () => {
+  it('treats an administrator session as administrator access', () => {
+    expect(resolveAuthSessionAccess({
+      loggedIn: true,
+      user: { uid: 1, roles: ['authenticated', 'administrator'] },
+    })).toEqual({
+      isAdministrator: true,
+      isAuthenticated: true,
+      hasEditorialAccess: true,
+    })
+  })
+
+  it('grants nothing without a session user', () => {
+    expect(resolveAuthSessionAccess({ loggedIn: false, user: null })).toEqual({
+      isAdministrator: false,
+      isAuthenticated: false,
+      hasEditorialAccess: false,
+    })
   })
 })
 

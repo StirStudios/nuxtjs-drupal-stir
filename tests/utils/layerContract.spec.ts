@@ -860,7 +860,12 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(pageContext).not.toContain('fetchSession()')
+    // A session request here must stay behind the no-SSR safeguard: a
+    // server-rendered load never carries a Drupal session cookie, so public
+    // pages must not reach /api/auth/session.
+    expect(pageContext).toMatch(
+      /payload\.serverRendered\) return[\s\S]*fetchSession\(\)/,
+    )
     expect(adminStyles).toContain('import(\'../assets/css/admin-ui.css\')')
 
     for (const component of [
