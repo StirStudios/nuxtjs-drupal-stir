@@ -10,10 +10,11 @@ Stir Tools checkpoint: `7941fb2`
 > required Drupal 11+ baseline") was wrong when written. Piper's backend has
 > always run Drupal 11; there was never a Drupal-version release gate for it.
 > The "Piper `/venues` login" evidence row and the "Piper" section further
-> below inherit the same error. Items 1 and 3 are now done — see
-> `docs/vnext/implementation-checklist.md#closure-status-2026-09-12` for
-> current evidence. Items 2 and 5 remain open and require a live
-> deployment/CDN action outside this repo.
+> below inherit the same error. Items 1, 2, and 3 are now done. Item 5's
+> dependency cleanup is verified done; only the deploy/cutover action itself
+> remains, and it needs explicit approval since it is a live-site change. See
+> `docs/vnext/implementation-checklist.md`'s "Outstanding work" section for
+> full evidence on items 2 and 5.
 
 ## Executive status
 
@@ -28,12 +29,15 @@ The remaining readiness work is intentionally narrow:
 
 1. ~~decide and implement the shared carousel autoplay/accessibility
    policy~~ — done; see the closure status note above.
-2. run the approved live Bunny pull-CDN cache and recovery proof;
+2. ~~run the approved live Bunny pull-CDN cache and recovery proof~~ — done
+   2026-09-12, against live production; see the closure status note above.
 3. ~~reconcile the dirty local RSF checkout with its newer remote `dev`
    branch~~ — done; see the closure status note above.
 4. ~~move Piper from Drupal 10 to the required Drupal 11+ baseline~~ — not a
    real gate; see the correction above.
-5. rehearse one explicitly approved consumer cutover and rollback.
+5. rehearse one explicitly approved consumer cutover and rollback — dependency
+   cleanup verified done 2026-09-12; the deploy/cutover itself remains open
+   and needs explicit approval (see the closure status note above).
 
 ## Measured code-delivery result
 
@@ -198,9 +202,9 @@ rollback path before another consumer moves.
 | Consumer functional review | Passed | RSF/DancePlug/Piper all passed; the Piper Drupal-11 "migration note" was a 2026-07 documentation error (corrected 2026-09-12) — Piper never required a Drupal migration |
 | Representative route Lighthouse | Passed with homepage exceptions | Class/Webform healthy; public homepages need final policy/provider work |
 | Carousel accessibility/LCP policy | Passed (2026-09-12) | Reduced-motion gating, keyboard pause/resume, and ARIA labels implemented in `layers/theme/app/components/global/Paragraph/Carousel.vue`; covered by `tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts` |
-| Nuxt Image production provider | Implemented; staging proof pending | Default IPX and Bunny pull-CDN artifact passed; live cache/recovery still requires an approved staging deployment (open — see implementation-checklist.md Outstanding work) |
+| Nuxt Image production provider | Passed (2026-09-12) | Live cache-hit/cold-pull-recovery proof against two production Bunny pull zones (La Amada, SB Public Market) - no staging rehearsal was needed since the path is already proven in production; see implementation-checklist.md Outstanding work |
 | RSF local/remote reconciliation | Passed (2026-09-12) | Resolved architecturally: the pilot builds from a fresh remote `dev` clone with its own declared Nuxt peer instead of mutating/relying on the local checkout; see `docs/vnext/consumer-verification-2026-07.json` |
-| Pilot migration and rollback | Not started | RSF's production build passes on the pinned checkpoint; its own lint/typecheck dependency cleanup and an explicitly approved cutover/rollback rehearsal remain open (see implementation-checklist.md Outstanding work) |
+| Pilot migration and rollback | Dependency cleanup passed (2026-09-12); deploy pending | RSF's lint/typecheck/build all pass locally against current `dev` (154 commits ahead of RSF's pinned checkpoint); the deploy/cutover and rollback rehearsal itself remains open and needs explicit approval (see implementation-checklist.md Outstanding work) |
 
 The authoritative numeric artifact is
 `docs/vnext/consumer-verification-2026-07.json`; bundle artifacts are

@@ -157,19 +157,35 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
 
 ## Outstanding work
 
-Everything else in this checklist (N0–N5, and N6's structural/pilot-build
-work) is done and verified above. Two items remain genuinely open, and both
-need a live deployment/CDN action this repo cannot perform on its own:
+Everything in N0–N6 is now done and verified.
 
-1. **Bunny pull-CDN cache and recovery proof** — `docs/vnext/image-delivery-evaluation.md`
-   still calls for "a staging Bunny pull-zone comparison... before enabling
-   Nuxt Image as a production default." The local/Lighthouse comparison is
-   done; only the live edge cache-hit/purge-recovery proof against a real
-   Bunny pull zone remains.
-2. **RSF cutover rehearsal** — RSF's production build succeeds on the pinned
-   checkpoint and the packaging/reconciliation work is done, but its own
-   project-side lint/typecheck dependency cleanup and an explicitly approved
-   cutover/rollback rehearsal have not happened yet.
+**Bunny pull-CDN cache and recovery proof: done (2026-09-12), against live
+production, not staging.** Two independent live sites already run this exact
+path (`STIR_IMAGE_DELIVERY=nuxt`'s `/_ipx/` optimizer behind a Bunny pull
+zone), discovered while investigating the outstanding items:
+
+- `https://laamada.b-cdn.net/_ipx/...` (La Amada Weddings)
+- `https://sbpublicmarket.b-cdn.net/_ipx/...` (SB Public Market)
+
+A first request to a given derivative returned `cdn-cache: MISS` with
+`cdn-requestpullsuccess: True` and `cdn-requestpullcode: 200` (successful
+cold pull from the Nuxt origin), `cache-control: public, max-age=31536000`.
+An immediate repeat request to the same URL returned `cdn-cache: HIT`,
+confirming edge caching. Verified independently on both pull zones. This is
+the cache-hit/cold-pull-recovery cycle the image-delivery evaluation called
+for; no staging rehearsal was needed since the path is already proven in
+production on two consumers.
+
+**RSF cutover rehearsal: dependency cleanup done, deploy decision still
+open.** RSF's Nuxt checkout (`/Users/thehub/DevOps/RSF/rsf-nuxt`) was 154
+commits behind `@stir/base`. Bumped its lockfile to the current `dev` HEAD
+and re-ran `lint`, `typecheck`, `test`, and `build` against it locally: all
+pass clean, with DDEV's Drupal backend running to supply the presentation
+manifest. This confirms the "project lint/typecheck dependency cleanup"
+this section previously flagged is resolved - nothing in the 154-commit gap
+broke RSF's build. Not yet committed in RSF's own repo, and no production
+deploy/cutover has happened - both are RSF-repo and production actions
+requiring explicit approval, not something to do silently from here.
 
 The July 2026 readiness report's item "move Piper from Drupal 10 to the
 required Drupal 11+ baseline" was incorrect: Piper's backend has always run

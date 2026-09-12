@@ -94,8 +94,16 @@ This is a real improvement in the tested local production path, especially for
 LCP. FCP remained flat because image delivery does not remove the homepage's
 render-blocking CSS. Local Lighthouse is still directional: it does not include
 Bunny edge latency/cache hits, production CPU contention, or internet origin
-latency. A staging Bunny pull-zone comparison remains required before enabling
-Nuxt Image as a production default.
+latency.
+
+**Update, 2026-09-12:** the live Bunny pull-zone proof this section called for
+is done, and against production rather than staging - two independent live
+consumers (La Amada Weddings, SB Public Market) already run `/_ipx/` behind a
+Bunny pull zone. A first request to a derivative returns `cdn-cache: MISS`
+with `cdn-requestpullsuccess: True`/`cdn-requestpullcode: 200` (successful
+cold pull from the Nuxt origin); an immediate repeat request returns
+`cdn-cache: HIT`. See `docs/vnext/implementation-checklist.md`'s "Outstanding
+work" section for full evidence.
 
 ## Candidate generation
 
