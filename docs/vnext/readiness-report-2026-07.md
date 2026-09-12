@@ -6,6 +6,15 @@ Nuxt checkpoint: `e17ca31f`
 Nuxt integration checkpoint: `e17ca31f`
 Stir Tools checkpoint: `7941fb2`
 
+> **Correction, 2026-09-12:** item 4 below ("move Piper from Drupal 10 to the
+> required Drupal 11+ baseline") was wrong when written. Piper's backend has
+> always run Drupal 11; there was never a Drupal-version release gate for it.
+> The "Piper `/venues` login" evidence row and the "Piper" section further
+> below inherit the same error. Items 1 and 3 are now done — see
+> `docs/vnext/implementation-checklist.md#closure-status-2026-09-12` for
+> current evidence. Items 2 and 5 remain open and require a live
+> deployment/CDN action outside this repo.
+
 ## Executive status
 
 The structural rebuild is substantially complete and frozen for evidence-led
@@ -17,10 +26,13 @@ a release or migration approval.
 
 The remaining readiness work is intentionally narrow:
 
-1. decide and implement the shared carousel autoplay/accessibility policy;
+1. ~~decide and implement the shared carousel autoplay/accessibility
+   policy~~ — done; see the closure status note above.
 2. run the approved live Bunny pull-CDN cache and recovery proof;
-3. reconcile the dirty local RSF checkout with its newer remote `dev` branch;
-4. move Piper from Drupal 10 to the required Drupal 11+ baseline;
+3. ~~reconcile the dirty local RSF checkout with its newer remote `dev`
+   branch~~ — done; see the closure status note above.
+4. ~~move Piper from Drupal 10 to the required Drupal 11+ baseline~~ — not a
+   real gate; see the correction above.
 5. rehearse one explicitly approved consumer cutover and rollback.
 
 ## Measured code-delivery result
@@ -133,7 +145,10 @@ profiles.
 - Protected `/venues` login and application shell passed.
 - Piper is an application-only consumer and its score is not averaged with
   public website routes.
-- Its local backend is Drupal 10; migration to Drupal 11+ is a release gate.
+- ~~Its local backend is Drupal 10; migration to Drupal 11+ is a release
+  gate.~~ Incorrect (see the 2026-09-12 correction at the top of this
+  report): Piper's backend has always run Drupal 11. There is no Drupal
+  version migration for Piper.
 
 ## Decision gates
 
@@ -180,12 +195,12 @@ rollback path before another consumer moves.
 | Bundle/code-reduction target | Passed | 19.27% initial gzip and about 44% server-output minimal reductions |
 | Listing parity/performance | Passed | Four live DancePlug paths inside all budgets |
 | Webform privacy/cacheability | Passed | Live render metadata and no-store submission response |
-| Consumer functional review | Passed with migration note | RSF/DancePlug passed; Piper requires Drupal 11+ |
+| Consumer functional review | Passed | RSF/DancePlug/Piper all passed; the Piper Drupal-11 "migration note" was a 2026-07 documentation error (corrected 2026-09-12) — Piper never required a Drupal migration |
 | Representative route Lighthouse | Passed with homepage exceptions | Class/Webform healthy; public homepages need final policy/provider work |
-| Carousel accessibility/LCP policy | Decision required | Approve recommended default/opt-in behavior |
-| Nuxt Image production provider | Implemented; staging proof pending | Default IPX and Bunny pull-CDN artifact passed; live cache/recovery requires approved deployment |
-| RSF local/remote reconciliation | Pending merge authorization | Preserve dirty local work; use current remote architecture |
-| Pilot migration and rollback | Not started | Requires explicit cutover approval |
+| Carousel accessibility/LCP policy | Passed (2026-09-12) | Reduced-motion gating, keyboard pause/resume, and ARIA labels implemented in `layers/theme/app/components/global/Paragraph/Carousel.vue`; covered by `tests/nuxt/runtime/ParagraphCarousel.nuxt.spec.ts` |
+| Nuxt Image production provider | Implemented; staging proof pending | Default IPX and Bunny pull-CDN artifact passed; live cache/recovery still requires an approved staging deployment (open — see implementation-checklist.md Outstanding work) |
+| RSF local/remote reconciliation | Passed (2026-09-12) | Resolved architecturally: the pilot builds from a fresh remote `dev` clone with its own declared Nuxt peer instead of mutating/relying on the local checkout; see `docs/vnext/consumer-verification-2026-07.json` |
+| Pilot migration and rollback | Not started | RSF's production build passes on the pinned checkpoint; its own lint/typecheck dependency cleanup and an explicitly approved cutover/rollback rehearsal remain open (see implementation-checklist.md Outstanding work) |
 
 The authoritative numeric artifact is
 `docs/vnext/consumer-verification-2026-07.json`; bundle artifacts are

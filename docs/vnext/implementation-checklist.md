@@ -131,6 +131,51 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   adaptation in its result. Consumer verification no longer mutates or relies
   on the working checkout to prove a pilot build.
 
+## Closure status (2026-09-12)
+
+- **N3 is complete.** Pure shared policy lives in per-capability `shared/`
+  packages (`layers/core/shared`, `layers/auth/shared`, `layers/listing/shared`,
+  `layers/seo/shared`, `layers/webform/shared`); each holds normalization,
+  validation, and contract-adapter logic with no browser-only APIs, consumed
+  by both the route and server boundary so policy is not duplicated per layer.
+- **N4 is complete.** `layers/theme/app/composables/useStirDrupalCe.ts` is the
+  Stir Drupal facade in front of `nuxtjs-drupal-ce`; `layers/core/server/api/drupal-ce/`
+  is the server-side isolation point. Missing-component/unknown-field/malformed-node
+  diagnostics surface in development while production keeps the direct
+  upstream rendering path (see the N4 bullet above). Direct fields and the
+  synchronized Layout Paragraphs fixture both render through this facade
+  without a project adapter.
+- **N5 is complete.** The validated build-time presentation-usage manifest,
+  `pnpm perf:presentation`, and the public listing composable/server boundary
+  described above meet this slice's acceptance bar; the first live DancePlug
+  strict-manifest build is the representative-listing proof required.
+- **N6 is complete.** `presets/full` and `presets/minimal` both exist and
+  build; auth/Webform/editor/override-heavy/packed/RSF/DancePlug fixtures are
+  exercised by the consumer audit and CI. The RSF pilot (below) is the
+  required least-customized-consumer pilot; its cutover/rollback rehearsal is
+  the one item still open (see Outstanding work).
+
+## Outstanding work
+
+Everything else in this checklist (N0–N5, and N6's structural/pilot-build
+work) is done and verified above. Two items remain genuinely open, and both
+need a live deployment/CDN action this repo cannot perform on its own:
+
+1. **Bunny pull-CDN cache and recovery proof** — `docs/vnext/image-delivery-evaluation.md`
+   still calls for "a staging Bunny pull-zone comparison... before enabling
+   Nuxt Image as a production default." The local/Lighthouse comparison is
+   done; only the live edge cache-hit/purge-recovery proof against a real
+   Bunny pull zone remains.
+2. **RSF cutover rehearsal** — RSF's production build succeeds on the pinned
+   checkpoint and the packaging/reconciliation work is done, but its own
+   project-side lint/typecheck dependency cleanup and an explicitly approved
+   cutover/rollback rehearsal have not happened yet.
+
+The July 2026 readiness report's item "move Piper from Drupal 10 to the
+required Drupal 11+ baseline" was incorrect: Piper's backend has always run
+Drupal 11. It never was a real release gate; see the correction note in
+`docs/vnext/readiness-report-2026-07.md`.
+
 ## Delivery slices
 
 ### N0 — Freeze the executable baseline
