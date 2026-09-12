@@ -47,6 +47,9 @@ untouched do not need one.
   before. See `layers/auth/README.md`.
 - The account settings guard now carries its destination on `?redirect=`, so a
   signed-out visitor following a link there returns after signing in.
+- `resolveAuthSessionAccess(session)` projects an auth-session snapshot onto the
+  editorial access shape, so role rules stay defined once alongside
+  `resolveDrupalPageAccess`.
 
 ### Changed
 
@@ -67,6 +70,13 @@ untouched do not need one.
 
 ### Fixed
 
+- **Editorial tabs return for administrators on mixed routes.** Access was
+  resolved from the current Drupal page payload alone, so `DrupalTabs`
+  disappeared on any route whose payload carries no `local_tasks`.
+  `usePageContext` merges an administrator session back in. The session lookup
+  stays behind a client-only render: `drupal-session-no-ssr` already disables
+  SSR for any request carrying a Drupal session cookie, so a server-rendered
+  public page never reaches `/api/auth/session`.
 - **Open redirect.** `useProtectedLogin` accepted any redirect starting with
   `/`, so a protocol-relative `//evil.com` navigated off-site. Both auth
   composables now share a validator that rejects protocol-relative and

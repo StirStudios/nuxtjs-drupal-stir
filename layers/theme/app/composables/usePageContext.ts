@@ -1,5 +1,6 @@
 import {
   mergeDrupalPageAccess,
+  resolveAuthSessionAccess,
   resolveDrupalPageAccess,
 } from '../utils/editorialAccess'
 import { useAuthSession } from '../../../auth/app/composables/useAuthSession'
@@ -9,6 +10,11 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
   const session = useAuthSession()
 
   onMounted(() => {
+    // The drupal-session-no-ssr safeguard disables SSR for any request carrying
+    // a Drupal session cookie, so a server-rendered load is always anonymous and
+    // must never spend a session request on a public page.
+    if (useNuxtApp().payload.serverRendered) return
+
     void session.fetchSession().catch(() => {
       // Route payload access remains available if the session check fails.
     })
@@ -21,20 +27,12 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
 
     return page.value?.is_front_page === true
   })
-  const routeAccess = computed(() => resolveDrupalPageAccess(page.value))
-  const sessionAccess = computed(() => resolveDrupalPageAccess({
-    current_user: session.user.value
-      ? {
-          authenticated: session.loggedIn.value,
-          id: session.user.value.uid,
-          uid: session.user.value.uid,
-          roles: session.user.value.roles,
-        }
-      : null,
-  }))
   const access = computed(() => mergeDrupalPageAccess(
-    routeAccess.value,
-    sessionAccess.value,
+    resolveDrupalPageAccess(page.value),
+    resolveAuthSessionAccess({
+      loggedIn: session.loggedIn.value,
+      user: session.user.value,
+    }),
   ))
   const isAdministrator = computed(() => access.value.isAdministrator)
   const isAuthenticated = computed(() => access.value.isAuthenticated)

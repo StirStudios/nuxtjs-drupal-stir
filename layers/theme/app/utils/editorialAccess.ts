@@ -58,6 +58,32 @@ export function resolveDrupalPageAccess(
 
 export type DrupalPageAccess = ReturnType<typeof resolveDrupalPageAccess>
 
+type AuthSessionAccessSource = {
+  loggedIn?: boolean
+  user?: {
+    uid?: number | string
+    roles?: unknown
+  } | null
+}
+
+/**
+ * Projects an auth-session snapshot onto the page payload shape so role rules
+ * stay defined in one place.
+ */
+export function resolveAuthSessionAccess(
+  session: AuthSessionAccessSource,
+): DrupalPageAccess {
+  return resolveDrupalPageAccess({
+    current_user: session.user
+      ? {
+          authenticated: session.loggedIn,
+          uid: session.user.uid,
+          roles: session.user.roles,
+        }
+      : null,
+  })
+}
+
 /**
  * Combines route-specific tasks with a stable authenticated-user snapshot.
  */
