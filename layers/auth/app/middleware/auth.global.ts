@@ -10,15 +10,6 @@ function markPrivateResponse(): void {
   }
 }
 
-function matchesProtectedPath(routePath: string, rule: string): boolean {
-  const normalizedRule = rule.trim()
-
-  if (!normalizedRule) return false
-  if (normalizedRule === '/') return routePath === '/'
-  if (normalizedRule.endsWith('/')) return routePath.startsWith(normalizedRule)
-  return routePath === normalizedRule
-}
-
 function isAuthSystemRoute(path: string, protectedLoginPath: string): boolean {
   if (path === protectedLoginPath) return true
 
@@ -37,11 +28,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!config) return
 
-  const configuredPaths: unknown = config.requireLoginPaths
-  const protectedPaths = (Array.isArray(configuredPaths) ? configuredPaths : []).filter(
-    (path): path is string =>
-      typeof path === 'string' && path.trim().length > 0,
-  )
+  const protectedPaths = normalizeStirProtectedPaths(config.requireLoginPaths)
 
   if (!protectedPaths.length) return
 
@@ -52,9 +39,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  const isProtected = protectedPaths.some((path: string) =>
-    matchesProtectedPath(to.path, path),
-  )
+  const isProtected = isStirProtectedPath(to.path, protectedPaths)
 
   if (!isProtected) return
 

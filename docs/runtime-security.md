@@ -93,6 +93,22 @@ The password signs the short-lived protected-access cookie and is never exposed
 to the browser. Rotating `PROTECTED_PASSWORD` immediately invalidates existing
 protected-access cookies.
 
+The gate is enforced at the server boundary as well as on the route. Gating
+only the Vue route would leave the page payload fetchable directly from
+`/api/drupal-ce/<path>`, so a server middleware applies the same policy to that
+proxy: a request for a configured protected path must carry a valid
+protected-access cookie, or a Drupal session when
+`protectedRoutes.allowAuthenticatedUserBypass` is enabled, and is answered with
+`403` otherwise. `protectedRoutes.requireLoginPaths` stays the single authoring
+surface in `app.config.ts`; it is mirrored into runtime config at build time
+because Nitro cannot read app config at runtime. Downstream applications need
+no new configuration.
+
+Protected-page access remains a Nuxt-local gate, not Drupal access control. It
+hides content that Drupal itself still serves anonymously, so anything that
+must not reach an anonymous visitor belongs behind Drupal's own entity access
+rather than this password.
+
 Configured protected routes and authentication pages emit
 `Cache-Control: private, no-store, max-age=0` during SSR. CDN, reverse-proxy,
 and browser caches must honor that header; protected HTML must never be cached

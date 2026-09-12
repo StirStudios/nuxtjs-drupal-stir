@@ -761,13 +761,13 @@
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 172,
+    "tests": 173,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 65,
       "scripts": 2,
-      "server": 27,
+      "server": 28,
       "unit": 10,
       "utils": 54
     }
@@ -871,6 +871,7 @@
     "tests/server/paragraphTextApi.spec.ts",
     "tests/server/paragraphViewApi.spec.ts",
     "tests/server/protectedAccessToken.spec.ts",
+    "tests/server/protectedContent.spec.ts",
     "tests/server/protectedLogin.spec.ts",
     "tests/server/protectedRateLimit.spec.ts",
     "tests/server/protectedSession.spec.ts",
