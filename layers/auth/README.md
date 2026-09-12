@@ -111,6 +111,11 @@ behaviour, fields, copy, password policy, and redirects. Drupal presentation
 values are not read; configure all auth layouts and visuals through
 `stirTheme.auth`.
 
+Hardcoded strings in auth composables/pages (for example `|| 'Sign in'`) are
+last-resort fallbacks only, shown before `/api/auth/config` resolves or if
+Drupal ever omits a key. They are not a content surface and do not need to
+match Drupal's configured copy word-for-word.
+
 ## Public Helpers
 
 Downstream projects with local auth page overrides can use the auth layer's
