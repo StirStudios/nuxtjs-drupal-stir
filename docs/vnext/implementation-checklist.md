@@ -106,9 +106,17 @@ This checklist turns `docs/vnext-architecture-review.md` into reviewable deliver
   raw (13.18%) and from 47.03 to 42.06 kB gzip (10.57%). The build identity is
   serialized before Nitro compilation and `/api/health` reports the exact
   manifest/source revisions, strict mode, schema, site UUID, and Drupal theme.
-  DancePlug still reports Gin as its frontend theme and requires visual
-  regression review plus explicit `stir_decoupled` adoption before strict mode
-  becomes a project default.
+  DancePlug's `/api/health` still reports "gin" as the manifest's theme
+  identity - this is a build-time label from `stirPresentationBuild.theme`
+  (see `layers/core/server/api/health.get.ts`), unrelated to Drupal's
+  `system.theme.default`/`admin` config (which only governs Drupal's own
+  server-rendered pages and never touches the decoupled frontend; RSF has
+  the identical `admin: gin`/`default: gin` setup and it caused no issue in
+  its own D8 deploy/rollback pilot). Not a functional gap - just a naming
+  question of what the manifest's theme label should say once a dedicated
+  frontend theme identity exists, and a visual sign-off on the
+  strict-manifest CSS reduction itself. Neither blocks strict mode on
+  correctness grounds.
 - The RSF consumer pilot exposed and closed the pnpm-isolation packaging seam:
   applications now own the required Nuxt peer directly, the layer no longer
   requests a dependency-time lifecycle build, and the packed-consumer gate
