@@ -300,7 +300,7 @@ async function handleArrangementSaved(
             <div>
               <h2
                 ref="quickSettingsHeading"
-                class="admin-ui-card-title text-highlighted outline-none"
+                class="admin-ui-card-title text-highlighted outline-hidden"
                 tabindex="-1"
               >
                 Quick settings
