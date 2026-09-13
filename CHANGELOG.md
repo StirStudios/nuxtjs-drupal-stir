@@ -71,6 +71,13 @@ untouched do not need one.
   ignored, so the base sitemap is still served. The Drupal payload stays strictly
   validated, and output is unchanged when no handler is registered. See
   `layers/seo/README.md`.
+- `/auth/verify` carries a safe same-site `?redirect=` through to its sign-in
+  link and post-verification navigation, using the existing
+  `safeStirAuthRedirect()` check; `//host` and absolute external URLs are
+  dropped. The page logic moved to `useAuthVerify({ fallbackRedirect })`, so a
+  project needing a remembered destination overrides the page with a few lines
+  instead of copying it. Without `?redirect=`, behaviour is unchanged.
+  `AuthSecondaryAction`'s `to` prop now accepts any `RouteLocationRaw`.
 - Account navigation is configurable. `app.config` `auth.accountNav.items`
   (`label`, `to`, optional `icon` and `visibility`) replaces the default
   Settings link, and `registerAccountNavVisibility(key, resolver)` decides at

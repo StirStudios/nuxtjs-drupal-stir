@@ -128,6 +128,7 @@ public auto-import surface instead of importing from nested layer internals:
 - `useAuthLogin`
 - `useAuthRegister`
 - `useAuthSession`
+- `useAuthVerify`
 - `usePasswordRequest`
 - `usePasswordReset`
 - `useProtectedActions`
@@ -218,3 +219,23 @@ The callback runs after the session resolves. Its return value is used as
 given, so pass a query parameter through `redirect` from the context rather
 than reading one yourself. Return `false` to navigate nowhere and let the page
 take over.
+
+### Verification redirect
+
+`/auth/verify` carries a safe same-site `?redirect=` through to the sign-in
+link and the post-verification navigation, so a destination chosen before
+sign-up survives email verification. Unsafe values (`//host`, `/\host`,
+absolute or non-path URLs) are dropped using the same check as
+`useAuthLogin()`.
+
+A project that remembers the destination elsewhere (for example in a cookie)
+overrides the page and supplies a fallback, which is held to the same rule:
+
+```ts
+const { isLoading, verified, message, title, loginTarget, verify }
+  = useAuthVerify({ fallbackRedirect: () => rememberedPath.value })
+
+onMounted(verify)
+```
+
+`AuthSecondaryAction` accepts a route location object for `to`.

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
 import type { AuthThemeConfig } from '../../types/theme'
 import { resolveAuthPageKey } from '../../utils/authTheme'
 import { resolveUiButtonVariant, resolveUiColor } from '../../utils/nuxtUiProps'
@@ -8,7 +9,7 @@ const {
   to = '/auth/login',
 } = defineProps<{
   label?: string
-  to?: string
+  to?: RouteLocationRaw
 }>()
 
 const route = useRoute()
