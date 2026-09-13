@@ -34,6 +34,53 @@ pnpm audit:seo
 pnpm audit:site
 ```
 
+## Service discovery
+
+`pnpm audit:compliance` does not trust the inventory alone. It reads the Drupal
+config export (`config/sync` or `../config/sync`), `app/app.config.ts`, and
+environment variable names (never values) to discover which services a site
+actually runs, then applies only the rules that evidence triggers:
+
+| Evidence | Requires |
+| --- | --- |
+| Webform config | privacy copy on form data and its retention |
+| `stir_turnstile`, `stir_bunny`, `stir_instagram`, Plausible app config | the vendor in the inventory and the Privacy Policy |
+| Mail transport module | an email delivery vendor in the inventory |
+| Remote video media type | privacy copy on third-party media |
+| Public user registration | account forms in the inventory; account and deletion copy in the Privacy Policy and Terms |
+| Payment module | a payment vendor; billing copy in the Privacy Policy and Terms |
+| Payment module plus role expiry, recurring, or subscription evidence | `dataHandling.checkoutConsentRecord`; automatic renewal and cancellation in the Terms |
+| Newsletter module, user newsletter field, or newsletter block | the list provider and newsletter copy |
+| Flag, favorites, or account tracker modules | privacy copy on saved items or activity history |
+| Enabled privacy notice or UserWay | matching storage or vendor declarations |
+
+A brochure site therefore never inherits account, billing, or renewal rules, and
+a subscription product cannot pass without them. Declared vendors with no
+repository evidence produce a warning. Record an installed but unused service
+under `technology.inactive` as `{ "<rule id>": "reason" }`.
+
+Disclosures are checked against tracked legal copy (below) or, when
+`COMPLIANCE_SITE_URL` is set, the rendered pages. Pattern checks confirm a topic
+is addressed; they cannot confirm the wording is accurate or sufficient.
+
+## Tracked legal copy
+
+Keep approved legal text in the Drupal project at `compliance/legal/<alias>.html`
+(for example `privacy-policy.html` for `/privacy-policy`), or point
+`documents.<key>.file` at another path relative to the Nuxt project. Apply it
+with the Stir Tools Drush command:
+
+```sh
+ddev drush stir-tools:compliance-content          # preview
+ddev drush stir-tools:compliance-content --apply  # new revisions
+```
+
+The command updates only the text of the page's single Text paragraph, or its
+body when it has no sections. It never creates pages, rebuilds layout, or
+removes sections, and it skips pages whose text already matches. Projects that
+deploy approved copy automatically can call the
+`stir_tools.compliance_content` service from their own update hook.
+
 Standard cookieless Plausible Analytics alone normally does not require a
 cookie-consent prompt. Enable consent UI only when the actual technology and
 applicable rules require a choice.

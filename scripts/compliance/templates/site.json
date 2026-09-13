@@ -6,7 +6,8 @@
     "domain": "REPLACE_DOMAIN",
     "email": "REPLACE_EMAIL",
     "phone": "REPLACE_PHONE_OR_REMOVE",
-    "address": "REPLACE_PUBLIC_ADDRESS"
+    "address": "REPLACE_PUBLIC_ADDRESS",
+    "privacyEmail": "REPLACE_PRIVACY_EMAIL_OR_REMOVE"
   },
   "review": {
     "lastReviewed": "REPLACE_YYYY-MM-DD",
@@ -24,7 +25,8 @@
     "formIds": [],
     "vendors": [],
     "browserStorage": [],
-    "marketingTrackers": []
+    "marketingTrackers": [],
+    "inactive": {}
   },
   "consent": {
     "mode": "REPLACE_NOT_REQUIRED_OR_REQUIRED",

@@ -50,6 +50,21 @@ untouched do not need one.
 
 ### Added
 
+- `stir-compliance` now discovers the services a site actually runs from the
+  Drupal config export, `app/app.config.ts`, and environment variable names,
+  and applies only the rules that evidence triggers: Webforms, Turnstile,
+  Plausible, Bunny, email delivery, remote video, Instagram, public accounts,
+  payments, automatic renewal, newsletters, saved activity, the privacy notice,
+  and UserWay. An active service missing from `compliance/site.json` or from the
+  legal copy is an error; record an installed but unused one under
+  `technology.inactive` with the reason.
+- Legal copy can be tracked in `compliance/legal/<alias>.html` (or
+  `documents.<key>.file`) and applied with the Stir Tools command
+  `drush stir-tools:compliance-content`. The audit checks disclosures against
+  those files, or the rendered pages when `COMPLIANCE_SITE_URL` is set.
+- **Action required.** `compliance/REVIEW.md` gains a "Tracked legal copy"
+  checklist. Run `pnpm exec stir-compliance-init` after updating, or
+  `pnpm audit:compliance` reports the checklist as outdated.
 - `useAuthLogin(options?)` takes an optional `redirectTo` callback for
   destinations that can only be decided once the session resolves. It also
   honours `?redirect=` with the Drupal-configured `loginRedirectPath` as
