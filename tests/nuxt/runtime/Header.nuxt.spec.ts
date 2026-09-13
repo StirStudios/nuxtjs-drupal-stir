@@ -64,6 +64,26 @@ describe('App header', () => {
     wrapper.unmount()
   })
 
+  it('shows the returned focus ring only after keyboard input', async () => {
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const toggle = wrapper.get('[data-slot="right"] [data-slot="toggle"]')
+    const focus = vi.spyOn(toggle.element as HTMLElement, 'focus')
+    const closeWith = async (event: Event) => {
+      document.dispatchEvent(event)
+      await toggle.trigger('click')
+      await vi.waitFor(() => expect(findSlideover(wrapper).exists()).toBe(true))
+      await toggle.trigger('click')
+      findSlideover(wrapper).vm.$emit('after:leave')
+      await nextTick()
+    }
+
+    await closeWith(new Event('pointerdown'))
+    expect(focus).toHaveBeenLastCalledWith({ focusVisible: false })
+    await closeWith(new KeyboardEvent('keydown', { key: 'Enter' }))
+    expect(focus).toHaveBeenLastCalledWith({ focusVisible: true })
+    wrapper.unmount()
+  })
+
   it('renders a centred toggle layout with project toggle, actions and panel classes', async () => {
     const nuxtApp = useNuxtApp()
 

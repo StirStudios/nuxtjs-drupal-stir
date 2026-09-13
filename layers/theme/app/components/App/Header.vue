@@ -4,7 +4,7 @@ import type {
   UNavigationMenu as UNavigationMenuComponent,
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { createReusableTemplate } from '@vueuse/core'
+import { createReusableTemplate, useEventListener } from '@vueuse/core'
 import {
   mapDrupalMenuItem,
   splitMenuAtMarker,
@@ -338,6 +338,14 @@ const mobileNavLinks = computed(() =>
 
 let menuToggleElement: HTMLElement | null = null
 let menuClosedByNavigation = false
+let lastInputWasPointer = false
+
+useEventListener(import.meta.client ? document : undefined, 'pointerdown', () => {
+  lastInputWasPointer = true
+}, { capture: true, passive: true })
+useEventListener(import.meta.client ? document : undefined, 'keydown', () => {
+  lastInputWasPointer = false
+}, { capture: true, passive: true })
 
 function setMenuToggle(instance: unknown) {
   menuToggleElement = (instance as { $el?: HTMLElement } | null)?.$el ?? null
@@ -354,9 +362,11 @@ function toggleMenu() {
 }
 
 // Return focus to the toggle when the visitor closes the menu, but not after a
-// menu link navigates, so focus stays with the new page.
+// menu link navigates, so focus stays with the new page. Keyboard closes show
+// the focus ring; pointer and touch closes restore focus without it.
 function restoreMenuFocus() {
-  if (!menuClosedByNavigation) menuToggleElement?.focus()
+  if (!menuClosedByNavigation)
+    menuToggleElement?.focus({ focusVisible: !lastInputWasPointer } as FocusOptions)
   menuClosedByNavigation = false
 }
 
