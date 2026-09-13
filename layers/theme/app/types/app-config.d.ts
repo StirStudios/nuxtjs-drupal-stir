@@ -55,7 +55,6 @@ export type StirThemeButtonLikeConfig = {
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
   loginPath?: string
-  redirectOnLogin?: string
   allowAuthenticatedUserBypass?: boolean
   fallbackRedirectPath?: string
 } & LooseRecord
@@ -63,11 +62,6 @@ type ProtectedRoutesConfig = {
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
-  apiHost?: string
-  autoPageviews?: boolean
-  autoOutboundTracking?: boolean
-  fileDownloads?: boolean | { fileExtensions: string[] }
-  formSubmissions?: boolean
 } & LooseRecord
 
 type AnalyticsConfig = {
@@ -96,6 +90,7 @@ type CmsGlobalSeoConfig = {
   ignoredPathPrefixes?: string[]
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
+  lang?: string
   socialImage?: {
     enabled?: boolean
     format?: string
@@ -209,11 +204,6 @@ type StirThemeHeroConfig = {
   hide?: ClassValue
 } & LooseRecord
 
-type StirThemeFrontPageConfig = {
-  heading?: ClassValue
-  main?: ClassValue
-} & LooseRecord
-
 type StirThemeLinkHubConfig = {
   root?: ClassValue
   backgroundImage?: ClassValue
@@ -310,7 +300,6 @@ type StirThemeModalConfig = {
   title?: boolean
   description?: {
     media?: boolean
-    default?: boolean
   } & LooseRecord
 } & LooseRecord
 
@@ -445,14 +434,11 @@ type StirThemeConfig = {
   showPdf?: boolean
   showBreadcrumbs?: boolean
   loadingIndicator?: string | false
-  heading?: ClassValue
   container?: ClassValue
-  header?: ClassValue
   article?: StirThemeArticleConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
   clientComponents?: string[]
-  frontPage?: StirThemeFrontPageConfig
   linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
   footer?: StirThemeFooterConfig
@@ -513,14 +499,11 @@ type ResolvedStirThemeCardConfig = StirThemeCardConfig & {
 type ResolvedStirThemeConfig = StirThemeConfig & {
   showPdf: boolean
   showBreadcrumbs: boolean
-  heading: ClassValue
   container: ClassValue
-  header: ClassValue
   article: Required<StirThemeArticleConfig>
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
   clientComponents: string[]
-  frontPage: StirThemeFrontPageConfig
   linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]
   footer: StirThemeFooterConfig

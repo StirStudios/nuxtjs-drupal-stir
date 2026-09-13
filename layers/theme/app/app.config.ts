@@ -21,9 +21,7 @@ export default defineAppConfig({
     showPdf: false,
     showBreadcrumbs: false,
 
-    heading: 'mb-12 text-center text-6xl lg:mb-20',
     container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
-    header: 'fixed top-0 z-30 w-full !p-0',
     clientComponents: [],
 
     article: {
@@ -125,11 +123,6 @@ export default defineAppConfig({
         subtitleClass: '',
         showText: true,
       },
-    },
-
-    frontPage: {
-      heading: '',
-      main: '',
     },
 
     linkHub: {
@@ -239,7 +232,6 @@ export default defineAppConfig({
       title: true,
       description: {
         media: true,
-        default: false,
       },
     },
 

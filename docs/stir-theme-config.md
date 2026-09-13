@@ -93,7 +93,6 @@ Connection warmup is disabled so the widget is not fetched before that trigger.
 ```ts
 protectedRoutes: {
   loginPath: '/login',
-  redirectOnLogin: '/',
   requireLoginPaths: [],
   fallbackRedirectPath: '/',
 }
@@ -309,7 +308,7 @@ the page by default so already-executed vendor code is fully torn down; use
 Recommended key order in `stirTheme`:
 
 1. Global flags and layout primitives:
-   `showPdf`, `showBreadcrumbs`, `heading`, `container`, `header`, `navigation`, `hero`, `footer`
+   `showPdf`, `showBreadcrumbs`, `container`, `navigation`, `hero`, `footer`
 2. Content/component behavior:
    `media`, `carousel`, `mediaModal`, `overlay`, `webform`, `turnstile`
 3. Visual/system tokens and utilities:
@@ -321,8 +320,6 @@ Recommended key order in `stirTheme`:
 showPdf: false,
 loadingIndicator: 'repeating-linear-gradient(to right,#D21B18 0%,#ED6663 50%,#F28E8D 100%)',
 showBreadcrumbs: false,
-heading: 'mb-20 text-center text-6xl',
-header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
 ```
 
 ### 🔗 `navigation`
@@ -436,15 +433,6 @@ stirTheme: {
     variant: 'link',
   },
 },
-```
-
-### 🏠 `frontPage`
-
-```ts
-frontPage: {
-  heading: 'sr-only',
-  main: 'mt-0',
-}
 ```
 
 ### 📦 Layout
@@ -766,20 +754,6 @@ motion-v. Shorthand props override the `reveal` config for that element only:
 Content stays visible in the server-rendered HTML and animates after
 hydration. A `motionProps` object, used by Drupal paragraphs, takes precedence
 over the shorthand props.
-
-### 🧱 Grid separator
-
-```ts
-grid: {
-  separator: {
-	condition: 'node-',
-	base: 'mt-16 mb-10 xl:mt-28 max-w-screen-sm lg:w-[20rem] mx-auto',
-	color: 'white',
-	type: 'solid',
-	size: 'xs',
-  },
-},
-```
 
 ### 🧩 Card and gradients
 

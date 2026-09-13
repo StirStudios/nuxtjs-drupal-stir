@@ -32,7 +32,6 @@ export type FooterThemeConfig = {
   leftSlot: string
   right: string
   rightSlot: string
-  center: string
   footerLinks: string
   logo: string
   menu: string
@@ -60,7 +59,7 @@ export const DEFAULT_FOOTER_SECTIONS: FooterSections = {
   right: ['socials', 'email'],
 }
 
-export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'center' | 'sections'> = {
+export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'sections'> = {
   layout: 'default',
   requireSiteName: false,
   showLogo: true,
@@ -161,7 +160,6 @@ export function resolveFooterConfig(
     leftSlot: toString(next.leftSlot, DEFAULT_FOOTER_THEME.leftSlot),
     right: toString(next.right, DEFAULT_FOOTER_THEME.right),
     rightSlot: toString(next.rightSlot, DEFAULT_FOOTER_THEME.rightSlot),
-    center: toString(next.center),
     footerLinks: toString(next.footerLinks, DEFAULT_FOOTER_THEME.footerLinks),
     logo: toString(next.logo, DEFAULT_FOOTER_THEME.logo),
     menu: toString(next.menu, DEFAULT_FOOTER_THEME.menu),

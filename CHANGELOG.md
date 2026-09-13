@@ -37,6 +37,16 @@ untouched do not need one.
 
 - `useAuthAccount` — a thin re-export of four `useAuthApi` methods with no
   consumers in the layer or any known downstream project. Use `useAuthActions`.
+- App config settings that no layer code has ever read, with their defaults,
+  types and docs: `stirTheme.heading`, `stirTheme.header`, `stirTheme.frontPage`
+  and `stirTheme.mediaModal.description.default`; the app-config types for
+  `protectedRoutes.redirectOnLogin` and `analytics.plausible.apiHost`,
+  `autoPageviews`, `autoOutboundTracking`, `fileDownloads` and `formSubmissions`
+  (Plausible options are runtime config, see the analytics docs); and the
+  docs-only `grid.separator` section. Rendered output does not change. Theme
+  types still accept unknown keys, so projects that set these keep type-checking;
+  the values simply do nothing, as before. The unread `center` field is also gone
+  from the internal footer theme resolver.
 
 ### Added
 
