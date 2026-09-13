@@ -24,6 +24,7 @@ export default defineAppConfig({
     heading: 'mb-12 text-center text-6xl lg:mb-20',
     container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
     header: 'fixed top-0 z-30 w-full !p-0',
+    clientComponents: [],
 
     article: {
       container: 'max-w-3xl',
@@ -57,6 +58,9 @@ export default defineAppConfig({
       toggleDirection: 'right',
       toggleIcon: 'size-7',
       toggleTransparentClass: '',
+      toggleClass: '',
+      toggleComponent: '',
+      actionsComponent: '',
       header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',
@@ -82,6 +86,10 @@ export default defineAppConfig({
         link: 'text-default hover:text-highlighted hover:before:bg-elevated/60 data-[active]:text-primary data-[active]:before:bg-primary/10 min-h-12 justify-start rounded-lg px-4 py-3 text-start text-base font-medium before:rounded-lg sm:text-lg',
         list: 'w-full space-y-1.5',
         body: 'flex flex-col',
+        content: '',
+        portal: true,
+        overlay: true,
+        unmountOnHide: true,
       },
     },
 

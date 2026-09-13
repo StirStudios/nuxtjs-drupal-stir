@@ -72,6 +72,18 @@ untouched do not need one.
   link, image and rich-text mapping. `toEditableRichTextProps(props, classes?)`
   in `utils/editableRichText` is the shared mapping that `ParagraphText` now
   uses too.
+- Header options so projects no longer need to replace `App/Header.vue`:
+  `navigation.desktopLayout: 'centered-toggle'` (the toggle is the only
+  navigation at every breakpoint), `navigation.toggleClass`,
+  `navigation.toggleComponent` (receives `open` and `scrolled`),
+  `navigation.actionsComponent` (receives `scrolled`, rendered in the right
+  region), and `navigation.slideover.content`, `portal`, `overlay` and
+  `unmountOnHide`. Component names resolve against globally registered
+  components; unknown names render nothing. `stirTheme.clientComponents` mounts
+  named browser-only components, such as a cursor or page transition, once in
+  `app.vue`. Defaults leave the existing header output unchanged.
+- The header menu returns focus to its toggle when a visitor closes it, but not
+  after a menu link navigates.
 
 ### Changed
 

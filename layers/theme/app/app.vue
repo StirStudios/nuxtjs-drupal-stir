@@ -1,7 +1,17 @@
 <script lang="ts" setup>
 const appConfig = useAppConfig()
+const nuxtApp = useNuxtApp()
 const scrollButtonEnabled = computed(
   () => appConfig.stirTheme.scrollButton?.enabled !== false,
+)
+// Project-registered browser-only components, such as a custom cursor or page
+// transition. Unknown names render nothing.
+const clientComponents = computed(() =>
+  (appConfig.stirTheme.clientComponents ?? []).flatMap((name) => {
+    const component = nuxtApp.vueApp.component(name)
+
+    return component ? [{ name, component }] : []
+  }),
 )
 </script>
 
@@ -24,5 +34,12 @@ const scrollButtonEnabled = computed(
     <NuxtPage />
     <LazyAppScrollToTop v-if="scrollButtonEnabled" />
     <LazyAppIntegrations />
+    <ClientOnly v-if="clientComponents.length">
+      <component
+        :is="entry.component"
+        v-for="entry in clientComponents"
+        :key="entry.name"
+      />
+    </ClientOnly>
   </UApp>
 </template>

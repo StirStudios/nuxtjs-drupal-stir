@@ -394,6 +394,31 @@ For a centered-logo desktop header, set `navigation.desktopLayout` to
 Items before that marker render to the left of the logo, items after it render
 to the right, and the marker is removed from the mobile menu.
 
+For a header whose menu toggle is the only navigation at every breakpoint, set
+`navigation.desktopLayout` to `'centered-toggle'`. The logo sits left, the
+toggle in the centre and project actions on the right.
+
+Project hooks, all optional:
+
+- `navigation.toggleComponent` names a globally registered component rendered
+  inside the toggle button in place of the icon. It receives `open` and
+  `scrolled`.
+- `navigation.actionsComponent` names a globally registered component rendered
+  at the start of the right region. It receives `scrolled`.
+- `navigation.toggleClass` adds classes to the header toggle only. Use
+  `aria-expanded:` variants to style the open state.
+- `navigation.slideover.content` replaces the panel background classes.
+- `navigation.slideover.portal`, `overlay` and `unmountOnHide` pass through to
+  Nuxt UI Slideover. Set both `portal: false` and `unmountOnHide: false` to keep
+  the closed menu in the server-rendered HTML.
+
+Closing the menu returns focus to its toggle, except when a menu link
+navigates.
+
+`stirTheme.clientComponents` lists globally registered components that only
+make sense in the browser, such as a custom cursor or page transition. `app.vue`
+mounts each once inside `ClientOnly`; unknown names render nothing.
+
 Drupal's optional menu-link description is passed directly to Nuxt UI navigation
 items. Add concise descriptions in Drupal to enrich dropdown children; links
 without descriptions retain the existing compact presentation.

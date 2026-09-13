@@ -132,11 +132,14 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: UiColorName
   variant?: UiNavigationVariantName
-  desktopLayout?: 'default' | 'split-logo' | string
+  desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   toggleIcon?: ClassValue
   toggleTransparentClass?: ClassValue
+  toggleClass?: ClassValue
+  toggleComponent?: string
+  actionsComponent?: string
   header?: ClassValue
   splitLogo?: {
     center?: ClassValue
@@ -161,6 +164,10 @@ type StirThemeNavigationConfig = {
     link?: ClassValue
     list?: ClassValue
     body?: ClassValue
+    content?: ClassValue
+    portal?: boolean
+    overlay?: boolean
+    unmountOnHide?: boolean
   } & LooseRecord
 } & LooseRecord
 
@@ -439,6 +446,7 @@ type StirThemeConfig = {
   article?: StirThemeArticleConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
+  clientComponents?: string[]
   frontPage?: StirThemeFrontPageConfig
   linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
@@ -505,6 +513,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   article: Required<StirThemeArticleConfig>
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
+  clientComponents: string[]
   frontPage: StirThemeFrontPageConfig
   linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]
