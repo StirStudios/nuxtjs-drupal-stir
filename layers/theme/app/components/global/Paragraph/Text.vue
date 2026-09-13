@@ -10,7 +10,7 @@ const props = defineProps<
   EditableRichTextProps & {
     eyebrow?: string
     align?: string
-    card?: boolean | string | number
+    card?: boolean
     cardVariant?: string
     width?: string
     spacing?: string

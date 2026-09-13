@@ -42,7 +42,7 @@ const props = defineProps<{
   randomize?: boolean
   direction?: string
   animationScope?: 'children' | 'layout'
-  animationStagger?: boolean | number | string
+  animationStagger?: boolean
   editLink?: string
 }>()
 

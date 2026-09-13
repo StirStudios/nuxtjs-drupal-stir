@@ -23,8 +23,8 @@ const props = defineProps<{
   mediaHeight?: 'natural' | 'small' | 'break' | 'feature' | string
   align?: string
   direction?: string
-  overlay?: boolean | number | string
-  randomize?: boolean | number | string
+  overlay?: boolean
+  randomize?: boolean
 
   masonry?: {
     lanes?: Record<string, number>
@@ -49,9 +49,7 @@ const mediaHeightClass = computed(() =>
 const roundedClass = computed(() =>
   props.cornerStyle === 'square' ? 'rounded-none' : undefined,
 )
-const overlayEnabled = computed(
-  () => props.overlay === true || props.overlay === 1 || props.overlay === '1',
-)
+const overlayEnabled = computed(() => props.overlay === true)
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)

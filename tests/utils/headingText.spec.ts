@@ -3,7 +3,7 @@ import { headingTextForEditing, headingTextForSave } from '../../layers/editoria
 import { normalizeFormattedTextEditTarget } from '../../layers/theme/app/utils/formattedTextEditTarget'
 
 describe('heading quick edit', () => {
-  it.each(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])('preserves the %s tag while editing the title', (tag) => {
+  it.each(['h2', 'h3', 'h4', 'div', 'span'])('preserves the %s tag while editing the title', (tag) => {
     expect(headingTextForEditing(`${tag}|Original`)).toBe('Original')
     expect(headingTextForSave(`${tag}|Original`, 'New title')).toBe(`${tag}|New title`)
   })
@@ -12,6 +12,12 @@ describe('heading quick edit', () => {
     expect(headingTextForSave('Original', 'New title')).toBe('New title')
     expect(headingTextForSave('h2|Original', '')).toBe('')
     expect(headingTextForEditing('A | B')).toBe('A | B')
+  })
+
+  it('treats an unrecognized prefix as plain text instead of splitting on it', () => {
+    expect(headingTextForEditing('h1|Original')).toBe('h1|Original')
+    expect(headingTextForEditing('script|Original')).toBe('script|Original')
+    expect(headingTextForSave('h1|Original', 'New title')).toBe('New title')
   })
 
   it('keeps heading mode in the existing edit target contract', () => {

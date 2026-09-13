@@ -23,7 +23,7 @@ const props = defineProps<{
   size?: string
   variant?: string
   icon?: string
-  block?: boolean | number | string
+  block?: boolean
 
   link?: DrupalLink
 
