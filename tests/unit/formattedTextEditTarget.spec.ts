@@ -5,12 +5,12 @@ import {
 } from '../../layers/theme/app/utils/formattedTextEditTarget'
 
 describe('formatted text edit targets', () => {
-  it('normalizes Drupal snake_case payload metadata', () => {
+  it('normalizes camelCase payload metadata', () => {
     const target = normalizeFormattedTextEditTarget({
-      entity_type: 'node',
-      entity_id: '89',
-      field_name: 'body',
-      editor_mode: 'plain',
+      entityType: 'node',
+      entityId: '89',
+      fieldName: 'body',
+      editorMode: 'plain',
     })
 
     expect(target).toEqual({
@@ -39,9 +39,9 @@ describe('formatted text edit targets', () => {
 
   it('rejects unsafe route segments', () => {
     expect(normalizeFormattedTextEditTarget({
-      entity_type: '../node',
-      entity_id: '89',
-      field_name: 'body',
+      entityType: '../node',
+      entityId: '89',
+      fieldName: 'body',
     })).toBeNull()
   })
 })

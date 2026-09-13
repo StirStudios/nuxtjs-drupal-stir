@@ -10,7 +10,6 @@ defineProps<{
 
   maxItems?: number
   gridItems?: GridConfig
-  randomize?: boolean
   direction?: string
   editLink?: string
 }>()

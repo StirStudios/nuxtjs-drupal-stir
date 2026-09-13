@@ -156,7 +156,6 @@ describe('componentTree', () => {
           header: 'Project gallery',
           headerTag: 'h2',
           overlay: true,
-          randomize: false,
         },
         slots: {
           media: [{

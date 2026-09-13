@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import * as v from 'valibot'
+import { WIDTH_MAX_WIDTH_CLASSES } from '../app/utils/gridClasses'
 
 const breakpointSchema = v.record(
   v.string(),
@@ -317,14 +318,11 @@ export function presentationUtilities(
   }
   for (const value of manifest.used.spacing) addSpacing(classes, value, warn)
 
-  const widthRecipes: Record<string, string[]> = {
-    'w-xs': ['mx-auto', 'sm:max-w-lg'],
-    'w-sm': ['mx-auto', 'lg:max-w-2xl'],
-    'w-md': ['mx-auto', 'lg:max-w-3xl'],
-    'w-lg': ['mx-auto', 'lg:max-w-4xl'],
-    'w-xl': ['mx-auto', 'lg:max-w-5xl'],
-    'w-2xl': ['mx-auto', 'lg:max-w-6xl'],
-  }
+  const widthRecipes: Record<string, string[]> = Object.fromEntries(
+    Object.entries(WIDTH_MAX_WIDTH_CLASSES).map(
+      ([token, maxWidthClass]) => [`w-${token}`, ['mx-auto', maxWidthClass]],
+    ),
+  )
 
   for (const value of manifest.used.width) {
     const recipe = widthRecipes[value]

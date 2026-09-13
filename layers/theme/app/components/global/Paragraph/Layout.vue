@@ -40,7 +40,6 @@ const props = defineProps<{
   regionAlign?: Record<string, AlignConfig>
   reverseMobile?: boolean
 
-  randomize?: boolean
   direction?: string
   animationScope?: 'children' | 'layout'
   animationStagger?: boolean

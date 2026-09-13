@@ -28,7 +28,6 @@ const props = withDefaults(defineProps<{
 
   items?: unknown[]
   presentation?: 'carousel' | 'marquee' | string
-  randomize?: boolean
 
   gridItems?: GridConfig
   width?: string

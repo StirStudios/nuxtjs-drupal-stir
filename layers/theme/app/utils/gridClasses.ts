@@ -100,7 +100,7 @@ export function resolveAlignClasses(align: AlignConfig | undefined): string {
   return classes.join(' ')
 }
 
-const WIDTH_MAX_WIDTH_CLASSES: Record<string, string> = {
+export const WIDTH_MAX_WIDTH_CLASSES: Record<string, string> = {
   xs: 'sm:max-w-lg',
   sm: 'lg:max-w-2xl',
   md: 'lg:max-w-3xl',

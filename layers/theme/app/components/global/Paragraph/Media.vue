@@ -25,7 +25,6 @@ const props = defineProps<{
   align?: AlignConfig
   direction?: string
   overlay?: boolean
-  randomize?: boolean
 
   masonry?: {
     lanes?: Record<string, number>

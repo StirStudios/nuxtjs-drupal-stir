@@ -43,7 +43,6 @@ export interface DrupalViewProps {
   parentUuid?: string
   queryNamespace?: string
   pager?: ViewPager | unknown
-  randomize?: boolean
   carousel?: boolean
   carouselArrows?: boolean
   carouselAutoheight?: boolean
