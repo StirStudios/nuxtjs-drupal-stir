@@ -3,7 +3,7 @@ const { getPage } = useStirDrupalCe()
 const page = getPage()
 
 type NodeLink = {
-  nid: string
+  nid: number
   title: string
   url: string
 }

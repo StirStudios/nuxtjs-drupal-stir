@@ -46,16 +46,16 @@ describe('hero reveal accessibility', () => {
     expect(heroSource).toContain('resolveBooleanProp(heroSnapshot.value.hideTitle)')
     expect(heroSource).not.toMatch(/pageProps\.value\?\.hide(?!Title)/)
     expect(heroSource).not.toContain('sr-hide')
-    expect(heroContentSource).toContain(':class="{ \'sr-only\': hideTitle }"')
+    expect(heroContentSource).toContain('{ \'sr-only\': hideTitle }')
   })
 
   it('collapses visual text spacing when the hero only contains a hidden h1', () => {
     expect(heroSource).toContain('const hasVisibleHeroContent = computed')
     expect(heroSource).toContain(
-      'hasVisibleHeroContent && !isSection && heroTheme.text.base',
+      'hasVisibleHeroContent && !isSection && (isInline ? heroTheme.inline.text : heroTheme.text.base)',
     )
     expect(heroSource).toContain(
-      'hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront',
+      'hasVisibleHeroContent && isFrontEffective && !isInline && heroTheme.text.isFront',
     )
   })
 

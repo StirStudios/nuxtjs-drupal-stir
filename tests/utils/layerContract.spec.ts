@@ -322,12 +322,18 @@ describe('layer contract', () => {
       'rsf',
       'danceplug',
       'stir',
+      'edsmart',
+      'trilink',
+      'tkflagg',
+      'sbpublic',
+      'ddrink',
+      'stir-base',
     ])
     expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
     expect(targets.targets.danceplug?.routes).toContain('/videos')
     expect(consumerScript).toContain('\'archive\'')
     expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
-    expect(consumerScript).toContain('packageJson.peerDependencies.nuxt')
+    expect(consumerScript).toContain('packageJson.peerDependencies?.nuxt ?? packageJson.dependencies.nuxt')
     expect(consumerScript).toContain('adaptations')
   })
 
@@ -652,9 +658,12 @@ describe('layer contract', () => {
     )
 
     expect(header).not.toContain(':icon="toggleIcon"')
-    expect(header).toContain('toggle: \'size-11 justify-center p-0 lg:hidden\'')
-    expect(header.match(/data-slot="leadingIcon"/g)).toHaveLength(2)
-    expect(header.match(/:class="toggleIconClass"/g)).toHaveLength(2)
+    expect(header).toContain('toggle: \'size-11 justify-center p-0\'')
+    expect(header).toContain('isCenteredToggleLayout.value ? \'\' : \'lg:hidden\'')
+    // One toggle definition, reused in the left, centre or right region.
+    expect(header.match(/data-slot="leadingIcon"/g)).toHaveLength(1)
+    expect(header.match(/:class="toggleIconClass"/g)).toHaveLength(1)
+    expect(header.match(/<ReuseMenuToggle/g)).toHaveLength(3)
 
     const themeConfig = readFileSync(
       resolve(rootDir, 'layers/theme/app/app.config.ts'),
@@ -748,7 +757,11 @@ describe('layer contract', () => {
     expect(paragraphText).not.toContain('v-html')
     expect(paragraphText).toContain('inheritAttrs: false')
     expect(paragraphText).toContain('textEdit?: unknown')
-    expect(paragraphText).toContain('editTarget: props.editTarget ?? props.textEdit')
+    expect(paragraphText).toContain('toEditableRichTextProps(props)')
+    expect(readFileSync(
+      resolve(rootDir, 'layers/theme/app/utils/editableRichText.ts'),
+      'utf8',
+    )).toContain('editTarget: source.editTarget ?? source.textEdit')
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')

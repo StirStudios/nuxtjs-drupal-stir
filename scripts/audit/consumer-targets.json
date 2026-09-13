@@ -20,6 +20,30 @@
     "stir": {
       "pathEnvironment": "STIR_CONSUMER_STIR",
       "routes": ["/", "/work"]
+    },
+    "edsmart": {
+      "pathEnvironment": "STIR_CONSUMER_EDSMART",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "trilink": {
+      "pathEnvironment": "STIR_CONSUMER_TRILINK",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "tkflagg": {
+      "pathEnvironment": "STIR_CONSUMER_TKFLAGG",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "sbpublic": {
+      "pathEnvironment": "STIR_CONSUMER_SBPUBLIC",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "ddrink": {
+      "pathEnvironment": "STIR_CONSUMER_DDRINK",
+      "routes": ["/", "discover:first-inner"]
+    },
+    "stir-base": {
+      "pathEnvironment": "STIR_CONSUMER_STIR_BASE",
+      "routes": ["/", "discover:first-inner"]
     }
   }
 }

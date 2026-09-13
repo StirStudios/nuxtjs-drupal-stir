@@ -545,7 +545,7 @@ export function useDrupalViewControls(
 
     const viewNodeProps = getDrupalViewNodeProps(viewNode)
 
-    randomOrder.value = normalizeDrupalRandomOrder(viewNodeProps.randomOrder ?? viewNodeProps.random_order) ?? randomOrder.value
+    randomOrder.value = normalizeDrupalRandomOrder(viewNodeProps.randomOrder) ?? randomOrder.value
 
     dynamicRows.value = getDrupalViewNodeRows(viewNode)
     dynamicPager.value = normalizeDrupalViewPager(viewNodeProps.pager) ?? {

@@ -4,6 +4,7 @@ import type {
   UNavigationMenu as UNavigationMenuComponent,
 } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { createReusableTemplate, useEventListener } from '@vueuse/core'
 import {
   mapDrupalMenuItem,
   splitMenuAtMarker,
@@ -23,29 +24,38 @@ const { getPage, useMenu } = useStirDrupalCe()
 const page = getPage()
 const { isFront, hasEditorialAccess } = usePageContext()
 const route = useRoute()
+const nuxtApp = useNuxtApp()
 const appConfig = useAppConfig()
 const theme = appConfig.stirTheme
 const hydrated = ref(false)
 const forceScrolled = ref(false)
 const menuOpen = ref(false)
-const menuMounted = ref(false)
+// A menu kept mounted while hidden is rendered up front so its links are in
+// the server HTML.
+const menuMounted = ref(theme.navigation.slideover?.unmountOnHide === false)
 const menuId = useId()
+const [DefineMenuToggle, ReuseMenuToggle] = createReusableTemplate()
 const headerUi = {
   container: 'flex items-center justify-between gap-3',
   left: 'lg:flex-1 flex items-center gap-1.5',
   center: 'hidden lg:flex',
   right: 'flex items-center justify-end lg:flex-1 gap-1.5',
   title: 'shrink-0 font-bold text-xl text-highlighted flex items-end gap-1.5',
-  toggle: 'size-11 justify-center p-0 lg:hidden',
-  content: 'lg:hidden sm:max-w-md',
-  overlay: 'lg:hidden',
+  toggle: 'size-11 justify-center p-0',
+  content: 'sm:max-w-md',
   header: 'flex min-h-(--ui-header-height) shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-6',
   body: 'flex-1 overflow-y-auto px-4 py-6 sm:px-6',
+} as const
+const centeredToggleUi = {
+  container: 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3',
+  left: 'flex items-center justify-self-start gap-1.5',
+  center: 'flex items-center justify-center',
+  right: 'flex items-center justify-self-end justify-end gap-1.5',
 } as const
 
 type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
 type HeaderToggleSide = 'left' | 'right'
-type DesktopHeaderLayout = 'default' | 'split-logo'
+type DesktopHeaderLayout = 'default' | 'split-logo' | 'centered-toggle'
 type LogoSurface = 'auto' | 'light' | 'dark'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
@@ -66,7 +76,7 @@ const toToggleDirection = (value: unknown): ToggleDirection => {
 }
 const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
 const toDesktopHeaderLayout = (value: unknown): DesktopHeaderLayout =>
-  value === 'split-logo' ? 'split-logo' : 'default'
+  value === 'split-logo' || value === 'centered-toggle' ? value : 'default'
 const toLogoSurface = (value: unknown): LogoSurface =>
   value === 'light' || value === 'dark' ? value : 'auto'
 
@@ -93,6 +103,12 @@ const toClassName = (value: unknown): string => {
   return ''
 }
 
+const toRegisteredComponent = (value: unknown) => {
+  const name = toStringProp<string>(value)
+
+  return name ? nuxtApp.vueApp.component(name) ?? null : null
+}
+
 const menuSide = computed(() => toToggleDirection(theme.navigation?.toggleDirection))
 const menuToggleSide = computed(() => toHeaderToggleSide(menuSide.value))
 const headerNavColor = computed(() => toNavigationColor(theme.navigation?.color))
@@ -102,6 +118,11 @@ const headerHighlightColor = computed(() =>
 const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
 const desktopHeaderLayout = computed(() => toDesktopHeaderLayout(theme.navigation?.desktopLayout))
 const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-logo')
+const isCenteredToggleLayout = computed(() => desktopHeaderLayout.value === 'centered-toggle')
+// The centred toggle is the only navigation at every breakpoint.
+const mobileOnlyClass = computed(() => isCenteredToggleLayout.value ? '' : 'lg:hidden')
+const toggleComponent = computed(() => toRegisteredComponent(theme.navigation?.toggleComponent))
+const actionsComponent = computed(() => toRegisteredComponent(theme.navigation?.actionsComponent))
 const siteTitle = computed(() => page.value?.site_info?.name ?? '')
 const showColorModeToggle = computed(() => appConfig.colorMode?.showToggle !== false)
 const finalIsScrolled = computed(() => {
@@ -152,7 +173,7 @@ const headerClasses = computed(() =>
 )
 const headerContainerClasses = computed(() =>
   [
-    headerUi.container,
+    isCenteredToggleLayout.value ? centeredToggleUi.container : headerUi.container,
     toClassName(theme.navigation.container),
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.container) : '',
   ].filter(Boolean).join(' '),
@@ -173,17 +194,21 @@ const mobileLogoClasses = computed(() =>
     logoClasses.value,
   ].filter(Boolean).join(' '),
 )
-const headerLeftClasses = computed(() =>
-  isSplitLogoLayout.value
+const headerLeftClasses = computed(() => {
+  if (isCenteredToggleLayout.value) return centeredToggleUi.left
+
+  return isSplitLogoLayout.value
     ? toClassName(theme.navigation.splitLogo?.mobileLeft) || headerUi.left
-    : headerUi.left,
-)
-const headerCenterClasses = computed(() =>
-  [
+    : headerUi.left
+})
+const headerCenterClasses = computed(() => {
+  if (isCenteredToggleLayout.value) return centeredToggleUi.center
+
+  return [
     headerUi.center,
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.center) : '',
-  ].filter(Boolean).join(' '),
-)
+  ].filter(Boolean).join(' ')
+})
 const menuContent = computed<SlideoverContentAttrs>(() => {
   const slideover = theme.navigation.slideover
   const angleEnabled = Boolean(slideover?.angle)
@@ -216,18 +241,22 @@ const menuContent = computed<SlideoverContentAttrs>(() => {
 })
 const menuOverlayClasses = computed(() =>
   [
-    headerUi.overlay,
+    mobileOnlyClass.value,
     theme.navigation.slideover?.angle ? '!bg-transparent' : '',
   ].filter(Boolean).join(' '),
 )
-const menuContentClasses = computed(() =>
-  [
+const menuContentClasses = computed(() => {
+  const angleEnabled = Boolean(theme.navigation.slideover?.angle)
+
+  return [
     headerUi.content,
-    theme.navigation.slideover?.angle
-      ? 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !bg-default !shadow-none !ring-0 sm:!ring-0'
+    mobileOnlyClass.value,
+    angleEnabled
+      ? 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-none !ring-0 sm:!ring-0'
       : '',
-  ].filter(Boolean).join(' '),
-)
+    toClassName(theme.navigation.slideover?.content) || (angleEnabled ? '!bg-default' : ''),
+  ].filter(Boolean).join(' ')
+})
 const menuHeaderClasses = computed(() =>
   [
     headerUi.header,
@@ -242,25 +271,29 @@ const menuBodyClasses = computed(() =>
     theme.navigation.slideover?.angle ? 'bg-transparent' : '',
   ].filter(Boolean).join(' '),
 )
-const headerRightClasses = computed(() =>
-  [
+const headerRightClasses = computed(() => {
+  if (isCenteredToggleLayout.value) return centeredToggleUi.right
+
+  return [
     headerUi.right,
     appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false
       ? 'block lg:hidden lg:flex-0'
       : 'lg:flex-1',
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.right) : '',
-  ].filter(Boolean).join(' '),
-)
+  ].filter(Boolean).join(' ')
+})
 const baseToggleClasses = computed(() =>
   [
     headerUi.toggle,
-    menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
-  ].join(' '),
+    mobileOnlyClass.value,
+    isCenteredToggleLayout.value ? '' : menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
+  ].filter(Boolean).join(' '),
 )
 const toggleClasses = computed(() =>
   [
     baseToggleClasses.value,
     isTransparentHeader.value ? toClassName(theme.navigation.toggleTransparentClass) : '',
+    toClassName(theme.navigation.toggleClass),
   ].filter(Boolean).join(' '),
 )
 const toggleIcon = computed(() => {
@@ -303,6 +336,21 @@ const mobileNavLinks = computed(() =>
     : navLinks.value,
 )
 
+let menuToggleElement: HTMLElement | null = null
+let menuClosedByNavigation = false
+let lastInputWasPointer = false
+
+useEventListener(import.meta.client ? document : undefined, 'pointerdown', () => {
+  lastInputWasPointer = true
+}, { capture: true, passive: true })
+useEventListener(import.meta.client ? document : undefined, 'keydown', () => {
+  lastInputWasPointer = false
+}, { capture: true, passive: true })
+
+function setMenuToggle(instance: unknown) {
+  menuToggleElement = (instance as { $el?: HTMLElement } | null)?.$el ?? null
+}
+
 function toggleMenu() {
   if (menuOpen.value) {
     menuOpen.value = false
@@ -311,6 +359,15 @@ function toggleMenu() {
 
   menuMounted.value = true
   menuOpen.value = true
+}
+
+// Return focus to the toggle when the visitor closes the menu, but not after a
+// menu link navigates, so focus stays with the new page. Keyboard closes show
+// the focus ring; pointer and touch closes restore focus without it.
+function restoreMenuFocus() {
+  if (!menuClosedByNavigation)
+    menuToggleElement?.focus({ focusVisible: !lastInputWasPointer } as FocusOptions)
+  menuClosedByNavigation = false
 }
 
 onMounted(() => {
@@ -328,6 +385,7 @@ watch(
 watch(
   () => route.fullPath,
   () => {
+    if (menuOpen.value) menuClosedByNavigation = true
     menuOpen.value = false
   },
 )
@@ -339,6 +397,36 @@ watch(menuOpen, (val) => {
 </script>
 
 <template>
+  <DefineMenuToggle>
+    <UButton
+      :ref="setMenuToggle"
+      :aria-controls="menuId"
+      :aria-expanded="menuOpen"
+      :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
+      :class="toggleClasses"
+      color="neutral"
+      data-slot="toggle"
+      variant="ghost"
+      @click="toggleMenu"
+    >
+      <template #leading>
+        <component
+          :is="toggleComponent"
+          v-if="toggleComponent"
+          :open="menuOpen"
+          :scrolled="finalIsScrolled"
+        />
+        <UIcon
+          v-else
+          aria-hidden="true"
+          :class="toggleIconClass"
+          data-slot="leadingIcon"
+          :name="toggleIcon"
+        />
+      </template>
+    </UButton>
+  </DefineMenuToggle>
+
   <LazyRegionArea area="top" />
   <LazyDrupalTabs v-if="hasEditorialAccess" />
 
@@ -356,26 +444,7 @@ watch(menuOpen, (val) => {
         :class="headerLeftClasses"
         data-slot="left"
       >
-        <UButton
-          v-if="menuToggleSide === 'left'"
-          :aria-controls="menuId"
-          :aria-expanded="menuOpen"
-          :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
-          :class="toggleClasses"
-          color="neutral"
-          data-slot="toggle"
-          variant="ghost"
-          @click="toggleMenu"
-        >
-          <template #leading>
-            <UIcon
-              aria-hidden="true"
-              :class="toggleIconClass"
-              data-slot="leadingIcon"
-              :name="toggleIcon"
-            />
-          </template>
-        </UButton>
+        <ReuseMenuToggle v-if="!isCenteredToggleLayout && menuToggleSide === 'left'" />
 
         <ULink
           aria-label="Home"
@@ -398,7 +467,9 @@ watch(menuOpen, (val) => {
         :class="headerCenterClasses"
         data-slot="center"
       >
-        <template v-if="isSplitLogoLayout">
+        <ReuseMenuToggle v-if="isCenteredToggleLayout" />
+
+        <template v-else-if="isSplitLogoLayout">
           <LazyUNavigationMenu
             v-if="beforeLogo.length"
             aria-label="Primary navigation"
@@ -450,28 +521,15 @@ watch(menuOpen, (val) => {
         :class="headerRightClasses"
         data-slot="right"
       >
+        <component
+          :is="actionsComponent"
+          v-if="actionsComponent"
+          :scrolled="finalIsScrolled"
+        />
+
         <LazyIconsColorMode v-if="showColorModeToggle" />
 
-        <UButton
-          v-if="menuToggleSide === 'right'"
-          :aria-controls="menuId"
-          :aria-expanded="menuOpen"
-          :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
-          :class="toggleClasses"
-          color="neutral"
-          data-slot="toggle"
-          variant="ghost"
-          @click="toggleMenu"
-        >
-          <template #leading>
-            <UIcon
-              aria-hidden="true"
-              :class="toggleIconClass"
-              data-slot="leadingIcon"
-              :name="toggleIcon"
-            />
-          </template>
-        </UButton>
+        <ReuseMenuToggle v-if="!isCenteredToggleLayout && menuToggleSide === 'right'" />
       </div>
     </UContainer>
   </header>
@@ -481,6 +539,8 @@ watch(menuOpen, (val) => {
     v-model:open="menuOpen"
     :content="menuContent"
     description="Site navigation"
+    :overlay="theme.navigation.slideover?.overlay ?? true"
+    :portal="theme.navigation.slideover?.portal ?? true"
     :side="menuSide"
     title="Navigation"
     :ui="{
@@ -489,6 +549,8 @@ watch(menuOpen, (val) => {
       header: menuHeaderClasses,
       body: menuBodyClasses,
     }"
+    :unmount-on-hide="theme.navigation.slideover?.unmountOnHide ?? true"
+    @after:leave="restoreMenuFocus"
   >
     <template #content>
       <div

@@ -95,4 +95,38 @@ describe('useDrupalPageNodes', () => {
     expect([image, video, document, audio, link].every(isDrupalPageMediaNode)).toBe(true)
     expect(isDrupalPageMediaNode(text)).toBe(false)
   })
+
+  it('resolves link, image and editable text props from page nodes', () => {
+    const button = h(TestComponent, {
+      element: 'paragraph-button',
+      link: { linkResolvableUri: '/contact', linkTitle: 'Contact us' },
+    })
+    const mediaLink = h(TestComponent, { element: 'media-link', type: 'link', link: 'https://example.com' })
+    const image = h(TestComponent, { element: 'media-image', type: 'image', src: '/portrait.jpg', alt: 'Portrait' })
+    const imageWithoutSource = h(TestComponent, { element: 'media-image', type: 'image' })
+    const text = h(TestComponent, {
+      element: 'paragraph-text',
+      id: 7,
+      text: '<p>Intro</p>',
+      textEdit: { fieldName: 'field_text' },
+      editLink: '/edit',
+    })
+    const layout = h(TestComponent, { element: 'paragraph-layout' }, {
+      default: () => [button, mediaLink, image, imageWithoutSource, text],
+    })
+    const nodes = useDrupalPageNodes(() => [layout])
+
+    expect(nodes.links()).toEqual([button])
+    expect(nodes.linkOf(button)).toEqual({ title: 'Contact us', url: '/contact', external: false })
+    expect(nodes.linkOf(mediaLink)).toEqual({ title: undefined, url: undefined, external: false })
+    expect(nodes.linkOf(undefined).url).toBeUndefined()
+    expect(nodes.imageProps()).toEqual([expect.objectContaining({ src: '/portrait.jpg', alt: 'Portrait' })])
+    expect(nodes.textPropsOf(text, 'lead')).toMatchObject({
+      id: 7,
+      text: '<p>Intro</p>',
+      classes: 'lead',
+      editLink: '/edit',
+      editTarget: { fieldName: 'field_text' },
+    })
+  })
 })

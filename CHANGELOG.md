@@ -37,6 +37,16 @@ untouched do not need one.
 
 - `useAuthAccount` — a thin re-export of four `useAuthApi` methods with no
   consumers in the layer or any known downstream project. Use `useAuthActions`.
+- App config settings that no layer code has ever read, with their defaults,
+  types and docs: `stirTheme.heading`, `stirTheme.header`, `stirTheme.frontPage`
+  and `stirTheme.mediaModal.description.default`; the app-config types for
+  `protectedRoutes.redirectOnLogin` and `analytics.plausible.apiHost`,
+  `autoPageviews`, `autoOutboundTracking`, `fileDownloads` and `formSubmissions`
+  (Plausible options are runtime config, see the analytics docs); and the
+  docs-only `grid.separator` section. Rendered output does not change. Theme
+  types still accept unknown keys, so projects that set these keep type-checking;
+  the values simply do nothing, as before. The unread `center` field is also gone
+  from the internal footer theme resolver.
 
 ### Added
 
@@ -50,6 +60,54 @@ untouched do not need one.
 - `resolveAuthSessionAccess(session)` projects an auth-session snapshot onto the
   editorial access shape, so role rules stay defined once alongside
   `resolveDrupalPageAccess`.
+- Page heroes gain `stirTheme.hero` options so projects no longer need to
+  replace `ParagraphHero`: `nodeTypes` (per Drupal node type `layout:
+  'background' | 'inline'` and `media: 'first' | 'last'`), `inline.base` and
+  `inline.text` classes, `textSpacing` for text-only heroes, and a decorative
+  `backdrop` for text-only inner-page heroes. Defaults leave existing output
+  unchanged. `HeroContent` receives the resolved `layout` prop, and its H1 now
+  uses the existing `hero.text.heading` classes (default `mb-0`, as before).
+  In `mode: 'simple'`, the `classes` prop now wraps the slots instead of being
+  ignored.
+- `RevealMotionElement` accepts shorthand props (`effect`, `delayMs`,
+  `durationMs`, `distancePx`, `rootMargin`) for component-authored reveals, so
+  projects no longer need their own motion-v wrapper. Shorthand reveals use the
+  same reduced-motion, SSR-visible and `animations.once` handling as Drupal
+  paragraph reveals. `getRevealMotionProps` / `useRevealMotionProps` accept the
+  same `durationMs`, `distancePx` and `rootMargin` overrides; `motionProps`
+  still takes precedence and is unchanged.
+- `useDrupalPageNodes` gains `links()`, `linkOf(node)`, `imageProps()` and
+  `textPropsOf(node, classes?)`, with standalone `isDrupalPageLinkNode` and
+  `getDrupalPageNodeLink` exports, so page components stop re-implementing
+  link, image and rich-text mapping. `toEditableRichTextProps(props, classes?)`
+  in `utils/editableRichText` is the shared mapping that `ParagraphText` now
+  uses too.
+- Header options so projects no longer need to replace `App/Header.vue`:
+  `navigation.desktopLayout: 'centered-toggle'` (the toggle is the only
+  navigation at every breakpoint), `navigation.toggleClass`,
+  `navigation.toggleComponent` (receives `open` and `scrolled`),
+  `navigation.actionsComponent` (receives `scrolled`, rendered in the right
+  region), and `navigation.slideover.content`, `portal`, `overlay` and
+  `unmountOnHide`. Component names resolve against globally registered
+  components; unknown names render nothing. `stirTheme.clientComponents` mounts
+  named browser-only components, such as a cursor or page transition, once in
+  `app.vue`. Defaults leave the existing header output unchanged.
+- The header menu returns focus to its toggle when a visitor closes it, but not
+  after a menu link navigates.
+- `stirTheme.hero.front` configures the front-page hero title without a
+  `HeroContent` override: `subtitle: 'below'` keeps the page title as the H1
+  and renders the authored header, or else the site slogan, as an H2 styled by
+  `subtitleClass`; `showText: false` hides the hero text on the front page.
+  Defaults (`subtitle: 'replace'`, `showText: true`) leave output unchanged.
+  `ParagraphHero` now passes the site slogan to `HeroContent` as `siteSlogan`.
+- `StirPdfViewer` renders the real `vue-pdf-viewer-core` viewer when a project
+  installs that package's Nuxt module, and keeps the lightweight stub otherwise,
+  so projects no longer need their own `StirPdfViewer.client.vue` wrapper.
+  `overrideFallbackComponent` accepts an optional `when` predicate.
+- `useFooterData()` returns `footerMenu`, `footerMenuItems` and `siteInfo` from
+  the current Drupal page, falling back to the app footer context (loaded during
+  SSR and when a client-side page lacks the data). `AppFooter` uses it, so
+  custom project footers no longer need to copy that loading logic.
 
 ### Changed
 

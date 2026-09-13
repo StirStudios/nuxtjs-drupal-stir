@@ -64,7 +64,7 @@ async function packLayer(directory) {
 
   return {
     path: join(directory, `${packageJson.name.replace(/^@/, '').replace('/', '-')}-${packageJson.version}.tgz`),
-    nuxtPeer: packageJson.peerDependencies.nuxt,
+    nuxtPeer: packageJson.peerDependencies?.nuxt ?? packageJson.dependencies.nuxt,
   }
 }
 

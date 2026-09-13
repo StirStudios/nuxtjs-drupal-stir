@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { drupalViewQueryIdentityKey, drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
 import { resolveLegacyDrupalViewQueryNamespace } from '#stir/utils/drupalViewQueryNamespace'
+import type { GridConfig } from '#stir/utils/gridClasses'
 
 const props = defineProps<{
   id?: number | string
@@ -9,8 +10,7 @@ const props = defineProps<{
   region?: string
 
   header?: string
-  gridItems?: string
-  randomize?: boolean | string
+  gridItems?: GridConfig
   width?: string
   spacing?: string
   editLink?: string

@@ -5,7 +5,7 @@ export type DrupalNodePath = {
 }
 
 export interface DrupalNodeRelatedItem {
-  nid: string
+  nid: number
   title: string
   url: string
 }

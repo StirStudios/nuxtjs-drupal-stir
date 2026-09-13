@@ -6,6 +6,8 @@ import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
 import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
+import { resolveHeadingTag } from '../../../utils/headingTag'
+import { resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
 
 const props = defineProps<{
   id?: number | string
@@ -13,17 +15,16 @@ const props = defineProps<{
   parentUuid?: string
   region?: string
 
-  gridItems?: string
+  gridItems?: GridConfig
   spacing?: string
   width?: string
   widthClass?: string
   cornerStyle?: 'default' | 'square' | string
   titleDisplay?: string
   mediaHeight?: 'natural' | 'small' | 'break' | 'feature' | string
-  align?: string
+  align?: AlignConfig
   direction?: string
-  overlay?: boolean | number | string
-  randomize?: boolean | number | string
+  overlay?: boolean
 
   masonry?: {
     lanes?: Record<string, number>
@@ -38,6 +39,8 @@ const props = defineProps<{
 }>()
 
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const alignClasses = computed(() => resolveAlignClasses(props.align))
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const theme = useAppConfig().stirTheme
 const mediaHeightClass = computed(() =>
   theme.media.heights?.[props.mediaHeight || 'natural']
@@ -47,9 +50,7 @@ const mediaHeightClass = computed(() =>
 const roundedClass = computed(() =>
   props.cornerStyle === 'square' ? 'rounded-none' : undefined,
 )
-const overlayEnabled = computed(
-  () => props.overlay === true || props.overlay === 1 || props.overlay === '1',
-)
+const overlayEnabled = computed(() => props.overlay === true)
 
 const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
@@ -129,8 +130,8 @@ onMounted(() => {
     :link="editLink"
     :parent-uuid="parentUuid"
   >
-    <WrapDiv :align="align">
-      <component :is="headerTag || 'h2'" v-if="header">
+    <WrapDiv :align="alignClasses">
+      <component :is="headingTag" v-if="header">
         {{ header }}
       </component>
 

@@ -40,7 +40,7 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     { layoutTag: 'script', header: '', tag: 'SECTION' },
   ])('uses $tag for a layout with heading "$header"', async ({ layoutTag, header, tag }) => {
     const wrapper = await mountSuspended(ParagraphLayout, {
-      props: { id: 'semantics', layoutTag, header, classes: 'showcase-row', gridClass: 'grid' },
+      props: { id: 'semantics', layoutTag, header, classes: 'showcase-row', gridClass: {} },
       slots: { first: '<h3>Independent child heading</h3>' },
     })
 
@@ -66,7 +66,7 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
       props: {
         id: 'grid',
         layout: 'grid',
-        gridClass: 'grid gap-4 md:grid-cols-2',
+        gridClass: { columns: { md: 2 }, gap: { default: 4 } },
       },
       slots: {
         items: `
@@ -132,7 +132,7 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
         id: 'aligned-region',
         layout: 'two_column',
         regionAlign: {
-          second: 'md:flex justify-center text-center',
+          second: { justify: 'center', text: 'center' },
         },
       },
       slots: {

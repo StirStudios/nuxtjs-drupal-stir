@@ -2,6 +2,8 @@
 import type { AccordionItem } from '@nuxt/ui'
 import type { Slots, VNode } from 'vue'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
+import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -16,7 +18,7 @@ const props = defineProps<{
   header?: string
   headerTag?: string
   text?: string
-  align?: string
+  align?: AlignConfig
   classes?: string
   width?: string
   spacing?: string
@@ -44,12 +46,13 @@ type AccordionEntry = AccordionItem & {
 
 const slots = useSlots()
 const trustedTextHtml = computed(() => trustedDrupalHtml(props.text))
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const sectionClasses = computed(() =>
   [
     'paragraph-accordion space-y-6',
     props.align ? 'w-full' : '',
-    props.align,
-    props.width,
+    resolveAlignClasses(props.align),
+    resolveWidthClasses(props.width, props.align),
     props.spacing,
     props.classes,
   ].filter(
@@ -91,7 +94,7 @@ const items = computed<AccordionEntry[]>(() =>
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid" />
 
     <div v-if="header || trustedTextHtml" class="space-y-3">
-      <component :is="headerTag || 'h2'" v-if="header">
+      <component :is="headingTag" v-if="header">
         {{ header }}
       </component>
       <div

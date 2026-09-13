@@ -7,6 +7,7 @@ import {
   resolveUiColor,
   resolveUiSize,
 } from '#stir/utils/nuxtUiProps'
+import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 
 const props = defineProps<{
   id?: number | string
@@ -14,7 +15,7 @@ const props = defineProps<{
   parentUuid?: string
   region?: string
 
-  align?: string
+  align?: AlignConfig
   spacing?: string
   width?: string
   direction?: string
@@ -23,7 +24,7 @@ const props = defineProps<{
   size?: string
   variant?: string
   icon?: string
-  block?: boolean | number | string
+  block?: boolean
 
   link?: DrupalLink
 
@@ -42,6 +43,8 @@ const btnColor = computed(() => resolveUiColor(props.color))
 const btnVariant = computed(() => resolveUiButtonVariant(props.variant))
 const btnSize = computed(() => resolveUiSize(props.size, 'xl'))
 const btnBlock = computed(() => resolveBooleanProp(props.block))
+const alignClasses = computed(() => resolveAlignClasses(props.align))
+const widthClasses = computed(() => resolveWidthClasses(props.width, props.align))
 const iconName = computed(() => props.icon || null)
 const slotMedia = computed(() => tk.mediaItems())
 
@@ -83,7 +86,7 @@ const pdfUrl = computed(() =>
   <ParagraphReveal
     :id="id"
     as="div"
-    :class="['paragraph-button flex w-full', align, spacing, width]"
+    :class="['paragraph-button flex w-full', alignClasses, spacing, widthClasses]"
     :direction="direction"
   >
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">

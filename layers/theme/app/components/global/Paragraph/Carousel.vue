@@ -17,6 +17,8 @@ import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
+import { resolveGridClasses, resolveWidthClasses, type GridConfig } from '#stir/utils/gridClasses'
 
 const props = withDefaults(defineProps<{
   id?: number | string
@@ -26,9 +28,8 @@ const props = withDefaults(defineProps<{
 
   items?: unknown[]
   presentation?: 'carousel' | 'marquee' | string
-  randomize?: boolean
 
-  gridItems?: string
+  gridItems?: GridConfig
   width?: string
   spacing?: string
 
@@ -71,6 +72,7 @@ const props = withDefaults(defineProps<{
 })
 
 const theme = useAppConfig().stirTheme
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
@@ -100,6 +102,8 @@ const carouselImageDeliverySizes = computed(() =>
     theme.media.image.profiles.full,
   ),
 )
+const widthClasses = computed(() => resolveWidthClasses(props.width, undefined))
+const carouselItemClasses = computed(() => resolveGridClasses(props.gridItems, 'carousel'))
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
@@ -254,13 +258,13 @@ function releasePointerArrowFocus(event: PointerEvent) {
   <RevealMotionElement
     :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
     class="relative z-10"
-    :class="[theme.carousel.padding, width, spacing]"
+    :class="[theme.carousel.padding, widthClasses, spacing]"
     :motion-props="carouselMotionProps"
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"
   >
     <div ref="carouselRoot">
-      <component :is="headerTag || 'h2'" v-if="header">
+      <component :is="headingTag" v-if="header">
         {{ header }}
       </component>
 
@@ -320,7 +324,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
           :ui="{
             root: ['stir-carousel', theme.carousel.root],
             container: 'items-center transition-[height]',
-            item: gridItems,
+            item: carouselItemClasses,
           }"
         >
           <component :is="item.vnode" :key="item.key" />

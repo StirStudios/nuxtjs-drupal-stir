@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { tv } from '@nuxt/ui/utils/tv'
+import { resolveGridClasses, resolveWidthClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
 
 const props = defineProps<{
-  align?: string
+  align?: AlignConfig
   classes?: string
-  gridClasses?: string
   spacing?: string
-  gridItems?: string
+  gridItems?: GridConfig
   container?: boolean
   width?: string
   card?: boolean
@@ -15,25 +15,22 @@ const props = defineProps<{
 defineSlots<{ default(): unknown }>()
 
 const { container: themeContainer, card: themeCard } = useAppConfig().stirTheme
-const gridClasses = computed(() => props.gridItems || props.gridClasses)
 const gridStyles = computed(() => {
-  return [gridClasses.value, props.card ? 'relative z-10' : null].filter(
+  return [resolveGridClasses(props.gridItems), props.card ? 'relative z-10' : null].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   )
 })
 
 const containerAlignment = computed(() => {
-  const align = props.align?.split(/\s+/) || []
-
-  if (align.includes('justify-start')) return 'mx-0 ms-0 me-auto'
-  if (align.includes('justify-end')) return 'mx-0 ms-auto me-0'
-  return align.includes('justify-center') ? 'mx-auto' : ''
+  if (props.align?.justify === 'start') return 'mx-0 ms-0 me-auto'
+  if (props.align?.justify === 'end') return 'mx-0 ms-auto me-0'
+  return props.align?.justify === 'center' ? 'mx-auto' : ''
 })
 const contentWrapperClasses = computed(() => {
   return [
     props.container ? 'mx-auto' : null,
     props.classes || null,
-    props.width || null,
+    resolveWidthClasses(props.width, props.align) || null,
     props.spacing || null,
     containerAlignment.value,
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)

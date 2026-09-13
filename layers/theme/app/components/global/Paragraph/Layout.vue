@@ -8,8 +8,10 @@ import {
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import {
   layoutImageDeliveryProfileKey,
-  resolveLayoutImageDeliveryProfile,
+  resolveGridImageDeliveryProfile,
 } from '#stir/utils/imageDelivery'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
+import { resolveAlignClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -23,7 +25,7 @@ const props = defineProps<{
 
   layoutTag?: string
   layout?: string
-  align?: string
+  align?: AlignConfig
   container?: boolean
   card?: boolean
 
@@ -33,20 +35,20 @@ const props = defineProps<{
 
   width?: string
   spacing?: string
-  gridClass?: string
+  gridClass?: GridConfig
   classes?: string
-  regionAlign?: Record<string, string>
+  regionAlign?: Record<string, AlignConfig>
   reverseMobile?: boolean
 
-  randomize?: boolean
   direction?: string
   animationScope?: 'children' | 'layout'
-  animationStagger?: boolean | number | string
+  animationStagger?: boolean
   editLink?: string
 }>()
 
 // Older payloads retain their existing section wrapper.
 const layoutTag = computed(() => props.layoutTag === 'div' ? 'div' : 'section')
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 
 const classNames = computed(() => props.classes?.split(/\s+/) || [])
 const isActionGroup = computed(() => classNames.value.includes('action-group'))
@@ -58,11 +60,7 @@ const isGridLayout = computed(
 )
 const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
 const imageDeliveryProfile = computed(() =>
-  resolveLayoutImageDeliveryProfile(
-    props.layout,
-    [props.gridClass, props.width].filter(Boolean).join(' '),
-    props.container,
-  ),
+  resolveGridImageDeliveryProfile(props.gridClass, props.layout, props.width, props.container),
 )
 const reversesTwoColumnMobileStack = computed(
   () => props.reverseMobile === true && props.layout?.startsWith('two_column') === true,
@@ -136,7 +134,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
     >
       <RevealMotionElement
         v-if="header"
-        :as="headerTag || 'h2'"
+        :as="headingTag"
         class="col-span-full"
         :motion-props="headerMotionProps"
       >
@@ -154,7 +152,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
             isActionGroup && classNames.includes('action-group--center') && 'justify-center',
             isActionGroup && classNames.includes('action-group--right') && 'justify-end',
             slotName,
-            props.regionAlign?.[slotName],
+            resolveAlignClasses(props.regionAlign?.[slotName]),
             mobileRegionOrderClass(slotName),
             ['top', 'bottom'].includes(slotName) ? 'col-span-full' : '',
           ]"

@@ -93,7 +93,6 @@ Connection warmup is disabled so the widget is not fetched before that trigger.
 ```ts
 protectedRoutes: {
   loginPath: '/login',
-  redirectOnLogin: '/',
   requireLoginPaths: [],
   fallbackRedirectPath: '/',
 }
@@ -309,7 +308,7 @@ the page by default so already-executed vendor code is fully torn down; use
 Recommended key order in `stirTheme`:
 
 1. Global flags and layout primitives:
-   `showPdf`, `showBreadcrumbs`, `heading`, `container`, `header`, `navigation`, `hero`, `footer`
+   `showPdf`, `showBreadcrumbs`, `container`, `navigation`, `hero`, `footer`
 2. Content/component behavior:
    `media`, `carousel`, `mediaModal`, `overlay`, `webform`, `turnstile`
 3. Visual/system tokens and utilities:
@@ -321,8 +320,6 @@ Recommended key order in `stirTheme`:
 showPdf: false,
 loadingIndicator: 'repeating-linear-gradient(to right,#D21B18 0%,#ED6663 50%,#F28E8D 100%)',
 showBreadcrumbs: false,
-heading: 'mb-20 text-center text-6xl',
-header: 'md:px-auto fixed top-0 z-30 w-full !p-0',
 ```
 
 ### 🔗 `navigation`
@@ -394,6 +391,31 @@ For a centered-logo desktop header, set `navigation.desktopLayout` to
 Items before that marker render to the left of the logo, items after it render
 to the right, and the marker is removed from the mobile menu.
 
+For a header whose menu toggle is the only navigation at every breakpoint, set
+`navigation.desktopLayout` to `'centered-toggle'`. The logo sits left, the
+toggle in the centre and project actions on the right.
+
+Project hooks, all optional:
+
+- `navigation.toggleComponent` names a globally registered component rendered
+  inside the toggle button in place of the icon. It receives `open` and
+  `scrolled`.
+- `navigation.actionsComponent` names a globally registered component rendered
+  at the start of the right region. It receives `scrolled`.
+- `navigation.toggleClass` adds classes to the header toggle only. Use
+  `aria-expanded:` variants to style the open state.
+- `navigation.slideover.content` replaces the panel background classes.
+- `navigation.slideover.portal`, `overlay` and `unmountOnHide` pass through to
+  Nuxt UI Slideover. Set both `portal: false` and `unmountOnHide: false` to keep
+  the closed menu in the server-rendered HTML.
+
+Closing the menu returns focus to its toggle, except when a menu link
+navigates.
+
+`stirTheme.clientComponents` lists globally registered components that only
+make sense in the browser, such as a custom cursor or page transition. `app.vue`
+mounts each once inside `ClientOnly`; unknown names render nothing.
+
 Drupal's optional menu-link description is passed directly to Nuxt UI navigation
 items. Add concise descriptions in Drupal to enrich dropdown children; links
 without descriptions retain the existing compact presentation.
@@ -411,15 +433,6 @@ stirTheme: {
     variant: 'link',
   },
 },
-```
-
-### 🏠 `frontPage`
-
-```ts
-frontPage: {
-  heading: 'sr-only',
-  main: 'mt-0',
-}
 ```
 
 ### 📦 Layout
@@ -648,8 +661,53 @@ hero: {
 	isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
   },
   hide: 'pt-30',
+  // Optional: text-only heroes use this instead of mediaSpacing.
+  textSpacing: 'pt-34 pb-26 lg:pt-48 lg:pb-56',
+  // Optional: decorative layer behind text-only inner-page heroes.
+  backdrop: 'bg-linear-to-br from-primary/10 to-transparent',
+  inline: {
+    base: 'mx-auto w-full max-w-(--ui-container) px-4 sm:px-6 lg:px-8',
+    text: 'mx-auto max-w-4xl p-5 text-center',
+  },
+  nodeTypes: {
+    'node-work': { layout: 'inline', media: 'last' },
+  },
 },
 ```
+
+`nodeTypes` is keyed by the Drupal page payload `type` (for example
+`node-work`) and only applies to page heroes (`field_hero`), not section
+heroes.
+
+- `layout: 'background'` (default) places media behind the text.
+- `layout: 'inline'` renders the text, then the media in normal flow inside
+  `inline.base`, without background sizing.
+- `media: 'first' | 'last'` chooses which media slot item the hero renders.
+
+`HeroContent` receives the resolved `layout`, so a downstream `HeroContent`
+override can vary its title markup without replacing `ParagraphHero`.
+
+Front-page title options (defaults shown):
+
+```ts
+hero: {
+  front: {
+    // 'replace': the authored header replaces the page title as the H1.
+    // 'below': the page title stays the H1 and the header, or else the site
+    // slogan, renders beneath it as an H2.
+    subtitle: 'replace',
+    subtitleClass: '',
+    // false hides the hero text on the front page only.
+    showText: true,
+  },
+},
+```
+
+Use `hero.text.isFront: 'sr-only'` to keep front-page titles for screen
+readers while hiding them visually.
+
+In `mode: 'simple'`, a programmatic `classes` prop wraps the header, media and
+footer slots in one element.
 
 ### 💥 Animations
 
@@ -677,19 +735,25 @@ When staggering is enabled at page or Layout scope, eligible children consume
 the configured `reveal.staggerMs` delay in content order. Reduced-motion
 preferences always disable movement.
 
-### 🧱 Grid separator
+Project components can reuse the same reveal behaviour without importing
+motion-v. Shorthand props override the `reveal` config for that element only:
 
-```ts
-grid: {
-  separator: {
-	condition: 'node-',
-	base: 'mt-16 mb-10 xl:mt-28 max-w-screen-sm lg:w-[20rem] mx-auto',
-	color: 'white',
-	type: 'solid',
-	size: 'xs',
-  },
-},
+```vue
+<RevealMotionElement
+  as="h2"
+  effect="fade-up"
+  :delay-ms="80"
+  :duration-ms="600"
+  :distance-px="24"
+  root-margin="0px 0px -18% 0px"
+>
+  Selected work
+</RevealMotionElement>
 ```
+
+Content stays visible in the server-rendered HTML and animates after
+hydration. A `motionProps` object, used by Drupal paragraphs, takes precedence
+over the shorthand props.
 
 ### 🧩 Card and gradients
 

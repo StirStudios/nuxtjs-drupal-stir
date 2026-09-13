@@ -55,7 +55,7 @@ describe('ParagraphText card presentation', () => {
   })
   it('keeps an eyebrow and body together as one layout item', async () => {
     const wrapper = await mountSuspended(ParagraphText, {
-      props: { align: 'md:flex justify-center items-start text-start', eyebrow: 'Featured opportunity', text: '<h2>Live entertainment</h2>' },
+      props: { align: { justify: 'center', items: 'start', text: 'start' }, eyebrow: 'Featured opportunity', text: '<h2>Live entertainment</h2>' },
     })
 
     const group = wrapper.get('.paragraph-text')

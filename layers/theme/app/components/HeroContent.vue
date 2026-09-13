@@ -7,9 +7,11 @@ const props = withDefaults(
     pageTitle?: string
     headerTag?: string
     subtitle?: string
+    siteSlogan?: string
     heroText?: string
     hideTitle?: boolean
     isFront?: boolean
+    layout?: 'background' | 'inline'
   }>(),
   {
     eyebrow: '',
@@ -18,15 +20,37 @@ const props = withDefaults(
     headerTag: undefined,
     pageTitle: '',
     subtitle: '',
+    siteSlogan: '',
     heroText: '',
     hideTitle: false,
     isFront: false,
+    layout: 'background',
   },
 )
 
-const heading = computed(() => props.subtitle.trim() || props.pageTitle.trim())
-
 const { isAdministrator } = usePageContext()
+const { hero: heroTheme } = useAppConfig().stirTheme
+
+// On the front page, `hero.front.subtitle: 'below'` keeps the page title as the
+// H1 and shows the authored header, or else the site slogan, beneath it.
+const subtitleBelow = computed(() => props.isFront && heroTheme.front.subtitle === 'below')
+const heading = computed(() =>
+  subtitleBelow.value
+    ? props.pageTitle.trim() || props.subtitle.trim()
+    : props.subtitle.trim() || props.pageTitle.trim(),
+)
+const secondaryHeading = computed(() =>
+  subtitleBelow.value && props.pageTitle.trim()
+    ? props.subtitle.trim() || props.siteSlogan.trim()
+    : '',
+)
+const showText = computed(() => !props.isFront || heroTheme.front.showText !== false)
+const headerEditTarget = computed(() => ({
+  entityType: 'paragraph',
+  entityId: props.id,
+  fieldName: 'field_header',
+  editorMode: 'heading',
+}))
 
 defineSlots<{ button?(): unknown }>()
 </script>
@@ -43,18 +67,45 @@ defineSlots<{ button?(): unknown }>()
       {{ eyebrow }}
     </p>
 
+    <template v-if="subtitleBelow">
+      <h1
+        v-if="heading"
+        class="heading"
+        :class="[heroTheme.text.heading, { 'sr-only': hideTitle }]"
+      >
+        {{ heading }}
+      </h1>
+
+      <EditableRichText
+        v-if="secondaryHeading || (isAdministrator && id)"
+        :id="id"
+        :edit-link="editLink"
+        :edit-target="headerEditTarget"
+        :text="subtitle"
+        :text-source="headerTag ? `${headerTag}|${subtitle}` : subtitle"
+      >
+        <h2
+          v-if="secondaryHeading"
+          class="subtitle"
+          :class="heroTheme.front.subtitleClass"
+        >
+          {{ secondaryHeading }}
+        </h2>
+      </EditableRichText>
+    </template>
+
     <EditableRichText
-      v-if="heading || (isAdministrator && id)"
+      v-else-if="heading || (isAdministrator && id)"
       :id="id"
       :edit-link="editLink"
-      :edit-target="{ entityType: 'paragraph', entityId: id, fieldName: 'field_header', editorMode: 'heading' }"
+      :edit-target="headerEditTarget"
       :text="heading"
       :text-source="headerTag ? `${headerTag}|${subtitle}` : subtitle"
     >
       <h1
         v-if="heading"
-        class="heading mb-0"
-        :class="{ 'sr-only': hideTitle }"
+        class="heading"
+        :class="[heroTheme.text.heading, { 'sr-only': hideTitle }]"
       >
         {{ heading }}
       </h1>
@@ -62,7 +113,7 @@ defineSlots<{ button?(): unknown }>()
   </div>
 
   <EditableRichText
-    v-if="heroText?.trim() || (isAdministrator && id)"
+    v-if="showText && (heroText?.trim() || (isAdministrator && id))"
     :id="id"
     classes="lead"
     :edit-link="editLink"

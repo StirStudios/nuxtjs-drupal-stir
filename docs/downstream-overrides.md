@@ -32,6 +32,32 @@ export default defineAppConfig({
 })
 ```
 
+Centred toggle header with project actions and page effects:
+
+```ts
+export default defineAppConfig({
+  stirTheme: {
+    clientComponents: ['AppPageTransition', 'AppCursor'],
+    navigation: {
+      desktopLayout: 'centered-toggle',
+      actionsComponent: 'AppHeaderActions',
+      toggleComponent: 'AppMenuToggleIcon',
+      toggleClass: 'aria-expanded:opacity-0',
+      slideover: {
+        angle: true,
+        content: '!bg-primary !text-inverted',
+        portal: false,
+        unmountOnHide: false,
+      },
+    },
+  },
+})
+```
+
+Put the named components in `app/components/global/` so they resolve by name.
+Keep brand copy, artwork and effects in those project components rather than
+replacing `App/Header.vue`.
+
 Footer atom ordering:
 
 ```ts

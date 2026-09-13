@@ -55,7 +55,6 @@ export type StirThemeButtonLikeConfig = {
 type ProtectedRoutesConfig = {
   requireLoginPaths?: string[]
   loginPath?: string
-  redirectOnLogin?: string
   allowAuthenticatedUserBypass?: boolean
   fallbackRedirectPath?: string
 } & LooseRecord
@@ -63,11 +62,6 @@ type ProtectedRoutesConfig = {
 type PlausibleConfig = {
   enabled?: boolean
   domain?: string
-  apiHost?: string
-  autoPageviews?: boolean
-  autoOutboundTracking?: boolean
-  fileDownloads?: boolean | { fileExtensions: string[] }
-  formSubmissions?: boolean
 } & LooseRecord
 
 type AnalyticsConfig = {
@@ -96,6 +90,7 @@ type CmsGlobalSeoConfig = {
   ignoredPathPrefixes?: string[]
   ignoredPaths?: string[]
   drupalRouteNames?: string[]
+  lang?: string
   socialImage?: {
     enabled?: boolean
     format?: string
@@ -132,11 +127,14 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: UiColorName
   variant?: UiNavigationVariantName
-  desktopLayout?: 'default' | 'split-logo' | string
+  desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   toggleIcon?: ClassValue
   toggleTransparentClass?: ClassValue
+  toggleClass?: ClassValue
+  toggleComponent?: string
+  actionsComponent?: string
   header?: ClassValue
   splitLogo?: {
     center?: ClassValue
@@ -161,8 +159,17 @@ type StirThemeNavigationConfig = {
     link?: ClassValue
     list?: ClassValue
     body?: ClassValue
+    content?: ClassValue
+    portal?: boolean
+    overlay?: boolean
+    unmountOnHide?: boolean
   } & LooseRecord
 } & LooseRecord
+
+type StirThemeHeroNodeTypeConfig = {
+  layout?: 'background' | 'inline'
+  media?: 'first' | 'last'
+}
 
 type StirThemeHeroConfig = {
   actions?: ClassValue
@@ -171,6 +178,18 @@ type StirThemeHeroConfig = {
   mediaSpacing?: ClassValue
   noMediaSpacing?: ClassValue
   noMediaFallback?: ClassValue
+  textSpacing?: ClassValue
+  backdrop?: ClassValue
+  inline?: {
+    base?: ClassValue
+    text?: ClassValue
+  } & LooseRecord
+  nodeTypes?: Record<string, StirThemeHeroNodeTypeConfig>
+  front?: {
+    subtitle?: 'replace' | 'below'
+    subtitleClass?: ClassValue
+    showText?: boolean
+  } & LooseRecord
   overlay?: ClassValue
   isFront?: ClassValue
   image?: {
@@ -183,11 +202,6 @@ type StirThemeHeroConfig = {
     isFront?: ClassValue
   } & LooseRecord
   hide?: ClassValue
-} & LooseRecord
-
-type StirThemeFrontPageConfig = {
-  heading?: ClassValue
-  main?: ClassValue
 } & LooseRecord
 
 type StirThemeLinkHubConfig = {
@@ -286,7 +300,6 @@ type StirThemeModalConfig = {
   title?: boolean
   description?: {
     media?: boolean
-    default?: boolean
   } & LooseRecord
 } & LooseRecord
 
@@ -421,13 +434,11 @@ type StirThemeConfig = {
   showPdf?: boolean
   showBreadcrumbs?: boolean
   loadingIndicator?: string | false
-  heading?: ClassValue
   container?: ClassValue
-  header?: ClassValue
   article?: StirThemeArticleConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
-  frontPage?: StirThemeFrontPageConfig
+  clientComponents?: string[]
   linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
   footer?: StirThemeFooterConfig
@@ -454,6 +465,9 @@ type ResolvedStirThemeNavigationConfig = StirThemeNavigationConfig & {
 type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
   image: NonNullable<StirThemeHeroConfig['image']>
   text: NonNullable<StirThemeHeroConfig['text']>
+  inline: NonNullable<StirThemeHeroConfig['inline']>
+  nodeTypes: NonNullable<StirThemeHeroConfig['nodeTypes']>
+  front: NonNullable<StirThemeHeroConfig['front']>
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
@@ -485,13 +499,11 @@ type ResolvedStirThemeCardConfig = StirThemeCardConfig & {
 type ResolvedStirThemeConfig = StirThemeConfig & {
   showPdf: boolean
   showBreadcrumbs: boolean
-  heading: ClassValue
   container: ClassValue
-  header: ClassValue
   article: Required<StirThemeArticleConfig>
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
-  frontPage: StirThemeFrontPageConfig
+  clientComponents: string[]
   linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]
   footer: StirThemeFooterConfig

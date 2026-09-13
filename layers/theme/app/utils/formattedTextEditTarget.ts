@@ -12,12 +12,10 @@ export function normalizeFormattedTextEditTarget(
   if (!value || typeof value !== 'object') return null
 
   const target = value as Record<string, unknown>
-  const entityType = stringValue(target.entityType ?? target.entity_type)
-  const entityId = stringValue(target.entityId ?? target.entity_id)
-  const fieldName = stringValue(target.fieldName ?? target.field_name)
-  const editorModeRaw = stringValue(
-    target.editorMode ?? target.editor_mode,
-  )
+  const entityType = stringValue(target.entityType)
+  const entityId = stringValue(target.entityId)
+  const fieldName = stringValue(target.fieldName)
+  const editorModeRaw = stringValue(target.editorMode)
   const editorMode = editorModeRaw === 'heading' ? 'heading' : editorModeRaw === 'plain' ? 'plain' : 'formatted'
 
   if (

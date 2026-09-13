@@ -33,9 +33,9 @@ describe('Drupal media ordering', () => {
     wrapper.unmount()
   })
 
-  it('preserves supplied order with a legacy randomize flag and opens the matching modal item', async () => {
+  it('preserves supplied order and opens the matching modal item', async () => {
     const wrapper = await mountSuspended(ParagraphMedia, {
-      props: { randomize: true, overlay: true },
+      props: { overlay: true },
       slots: {
         media: () => ['third', 'first', 'second'].map(mid => h('div', { mid, type: 'audio' })),
       },

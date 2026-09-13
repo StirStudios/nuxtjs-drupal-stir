@@ -9,7 +9,7 @@ declare global {
 if (import.meta.dev && !window.__stirPdfViewerWarned) {
   window.__stirPdfViewerWarned = true
   console.warn(
-    '[StirPdfViewer] PDF Viewer is not installed. Add a real StirPdfViewer.client.vue in your root app if needed.',
+    '[StirPdfViewer] PDF Viewer is not installed. Add vue-pdf-viewer-core and its \'vue-pdf-viewer-core/nuxt\' module to enable document previews.',
   )
 }
 </script>
@@ -17,7 +17,7 @@ if (import.meta.dev && !window.__stirPdfViewerWarned) {
 <template>
   <UAlert
     color="error"
-    description="Add a project PDF viewer component to enable document previews."
+    description="Install vue-pdf-viewer-core and add its Nuxt module to enable document previews."
     icon="i-lucide-file-warning"
     title="PDF Viewer is not installed"
     variant="soft"

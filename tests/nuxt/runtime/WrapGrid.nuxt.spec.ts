@@ -18,9 +18,9 @@ describe('WrapGrid (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(WrapGrid, {
       props: {
         classes: 'outer-class',
-        gridItems: 'grid grid-cols-2',
+        gridItems: { columns: { default: 2 } },
         spacing: 'py-10',
-        width: 'max-w-4xl',
+        width: 'lg',
       },
       slots: {
         default: '<span>Grid content</span>',
@@ -34,7 +34,8 @@ describe('WrapGrid (Nuxt runtime)', () => {
       'grid',
       'grid-cols-2',
       'py-10',
-      'max-w-4xl',
+      'mx-auto',
+      'lg:max-w-4xl',
     ]))
   })
 
@@ -42,7 +43,7 @@ describe('WrapGrid (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(WrapGrid, {
       props: {
         card: true,
-        gridItems: 'grid grid-cols-2',
+        gridItems: { columns: { default: 2 } },
       },
       slots: {
         default: '<span>Card content</span>',
@@ -63,8 +64,8 @@ describe('WrapGrid (Nuxt runtime)', () => {
       props: {
         card: true,
         container: true,
-        gridItems: 'grid grid-cols-1',
-        width: 'max-w-4xl',
+        gridItems: { columns: { default: 1 } },
+        width: 'lg',
       },
       slots: {
         default: '<span>Contained card content</span>',
@@ -78,7 +79,7 @@ describe('WrapGrid (Nuxt runtime)', () => {
 
     expect(grid?.classList.contains('grid')).toBe(true)
     expect(card?.classList.contains('isolate')).toBe(true)
-    expect(card?.classList.contains('max-w-4xl')).toBe(true)
+    expect(card?.classList.contains('lg:max-w-4xl')).toBe(true)
     expect(container?.classList.contains('px-4')).toBe(true)
     expect(card?.classList.contains('px-4')).toBe(false)
   })

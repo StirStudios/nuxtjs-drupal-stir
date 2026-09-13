@@ -2,6 +2,7 @@
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveDrupalLink, type DrupalLink } from '#stir/utils/drupalLink'
 import { resolveUiPageCardVariant } from '#stir/utils/nuxtUiProps'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
 
 defineOptions({
   inheritAttrs: false,
@@ -25,6 +26,7 @@ const props = defineProps<{
 }>()
 
 const descriptionHtml = computed(() => trustedDrupalHtml(props.text))
+const headingTag = computed(() => resolveHeadingTag(props.headerTag, 'h3'))
 const linkData = computed(() => resolveDrupalLink(props.link))
 const hasAction = computed(() => !!linkData.value.url && !!linkData.value.title)
 const cardLink = computed(() => hasAction.value ? undefined : linkData.value.url)
@@ -45,7 +47,7 @@ const cardVariant = computed(() => resolveUiPageCardVariant(props.cardVariant))
         :variant="cardVariant"
       >
         <template v-if="header" #title>
-          <component :is="headerTag || 'h3'">
+          <component :is="headingTag">
             {{ header }}
           </component>
         </template>

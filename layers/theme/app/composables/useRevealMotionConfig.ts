@@ -22,9 +22,12 @@ export type RevealMotionResolved = {
 
 export type RevealStaggerMode = 'default' | 'dense'
 
-type RevealMotionOptions = {
+export type RevealMotionOptions = {
   ssrVisible?: boolean
   trigger?: 'enter' | 'in-view'
+  durationMs?: number
+  distancePx?: number
+  rootMargin?: string
 }
 
 export const REVEAL_DEFAULTS = {
@@ -227,7 +230,7 @@ export function useRevealMotionConfig() {
 
     const initial = resolveRevealInitialTarget(
       normalizedEffect,
-      resolved.value.distancePx,
+      Math.max(0, options.distancePx ?? resolved.value.distancePx),
     )
 
     if (!initial) {
@@ -241,7 +244,7 @@ export function useRevealMotionConfig() {
         : { whileInView: REVEAL_VISIBLE_TARGET }),
       transition: {
         type: 'tween',
-        duration: resolved.value.durationMs / 1000,
+        duration: Math.max(0, options.durationMs ?? resolved.value.durationMs) / 1000,
         ease: resolved.value.ease,
         delay: resolvedDelay,
       },
@@ -251,7 +254,7 @@ export function useRevealMotionConfig() {
             inViewOptions: {
               once: animateOnce.value,
               amount: resolved.value.threshold,
-              margin: resolved.value.rootMargin,
+              margin: options.rootMargin ?? resolved.value.rootMargin,
             },
           }),
       style: {
