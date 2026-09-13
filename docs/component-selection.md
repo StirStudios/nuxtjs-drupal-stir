@@ -24,5 +24,7 @@ project-only components.
 ## Drupal views
 
 Keep view control behavior in `useDrupalViewControls` and keep rendering in
-`drupal-view--default.vue`. If new behavior is needed, add pure helpers and
-tests before wiring it into the component.
+`DrupalViewDisplay`. If new behavior is needed, add pure helpers and tests
+before wiring it into the component. Projects replace the filter bar through
+the `controls` slot rather than forking the view; see
+[downstream overrides](downstream-overrides.md).

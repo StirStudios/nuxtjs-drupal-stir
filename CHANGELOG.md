@@ -50,6 +50,18 @@ untouched do not need one.
 
 ### Added
 
+- `DrupalViewDisplay` and `drupal-view--default` accept a `controls` slot, so a
+  project can replace only the filter and sort bar of a Drupal view. The layer
+  still resolves `?page=N` during SSR and keeps crawlable pager links, rows,
+  loading, empty and error states, the grid image profile and the query
+  namespace. The slot receives `DrupalViewControlsSlotProps`: `filters`,
+  `filterValues`, `sort`, `sortByOptions`, `sortOrderOptions`, `sortValues`,
+  `activeFilters` (with `label` and an accessible `removeLabel`), `isLoading`,
+  and the actions `setFilter`, `setSort`, `removeFilter`, `resetFilters`,
+  `resetSort` and `resetControls`. With a slot, the layer also renders a
+  visually hidden `role="status"` region that announces result updates. Views
+  without the slot render exactly as before. `useDrupalViewControls` returns the
+  same `activeFilters`, `removeFilter`, `resetFilters` and `resetSort`.
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and

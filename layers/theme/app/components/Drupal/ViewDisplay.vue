@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DrupalViewProps } from '#stir/types'
+import type { DrupalViewControlsSlotProps, DrupalViewProps } from '#stir/types'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
@@ -21,6 +21,7 @@ const { renderCustomElements } = useStirDrupalCe()
 
 defineSlots<{
   rows?(): unknown
+  controls?(props: DrupalViewControlsSlotProps): unknown
   grid?(props: {
     rows: RenderedDrupalViewRow[]
     renderCustomElements: typeof renderCustomElements
@@ -59,13 +60,17 @@ const {
   sortByOptions,
   sortOrderOptions,
   hasControls,
+  activeFilters,
   pageLink,
   resolveInitialView,
   retryCurrentPage,
   onFilterChange,
   onSortChange,
   onPageChange,
+  removeFilter,
   resetControls,
+  resetFilters,
+  resetSort,
 } = useDrupalViewControls(props, inheritedQueryNamespace)
 
 await resolveInitialView()
@@ -73,6 +78,29 @@ await resolveInitialView()
 const trustedDynamicNoResults = computed(() =>
   trustedDrupalHtml(dynamicNoResults.value),
 )
+const controlsSlotProps = computed<DrupalViewControlsSlotProps>(() => ({
+  filters: normalizedFilters.value,
+  filterValues: filterValues.value,
+  sort: primarySort.value,
+  sortByOptions: sortByOptions.value,
+  sortOrderOptions: sortOrderOptions.value,
+  sortValues: sortValues.value,
+  activeFilters: activeFilters.value,
+  isLoading: isLoading.value,
+  setFilter: onFilterChange,
+  setSort: onSortChange,
+  removeFilter,
+  resetFilters,
+  resetSort,
+  resetControls,
+}))
+const controlsStatus = computed(() => {
+  if (isLoading.value) return 'Loading results'
+  if (loadError.value) return 'Unable to load results'
+  if (dynamicRows.value === null) return ''
+
+  return dynamicRows.value.length ? 'Results updated' : 'No results found'
+})
 
 function resolveSlotRows() {
   const rows = tk.slot('rows')
@@ -135,7 +163,11 @@ const getRowMotionProps = (index: number) =>
 
 <template>
   <section ref="viewRoot" class="scroll-mt-24">
-    <div v-if="hasControls && !carousel" class="mb-6 space-y-4">
+    <template v-if="hasControls && !carousel && vueSlots.controls">
+      <slot name="controls" v-bind="controlsSlotProps" />
+      <p class="sr-only" role="status">{{ controlsStatus }}</p>
+    </template>
+    <div v-else-if="hasControls && !carousel" class="mb-6 space-y-4">
       <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 flex-1">
           <LazyDrupalViewsFilters

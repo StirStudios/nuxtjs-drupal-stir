@@ -30,6 +30,7 @@ import {
   createViewStateSnapshot,
   createViewStateStorageKey,
   defaultDrupalViewFilterValue,
+  drupalViewActiveFilters,
   firstViewControlString,
   parseStoredViewState,
   sanitizeDrupalViewStoredFilters,
@@ -161,6 +162,9 @@ export function useDrupalViewControls(
 
   const normalizedFilters = computed(() =>
     normalizeDrupalViewFilters(effectiveFilters.value),
+  )
+  const activeFilters = computed(() =>
+    drupalViewActiveFilters(normalizedFilters.value, filterValues.value),
   )
 
   const primarySort = computed(() => primaryDrupalViewSort(effectiveSorts.value))
@@ -668,21 +672,55 @@ export function useDrupalViewControls(
     defaultViewState.value = defaultViewStateSnapshot()
   }
 
-  function resetControls() {
+  function resetToDefaults(scope: { filters: boolean, sorts: boolean }) {
     const defaults = defaultViewState.value
 
     if (!defaults) return
 
-    filterValues.value = {
-      ...defaults.filters,
+    if (scope.filters) {
+      filterValues.value = {
+        ...defaults.filters,
+      }
     }
-    sortValues.value = {
-      ...defaults.sorts,
+
+    if (scope.sorts) {
+      sortValues.value = {
+        ...defaults.sorts,
+      }
     }
+
     currentPage.value = 0
     saveViewState(0)
     syncUrlQuery(0)
     scheduleRefresh(0)
+  }
+
+  function resetControls() {
+    resetToDefaults({ filters: true, sorts: true })
+  }
+
+  function resetFilters() {
+    resetToDefaults({ filters: true, sorts: false })
+  }
+
+  function resetSort() {
+    resetToDefaults({ filters: false, sorts: true })
+  }
+
+  function removeFilter(filter: { filterKey: string, value: string }) {
+    const current = filterValues.value[filter.filterKey]
+    const definition = normalizedFilters.value.find(
+      (item) => item.queryParamName === filter.filterKey,
+    )
+    let value: string | string[] = ''
+
+    if (Array.isArray(current)) {
+      value = definition?.type === 'date_range'
+        ? []
+        : current.filter((item) => String(item) !== filter.value)
+    }
+
+    onFilterChange({ key: filter.filterKey, value })
   }
 
   watch(
@@ -747,6 +785,7 @@ export function useDrupalViewControls(
     sortByOptions,
     sortOrderOptions,
     hasControls,
+    activeFilters,
     resolvedQueryNamespace,
     pageLink,
     resolveInitialView,
@@ -755,6 +794,9 @@ export function useDrupalViewControls(
     onFilterChange,
     onSortChange,
     onPageChange,
+    removeFilter,
     resetControls,
+    resetFilters,
+    resetSort,
   }
 }

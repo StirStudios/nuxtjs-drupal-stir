@@ -85,6 +85,68 @@ with the same `html` prop. Keep one root element so wrapper classes and reveal
 motion still apply, and keep plain HTML output unchanged when no embed is found.
 Override the global `drupal-markup` component the same way for body fields.
 
+Drupal view filter bars:
+
+Do not fork `drupal-view--default.vue` to change filters. A fork loses SSR
+`?page=N` resolution, crawlable pager links, the grid image profile and the
+query namespace. Replace only the controls region with the `controls` slot:
+
+```vue
+<!-- app/components/global/drupal-view--default.vue -->
+<script setup lang="ts">
+import type { DrupalViewProps } from '#stir/types'
+
+const props = defineProps<DrupalViewProps>()
+</script>
+
+<template>
+  <DrupalViewDisplay v-bind="props">
+    <template #rows>
+      <slot name="rows" />
+    </template>
+    <template #controls="{ filters, filterValues, activeFilters, removeFilter, resetFilters, setFilter }">
+      <div class="mb-6 flex flex-wrap gap-2">
+        <UButton
+          v-for="filter in activeFilters"
+          :key="filter.key"
+          :aria-label="filter.removeLabel"
+          trailing-icon="i-lucide-x"
+          variant="soft"
+          @click="removeFilter(filter)"
+        >
+          {{ filter.label }}
+        </UButton>
+        <UButton v-if="activeFilters.length" variant="ghost" @click="resetFilters">
+          Reset
+        </UButton>
+        <DrupalViewsFilters :filters="filters" :values="filterValues" @change="setFilter" />
+      </div>
+    </template>
+  </DrupalViewDisplay>
+</template>
+```
+
+The slot renders only when the view has exposed filters or sorts and is not a
+carousel. Slot props are `DrupalViewControlsSlotProps` from `#stir/types`:
+
+- State: `filters`, `filterValues`, `sort`, `sortByOptions`,
+  `sortOrderOptions`, `sortValues`, `isLoading`.
+- `activeFilters`: one entry per selected, non-empty filter value, with
+  `filterKey`, `filterLabel`, the option `label`, `value`, and a `removeLabel`
+  such as `Remove Category: News` for icon-only chip buttons. A date range is
+  one entry.
+- `setFilter({ key, value })` and `setSort({ key, value })` match the `change`
+  events of `DrupalViewsFilters` and `DrupalViewsSort`.
+- `removeFilter(activeFilter)` removes one value; `resetFilters()`,
+  `resetSort()` and `resetControls()` restore the Drupal defaults for filters,
+  sort, or both. Every action returns to the first page, updates the URL and
+  refreshes the rows.
+
+With the slot, the layer adds a visually hidden `role="status"` region that
+announces loading, errors, and updated or empty results, so a custom bar does
+not need its own. Keep visible labels on form controls and use `removeLabel`
+when a chip shows only the value.
+
 Webform styling:
 
 ```ts
