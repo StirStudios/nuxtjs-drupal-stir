@@ -124,7 +124,10 @@ untouched do not need one.
 - The initial-graph performance budget was re-baselined to the measured Nuxt
   4.5 numbers and is now enforced in CI rather than warned about. A breach
   names the packages that grew. See `docs/perf-initial-graph.md`.
-- The published archive budget rose from 310000 to 320000 bytes.
+- The published archive budget rose from 310000 to 340000 bytes. The archive
+  is 320089 bytes after the hero, reveal, header, footer and page-node
+  additions; the budget catches accidentally published directories, not
+  feature code, so it keeps about 20 KB of headroom.
 
 ### Fixed
 
