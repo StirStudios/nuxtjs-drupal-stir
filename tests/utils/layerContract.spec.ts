@@ -322,6 +322,12 @@ describe('layer contract', () => {
       'rsf',
       'danceplug',
       'stir',
+      'edsmart',
+      'trilink',
+      'tkflagg',
+      'sbpublic',
+      'ddrink',
+      'stir-base',
     ])
     expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
     expect(targets.targets.danceplug?.routes).toContain('/videos')
