@@ -84,6 +84,16 @@ untouched do not need one.
   `app.vue`. Defaults leave the existing header output unchanged.
 - The header menu returns focus to its toggle when a visitor closes it, but not
   after a menu link navigates.
+- `stirTheme.hero.front` configures the front-page hero title without a
+  `HeroContent` override: `subtitle: 'below'` keeps the page title as the H1
+  and renders the authored header, or else the site slogan, as an H2 styled by
+  `subtitleClass`; `showText: false` hides the hero text on the front page.
+  Defaults (`subtitle: 'replace'`, `showText: true`) leave output unchanged.
+  `ParagraphHero` now passes the site slogan to `HeroContent` as `siteSlogan`.
+- `StirPdfViewer` renders the real `vue-pdf-viewer-core` viewer when a project
+  installs that package's Nuxt module, and keeps the lightweight stub otherwise,
+  so projects no longer need their own `StirPdfViewer.client.vue` wrapper.
+  `overrideFallbackComponent` accepts an optional `when` predicate.
 
 ### Changed
 

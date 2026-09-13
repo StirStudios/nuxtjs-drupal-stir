@@ -699,6 +699,25 @@ heroes.
 `HeroContent` receives the resolved `layout`, so a downstream `HeroContent`
 override can vary its title markup without replacing `ParagraphHero`.
 
+Front-page title options (defaults shown):
+
+```ts
+hero: {
+  front: {
+    // 'replace': the authored header replaces the page title as the H1.
+    // 'below': the page title stays the H1 and the header, or else the site
+    // slogan, renders beneath it as an H2.
+    subtitle: 'replace',
+    subtitleClass: '',
+    // false hides the hero text on the front page only.
+    showText: true,
+  },
+},
+```
+
+Use `hero.text.isFront: 'sr-only'` to keep front-page titles for screen
+readers while hiding them visually.
+
 In `mode: 'simple'`, a programmatic `classes` prop wraps the header, media and
 footer slots in one element.
 

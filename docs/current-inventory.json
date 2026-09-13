@@ -391,6 +391,7 @@
       "layers/theme/app/utils/formatUtils.ts",
       "layers/theme/app/utils/formattedTextEditTarget.ts",
       "layers/theme/app/utils/getHiddenDefaults.ts",
+      "layers/theme/app/utils/gridClasses.ts",
       "layers/theme/app/utils/headingTag.ts",
       "layers/theme/app/utils/heroVideoSource.ts",
       "layers/theme/app/utils/imageDelivery.ts",
@@ -740,6 +741,7 @@
         "layers/theme/app/utils/formatUtils.ts",
         "layers/theme/app/utils/formattedTextEditTarget.ts",
         "layers/theme/app/utils/getHiddenDefaults.ts",
+        "layers/theme/app/utils/gridClasses.ts",
         "layers/theme/app/utils/headingTag.ts",
         "layers/theme/app/utils/heroVideoSource.ts",
         "layers/theme/app/utils/imageDelivery.ts",
@@ -782,21 +784,21 @@
   "counts": {
     "components": 128,
     "composables": 71,
-    "utils": 63,
+    "utils": 64,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 179,
+    "tests": 181,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 68,
       "scripts": 2,
       "server": 28,
-      "unit": 10,
-      "utils": 57
+      "unit": 11,
+      "utils": 58
     }
   },
   "tests": [
@@ -912,6 +914,7 @@
     "tests/server/stirRequestSecurity.spec.ts",
     "tests/server/webformLimits.spec.ts",
     "tests/server/webformSubmit.spec.ts",
+    "tests/unit/componentOverrides.spec.ts",
     "tests/unit/drupalMediaEditor.spec.ts",
     "tests/unit/editorDragHandle.spec.ts",
     "tests/unit/editorialAccess.spec.ts",
@@ -941,6 +944,7 @@
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/globalSeoAssets.spec.ts",
+    "tests/utils/gridClasses.spec.ts",
     "tests/utils/headingTag.spec.ts",
     "tests/utils/headingText.spec.ts",
     "tests/utils/heroMotionAccessibility.spec.ts",

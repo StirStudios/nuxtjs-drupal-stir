@@ -120,6 +120,11 @@ export default defineAppConfig({
         text: 'mx-auto max-w-4xl p-5 text-center',
       },
       nodeTypes: {},
+      front: {
+        subtitle: 'replace',
+        subtitleClass: '',
+        showText: true,
+      },
     },
 
     frontPage: {

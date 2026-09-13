@@ -260,6 +260,7 @@ provideRevealMotionScope(() => undefined)
                 :is-front="isFrontEffective"
                 :layout="isInline ? 'inline' : 'background'"
                 :page-title="pageTitleEffective"
+                :site-slogan="siteSlogan || page?.site_info?.slogan"
                 :subtitle="heroSubtitle"
               />
 

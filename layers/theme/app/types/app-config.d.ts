@@ -190,6 +190,11 @@ type StirThemeHeroConfig = {
     text?: ClassValue
   } & LooseRecord
   nodeTypes?: Record<string, StirThemeHeroNodeTypeConfig>
+  front?: {
+    subtitle?: 'replace' | 'below'
+    subtitleClass?: ClassValue
+    showText?: boolean
+  } & LooseRecord
   overlay?: ClassValue
   isFront?: ClassValue
   image?: {
@@ -476,6 +481,7 @@ type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
   text: NonNullable<StirThemeHeroConfig['text']>
   inline: NonNullable<StirThemeHeroConfig['inline']>
   nodeTypes: NonNullable<StirThemeHeroConfig['nodeTypes']>
+  front: NonNullable<StirThemeHeroConfig['front']>
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {

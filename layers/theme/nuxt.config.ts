@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import {
   addTypeTemplate,
   findPath,
+  hasNuxtModule,
   useLogger,
   useNuxt,
 } from '@nuxt/kit'
@@ -20,6 +21,7 @@ import {
 } from './build/imageCdn'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
+import { overrideFallbackComponent } from '../../config/componentOverrides'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = resolvePath(themeLayerDir, '../..')
@@ -70,6 +72,16 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/image',
     '@nuxt/scripts',
+    function useInstalledPdfViewer() {
+      // Projects that install the vue-pdf-viewer-core Nuxt module get the real
+      // viewer; others keep the lightweight stub and never load the viewer.
+      overrideFallbackComponent(
+        'StirPdfViewer',
+        resolvePath(themeLayerDir, 'app/components/StirPdfViewer.client.vue'),
+        resolvePath(themeLayerDir, 'app/pdf/StirPdfViewer.client.vue'),
+        () => hasNuxtModule('vue-pdf-viewer-core'),
+      )
+    },
     function registerStirAppConfigTypes() {
       addTypeTemplate({
         filename: 'types/stir-app-config.d.ts',

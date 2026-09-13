@@ -309,5 +309,32 @@ describe('Drupal Hero page ownership and headings', () => {
       expect(wrapper.get('.contained').findAll('figure')).toHaveLength(2)
       wrapper.unmount()
     })
+
+    it('keeps the front-page title as the H1 with the header or slogan beneath it', async () => {
+      await withHeroTheme({ front: { subtitle: 'below', subtitleClass: 'hero-subtitle', showText: false } }, async () => {
+        const page = ref(makePage('Front page title'))
+
+        page.value.is_front_page = true
+        Object.assign(page.value, { site_info: { name: 'Site', slogan: 'Site slogan' } })
+        const wrapper = await mountSuspended(Hero, {
+          props: { header: 'Authored header', text: '<p>Intro</p>' },
+          global: { provide: { [drupalPageKey as symbol]: page } },
+        })
+
+        expect(wrapper.findAll('h1')).toHaveLength(1)
+        expect(wrapper.get('h1').text()).toBe('Front page title')
+        expect(wrapper.get('h2.subtitle').text()).toBe('Authored header')
+        expect(wrapper.get('h2.subtitle').classes()).toContain('hero-subtitle')
+        expect(wrapper.find('.lead').exists()).toBe(false)
+        await wrapper.setProps({ header: '' })
+        expect(wrapper.get('h2.subtitle').text()).toBe('Site slogan')
+        page.value.is_front_page = false
+        await nextTick()
+        expect(wrapper.find('h2.subtitle').exists()).toBe(false)
+        expect(wrapper.get('h1').text()).toBe('Front page title')
+        expect(wrapper.find('.lead').exists()).toBe(true)
+        wrapper.unmount()
+      })
+    })
   })
 })
