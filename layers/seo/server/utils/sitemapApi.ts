@@ -10,8 +10,18 @@ import {
   strictObject,
   string,
 } from 'valibot'
-import type { SitemapProducerPayload } from '../../shared/types/sitemap'
-import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
+import type {
+  SitemapEntry,
+  SitemapProducerPayload,
+} from '../../shared/types/sitemap'
+import {
+  getStirDrupalApiConfig,
+  stirDrupalApiRequest,
+} from '../../../foundation/server/utils/stirDrupalApi'
+import {
+  mergeSitemapExtensions,
+  resolveSitemapExtensions,
+} from './sitemapExtensions'
 
 const sitemapSchema = array(strictObject({
   loc: pipe(string(), minLength(1)),
@@ -39,10 +49,14 @@ export function parseSitemapResponse(value: unknown): SitemapProducerPayload {
 
 export async function fetchSitemap(
   event: Parameters<typeof stirDrupalApiRequest>[0],
-): Promise<SitemapProducerPayload> {
-  const response = await stirDrupalApiRequest<unknown>(event, '/api/sitemap', {
-    method: 'GET',
-  })
+): Promise<SitemapEntry[]> {
+  const { requestTimeoutMs } = getStirDrupalApiConfig()
+  const [response, extensions] = await Promise.all([
+    stirDrupalApiRequest<unknown>(event, '/api/sitemap', {
+      method: 'GET',
+    }),
+    resolveSitemapExtensions(event, requestTimeoutMs),
+  ])
 
-  return parseSitemapResponse(response)
+  return mergeSitemapExtensions(parseSitemapResponse(response), extensions)
 }

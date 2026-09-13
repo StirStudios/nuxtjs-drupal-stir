@@ -62,6 +62,15 @@ untouched do not need one.
   visually hidden `role="status"` region that announces result updates. Views
   without the slot render exactly as before. `useDrupalViewControls` returns the
   same `activeFilters`, `removeFilter`, `resetFilters` and `resetSort`.
+- The SEO layer's `/api/sitemap` source calls a `stir:sitemap:extend` Nitro
+  runtime hook so projects can add `images` and `videos` to Drupal sitemap URLs
+  without replacing `server/api/sitemap.get.ts`. Handlers run in parallel with
+  the Drupal request. Extension entries are validated (absolute http(s) `loc`,
+  image and video shapes); invalid entries are dropped with a warning, and a
+  handler that throws or exceeds the Drupal request timeout is logged and
+  ignored, so the base sitemap is still served. The Drupal payload stays strictly
+  validated, and output is unchanged when no handler is registered. See
+  `layers/seo/README.md`.
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and

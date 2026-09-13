@@ -33,7 +33,11 @@ export function buildSitemapModuleOptions(drupalUrl: string) {
   }
 }
 
-function sitemapCanonicalKey(loc: string, siteUrl: string): string | null {
+/** Host-independent path (plus query) used to match sitemap URLs. */
+export function sitemapCanonicalKey(
+  loc: string,
+  siteUrl = process.env.NUXT_URL || '',
+): string | null {
   try {
     const url = new URL(loc.replaceAll('&amp;', '&'), siteUrl || 'https://example.com')
     const pathname = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
