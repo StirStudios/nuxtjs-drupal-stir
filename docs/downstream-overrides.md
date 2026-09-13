@@ -54,6 +54,22 @@ export default defineAppConfig({
 })
 ```
 
+Call-to-action button and account menu taken from the last two Drupal main-menu
+links:
+
+```ts
+export default defineAppConfig({
+  stirTheme: {
+    navigation: {
+      actionItems: [
+        { match: -2, as: 'button', mobile: 'button', color: 'secondary', size: 'lg' },
+        { match: -1 },
+      ],
+    },
+  },
+})
+```
+
 Put the named components in `app/components/global/` so they resolve by name.
 Keep brand copy, artwork and effects in those project components rather than
 replacing `App/Header.vue`.

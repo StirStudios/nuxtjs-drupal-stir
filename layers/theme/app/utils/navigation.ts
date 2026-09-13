@@ -1,4 +1,4 @@
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { ButtonProps, NavigationMenuItem } from '@nuxt/ui'
 
 export type DrupalMenuItemLink = {
   external?: boolean
@@ -109,5 +109,61 @@ export function splitMenuAtMarker(
     before: markerIndex > -1 ? items.slice(0, markerIndex) : items,
     after: markerIndex > -1 ? items.slice(markerIndex + 1) : [],
     markerIndex,
+  }
+}
+
+export type HeaderActionRule = {
+  match?: string | number
+  as?: 'button' | 'navigation' | string
+  mobile?: 'menu' | 'button' | 'hidden' | string
+  color?: string
+  variant?: string
+  size?: string
+  class?: string
+  icon?: string
+}
+
+export type HeaderActionItem = {
+  item: NavigationMenuItem
+  as: 'button' | 'navigation'
+  mobile: 'menu' | 'button' | 'hidden'
+  button: Pick<ButtonProps, 'color' | 'variant' | 'size' | 'icon'> & { class?: string }
+}
+
+// Moves top-level menu items matched by label or position (negative counts
+// from the end) into the header actions region, in rule order.
+export function extractHeaderActions(
+  items: NavigationMenuItem[],
+  rules: unknown,
+): { items: NavigationMenuItem[], actions: HeaderActionItem[] } {
+  const taken = new Set<NavigationMenuItem>()
+  const actions: HeaderActionItem[] = []
+
+  for (const rule of Array.isArray(rules) ? rules as HeaderActionRule[] : []) {
+    const index = typeof rule?.match === 'number'
+      ? (rule.match < 0 ? items.length + rule.match : rule.match)
+      : items.findIndex(item => typeof rule?.match === 'string' && item.label === rule.match)
+    const item = Number.isInteger(index) ? items[index] : undefined
+
+    if (!item || taken.has(item)) continue
+
+    taken.add(item)
+    actions.push({
+      item,
+      as: rule.as === 'button' ? 'button' : 'navigation',
+      mobile: rule.mobile === 'button' || rule.mobile === 'hidden' ? rule.mobile : 'menu',
+      button: {
+        color: rule.color as ButtonProps['color'],
+        variant: rule.variant as ButtonProps['variant'],
+        size: rule.size as ButtonProps['size'],
+        class: rule.class,
+        icon: rule.icon,
+      },
+    })
+  }
+
+  return {
+    items: taken.size ? items.filter(item => !taken.has(item)) : items,
+    actions,
   }
 }

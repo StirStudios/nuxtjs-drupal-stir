@@ -104,6 +104,14 @@ untouched do not need one.
   inline `hero` slot. Disabled by default, so existing output is unchanged.
   `usePageContext` now shares its Drupal-route check through
   `isDrupalRenderedRoute()`.
+- `stirTheme.navigation.actionItems` routes top-level main-menu items, matched
+  by title or position, into the header's right region as a button or a
+  secondary navigation menu, with `mobile: 'menu' | 'button' | 'hidden'`
+  placement in the mobile panel. `navigation.actionsComponent` now also
+  receives the resolved `actions`. Default header output is unchanged. When the
+  color-mode toggle is hidden, the right region now stays visible on desktop if
+  it holds action items or an actions component.
+
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and

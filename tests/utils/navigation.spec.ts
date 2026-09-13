@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  extractHeaderActions,
   mapDrupalMenuItem,
   menuItemTo,
   normalizeInternalMenuPath,
@@ -116,5 +117,39 @@ describe('splitMenuAtMarker', () => {
       after: [],
       markerIndex: -1,
     })
+  })
+})
+
+describe('extractHeaderActions', () => {
+  const items = [{ label: 'Classes' }, { label: 'Pricing' }, { label: 'Join now' }, { label: 'Account' }]
+
+  it('leaves navigation untouched without rules', () => {
+    expect(extractHeaderActions(items, undefined)).toEqual({ items, actions: [] })
+    expect(extractHeaderActions(items, [])).toEqual({ items, actions: [] })
+  })
+
+  it('routes items by position or label in rule order', () => {
+    const result = extractHeaderActions(items, [
+      { match: -2, as: 'button', mobile: 'button', color: 'secondary', size: 'lg' },
+      { match: 'Account' },
+    ])
+
+    expect(result.items).toEqual([{ label: 'Classes' }, { label: 'Pricing' }])
+    expect(result.actions).toEqual([
+      {
+        item: { label: 'Join now' },
+        as: 'button',
+        mobile: 'button',
+        button: { color: 'secondary', variant: undefined, size: 'lg', class: undefined, icon: undefined },
+      },
+      expect.objectContaining({ item: { label: 'Account' }, as: 'navigation', mobile: 'menu' }),
+    ])
+  })
+
+  it('ignores unmatched, out-of-range and duplicate rules', () => {
+    const result = extractHeaderActions(items, [{ match: 'Missing' }, { match: 9 }, { match: 0 }, { match: -4 }])
+
+    expect(result.actions.map(action => action.item.label)).toEqual(['Classes'])
+    expect(result.items).toHaveLength(3)
   })
 })

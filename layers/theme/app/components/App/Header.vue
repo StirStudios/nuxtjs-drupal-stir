@@ -6,6 +6,7 @@ import type {
 import type { NavigationMenuItem } from '@nuxt/ui'
 import { createReusableTemplate, useEventListener } from '@vueuse/core'
 import {
+  extractHeaderActions,
   mapDrupalMenuItem,
   splitMenuAtMarker,
   type DrupalMenuTreeItem,
@@ -276,7 +277,7 @@ const headerRightClasses = computed(() => {
 
   return [
     headerUi.right,
-    appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false
+    (appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false) && !hasDesktopActions.value
       ? 'block lg:hidden lg:flex-0'
       : 'lg:flex-1',
     isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.right) : '',
@@ -321,8 +322,14 @@ const navLinks = computed<NavigationMenuItem[]>(() =>
   (Array.isArray(mainMenu.value) ? mainMenu.value : [])
     .map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
 )
+const headerActions = computed(() => extractHeaderActions(navLinks.value, theme.navigation?.actionItems))
+const actionButtons = computed(() => headerActions.value.actions.filter(action => action.as === 'button'))
+const actionNavLinks = computed(() =>
+  headerActions.value.actions.filter(action => action.as === 'navigation').map(action => action.item),
+)
+const hasDesktopActions = computed(() => Boolean(headerActions.value.actions.length || actionsComponent.value))
 const splitMenu = computed(() => splitMenuAtMarker(
-  navLinks.value,
+  headerActions.value.items,
   isSplitLogoLayout.value ? splitLogoMarker.value : undefined,
 ))
 const beforeLogo = computed(() => splitMenu.value.before)
@@ -330,10 +337,18 @@ const afterLogo = computed(() => splitMenu.value.after)
 const splitRightNavigationLabel = computed(() =>
   beforeLogo.value.length ? 'Additional navigation' : 'Primary navigation',
 )
-const mobileNavLinks = computed(() =>
-  splitMenu.value.markerIndex > -1
-    ? [...beforeLogo.value, ...afterLogo.value]
-    : navLinks.value,
+// Action items keep their menu position in the mobile panel unless routed to
+// its buttons or hidden.
+const mobileNavLinks = computed(() => {
+  const marker = splitMenu.value.markerIndex > -1 ? splitLogoMarker.value : undefined
+  const excluded = new Set(headerActions.value.actions
+    .filter(action => action.mobile !== 'menu')
+    .map(action => action.item))
+
+  return navLinks.value.filter(item => !excluded.has(item) && (!marker || item.label !== marker))
+})
+const mobileActionButtons = computed(() =>
+  headerActions.value.actions.filter(action => action.mobile === 'button'),
 )
 
 let menuToggleElement: HTMLElement | null = null
@@ -512,7 +527,7 @@ watch(menuOpen, (val) => {
           :color="headerNavColor"
           :highlight="theme.navigation.highlight.show"
           :highlight-color="headerHighlightColor"
-          :items="navLinks"
+          :items="headerActions.items"
           :variant="headerNavVariant"
         />
       </div>
@@ -521,9 +536,35 @@ watch(menuOpen, (val) => {
         :class="headerRightClasses"
         data-slot="right"
       >
+        <UButton
+          v-for="action in actionButtons"
+          :key="action.item.label"
+          :class="['hidden shrink-0 whitespace-nowrap lg:inline-flex', action.button.class]"
+          :color="action.button.color"
+          data-slot="action"
+          :icon="action.button.icon"
+          :label="action.item.label"
+          :size="action.button.size"
+          :target="action.item.target"
+          :to="action.item.to"
+          :variant="action.button.variant"
+        />
+
+        <LazyUNavigationMenu
+          v-if="actionNavLinks.length"
+          aria-label="Secondary navigation"
+          class="app-nav app-nav-actions app-nav-desktop hidden lg:flex"
+          :color="headerNavColor"
+          :highlight="theme.navigation.highlight.show"
+          :highlight-color="headerHighlightColor"
+          :items="actionNavLinks"
+          :variant="headerNavVariant"
+        />
+
         <component
           :is="actionsComponent"
           v-if="actionsComponent"
+          :actions="headerActions.actions"
           :scrolled="finalIsScrolled"
         />
 
@@ -579,6 +620,7 @@ watch(menuOpen, (val) => {
         data-slot="body"
       >
         <LazyAppHeaderMobileMenu
+          :actions="mobileActionButtons"
           :items="mobileNavLinks"
           :link-class="slideoverLinkClasses"
           :list-class="slideoverListClasses"

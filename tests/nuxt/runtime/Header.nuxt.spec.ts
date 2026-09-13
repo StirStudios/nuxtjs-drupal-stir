@@ -15,9 +15,12 @@ mockNuxtImport('usePageContext', () => () => ({
   hasEditorialAccess: ref(false),
 }))
 
+const menu = vi.hoisted(() => ({ items: [] as Record<string, unknown>[] }))
+const defaultMenu = [{ title: 'Work', url: '/work' }]
+
 mockNuxtImport('useStirDrupalCe', () => () => ({
   getPage: () => ref({ site_info: { name: 'Example site' } }),
-  useMenu: async () => ({ data: ref([{ title: 'Work', url: '/work' }]) }),
+  useMenu: async () => ({ data: ref(menu.items) }),
 }))
 
 const navigation = () => useAppConfig().stirTheme.navigation as Record<string, unknown>
@@ -30,6 +33,7 @@ function setNavigation(overrides: Record<string, unknown>) {
 // App config is reactive, so snapshot it as plain data. Tests only override
 // keys that exist in the layer defaults.
 beforeEach(() => {
+  menu.items = defaultMenu
   originalNavigation = JSON.parse(JSON.stringify(navigation()))
 })
 
@@ -139,6 +143,65 @@ describe('App header', () => {
 
     expect(wrapper.get('[data-slot="right"]').text()).toBe('')
     expect(wrapper.find('[data-slot="toggle"] [data-slot="leadingIcon"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('keeps the default right region free of action items', async () => {
+    const wrapper = await mountSuspended(Header)
+    const right = wrapper.get('[data-slot="right"]')
+
+    expect(right.find('[data-slot="action"]').exists()).toBe(false)
+    expect(right.find('.app-nav-actions').exists()).toBe(false)
+    expect(wrapper.findAll('.app-nav-desktop')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('routes configured menu items into header actions with mobile parity and focus return', async () => {
+    const colorMode = useAppConfig().colorMode as Record<string, unknown>
+    const showToggle = colorMode.showToggle
+
+    colorMode.showToggle = false
+    menu.items = [
+      { title: 'Classes', url: '/classes' },
+      { title: 'Join now', url: '/pricing' },
+      { title: 'Account', url: '/account', children: [{ title: 'Sign in', url: '/auth/login' }] },
+    ]
+    setNavigation({
+      actionItems: [
+        { match: -2, as: 'button', mobile: 'button', color: 'secondary', class: 'uppercase' },
+        { match: 'Account' },
+      ],
+    })
+
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const right = wrapper.get('[data-slot="right"]')
+    const cta = right.get('[data-slot="action"]')
+    const primaryNav = wrapper.get('nav[aria-label="Site Navigation"]')
+    const actionNav = right.get('nav[aria-label="Secondary navigation"]')
+
+    expect(right.classes()).not.toContain('lg:hidden')
+    expect(cta.text()).toBe('Join now')
+    expect(cta.attributes('href')).toBe('/pricing')
+    expect(cta.classes()).toEqual(expect.arrayContaining(['hidden', 'lg:inline-flex', 'uppercase']))
+    expect(primaryNav.text()).toContain('Classes')
+    expect(primaryNav.text()).not.toMatch(/Join now|Account/)
+    expect(actionNav.classes()).toEqual(expect.arrayContaining(['app-nav-actions', 'hidden', 'lg:flex']))
+    expect(actionNav.text()).toContain('Account')
+    expect(actionNav.text()).not.toContain('Join now')
+
+    const toggle = right.get('[data-slot="toggle"]')
+
+    await toggle.trigger('click')
+    await vi.waitFor(() => expect(wrapper.findComponent({ name: 'AppHeaderMobileMenu' }).exists()).toBe(true))
+    const mobileMenu = wrapper.findComponent({ name: 'AppHeaderMobileMenu' })
+
+    expect(mobileMenu.props('items').map((item: { label: string }) => item.label)).toEqual(['Classes', 'Account'])
+    expect(mobileMenu.props('actions').map((action: { item: { label: string } }) => action.item.label)).toEqual(['Join now'])
+    await toggle.trigger('click')
+    findSlideover(wrapper).vm.$emit('after:leave')
+    await nextTick()
+    expect(document.activeElement).toBe(toggle.element)
+    colorMode.showToggle = showToggle
     wrapper.unmount()
   })
 })

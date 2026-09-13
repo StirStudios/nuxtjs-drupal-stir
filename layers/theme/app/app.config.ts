@@ -59,6 +59,7 @@ export default defineAppConfig({
       toggleClass: '',
       toggleComponent: '',
       actionsComponent: '',
+      actionItems: [],
       header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',

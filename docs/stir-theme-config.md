@@ -342,6 +342,7 @@ navigation: {
   logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'
   toggleIcon: 'size-7',
+  actionItems: [], // route main-menu items into the header actions region
   splitLogo: {
 	center: 'flex-1 items-center justify-center',
 	container: 'relative',
@@ -401,7 +402,26 @@ Project hooks, all optional:
   inside the toggle button in place of the icon. It receives `open` and
   `scrolled`.
 - `navigation.actionsComponent` names a globally registered component rendered
-  at the start of the right region. It receives `scrolled`.
+  in the right region after any action items. It receives `scrolled` and
+  `actions`, the resolved `navigation.actionItems`, which the layer already
+  renders.
+- `navigation.actionItems` moves top-level main-menu items into the right
+  region. Each rule has `match` (a menu title, or a position where negative
+  numbers count from the end), `as` (`'navigation'`, the default, or
+  `'button'`) and `mobile` (`'menu'`, the default, keeps the item in its menu
+  position; `'button'` renders it as a full-width button below the mobile menu;
+  `'hidden'` omits it). Button rules accept `color`, `variant`, `size`, `class`
+  and `icon`. Navigation items share one `Secondary navigation` menu, so
+  dropdown children and keyboard behavior match the main menu. Action items
+  show from `lg` up; below that they live in the mobile panel. Positions count
+  the full top-level menu, including a split-logo marker.
+
+  ```ts
+  actionItems: [
+    { match: -2, as: 'button', mobile: 'button', color: 'secondary', size: 'lg' },
+    { match: -1 },
+  ],
+  ```
 - `navigation.toggleClass` adds classes to the header toggle only. Use
   `aria-expanded:` variants to style the open state.
 - `navigation.slideover.content` replaces the panel background classes.
