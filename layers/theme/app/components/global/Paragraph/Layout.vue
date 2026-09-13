@@ -10,6 +10,7 @@ import {
   layoutImageDeliveryProfileKey,
   resolveLayoutImageDeliveryProfile,
 } from '#stir/utils/imageDelivery'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
 
 defineOptions({
   inheritAttrs: false,
@@ -47,6 +48,7 @@ const props = defineProps<{
 
 // Older payloads retain their existing section wrapper.
 const layoutTag = computed(() => props.layoutTag === 'div' ? 'div' : 'section')
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 
 const classNames = computed(() => props.classes?.split(/\s+/) || [])
 const isActionGroup = computed(() => classNames.value.includes('action-group'))
@@ -136,7 +138,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
     >
       <RevealMotionElement
         v-if="header"
-        :as="headerTag || 'h2'"
+        :as="headingTag"
         class="col-span-full"
         :motion-props="headerMotionProps"
       >

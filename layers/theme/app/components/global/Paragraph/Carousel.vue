@@ -17,6 +17,7 @@ import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
 
 const props = withDefaults(defineProps<{
   id?: number | string
@@ -71,6 +72,7 @@ const props = withDefaults(defineProps<{
 })
 
 const theme = useAppConfig().stirTheme
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
@@ -260,7 +262,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
     @pointerup.capture="releasePointerArrowFocus"
   >
     <div ref="carouselRoot">
-      <component :is="headerTag || 'h2'" v-if="header">
+      <component :is="headingTag" v-if="header">
         {{ header }}
       </component>
 

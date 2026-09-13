@@ -6,6 +6,7 @@ import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
 import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
+import { resolveHeadingTag } from '../../../utils/headingTag'
 
 const props = defineProps<{
   id?: number | string
@@ -38,6 +39,7 @@ const props = defineProps<{
 }>()
 
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const theme = useAppConfig().stirTheme
 const mediaHeightClass = computed(() =>
   theme.media.heights?.[props.mediaHeight || 'natural']
@@ -130,7 +132,7 @@ onMounted(() => {
     :parent-uuid="parentUuid"
   >
     <WrapDiv :align="align">
-      <component :is="headerTag || 'h2'" v-if="header">
+      <component :is="headingTag" v-if="header">
         {{ header }}
       </component>
 
