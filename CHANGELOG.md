@@ -50,6 +50,10 @@ untouched do not need one.
 
 ### Added
 
+- `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
+  and Hero paragraph copy. Projects can override it to expand their own inline
+  embeds. The default output is unchanged: one `div` with the same classes and
+  `v-html` content.
 - `stir-compliance` now discovers the services a site actually runs from the
   Drupal config export, `app/app.config.ts`, and environment variable names,
   and applies only the rules that evidence triggers: Webforms, Turnstile,

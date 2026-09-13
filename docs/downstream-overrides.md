@@ -76,6 +76,15 @@ export default defineAppConfig({
 Project-specific footer CTAs should use `app/components/App/Footer.vue` in the
 downstream project. Do not add project CTAs back to the shared footer contract.
 
+Rich text inline embeds:
+
+`EditableRichText`, used by Text and Hero paragraphs, renders its trusted HTML
+through `RichTextHtml`. To expand project-specific inline elements (for example
+a `<stir-cta>` tag stored in Drupal text), add `app/components/RichTextHtml.vue`
+with the same `html` prop. Keep one root element so wrapper classes and reveal
+motion still apply, and keep plain HTML output unchanged when no embed is found.
+Override the global `drupal-markup` component the same way for body fields.
+
 Webform styling:
 
 ```ts
