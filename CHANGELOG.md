@@ -59,6 +59,13 @@ untouched do not need one.
   uses the existing `hero.text.heading` classes (default `mb-0`, as before).
   In `mode: 'simple'`, the `classes` prop now wraps the slots instead of being
   ignored.
+- `RevealMotionElement` accepts shorthand props (`effect`, `delayMs`,
+  `durationMs`, `distancePx`, `rootMargin`) for component-authored reveals, so
+  projects no longer need their own motion-v wrapper. Shorthand reveals use the
+  same reduced-motion, SSR-visible and `animations.once` handling as Drupal
+  paragraph reveals. `getRevealMotionProps` / `useRevealMotionProps` accept the
+  same `durationMs`, `distancePx` and `rootMargin` overrides; `motionProps`
+  still takes precedence and is unchanged.
 
 ### Changed
 

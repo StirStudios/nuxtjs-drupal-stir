@@ -703,6 +703,26 @@ When staggering is enabled at page or Layout scope, eligible children consume
 the configured `reveal.staggerMs` delay in content order. Reduced-motion
 preferences always disable movement.
 
+Project components can reuse the same reveal behaviour without importing
+motion-v. Shorthand props override the `reveal` config for that element only:
+
+```vue
+<RevealMotionElement
+  as="h2"
+  effect="fade-up"
+  :delay-ms="80"
+  :duration-ms="600"
+  :distance-px="24"
+  root-margin="0px 0px -18% 0px"
+>
+  Selected work
+</RevealMotionElement>
+```
+
+Content stays visible in the server-rendered HTML and animates after
+hydration. A `motionProps` object, used by Drupal paragraphs, takes precedence
+over the shorthand props.
+
 ### 🧱 Grid separator
 
 ```ts
