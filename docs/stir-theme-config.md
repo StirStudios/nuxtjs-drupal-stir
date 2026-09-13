@@ -231,15 +231,42 @@ loader URL. UserWay remains ungated as an accessibility-essential service.
 ```ts
 popup: {
   enabled: false, // global mount switch for <LazyAppPopup />
+  component: '', // optional globally registered popup body
   dismissalTtlDays: 14, // days before a dismissed campaign may appear again
+  hideWhenLoggedIn: false, // hide from signed-in Drupal users (auth layer)
 }
 ```
 
 Popup visibility should be controlled in Drupal block visibility settings
 (Show/Hide for listed pages). Nuxt no longer applies route allow/block lists.
 `dismissalTtlDays` accepts a positive number and falls back to 14 when omitted
-or invalid. A successful form completion suppresses that campaign permanently;
-closing it without completing the form uses the timed dismissal.
+or invalid.
+
+Storage semantics: suppression is stored per campaign (`uuid`, else `id`) in
+`localStorage` under `stir:marketing-popup-dismissals`.
+
+- Dismissal (close button, Escape, overlay, or the body calling `onClose`)
+  hides the campaign for `dismissalTtlDays`.
+- Completion (the body calling `onComplete`, for example after a successful
+  signup) hides the campaign permanently in that browser.
+- A popup closed because it became suppressed, such as a visitor signing in,
+  records nothing.
+
+`hideWhenLoggedIn: true` renders nothing until `/api/auth/session` resolves, so
+signed-in visitors never see a flash; the popup then stays hidden for them. It
+requires the auth layer. If the session request fails, the popup stays hidden.
+
+Each time the popup opens, the layer calls the `stir:popup:shown` Nuxt app hook
+with `{ key, popup }`, where `key` is the campaign key above. Use it for
+analytics from a project plugin:
+
+```ts
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.hook('stir:popup:shown', ({ key }) => {
+    useTrackEvent('Marketing popup shown', { props: { campaign: key ?? '' } })
+  })
+})
+```
 
 ### 🍪 `privacyNotice`
 

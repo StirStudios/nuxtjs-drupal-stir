@@ -111,6 +111,11 @@ untouched do not need one.
   receives the resolved `actions`. Default header output is unchanged. When the
   color-mode toggle is hidden, the right region now stays visible on desktop if
   it holds action items or an actions component.
+- `popup.hideWhenLoggedIn` (default `false`) waits for the Drupal session and
+  keeps the popup hidden for signed-in visitors, with nothing rendered before
+  the session resolves.
+- The `stir:popup:shown` Nuxt app hook fires with `{ key, popup }` each time
+  the popup opens.
 
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline

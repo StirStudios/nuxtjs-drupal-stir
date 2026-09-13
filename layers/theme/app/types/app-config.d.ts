@@ -43,6 +43,7 @@ type PopupConfig = {
   enabled?: boolean
   component?: string
   dismissalTtlDays?: number
+  hideWhenLoggedIn?: boolean
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {

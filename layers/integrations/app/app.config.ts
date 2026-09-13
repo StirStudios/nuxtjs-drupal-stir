@@ -23,5 +23,6 @@ export default defineAppConfig({
     enabled: false,
     component: '',
     dismissalTtlDays: 14,
+    hideWhenLoggedIn: false,
   },
 } as unknown as AppConfigInput)
