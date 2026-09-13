@@ -128,7 +128,7 @@
     }
 
     :where(blockquote) {
-      @apply border-accented my-5 border-s-4 ps-4 italic;
+      @apply border-accented my-[1.5em] border-s-4 ps-[1.25em] italic;
     }
 
     :where(hr) {
