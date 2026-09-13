@@ -801,7 +801,7 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('const richTextClass = \'prose max-w-none\'')
     expect(baseCss).toContain(':where(.prose, .admin-editor-prose)')
     expect(baseCss).toMatch(/:where\(p\)\s*\{\s*@apply my-\[1em\] text-pretty;/)
-    expect(baseCss).toMatch(/:where\(\.prose, \.admin-editor-prose\)\s*\{\s*@apply leading-7;/)
+    expect(baseCss).toMatch(/:where\(\.prose, \.admin-editor-prose\)\s*\{\s*@apply leading-relaxed;/)
   })
 
   it('renders Drupal markup through the hydration-safe upstream directive', () => {
