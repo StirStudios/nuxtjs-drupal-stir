@@ -121,6 +121,8 @@ match Drupal's configured copy word-for-word.
 Downstream projects with local auth page overrides can use the auth layer's
 public auto-import surface instead of importing from nested layer internals:
 
+- `registerAccountNavVisibility`
+- `useAccountNav`
 - `useAuthActions`
 - `useAuthConfig`
 - `useAuthLogin`
@@ -148,6 +150,47 @@ or sent.
   requires the current password for an email change at all, so a page can show
   the password input up front. `requiresCurrentPassword` stays true only once
   the email has actually changed.
+
+### Account navigation
+
+`useAccountNav()` returns `items`, a computed list for `UNavigationMenu`, used
+by the `account` layout. It defaults to a single Settings link. Replace the
+list in `app.config`; a non-empty `items` replaces the default rather than
+extending it:
+
+```ts
+export default defineAppConfig({
+  auth: {
+    accountNav: {
+      items: [
+        { label: 'Settings', icon: 'i-lucide-settings', to: '/account/settings' },
+        { label: 'Profile', icon: 'i-lucide-user-round', to: '/account/profile' },
+        { label: 'Billing', icon: 'i-lucide-credit-card', to: '/account/billing', visibility: 'billing' },
+      ],
+    },
+  },
+})
+```
+
+An item with `visibility` is shown only while the resolver registered for that
+key returns `true`, and stays hidden if no resolver is registered. Register
+resolvers from a plugin:
+
+```ts
+export default defineNuxtPlugin(() => {
+  registerAccountNavVisibility('billing', () => {
+    const { data } = useFetch<{ has_customer?: boolean }>('/api/stripe/access')
+
+    return () => data.value?.has_customer === true
+  })
+})
+```
+
+A resolver runs in the setup of each component calling `useAccountNav()`, so
+composables are available, and it may return a boolean, ref or getter.
+Resolvers are stored per Nuxt app instance, so they never leak between SSR
+requests. Resolve on the server where possible (as above) so the item is
+present in the SSR HTML; with `server: false` it appears after hydration.
 
 ### Post-login destination
 

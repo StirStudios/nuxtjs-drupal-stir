@@ -71,6 +71,11 @@ untouched do not need one.
   ignored, so the base sitemap is still served. The Drupal payload stays strictly
   validated, and output is unchanged when no handler is registered. See
   `layers/seo/README.md`.
+- Account navigation is configurable. `app.config` `auth.accountNav.items`
+  (`label`, `to`, optional `icon` and `visibility`) replaces the default
+  Settings link, and `registerAccountNavVisibility(key, resolver)` decides at
+  runtime whether items with that `visibility` key are shown. Both are typed
+  and auto-imported. The default navigation is unchanged.
 - `useAccountSettings()` returns `reset()`, which restores the last loaded or
   saved values and clears the current password, and
   `emailChangeRequiresCurrentPassword`, a readonly ref reporting whether Drupal
@@ -157,6 +162,9 @@ untouched do not need one.
 
 ### Changed
 
+- `useAccountNav().items` is now a `ComputedRef<NavigationMenuItem[]>` rather
+  than a plain array. Templates are unaffected; script code reading the list
+  should use `items.value`.
 - **Behaviour change: profile validation.** `validateProfileValues()` (used by
   `AccountProfileForm`) is stricter and more precise:
   - email checks apply only to `email` fields and to `link` fields named or
