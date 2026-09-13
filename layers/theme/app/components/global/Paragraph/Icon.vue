@@ -1,23 +1,27 @@
 <script setup lang="ts">
-defineProps<{
+import { resolveAlignClasses, type AlignConfig } from '#stir/utils/gridClasses'
+
+const props = defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  align?: string
+  align?: AlignConfig
   iconName?: string
   iconSize?: number | string
   direction?: string
 
   editLink?: string
 }>()
+
+const alignClasses = computed(() => resolveAlignClasses(props.align))
 </script>
 
 <template>
   <ParagraphReveal :id="id" :direction="direction">
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
-      <WrapDiv :align="align">
+      <WrapDiv :align="alignClasses">
         <UIcon
           v-if="iconName"
           :class="['text-primary inline-block', iconSize ? `size-${iconSize}` : undefined]"

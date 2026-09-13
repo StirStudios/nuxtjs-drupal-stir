@@ -1,4 +1,6 @@
 import type { ComputedRef, InjectionKey } from 'vue'
+import type { GridConfig } from './gridClasses'
+import { GRID_BREAKPOINTS, maxGridColumns } from './gridClasses'
 
 export const viewportImageLoadingKey: InjectionKey<boolean> =
   Symbol('stirViewportImageLoading')
@@ -33,8 +35,34 @@ export function resolveLayoutImageDeliveryProfile(
   return undefined
 }
 
+/**
+ * Resolves an image delivery profile from a grid-mode paragraph's own
+ * layout key and structured column config (e.g. the Layout paragraph's
+ * `grid_class`, or a View's `grid_items`). See
+ * resolveLayoutImageDeliveryProfile() for the rich-text-HTML equivalent,
+ * which still parses author-entered container classes, not Drupal's
+ * structured contract.
+ */
+export function resolveGridImageDeliveryProfile(
+  grid: GridConfig | undefined,
+  layoutKey: string | undefined,
+  width: string | undefined,
+  contained = true,
+): string | undefined {
+  const maxColumns = maxGridColumns(grid)
+
+  if (maxColumns >= 3) return 'card'
+  if (maxColumns === 2 || layoutKey?.startsWith('two_column')) {
+    return contained ? 'split' : 'splitFull'
+  }
+  if (layoutKey === 'grid') return 'card'
+  if (width) return 'split'
+
+  return undefined
+}
+
 export function resolveMediaGalleryDeliveryProfile(
-  gridItems: string | undefined,
+  gridItems: GridConfig | undefined,
   itemCount: number,
   laneCount?: number,
 ): string | undefined {
@@ -46,12 +74,7 @@ export function resolveMediaGalleryDeliveryProfile(
     return 'container'
   }
 
-  const columns = [...(gridItems || '').matchAll(
-    /(?:^|[:\s])(?:grid-cols-|grid_col_|col_?)(\d+)(?:\s|$)/g,
-  )]
-    .map(match => Number(match[1]))
-    .filter(Number.isFinite)
-  const maximumColumns = columns.length > 0 ? Math.max(...columns) : 0
+  const maximumColumns = maxGridColumns(gridItems)
 
   if (maximumColumns >= 3) return 'card'
   if (maximumColumns === 2) return 'split'
@@ -61,33 +84,42 @@ export function resolveMediaGalleryDeliveryProfile(
 }
 
 export function resolveStableMediaDeliveryProfile(
-  gridItems: string | undefined,
+  gridItems: GridConfig | undefined,
   isMasonry: boolean,
 ): string {
-  if (isMasonry || !gridItems?.trim()) return 'container'
+  if (isMasonry || !gridItems?.columns || Object.keys(gridItems.columns).length === 0) {
+    return 'container'
+  }
 
   return resolveMediaGalleryDeliveryProfile(gridItems, 2) || 'container'
 }
 
 export function resolveCarouselImageDeliverySizes(
-  gridItems: string | undefined,
+  gridItems: GridConfig | undefined,
   fullProfile: string | undefined,
 ): string | undefined {
   const profile = fullProfile?.trim()
 
   if (!profile) return undefined
 
-  const itemClasses = gridItems?.trim()
+  const columns = gridItems?.columns
 
-  if (!itemClasses) return profile
+  // A single (or no) full-width slide gets the plain full profile, matching
+  // the default single-slide carousel with no per-breakpoint override.
+  if (!columns || maxGridColumns(gridItems) <= 1) return profile
 
-  const responsiveWidths = [...itemClasses.matchAll(
-    /(?:^|\s)(?:(sm|md|lg|xl|2xl):)?(?:basis|w)-(\d+)\/(\d+)(?=\s|$)/g,
-  )].map(([, breakpoint, numerator, denominator]) => {
-    const width = Math.round(Number(numerator) / Number(denominator) * 100)
+  const responsiveWidths: string[] = []
 
-    return `${breakpoint || 'sm'}:${width}vw`
-  })
+  for (const breakpoint of GRID_BREAKPOINTS) {
+    const value = columns[breakpoint]
+
+    if (typeof value !== 'number') continue
+
+    const width = Math.round(100 / value)
+    const label = breakpoint === 'default' ? 'sm' : breakpoint
+
+    responsiveWidths.push(`${label}:${width}vw`)
+  }
 
   return responsiveWidths.length > 0
     ? responsiveWidths.join(' ')

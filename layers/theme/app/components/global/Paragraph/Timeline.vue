@@ -2,6 +2,7 @@
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiColor } from '#stir/utils/nuxtUiProps'
+import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 
 type UITimelineItem = {
   date?: string
@@ -24,7 +25,7 @@ const props = defineProps<{
   parentUuid?: string
   region?: string
 
-  align?: string
+  align?: AlignConfig
   direction?: string
   classes?: string
   width?: string
@@ -56,15 +57,16 @@ const timelineItems = computed<UITimelineItem[]>(() =>
   }),
 )
 
+const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapperClasses = computed(() =>
-  ['w-full', props.classes, props.width, props.spacing].filter(Boolean).join(' '),
+  ['w-full', props.classes, resolveWidthClasses(props.width, props.align), props.spacing].filter(Boolean).join(' '),
 )
 const timelineColor = computed(() => resolveUiColor(props.color))
 </script>
 
 <template>
   <ParagraphReveal :id="id" :direction="direction">
-    <WrapDiv :align="align" :styles="wrapperClasses">
+    <WrapDiv :align="alignClasses" :styles="wrapperClasses">
       <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
         <UTimeline
           class="max-w-3xl"

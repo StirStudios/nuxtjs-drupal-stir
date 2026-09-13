@@ -318,12 +318,12 @@ export function presentationUtilities(
   for (const value of manifest.used.spacing) addSpacing(classes, value, warn)
 
   const widthRecipes: Record<string, string[]> = {
-    'w-xs': ['m-auto', 'sm:max-w-lg'],
-    'w-sm': ['m-auto', 'lg:max-w-2xl'],
-    'w-md': ['m-auto', 'lg:max-w-3xl'],
-    'w-lg': ['m-auto', 'lg:max-w-4xl'],
-    'w-xl': ['m-auto', 'lg:max-w-5xl'],
-    'w-2xl': ['m-auto', 'lg:max-w-6xl'],
+    'w-xs': ['mx-auto', 'sm:max-w-lg'],
+    'w-sm': ['mx-auto', 'lg:max-w-2xl'],
+    'w-md': ['mx-auto', 'lg:max-w-3xl'],
+    'w-lg': ['mx-auto', 'lg:max-w-4xl'],
+    'w-xl': ['mx-auto', 'lg:max-w-5xl'],
+    'w-2xl': ['mx-auto', 'lg:max-w-6xl'],
   }
 
   for (const value of manifest.used.width) {

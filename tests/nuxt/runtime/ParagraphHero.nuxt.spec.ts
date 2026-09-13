@@ -56,14 +56,14 @@ describe('Drupal Hero page ownership and headings', () => {
     }
   })
 
-  it.each(['start', 'center', 'end'].flatMap(horizontal =>
-    ['start', 'center', 'end'].map(vertical => ({ horizontal, vertical })),
+  it.each((['start', 'center', 'end'] as const).flatMap(horizontal =>
+    (['start', 'center', 'end'] as const).map(vertical => ({ horizontal, vertical })),
   ))('aligns the main hero $horizontal/$vertical without dropping theme classes', async ({ horizontal, vertical }) => {
     const page = ref(makePage('Page title'))
 
     page.value.is_front_page = true
     const wrapper = await mountSuspended(Hero, {
-      props: { align: `justify-${horizontal} items-${vertical}`, header: 'Heading', text: '<p>Intro</p>' },
+      props: { align: { justify: horizontal, items: vertical }, header: 'Heading', text: '<p>Intro</p>' },
       slots: { button: () => h('button', 'Action') },
       global: { provide: { [drupalPageKey as symbol]: page } },
     })
@@ -167,7 +167,7 @@ describe('Drupal Hero page ownership and headings', () => {
   })
   it.each(['field_section', 'field_content'])('uses authored section headings in %s without the page title', async (placement) => {
     const wrapper = await mountSuspended(Hero, {
-      props: { placement, header: 'Section title', headerTag: 'h3', label: 'Contact', mediaHeight: 'feature', align: 'justify-end items-end text-right' },
+      props: { placement, header: 'Section title', headerTag: 'h3', label: 'Contact', mediaHeight: 'feature', align: { justify: 'end', items: 'end', text: 'end' } },
       global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page title')) } },
     })
 

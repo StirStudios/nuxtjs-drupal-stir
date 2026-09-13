@@ -14,13 +14,14 @@ import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
+import type { AlignConfig } from '#stir/utils/gridClasses'
 
 const props = defineProps<{
   mode?: 'full' | 'simple'
   id?: string | number
   label?: string
   placement?: string
-  align?: string
+  align?: AlignConfig
   mediaHeight?: string
   eyebrow?: string
   headerTag?: string
@@ -45,13 +46,14 @@ const sectionHeadingTag = computed(() => resolveHeadingTag(props.headerTag))
 const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const alignment = computed(() => {
-  const tokens = props.align?.split(/\s+/) || []
+  const align = props.align
+  const text = align?.text ?? align?.justify
 
   return {
-    vertical: tokens.includes('items-end') ? 'items-end' : tokens.includes('items-start') ? 'items-start' : 'items-center',
-    horizontal: tokens.includes('justify-start') ? 'items-start' : tokens.includes('justify-end') ? 'items-end' : 'items-center',
-    text: tokens.includes('text-start') || tokens.includes('text-left') ? 'text-start' : tokens.includes('text-end') || tokens.includes('text-right') ? 'text-end' : tokens.includes('justify-start') ? 'text-start' : tokens.includes('justify-end') ? 'text-end' : 'text-center',
-    actions: tokens.includes('justify-start') ? 'justify-start' : tokens.includes('justify-end') ? 'justify-end' : 'justify-center',
+    vertical: align?.items === 'end' ? 'items-end' : align?.items === 'start' ? 'items-start' : 'items-center',
+    horizontal: align?.justify === 'start' ? 'items-start' : align?.justify === 'end' ? 'items-end' : 'items-center',
+    text: text === 'start' ? 'text-start' : text === 'end' ? 'text-end' : 'text-center',
+    actions: align?.justify === 'start' ? 'justify-start' : align?.justify === 'end' ? 'justify-end' : 'justify-center',
   }
 })
 const vueSlots = useSlots()

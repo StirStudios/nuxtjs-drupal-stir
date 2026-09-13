@@ -12,7 +12,7 @@ import {
 import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
 import {
   layoutImageDeliveryProfileKey,
-  resolveLayoutImageDeliveryProfile,
+  resolveGridImageDeliveryProfile,
 } from '#stir/utils/imageDelivery'
 
 const props = defineProps<DrupalViewProps>()
@@ -39,10 +39,8 @@ const inheritedImageDeliveryProfile = inject(
   undefined,
 )
 const viewImageDeliveryProfile = computed(() =>
-  resolveLayoutImageDeliveryProfile(
-    undefined,
-    [props.gridItems, props.width].filter(Boolean).join(' '),
-  ) || inheritedImageDeliveryProfile?.value,
+  resolveGridImageDeliveryProfile(props.gridItems, undefined, props.width)
+    || inheritedImageDeliveryProfile?.value,
 )
 
 provide(layoutImageDeliveryProfileKey, viewImageDeliveryProfile)

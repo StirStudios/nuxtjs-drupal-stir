@@ -3,6 +3,7 @@ import type { AccordionItem } from '@nuxt/ui'
 import type { Slots, VNode } from 'vue'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
+import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -17,7 +18,7 @@ const props = defineProps<{
   header?: string
   headerTag?: string
   text?: string
-  align?: string
+  align?: AlignConfig
   classes?: string
   width?: string
   spacing?: string
@@ -50,8 +51,8 @@ const sectionClasses = computed(() =>
   [
     'paragraph-accordion space-y-6',
     props.align ? 'w-full' : '',
-    props.align,
-    props.width,
+    resolveAlignClasses(props.align),
+    resolveWidthClasses(props.width, props.align),
     props.spacing,
     props.classes,
   ].filter(

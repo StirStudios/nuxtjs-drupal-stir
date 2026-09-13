@@ -1,4 +1,5 @@
 import type { ViewPager } from '#stir/composables/useDrupalViewQuery'
+import type { GridConfig } from '#stir/utils/gridClasses'
 
 export interface ExposedFilter {
   label: string
@@ -30,7 +31,7 @@ export interface DrupalViewProps {
   randomOrder?: DrupalRandomOrder
 
   title?: string
-  gridItems?: string
+  gridItems?: GridConfig
   rowsWrapper?: string
   width?: string
   spacing?: string

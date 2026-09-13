@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GridConfig } from '#stir/utils/gridClasses'
+
 defineProps<{
   id?: number
   uid?: number
@@ -7,7 +9,7 @@ defineProps<{
   region?: string
 
   maxItems?: number
-  gridItems?: string
+  gridItems?: GridConfig
   randomize?: boolean
   direction?: string
   editLink?: string
