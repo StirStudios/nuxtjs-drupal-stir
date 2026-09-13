@@ -157,6 +157,21 @@ untouched do not need one.
 
 ### Changed
 
+- **Behaviour change: profile validation.** `validateProfileValues()` (used by
+  `AccountProfileForm`) is stricter and more precise:
+  - email checks apply only to `email` fields and to `link` fields named or
+    labelled for email (a leading `mailto:` is ignored). A `string` field whose
+    name merely contains "email" is no longer email-validated;
+  - other `link` fields must be absolute `http://` or `https://` URLs, so
+    values such as `example.com`, `/path` or `javascript:` are now rejected;
+  - `cardinality` is honoured: every entry of a multi-value field is checked,
+    and more non-blank entries than the cardinality allows is an error
+    (`-1` is unlimited);
+  - an empty array, or an array of blank entries, counts as missing for a
+    required field.
+  Forms whose saved values violate these rules will show errors on the next
+  save. Projects that forked `profileValidation.ts` for these rules can delete
+  the fork.
 - **Breaking.** `stir-seo` and `stir-compliance` no longer read `SEO_SITE_URL`
   or `COMPLIANCE_SITE_URL`, or any other environment variable, for their
   target. Both always audit `owner.domain` from `compliance/site.json`, so a

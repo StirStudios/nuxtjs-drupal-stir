@@ -28,6 +28,15 @@ This layer uses one Valibot and Nuxt UI Standard Schema foundation with two doma
   - Password policy is centralized in `authValidation.ts`.
   - Route-token checks (for reset links) are validated in composables in addition to Valibot field checks.
 
+### Profile fields
+
+`layers/auth/app/utils/profileValidation.ts` validates Drupal-described profile
+fields. Required fields treat `null`, blank strings and empty (or all-blank)
+arrays as missing. `cardinality` limits the number of non-blank entries (`-1`
+is unlimited), and each entry is format-checked: `email` fields, and `link`
+fields named or labelled for email (`mailto:` allowed), must be addresses;
+other `link` fields must be `http(s)` URLs. Read-only fields are skipped.
+
 ## Shared Validation Error Mapping
 
 - Utility: `layers/auth/app/utils/validationErrors.ts`
