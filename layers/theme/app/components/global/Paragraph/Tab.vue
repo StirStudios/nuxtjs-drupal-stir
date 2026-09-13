@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { resolveHeadingTag } from '#stir/utils/headingTag'
+
 defineOptions({
   inheritAttrs: false,
 })
 
-defineProps<{
+const props = defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
@@ -15,8 +17,13 @@ defineProps<{
 
   editLink?: string
 }>()
+
+const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 </script>
 
 <template>
+  <component :is="headingTag" v-if="header" class="mb-4 text-lg font-semibold">
+    {{ header }}
+  </component>
   <slot name="tabContent" />
 </template>

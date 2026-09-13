@@ -32,12 +32,14 @@ type AccordionItemProps = {
   uuid?: string
   parentUuid?: string
   header?: string
+  headerTag?: string
   text?: string
   editLink?: string
 }
 
 type AccordionEntry = AccordionItem & {
   id?: number | string
+  headingTag: string
   buttonNodes: VNode[]
   contentHtml: string
   editLink?: string
@@ -75,6 +77,7 @@ const items = computed<AccordionEntry[]>(() =>
       id: itemProps.id,
       label,
       value,
+      headingTag: resolveHeadingTag(itemProps.headerTag),
       buttonNodes: itemSlots?.buttons?.() ?? [],
       contentHtml: trustedDrupalHtml(itemProps.text),
       editLink: itemProps.editLink,
@@ -118,6 +121,12 @@ const items = computed<AccordionEntry[]>(() =>
       }"
       :unmount-on-hide="false"
     >
+      <template #default="{ item }">
+        <component :is="item.headingTag" class="text-highlighted text-lg font-semibold">
+          {{ item.label }}
+        </component>
+      </template>
+
       <template #body="{ item }">
         <div
           v-if="item.contentHtml"
