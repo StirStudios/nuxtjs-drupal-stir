@@ -33,7 +33,7 @@
   }
 
   :where(.prose, .admin-editor-prose) {
-    @apply leading-7;
+    @apply leading-relaxed;
     & > :first-child {
       @apply mt-0;
     }
