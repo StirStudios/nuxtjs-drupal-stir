@@ -10,6 +10,7 @@ const props = withDefaults(
     heroText?: string
     hideTitle?: boolean
     isFront?: boolean
+    layout?: 'background' | 'inline'
   }>(),
   {
     eyebrow: '',
@@ -21,12 +22,14 @@ const props = withDefaults(
     heroText: '',
     hideTitle: false,
     isFront: false,
+    layout: 'background',
   },
 )
 
 const heading = computed(() => props.subtitle.trim() || props.pageTitle.trim())
 
 const { isAdministrator } = usePageContext()
+const { hero: heroTheme } = useAppConfig().stirTheme
 
 defineSlots<{ button?(): unknown }>()
 </script>
@@ -53,8 +56,8 @@ defineSlots<{ button?(): unknown }>()
     >
       <h1
         v-if="heading"
-        class="heading mb-0"
-        :class="{ 'sr-only': hideTitle }"
+        class="heading"
+        :class="[heroTheme.text.heading, { 'sr-only': hideTitle }]"
       >
         {{ heading }}
       </h1>

@@ -648,8 +648,34 @@ hero: {
 	isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
   },
   hide: 'pt-30',
+  // Optional: text-only heroes use this instead of mediaSpacing.
+  textSpacing: 'pt-34 pb-26 lg:pt-48 lg:pb-56',
+  // Optional: decorative layer behind text-only inner-page heroes.
+  backdrop: 'bg-linear-to-br from-primary/10 to-transparent',
+  inline: {
+    base: 'mx-auto w-full max-w-(--ui-container) px-4 sm:px-6 lg:px-8',
+    text: 'mx-auto max-w-4xl p-5 text-center',
+  },
+  nodeTypes: {
+    'node-work': { layout: 'inline', media: 'last' },
+  },
 },
 ```
+
+`nodeTypes` is keyed by the Drupal page payload `type` (for example
+`node-work`) and only applies to page heroes (`field_hero`), not section
+heroes.
+
+- `layout: 'background'` (default) places media behind the text.
+- `layout: 'inline'` renders the text, then the media in normal flow inside
+  `inline.base`, without background sizing.
+- `media: 'first' | 'last'` chooses which media slot item the hero renders.
+
+`HeroContent` receives the resolved `layout`, so a downstream `HeroContent`
+override can vary its title markup without replacing `ParagraphHero`.
+
+In `mode: 'simple'`, a programmatic `classes` prop wraps the header, media and
+footer slots in one element.
 
 ### 💥 Animations
 

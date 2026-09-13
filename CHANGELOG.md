@@ -50,6 +50,15 @@ untouched do not need one.
 - `resolveAuthSessionAccess(session)` projects an auth-session snapshot onto the
   editorial access shape, so role rules stay defined once alongside
   `resolveDrupalPageAccess`.
+- Page heroes gain `stirTheme.hero` options so projects no longer need to
+  replace `ParagraphHero`: `nodeTypes` (per Drupal node type `layout:
+  'background' | 'inline'` and `media: 'first' | 'last'`), `inline.base` and
+  `inline.text` classes, `textSpacing` for text-only heroes, and a decorative
+  `backdrop` for text-only inner-page heroes. Defaults leave existing output
+  unchanged. `HeroContent` receives the resolved `layout` prop, and its H1 now
+  uses the existing `hero.text.heading` classes (default `mb-0`, as before).
+  In `mode: 'simple'`, the `classes` prop now wraps the slots instead of being
+  ignored.
 
 ### Changed
 

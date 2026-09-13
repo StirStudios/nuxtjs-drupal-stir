@@ -327,7 +327,7 @@ describe('layer contract', () => {
     expect(targets.targets.danceplug?.routes).toContain('/videos')
     expect(consumerScript).toContain('\'archive\'')
     expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
-    expect(consumerScript).toContain('packageJson.peerDependencies.nuxt')
+    expect(consumerScript).toContain('packageJson.peerDependencies?.nuxt ?? packageJson.dependencies.nuxt')
     expect(consumerScript).toContain('adaptations')
   })
 

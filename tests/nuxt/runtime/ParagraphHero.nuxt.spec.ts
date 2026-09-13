@@ -1,6 +1,7 @@
+import { useAppConfig } from '#imports'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
-import { h, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import Hero from '../../../layers/theme/app/components/global/Paragraph/Hero.vue'
 import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
@@ -215,4 +216,98 @@ describe('Drupal Hero page ownership and headings', () => {
     wrapper.unmount()
   })
 
+  describe('theme presentation options', () => {
+    const Media = defineComponent({
+      props: { isHero: Boolean, name: { type: String, default: '' } },
+      setup: mediaProps => () => h('figure', { 'data-hero': String(mediaProps.isHero), 'data-name': mediaProps.name }),
+    })
+    const media = () => [h(Media, { name: 'teaser' }), h(Media, { name: 'hero' })]
+    const makeWorkPage = () => {
+      const page = ref(makePage('GROOV3'))
+
+      page.value.content = { props: { title: 'GROOV3', type: 'node-work' } }
+      return page
+    }
+
+    async function withHeroTheme(overrides: Record<string, unknown>, run: () => Promise<void>) {
+      const hero = useAppConfig().stirTheme.hero as Record<string, unknown>
+      const original = Object.fromEntries(Object.keys(overrides).map(key => [key, hero[key]]))
+
+      Object.assign(hero, overrides)
+      try {
+        await run()
+      }
+      finally {
+        Object.assign(hero, original)
+      }
+    }
+
+    it('renders a configured node type inline with the selected media item', async () => {
+      await withHeroTheme({ nodeTypes: { 'node-work': { layout: 'inline', media: 'last' } } }, async () => {
+        const wrapper = await mountSuspended(Hero, {
+          slots: { media },
+          global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
+        })
+        const section = wrapper.get('section')
+
+        expect(section.classes()).toContain('max-w-(--ui-container)')
+        expect(section.classes()).not.toContain('hero')
+        expect(wrapper.findAll('figure')).toHaveLength(1)
+        expect(wrapper.get('figure').attributes()).toMatchObject({ 'data-name': 'hero', 'data-hero': 'false' })
+        expect(wrapper.get('h1').text()).toBe('GROOV3')
+        expect(section.element.lastElementChild?.tagName).toBe('FIGURE')
+        wrapper.unmount()
+
+        const sectionHero = await mountSuspended(Hero, {
+          props: { placement: 'field_section', header: 'Section' },
+          slots: { media },
+          global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
+        })
+
+        expect(sectionHero.get('figure').attributes()).toMatchObject({ 'data-name': 'teaser', 'data-hero': 'true' })
+        sectionHero.unmount()
+      })
+    })
+
+    it('keeps background media for node types without configuration', async () => {
+      const wrapper = await mountSuspended(Hero, {
+        slots: { media },
+        global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
+      })
+
+      expect(wrapper.get('section').classes()).toContain('hero')
+      expect(wrapper.get('figure').attributes()).toMatchObject({ 'data-name': 'teaser', 'data-hero': 'true' })
+      wrapper.unmount()
+    })
+
+    it('applies text spacing and the backdrop only to text-only inner-page heroes', async () => {
+      await withHeroTheme({ textSpacing: 'pt-99', backdrop: 'bg-red-500' }, async () => {
+        const page = ref(makePage('Inner page'))
+        const wrapper = await mountSuspended(Hero, {
+          props: { text: '<p>Intro</p>' },
+          global: { provide: { [drupalPageKey as symbol]: page } },
+        })
+
+        expect(wrapper.get('section').classes()).toContain('pt-99')
+        expect(wrapper.get('section').classes()).toContain('isolate')
+        expect(wrapper.get('.hero-backdrop').attributes('aria-hidden')).toBe('true')
+        expect(wrapper.get('.hero-backdrop').classes()).toContain('bg-red-500')
+        page.value.is_front_page = true
+        await nextTick()
+        expect(wrapper.find('.hero-backdrop').exists()).toBe(false)
+        wrapper.unmount()
+      })
+    })
+
+    it('wraps simple mode slots in the supplied classes', async () => {
+      const wrapper = await mountSuspended(Hero, {
+        props: { mode: 'simple', classes: 'contained' },
+        slots: { media },
+        global: { provide: { [drupalPageKey as symbol]: ref(makePage('Page')) } },
+      })
+
+      expect(wrapper.get('.contained').findAll('figure')).toHaveLength(2)
+      wrapper.unmount()
+    })
+  })
 })

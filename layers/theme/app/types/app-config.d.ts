@@ -164,6 +164,11 @@ type StirThemeNavigationConfig = {
   } & LooseRecord
 } & LooseRecord
 
+type StirThemeHeroNodeTypeConfig = {
+  layout?: 'background' | 'inline'
+  media?: 'first' | 'last'
+}
+
 type StirThemeHeroConfig = {
   actions?: ClassValue
   base?: ClassValue
@@ -171,6 +176,13 @@ type StirThemeHeroConfig = {
   mediaSpacing?: ClassValue
   noMediaSpacing?: ClassValue
   noMediaFallback?: ClassValue
+  textSpacing?: ClassValue
+  backdrop?: ClassValue
+  inline?: {
+    base?: ClassValue
+    text?: ClassValue
+  } & LooseRecord
+  nodeTypes?: Record<string, StirThemeHeroNodeTypeConfig>
   overlay?: ClassValue
   isFront?: ClassValue
   image?: {
@@ -454,6 +466,8 @@ type ResolvedStirThemeNavigationConfig = StirThemeNavigationConfig & {
 type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
   image: NonNullable<StirThemeHeroConfig['image']>
   text: NonNullable<StirThemeHeroConfig['text']>
+  inline: NonNullable<StirThemeHeroConfig['inline']>
+  nodeTypes: NonNullable<StirThemeHeroConfig['nodeTypes']>
 }
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {

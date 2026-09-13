@@ -77,18 +77,22 @@ const heroState = computed(() => ({
   hideTitle: pageHideTitle.value,
   isFront: owningPage ? owningPage.value?.is_front_page === true : isFront.value,
   title: pageTitle.value,
+  type: typeof pageProps.value?.type === 'string' ? pageProps.value.type : '',
 }))
 const heroSnapshot = owningPage ? heroState : useNavLockedSnapshot(heroState)
 const isFrontEffective = computed(() => !isSection.value && heroSnapshot.value.isFront)
 const pageTitleEffective = computed(() => isSection.value ? '' : heroSnapshot.value.title)
 const pageHideTitleEffective = computed(() => resolveBooleanProp(heroSnapshot.value.hideTitle))
+const nodeTypeHero = computed(() => isSection.value ? undefined : heroTheme.nodeTypes[heroSnapshot.value.type])
+const isInline = computed(() => nodeTypeHero.value?.layout === 'inline')
 
 const slotMedia = computed(() => tk.slot('media'))
 const heroMediaNode = computed(() => {
-  const node = slotMedia.value[0]
+  const node = nodeTypeHero.value?.media === 'last' ? slotMedia.value.at(-1) : slotMedia.value[0]
 
   if (!node) return null
-  return cloneVNode(node, { isHero: true }, true)
+  // Inline media flows after the text, so it must not take background sizing.
+  return cloneVNode(node, { isHero: !isInline.value }, true)
 })
 const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
@@ -98,6 +102,13 @@ const containsVideo = computed(() =>
       normalizeDrupalMediaType(node?.props?.type) === 'video' ||
       node?.props?.mediaEmbed,
     ),
+)
+const showBackdrop = computed(() =>
+  Boolean(heroTheme.backdrop) &&
+  !isSection.value &&
+  !isInline.value &&
+  !isFrontEffective.value &&
+  !hasMediaSlot.value,
 )
 
 const heroSubtitle = computed(() => props.header?.trim() || '')
@@ -126,6 +137,8 @@ const sectionClasses = computed(() => {
 
   if (isSection.value) return ['hero hero-section relative overflow-hidden [&>:is(.media,img)]:absolute [&>:is(.media,img)]:inset-0 [&>:is(.media,img)]:h-full [&>:is(.media,img)]:w-full [&>.media_img]:h-full [&>.media_img]:w-full [&>.media_img]:object-cover', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
 
+  if (isInline.value) return heroTheme.inline.base
+
   const hasHeroContent = hasHero.value
 
   return [
@@ -137,11 +150,12 @@ const sectionClasses = computed(() => {
       : hasMediaSlot.value
         ? heroTheme.mediaSpacing
         : hasHeroContent
-          ? [heroTheme.mediaSpacing, heroTheme.noMediaFallback]
+          ? [heroTheme.textSpacing ?? heroTheme.mediaSpacing, heroTheme.noMediaFallback]
           : heroTheme.noMediaSpacing,
 
     hasMediaSlot.value && heroTheme.overlay,
     isFrontEffective.value && heroTheme.isFront,
+    showBackdrop.value && 'isolate',
 
     containsVideo.value && 'min-h-[75vh]',
   ]
@@ -174,9 +188,17 @@ provideRevealMotionScope(() => undefined)
     :link="editLink"
   >
     <template v-if="mode === 'simple'">
-      <slot name="header" />
-      <slot name="media" />
-      <slot name="footer" />
+      <div v-if="classes" :class="classes">
+        <slot name="header" />
+        <slot name="media" />
+        <slot name="footer" />
+      </div>
+
+      <template v-else>
+        <slot name="header" />
+        <slot name="media" />
+        <slot name="footer" />
+      </template>
 
       <LazyEditControls
         v-if="hasActions"
@@ -187,6 +209,13 @@ provideRevealMotionScope(() => undefined)
 
     <template v-else>
       <section :id="isSection ? (label ? slugify(label) : id ? `hero-${id}` : undefined) : undefined" class="relative" :class="tv({ base: [sectionClasses, customContent && 'flex flex-row', customContent && alignment.vertical] })()" :style="minimumHeight ? { minHeight: minimumHeight, height: 'auto' } : undefined">
+        <span
+          v-if="showBackdrop"
+          aria-hidden="true"
+          class="hero-backdrop pointer-events-none absolute inset-0 z-0"
+          :class="heroTheme.backdrop"
+        />
+
         <RevealMotion
           v-if="hasVisibleHeroContent || pageTitleEffective"
           as-child
@@ -194,9 +223,9 @@ provideRevealMotionScope(() => undefined)
         >
           <div
             :class="tv({ base: [
-              hasVisibleHeroContent && !isSection && heroTheme.text.base,
+              hasVisibleHeroContent && !isSection && (isInline ? heroTheme.inline.text : heroTheme.text.base),
               isSection && 'relative z-10 w-full p-8 lg:p-24',
-              hasVisibleHeroContent && isFrontEffective && heroTheme.text.isFront,
+              hasVisibleHeroContent && isFrontEffective && !isInline && heroTheme.text.isFront,
               customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&_:is(h1,h2,h3,h4,h5,h6,.lead)]:[text-align:inherit]', alignment.horizontal, alignment.text],
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ] })()"
@@ -227,6 +256,7 @@ provideRevealMotionScope(() => undefined)
                 :hero-text="text"
                 :hide-title="pageHideTitleEffective"
                 :is-front="isFrontEffective"
+                :layout="isInline ? 'inline' : 'background'"
                 :page-title="pageTitleEffective"
                 :subtitle="heroSubtitle"
               />

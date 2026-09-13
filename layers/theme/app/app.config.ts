@@ -106,6 +106,12 @@ export default defineAppConfig({
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
       hide: 'pt-15 lg:pt-30',
+      backdrop: '',
+      inline: {
+        base: 'mx-auto w-full max-w-(--ui-container) px-4 sm:px-6 lg:px-8',
+        text: 'mx-auto max-w-4xl p-5 text-center',
+      },
+      nodeTypes: {},
     },
 
     frontPage: {
