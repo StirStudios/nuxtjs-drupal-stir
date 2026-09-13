@@ -40,6 +40,20 @@ describe('ParagraphText card presentation', () => {
     )
   })
 
+  it('fills its container only when the card is the only item', async () => {
+    const wrapper = await mountSuspended(ParagraphText, {
+      props: {
+        card: true,
+        text: '<p>Sized card text</p>',
+      },
+    })
+
+    const classes = wrapper.findComponent({ name: 'UCard' }).classes()
+
+    expect(classes).toContain('only:h-full')
+    expect(classes).not.toContain('h-full')
+  })
+
   it('falls back to outline for unsupported values', async () => {
     const wrapper = await mountSuspended(ParagraphText, {
       props: {
