@@ -151,14 +151,29 @@ export function useAccountSettings() {
     }
   }
 
+  /**
+   * Discards unsaved edits, restoring the last loaded or saved values.
+   */
+  const reset = () => {
+    values.value = {
+      account_name: baselineValues.value.account_name ?? '',
+      account_email: baselineValues.value.account_email ?? '',
+      current_password: '',
+    }
+  }
+
   return {
     values,
     fieldEditability,
+    // Whether Drupal requires the current password for any email change,
+    // independent of whether the email has been edited yet.
+    emailChangeRequiresCurrentPassword: readonly(accountEmailRequiresCurrentPassword),
     hasChanges,
     requiresCurrentPassword,
     loading,
     saving,
     load,
+    reset,
     save,
   }
 }

@@ -136,6 +136,19 @@ public auto-import surface instead of importing from nested layer internals:
 - `createPasswordResetValidationSchema`
 - `createAccountPasswordChangeValidationSchema`
 
+### Account settings
+
+`useAccountSettings()` loads and saves the account name and email through
+`/api/account/settings/values`. Only fields Drupal marks editable are compared
+or sent.
+
+- `reset()` discards unsaved edits, restoring the last loaded or saved values
+  and clearing `current_password`. Call it when an edit dialog closes.
+- `emailChangeRequiresCurrentPassword` (readonly ref) reports whether Drupal
+  requires the current password for an email change at all, so a page can show
+  the password input up front. `requiresCurrentPassword` stays true only once
+  the email has actually changed.
+
 ### Post-login destination
 
 `useAuthLogin()` sends the visitor to `?redirect=` when it is a safe same-site

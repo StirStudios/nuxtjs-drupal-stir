@@ -71,6 +71,12 @@ untouched do not need one.
   ignored, so the base sitemap is still served. The Drupal payload stays strictly
   validated, and output is unchanged when no handler is registered. See
   `layers/seo/README.md`.
+- `useAccountSettings()` returns `reset()`, which restores the last loaded or
+  saved values and clears the current password, and
+  `emailChangeRequiresCurrentPassword`, a readonly ref reporting whether Drupal
+  requires the current password for an email change before any edit. Editable
+  field checks are unchanged. Projects that forked the composable for these can
+  delete the fork.
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and
