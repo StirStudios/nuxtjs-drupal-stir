@@ -19,11 +19,12 @@ const props = defineProps<{
 }>()
 
 const headingTag = computed(() => resolveHeadingTag(props.headerTag))
+const trimmedHeader = computed(() => props.header?.trim() ?? '')
 </script>
 
 <template>
-  <component :is="headingTag" v-if="header" class="mb-4 text-lg font-semibold">
-    {{ header }}
+  <component :is="headingTag" v-if="trimmedHeader" class="mb-4 text-lg font-semibold">
+    {{ trimmedHeader }}
   </component>
   <slot name="tabContent" />
 </template>

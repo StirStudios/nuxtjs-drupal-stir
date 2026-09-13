@@ -52,7 +52,7 @@ const timelineItems = computed<UITimelineItem[]>(() =>
 
     return {
       date: stringProp(p.date, 'Present'),
-      title: stringProp(p.header),
+      title: stringProp(p.header).trim(),
       headingTag: resolveHeadingTag(stringProp(p.headerTag)),
       icon: stringProp(p.icon, 'i-lucide-rocket'),
       description: trustedDrupalHtml(stringProp(p.text)),
@@ -85,7 +85,11 @@ const timelineColor = computed(() => resolveUiColor(props.color))
           }"
         >
           <template #rich-title="{ item }: { item: UITimelineItem }">
-            <component :is="item.headingTag" class="font-medium text-highlighted text-sm">
+            <component
+              :is="item.headingTag"
+              v-if="item.title"
+              class="font-medium text-highlighted text-sm"
+            >
               {{ item.title }}
             </component>
           </template>
