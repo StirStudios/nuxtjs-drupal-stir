@@ -2,11 +2,13 @@
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiColor } from '#stir/utils/nuxtUiProps'
+import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 
 type UITimelineItem = {
   date?: string
   title?: string
+  headingTag: string
   icon?: string
   description?: string
   slot?: string
@@ -15,6 +17,7 @@ type UITimelineItem = {
 type TimelineNodeProps = {
   date?: unknown
   header?: unknown
+  headerTag?: unknown
   icon?: unknown
   text?: unknown
 }
@@ -49,7 +52,8 @@ const timelineItems = computed<UITimelineItem[]>(() =>
 
     return {
       date: stringProp(p.date, 'Present'),
-      title: stringProp(p.header),
+      title: stringProp(p.header).trim(),
+      headingTag: resolveHeadingTag(stringProp(p.headerTag)),
       icon: stringProp(p.icon, 'i-lucide-rocket'),
       description: trustedDrupalHtml(stringProp(p.text)),
       slot: 'rich',
@@ -80,6 +84,16 @@ const timelineColor = computed(() => resolveUiColor(props.color))
             date: 'text-muted',
           }"
         >
+          <template #rich-title="{ item }: { item: UITimelineItem }">
+            <component
+              :is="item.headingTag"
+              v-if="item.title"
+              class="font-medium text-highlighted text-sm"
+            >
+              {{ item.title }}
+            </component>
+          </template>
+
           <template #rich-description="{ item }: { item: UITimelineItem }">
             <div class="prose max-w-none" v-html="item.description" />
           </template>

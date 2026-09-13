@@ -32,16 +32,28 @@ type AccordionItemProps = {
   uuid?: string
   parentUuid?: string
   header?: string
+  headerTag?: string
   text?: string
   editLink?: string
 }
 
 type AccordionEntry = AccordionItem & {
   id?: number | string
+  headingLevel: number | null
   buttonNodes: VNode[]
   contentHtml: string
   editLink?: string
   parentUuid?: string
+}
+
+// UAccordion's #default slot renders inside the trigger <button>, where a
+// real heading element (h2-h6) is invalid — headings aren't phrasing
+// content. role="heading" + aria-level exposes the same level to
+// heading-navigation without nesting an element the button can't contain.
+function headingLevelOf(tag: string): number | null {
+  const match = /^h([2-6])$/.exec(tag)
+
+  return match ? Number(match[1]) : null
 }
 
 const slots = useSlots()
@@ -75,6 +87,7 @@ const items = computed<AccordionEntry[]>(() =>
       id: itemProps.id,
       label,
       value,
+      headingLevel: headingLevelOf(resolveHeadingTag(itemProps.headerTag)),
       buttonNodes: itemSlots?.buttons?.() ?? [],
       contentHtml: trustedDrupalHtml(itemProps.text),
       editLink: itemProps.editLink,
@@ -118,6 +131,16 @@ const items = computed<AccordionEntry[]>(() =>
       }"
       :unmount-on-hide="false"
     >
+      <template #default="{ item }">
+        <span
+          :aria-level="item.headingLevel ?? undefined"
+          class="text-highlighted text-lg font-semibold"
+          :role="item.headingLevel ? 'heading' : undefined"
+        >
+          {{ item.label }}
+        </span>
+      </template>
+
       <template #body="{ item }">
         <div
           v-if="item.contentHtml"
