@@ -9,7 +9,7 @@ const compliance = await readFile(resolve(projectRoot, 'compliance/site.json'), 
   .then(value => JSON.parse(value))
   .catch(() => ({}))
 const siteUrl = resolveSiteUrl(
-  process.env.SEO_SITE_URL || process.env.COMPLIANCE_SITE_URL,
+  process.env.NUXT_URL,
   compliance,
 )
 const errors = []
@@ -161,7 +161,7 @@ async function auditPage(route, titleOwners, sitemapRouteSet) {
 }
 
 if (!siteUrl || !absoluteUrl(siteUrl, siteUrl)) {
-  console.error('ERROR Set owner.domain in compliance/site.json or provide SEO_SITE_URL (or COMPLIANCE_SITE_URL).')
+  console.error('ERROR Set owner.domain in compliance/site.json or provide NUXT_URL.')
   process.exit(1)
 }
 

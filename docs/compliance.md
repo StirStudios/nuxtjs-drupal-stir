@@ -25,8 +25,11 @@ agent-generated edits.
 
 The audit validates the inventory, review schedule, Drupal page contract,
 consent rationale, and common tracker references. SEO audits use `owner.domain`
-from `compliance/site.json` automatically. Set `COMPLIANCE_SITE_URL` or
-`SEO_SITE_URL` only to override that domain, such as when testing locally.
+from `compliance/site.json` automatically. When `NUXT_URL` is set in the
+environment, as in deploy and CI jobs, both audits use that frontend origin
+instead; export it for a one-off run, such as
+`NUXT_URL=http://localhost:3000 pnpm audit:seo`. The scripts do not read `.env`
+files, so a local `.env` never redirects an audit.
 
 ```sh
 pnpm audit:compliance
@@ -60,7 +63,7 @@ repository evidence produce a warning. Record an installed but unused service
 under `technology.inactive` as `{ "<rule id>": "reason" }`.
 
 Disclosures are checked against tracked legal copy (below) or, when
-`COMPLIANCE_SITE_URL` is set, the rendered pages. Pattern checks confirm a topic
+`NUXT_URL` is set, the rendered pages. Pattern checks confirm a topic
 is addressed; they cannot confirm the wording is accurate or sufficient.
 
 ## Tracked legal copy

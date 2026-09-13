@@ -2,6 +2,7 @@
 
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
+import { resolveSiteUrl } from '../seo/html.mjs'
 import { collectSignals, evaluateServices, loadLegalText, plainText } from './discovery.mjs'
 
 const projectRoot = resolve(process.cwd())
@@ -13,7 +14,8 @@ const reviewMarkers = [
   '<!-- stir-compliance-seo:v1 -->',
   '<!-- stir-compliance-legal-source:v1 -->',
 ]
-const siteUrl = process.env.COMPLIANCE_SITE_URL?.replace(/\/$/, '')
+// Rendered pages are checked only when the environment names the frontend origin.
+const siteUrl = resolveSiteUrl(process.env.NUXT_URL)
 const errors = []
 const warnings = []
 const notes = []
