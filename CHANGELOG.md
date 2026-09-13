@@ -94,6 +94,10 @@ untouched do not need one.
   installs that package's Nuxt module, and keeps the lightweight stub otherwise,
   so projects no longer need their own `StirPdfViewer.client.vue` wrapper.
   `overrideFallbackComponent` accepts an optional `when` predicate.
+- `useFooterData()` returns `footerMenu`, `footerMenuItems` and `siteInfo` from
+  the current Drupal page, falling back to the app footer context (loaded during
+  SSR and when a client-side page lacks the data). `AppFooter` uses it, so
+  custom project footers no longer need to copy that loading logic.
 
 ### Changed
 

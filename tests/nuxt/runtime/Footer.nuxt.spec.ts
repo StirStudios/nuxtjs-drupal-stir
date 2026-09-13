@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { ref } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import Footer from '../../../layers/theme/app/components/App/Footer.vue'
+import { useFooterData } from '../../../layers/theme/app/composables/useFooterData'
 
 const page = ref({} as Record<string, unknown>)
 const appFooterContextData = ref({
@@ -191,5 +192,26 @@ describe('Footer (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="center"]').classes()).toContain('hidden')
 
     delete appConfig.value.stirTheme.footer.sections
+  })
+
+  it('exposes page footer data through useFooterData without loading app context', async () => {
+    page.value = {
+      footer_menu: [{ title: 'Terms', url: '/terms' }],
+      site_info: { name: 'Page site' },
+    }
+    appFooterContextExecuteCalls = 0
+    let footerData: ReturnType<typeof useFooterData> | undefined
+    const Probe = defineComponent({
+      setup() {
+        footerData = useFooterData()
+        return () => h('div')
+      },
+    })
+    const wrapper = await mountSuspended(Probe)
+
+    expect(footerData?.footerMenuItems.value).toEqual([{ label: 'Terms', to: '/terms' }])
+    expect(footerData?.siteInfo.value?.name).toBe('Page site')
+    expect(appFooterContextExecuteCalls).toBe(0)
+    wrapper.unmount()
   })
 })
