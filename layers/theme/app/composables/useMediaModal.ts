@@ -22,7 +22,7 @@ export function useMediaModal(
     slotMedia.value.map((vnode, i) => {
       const props = tk.propsOf<DrupalMediaNodeProps>(vnode)
       const type = normalizeDrupalMediaType(props.type)
-      const mid = typeof props.mid === 'string' ? props.mid : undefined
+      const mid = props.mid !== undefined ? String(props.mid) : undefined
       const src = typeof props.src === 'string' ? props.src : undefined
       const item: ModalMediaItem = {
         ...props,

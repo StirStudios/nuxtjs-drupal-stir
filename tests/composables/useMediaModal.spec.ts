@@ -47,6 +47,19 @@ describe('useMediaModal', () => {
     ])
   })
 
+  it('keys items by a numeric mid instead of discarding it', () => {
+    // Drupal's `mid` can arrive as a real JSON number, not just a string.
+    // The key must still prefer it over falling back to src/position, or
+    // two items sharing a src collide on the same Vue :key.
+    const first = h('img', { type: 'image', mid: 1, src: '/shared.jpg' })
+    const second = h('img', { type: 'image', mid: 2, src: '/shared.jpg' })
+    const modal = useMediaModal(ref([first, second]), {
+      propsOf: (node: VNode) => node.props ?? {},
+    } as never)
+
+    expect(modal.itemsOrdered.value.map(item => item.key)).toEqual(['1', '2'])
+  })
+
   it('falls back unknown media types to image', () => {
     const item = h('div', {
       type: 'unsupported',
