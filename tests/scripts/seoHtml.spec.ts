@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { attributes, crawlableUrl, hasNoindex, resolveSiteUrl } from '../../scripts/seo/html.mjs'
+import { attributes, crawlableUrl, hasNoindex, readUrlArgument, resolveSiteUrl } from '../../scripts/seo/html.mjs'
 
 describe('SEO HTML inspection', () => {
   it('reads quoted, unquoted, boolean, and encoded attributes', () => {
@@ -19,6 +19,12 @@ describe('SEO HTML inspection', () => {
   it('recognizes noindex as a complete robots token', () => {
     expect(hasNoindex('nofollow, noindex')).toBe(true)
     expect(hasNoindex('index, follow')).toBe(false)
+  })
+
+  it('reads the audit origin only from an explicit --url argument', () => {
+    expect(readUrlArgument(['--url', 'http://127.0.0.1:3000'])).toBe('http://127.0.0.1:3000')
+    expect(readUrlArgument(['--', '--url=https://staging.example.com'])).toBe('https://staging.example.com')
+    expect(readUrlArgument(['--verbose'])).toBe('')
   })
 
   it('resolves the audit origin from an override or the compliance inventory', () => {

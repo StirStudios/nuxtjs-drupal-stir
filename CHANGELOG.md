@@ -61,7 +61,7 @@ untouched do not need one.
 - Legal copy can be tracked in `compliance/legal/<alias>.html` (or
   `documents.<key>.file`) and applied with the Stir Tools command
   `drush stir-tools:compliance-content`. The audit checks disclosures against
-  those files, or the rendered pages when `NUXT_URL` is set.
+  those files, or the rendered pages at `owner.domain`.
 - **Action required.** `compliance/REVIEW.md` gains a "Tracked legal copy"
   checklist. Run `pnpm exec stir-compliance-init` after updating, or
   `pnpm audit:compliance` reports the checklist as outdated.
@@ -126,11 +126,12 @@ untouched do not need one.
 
 ### Changed
 
-- **Breaking.** `stir-seo` and `stir-compliance` read the frontend origin from
-  the existing `NUXT_URL` instead of `SEO_SITE_URL` and `COMPLIANCE_SITE_URL`,
-  which are no longer read. `stir-seo` still falls back to `owner.domain` in
-  `compliance/site.json`; `stir-compliance` fetches rendered legal pages only
-  when `NUXT_URL` is set.
+- **Breaking.** `stir-seo` and `stir-compliance` no longer read `SEO_SITE_URL`
+  or `COMPLIANCE_SITE_URL`, or any other environment variable, for their
+  target. Both always audit `owner.domain` from `compliance/site.json`, so a
+  local or staging value cannot point them at the wrong site, and
+  `stir-compliance` now checks the rendered legal pages on every run. Pass
+  `--url <origin>` to audit another origin deliberately.
 - **Protected pages are enforced at the server boundary.** Gating lived only in
   the route middleware, so the page payload behind a protected route stayed
   fetchable from `/api/drupal-ce/<path>`. Requests for a configured protected

@@ -346,7 +346,7 @@ export function evaluateServices(signals, config, legalText = {}) {
   }
 
   for (const document of unverified) {
-    warnings.push(`${document} disclosures were not verified; add compliance/legal/<alias>.html or set NUXT_URL.`)
+    warnings.push(`${document} disclosures were not verified; add compliance/legal/<alias>.html or publish the page at owner.domain.`)
   }
 
   return { errors, warnings, detected }

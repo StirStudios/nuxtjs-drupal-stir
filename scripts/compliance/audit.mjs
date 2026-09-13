@@ -2,7 +2,7 @@
 
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
-import { resolveSiteUrl } from '../seo/html.mjs'
+import { readUrlArgument, resolveSiteUrl } from '../seo/html.mjs'
 import { collectSignals, evaluateServices, loadLegalText, plainText } from './discovery.mjs'
 
 const projectRoot = resolve(process.cwd())
@@ -14,8 +14,7 @@ const reviewMarkers = [
   '<!-- stir-compliance-seo:v1 -->',
   '<!-- stir-compliance-legal-source:v1 -->',
 ]
-// Rendered pages are checked only when the environment names the frontend origin.
-const siteUrl = resolveSiteUrl(process.env.NUXT_URL)
+let siteUrl = ''
 const errors = []
 const warnings = []
 const notes = []
@@ -137,6 +136,11 @@ try {
 }
 
 if (config) {
+  // Always audit the inventory's production domain unless --url is passed.
+  siteUrl = resolveSiteUrl(readUrlArgument(), config)
+  if (siteUrl) notes.push(`TARGET ${siteUrl}`)
+  else error('owner.domain must be a valid site origin, or pass --url <origin>.')
+
   if (config.version !== 1) error('compliance/site.json must use version 1.')
   if (JSON.stringify(config).includes('REPLACE_')) {
     error('compliance/site.json still contains starter-template REPLACE_* values.')

@@ -111,7 +111,7 @@ describe('compliance service discovery', () => {
     const result = evaluateServices(brochureSignals(), brochureConfig, {})
 
     expect(result.errors).toEqual([])
-    expect(result.warnings).toContain('privacy disclosures were not verified; add compliance/legal/<alias>.html or set NUXT_URL.')
+    expect(result.warnings).toContain('privacy disclosures were not verified; add compliance/legal/<alias>.html or publish the page at owner.domain.')
   })
 
   it('accepts a documented inactive service and rejects an undocumented one', () => {
