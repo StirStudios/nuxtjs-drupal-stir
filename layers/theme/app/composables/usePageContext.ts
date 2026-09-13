@@ -3,6 +3,7 @@ import {
   resolveAuthSessionAccess,
   resolveDrupalPageAccess,
 } from '../utils/editorialAccess'
+import { isDrupalRenderedRoute } from '../utils/drupalPage'
 import { useAuthSession } from '../../../auth/app/composables/useAuthSession'
 
 export function usePageContext(page = useStirDrupalCe().getPage()) {
@@ -20,10 +21,7 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
     })
   })
   const isFront = computed(() => {
-    const hasDrupalSlugParam = Object.hasOwn(route.params, 'slug')
-    const isDrupalRenderedRoute = route.path === '/' || hasDrupalSlugParam
-
-    if (!isDrupalRenderedRoute) return false
+    if (!isDrupalRenderedRoute(route)) return false
 
     return page.value?.is_front_page === true
   })

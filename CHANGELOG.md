@@ -89,6 +89,21 @@ untouched do not need one.
   requires the current password for an email change before any edit. Editable
   field checks are unchanged. Projects that forked the composable for these can
   delete the fork.
+- Route hero (#806, #807). `useRouteHero()` resolves a page-level hero model
+  (title, title lines, eyebrow, description, actions, image, variant) from the
+  current Drupal page's `hero` slot, falling back to the page title and
+  metatag description. Explicit heroes come from `definePageMeta({ routeHero })`,
+  `stirTheme.routeHero.routes`, or a project resolver registered with
+  `registerRouteHeroResolver()`. `RouteHeroSection` renders `cover`, `simple`
+  and `overlap` variants with one H1, an eager high-priority image and parallax
+  that is inert under reduced motion; `resolveEditorialRouteHero()` builds the
+  overlap model for editorial detail pages, keeping playable media in the
+  `media` slot rather than behind the hero. `useParallaxStyle()` is also
+  exported. Opt in with `stirTheme.routeHero.enabled: true`; the default layout
+  then renders `RouteHero` inside `main`, and `node--page` stops rendering its
+  inline `hero` slot. Disabled by default, so existing output is unchanged.
+  `usePageContext` now shares its Drupal-route check through
+  `isDrupalRenderedRoute()`.
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and
