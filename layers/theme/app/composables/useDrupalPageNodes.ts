@@ -1,4 +1,5 @@
 import type { VNode } from 'vue'
+import type { DrupalMediaNodeProps } from '../types/CustomElements'
 import type { VNodeInput } from './useSlotsToolkit'
 import {
   findVNodes,
@@ -6,9 +7,12 @@ import {
   findVNodesByProp,
   getVNodeElement,
   getVNodeProp,
+  getVNodeProps,
   useVNodes,
 } from './useSlotsToolkit'
 import { normalizeDrupalMediaType } from '../utils/drupalMediaTypes'
+import { resolveDrupalLink, type DrupalLink } from '../utils/drupalLink'
+import { toEditableRichTextProps } from '../utils/editableRichText'
 
 export function getDrupalPageNodeView(
   node: VNode | undefined,
@@ -49,6 +53,18 @@ export function isDrupalPageMediaNode(node: VNode | undefined): boolean {
   )
 }
 
+export function isDrupalPageLinkNode(node: VNode | undefined): boolean {
+  const link = getVNodeProp<unknown>(node, 'link')
+
+  return Boolean(link) && typeof link === 'object'
+}
+
+export function getDrupalPageNodeLink(node: VNode | undefined) {
+  return resolveDrupalLink(
+    isDrupalPageLinkNode(node) ? getVNodeProp<DrupalLink>(node, 'link') : undefined,
+  )
+}
+
 export const getDrupalPageNodeElement = getVNodeElement
 export const getDrupalPageNodeProp = getVNodeProp
 export const findDrupalPageNodes = findVNodes
@@ -71,10 +87,20 @@ export function useDrupalPageNodes(input: VNodeInput) {
       nodes.filter((node) => typeof getVNodeProp(node, 'text') === 'string'),
     body: () => nodes.filter((node) => getVNodeProp(node, 'body') !== undefined),
     media: () => nodes.filter(isDrupalPageMediaNode),
+    imageProps: () =>
+      nodes
+        .filter(isDrupalPageMediaNode)
+        .map((node) => getVNodeProps<DrupalMediaNodeProps>(node))
+        .filter((image) => image.type === 'image' && typeof image.src === 'string'),
+    links: () => nodes.filter(isDrupalPageLinkNode),
     views: (targetId?: string) =>
       nodes.filter((node) => isDrupalPageViewNode(node, targetId)),
+    linkOf: getDrupalPageNodeLink,
+    textPropsOf: (node: VNode | undefined, classes?: string) =>
+      toEditableRichTextProps(getVNodeProps(node), classes),
     viewOf: getDrupalPageNodeView,
     viewTargetIdOf: getDrupalPageNodeViewTargetId,
+    isLink: isDrupalPageLinkNode,
     isMedia: isDrupalPageMediaNode,
     isView: isDrupalPageViewNode,
   }

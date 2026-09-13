@@ -748,7 +748,11 @@ describe('layer contract', () => {
     expect(paragraphText).not.toContain('v-html')
     expect(paragraphText).toContain('inheritAttrs: false')
     expect(paragraphText).toContain('textEdit?: unknown')
-    expect(paragraphText).toContain('editTarget: props.editTarget ?? props.textEdit')
+    expect(paragraphText).toContain('toEditableRichTextProps(props)')
+    expect(readFileSync(
+      resolve(rootDir, 'layers/theme/app/utils/editableRichText.ts'),
+      'utf8',
+    )).toContain('editTarget: source.editTarget ?? source.textEdit')
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')

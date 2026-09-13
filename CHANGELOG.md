@@ -66,6 +66,12 @@ untouched do not need one.
   paragraph reveals. `getRevealMotionProps` / `useRevealMotionProps` accept the
   same `durationMs`, `distancePx` and `rootMargin` overrides; `motionProps`
   still takes precedence and is unchanged.
+- `useDrupalPageNodes` gains `links()`, `linkOf(node)`, `imageProps()` and
+  `textPropsOf(node, classes?)`, with standalone `isDrupalPageLinkNode` and
+  `getDrupalPageNodeLink` exports, so page components stop re-implementing
+  link, image and rich-text mapping. `toEditableRichTextProps(props, classes?)`
+  in `utils/editableRichText` is the shared mapping that `ParagraphText` now
+  uses too.
 
 ### Changed
 

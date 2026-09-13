@@ -384,6 +384,7 @@
       "layers/theme/app/utils/drupalViewContext.ts",
       "layers/theme/app/utils/drupalViewQueryNamespace.ts",
       "layers/theme/app/utils/drupalViewState.ts",
+      "layers/theme/app/utils/editableRichText.ts",
       "layers/theme/app/utils/editorialAccess.ts",
       "layers/theme/app/utils/footer.ts",
       "layers/theme/app/utils/formInputUtils.ts",
@@ -732,6 +733,7 @@
         "layers/theme/app/utils/drupalViewContext.ts",
         "layers/theme/app/utils/drupalViewQueryNamespace.ts",
         "layers/theme/app/utils/drupalViewState.ts",
+        "layers/theme/app/utils/editableRichText.ts",
         "layers/theme/app/utils/editorialAccess.ts",
         "layers/theme/app/utils/footer.ts",
         "layers/theme/app/utils/formInputUtils.ts",
@@ -780,13 +782,13 @@
   "counts": {
     "components": 128,
     "composables": 71,
-    "utils": 62,
+    "utils": 63,
     "plugins": 7,
     "middleware": 4,
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 177,
+    "tests": 178,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -794,7 +796,7 @@
       "scripts": 2,
       "server": 28,
       "unit": 10,
-      "utils": 56
+      "utils": 57
     }
   },
   "tests": [
@@ -933,6 +935,7 @@
     "tests/utils/drupalViewPublicQuery.spec.ts",
     "tests/utils/drupalViewQueryNamespace.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
+    "tests/utils/editableRichText.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",

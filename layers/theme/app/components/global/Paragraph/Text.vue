@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EditableRichTextProps } from '#stir/types'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import { toEditableRichTextProps } from '#stir/utils/editableRichText'
 
 defineOptions({
   inheritAttrs: false,
@@ -19,17 +20,7 @@ const props = defineProps<
   }
 >()
 
-const richTextProps = computed(() => ({
-  id: props.id,
-  uuid: props.uuid,
-  parentUuid: props.parentUuid,
-  text: props.text,
-  textSource: props.textSource,
-  classes: props.classes,
-  direction: props.direction,
-  editLink: props.editLink,
-  editTarget: props.editTarget ?? props.textEdit,
-}))
+const richTextProps = computed(() => toEditableRichTextProps(props))
 const wrapStyles = computed(() =>
   [props.width, props.spacing].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
