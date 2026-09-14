@@ -105,9 +105,53 @@ Record each review in a dated `compliance/AUDIT-YYYY-MM-DD.md` report. Update
 `review.lastReviewed` and `review.nextReview` only after the technical review and
 any required owner or counsel approval are complete.
 
+## Owner questionnaire
+
+<!-- stir-compliance-owner:v1 -->
+
+Code and the live site cannot answer these. Ask the business owner every
+question at each review, and record each answer, who gave it, and the date in
+the dated audit report. Do not infer an answer; an unanswered question stays an
+open finding, and legal copy must not state the unconfirmed fact.
+
+Business and contact
+
+1. What is the legal entity name, any trade names (d/b/a), and the public postal
+   address for notices?
+2. Where are customers or clients located? Are any outside the United States?
+3. Which provider hosts the mailboxes that receive form and customer email, who
+   can read them, and how long are messages kept?
+
+Data use and providers
+
+4. Is form, account, or customer data used for marketing, added to a mailing
+   list or CRM, or shared outside the business?
+5. Which tools outside this repository receive that data, such as a CRM,
+   spreadsheet, automation, support desk, accounting, or mailing tool?
+6. Which services are self-hosted, and who operates them?
+7. May the legal copy name each provider?
+8. May test data and personal data that is no longer needed, such as stored
+   submitter IP addresses, be deleted?
+
+Accounts and payments (when the site has them)
+
+9. Who can create an account, and is the audience likely to include children or
+   teenagers?
+10. How do trials, renewals, refunds, and cancellation work in practice?
+
+Accessibility
+
+11. Which manual checks have been completed (keyboard, screen reader, zoom), by
+    whom, and when?
+12. Do video and audio have captions or transcripts?
+13. What response time can be promised for accessibility requests, and what
+    limitations are known?
+
+Legal
+
+14. Which state or country's law governs the terms, and has counsel reviewed the
+    legal copy?
+
 ## Human confirmations
 
-- Confirm the legal operator, trade names, public contact details, and domain.
-- Confirm every form, data use, retention practice, and third-party service.
-- Confirm whether inquiry data is used for email, text, or other marketing.
 - Review material legal changes with qualified counsel before publication.

@@ -28,5 +28,10 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # Offline: fails when a layer update needs stir-compliance-init, before the
+      # live compliance audit stops a deployment.
+      - name: Check compliance review checklists
+        run: pnpm exec stir-compliance-init --check
+
       - name: Verify lint, types, tests and production build
         run: pnpm verify:ci

@@ -15,6 +15,22 @@ untouched do not need one.
 
 ### Added
 
+- `compliance/REVIEW.md` gains an owner questionnaire
+  (`<!-- stir-compliance-owner:v1 -->`) for facts code cannot establish: legal
+  entity and trade names, customer locations, mailbox provider, marketing use,
+  external tools, provider naming, data clean-up, audience age, billing
+  practice, manual accessibility testing, captions, response time, and
+  governing law. Existing consumers must run `pnpm exec stir-compliance-init`,
+  which inserts the section; until then `audit:compliance` and
+  `stir-compliance-init --check` report `REVIEW.md` as outdated.
+
+- `stir-compliance-init --check` reports a missing `compliance/site.json` or
+  an outdated `compliance/REVIEW.md` without writing files, and exits non-zero.
+  The shared client CI workflow runs it after install, so a layer update that
+  adds review checklists fails CI instead of the live audit during deployment.
+  **Behaviour change for CI:** client repositories with an outdated
+  `REVIEW.md` now fail CI until they run `pnpm exec stir-compliance-init`.
+
 - `useAuthRegister(options?)` accepts `initialState`, `toFields` and
   `validate` for project signup fields and returns them as `state`. The
   register page moved into the `AuthRegister` component, whose `fields` and
@@ -28,6 +44,10 @@ untouched do not need one.
 
 ### Changed
 
+- The compliance audit's "how long submissions are kept" privacy check also
+  accepts wording that states a period with kept, stored, held, deleted,
+  purged or removed, such as "kept for no more than 24 months" or "deleted
+  after 12 months". Wording without a period still fails.
 - **Breaking.** Paragraph presentation props now take the structured values
   that stir-tools sends (stir-tools `2da0807b`), not Tailwind class strings:
 

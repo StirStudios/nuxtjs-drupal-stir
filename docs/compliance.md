@@ -120,6 +120,11 @@ Use this scheduled task in each downstream repository:
 > and items requiring counsel separately. Draft changes when supported, but do
 > not publish or deploy legal changes without human approval.
 
+`compliance/REVIEW.md` includes an owner questionnaire covering facts that code
+cannot establish, such as the legal entity, customer locations, mailbox
+provider, marketing use, manual accessibility testing, and captions. Ask it at
+every review and record the answers in the dated audit report.
+
 Existing consumers should rerun `pnpm exec stir-compliance-init` after upgrading.
 The command preserves project-specific content while installing versioned review
 checklist additions. `pnpm audit:compliance` reports an error when that checklist

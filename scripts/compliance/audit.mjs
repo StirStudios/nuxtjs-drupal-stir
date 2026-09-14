@@ -4,16 +4,11 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
 import { readUrlArgument, resolveSiteUrl } from '../seo/html.mjs'
 import { collectSignals, evaluateServices, loadLegalText, plainText } from './discovery.mjs'
+import { missingReviewMarkers } from './review.mjs'
 
 const projectRoot = resolve(process.cwd())
 const configPath = resolve(projectRoot, 'compliance/site.json')
 const reviewPath = resolve(projectRoot, 'compliance/REVIEW.md')
-const reviewMarkers = [
-  '<!-- stir-compliance-discovery:v1 -->',
-  '<!-- stir-compliance-accessibility:v1 -->',
-  '<!-- stir-compliance-seo:v1 -->',
-  '<!-- stir-compliance-legal-source:v1 -->',
-]
 let siteUrl = ''
 const errors = []
 const warnings = []
@@ -148,7 +143,7 @@ if (config) {
 
   try {
     const review = await readFile(reviewPath, 'utf8')
-    if (reviewMarkers.some(marker => !review.includes(marker))) {
+    if (missingReviewMarkers(review).length) {
       error('compliance/REVIEW.md is outdated; run stir-compliance-init to install the current review checklists.')
     }
   } catch (cause) {
