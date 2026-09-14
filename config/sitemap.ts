@@ -1,3 +1,5 @@
+import { sitemapCanonicalKey } from './sitemapCanonicalKey'
+
 const sitemapExcludedRoutes = [
   '/account/**',
   '/auth/**',
@@ -33,20 +35,7 @@ export function buildSitemapModuleOptions(drupalUrl: string) {
   }
 }
 
-/** Host-independent path (plus query) used to match sitemap URLs. */
-export function sitemapCanonicalKey(
-  loc: string,
-  siteUrl = process.env.NUXT_URL || '',
-): string | null {
-  try {
-    const url = new URL(loc.replaceAll('&amp;', '&'), siteUrl || 'https://example.com')
-    const pathname = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '')
-
-    return url.search ? pathname + url.search : pathname
-  } catch {
-    return null
-  }
-}
+export { sitemapCanonicalKey }
 
 interface SitemapEntry {
   loc: string
