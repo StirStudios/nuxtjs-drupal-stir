@@ -174,11 +174,15 @@ export const SERVICE_RULES = [
     id: 'remote-video',
     label: 'Third-party video embeds',
     detect: signals => configs(signals, /^media\.type\.remote_video$/),
+    // The stir-decoupled recipe installs this media type on every site, so
+    // its presence alone cannot prove that content embeds third-party video.
     disclosures: [
       {
         document: 'privacy',
         label: 'third-party media providers',
         pattern: /youtube|vimeo|third[- ]party (?:media|video|content|platforms?)/i,
+        severity: 'warning',
+        hint: 'disclose them if content embeds YouTube or Vimeo media, or record technology.inactive["remote-video"]',
       },
     ],
   },
@@ -196,7 +200,8 @@ export const SERVICE_RULES = [
       signals.userRegistration && signals.userRegistration !== 'admin_only'
         ? [`Drupal user.settings register: ${signals.userRegistration}`]
         : [],
-    inventory: { path: 'technology.forms', pattern: /account|regist|profile|sign[- ]?up/i },
+    // Free-text form names such as "book signup" are not account evidence.
+    inventory: { path: 'technology.forms', pattern: /account|regist|profile|sign[- ]?up/i, reverse: false },
     disclosures: [
       { document: 'privacy', label: 'account information', pattern: /\baccounts?\b/i },
       { document: 'privacy', label: 'account deletion requests', pattern: /delet/i },
@@ -330,7 +335,10 @@ export function evaluateServices(signals, config, legalText = {}) {
         unverified.add(disclosure.document)
         continue
       }
-      if (!disclosure.pattern.test(text)) {
+      if (disclosure.pattern.test(text)) continue
+      if (disclosure.severity === 'warning') {
+        warnings.push(`${rule.label} is installed, but the ${disclosure.document} document does not cover ${disclosure.label}; ${disclosure.hint}.`)
+      } else {
         errors.push(`${rule.label} is active, but the ${disclosure.document} document does not cover ${disclosure.label}.`)
       }
     }
