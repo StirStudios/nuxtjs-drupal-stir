@@ -107,6 +107,31 @@ describe('compliance service discovery', () => {
     }).errors).toEqual([])
   })
 
+  it('accepts retention wording that states a period and rejects wording that does not', () => {
+    const retentionError = 'Drupal Webforms is active, but the privacy document does not cover how long submissions are kept.'
+    const privacyWith = (sentence: string) =>
+      `We use Plausible, Cloudflare Turnstile, and Bunny.net. Contact form submissions: ${sentence}`
+
+    for (const sentence of [
+      'they are generally kept for no more than 24 months.',
+      'we retain them for two years.',
+      'they are deleted after 12 months.',
+      'they are purged within 90 days.',
+      'they are stored for 6 months.',
+    ]) {
+      expect(evaluateServices(brochureSignals(), brochureConfig, { privacy: privacyWith(sentence) }).errors, sentence)
+        .not.toContain(retentionError)
+    }
+
+    for (const sentence of [
+      'they are kept securely.',
+      'we keep you informed about new work.',
+    ]) {
+      expect(evaluateServices(brochureSignals(), brochureConfig, { privacy: privacyWith(sentence) }).errors, sentence)
+        .toContain(retentionError)
+    }
+  })
+
   it('warns when legal copy is unavailable instead of guessing', () => {
     const result = evaluateServices(brochureSignals(), brochureConfig, {})
 

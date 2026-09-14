@@ -3,6 +3,7 @@
 import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { REVIEW_SECTIONS as reviewSections, missingReviewMarkers } from './review.mjs'
 
 const projectRoot = resolve(process.cwd())
 const templateRoot = fileURLToPath(new URL('./templates/', import.meta.url))
@@ -10,32 +11,40 @@ const files = ['site.json', 'REVIEW.md']
 const created = []
 const preserved = []
 const updated = []
-const reviewSections = [
-  {
-    heading: '## Required service discovery',
-    marker: '<!-- stir-compliance-discovery:v1 -->',
-    nextHeading: '## Required accessibility review',
-  },
-  {
-    heading: '## Required accessibility review',
-    marker: '<!-- stir-compliance-accessibility:v1 -->',
-    nextHeading: '## Required SEO review',
-  },
-  {
-    heading: '## Required SEO review',
-    marker: '<!-- stir-compliance-seo:v1 -->',
-    nextHeading: '## Tracked legal copy',
-  },
-  {
-    heading: '## Tracked legal copy',
-    marker: '<!-- stir-compliance-legal-source:v1 -->',
-    nextHeading: '## Human confirmations',
-  },
-]
 const requiredScripts = {
   'audit:compliance': 'stir-compliance',
   'audit:seo': 'stir-seo',
   'audit:site': 'pnpm audit:compliance && pnpm audit:seo && pnpm test:a11y',
+}
+
+// --check reports missing or outdated compliance files without writing, so CI
+// and deploy preflights catch a layer update before the live audit does.
+if (process.argv.includes('--check')) {
+  const problems = []
+
+  for (const file of files) {
+    try {
+      await access(resolve(projectRoot, 'compliance', file))
+    }
+    catch {
+      problems.push(`compliance/${file} is missing; run stir-compliance-init.`)
+    }
+  }
+
+  try {
+    const missing = missingReviewMarkers(await readFile(resolve(projectRoot, 'compliance/REVIEW.md'), 'utf8'))
+    if (missing.length) {
+      problems.push(`compliance/REVIEW.md is outdated (missing ${missing.join(', ')}); run stir-compliance-init to install the current review checklists.`)
+    }
+  }
+  catch {
+    // A missing REVIEW.md is already reported above.
+  }
+
+  console.log('Stir compliance setup check')
+  for (const problem of problems) console.log(`ERROR ${problem}`)
+  if (!problems.length) console.log('OK    compliance/site.json and current compliance/REVIEW.md checklists are present.')
+  process.exit(problems.length ? 1 : 0)
 }
 
 await mkdir(resolve(projectRoot, 'compliance'), { recursive: true })
@@ -59,20 +68,28 @@ for (const file of files) {
         if (templateStart < 0 || templateEnd <= templateStart) continue
 
         const currentStart = review.indexOf(section.heading)
-        const nextSectionStart = currentStart >= 0
-          ? review.indexOf('\n## ', currentStart + section.heading.length)
-          : -1
+
+        if (currentStart >= 0) {
+          // The heading already exists without its marker, so a downstream
+          // site wrote its own content under it. Add only the marker
+          // (right after the heading line) rather than replacing the
+          // section body, which would silently discard recorded answers.
+          const headingLineEnd = review.indexOf('\n', currentStart)
+          const insertAt = headingLineEnd >= 0 ? headingLineEnd + 1 : review.length
+          review = `${review.slice(0, insertAt)}${section.marker}\n\n${review.slice(insertAt)}`
+          changed = true
+          continue
+        }
+
         const preferredInsertionPoint = review.indexOf(section.nextHeading)
         const humanConfirmations = review.indexOf('## Human confirmations')
         const insertionPoint = preferredInsertionPoint >= 0
           ? preferredInsertionPoint
           : humanConfirmations
         const replacement = template.slice(templateStart, templateEnd)
-        review = currentStart >= 0
-          ? `${review.slice(0, currentStart)}${replacement}${review.slice(nextSectionStart >= 0 ? nextSectionStart + 1 : review.length)}`
-          : insertionPoint >= 0
-            ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
-            : `${review.trimEnd()}\n\n${replacement}`
+        review = insertionPoint >= 0
+          ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
+          : `${review.trimEnd()}\n\n${replacement}`
         changed = true
       }
 

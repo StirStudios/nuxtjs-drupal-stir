@@ -133,7 +133,9 @@ export const SERVICE_RULES = [
       {
         document: 'privacy',
         label: 'how long submissions are kept',
-        pattern: /retain|retention|stored for|up to \d+ (?:days|weeks|months|years)/i,
+        // Accept any wording that states a period, e.g. "kept for no more than
+        // 24 months" or "deleted after 12 months", not only "retain".
+        pattern: /retain|retention|stored for|up to \d+ (?:days|weeks|months|years)|\b(?:kept|stored|held|deleted|purged|removed)\b[^.]{0,40}?\b(?:for|after|within|no (?:more|longer) than|at most)\s+(?:up to\s+)?\d+\s+(?:days|weeks|months|years)/i,
       },
     ],
   },

@@ -816,12 +816,12 @@
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 194,
+    "tests": 195,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 77,
-      "scripts": 3,
+      "scripts": 4,
       "server": 29,
       "unit": 11,
       "utils": 60
@@ -920,6 +920,7 @@
     "tests/nuxt/runtime/usePageContext.nuxt.spec.ts",
     "tests/nuxt/runtime/useStirDrupalCe.nuxt.spec.ts",
     "tests/scripts/complianceDiscovery.spec.ts",
+    "tests/scripts/complianceReview.spec.ts",
     "tests/scripts/perfGrowth.spec.ts",
     "tests/scripts/seoHtml.spec.ts",
     "tests/server/appContextApi.spec.ts",
