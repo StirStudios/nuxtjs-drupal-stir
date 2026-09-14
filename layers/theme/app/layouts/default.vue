@@ -2,7 +2,7 @@
 type HeaderMode = 'fixed' | 'sticky'
 
 const route = useRoute()
-const { navigation } = useAppConfig().stirTheme
+const { navigation, routeHero } = useAppConfig().stirTheme
 
 const toHeaderMode = (value: unknown): HeaderMode =>
   value === 'sticky' ? 'sticky' : 'fixed'
@@ -26,6 +26,7 @@ const normalizedNavigationMode = computed<HeaderMode>(() => {
 
     <UMain id="main-content" class="flex-1" role="main" tabindex="-1">
       <SiteMessages />
+      <LazyRouteHero v-if="routeHero.enabled" />
       <slot />
     </UMain>
 

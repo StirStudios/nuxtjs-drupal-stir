@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NodeDefaultProps } from '#stir/types'
+import { resolveRouteHeroElements } from '#stir/utils/routeHero'
 
 const props = defineProps<NodeDefaultProps>()
 const attrs = useAttrs()
@@ -8,7 +9,12 @@ const nodeProps = computed(() => ({
   ...props,
   ...attrs,
 }))
-const forwardedSlotNames = computed(() => Object.keys(slots))
+const { routeHero } = useAppConfig().stirTheme
+// The layout route hero renders the page hero; skipping the slot avoids a second H1.
+const skipHeroSlot = routeHero.enabled && resolveRouteHeroElements(routeHero.elements).includes('node-page')
+const forwardedSlotNames = computed(() =>
+  Object.keys(slots).filter(name => !(skipHeroSlot && name === 'hero')),
+)
 
 defineOptions({
   inheritAttrs: false,

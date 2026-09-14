@@ -50,6 +50,79 @@ untouched do not need one.
 
 ### Added
 
+- `DrupalViewDisplay` and `drupal-view--default` accept a `controls` slot, so a
+  project can replace only the filter and sort bar of a Drupal view. The layer
+  still resolves `?page=N` during SSR and keeps crawlable pager links, rows,
+  loading, empty and error states, the grid image profile and the query
+  namespace. The slot receives `DrupalViewControlsSlotProps`: `filters`,
+  `filterValues`, `sort`, `sortByOptions`, `sortOrderOptions`, `sortValues`,
+  `activeFilters` (with `label` and an accessible `removeLabel`), `isLoading`,
+  and the actions `setFilter`, `setSort`, `removeFilter`, `resetFilters`,
+  `resetSort` and `resetControls`. With a slot, the layer also renders a
+  visually hidden `role="status"` region that announces result updates. Views
+  without the slot render exactly as before. `useDrupalViewControls` returns the
+  same `activeFilters`, `removeFilter`, `resetFilters` and `resetSort`.
+- The SEO layer's `/api/sitemap` source calls a `stir:sitemap:extend` Nitro
+  runtime hook so projects can add `images` and `videos` to Drupal sitemap URLs
+  without replacing `server/api/sitemap.get.ts`. Handlers run in parallel with
+  the Drupal request. Extension entries are validated (absolute http(s) `loc`,
+  image and video shapes); invalid entries are dropped with a warning, and a
+  handler that throws or exceeds the Drupal request timeout is logged and
+  ignored, so the base sitemap is still served. The Drupal payload stays strictly
+  validated, and output is unchanged when no handler is registered. See
+  `layers/seo/README.md`.
+- `/auth/verify` carries a safe same-site `?redirect=` through to its sign-in
+  link and post-verification navigation, using the existing
+  `safeStirAuthRedirect()` check; `//host` and absolute external URLs are
+  dropped. The page logic moved to `useAuthVerify({ fallbackRedirect })`, so a
+  project needing a remembered destination overrides the page with a few lines
+  instead of copying it. Without `?redirect=`, behaviour is unchanged.
+  `AuthSecondaryAction`'s `to` prop now accepts any `RouteLocationRaw`.
+- Account navigation is configurable. `app.config` `auth.accountNav.items`
+  (`label`, `to`, optional `icon` and `visibility`) replaces the default
+  Settings link, and `registerAccountNavVisibility(key, resolver)` decides at
+  runtime whether items with that `visibility` key are shown. Both are typed
+  and auto-imported. The default navigation is unchanged.
+- `useAccountSettings()` returns `reset()`, which restores the last loaded or
+  saved values and clears the current password, and
+  `emailChangeRequiresCurrentPassword`, a readonly ref reporting whether Drupal
+  requires the current password for an email change before any edit. Editable
+  field checks are unchanged. Projects that forked the composable for these can
+  delete the fork.
+- Route hero (#806, #807). `useRouteHero()` resolves a page-level hero model
+  (title, title lines, eyebrow, description, actions, image, variant) from the
+  current Drupal page's `hero` slot, falling back to the page title and
+  metatag description. Explicit heroes come from `definePageMeta({ routeHero })`,
+  `stirTheme.routeHero.routes`, or a project resolver registered with
+  `registerRouteHeroResolver()`. `RouteHeroSection` renders `cover`, `simple`
+  and `overlap` variants with one H1, an eager high-priority image and parallax
+  that is inert under reduced motion; `resolveEditorialRouteHero()` builds the
+  overlap model for editorial detail pages, keeping playable media in the
+  `media` slot rather than behind the hero. `useParallaxStyle()` is also
+  exported. Opt in with `stirTheme.routeHero.enabled: true`; the default layout
+  then renders `RouteHero` inside `main`, and `node--page` stops rendering its
+  inline `hero` slot. Disabled by default, so existing output is unchanged.
+  `usePageContext` now shares its Drupal-route check through
+  `isDrupalRenderedRoute()`.
+- `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
+  and Hero paragraph copy. Projects can override it to expand their own inline
+  embeds. The default output is unchanged: one `div` with the same classes and
+  `v-html` content.
+- `stir-compliance` now discovers the services a site actually runs from the
+  Drupal config export, `app/app.config.ts`, and environment variable names,
+  and applies only the rules that evidence triggers: Webforms, Turnstile,
+  Plausible, Bunny, email delivery, remote video, Instagram, public accounts,
+  payments, automatic renewal, newsletters, saved activity, the privacy notice,
+  and UserWay. An active service missing from `compliance/site.json` or from the
+  legal copy is an error; record an installed but unused one under
+  `technology.inactive` with the reason.
+- Legal copy can be tracked in `compliance/legal/<alias>.html` (or
+  `documents.<key>.file`) and applied with the Stir Tools command
+  `drush stir-tools:compliance-content`. The audit checks disclosures against
+  those files, or the rendered pages at `owner.domain`.
+- **Action required.** `compliance/REVIEW.md` gains a "Tracked legal copy"
+  checklist. Run `pnpm exec stir-compliance-init` after updating, or
+  `pnpm audit:compliance` reports the checklist as outdated.
 - `useAuthLogin(options?)` takes an optional `redirectTo` callback for
   destinations that can only be decided once the session resolves. It also
   honours `?redirect=` with the Drupal-configured `loginRedirectPath` as
@@ -111,6 +184,30 @@ untouched do not need one.
 
 ### Changed
 
+- `useAccountNav().items` is now a `ComputedRef<NavigationMenuItem[]>` rather
+  than a plain array. Templates are unaffected; script code reading the list
+  should use `items.value`.
+- **Behaviour change: profile validation.** `validateProfileValues()` (used by
+  `AccountProfileForm`) is stricter and more precise:
+  - email checks apply only to `email` fields and to `link` fields named or
+    labelled for email (a leading `mailto:` is ignored). A `string` field whose
+    name merely contains "email" is no longer email-validated;
+  - other `link` fields must be absolute `http://` or `https://` URLs, so
+    values such as `example.com`, `/path` or `javascript:` are now rejected;
+  - `cardinality` is honoured: every entry of a multi-value field is checked,
+    and more non-blank entries than the cardinality allows is an error
+    (`-1` is unlimited);
+  - an empty array, or an array of blank entries, counts as missing for a
+    required field.
+  Forms whose saved values violate these rules will show errors on the next
+  save. Projects that forked `profileValidation.ts` for these rules can delete
+  the fork.
+- **Breaking.** `stir-seo` and `stir-compliance` no longer read `SEO_SITE_URL`
+  or `COMPLIANCE_SITE_URL`, or any other environment variable, for their
+  target. Both always audit `owner.domain` from `compliance/site.json`, so a
+  local or staging value cannot point them at the wrong site, and
+  `stir-compliance` now checks the rendered legal pages on every run. Pass
+  `--url <origin>` to audit another origin deliberately.
 - **Protected pages are enforced at the server boundary.** Gating lived only in
   the route middleware, so the page payload behind a protected route stayed
   fetchable from `/api/drupal-ce/<path>`. Requests for a configured protected

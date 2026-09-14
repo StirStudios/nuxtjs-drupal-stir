@@ -1,4 +1,4 @@
-import type { ViewPager } from '#stir/composables/useDrupalViewQuery'
+import type { NormalizedViewFilter, ViewPager } from '#stir/composables/useDrupalViewQuery'
 import type { GridConfig } from '#stir/utils/gridClasses'
 
 export interface ExposedFilter {
@@ -56,4 +56,30 @@ export interface DrupalViewProps {
   exposedSorts?: ExposedSort[] | unknown[]
   restoreScrollLinkPattern?: string
   noResults?: string
+}
+
+export interface DrupalViewActiveFilter {
+  key: string
+  filterKey: string
+  filterLabel: string
+  label: string
+  value: string
+  removeLabel: string
+}
+
+export interface DrupalViewControlsSlotProps {
+  filters: NormalizedViewFilter[]
+  filterValues: Record<string, string | string[]>
+  sort: ExposedSort | null
+  sortByOptions: Array<{ label: string, value: string }>
+  sortOrderOptions: Array<{ label: string, value: string }>
+  sortValues: Record<string, string | string[]>
+  activeFilters: DrupalViewActiveFilter[]
+  isLoading: boolean
+  setFilter: (payload: { key: string, value: string | string[] }) => void
+  setSort: (payload: { key: string, value: string }) => void
+  removeFilter: (filter: Pick<DrupalViewActiveFilter, 'filterKey' | 'value'>) => void
+  resetFilters: () => void
+  resetSort: () => void
+  resetControls: () => void
 }

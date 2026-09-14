@@ -709,6 +709,66 @@ readers while hiding them visually.
 In `mode: 'simple'`, a programmatic `classes` prop wraps the header, media and
 footer slots in one element.
 
+### 🦸 `routeHero`
+
+Page-level hero rendered by the default layout above the page content. Disabled
+by default; existing sites render unchanged until `enabled` is `true`.
+
+```ts
+routeHero: {
+  enabled: false,
+  elements: [], // Drupal page elements resolved from the hero slot; empty means ['node-page']
+  imageSelection: 'first', // 'first' | 'random' (SSR-stable seed in useState)
+  parallax: true, // inert during SSR and under prefers-reduced-motion
+  routes: [], // RouteHeroDefinition[]: { path, title, eyebrow, description, actions, image, variant, ... }
+  base: 'route-hero relative isolate',
+  band: 'route-hero-band isolate overflow-hidden',
+  surface: 'bg-gradient-to-b from-gray-900 via-gray-800 to-black', // replaced by a hero's surfaceClass
+  visual: 'absolute inset-x-0 top-0 -z-10 h-[calc(100%+7rem)]',
+  image: 'inset-0 !h-full !w-full !object-cover',
+  overlay: 'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/80 via-black/50 to-black/20',
+  container: 'relative z-10 mx-auto w-full max-w-(--ui-container) px-4 md:px-5 lg:px-8',
+  content: 'flex flex-col gap-[var(--stir-content-action-gap,1.5rem)]',
+  eyebrow: 'mb-0 text-sm font-semibold tracking-[0.1em] uppercase',
+  title: 'mb-0 text-balance',
+  description: 'mb-0 max-w-3xl text-lg text-balance',
+  actions: 'flex flex-wrap gap-x-6 gap-y-3',
+  variants: {
+    cover: {
+      base: 'dark text-default flex min-h-[max(32rem,85dvh)] items-center py-24',
+      band: 'absolute inset-0 -z-10',
+      content: 'max-w-4xl items-start text-start',
+    },
+    simple: {
+      base: 'dark text-default flex min-h-[22rem] items-end pt-32 pb-16 lg:min-h-[28rem] lg:pt-40',
+      band: 'absolute inset-0 -z-10',
+      content: 'items-center text-center [&>*]:max-w-4xl',
+    },
+    overlap: {
+      band: 'relative min-h-[20rem] sm:min-h-[24rem] md:min-h-[34rem]',
+      container: '-mt-32 pb-8 md:-mt-64 md:pb-12',
+      content: 'bg-default text-default mx-auto max-w-4xl rounded-xl p-6 shadow-xl md:p-10',
+    },
+  },
+}
+```
+
+- The rendered structure is `section` (`base` + variant `base`) > band
+  (`band`, `surface`, variant `band`; holds `visual` with the image and
+  `overlay`) and container (`container`) > content (`content`). Variant keys
+  `base`, `band`, `container` and `content` add to the shared classes.
+- `cover` shows the image behind the copy, `simple` is a text band without an
+  image, and `overlap` puts the copy in a card that overlaps the image band. A
+  hero without `variant` uses `cover` when it has an image, otherwise `simple`.
+- The hero always renders exactly one `h1`; `hideTitle` keeps it for screen
+  readers only. The image loads eagerly with `fetchpriority="high"`.
+- When enabled, `node--page` skips its inline `hero` slot if `node-page` is in
+  `elements`, so the Hero paragraph is not rendered twice.
+- `routes[].path` uses the `colorMode` route patterns (exact, `/path*`,
+  `/path/*`). Arrays merge with the layer default, which is empty.
+- Resolution order and editorial usage are documented in
+  [downstream-overrides.md](./downstream-overrides.md).
+
 ### 💥 Animations
 
 ```ts

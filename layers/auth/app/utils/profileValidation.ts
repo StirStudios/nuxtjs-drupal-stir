@@ -6,18 +6,47 @@ export type ProfileFieldValidationInput = {
   type: string
   required: boolean
   editable: boolean
+  /**
+   * Drupal field cardinality: 1 for single-value, N for a limit, -1 unlimited.
+   */
+  cardinality?: number
 }
 
-const isEmailField = (field: ProfileFieldValidationInput): boolean => {
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const mentionsEmail = (field: ProfileFieldValidationInput): boolean => {
   const name = field.name.trim().toLowerCase()
   const label = field.label.trim().toLowerCase()
 
-  if (name === 'mail' || name === 'email' || name.includes('email')) {
-    return true
-  }
-
-  return label === 'email' || label.includes('email')
+  return name.includes('email') || name === 'mail' || label.includes('email')
 }
+
+// Email rules apply to Drupal email fields, and to link fields that hold an
+// email address (commonly stored as a `mailto:` URI). Other field types are
+// never email-validated, whatever they are named.
+const isEmailField = (field: ProfileFieldValidationInput): boolean =>
+  field.type === 'email' || (field.type === 'link' && mentionsEmail(field))
+
+const isUrlField = (field: ProfileFieldValidationInput): boolean =>
+  field.type === 'link' && !isEmailField(field)
+
+const isValidEmail = (value: string): boolean =>
+  EMAIL_PATTERN.test(value.replace(/^mailto:/i, ''))
+
+const isValidUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value)
+
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+const isBlank = (value: unknown): boolean =>
+  value === null
+  || value === undefined
+  || (typeof value === 'string' && value.trim().length === 0)
 
 export const validateProfileValues = (
   fields: ProfileFieldValidationInput[],
@@ -31,30 +60,42 @@ export const validateProfileValues = (
     }
 
     const rawValue = state[field.name]
-    const value = typeof rawValue === 'string' ? rawValue.trim() : rawValue
-    const isEmptyString = typeof value === 'string' && value.length === 0
-    const isMissing = value === null || value === undefined || isEmptyString
+    const entries = (Array.isArray(rawValue) ? rawValue : [rawValue])
+      .filter(entry => !isBlank(entry))
+    const label = field.label || 'This field'
 
-    if (field.required && isMissing) {
+    if (entries.length === 0) {
+      if (field.required) {
+        errors.push({ name: field.name, message: `${label} is required` })
+      }
+      continue
+    }
+
+    const cardinality = field.cardinality ?? 1
+
+    if (cardinality > 0 && entries.length > cardinality) {
       errors.push({
         name: field.name,
-        message: `${field.label || 'This field'} is required`,
+        message: cardinality === 1
+          ? `${label} accepts a single value`
+          : `${label} accepts at most ${cardinality} values`,
       })
       continue
     }
 
-    if (isEmailField(field) && typeof value === 'string' && value.length > 0) {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const strings = entries
+      .filter((entry): entry is string => typeof entry === 'string')
+      .map(entry => entry.trim())
 
-      if (!emailPattern.test(value)) {
-        errors.push({
-          name: field.name,
-          message: 'Enter a valid email address',
-        })
-      }
+    if (isEmailField(field) && strings.some(entry => !isValidEmail(entry))) {
+      errors.push({ name: field.name, message: 'Enter a valid email address' })
+    } else if (isUrlField(field) && strings.some(entry => !isValidUrl(entry))) {
+      errors.push({
+        name: field.name,
+        message: 'Enter a valid URL starting with http:// or https://',
+      })
     }
   }
 
   return errors
 }
-

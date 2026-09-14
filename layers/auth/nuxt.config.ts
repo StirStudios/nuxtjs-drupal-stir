@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { createJiti } from 'jiti'
-import { useNuxt } from '@nuxt/kit'
+import { addTypeTemplate, useNuxt } from '@nuxt/kit'
 import { positiveIntegerEnvironment } from '../../config/runtime'
 
 const loadModule = createJiti(import.meta.url, {
@@ -17,7 +19,19 @@ type ProtectedRoutesAppConfig = {
 export default defineNuxtConfig({
   extends: ['../turnstile'],
 
-  modules: ['@nuxt/image'],
+  modules: [
+    '@nuxt/image',
+    function registerStirAuthAppConfigTypes() {
+      const appConfigTypes = fileURLToPath(
+        new URL('./app/types/app-config.d.ts', import.meta.url),
+      )
+
+      addTypeTemplate({
+        filename: 'types/stir-auth-app-config.d.ts',
+        getContents: () => readFileSync(appConfigTypes, 'utf8'),
+      })
+    },
+  ],
 
   runtimeConfig: {
     protectedPassword: process.env.PROTECTED_PASSWORD || '',

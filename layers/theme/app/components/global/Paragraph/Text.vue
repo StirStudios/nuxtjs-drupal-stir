@@ -39,7 +39,8 @@ const cardVariant = computed(() => {
 
 <template>
   <WrapDiv :align="alignClasses" :styles="wrapStyles">
-    <UCard v-if="isCard" class="h-full" :variant="cardVariant">
+    <!-- Fill the cell only when the card is alone in it; beside siblings in a region, a full-height card pushes them out of the section. -->
+    <UCard v-if="isCard" class="only:h-full" :variant="cardVariant">
       <p v-if="eyebrow?.trim()" class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
       <EditableRichText v-bind="richTextProps" />
     </UCard>

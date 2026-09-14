@@ -269,6 +269,20 @@ describe('Drupal Hero page ownership and headings', () => {
       })
     })
 
+    it('crops a bare background image in a section hero', async () => {
+      const wrapper = await mountSuspended(Hero, {
+        props: { placement: 'field_section', header: 'Section' },
+        slots: { media },
+        global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
+      })
+      const classes = wrapper.get('section').classes()
+
+      // Bare hero images are direct children, so they need cover sizing as well as `.media img`.
+      expect(classes).toContain('[&>img]:object-cover')
+      expect(classes).toContain('[&>:is(.media,img)]:h-full')
+      wrapper.unmount()
+    })
+
     it('keeps background media for node types without configuration', async () => {
       const wrapper = await mountSuspended(Hero, {
         slots: { media },

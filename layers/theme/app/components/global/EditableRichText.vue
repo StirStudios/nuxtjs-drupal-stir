@@ -151,23 +151,23 @@ watch(
           as-child
           v-bind="motionProps"
         >
-          <div
+          <RichTextHtml
             :class="
               [classes, richTextClass]
                 .filter(Boolean)
                 .join(' ')
             "
-            v-html="trustedTextHtml"
+            :html="trustedTextHtml"
           />
         </LazyRevealMotion>
-        <div
+        <RichTextHtml
           v-else
           :class="
             [classes, richTextClass]
               .filter(Boolean)
               .join(' ')
           "
-          v-html="trustedTextHtml"
+          :html="trustedTextHtml"
         />
       </template>
     </template>

@@ -121,11 +121,14 @@ match Drupal's configured copy word-for-word.
 Downstream projects with local auth page overrides can use the auth layer's
 public auto-import surface instead of importing from nested layer internals:
 
+- `registerAccountNavVisibility`
+- `useAccountNav`
 - `useAuthActions`
 - `useAuthConfig`
 - `useAuthLogin`
 - `useAuthRegister`
 - `useAuthSession`
+- `useAuthVerify`
 - `usePasswordRequest`
 - `usePasswordReset`
 - `useProtectedActions`
@@ -135,6 +138,60 @@ public auto-import surface instead of importing from nested layer internals:
 - `createRegisterValidationSchema`
 - `createPasswordResetValidationSchema`
 - `createAccountPasswordChangeValidationSchema`
+
+### Account settings
+
+`useAccountSettings()` loads and saves the account name and email through
+`/api/account/settings/values`. Only fields Drupal marks editable are compared
+or sent.
+
+- `reset()` discards unsaved edits, restoring the last loaded or saved values
+  and clearing `current_password`. Call it when an edit dialog closes.
+- `emailChangeRequiresCurrentPassword` (readonly ref) reports whether Drupal
+  requires the current password for an email change at all, so a page can show
+  the password input up front. `requiresCurrentPassword` stays true only once
+  the email has actually changed.
+
+### Account navigation
+
+`useAccountNav()` returns `items`, a computed list for `UNavigationMenu`, used
+by the `account` layout. It defaults to a single Settings link. Replace the
+list in `app.config`; a non-empty `items` replaces the default rather than
+extending it:
+
+```ts
+export default defineAppConfig({
+  auth: {
+    accountNav: {
+      items: [
+        { label: 'Settings', icon: 'i-lucide-settings', to: '/account/settings' },
+        { label: 'Profile', icon: 'i-lucide-user-round', to: '/account/profile' },
+        { label: 'Billing', icon: 'i-lucide-credit-card', to: '/account/billing', visibility: 'billing' },
+      ],
+    },
+  },
+})
+```
+
+An item with `visibility` is shown only while the resolver registered for that
+key returns `true`, and stays hidden if no resolver is registered. Register
+resolvers from a plugin:
+
+```ts
+export default defineNuxtPlugin(() => {
+  registerAccountNavVisibility('billing', () => {
+    const { data } = useFetch<{ has_customer?: boolean }>('/api/stripe/access')
+
+    return () => data.value?.has_customer === true
+  })
+})
+```
+
+A resolver runs in the setup of each component calling `useAccountNav()`, so
+composables are available, and it may return a boolean, ref or getter.
+Resolvers are stored per Nuxt app instance, so they never leak between SSR
+requests. Resolve on the server where possible (as above) so the item is
+present in the SSR HTML; with `server: false` it appears after hydration.
 
 ### Post-login destination
 
@@ -162,3 +219,23 @@ The callback runs after the session resolves. Its return value is used as
 given, so pass a query parameter through `redirect` from the context rather
 than reading one yourself. Return `false` to navigate nowhere and let the page
 take over.
+
+### Verification redirect
+
+`/auth/verify` carries a safe same-site `?redirect=` through to the sign-in
+link and the post-verification navigation, so a destination chosen before
+sign-up survives email verification. Unsafe values (`//host`, `/\host`,
+absolute or non-path URLs) are dropped using the same check as
+`useAuthLogin()`.
+
+A project that remembers the destination elsewhere (for example in a cookie)
+overrides the page and supplies a fallback, which is held to the same rule:
+
+```ts
+const { isLoading, verified, message, title, loginTarget, verify }
+  = useAuthVerify({ fallbackRedirect: () => rememberedPath.value })
+
+onMounted(verify)
+```
+
+`AuthSecondaryAction` accepts a route location object for `to`.

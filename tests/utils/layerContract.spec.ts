@@ -738,6 +738,23 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('v-else')
   })
 
+  it('renders rich text HTML through the overridable RichTextHtml component', () => {
+    const editableRichText = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
+      'utf8',
+    )
+    const richTextHtml = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/RichTextHtml.vue'),
+      'utf8',
+    )
+
+    expect(editableRichText).toContain('<RichTextHtml')
+    expect(editableRichText).toContain(':html="trustedTextHtml"')
+    expect(editableRichText).not.toContain('v-html')
+    expect(richTextHtml).toContain('html: string')
+    expect(richTextHtml).toContain('<div v-html="html" />')
+  })
+
   it('keeps paragraph layout separate from reusable rich-text editing', () => {
     const paragraphText = readFileSync(
       resolve(rootDir, 'layers/theme/app/components/global/Paragraph/Text.vue'),

@@ -137,7 +137,7 @@ const sectionClasses = computed(() => {
     return props.classes || ''
   }
 
-  if (isSection.value) return ['hero hero-section relative overflow-hidden [&>:is(.media,img)]:absolute [&>:is(.media,img)]:inset-0 [&>:is(.media,img)]:h-full [&>:is(.media,img)]:w-full [&>.media_img]:h-full [&>.media_img]:w-full [&>.media_img]:object-cover', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
+  if (isSection.value) return ['hero hero-section relative overflow-hidden [&>:is(.media,img)]:absolute [&>:is(.media,img)]:inset-0 [&>:is(.media,img)]:h-full [&>:is(.media,img)]:w-full [&>.media_img]:h-full [&>.media_img]:w-full [&>.media_img]:object-cover [&>img]:object-cover', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
 
   if (isInline.value) return heroTheme.inline.base
 

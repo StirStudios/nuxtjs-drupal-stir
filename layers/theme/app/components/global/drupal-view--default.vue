@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DrupalViewProps } from '#stir/types'
+import type { DrupalViewControlsSlotProps, DrupalViewProps } from '#stir/types'
 
 const props = defineProps<DrupalViewProps>()
 const attrs = useAttrs()
@@ -10,6 +10,7 @@ const viewProps = computed(() => ({
 
 defineSlots<{
   rows?(): unknown
+  controls?(props: DrupalViewControlsSlotProps): unknown
 }>()
 </script>
 
@@ -17,6 +18,9 @@ defineSlots<{
   <DrupalViewDisplay v-bind="viewProps">
     <template #rows>
       <slot name="rows" />
+    </template>
+    <template v-if="$slots.controls" #controls="controls">
+      <slot name="controls" v-bind="controls" />
     </template>
   </DrupalViewDisplay>
 </template>

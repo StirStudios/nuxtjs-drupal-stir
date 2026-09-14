@@ -1,4 +1,5 @@
 import type { UiFieldVariantName } from '../../../foundation/app/types/ui'
+import type { RouteHeroDefinition, RouteHeroVariant } from './RouteHero'
 
 export type { UiFieldVariantName } from '../../../foundation/app/types/ui'
 
@@ -202,6 +203,34 @@ type StirThemeHeroConfig = {
     isFront?: ClassValue
   } & LooseRecord
   hide?: ClassValue
+} & LooseRecord
+
+type StirThemeRouteHeroVariantConfig = {
+  base?: ClassValue
+  band?: ClassValue
+  container?: ClassValue
+  content?: ClassValue
+} & LooseRecord
+
+type StirThemeRouteHeroConfig = {
+  enabled?: boolean
+  elements?: string[]
+  imageSelection?: 'first' | 'random'
+  parallax?: boolean
+  routes?: RouteHeroDefinition[]
+  base?: ClassValue
+  band?: ClassValue
+  surface?: ClassValue
+  visual?: ClassValue
+  image?: ClassValue
+  overlay?: ClassValue
+  container?: ClassValue
+  content?: ClassValue
+  eyebrow?: ClassValue
+  title?: ClassValue
+  description?: ClassValue
+  actions?: ClassValue
+  variants?: Partial<Record<RouteHeroVariant, StirThemeRouteHeroVariantConfig>>
 } & LooseRecord
 
 type StirThemeLinkHubConfig = {
@@ -438,6 +467,7 @@ type StirThemeConfig = {
   article?: StirThemeArticleConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
+  routeHero?: StirThemeRouteHeroConfig
   clientComponents?: string[]
   linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
@@ -503,6 +533,9 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   article: Required<StirThemeArticleConfig>
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
+  routeHero: StirThemeRouteHeroConfig & {
+    variants: Partial<Record<RouteHeroVariant, StirThemeRouteHeroVariantConfig>>
+  }
   clientComponents: string[]
   linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]

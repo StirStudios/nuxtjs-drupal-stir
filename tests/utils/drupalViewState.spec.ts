@@ -5,6 +5,7 @@ import {
   createViewStateSnapshot,
   createViewStateStorageKey,
   defaultDrupalViewFilterValue,
+  drupalViewActiveFilters,
   firstViewControlString,
   parseStoredViewState,
   pruneStoredViewState,
@@ -38,6 +39,25 @@ const sort = {
 }
 
 describe('Drupal view state', () => {
+  it('describes each selected filter value as a removable active filter', () => {
+    expect(drupalViewActiveFilters([
+      ...filters,
+      { label: 'Search', queryParamName: 'q', options: [] },
+      { label: 'Dates', queryParamName: 'dates', type: 'date_range', options: [] },
+      { label: '', queryParamName: 'empty', options: [] },
+    ], {
+      category: ['news', 'unknown'],
+      q: 'jazz',
+      dates: ['2026-01-01', '2026-02-01'],
+      empty: '',
+    })).toEqual([
+      { key: 'category:news', filterKey: 'category', filterLabel: 'Category', label: 'News', value: 'news', removeLabel: 'Remove Category: News' },
+      { key: 'category:unknown', filterKey: 'category', filterLabel: 'Category', label: 'unknown', value: 'unknown', removeLabel: 'Remove Category: unknown' },
+      { key: 'q:jazz', filterKey: 'q', filterLabel: 'Search', label: 'jazz', value: 'jazz', removeLabel: 'Remove Search: jazz' },
+      { key: 'dates:2026-01-01 – 2026-02-01', filterKey: 'dates', filterLabel: 'Dates', label: '2026-01-01 – 2026-02-01', value: '2026-01-01 – 2026-02-01', removeLabel: 'Remove Dates: 2026-01-01 – 2026-02-01' },
+    ])
+  })
+
   it('builds a view-specific storage key', () => {
     expect(createViewStateStorageKey({
       path: '/articles',

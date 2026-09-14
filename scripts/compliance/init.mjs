@@ -24,6 +24,11 @@ const reviewSections = [
   {
     heading: '## Required SEO review',
     marker: '<!-- stir-compliance-seo:v1 -->',
+    nextHeading: '## Tracked legal copy',
+  },
+  {
+    heading: '## Tracked legal copy',
+    marker: '<!-- stir-compliance-legal-source:v1 -->',
     nextHeading: '## Human confirmations',
   },
 ]

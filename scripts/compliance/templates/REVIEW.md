@@ -79,6 +79,32 @@ Automation validates technical consistency, not search rankings or editorial
 quality. Confirm that page titles, descriptions, link text, image alternatives,
 and structured data accurately describe the visible content.
 
+## Tracked legal copy
+
+<!-- stir-compliance-legal-source:v1 -->
+
+Keep the approved Privacy Policy, Terms of Service, and Accessibility Statement
+text in the Drupal project's `compliance/legal/` directory, one HTML file per
+page named after its URL alias (for example `privacy-policy.html`). Drupal still
+publishes the pages; these files are the reviewed, version-controlled copy.
+
+Preview an approved edit, then apply it through the owning Drupal node:
+
+```sh
+ddev drush stir-tools:compliance-content
+ddev drush stir-tools:compliance-content --apply
+```
+
+The command replaces only the text of a page's single Text paragraph, or its
+body when the page has no sections, in a new revision. It never creates pages or
+changes layout. `pnpm audit:compliance` reads the same files to confirm that
+every service it discovers is declared and disclosed; record a service that is
+installed but unused under `technology.inactive` with the reason.
+
+Record each review in a dated `compliance/AUDIT-YYYY-MM-DD.md` report. Update
+`review.lastReviewed` and `review.nextReview` only after the technical review and
+any required owner or counsel approval are complete.
+
 ## Human confirmations
 
 - Confirm the legal operator, trade names, public contact details, and domain.

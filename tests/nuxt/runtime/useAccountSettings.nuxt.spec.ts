@@ -247,4 +247,77 @@ describe('useAccountSettings', () => {
     await expect(settings.save()).resolves.toMatchObject({ no_changes: true })
     expect(fetchMock).toHaveBeenCalledOnce()
   })
+  it('exposes whether Drupal requires the current password before any edit', async () => {
+    state.api.mockResolvedValueOnce({
+      fields: {
+        account_email: {
+          editable: true,
+          requires_current_password: true,
+        },
+      },
+      values: { account_email: 'before@example.test' },
+    })
+
+    const settings = await mountComposable()
+
+    expect(settings.emailChangeRequiresCurrentPassword.value).toBe(false)
+    await settings.load()
+    expect(settings.emailChangeRequiresCurrentPassword.value).toBe(true)
+    expect(settings.requiresCurrentPassword.value).toBe(false)
+  })
+
+  it('reset() restores loaded values and clears the current password', async () => {
+    state.api.mockResolvedValueOnce({
+      fields: {
+        account_name: { editable: true },
+        account_email: { editable: true },
+      },
+      values: {
+        account_name: 'before-name',
+        account_email: 'before@example.test',
+      },
+    })
+
+    const settings = await mountComposable()
+
+    await settings.load()
+    settings.values.value.account_name = 'after-name'
+    settings.values.value.account_email = 'after@example.test'
+    settings.values.value.current_password = 'secret'
+    expect(settings.hasChanges.value).toBe(true)
+
+    settings.reset()
+
+    expect(settings.values.value).toEqual({
+      account_name: 'before-name',
+      account_email: 'before@example.test',
+      current_password: '',
+    })
+    expect(settings.hasChanges.value).toBe(false)
+  })
+
+  it('reset() keeps the read-only username check after restoring values', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      fields: {
+        account_name: { editable: false },
+        account_email: { editable: true },
+      },
+      values: {
+        account_name: 'fixed-name',
+        account_email: 'before@example.test',
+      },
+    })
+
+    state.api.mockImplementation(fetchMock)
+    const settings = await mountComposable()
+
+    await settings.load()
+    settings.values.value.account_email = 'after@example.test'
+    settings.reset()
+    settings.values.value.account_name = 'ignored-name'
+
+    expect(settings.hasChanges.value).toBe(false)
+    await expect(settings.save()).resolves.toMatchObject({ no_changes: true })
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
 })

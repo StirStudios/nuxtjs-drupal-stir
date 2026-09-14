@@ -2,16 +2,13 @@
 
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { attributes, crawlableUrl, hasNoindex, resolveSiteUrl } from './html.mjs'
+import { attributes, crawlableUrl, hasNoindex, readUrlArgument, resolveSiteUrl } from './html.mjs'
 
 const projectRoot = resolve(process.cwd())
 const compliance = await readFile(resolve(projectRoot, 'compliance/site.json'), 'utf8')
   .then(value => JSON.parse(value))
   .catch(() => ({}))
-const siteUrl = resolveSiteUrl(
-  process.env.SEO_SITE_URL || process.env.COMPLIANCE_SITE_URL,
-  compliance,
-)
+const siteUrl = resolveSiteUrl(readUrlArgument(), compliance)
 const errors = []
 const warnings = []
 const checkedTargets = new Map()
@@ -161,9 +158,10 @@ async function auditPage(route, titleOwners, sitemapRouteSet) {
 }
 
 if (!siteUrl || !absoluteUrl(siteUrl, siteUrl)) {
-  console.error('ERROR Set owner.domain in compliance/site.json or provide SEO_SITE_URL (or COMPLIANCE_SITE_URL).')
+  console.error('ERROR Set owner.domain in compliance/site.json or pass --url <origin>.')
   process.exit(1)
 }
+console.log(`TARGET ${siteUrl}`)
 
 const robots = await fetchResource(new URL('/robots.txt', siteUrl))
 if (robots.cause || !robots.ok) error(`robots.txt could not be read: ${robots.cause?.message ?? `HTTP ${robots.status}`}.`)

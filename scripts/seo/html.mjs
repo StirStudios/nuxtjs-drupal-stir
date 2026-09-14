@@ -28,6 +28,18 @@ export function hasNoindex(value) {
   return value.toLowerCase().split(/[\s,]+/).includes('noindex')
 }
 
+/**
+ * Reads an explicit `--url <origin>` or `--url=<origin>` command-line argument.
+ *
+ * Audits never take their target from environment variables, whose local or
+ * staging values would silently point them at the wrong site.
+ */
+export function readUrlArgument(argv = process.argv.slice(2)) {
+  const index = argv.findIndex(arg => arg === '--url' || arg.startsWith('--url='))
+  if (index < 0) return ''
+  return argv[index] === '--url' ? argv[index + 1] ?? '' : argv[index].slice('--url='.length)
+}
+
 export function resolveSiteUrl(value, config = {}) {
   const candidate = value?.trim() || config.seo?.siteUrl?.trim() || config.owner?.domain?.trim()
   if (!candidate) return ''

@@ -2,6 +2,8 @@
 
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
+import { readUrlArgument, resolveSiteUrl } from '../seo/html.mjs'
+import { collectSignals, evaluateServices, loadLegalText, plainText } from './discovery.mjs'
 
 const projectRoot = resolve(process.cwd())
 const configPath = resolve(projectRoot, 'compliance/site.json')
@@ -10,10 +12,12 @@ const reviewMarkers = [
   '<!-- stir-compliance-discovery:v1 -->',
   '<!-- stir-compliance-accessibility:v1 -->',
   '<!-- stir-compliance-seo:v1 -->',
+  '<!-- stir-compliance-legal-source:v1 -->',
 ]
-const siteUrl = process.env.COMPLIANCE_SITE_URL?.replace(/\/$/, '')
+let siteUrl = ''
 const errors = []
 const warnings = []
+const notes = []
 
 const error = message => errors.push(message)
 const warn = message => warnings.push(message)
@@ -118,6 +122,7 @@ async function checkPublicDocument(document) {
     if (/userway|accessibility widget/i.test(html)) {
       error(`${document.title} still contains a UserWay/widget reference.`)
     }
+    return plainText(html)
   } catch (cause) {
     error(`Unable to verify ${url}: ${cause.message}`)
   }
@@ -131,6 +136,11 @@ try {
 }
 
 if (config) {
+  // Always audit the inventory's production domain unless --url is passed.
+  siteUrl = resolveSiteUrl(readUrlArgument(), config)
+  if (siteUrl) notes.push(`TARGET ${siteUrl}`)
+  else error('owner.domain must be a valid site origin, or pass --url <origin>.')
+
   if (config.version !== 1) error('compliance/site.json must use version 1.')
   if (JSON.stringify(config).includes('REPLACE_')) {
     error('compliance/site.json still contains starter-template REPLACE_* values.')
@@ -148,6 +158,9 @@ if (config) {
   for (const field of ['legalName', 'brandName', 'domain', 'email', 'address']) {
     if (!config.owner?.[field]?.trim()) error(`owner.${field} is required.`)
   }
+  if (config.owner?.privacyEmail !== undefined && !/^[^@\s]+@[^@\s]+$/.test(config.owner.privacyEmail)) {
+    error('owner.privacyEmail must be an email address when provided.')
+  }
 
   if (!validDate(config.review?.lastReviewed)) error('review.lastReviewed must use YYYY-MM-DD.')
   if (!validDate(config.review?.nextReview)) error('review.nextReview must use YYYY-MM-DD.')
@@ -158,6 +171,7 @@ if (config) {
   }
   if (config.review?.intervalMonths !== 6) warn('The standard review interval is six months.')
 
+  const renderedDocuments = {}
   for (const key of ['privacy', 'terms', 'accessibility']) {
     const document = config.documents?.[key]
     if (!document?.title || !document?.path?.startsWith('/')) {
@@ -166,7 +180,7 @@ if (config) {
     }
     if (document.source !== 'drupal') error(`documents.${key}.source must be "drupal".`)
     if (document.menu !== 'footer') warn(`${document.title} is not declared in the footer menu.`)
-    if (siteUrl) await checkPublicDocument(document)
+    if (siteUrl) renderedDocuments[key] = await checkPublicDocument(document)
   }
 
   if (!config.consent?.mode || !config.consent?.reason) {
@@ -228,9 +242,27 @@ if (config) {
       // Optional source paths may not exist.
     }
   }
+
+  // Discover active services from repository evidence and hold each one to
+  // its inventory and disclosure requirements.
+  const signals = await collectSignals(projectRoot, await findDrupalConfigDirectory())
+  const legal = await loadLegalText(projectRoot, config.documents)
+  for (const [key, document] of Object.entries(config.documents ?? {})) {
+    if (document?.file && !legal.sources[key]) error(`documents.${key}.file ${document.file} was not found.`)
+    if (legal.sources[key]) notes.push(`SOURCE documents.${key}: ${legal.sources[key]}`)
+    else if (renderedDocuments[key]) {
+      legal.text[key] = renderedDocuments[key]
+      notes.push(`SOURCE documents.${key}: ${siteUrl}${document.path}`)
+    }
+  }
+  const services = evaluateServices(signals, config, legal.text)
+  for (const line of services.detected) notes.push(`DETECT ${line}`)
+  services.warnings.forEach(warn)
+  services.errors.forEach(error)
 }
 
 console.log('Stir compliance audit')
+for (const message of notes) console.log(message)
 for (const message of warnings) console.log(`WARN  ${message}`)
 for (const message of errors) console.error(`ERROR ${message}`)
 

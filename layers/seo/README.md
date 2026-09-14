@@ -33,3 +33,44 @@ pull-CDN `/_ipx/**` origin; without it, the URL uses the current frontend origin
 Drupal remains the single source for favicon and manifest metadata and files;
 those links pass through unchanged. Do not duplicate them in the consumer's
 `public/` directory or route them through IPX.
+
+## Sitemap extensions
+
+Drupal `/api/sitemap` stays the source of sitemap URLs, and `/sitemap.xml` from
+`@nuxtjs/sitemap` stays the public artifact. To add `images` or `videos` to those
+URLs, register a `stir:sitemap:extend` handler in a Nitro plugin. Do not
+replace `server/api/sitemap.get.ts`.
+
+```ts
+// server/plugins/sitemap-class-media.ts
+import type { SitemapExtensionEntry } from '@stir/base/layers/seo/shared/types/sitemap'
+
+export default defineNitroPlugin((nitroApp) => {
+  nitroApp.hooks.hook('stir:sitemap:extend', async ({ event, entries }) => {
+    entries.push(...await stirDrupalApiRequest<SitemapExtensionEntry[]>(
+      event,
+      '/api/example/sitemap-media',
+      { method: 'GET', forwardClientIp: true },
+    ))
+  })
+})
+```
+
+Each handler receives its own `{ event, entries }` context and pushes entries
+shaped like `{ loc, images?, videos? }`, following the `@nuxtjs/sitemap` image
+and video formats:
+
+- `loc` must be an absolute http(s) URL. It is matched to a Drupal entry by
+  path and query, ignoring host and trailing slash, so canonical host handling
+  is unchanged. Entries with no matching Drupal URL are ignored, so an extension
+  can enrich URLs but cannot add them.
+- Image `loc` and `license` must be absolute http(s) URLs. A video needs a
+  non-empty `title` and `description`, an absolute `thumbnail_loc`, and an
+  absolute `content_loc` or `player_loc`.
+- Contributions from several handlers for the same URL are concatenated.
+
+Handlers run in parallel with the Drupal request. An invalid entry is dropped
+with a `[stir:sitemap]` warning. A handler that throws, rejects, or runs longer
+than `drupalRequestTimeoutMs` (default 10s) is logged and contributes nothing,
+so the base sitemap is still served. An invalid Drupal payload still fails the
+request. Dedupe, exclusions and sitemap caching behave as before.

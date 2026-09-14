@@ -4,7 +4,7 @@ import {
   isValidDrupalViewSortOrderValue,
   type NormalizedViewFilter,
 } from '../composables/useDrupalViewQuery'
-import type { ExposedFilter, ExposedSort } from '../types/View'
+import type { DrupalViewActiveFilter, ExposedFilter, ExposedSort } from '../types/View'
 
 export type ViewControlValue = string | string[]
 
@@ -253,4 +253,38 @@ export function sanitizeDrupalViewStoredSorts(options: {
   }
 
   return sanitized
+}
+
+export function drupalViewActiveFilters(
+  filters: NormalizedViewFilter[],
+  values: Record<string, ViewControlValue>,
+): DrupalViewActiveFilter[] {
+  return filters.flatMap((filter) => {
+    const current = values[filter.queryParamName]
+    const selected = (Array.isArray(current) ? current : [current ?? ''])
+      .map(String)
+      .filter(Boolean)
+
+    if (!selected.length) return []
+
+    const entries = filter.type === 'date_range'
+      ? [selected.join(' – ')]
+      : selected
+
+    return entries.map((value) => {
+      const label = filter.type === 'date_range'
+        ? value
+        : filter.options.find(option => option.value === value)?.label || value
+      const name = filter.label ? `${filter.label}: ${label}` : label
+
+      return {
+        key: `${filter.queryParamName}:${value}`,
+        filterKey: filter.queryParamName,
+        filterLabel: filter.label,
+        label,
+        value,
+        removeLabel: `Remove ${name}`,
+      }
+    })
+  })
 }
