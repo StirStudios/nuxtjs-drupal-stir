@@ -79,18 +79,33 @@ describe('Webform (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(Webform, {
       props: {
         webform,
-        width: 'm-auto lg:max-w-3xl',
+        width: 'md',
       },
     })
 
     await flushPromises()
 
-    expect(wrapper.get('form').element.parentElement?.classList).toContain(
-      'w-full',
+    expect([...wrapper.get('form').element.parentElement!.classList]).toEqual(
+      expect.arrayContaining(['w-full', 'mx-auto', 'lg:max-w-3xl']),
     )
-    expect(wrapper.get('form').element.parentElement?.classList).toContain(
-      'lg:max-w-3xl',
-    )
+  })
+
+  it('maps structured Drupal alignment instead of treating it as classes', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform,
+        width: 'xs',
+        align: { justify: 'start' },
+      },
+    })
+
+    await flushPromises()
+
+    const formWrapper = [...wrapper.get('form').element.parentElement!.classList]
+
+    expect(formWrapper).toEqual(expect.arrayContaining(['w-full', 'sm:max-w-lg']))
+    expect(formWrapper).not.toContain('mx-auto')
+    expect(wrapper.html()).not.toContain('[object Object]')
   })
 
   it('does not submit display-only markup as an empty field', async () => {

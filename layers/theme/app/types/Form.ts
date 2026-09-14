@@ -1,3 +1,5 @@
+import type { AlignConfig } from '../utils/gridClasses'
+
 export type InputType =
   | 'text'
   | 'textfield'
@@ -44,7 +46,7 @@ export interface WebformProps {
   parentUuid?: string
   region?: string
   webform?: WebformDefinition
-  align?: string
+  align?: AlignConfig
   width?: string
   spacing?: string
   editLink?: string
