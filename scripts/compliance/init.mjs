@@ -68,20 +68,28 @@ for (const file of files) {
         if (templateStart < 0 || templateEnd <= templateStart) continue
 
         const currentStart = review.indexOf(section.heading)
-        const nextSectionStart = currentStart >= 0
-          ? review.indexOf('\n## ', currentStart + section.heading.length)
-          : -1
+
+        if (currentStart >= 0) {
+          // The heading already exists without its marker, so a downstream
+          // site wrote its own content under it. Add only the marker
+          // (right after the heading line) rather than replacing the
+          // section body, which would silently discard recorded answers.
+          const headingLineEnd = review.indexOf('\n', currentStart)
+          const insertAt = headingLineEnd >= 0 ? headingLineEnd + 1 : review.length
+          review = `${review.slice(0, insertAt)}${section.marker}\n\n${review.slice(insertAt)}`
+          changed = true
+          continue
+        }
+
         const preferredInsertionPoint = review.indexOf(section.nextHeading)
         const humanConfirmations = review.indexOf('## Human confirmations')
         const insertionPoint = preferredInsertionPoint >= 0
           ? preferredInsertionPoint
           : humanConfirmations
         const replacement = template.slice(templateStart, templateEnd)
-        review = currentStart >= 0
-          ? `${review.slice(0, currentStart)}${replacement}${review.slice(nextSectionStart >= 0 ? nextSectionStart + 1 : review.length)}`
-          : insertionPoint >= 0
-            ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
-            : `${review.trimEnd()}\n\n${replacement}`
+        review = insertionPoint >= 0
+          ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
+          : `${review.trimEnd()}\n\n${replacement}`
         changed = true
       }
 
