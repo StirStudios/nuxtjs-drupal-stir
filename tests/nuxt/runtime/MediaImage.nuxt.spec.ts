@@ -1,9 +1,9 @@
-import { defineComponent, h } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-import { carouselImageDeliverySizesKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { carouselImageDeliverySizesKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 describe('MediaImage (Nuxt runtime)', () => {
   it('reports the cached responsive source without waiting for another load event', async () => {
@@ -47,6 +47,27 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(wrapper.get('img').attributes()).toMatchObject({ loading: 'lazy', fetchpriority: 'auto' })
     expect(wrapper.find('.media').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('covers a section hero with its background image', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      global: { provide: { [sectionHeroMediaKey as symbol]: computed(() => true) } },
+      props: { src: '/hero.jpg', isHero: true },
+    })
+    const classes = wrapper.get('img').classes()
+
+    expect(classes).toEqual(expect.arrayContaining(['absolute', 'inset-0', 'size-full', 'object-cover']))
+    expect(classes).not.toContain('w-auto')
+    wrapper.unmount()
+  })
+
+  it('keeps page hero image sizing outside a section hero', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { src: '/hero.jpg', isHero: true },
+    })
+
+    expect(wrapper.get('img').classes()).toEqual(expect.arrayContaining(['w-auto', 'min-w-full']))
     wrapper.unmount()
   })
 

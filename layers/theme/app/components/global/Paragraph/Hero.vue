@@ -13,6 +13,7 @@ import {
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
+import { sectionHeroMediaKey } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import type { AlignConfig } from '#stir/utils/gridClasses'
 
@@ -42,6 +43,9 @@ defineSlots<{
 }>()
 
 const isSection = computed(() => Boolean(props.placement && props.placement !== 'field_hero'))
+
+provide(sectionHeroMediaKey, isSection)
+
 const sectionHeadingTag = computed(() => resolveHeadingTag(props.headerTag))
 const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
@@ -137,7 +141,7 @@ const sectionClasses = computed(() => {
     return props.classes || ''
   }
 
-  if (isSection.value) return ['hero hero-section relative overflow-hidden [&>:is(.media,img)]:absolute [&>:is(.media,img)]:inset-0 [&>:is(.media,img)]:h-full [&>:is(.media,img)]:w-full [&>.media_img]:h-full [&>.media_img]:w-full [&>.media_img]:object-cover [&>img]:object-cover', heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
+  if (isSection.value) return ['hero hero-section overflow-hidden', hasMediaSlot.value && heroTheme.mediaAppearance, hasMediaSlot.value && heroTheme.overlay]
 
   if (isInline.value) return heroTheme.inline.base
 

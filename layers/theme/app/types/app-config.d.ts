@@ -209,6 +209,7 @@ type StirThemeHeroConfig = {
   image?: {
     base?: ClassValue
     isFront?: ClassValue
+    section?: ClassValue
   } & LooseRecord
   text?: {
     heading?: ClassValue

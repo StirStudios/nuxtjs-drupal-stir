@@ -5,6 +5,7 @@ import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
   carouselImageDeliverySizesKey,
+  sectionHeroMediaKey,
   viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
   resolveImageDeliveryProfile,
@@ -87,6 +88,8 @@ const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
+const sectionHero = inject(sectionHeroMediaKey, undefined)
+const isSectionHero = computed(() => isHero.value && Boolean(sectionHero?.value))
 const providerSizes = computed(() =>
   props.deliverySizes?.trim()
   || carouselDeliverySizes?.value?.trim()
@@ -227,8 +230,9 @@ onMounted(() => {
     :class="
       isHero
         ? [
-          theme.hero.image.base,
-          isFront ? theme.hero.image.isFront : 'max-w-none',
+          isSectionHero
+            ? theme.hero.image.section
+            : [theme.hero.image.base, isFront ? theme.hero.image.isFront : 'max-w-none'],
           !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
           imageClass,
         ]
