@@ -88,6 +88,31 @@ describe('App header', () => {
     wrapper.unmount()
   })
 
+  it('does not focus the toggle when a kept-mounted menu first renders closed', async () => {
+    setNavigation({
+      slideover: {
+        ...(originalNavigation.slideover as Record<string, unknown>),
+        portal: false,
+        unmountOnHide: false,
+      },
+    })
+
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const toggle = wrapper.get('[data-slot="right"] [data-slot="toggle"]')
+    const focus = vi.spyOn(toggle.element as HTMLElement, 'focus')
+
+    findSlideover(wrapper).vm.$emit('after:leave')
+    await nextTick()
+    expect(focus).not.toHaveBeenCalled()
+
+    await toggle.trigger('click')
+    await toggle.trigger('click')
+    findSlideover(wrapper).vm.$emit('after:leave')
+    await nextTick()
+    expect(focus).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
   it('renders a centred toggle layout with project toggle, actions and panel classes', async () => {
     const nuxtApp = useNuxtApp()
 

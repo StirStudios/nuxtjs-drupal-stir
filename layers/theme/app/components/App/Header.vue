@@ -353,6 +353,7 @@ const mobileActionButtons = computed(() =>
 
 let menuToggleElement: HTMLElement | null = null
 let menuClosedByNavigation = false
+let menuWasOpened = false
 let lastInputWasPointer = false
 
 useEventListener(import.meta.client ? document : undefined, 'pointerdown', () => {
@@ -373,15 +374,19 @@ function toggleMenu() {
   }
 
   menuMounted.value = true
+  menuWasOpened = true
   menuOpen.value = true
 }
 
 // Return focus to the toggle when the visitor closes the menu, but not after a
 // menu link navigates, so focus stays with the new page. Keyboard closes show
-// the focus ring; pointer and touch closes restore focus without it.
+// the focus ring; pointer and touch closes restore focus without it. A menu
+// kept mounted while closed can report a leave on first render, before anyone
+// opened it; that must not focus the toggle on page load.
 function restoreMenuFocus() {
-  if (!menuClosedByNavigation)
+  if (menuWasOpened && !menuClosedByNavigation)
     menuToggleElement?.focus({ focusVisible: !lastInputWasPointer } as FocusOptions)
+  menuWasOpened = false
   menuClosedByNavigation = false
 }
 

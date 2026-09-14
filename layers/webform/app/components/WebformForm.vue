@@ -3,6 +3,7 @@ import { flattenWebformFields } from '#stir-webform/utils/flattenWebformFields'
 import { evaluateContainerVisibility } from '#stir-webform/composables/useContainerVisibility'
 import { serializeWebformSubmission } from '#stir-webform/utils/transformUtils'
 import { getHiddenDefaults } from '#stir/utils/getHiddenDefaults'
+import { resolveAlignClasses, resolveWidthClasses } from '#stir/utils/gridClasses'
 import { useWindowScroll } from '@vueuse/core'
 import {
   createScrollToTopRunner,
@@ -224,8 +225,9 @@ const shouldRenderIndividualField = (fieldName: string) =>
 const isContainerVisible = (containerName: string) =>
   evaluateContainerVisibility(containerName, state, fields, getGroupFields)
 
+const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapStyles = computed(() =>
-  ['w-full', props.width, props.spacing].filter(
+  ['w-full', resolveWidthClasses(props.width, props.align), props.spacing].filter(
     (value): value is string =>
       typeof value === 'string' && value.length > 0,
   ),
@@ -320,7 +322,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
 </script>
 
 <template>
-  <WrapDiv :align="props.align" :styles="wrapStyles">
+  <WrapDiv :align="alignClasses" :styles="wrapStyles">
     <WebformContent
       :key="formResetKey"
       v-model:turnstile-token="turnstileToken"

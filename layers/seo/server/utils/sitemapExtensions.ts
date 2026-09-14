@@ -23,7 +23,7 @@ import type {
   SitemapExtensionEntry,
   SitemapProducerPayload,
 } from '../../shared/types/sitemap'
-import { sitemapCanonicalKey } from '../../../../config/sitemap'
+import { sitemapCanonicalKey } from '../../../../config/sitemapCanonicalKey'
 
 export const STIR_SITEMAP_EXTEND_HOOK = 'stir:sitemap:extend'
 
