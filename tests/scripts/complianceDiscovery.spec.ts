@@ -127,6 +127,25 @@ describe('compliance service discovery', () => {
     ])
   })
 
+  it('only warns about undisclosed remote video installed by the base recipe', () => {
+    const result = evaluateServices(
+      signals({ configNames: new Set(['media.type.remote_video']) }),
+      { technology: {} },
+      { privacy: 'No embeds.' },
+    )
+
+    expect(result.errors).toEqual([])
+    expect(result.warnings).toContain(
+      'Third-party video embeds is installed, but the privacy document does not cover third-party media providers; disclose them if content embeds YouTube or Vimeo media, or record technology.inactive["remote-video"].',
+    )
+  })
+
+  it('does not treat free-text sign-up form names as account evidence', () => {
+    const result = evaluateServices(signals(), { technology: { forms: ['Book signup'] } }, {})
+
+    expect(result.warnings.join('\n')).not.toContain('Public user accounts')
+  })
+
   it('flags declared vendors without repository evidence', () => {
     const result = evaluateServices(signals(), { technology: { vendors: ['Stripe'] } }, {})
 

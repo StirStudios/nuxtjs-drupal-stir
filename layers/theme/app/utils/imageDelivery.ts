@@ -5,6 +5,10 @@ import { GRID_BREAKPOINTS, maxGridColumns } from './gridClasses'
 export const viewportImageLoadingKey: InjectionKey<boolean> =
   Symbol('stirViewportImageLoading')
 
+// Set by Paragraph/Hero when it renders as a section hero; media sizes itself as the section background.
+export const sectionHeroMediaKey: InjectionKey<ComputedRef<boolean>> =
+  Symbol('stirSectionHeroMedia')
+
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
 export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =

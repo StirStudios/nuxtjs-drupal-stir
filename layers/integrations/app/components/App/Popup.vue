@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PopupMedia, PopupNode, PopupProps } from '#stir/types'
+import { useAuthSession } from '../../../../auth/app/composables/auth/useAuthSession'
 
 const appConfig = useAppConfig()
 const { renderCustomElements } = useStirDrupalCe()
@@ -13,12 +14,17 @@ function getPopupProps(node: PopupNode | null): PopupProps {
   return node.props as PopupProps
 }
 
-const hasPopup = computed(() => !!popup.value)
+// With hideWhenLoggedIn, nothing renders until the Drupal session resolves, so
+// signed-in visitors never see a flash. A failed session lookup keeps it hidden.
+const session = appConfig.popup?.hideWhenLoggedIn === true ? useAuthSession() : null
+const sessionBlocksPopup = computed(() => Boolean(session && (!session.ready.value || session.loggedIn.value)))
+const hasPopup = computed(() => !!popup.value && !sessionBlocksPopup.value)
 const popupProps = computed(() => getPopupProps(popup.value))
 
 const { completePopup, dismissPopup, open, shouldRenderPopupContent } = usePopupBehavior({
   popup,
   config,
+  suppress: sessionBlocksPopup,
 })
 const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
@@ -76,6 +82,10 @@ watch(
     selectedMedia.value = null
   },
 )
+
+onMounted(() => {
+  session?.fetchSession().catch(() => {})
+})
 
 watch(open, (isOpen) => {
   if (!isOpen) return

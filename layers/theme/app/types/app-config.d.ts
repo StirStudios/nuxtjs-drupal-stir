@@ -43,6 +43,7 @@ type PopupConfig = {
   enabled?: boolean
   component?: string
   dismissalTtlDays?: number
+  hideWhenLoggedIn?: boolean
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {
@@ -114,6 +115,17 @@ type StirThemeOverlayConfig = {
   portal?: boolean | string | HTMLElement
 } & LooseRecord
 
+type StirThemeNavigationActionItem = {
+  match: string | number
+  as?: 'button' | 'navigation'
+  mobile?: 'menu' | 'button' | 'hidden'
+  color?: UiColorName
+  variant?: UiButtonVariantName
+  size?: UiSizeName
+  class?: ClassValue
+  icon?: string
+}
+
 type StirThemeNavigationConfig = {
   mode?: 'fixed' | 'sticky'
   modeRoutes?: Partial<Record<'fixed' | 'sticky', string[]>>
@@ -136,6 +148,7 @@ type StirThemeNavigationConfig = {
   toggleClass?: ClassValue
   toggleComponent?: string
   actionsComponent?: string
+  actionItems?: StirThemeNavigationActionItem[]
   header?: ClassValue
   splitLogo?: {
     center?: ClassValue
@@ -196,6 +209,7 @@ type StirThemeHeroConfig = {
   image?: {
     base?: ClassValue
     isFront?: ClassValue
+    section?: ClassValue
   } & LooseRecord
   text?: {
     heading?: ClassValue

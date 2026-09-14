@@ -1,9 +1,10 @@
 import { useAppConfig } from '#imports'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import { defineComponent, h, inject, nextTick, ref } from 'vue'
 import Hero from '../../../layers/theme/app/components/global/Paragraph/Hero.vue'
 import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
+import { sectionHeroMediaKey } from '../../../layers/theme/app/utils/imageDelivery'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
 
 const shared = vi.hoisted(() => ({ getPage: vi.fn() }))
@@ -269,18 +270,42 @@ describe('Drupal Hero page ownership and headings', () => {
       })
     })
 
-    it('crops a bare background image in a section hero', async () => {
+    it('lets section hero media size itself as the background', async () => {
+      const SectionMedia = defineComponent({
+        setup: () => {
+          const sectionHero = inject(sectionHeroMediaKey, undefined)
+
+          return () => h('figure', { 'data-section-hero': String(Boolean(sectionHero?.value)) })
+        },
+      })
       const wrapper = await mountSuspended(Hero, {
         props: { placement: 'field_section', header: 'Section' },
-        slots: { media },
+        slots: { media: () => [h(SectionMedia)] },
         global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
       })
       const classes = wrapper.get('section').classes()
 
-      // Bare hero images are direct children, so they need cover sizing as well as `.media img`.
-      expect(classes).toContain('[&>img]:object-cover')
-      expect(classes).toContain('[&>:is(.media,img)]:h-full')
+      expect(wrapper.get('figure').attributes('data-section-hero')).toBe('true')
+      expect(classes).toContain('dark')
+      expect(classes.some(name => name.startsWith('[&>'))).toBe(false)
       wrapper.unmount()
+    })
+
+    it('keeps the page colour scheme for a section hero without media', async () => {
+      const wrapper = await mountSuspended(Hero, {
+        props: { placement: 'field_section', header: 'Section' },
+        global: { provide: { [drupalPageKey as symbol]: makeWorkPage() } },
+      })
+
+      expect(wrapper.get('section').classes()).not.toContain('dark')
+      wrapper.unmount()
+    })
+
+    it('uses valid overlay utilities', () => {
+      const overlay = String(useAppConfig().stirTheme.hero.overlay)
+
+      expect(overlay).not.toMatch(/to-bg-|bg-gradient-to-/)
+      expect(overlay).toContain('after:to-black/10')
     })
 
     it('keeps background media for node types without configuration', async () => {

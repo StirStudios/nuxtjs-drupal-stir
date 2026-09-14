@@ -59,6 +59,7 @@ export default defineAppConfig({
       toggleClass: '',
       toggleComponent: '',
       actionsComponent: '',
+      actionItems: [],
       header: '',
       splitLogo: {
         center: 'flex-1 items-center justify-center',
@@ -98,13 +99,14 @@ export default defineAppConfig({
       mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
       noMediaSpacing: 'pt-20 lg:pt-54',
       noMediaFallback:
-        'dark text-default bg-gradient-to-b from-gray-900 via-gray-800 to-black/70',
+        'dark text-default bg-linear-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
-        'after:to-bg-black-10 relative after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
+        'after:absolute after:inset-0 after:z-auto after:bg-linear-to-b after:from-black/80 after:via-black/50 after:to-black/10',
       isFront: 'h-screen',
       image: {
         base: 'absolute min-h-full w-auto max-w-none min-w-full',
         isFront: 'object-cover',
+        section: 'absolute inset-0 size-full object-cover',
       },
       text: {
         heading: 'mb-0',
@@ -133,11 +135,11 @@ export default defineAppConfig({
       routes: [],
       base: 'route-hero relative isolate',
       band: 'route-hero-band isolate overflow-hidden',
-      surface: 'bg-gradient-to-b from-gray-900 via-gray-800 to-black',
+      surface: 'bg-linear-to-b from-gray-900 via-gray-800 to-black',
       visual: 'absolute inset-x-0 top-0 -z-10 h-[calc(100%+7rem)]',
       image: 'inset-0 !h-full !w-full !object-cover',
       overlay:
-        'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/80 via-black/50 to-black/20',
+        'pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/80 via-black/50 to-black/20',
       container:
         'relative z-10 mx-auto w-full max-w-(--ui-container) px-4 md:px-5 lg:px-8',
       content: 'flex flex-col gap-[var(--stir-content-action-gap,1.5rem)]',
@@ -291,12 +293,12 @@ export default defineAppConfig({
     },
 
     gradients: {
-      1: 'bg-gradient-to-tr from-[#f35b0f] to-[#6b4ef2]',
-      2: 'bg-gradient-to-r from-[#fde047] via-[#facc15] to-[#2563eb]',
-      3: 'bg-gradient-to-b from-[#166534] via-[#22c55e] to-[#38bdf8]',
-      4: 'bg-gradient-to-br from-[#0f172a] via-[#1d4ed8] to-[#38bdf8]',
-      5: 'bg-gradient-to-tr from-[#22d3ee] via-[#38bdf8] to-[#a855f7]',
-      6: 'bg-gradient-to-r from-[#111827] via-[#dc2626] to-[#f59e0b]',
+      1: 'bg-linear-to-tr from-[#f35b0f] to-[#6b4ef2]',
+      2: 'bg-linear-to-r from-[#fde047] via-[#facc15] to-[#2563eb]',
+      3: 'bg-linear-to-b from-[#166534] via-[#22c55e] to-[#38bdf8]',
+      4: 'bg-linear-to-br from-[#0f172a] via-[#1d4ed8] to-[#38bdf8]',
+      5: 'bg-linear-to-tr from-[#22d3ee] via-[#38bdf8] to-[#a855f7]',
+      6: 'bg-linear-to-r from-[#111827] via-[#dc2626] to-[#f59e0b]',
     },
 
     animations: {

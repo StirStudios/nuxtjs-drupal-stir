@@ -13,6 +13,25 @@ untouched do not need one.
 
 ## Unreleased
 
+### Added
+
+- `useAuthRegister(options?)` accepts `initialState`, `toFields` and
+  `validate` for project signup fields and returns them as `state`. The
+  register page moved into the `AuthRegister` component, whose `fields` and
+  `footer` slots add inputs without forking the form, Turnstile or the
+  approval-required state. No options sends the original payload.
+- `POST /api/auth/register` now rejects `fields` with base user entity keys
+  (`roles`, `status`, `uid`, ...), malformed keys, or nested values, and
+  honours an optional `runtimeConfig.stirAuthRegister.allowedFields`
+  allow-list. **Behaviour change:** such payloads were previously forwarded to
+  Drupal; they now return 400.
+
+### Fixed
+
+- `createRegisterValidationSchema()` no longer fails a form that has no
+  `display_name` key. Valibot reported it as an invalid key, which blocked
+  submission of `/auth/register` and any page reusing the schema.
+
 ### Removed
 
 - **Breaking.** The rename-only aliases over the shared Drupal request helpers
@@ -104,6 +123,19 @@ untouched do not need one.
   inline `hero` slot. Disabled by default, so existing output is unchanged.
   `usePageContext` now shares its Drupal-route check through
   `isDrupalRenderedRoute()`.
+- `stirTheme.navigation.actionItems` routes top-level main-menu items, matched
+  by title or position, into the header's right region as a button or a
+  secondary navigation menu, with `mobile: 'menu' | 'button' | 'hidden'`
+  placement in the mobile panel. `navigation.actionsComponent` now also
+  receives the resolved `actions`. Default header output is unchanged. When the
+  color-mode toggle is hidden, the right region now stays visible on desktop if
+  it holds action items or an actions component.
+- `popup.hideWhenLoggedIn` (default `false`) waits for the Drupal session and
+  keeps the popup hidden for signed-in visitors, with nothing rendered before
+  the session resolves.
+- The `stir:popup:shown` Nuxt app hook fires with `{ key, popup }` each time
+  the popup opens.
+
 - `RichTextHtml` renders the trusted HTML of `EditableRichText`, and so of Text
   and Hero paragraph copy. Projects can override it to expand their own inline
   embeds. The default output is unchanged: one `div` with the same classes and

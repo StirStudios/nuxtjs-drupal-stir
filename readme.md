@@ -269,6 +269,7 @@ attributes above; the harness does not depend on project-specific components.
 - `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)
 - `PROTECTED_RATE_LIMIT_WINDOW_SECONDS`: Protected-login window in seconds (default: `900`)
 - `PROTECTED_RATE_LIMIT_TRUST_PROXY`: Set to `'true'` only behind an ingress that replaces, rather than appends to, `X-Forwarded-For` (default: `false`)
+- `NUXT_STIR_AUTH_REGISTER_ALLOWED_FIELDS`: Optional JSON array of keys accepted in the registration `fields` payload, for example `'["first_name","newsletter"]'` (default: any well-formed key except base user entity keys)
 - `DRUPAL_REQUEST_TIMEOUT_MS`: Timeout for custom Nitro-to-Drupal requests in milliseconds (default: `10000`)
 - `WEBFORM_MAX_REQUEST_BYTES`: Maximum webform request size (default: `10485760`, 10 MB)
 - `WEBFORM_MAX_FILE_BYTES`: Maximum size of one webform upload (default: `5242880`, 5 MB)

@@ -49,7 +49,7 @@ actually runs, then applies only the rules that evidence triggers:
 | Webform config | privacy copy on form data and its retention |
 | `stir_turnstile`, `stir_bunny`, `stir_instagram`, Plausible app config | the vendor in the inventory and the Privacy Policy |
 | Mail transport module | an email delivery vendor in the inventory |
-| Remote video media type | privacy copy on third-party media |
+| Remote video media type | a warning unless privacy copy covers third-party media (the base recipe installs it everywhere) |
 | Public user registration | account forms in the inventory; account and deletion copy in the Privacy Policy and Terms |
 | Payment module | a payment vendor; billing copy in the Privacy Policy and Terms |
 | Payment module plus role expiry, recurring, or subscription evidence | `dataHandling.checkoutConsentRecord`; automatic renewal and cancellation in the Terms |

@@ -1,11 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { parse } from 'valibot'
+import { parse, safeParse } from 'valibot'
 import {
   createRegisterValidationSchema,
   createPasswordResetValidationSchema,
 } from '../../layers/auth/app/utils/authValidation'
 
 describe('auth validation', () => {
+  it('validates registration without a display name key', () => {
+    const schema = createRegisterValidationSchema()
+
+    expect(safeParse(schema, {
+      email: 'demo@example.com',
+      password: 'Password1',
+    }).success).toBe(true)
+    expect(safeParse(schema, {
+      email: 'demo@example.com',
+      password: 'Password1',
+      display_name: 'x'.repeat(81),
+    }).success).toBe(false)
+  })
+
   it('preserves whitespace in passwords', () => {
     const schema = createPasswordResetValidationSchema({
       minLength: 8,

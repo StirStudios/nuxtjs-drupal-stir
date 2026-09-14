@@ -47,6 +47,11 @@ export default defineNuxtConfig({
       ),
       trustProxy: process.env.PROTECTED_RATE_LIMIT_TRUST_PROXY === 'true',
     },
+    stirAuthRegister: {
+      // Keys accepted in the registration `fields` payload. Empty accepts any
+      // well-formed key except base user entity keys (roles, status, ...).
+      allowedFields: [] as string[],
+    },
     // Mirrored from app config at build time so the server boundary can gate
     // protected content. Nitro cannot read app config at runtime, and a second
     // authoring surface would let the two drift apart, leaving a security

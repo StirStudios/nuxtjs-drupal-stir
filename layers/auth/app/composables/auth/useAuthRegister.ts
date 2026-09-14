@@ -1,11 +1,39 @@
-import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
+import type { AuthFormField, FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { RegisterFieldValue } from '../../types/auth'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createRegisterValidationSchema } from '../../utils/authValidation'
 import { registrationRequirement } from '../../utils/registrationCompletion'
 import { validateForm } from '../../utils/validationErrors'
 
-export function useAuthRegister() {
+export type StirAuthRegisterCredentials = {
+  email?: string
+  password?: string
+}
+
+export interface StirAuthRegisterOptions<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> {
+  /**
+   * Initial values for project-specific signup fields. They are held in
+   * `state` and rendered through the `AuthRegister` `fields` slot.
+   */
+  initialState?: T
+  /**
+   * Maps `state` to the `fields` object sent with registration. Defaults to
+   * the state as-is. Keys must be accepted by `/api/auth/register`.
+   */
+  toFields?: (state: T) => Record<string, RegisterFieldValue>
+  /**
+   * Extra client validation, merged with the email and password errors.
+   * Name each error after the matching `UFormField`.
+   */
+  validate?: (state: StirAuthRegisterCredentials & T) => FormError[]
+}
+
+export function useAuthRegister<
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(options: StirAuthRegisterOptions<T> = {}) {
   const toast = useToast()
   const isLoading = ref(false)
   const registrationComplete = ref(false)
@@ -13,6 +41,7 @@ export function useAuthRegister() {
   const requiresVerification = ref(false)
   const requiresApproval = ref(false)
   const turnstileToken = ref('')
+  const state = reactive(structuredClone(toRaw(options.initialState ?? {}))) as T
   const { register, getFetchErrorMessage } = useAuthActions()
   const { auth } = useAuthConfig()
 
@@ -34,17 +63,18 @@ export function useAuthRegister() {
     },
   ])
 
-  const validate = (formState: {
-    email?: string
-    password?: string
-  }) => {
-    return validateForm(
+  const validate = (formState: StirAuthRegisterCredentials) => {
+    const errors = validateForm(
       createRegisterValidationSchema(
         auth.value.register?.email,
         auth.value.passwordPolicy,
       ),
       formState,
     )
+
+    return options.validate
+      ? [...errors, ...options.validate({ ...state, ...formState })]
+      : errors
   }
 
   const onSubmit = async (
@@ -56,10 +86,14 @@ export function useAuthRegister() {
     isLoading.value = true
 
     try {
+      const extraFields = options.toFields
+        ? options.toFields(state)
+        : { ...state } as Record<string, RegisterFieldValue>
       const response = await register({
         email: event.data.email.trim(),
         password: event.data.password,
         turnstile_response: turnstileToken.value,
+        ...(Object.keys(extraFields).length ? { fields: extraFields } : {}),
       })
 
       const requirement = registrationRequirement(response)
@@ -114,6 +148,7 @@ export function useAuthRegister() {
 
   return {
     fields,
+    state,
     validate,
     onSubmit,
     isLoading,

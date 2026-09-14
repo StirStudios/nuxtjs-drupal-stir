@@ -1,3 +1,4 @@
+import type { RegisterPayload } from '../../types/auth'
 import { getFetchErrorMessage } from '../../utils/fetchError'
 import { useAuthApi } from './useAuthApi'
 import { useAuthSession } from './useAuthSession'
@@ -38,12 +39,7 @@ export function useAuthActions() {
     }
   }
 
-  const register = (payload: {
-    email: string
-    password: string
-    display_name?: string
-    turnstile_response?: string
-  }) => authApi.register(payload)
+  const register = (payload: RegisterPayload) => authApi.register(payload)
 
   const requestPasswordReset = (payload: {
     identifier: string

@@ -23,6 +23,17 @@ const POPUP_COMPLETED = 'completed'
 
 export type PopupSuppression = number | typeof POPUP_COMPLETED
 
+export type PopupShownPayload = {
+  key: string | null
+  popup: PopupLike | null
+}
+
+declare module '#app' {
+  interface RuntimeNuxtHooks {
+    'stir:popup:shown': (payload: PopupShownPayload) => void | Promise<void>
+  }
+}
+
 function popupDismissKey(popup: PopupLike | null): string | null {
   const uuid = popup?.props?.uuid
 
@@ -88,6 +99,7 @@ export const usePopupBehavior = ({
   minDelayMs = 3000,
 }: PopupBehaviorOptions) => {
   const appConfig = useAppConfig()
+  const nuxtApp = useNuxtApp()
   const route = useRoute()
   const { y } = useWindowScroll()
 
@@ -363,7 +375,10 @@ export const usePopupBehavior = ({
   })
 
   watch(open, (value, oldValue) => {
-    if (value && !oldValue) closeReason = null
+    if (value && !oldValue) {
+      closeReason = null
+      void nuxtApp.callHook('stir:popup:shown', { key: dismissalKey.value, popup: popup.value })
+    }
 
     if (oldValue && !value) {
       if (closeReason === 'completed') {
