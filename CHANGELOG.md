@@ -26,8 +26,42 @@ untouched do not need one.
   allow-list. **Behaviour change:** such payloads were previously forwarded to
   Drupal; they now return 400.
 
+### Changed
+
+- **Breaking.** Paragraph presentation props now take the structured values
+  that stir-tools sends (stir-tools `2da0807b`), not Tailwind class strings:
+
+  | Prop | Before | Now |
+  | --- | --- | --- |
+  | `width` | Classes, e.g. `"m-auto lg:max-w-4xl"` | Size token: `xs`, `sm`, `md`, `lg`, `xl` or `2xl` |
+  | `align` | Classes, e.g. `"md:flex justify-center"` | `AlignConfig`: `{ justify?, items?, text? }`, each `'start'`, `'center'` or `'end'` |
+  | `gridClass`, `gridItems` | Classes, e.g. `"grid grid-cols-1 lg:grid-cols-2"` | `GridConfig`: `{ columns?, gap?, matrix? }` keyed by breakpoint |
+
+  Components map them with `resolveWidthClasses`, `resolveAlignClasses` and
+  `resolveGridClasses` from `#stir/utils/gridClasses`. For example, width
+  `lg` renders `mx-auto lg:max-w-4xl`, without `mx-auto` when
+  `align.justify` is `start` or `end`. `WebformProps.align` is now
+  `AlignConfig`.
+
+  **Migration:**
+  - Release this layer together with a stir-tools version that includes
+    `2da0807b`. Class strings from an older Drupal payload are not recognised,
+    so paragraphs lose their width, alignment and grid classes.
+  - A project that passes layout classes through these props, such as
+    `<ParagraphText width="max-w-2xl">`, loses them silently. Put the classes
+    on a wrapper element, or pass a size token.
+  - Code that reads `gridClass` from page nodes must treat it as `GridConfig`
+    and call `resolveGridClasses()`.
+
 ### Fixed
 
+- `WebformForm` applies Drupal's structured `width` and `align` through the
+  shared helpers. It used them as raw classes, so webforms lost their width
+  and alignment.
+- `AppHeader` only returns focus to the menu toggle after the menu has been
+  opened. With `slideover.unmountOnHide: false`, the closed menu reported a
+  leave on first render, which focused the toggle with a visible ring on page
+  load.
 - `createRegisterValidationSchema()` no longer fails a form that has no
   `display_name` key. Valibot reported it as an invalid key, which blocked
   submission of `/auth/register` and any page reusing the schema.
