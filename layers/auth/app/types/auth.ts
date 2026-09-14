@@ -21,11 +21,19 @@ export type LoginResponse = {
   } & Record<string, unknown>
 }
 
+export type RegisterFieldValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Array<string | number | boolean>
+
 export type RegisterPayload = {
   email: string
   password: string
   display_name?: string
   turnstile_response?: string
+  fields?: Record<string, RegisterFieldValue>
 }
 
 export type RegisterResponse = {

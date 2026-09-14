@@ -239,3 +239,58 @@ onMounted(verify)
 ```
 
 `AuthSecondaryAction` accepts a route location object for `to`.
+
+### Extra signup fields
+
+`/auth/register` renders `AuthRegister`, which owns the form, Turnstile, error
+toasts and the verification and approval-required states. A project that needs
+more signup inputs overrides the page with a thin wrapper and fills the
+`fields` slot instead of copying the form:
+
+```vue
+<script setup lang="ts">
+const options = {
+  initialState: { first_name: '', newsletter: false },
+  toFields: (state: { first_name: string, newsletter: boolean }) => ({
+    first_name: state.first_name.trim(),
+    newsletter: state.newsletter,
+  }),
+  validate: (state: { first_name?: string }) =>
+    state.first_name?.trim()
+      ? []
+      : [{ name: 'first_name', message: 'First name is required' }],
+}
+</script>
+
+<template>
+  <AuthRegister :options="options">
+    <template #fields="{ state }">
+      <UFormField label="First name" name="first_name" required>
+        <UInput v-model="state.first_name" autocomplete="given-name" class="w-full" />
+      </UFormField>
+      <USwitch v-model="state.newsletter" label="Send me the newsletter" />
+    </template>
+  </AuthRegister>
+</template>
+```
+
+- `options` is read once during setup and passed to
+  `useAuthRegister(options)`, which a fully custom page can call directly and
+  which returns the extra values as `state`.
+- `initialState` is copied, so instances never share values. `toFields` maps
+  `state` to the registration `fields` payload (default: the state as-is);
+  `fields` is omitted when empty, so no options sends the original payload.
+- `validate` errors merge with the email and password errors. Name each error
+  after its `UFormField` so the message and `aria-invalid`/`aria-describedby`
+  attach to that input.
+- The `fields` slot renders after the password, before Turnstile. A `footer`
+  slot replaces the sign-in link, for example to carry `?redirect=`.
+
+`POST /api/auth/register` forwards `fields` to Drupal's registration presave
+event only when every key is lower-case snake case, is not a base user entity
+key (`roles`, `status`, `uid`, `name`, `mail`, `pass`, ...), and holds a
+string, number, boolean, null, or list of scalars. Anything else fails with a
+400 before Drupal is called. Restrict the accepted keys further with
+`runtimeConfig.stirAuthRegister.allowedFields` (or
+`NUXT_STIR_AUTH_REGISTER_ALLOWED_FIELDS='["first_name","newsletter"]'`).
+Drupal remains responsible for validating and saving each value.

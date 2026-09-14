@@ -13,6 +13,25 @@ untouched do not need one.
 
 ## Unreleased
 
+### Added
+
+- `useAuthRegister(options?)` accepts `initialState`, `toFields` and
+  `validate` for project signup fields and returns them as `state`. The
+  register page moved into the `AuthRegister` component, whose `fields` and
+  `footer` slots add inputs without forking the form, Turnstile or the
+  approval-required state. No options sends the original payload.
+- `POST /api/auth/register` now rejects `fields` with base user entity keys
+  (`roles`, `status`, `uid`, ...), malformed keys, or nested values, and
+  honours an optional `runtimeConfig.stirAuthRegister.allowedFields`
+  allow-list. **Behaviour change:** such payloads were previously forwarded to
+  Drupal; they now return 400.
+
+### Fixed
+
+- `createRegisterValidationSchema()` no longer fails a form that has no
+  `display_name` key. Valibot reported it as an invalid key, which blocked
+  submission of `/auth/register` and any page reusing the schema.
+
 ### Removed
 
 - **Breaking.** The rename-only aliases over the shared Drupal request helpers

@@ -3,6 +3,7 @@ import {
   custom,
   forward,
   object,
+  optional,
   pipe,
 } from 'valibot'
 import type {
@@ -118,11 +119,11 @@ export function createRegisterValidationSchema(
   passwordPolicy: AuthPasswordPolicy = {},
 ) {
   return object({
-    display_name: custom<string | undefined>(
-      value => value === undefined
-        || (typeof value === 'string' && value.trim().length <= 80),
+    // Optional so forms without a display name input still validate.
+    display_name: optional(custom<string>(
+      value => typeof value === 'string' && value.trim().length <= 80,
       'Display name must be 80 characters or less',
-    ),
+    )),
     email: emailString(
       emailField.requiredMessage || 'Email is required',
       emailField.invalidMessage || 'Enter a valid email address',

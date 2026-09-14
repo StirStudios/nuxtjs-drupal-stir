@@ -163,6 +163,7 @@
       "layers/auth/app/components/Auth/AuthPage.vue",
       "layers/auth/app/components/Auth/AuthPageCard.vue",
       "layers/auth/app/components/Auth/AuthPasswordField.vue",
+      "layers/auth/app/components/Auth/AuthRegister.vue",
       "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
       "layers/auth/app/components/Auth/AuthStatusPanel.vue",
       "layers/editorial/app/components/Drupal/Tabs.vue",
@@ -524,6 +525,7 @@
         "layers/auth/app/components/Auth/AuthPage.vue",
         "layers/auth/app/components/Auth/AuthPageCard.vue",
         "layers/auth/app/components/Auth/AuthPasswordField.vue",
+        "layers/auth/app/components/Auth/AuthRegister.vue",
         "layers/auth/app/components/Auth/AuthSecondaryAction.vue",
         "layers/auth/app/components/Auth/AuthStatusPanel.vue",
         "layers/editorial/app/components/Drupal/Tabs.vue",
@@ -804,7 +806,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 131,
+    "components": 132,
     "composables": 77,
     "utils": 66,
     "plugins": 7,
@@ -812,13 +814,13 @@
     "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 192,
+    "tests": 194,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 76,
+      "nuxt": 77,
       "scripts": 3,
-      "server": 28,
+      "server": 29,
       "unit": 11,
       "utils": 60
     }
@@ -847,6 +849,7 @@
     "tests/nuxt/runtime/AppContextSharing.nuxt.spec.ts",
     "tests/nuxt/runtime/AuthPage.nuxt.spec.ts",
     "tests/nuxt/runtime/AuthPasswordField.nuxt.spec.ts",
+    "tests/nuxt/runtime/AuthRegister.nuxt.spec.ts",
     "tests/nuxt/runtime/BlockContentParagraph.nuxt.spec.ts",
     "tests/nuxt/runtime/ColorModeMiddleware.nuxt.spec.ts",
     "tests/nuxt/runtime/ContentCompactTagList.nuxt.spec.ts",
@@ -920,6 +923,7 @@
     "tests/server/appContextApi.spec.ts",
     "tests/server/authCacheControl.spec.ts",
     "tests/server/authLogin.spec.ts",
+    "tests/server/authRegister.spec.ts",
     "tests/server/authSession.spec.ts",
     "tests/server/authUiConfigApi.spec.ts",
     "tests/server/authVerify.spec.ts",
