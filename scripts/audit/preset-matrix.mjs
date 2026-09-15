@@ -78,6 +78,12 @@ const minimal = await inspectPreset('minimal')
 const full = await inspectPreset('full')
 const auth = await inspectPreset('auth')
 const webform = await inspectPreset('webform')
+// Standalone capability compositions that load neither auth nor Webform.
+const standalone = [
+  await inspectPreset('editorial'),
+  await inspectPreset('listing'),
+  await inspectPreset('integrations'),
+]
 
 if (minimal.hasAuth) {
   throw new Error('The minimal preset must not load the authentication layer.')
@@ -115,10 +121,18 @@ if (minimal.hasSeo || minimal.hasSitemap) {
   throw new Error('The minimal preset must not load SEO or Sitemap.')
 }
 
-for (const preset of [minimal, full, auth, webform]) {
-  if (!preset.hasRobots) {
+for (const preset of [minimal, full, auth, webform, ...standalone]) {
+  if (!preset.hasFoundation || !preset.hasRobots) {
     throw new Error(
-      `The ${preset.name} fixture must register Robots exactly once to enforce indexability.`,
+      `The ${preset.name} fixture must load foundation and register Robots exactly once to enforce indexability.`,
+    )
+  }
+}
+
+for (const preset of standalone) {
+  if (preset.hasAuth || preset.hasWebform || preset.hasSeo || preset.hasSitemap) {
+    throw new Error(
+      `The ${preset.name} fixture must stay a standalone composition without auth, Webform, SEO or Sitemap.`,
     )
   }
 }

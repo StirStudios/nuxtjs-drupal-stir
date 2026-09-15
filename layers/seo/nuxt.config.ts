@@ -8,6 +8,9 @@ import {
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
+  // Foundation registers Robots, which enforces the site's indexability.
+  extends: ['../foundation'],
+
   // Robots resolves these into its noindex header and meta on every build.
   routeRules: {
     '/account/**': { robots: false },

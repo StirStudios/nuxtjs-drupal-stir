@@ -25,7 +25,7 @@ Set `DRUPAL_URL` to the Drupal origin, `DRUPAL_API_KEY` to the private CE/API cr
 
 Tools, portals, calculators and other applications that must never appear in search results use the same layer with a narrower composition:
 
-- Extend only the capability layers the application needs, for example `@stir/base/layers/auth/nuxt.config` or `@stir/base/layers/webform/nuxt.config`. Do not add the SEO or analytics layers, or a preset that includes them.
+- Extend only the capability layers the application needs, for example `@stir/base/layers/auth/nuxt.config`, `@stir/base/layers/webform/nuxt.config`, `@stir/base/layers/editorial/nuxt.config`, `@stir/base/layers/listing/nuxt.config` or `@stir/base/layers/integrations/nuxt.config`. Each brings the shared base it needs. Do not add the SEO or analytics layers, or a preset that includes them.
 - Set `ssr: false` when the application renders only for signed-in or embedded use and gains nothing from server-rendered HTML.
 - Keep the normal `NUXT_ENV` for each environment. Application mode is automatic when the SEO layer is not extended: the build is never indexable, including with `NUXT_ENV=production`, so no `NUXT_INDEXABLE` setting is needed. `NUXT_INDEXABLE=false` is only for temporarily hiding a website that includes the SEO layer.
 
