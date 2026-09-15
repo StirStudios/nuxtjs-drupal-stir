@@ -368,6 +368,7 @@ navigation: {
   background: 'border-none bg-white/90 shadow backdrop-blur-md dark:bg-gray-950/70',
   color: 'primary',
   variant: 'link',
+  contentOrientation: 'horizontal', // 'vertical' stacks dropdown links under the open item
   desktopLayout: 'default', // 'default' or 'split-logo'
   logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'

@@ -171,6 +171,17 @@ describe('App header', () => {
     wrapper.unmount()
   })
 
+  it('applies the configured dropdown orientation to desktop menus', async () => {
+    setNavigation({ contentOrientation: 'vertical' })
+
+    const wrapper = await mountSuspended(Header)
+
+    await vi.waitFor(() => expect(wrapper.findComponent({ name: 'UNavigationMenu' }).exists()).toBe(true))
+
+    expect(wrapper.findComponent({ name: 'UNavigationMenu' }).props('contentOrientation')).toBe('vertical')
+    wrapper.unmount()
+  })
+
   it('keeps the default right region free of action items', async () => {
     const wrapper = await mountSuspended(Header)
     const right = wrapper.get('[data-slot="right"]')

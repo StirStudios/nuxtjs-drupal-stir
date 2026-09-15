@@ -140,6 +140,7 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: UiColorName
   variant?: UiNavigationVariantName
+  contentOrientation?: 'horizontal' | 'vertical'
   desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
