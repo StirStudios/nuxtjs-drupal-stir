@@ -51,6 +51,7 @@ export default defineAppConfig({
       container: 'flex-wrap',
       color: 'primary',
       variant: 'link',
+      contentOrientation: 'horizontal',
       desktopLayout: 'default',
       logoMenuMarker: '--logo--',
       toggleDirection: 'right',

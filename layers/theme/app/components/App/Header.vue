@@ -117,6 +117,9 @@ const headerHighlightColor = computed(() =>
   theme.navigation?.highlight?.show ? toNavigationColor(theme.navigation.highlight?.color) : undefined,
 )
 const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
+const headerNavContentOrientation = computed(() =>
+  theme.navigation?.contentOrientation === 'vertical' ? 'vertical' : 'horizontal',
+)
 const desktopHeaderLayout = computed(() => toDesktopHeaderLayout(theme.navigation?.desktopLayout))
 const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-logo')
 const isCenteredToggleLayout = computed(() => desktopHeaderLayout.value === 'centered-toggle')
@@ -495,6 +498,7 @@ watch(menuOpen, (val) => {
             aria-label="Primary navigation"
             :class="[splitDesktopNavClasses, splitLeftNavClasses]"
             :color="headerNavColor"
+            :content-orientation="headerNavContentOrientation"
             :highlight="theme.navigation.highlight.show"
             :highlight-color="headerHighlightColor"
             :items="beforeLogo"
@@ -518,6 +522,7 @@ watch(menuOpen, (val) => {
             :aria-label="splitRightNavigationLabel"
             :class="[splitDesktopNavClasses, splitRightNavClasses]"
             :color="headerNavColor"
+            :content-orientation="headerNavContentOrientation"
             :highlight="theme.navigation.highlight.show"
             :highlight-color="headerHighlightColor"
             :items="afterLogo"
@@ -530,6 +535,7 @@ watch(menuOpen, (val) => {
           aria-label="Site Navigation"
           class="app-nav app-nav-desktop"
           :color="headerNavColor"
+          :content-orientation="headerNavContentOrientation"
           :highlight="theme.navigation.highlight.show"
           :highlight-color="headerHighlightColor"
           :items="headerActions.items"
@@ -560,6 +566,7 @@ watch(menuOpen, (val) => {
           aria-label="Secondary navigation"
           class="app-nav app-nav-actions app-nav-desktop hidden lg:flex"
           :color="headerNavColor"
+          :content-orientation="headerNavContentOrientation"
           :highlight="theme.navigation.highlight.show"
           :highlight-color="headerHighlightColor"
           :items="actionNavLinks"

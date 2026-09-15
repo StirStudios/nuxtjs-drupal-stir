@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+### Added
+
+- `stirTheme.navigation.contentOrientation` sets the desktop header menus'
+  dropdown orientation. `'vertical'` stacks child links in a panel under the
+  open item; the default `'horizontal'` keeps Nuxt UI's two-column panel.
+
 ### Changed
 
 - Popups now come from the Drupal `popups` block region (`blocks.popups`),
