@@ -59,8 +59,13 @@ untouched do not need one.
   `NUXT_INDEXABLE !== 'false'`. `@nuxtjs/robots` and the `site` configuration
   (`NUXT_NAME`, `NUXT_URL`, indexability) moved from the platform and SEO
   layers to the foundation layer, which every composition loads.
+  - So that standalone capability compositions reach foundation, `editorial`
+    and `integrations` (and through it `analytics` and `scripts`) now extend
+    `platform`, whose utilities they already import. `listing` and `seo` now
+    extend `foundation`. Nuxt de-duplicates layers, so root, full and minimal
+    layer order and output are unchanged.
   - Consumers of the minimal preset or of individual layers such as `auth`,
-    `webform` or `editorial` now serve a real `/robots.txt` with `Disallow: /`,
+    `webform`, `editorial`, `listing` or `integrations` now serve a real `/robots.txt` with `Disallow: /`,
     `X-Robots-Tag: noindex, nofollow` and a noindex robots meta tag.
     Previously they served none, and `ssr: false` applications returned the
     application shell for `/robots.txt`.

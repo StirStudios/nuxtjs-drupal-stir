@@ -16,5 +16,9 @@ const integrationMountOverride = defineNuxtModule({
 })
 
 export default defineNuxtConfig({
+  // The popup renders through platform utilities, and platform's foundation
+  // keeps standalone integrations, analytics and scripts compositions in
+  // application mode.
+  extends: ['../platform'],
   modules: [integrationMountOverride],
 })

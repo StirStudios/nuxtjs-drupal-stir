@@ -21,5 +21,8 @@ const editorialComponentOverrides = defineNuxtModule({
 })
 
 export default defineNuxtConfig({
+  // Editing controls render through platform utilities, and platform's
+  // foundation keeps a standalone editorial composition in application mode.
+  extends: ['../platform'],
   modules: [editorialComponentOverrides],
 })
