@@ -14,8 +14,7 @@ const props = defineProps<{
 }>()
 
 const show = ref(false)
-const forms = useStirFormTheme()
-const fieldVariant = computed(() => resolveUiFieldVariant(forms.variant))
+const fieldTheme = useAuthFieldTheme()
 
 function checkStrength(str: string) {
   return passwordRequirements.value.map((req) => ({
@@ -145,13 +144,12 @@ function defaultPasswordRequirements(policy?: AuthPasswordPolicy): AuthPasswordR
       :aria-describedby="describedBy"
       :aria-invalid="invalid"
       :autocomplete="field?.autocomplete"
-      class="w-full"
+      :class="fieldTheme.class"
       :color="color"
       :name="field?.name"
       :placeholder="field?.placeholder || 'Password'"
       :type="show ? 'text' : 'password'"
-      :ui="{ trailing: 'pe-1' }"
-      :variant="fieldVariant"
+      :variant="fieldTheme.variant"
     >
       <template #trailing>
         <UButton
@@ -159,9 +157,9 @@ function defaultPasswordRequirements(policy?: AuthPasswordPolicy): AuthPasswordR
           :aria-pressed="show"
           color="neutral"
           :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-          size="sm"
+          size="xs"
           type="button"
-          variant="link"
+          variant="ghost"
           @click="() => { show = !show }"
         />
       </template>

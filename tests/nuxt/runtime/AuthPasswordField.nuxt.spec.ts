@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
+import AccountSecurityForm from '../../../layers/auth/app/components/Account/SecurityForm.vue'
 import AuthPasswordField from '../../../layers/auth/app/components/Auth/AuthPasswordField.vue'
 
 const passwordPolicy = {
@@ -37,5 +38,31 @@ describe('AuthPasswordField', () => {
 
     expect(wrapper.find('[role="progressbar"]').exists()).toBe(false)
     expect(wrapper.find('#password-strength').exists()).toBe(false)
+  })
+
+  it('uses the app config field theme and the shared visibility toggle', async () => {
+    const webform = useAppConfig().stirTheme.webform
+    const previousVariant = webform.fieldVariant
+
+    webform.fieldVariant = 'material'
+
+    try {
+      const wrapper = await mountSuspended(AccountSecurityForm, {
+        props: { currentPassword: '', newPassword: '', changingPassword: false, cancelingAccount: false, cancelModalOpen: false, portal: false },
+      })
+      const [currentInput, newInput] = wrapper.findAll('input')
+      const newPasswordToggle = wrapper.get('button[aria-label="Show password"]')
+
+      expect(newInput!.attributes('aria-describedby')).toBe('password-strength')
+      expect(newInput!.classes()).toEqual(expect.arrayContaining(['border-b-2!', 'ring-0!', 'bg-transparent']))
+      expect(newInput!.classes()).not.toContain('ring-inset')
+      expect(newInput!.classes()).toEqual(currentInput!.classes())
+      expect(newPasswordToggle.attributes('aria-pressed')).toBe('false')
+      expect(newPasswordToggle.classes())
+        .toEqual(wrapper.get('button[aria-label="Show current password"]').classes())
+      wrapper.unmount()
+    } finally {
+      webform.fieldVariant = previousVariant
+    }
   })
 })

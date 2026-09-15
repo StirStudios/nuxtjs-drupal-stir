@@ -14,14 +14,13 @@ const props = defineProps<{
   ) => FormError<string>[] | Promise<FormError<string>[]>
 }>()
 
-const forms = useStirFormTheme()
-const fieldVariant = computed(() => resolveUiFieldVariant(forms.variant))
+const fieldTheme = useAuthFieldTheme()
 const themedFields = computed<AuthFormField[]>(() => props.fields.map((field) => {
   if (field.type === 'checkbox' || field.type === 'otp') return field
 
   return {
     ...field,
-    variant: field.variant ?? fieldVariant.value,
+    variant: field.variant ?? fieldTheme.variant,
   } as AuthFormField
 }))
 
