@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Changed
+
+- Popups now come from the Drupal `popups` block region (`blocks.popups`),
+  which replaces the hidden `decoupled` region. `usePopupData` still reads
+  `blocks.decoupled` when `popups` is absent, so deploy this layer before the
+  Stir Tools update that renames the region. Consumers that read
+  `blocks.decoupled` directly should switch to `blocks.popups`.
+
 ### Fixed
 
 - On indexable production builds, `/auth/**`, `/account/**` and `/login` sent
