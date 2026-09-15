@@ -18,14 +18,7 @@ const emit = defineEmits<{
   (e: 'update:cancelModalOpen', value: boolean): void
   (e: 'change-password' | 'cancel-account'): void
 }>()
-const themeWebform = (
-  (
-    useAppConfig().stirTheme as {
-      webform?: { fieldVariant?: 'outline' | 'material' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
-    }
-  ).webform || {}
-)
-const webformVariant = computed(() => themeWebform.fieldVariant as never)
+const fieldTheme = useAuthFieldTheme()
 const showCurrentPassword = ref(false)
 const { auth } = useAuthConfig()
 
@@ -77,15 +70,16 @@ const confirmCancel = () => {
     >
       <UFormField label="Current password" name="currentPassword" required>
         <UInput
-          :class="themeWebform.fieldInput || 'w-full'"
+          :class="fieldTheme.class"
           :model-value="props.currentPassword"
           :type="showCurrentPassword ? 'text' : 'password'"
-          :variant="webformVariant"
+          :variant="fieldTheme.variant"
           @update:model-value="emit('update:currentPassword', String($event ?? ''))"
         >
           <template #trailing>
             <UButton
               :aria-label="showCurrentPassword ? 'Hide current password' : 'Show current password'"
+              :aria-pressed="showCurrentPassword"
               color="neutral"
               :icon="showCurrentPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
               size="xs"

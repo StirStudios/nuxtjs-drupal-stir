@@ -47,13 +47,7 @@ const emit = defineEmits<{
 }>()
 
 const appConfig = useAppConfig()
-const themeWebform = (
-  (
-    appConfig.stirTheme as {
-      webform?: { fieldVariant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none'; fieldInput?: string }
-    }
-  ).webform || {}
-)
+const fieldTheme = useAuthFieldTheme()
 const profileFormConfig = (appConfig.authProfileForm || {}) as ProfileFormConfig
 
 const getFieldType = (
@@ -184,35 +178,35 @@ const editorToolbarItems = [
 
         <UTextarea
           v-else-if="getFieldType(field.type) === 'textarea'"
-          :class="themeWebform.fieldInput || 'w-full'"
+          :class="fieldTheme.class"
           :disabled="!field.editable"
           :model-value="getStringValue(values[field.name])"
           :rows="4"
-          :variant="themeWebform.fieldVariant"
+          :variant="fieldTheme.variant"
           @update:model-value="values[field.name] = String($event ?? '')"
         />
 
         <USelect
           v-else-if="getFieldType(field.type) === 'select'"
-          :class="themeWebform.fieldInput || 'w-full'"
+          :class="fieldTheme.class"
           :disabled="!field.editable"
           :items="toSelectItems(field)"
           label-key="label"
           :model-value="getSelectValue(field, values[field.name])"
           :multiple="isMultiValueField(field)"
           value-key="value"
-          :variant="themeWebform.fieldVariant"
+          :variant="fieldTheme.variant"
           @update:model-value="values[field.name] = isMultiValueField(field) ? $event : String($event ?? '')"
         />
 
         <UInput
           v-else
-          :class="themeWebform.fieldInput || 'w-full'"
+          :class="fieldTheme.class"
           :disabled="!field.editable"
           :icon="getInputIcon(field)"
           :model-value="getStringValue(values[field.name])"
           :type="getInputType(field)"
-          :variant="themeWebform.fieldVariant"
+          :variant="fieldTheme.variant"
           @update:model-value="values[field.name] = String($event ?? '')"
         />
       </UFormField>
@@ -226,10 +220,10 @@ const editorToolbarItems = [
       >
         <UInput
           autocomplete="current-password"
-          :class="themeWebform.fieldInput || 'w-full'"
+          :class="fieldTheme.class"
           :model-value="getStringValue(values.current_password)"
           type="password"
-          :variant="themeWebform.fieldVariant"
+          :variant="fieldTheme.variant"
           @update:model-value="values.current_password = String($event ?? '')"
         />
       </UFormField>

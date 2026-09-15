@@ -100,8 +100,8 @@ function blockAllowsRoute(block: UnknownRecord, routePath: string): boolean {
   return visibility.mode === 'hide' ? !matches : matches
 }
 
-function findPopupInDecoupledBlocks(decoupled: unknown, routePath: string): PopupNode | null {
-  const stack: unknown[] = [decoupled]
+function findPopupInRegionBlocks(regionBlocks: unknown, routePath: string): PopupNode | null {
+  const stack: unknown[] = [regionBlocks]
 
   while (stack.length) {
     const current = stack.pop()
@@ -161,8 +161,16 @@ function findPopupInContent(content: unknown): PopupNode | null {
   return findPopup(content)
 }
 
-function findPopupInSources(content: unknown, decoupled: unknown, routePath: string): PopupNode | null {
-  return findPopupInDecoupledBlocks(decoupled, routePath) || findPopupInContent(content)
+function findPopupInSources(content: unknown, regionBlocks: unknown, routePath: string): PopupNode | null {
+  return findPopupInRegionBlocks(regionBlocks, routePath) || findPopupInContent(content)
+}
+
+// Drupal renamed the hidden popup region from `decoupled` to `popups`; read the
+// legacy key until every producer has run the stir_layout_block migration.
+function popupRegionBlocks(blocks: unknown): unknown {
+  if (!isRecord(blocks)) return undefined
+
+  return blocks.popups ?? blocks.decoupled
 }
 
 function stringSetting(...values: unknown[]): string | undefined {
@@ -183,12 +191,12 @@ export const usePopupData = () => {
   const { data: appContext, status: appContextStatus, execute: loadAppContext } = useAppContext({ immediate: false })
 
   const contentSource = computed(() => page.value?.content)
-  const decoupledSource = computed(() => page.value?.blocks?.decoupled)
+  const popupRegionSource = computed(() => popupRegionBlocks(page.value?.blocks))
   const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
   const routePath = computed(() => route.path || '/')
   const pagePopup = computed(() => findPopupInSources(
     contentSource.value,
-    decoupledSource.value,
+    popupRegionSource.value,
     routePath.value,
   ))
   const fallbackPopup = computed(() => {
@@ -196,7 +204,7 @@ export const usePopupData = () => {
 
     return findPopupInSources(
       undefined,
-      appContext.value?.blocks?.decoupled,
+      popupRegionBlocks(appContext.value?.blocks),
       routePath.value,
     )
   })

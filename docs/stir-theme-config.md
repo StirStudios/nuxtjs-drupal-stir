@@ -237,6 +237,9 @@ popup: {
 }
 ```
 
+Place popup blocks in the hidden Drupal `popups` region of the `stir_decoupled`
+theme; Nuxt reads them from `blocks.popups`, falling back to the legacy
+`blocks.decoupled` region until the Drupal site has run its database updates.
 Popup visibility should be controlled in Drupal block visibility settings
 (Show/Hide for listed pages). Nuxt no longer applies route allow/block lists.
 `dismissalTtlDays` accepts a positive number and falls back to 14 when omitted

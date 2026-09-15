@@ -13,7 +13,25 @@ untouched do not need one.
 
 ## Unreleased
 
+### Changed
+
+- Popups now come from the Drupal `popups` block region (`blocks.popups`),
+  which replaces the hidden `decoupled` region. `usePopupData` still reads
+  `blocks.decoupled` when `popups` is absent, so deploy this layer before the
+  Stir Tools update that renames the region. Consumers that read
+  `blocks.decoupled` directly should switch to `blocks.popups`.
+
 ### Fixed
+
+- Auth and account form fields now resolve their Nuxt UI variant and width
+  class the same way the webform layer does: `stirTheme.webform.fieldVariant`,
+  then `stirTheme.forms.variant`, and `stirTheme.webform.fieldInput`. The
+  password strength field (new, confirm, reset and register passwords) and the
+  login/register `UAuthForm` fields previously read only `forms.variant`, so a
+  site with `webform.fieldVariant: 'material'` got Nuxt UI's outline input
+  there while "Current password" was underlined. Password visibility toggles
+  now share the ghost `xs` button, and the current-password toggle exposes
+  `aria-pressed`.
 
 - On indexable production builds, `/auth/**`, `/account/**` and `/login` sent
   `X-Robots-Tag: index, follow, …` because the Robots middleware overrode the
