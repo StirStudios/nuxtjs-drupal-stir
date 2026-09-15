@@ -277,8 +277,8 @@ attributes above; the harness does not depend on project-specific components.
 - `WEBFORM_MAX_FIELDS`: Maximum non-file multipart fields per submission (default: `100`)
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
-- `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`)
-- `NUXT_INDEXABLE`: Indexability switch (`'false'` disables production indexing behavior while keeping sitemap routes available for verification)
+- `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable
+- `NUXT_INDEXABLE`: Set to `'false'` to temporarily hide a website (a composition with the SEO capability) even when `NUXT_ENV=production`. Applications without the SEO capability are never indexable and do not need it
 - `DRUPAL_CDN`: Optional Drupal asset CDN origin. When set in the Nuxt environment, its host is automatically trusted as an IPX source alongside `DRUPAL_URL`
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required
 - `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
@@ -297,8 +297,9 @@ Notes:
 - Nuxt bounds streamed JSON and multipart request bodies before parsing and returns `413` when the wire-body limit is exceeded. Configure the hosting/ingress upload cap at or below `WEBFORM_MAX_REQUEST_BYTES` too: an adapter or upstream proxy may buffer a request before Nitro receives it.
 - Align `WEBFORM_MAX_*` with the largest deployed Drupal Webform and its PHP/Webform upload limits before rollout; submissions over the Nuxt limits return `413`.
 - When Drupal Flood limits must see the original visitor IP, enable the two `DRUPAL_*CLIENT_IP/TRUST_PROXY` controls only after the ingress replaces forwarded headers and Symfony trusts the Nuxt proxy address.
-- `site.indexable` and Plausible runtime enablement require `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`.
-- When the SEO capability is selected, sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior.
+- `site.indexable` requires the SEO capability, `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`. Plausible runtime enablement requires `NUXT_ENV=production` and `NUXT_INDEXABLE !== 'false'`. Both are read at build time, so build each environment with its own values.
+- Every composition (root, presets, and individual capability layers) registers `@nuxtjs/robots` through the foundation layer. A composition without the SEO capability, including `presets/minimal`, is in application mode and never indexable. When `site.indexable` is false, responses carry `X-Robots-Tag: noindex, nofollow`, `/robots.txt` disallows every crawler, and documents, including `ssr: false` ones, get a noindex robots meta tag.
+- When the SEO capability is selected, sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior. Without the SEO capability, `/sitemap.xml`, `/sitemap_index.xml` and `/__sitemap__/**` return a plain 404.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
 - Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_URL`.
 

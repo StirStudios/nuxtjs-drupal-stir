@@ -41,7 +41,10 @@ async function inspectPreset(name) {
     const installedModules = nuxt.options._installedModules
       .map(module => module.meta?.name)
       .filter(name => typeof name === 'string')
-    const hasRobots = installedModules.includes('@nuxtjs/robots')
+    const robotsRegistrations = installedModules
+      .filter(moduleName => moduleName === '@nuxtjs/robots').length
+    const hasRobots = robotsRegistrations === 1
+    const hasSitemap = installedModules.includes('@nuxtjs/sitemap')
     const hasProtectedAccessConfig = Object.hasOwn(
       nuxt.options.runtimeConfig,
       'protectedPassword',
@@ -62,6 +65,7 @@ async function inspectPreset(name) {
       hasSeo,
       hasListing,
       hasRobots,
+      hasSitemap,
       hasProtectedAccessConfig,
       layers: layers.map((layer) => layer.replace(`${rootDir}/`, '')),
     }
@@ -107,8 +111,16 @@ if (minimal.hasIntegrations) {
   throw new Error('The minimal preset must not load the integrations layer.')
 }
 
-if (minimal.hasSeo || minimal.hasRobots) {
-  throw new Error('The minimal preset must not load SEO or Robots.')
+if (minimal.hasSeo || minimal.hasSitemap) {
+  throw new Error('The minimal preset must not load SEO or Sitemap.')
+}
+
+for (const preset of [minimal, full, auth, webform]) {
+  if (!preset.hasRobots) {
+    throw new Error(
+      `The ${preset.name} fixture must register Robots exactly once to enforce indexability.`,
+    )
+  }
 }
 
 if (minimal.hasListing) {
@@ -145,8 +157,8 @@ if (!full.hasIntegrations) {
   throw new Error('The full preset must preserve the integrations layer.')
 }
 
-if (!full.hasSeo || !full.hasRobots) {
-  throw new Error('The full preset must preserve SEO and Robots.')
+if (!full.hasSeo || !full.hasSitemap) {
+  throw new Error('The full preset must preserve SEO and Sitemap.')
 }
 
 if (!full.hasListing) {
@@ -175,11 +187,11 @@ if (
   || webform.hasSeo
   || auth.hasListing
   || webform.hasListing
-  || auth.hasRobots
-  || webform.hasRobots
+  || auth.hasSitemap
+  || webform.hasSitemap
 ) {
   throw new Error(
-    'Auth and Webform fixtures must not load SEO, Robots, or listing layers.',
+    'Auth and Webform fixtures must not load SEO, Sitemap, or listing layers.',
   )
 }
 

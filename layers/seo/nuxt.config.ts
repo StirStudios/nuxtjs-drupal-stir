@@ -8,16 +8,11 @@ import {
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
+  // Robots resolves these into its noindex header and meta on every build.
   routeRules: {
-    '/account/**': {
-      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-    },
-    '/auth/**': {
-      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-    },
-    '/login': {
-      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-    },
+    '/account/**': { robots: false },
+    '/auth/**': { robots: false },
+    '/login': { robots: false },
   },
 
   nitro: {
@@ -29,7 +24,6 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@nuxtjs/robots',
     [
       '@nuxtjs/sitemap',
       buildSitemapModuleOptions(drupalUrl),

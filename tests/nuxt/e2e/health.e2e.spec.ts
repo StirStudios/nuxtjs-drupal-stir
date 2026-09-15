@@ -134,6 +134,10 @@ const presentationManifestFixture = JSON.parse(readFileSync(resolve(
   __dirname,
   '../../../contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
 ), 'utf8'))
+const sitemapFixture = JSON.parse(readFileSync(resolve(
+  __dirname,
+  '../../../contracts/stir-tools/v1/fixtures/sitemap.json',
+), 'utf8'))
 let presentationManifestApiKey: string | undefined
 
 const drupalFixtureServer = createServer((request, response) => {
@@ -156,6 +160,8 @@ const drupalFixtureServer = createServer((request, response) => {
       ? { lang: 'en', meta: [], link: [] }
       : path === '/ce-api/stir-layout-builder/presentation-manifest'
         ? presentationManifestFixture
+      : path === '/api/sitemap'
+        ? sitemapFixture
       : path.includes('/api/menu_items/')
         ? []
         : path.endsWith('/image-loading-fixture') ? imageLoadingFixture
@@ -269,6 +275,27 @@ describe('Nuxt E2E smoke', async () => {
     expect(authConfig).toBeTypeOf('object')
     expect(authConfig.version).toBe(2)
     expect(seo).toEqual({ lang: 'en', meta: [], link: [] })
+  })
+
+  it('keeps a non-indexable website out of search while serving its sitemap', async () => {
+    const page = await fetch(url('/'))
+    const html = await page.text()
+
+    expect(page.headers.get('x-robots-tag')).toBe('noindex, nofollow')
+    expect(html.match(/<meta name="robots"[^>]*>/g)).toEqual([
+      '<meta name="robots" content="noindex, nofollow">',
+    ])
+
+    const robots = await fetch(url('/robots.txt'))
+
+    expect(robots.headers.get('content-type')).toContain('text/plain')
+    expect(await robots.text()).toMatch(/User-agent: \*\nDisallow: \/\n/)
+
+    const sitemap = await fetch(url('/sitemap.xml'))
+
+    expect(sitemap.status).toBe(200)
+    expect(sitemap.headers.get('content-type')).toContain('xml')
+    expect(await sitemap.text()).toContain('<urlset')
   })
 
   it('renders the deterministic homepage twice without SSR drift', async () => {
