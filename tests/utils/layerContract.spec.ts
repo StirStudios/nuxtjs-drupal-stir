@@ -490,10 +490,29 @@ describe('layer contract', () => {
       'utf8',
     )
 
+    const foundationConfig = readFileSync(
+      resolve(rootDir, 'layers/foundation/nuxt.config.ts'),
+      'utf8',
+    )
+
     expect(platformConfig).not.toContain('@nuxtjs/sitemap')
     expect(seoConfig).toContain('@nuxtjs/sitemap')
-    expect(seoConfig).toContain('\'X-Robots-Tag\': \'noindex, nofollow\'')
-    expect(seoConfig).not.toContain('robots: false')
+    // Robots and indexability belong to the layer every consumer loads.
+    expect(foundationConfig).toContain('\'@nuxtjs/robots\'')
+    expect(foundationConfig).toContain('indexable: isIndexable')
+    expect(foundationConfig).toContain('hasNuxtModule(\'@nuxtjs/sitemap\', nuxt)')
+    expect(foundationConfig).toContain('nuxt.options.site.indexable = false')
+    expect(foundationConfig.indexOf('applicationMode,')).toBeLessThan(
+      foundationConfig.indexOf('\'@nuxtjs/robots\','),
+    )
+    expect(platformConfig).not.toContain('@nuxtjs/robots')
+    expect(platformConfig).not.toContain('indexable')
+    expect(seoConfig).not.toContain('@nuxtjs/robots')
+    // Private routes use Robots route rules so no middleware overrides them.
+    expect(seoConfig).toContain('\'/auth/**\': { robots: false }')
+    expect(seoConfig).toContain('\'/account/**\': { robots: false }')
+    expect(seoConfig).toContain('\'/login\': { robots: false }')
+    expect(seoConfig).not.toContain('X-Robots-Tag')
     expect(themeConfig).not.toContain('cmsGlobalSeo:')
     expect(seoAppConfig).toContain('cmsGlobalSeo:')
     expect(seoAppConfig).toContain('enabled: false')

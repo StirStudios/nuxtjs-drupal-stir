@@ -6,7 +6,7 @@ Install one reviewed revision as `@stir/base`, declare Nuxt in the application, 
 |---|---|
 | Marketing site with editing, forms, analytics and auth support | `@stir/base` (current complete profile) |
 | Same explicit complete profile | `@stir/base/presets/full` |
-| Read-only Drupal site without editorial, Webform, auth or privacy-popup integrations | `@stir/base/presets/minimal` |
+| Read-only Drupal site without editorial, Webform, auth or privacy-popup integrations | `@stir/base/presets/minimal`, plus `@stir/base/layers/seo/nuxt.config` if it must be indexed |
 
 The minimal theme still supports its existing media, calendar and calculator widgets. Their script loading uses Nuxt Scripts, owned by the theme. An excluded integration does not become enabled merely because the script loader exists.
 
@@ -20,6 +20,34 @@ export default defineNuxtConfig({
 Set `DRUPAL_URL` to the Drupal origin, `DRUPAL_API_KEY` to the private CE/API credential and `NUXT_URL` to the public frontend origin. Configure `NUXT_NAME`, `NUXT_ENV`, `NUXT_INDEXABLE`, `SERVER_DOMAIN_CLIENT` and, when forms/auth require CAPTCHA, `TURNSTILE_KEY` and private `TURNSTILE_SECRET` as documented in the [environment reference](../readme.md#-environment-variables). Never put the API key or Turnstile secret in `runtimeConfig.public`.
 
 `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL` and `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL` can override Drupal origins at runtime. Match them deliberately to the deployment; don't ship localhost/DDEV values to production. The CE format remains `explicit`, and the existing CE/menu endpoints remain unchanged.
+
+## Applications (not indexed)
+
+Tools, portals, calculators and other applications that must never appear in search results use the same layer with a narrower composition:
+
+- Extend only the capability layers the application needs, for example `@stir/base/layers/auth/nuxt.config` or `@stir/base/layers/webform/nuxt.config`. Do not add the SEO or analytics layers, or a preset that includes them.
+- Set `ssr: false` when the application renders only for signed-in or embedded use and gains nothing from server-rendered HTML.
+- Keep the normal `NUXT_ENV` for each environment. Application mode is automatic when the SEO layer is not extended: the build is never indexable, including with `NUXT_ENV=production`, so no `NUXT_INDEXABLE` setting is needed. `NUXT_INDEXABLE=false` is only for temporarily hiding a website that includes the SEO layer.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: false,
+  extends: [
+    '@stir/base/layers/auth/nuxt.config',
+    '@stir/base/layers/webform/nuxt.config',
+  ],
+})
+```
+
+Every composition loads the foundation layer, which registers `@nuxtjs/robots`. In application mode, or on a website with indexing disabled, the layer enforces:
+
+- `X-Robots-Tag: noindex, nofollow` on application responses
+- a plain-text `/robots.txt` with `User-agent: *` and `Disallow: /`
+- `<meta name="robots" content="noindex, nofollow">` in every document, including client-rendered ones
+- in application mode, a plain 404, not the application shell, for `/sitemap.xml`, `/sitemap_index.xml` and `/__sitemap__/**`, because no sitemap exists without the SEO layer
+
+After deploying, check `/`, `/robots.txt` and `/sitemap.xml` on each environment. Do not keep a `public/robots.txt`: at build time the module moves it to `public/_robots.txt` and merges its rules.
 
 ## Drupal is the content and editorial source of truth
 

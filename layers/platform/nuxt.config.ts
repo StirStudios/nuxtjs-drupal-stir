@@ -7,21 +7,9 @@ const resolveLayerPath = (path: string) =>
 const isTestEnv =
   process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 const isDevelopment = process.env.NODE_ENV === 'development'
-const isProductionEnv = process.env.NUXT_ENV === 'production'
-const isIndexable = isProductionEnv && process.env.NUXT_INDEXABLE !== 'false'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
-// Keep site defaults available when a consumer enables the optional SEO modules.
-const optionalSeoConfig = {
-  site: {
-    name: process.env.NUXT_NAME,
-    url: process.env.NUXT_URL,
-    indexable: isIndexable,
-  },
-}
-
 export default defineNuxtConfig({
-  ...optionalSeoConfig,
   extends: ['../foundation', '../core', '../theme'],
 
   vite: {

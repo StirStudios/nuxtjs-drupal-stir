@@ -6,6 +6,7 @@ and the `/api/seo/global` and `/api/sitemap` server boundaries.
 The root and full compatibility preset include it. The minimal, auth-only, and
 Webform-only compositions exclude it, so applications that do not publish an
 indexable website do not initialize sitemap runtime or ship SEO proxy routes.
+See [Applications](../../docs/consumer-quickstart.md#applications-not-indexed).
 
 Add it beside a platform-based composition when needed:
 
@@ -19,8 +20,24 @@ export default defineNuxtConfig({
 ```
 
 `DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_URL`, `NUXT_NAME`,
-`NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration. The
-Robots module is registered only when this SEO capability is selected.
+`NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration.
+
+This layer is what makes a composition an indexable website. The Robots module
+is not part of it: the foundation layer, which every composition loads,
+registers Robots so indexability is always enforced. With this layer, a build
+is indexable when `NUXT_ENV=production` and `NUXT_INDEXABLE` is not `'false'`.
+Without it, the composition is in application mode and never indexable,
+whatever those variables say. When not indexable, responses carry
+`X-Robots-Tag: noindex, nofollow`, `/robots.txt` disallows every crawler, and
+documents (including `ssr: false` ones) get a noindex robots meta tag.
+
+This layer marks `/account/**`, `/auth/**` and `/login` with `robots: false`
+route rules, so Robots sends a noindex header and meta for them even on an
+indexable production build. Sitemap routes stay registered in non-indexable
+environments so `/sitemap.xml` can be checked in development and staging.
+Without this layer, `/sitemap.xml`, `/sitemap_index.xml` and `/__sitemap__/**`
+return a plain 404.
+
 The optional global-metadata request is disabled by default because it requires
 downstream Drupal support. Sites that expose `/api/seo/global` can enable it
 through `cmsGlobalSeo.enabled`. Page-level Drupal Metatag output is unaffected.

@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Fixed
+
+- On indexable production builds, `/auth/**`, `/account/**` and `/login` sent
+  `X-Robots-Tag: index, follow, …` because the Robots middleware overrode the
+  SEO layer's raw `noindex, nofollow` header rules. The SEO layer now declares
+  them as `robots: false` route rules, so both the header and the robots meta
+  say `noindex, nofollow`.
+
 ### Added
 
 - `compliance/REVIEW.md` gains an owner questionnaire
@@ -44,6 +52,31 @@ untouched do not need one.
 
 ### Changed
 
+- **Behaviour change for `presets/minimal` and capability-layer consumers:
+  application mode.** A composition without the SEO layer is now never
+  indexable, whatever `NUXT_ENV` or `NUXT_INDEXABLE` say. With the SEO layer,
+  indexability still requires `NUXT_ENV=production` and
+  `NUXT_INDEXABLE !== 'false'`. `@nuxtjs/robots` and the `site` configuration
+  (`NUXT_NAME`, `NUXT_URL`, indexability) moved from the platform and SEO
+  layers to the foundation layer, which every composition loads.
+  - Consumers of the minimal preset or of individual layers such as `auth`,
+    `webform` or `editorial` now serve a real `/robots.txt` with `Disallow: /`,
+    `X-Robots-Tag: noindex, nofollow` and a noindex robots meta tag.
+    Previously they served none, and `ssr: false` applications returned the
+    application shell for `/robots.txt`.
+  - A foundation Nitro plugin adds the module's robots meta to client-rendered
+    documents.
+  - `/sitemap.xml`, `/sitemap_index.xml` and `/__sitemap__/**` now return a
+    plain 404 instead of the application shell.
+  - A `public/robots.txt` in such projects is moved to `public/_robots.txt`
+    at build time and its rules are merged.
+  - A read-only website on the minimal preset that must be indexed must now
+    also extend `@stir/base/layers/seo/nuxt.config`.
+  - Root and full-preset output is unchanged apart from the fix below: indexable
+    production `robots.txt`, page headers, and sitemap routes in non-indexable
+    environments stay as they were.
+
+  See [Applications](docs/consumer-quickstart.md#applications-not-indexed).
 - The compliance audit's "how long submissions are kept" privacy check also
   accepts wording that states a period with kept, stored, held, deleted,
   purged or removed, such as "kept for no more than 24 months" or "deleted
