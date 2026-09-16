@@ -138,7 +138,8 @@ try {
 
 if (config) {
   // Always audit the inventory's production domain unless --url is passed.
-  siteUrl = resolveSiteUrl(readUrlArgument(), config)
+  const urlArgument = readUrlArgument()
+  siteUrl = resolveSiteUrl(urlArgument, config)
   if (siteUrl) notes.push(`TARGET ${siteUrl}`)
   else error('owner.domain must be a valid site origin, or pass --url <origin>.')
 
@@ -146,7 +147,9 @@ if (config) {
   if (config.prelaunch !== undefined && typeof config.prelaunch !== 'boolean') {
     error('prelaunch must be true or false when provided.')
   }
-  prelaunch = config.prelaunch === true
+  // Pre-launch describes owner.domain only. An explicitly audited origin is one
+  // the project already serves, so findings there stay errors.
+  prelaunch = config.prelaunch === true && !urlArgument
   if (prelaunch) {
     notes.push(`PRELAUNCH ${siteUrl} is not serving this project yet; live page findings are warnings.`)
   }

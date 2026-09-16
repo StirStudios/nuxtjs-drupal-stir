@@ -19,7 +19,10 @@ untouched do not need one.
   domain still serves the outgoing site. Live page findings become warnings
   prefixed `(pre-launch)`, the audit prints a `PRELAUNCH` line, and the
   outgoing site's copy is no longer used as legal text for disclosure checks.
-  Everything else still fails the audit as before. Remove the flag at cutover.
+  Everything else still fails the audit as before. The flag applies to
+  `owner.domain` only, so auditing an origin the project already serves with
+  `--url` still reports live page problems as errors. Remove the flag at
+  cutover.
 - `stirTheme.navigation.contentOrientation` sets the desktop header menus'
   dropdown orientation. `'vertical'` stacks child links in a panel under the
   open item; the default `'horizontal'` keeps Nuxt UI's two-column panel.
