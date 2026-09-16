@@ -31,6 +31,24 @@ staging value can never point an audit at the wrong site. To check another
 origin deliberately, pass it on the command line, such as
 `pnpm audit:seo --url http://localhost:3000`. Every run prints its `TARGET`.
 
+### Before a site launches
+
+Until cutover, `owner.domain` still resolves to the outgoing site, so the audit
+holds this project to pages it does not serve yet. Set `"prelaunch": true` in
+`compliance/site.json` to keep those findings visible without failing the build:
+
+```json
+{ "version": 1, "prelaunch": true }
+```
+
+While it is set, the audit reports live page problems (missing pages, an Enzuzo
+or widget embed, an unreachable origin) as warnings prefixed `(pre-launch)`,
+prints a `PRELAUNCH` line naming the target, and never lets the outgoing site's
+copy stand in for tracked legal text when checking service disclosures. Tracked
+copy, the inventory, the review schedule, and Drupal evidence are still held to
+the usual errors. Remove the flag at cutover: leaving it on hides exactly the
+failures the audit exists to catch.
+
 ```sh
 pnpm audit:compliance
 pnpm audit:seo

@@ -16,6 +16,10 @@ const notes = []
 
 const error = message => errors.push(message)
 const warn = message => warnings.push(message)
+// Before cutover the public domain still serves someone else's site, so
+// findings about it describe a site the project does not control yet.
+let prelaunch = false
+const liveIssue = message => (prelaunch ? warn(`${message} (pre-launch)`) : error(message))
 const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 function daysFromToday(value) {
@@ -104,7 +108,7 @@ async function checkPublicDocument(document) {
   try {
     const response = await fetch(url, { redirect: 'follow' })
     if (!response.ok) {
-      error(`${document.title} returned HTTP ${response.status} at ${url}.`)
+      liveIssue(`${document.title} returned HTTP ${response.status} at ${url}.`)
       return
     }
     const html = await response.text()
@@ -112,14 +116,16 @@ async function checkPublicDocument(document) {
       warn(`${document.title} was not found in the rendered page at ${url}.`)
     }
     if (/app\.enzuzo\.com|__enzuzo/i.test(html)) {
-      error(`${document.title} still contains an Enzuzo embed.`)
+      liveIssue(`${document.title} still contains an Enzuzo embed.`)
     }
     if (/userway|accessibility widget/i.test(html)) {
-      error(`${document.title} still contains a UserWay/widget reference.`)
+      liveIssue(`${document.title} still contains a UserWay/widget reference.`)
     }
-    return plainText(html)
+    // A pre-launch domain is not this project's copy, so it must never stand in
+    // for tracked legal text when services are held to their disclosures.
+    return prelaunch ? undefined : plainText(html)
   } catch (cause) {
-    error(`Unable to verify ${url}: ${cause.message}`)
+    liveIssue(`Unable to verify ${url}: ${cause.message}`)
   }
 }
 
@@ -137,6 +143,13 @@ if (config) {
   else error('owner.domain must be a valid site origin, or pass --url <origin>.')
 
   if (config.version !== 1) error('compliance/site.json must use version 1.')
+  if (config.prelaunch !== undefined && typeof config.prelaunch !== 'boolean') {
+    error('prelaunch must be true or false when provided.')
+  }
+  prelaunch = config.prelaunch === true
+  if (prelaunch) {
+    notes.push(`PRELAUNCH ${siteUrl} is not serving this project yet; live page findings are warnings.`)
+  }
   if (JSON.stringify(config).includes('REPLACE_')) {
     error('compliance/site.json still contains starter-template REPLACE_* values.')
   }
