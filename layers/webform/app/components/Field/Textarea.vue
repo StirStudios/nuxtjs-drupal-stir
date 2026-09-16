@@ -17,6 +17,8 @@ const textareaUi = computed(() => props.floatingLabel
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const id = computed(() => injectedInputId?.value ?? props.fieldName)
+// Drupal's #rows sets the starting height; autoresize grows from there.
+const rows = computed(() => Number(props.field['#rows']) || 1)
 </script>
 
 <template>
@@ -26,7 +28,7 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
     autoresize
     :class="['w-full', webform.fieldText]"
     :placeholder="props.floatingLabel ? ' ' : ''"
-    :rows="1"
+    :rows="rows"
     :ui="textareaUi"
     :variant="fieldVariant"
   >

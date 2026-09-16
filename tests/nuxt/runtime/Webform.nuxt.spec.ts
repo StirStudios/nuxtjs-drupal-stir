@@ -90,6 +90,49 @@ describe('Webform (Nuxt runtime)', () => {
     )
   })
 
+  it('starts a textarea at the height Drupal configured', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            message: {
+              '#name': 'message',
+              '#rows': 4,
+              '#title': 'Message',
+              '#type': 'textarea',
+            },
+          },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('textarea').attributes('rows')).toBe('4')
+  })
+
+  it('keeps a single-row textarea when Drupal sets no height', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            message: {
+              '#name': 'message',
+              '#title': 'Message',
+              '#type': 'textarea',
+            },
+          },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('textarea').attributes('rows')).toBe('1')
+  })
+
   it('maps structured Drupal alignment instead of treating it as classes', async () => {
     const wrapper = await mountSuspended(Webform, {
       props: {
