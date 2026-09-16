@@ -6,15 +6,28 @@ This document outlines the full structure of the StirStudios `app.config.ts` fil
 
 ### 🔧 `colorMode`
 
+The layer defaults, which apply to any key a project does not set:
+
 ```ts
 colorMode: {
   forced: false,
   preference: 'dark',
-  showToggle: true,
-  lightRoutes: ['/clients', '/book'],
-  darkRoutes: ['/pricing'],
+  showToggle: false,
+  lightRoutes: [],
+  darkRoutes: [],
 }
 ```
+
+Two consequences are worth knowing before configuring a site:
+
+- **A project that sets no `preference` gets dark.** `preference` also falls
+  back to `'dark'` for any unrecognised value, so a light site must say
+  `preference: 'light'` rather than rely on the default.
+- **The toggle is hidden by default, which locks the theme.** `showToggle:
+  false` alone is enough to enforce `preference` as the baseline, so most
+  projects never need `forced: true`. Because the theme is locked, the color
+  mode module never persists a preference: no `nuxt-color-mode` value is
+  written to browser storage unless a project turns the toggle back on.
 
 #### `colorMode` behavior and precedence
 
