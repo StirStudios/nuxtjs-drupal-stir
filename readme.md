@@ -263,7 +263,7 @@ attributes above; the harness does not depend on project-specific components.
 - `STIR_PRESENTATION_MANIFEST_FIXTURE`: Set to `'1'` only in downstream quality/test workflows without Drupal to use the layer's validated, version-matched fixture; never enable it for deployment builds
 - `DRUPAL_SESSION_COOKIE_NAMES`: Optional comma-separated allowlist for deployments that override Drupal's standard session cookie name
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
-- `DRUPAL_TRUST_PROXY`: Set to `'true'` only when a trusted ingress replaces `X-Forwarded-For` and `DRUPAL_FORWARD_CLIENT_IP` is enabled (default: `false`)
+- `DRUPAL_TRUST_PROXY`: Set to `'true'` when Nuxt runs behind nginx, which sets `X-Real-IP` from the visitor's address. The visitor address is then read from `X-Real-IP` and sent to Drupal in both `X-Real-IP` and `X-Forwarded-For`; the incoming `X-Forwarded-For` is never read, because nginx appends to it and the visitor controls its first entry. For Drupal to use the address, its nginx must trust the Nuxt server as a real-IP proxy (default: `false`)
 - `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate; requires the Turnstile keys below
 - `PROTECTED_RATE_LIMIT_ENABLED`: Set to `'false'` to disable the protected-login limiter (default: enabled)
 - `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)

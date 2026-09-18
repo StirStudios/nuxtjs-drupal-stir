@@ -1,5 +1,6 @@
-import { createError, getRequestIP, type H3Event } from 'h3'
+import { createError, type H3Event } from 'h3'
 import { RateLimiterMemory } from 'rate-limiter-flexible'
+import { getStirVisitorIp } from '../../../foundation/server/utils/stirDrupalApi'
 
 const DEFAULT_MAX_ATTEMPTS = 5
 const DEFAULT_WINDOW_SECONDS = 15 * 60
@@ -97,16 +98,7 @@ const getRateLimitKey = async (
   identifier?: string,
   trustProxy = false,
 ): Promise<string> => {
-  let requestIp = ''
-
-  if (!identifier) {
-    try {
-      requestIp = getRequestIP(event, { xForwardedFor: trustProxy }) || ''
-    } catch {
-      requestIp = ''
-    }
-  }
-
+  const requestIp = identifier ? '' : getStirVisitorIp(event, trustProxy) || ''
   const clientIdentifier = identifier || requestIp || 'unknown'
 
   return `${STORAGE_BASE}:${await hashIdentifier(clientIdentifier)}`

@@ -113,7 +113,10 @@ export function buildStirDrupalHeaders(
   }
 
   if (typeof options.clientIp === 'string' && options.clientIp.trim()) {
+    // Both headers carry the same single address, so Drupal's nginx finds the
+    // visitor whichever real-IP header it is configured to read.
     headers['x-forwarded-for'] = options.clientIp
+    headers['x-real-ip'] = options.clientIp
   }
 
   if (typeof options.csrfToken === 'string' && options.csrfToken.trim()) {
@@ -209,6 +212,31 @@ const normalizeClientIp = (value: string | undefined): string | undefined => {
   return normalized
 }
 
+/**
+ * Returns the visitor's IP address as the server sees it.
+ *
+ * Behind a reverse proxy the socket address is the proxy itself, so with
+ * `trustProxy` the address comes from `X-Real-IP`, which nginx sets from its
+ * own resolved client address and overwrites whatever the visitor sent.
+ * `X-Forwarded-For` is never read: nginx appends to it, leaving its first
+ * entry under the visitor's control. Without `trustProxy` the socket address
+ * is used, for a server that faces visitors directly.
+ */
+export const getStirVisitorIp = (
+  event: H3Event,
+  trustProxy: boolean,
+): string | undefined => {
+  if (trustProxy) {
+    return normalizeClientIp(getHeader(event, 'x-real-ip'))
+  }
+
+  try {
+    return normalizeClientIp(getRequestIP(event))
+  } catch {
+    return undefined
+  }
+}
+
 export const getStirForwardedClientIp = (
   event: H3Event,
 ): string | undefined => {
@@ -220,13 +248,7 @@ export const getStirForwardedClientIp = (
 
   if (forwarding.enabled !== true) return undefined
 
-  try {
-    return normalizeClientIp(getRequestIP(event, {
-      xForwardedFor: forwarding.trustProxy === true,
-    }))
-  } catch {
-    return undefined
-  }
+  return getStirVisitorIp(event, forwarding.trustProxy === true)
 }
 
 export const markStirPrivateResponse = (event: H3Event): void => {
