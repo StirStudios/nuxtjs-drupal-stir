@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { useAppConfig } from '#app'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import FieldTurnstile from '../../../layers/turnstile/app/components/Field/Turnstile.vue'
@@ -58,5 +58,35 @@ describe('Turnstile configuration', () => {
     options['after-interactive-callback']?.()
     await wrapper.vm.$nextTick()
     expect(wrapper.classes()).toContain('mb-0!')
+  })
+
+  it('requests a fresh token when the form clears a spent one', async () => {
+    const reset = vi.fn()
+    const widgetStub = {
+      name: 'NuxtTurnstile',
+      props: ['modelValue', 'options'],
+      setup: (_props: unknown, { expose }: { expose: (exposed: object) => void }) => {
+        expose({ reset })
+      },
+      template: '<div />',
+    }
+    const wrapper = await mountSuspended(FieldTurnstile, {
+      props: { modelValue: 'spent-token' },
+      global: {
+        stubs: { LazyNuxtTurnstile: widgetStub, NuxtTurnstile: widgetStub },
+      },
+    })
+
+    await wrapper.setProps({ modelValue: '' })
+    expect(reset).toHaveBeenCalledOnce()
+
+    await wrapper.setProps({ modelValue: 'fresh-token' })
+    const options = wrapper.findComponent({ name: 'NuxtTurnstile' })
+      .props('options') as Record<string, () => unknown>
+
+    // Expiry is handled by the widget itself, so it must not reset twice.
+    options['expired-callback']?.()
+    await wrapper.setProps({ modelValue: '' })
+    expect(reset).toHaveBeenCalledOnce()
   })
 })

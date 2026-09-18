@@ -49,6 +49,10 @@ copy, the inventory, the review schedule, and Drupal evidence are still held to
 the usual errors. Remove the flag at cutover: leaving it on hides exactly the
 failures the audit exists to catch.
 
+The flag describes `owner.domain` only. Auditing an origin the project already
+serves, such as `pnpm audit:compliance --url https://stage.example.com`, ignores
+the flag and reports live page problems as errors.
+
 ```sh
 pnpm audit:compliance
 pnpm audit:seo

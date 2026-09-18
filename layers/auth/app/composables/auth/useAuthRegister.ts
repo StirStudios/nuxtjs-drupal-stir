@@ -143,6 +143,9 @@ export function useAuthRegister<
       })
     } finally {
       isLoading.value = false
+      // The server spends the token on every attempt; clearing it makes the
+      // widget issue a fresh one for the next submission.
+      turnstileToken.value = ''
     }
   }
 
