@@ -84,6 +84,9 @@ remain available without a pre-existing session token.
 
 - Auth forms can include Turnstile tokens.
 - Server-side validation belongs in Drupal (`stir_turnstile` + consuming modules).
+- Turnstile tokens are single-use and Drupal spends one on every attempt. The
+  auth composables clear their token after each submission, which makes
+  `FieldTurnstile` request a fresh one; custom forms should do the same.
 - The local `/auth/protected` password gate verifies Turnstile in Nuxt before
   comparing the configured password. `TURNSTILE_KEY` and `TURNSTILE_SECRET`
   are therefore required whenever `PROTECTED_PASSWORD` is enabled.

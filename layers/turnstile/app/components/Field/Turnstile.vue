@@ -11,10 +11,13 @@ const props = withDefaults(defineProps<{
 const turnstileToken = defineModel<string | undefined>({ default: undefined })
 const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
   .turnstile ?? {}) as TurnstileTheme
+const widget = useTemplateRef<{ reset: () => void }>('widget')
 const verificationFailed = ref(false)
 const isInteractive = ref(false)
+let clearedByWidget = false
 
 const clearVerification = () => {
+  clearedByWidget = Boolean(turnstileToken.value)
   turnstileToken.value = ''
   isInteractive.value = false
 }
@@ -33,8 +36,18 @@ const handleInteractiveEnd = () => {
   isInteractive.value = false
 }
 
-watch(turnstileToken, (token) => {
-  if (token) verificationFailed.value = false
+// Tokens are single-use: once a form has submitted one, the server has spent
+// it. A parent clears the model to ask for a fresh token, so a retry after a
+// failed submission does not resend a spent one. Clears raised by the widget's
+// own expiry or error callbacks are left to the widget.
+watch(turnstileToken, (token, previous) => {
+  if (token) {
+    verificationFailed.value = false
+  }
+  else if (previous && !clearedByWidget) {
+    widget.value?.reset()
+  }
+  clearedByWidget = false
 })
 </script>
 
@@ -51,6 +64,7 @@ watch(turnstileToken, (token) => {
     ]"
   >
     <LazyNuxtTurnstile
+      ref="widget"
       v-model="turnstileToken"
       class="max-w-xs overflow-x-hidden"
       :options="{

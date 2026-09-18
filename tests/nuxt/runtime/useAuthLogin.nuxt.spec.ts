@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { clearNuxtData } from '#app'
 import { defineComponent } from 'vue'
+import { createError } from 'h3'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import {
   useAuthLogin,
@@ -136,5 +137,48 @@ describe('useAuthLogin post-login destination', () => {
 
   it('navigates nowhere when the caller returns false', async () => {
     expect(await signIn({ redirectTo: () => false })).toEqual([])
+  })
+})
+
+describe('useAuthLogin Turnstile token', () => {
+  let unregister: Array<() => void> = []
+
+  beforeEach(() => {
+    clearNuxtData('stir-auth-ui-config')
+    unregister = [
+      registerEndpoint('/api/auth/config', () => ({
+        version: 2,
+        accountsEnabled: true,
+      })),
+      registerEndpoint('/api/auth/login', () => {
+        throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
+      }),
+    ]
+  })
+
+  afterEach(() => {
+    for (const remove of unregister) remove()
+    unregister = []
+    clearNuxtData('stir-auth-ui-config')
+  })
+
+  it('discards the spent token after a failed attempt', async () => {
+    let login: ReturnType<typeof useAuthLogin> | undefined
+
+    const LoginHarness = defineComponent({
+      setup() {
+        login = useAuthLogin()
+
+        return () => null
+      },
+    })
+
+    const wrapper = await mountSuspended(LoginHarness)
+
+    login!.turnstileToken.value = 'spent-token'
+    await login!.onSubmit(submitEvent)
+
+    expect(login!.turnstileToken.value).toBe('')
+    wrapper.unmount()
   })
 })

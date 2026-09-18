@@ -37,6 +37,14 @@ untouched do not need one.
 
 ### Fixed
 
+- Sign-in, registration and password-request forms no longer resend a spent
+  Turnstile token. Drupal verifies the token on every attempt and Turnstile
+  tokens are single-use, so once `stir_account` enforced Turnstile on login a
+  retry after a wrong password failed verification until the widget's
+  250-second refresh. Each composable now clears its token after every
+  attempt, and `FieldTurnstile` treats a model cleared by its parent as a
+  request for a fresh token. Custom auth forms that use `FieldTurnstile` get a
+  fresh token the same way: set the bound token to `''` after submitting.
 - Auth and account form fields now resolve their Nuxt UI variant and width
   class the same way the webform layer does: `stirTheme.webform.fieldVariant`,
   then `stirTheme.forms.variant`, and `stirTheme.webform.fieldInput`. The
