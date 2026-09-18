@@ -138,9 +138,11 @@ the protected-login route; consumers should use the atomic adapter seam above.
 The [read-only consumer scan](consumer-compatibility-2026-09-06.md) found no callers
 of those old helpers.
 
-`PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only when a
-trusted ingress removes client-supplied forwarding headers and sets
-`X-Forwarded-For` itself.
+`PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only behind a
+trusted ingress. The visitor address then comes from `X-Real-IP`, or else the
+last `X-Forwarded-For` entry, which the ingress wrote or appended. The first
+entry is never used, because an ingress that appends leaves it under the
+visitor's control.
 
 ## Deployment notes
 

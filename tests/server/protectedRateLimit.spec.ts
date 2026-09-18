@@ -21,13 +21,15 @@ describe('protected login rate limit', () => {
     } as never).trustProxy).toBe(true)
   })
 
+  // The forged first X-Forwarded-For entries differ, so only X-Real-IP, set by
+  // nginx, can make the two requests count as one visitor.
   it('uses the socket address unless trusted-proxy mode is enabled', async () => {
     const limiter = new RateLimiterMemory({ points: 1, duration: 60 })
     const firstEvent = {
       context: {},
       node: {
         req: {
-          headers: { 'x-forwarded-for': '198.51.100.10' },
+          headers: { 'x-forwarded-for': '203.0.113.1, 198.51.100.10', 'x-real-ip': '198.51.100.10' },
           socket: { remoteAddress: '192.0.2.1' },
         },
       },
@@ -36,7 +38,7 @@ describe('protected login rate limit', () => {
       context: {},
       node: {
         req: {
-          headers: { 'x-forwarded-for': '198.51.100.10' },
+          headers: { 'x-forwarded-for': '203.0.113.2, 198.51.100.10', 'x-real-ip': '198.51.100.10' },
           socket: { remoteAddress: '192.0.2.2' },
         },
       },

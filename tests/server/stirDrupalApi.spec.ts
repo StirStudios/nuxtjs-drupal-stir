@@ -340,7 +340,10 @@ describe('Stir Drupal API boundary', () => {
       event as { node: { req: { headers: Record<string, string> } } }
     ).node.req.headers
 
-    requestHeaders['x-forwarded-for'] = '203.0.113.10'
+    // A visitor can put anything first in X-Forwarded-For; nginx overwrites
+    // X-Real-IP with the address it actually saw.
+    requestHeaders['x-forwarded-for'] = '198.51.100.99, 203.0.113.10'
+    requestHeaders['x-real-ip'] = '203.0.113.10'
 
     await stirDrupalApiRequest(event, '/api/auth/login', {
       forwardClientIp: true,
@@ -352,6 +355,7 @@ describe('Stir Drupal API boundary', () => {
         headers: {
           'x-api-key': 'api-key',
           'x-forwarded-for': '203.0.113.10',
+          'x-real-ip': '203.0.113.10',
         },
         redirect: 'manual',
       }),
