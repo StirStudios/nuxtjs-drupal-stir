@@ -7,6 +7,7 @@ import {
   setResponseHeader,
   type H3Event,
 } from 'h3'
+import { isCloudflareAddress } from './cloudflareAddresses'
 import { assertStirSameOrigin } from './stirRequestSecurity'
 
 // Shared by focused server capabilities and the full Drupal CE platform.
@@ -224,6 +225,10 @@ const normalizeClientIp = (value: string | undefined): string | undefined => {
  *   appended. The first entry is never used: a proxy that appends leaves it
  *   under the visitor's control.
  *
+ * When that address is a Cloudflare edge, the visitor is behind it, in
+ * `CF-Connecting-IP`. That header is only believed when the connection really
+ * came from Cloudflare; anyone reaching the server directly could send it.
+ *
  * Without `trustProxy` the socket address is used, for a server that faces
  * visitors directly.
  */
@@ -236,9 +241,12 @@ export const getStirVisitorIp = (
       ?.split(',')
       .map(entry => entry.trim())
       .filter(Boolean)
-
-    return normalizeClientIp(getHeader(event, 'x-real-ip'))
+    const proxied = normalizeClientIp(getHeader(event, 'x-real-ip'))
       ?? normalizeClientIp(forwarded?.at(-1))
+
+    return proxied && isCloudflareAddress(proxied)
+      ? normalizeClientIp(getHeader(event, 'cf-connecting-ip'))
+      : proxied
   }
 
   try {

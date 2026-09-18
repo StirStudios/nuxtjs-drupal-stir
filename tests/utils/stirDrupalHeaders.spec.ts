@@ -60,3 +60,24 @@ describe('getStirVisitorIp', () => {
     expect(getStirVisitorIp(eventWith({ 'x-real-ip': '203.0.113.9' }, '192.0.2.4'), false)).toBe('192.0.2.4')
   })
 })
+
+describe('getStirVisitorIp behind Cloudflare', () => {
+  const eventWith = (headers: Record<string, string>) => ({
+    context: {},
+    node: { req: { headers, socket: { remoteAddress: '127.0.0.1' } } },
+  }) as never
+
+  it('takes the visitor from CF-Connecting-IP when the connection came from Cloudflare', () => {
+    expect(getStirVisitorIp(eventWith({ 'x-real-ip': '104.16.123.96', 'cf-connecting-ip': '198.51.100.10' }), true))
+      .toBe('198.51.100.10')
+  })
+
+  it('ignores CF-Connecting-IP from a visitor who reached the server directly', () => {
+    expect(getStirVisitorIp(eventWith({ 'x-real-ip': '198.51.100.10', 'cf-connecting-ip': '203.0.113.9' }), true))
+      .toBe('198.51.100.10')
+  })
+
+  it('never falls back to the Cloudflare edge as the visitor', () => {
+    expect(getStirVisitorIp(eventWith({ 'x-real-ip': '104.16.123.96' }), true)).toBeUndefined()
+  })
+})
