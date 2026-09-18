@@ -216,18 +216,29 @@ const normalizeClientIp = (value: string | undefined): string | undefined => {
  * Returns the visitor's IP address as the server sees it.
  *
  * Behind a reverse proxy the socket address is the proxy itself, so with
- * `trustProxy` the address comes from `X-Real-IP`, which nginx sets from its
- * own resolved client address and overwrites whatever the visitor sent.
- * `X-Forwarded-For` is never read: nginx appends to it, leaving its first
- * entry under the visitor's control. Without `trustProxy` the socket address
- * is used, for a server that faces visitors directly.
+ * `trustProxy` the address comes from the proxy's own headers:
+ *
+ * - `X-Real-IP`, which nginx sets from the address it saw, overwriting
+ *   whatever the visitor sent; otherwise
+ * - the last `X-Forwarded-For` entry, which the trusted proxy wrote or
+ *   appended. The first entry is never used: a proxy that appends leaves it
+ *   under the visitor's control.
+ *
+ * Without `trustProxy` the socket address is used, for a server that faces
+ * visitors directly.
  */
 export const getStirVisitorIp = (
   event: H3Event,
   trustProxy: boolean,
 ): string | undefined => {
   if (trustProxy) {
+    const forwarded = getHeader(event, 'x-forwarded-for')
+      ?.split(',')
+      .map(entry => entry.trim())
+      .filter(Boolean)
+
     return normalizeClientIp(getHeader(event, 'x-real-ip'))
+      ?? normalizeClientIp(forwarded?.at(-1))
   }
 
   try {

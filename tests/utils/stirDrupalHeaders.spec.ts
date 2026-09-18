@@ -46,8 +46,14 @@ describe('getStirVisitorIp', () => {
     expect(getStirVisitorIp(event, true)).toBe('198.51.100.10')
   })
 
-  it('has no visitor address behind a proxy that did not set one', () => {
-    expect(getStirVisitorIp(eventWith({ 'x-forwarded-for': '203.0.113.9' }), true)).toBeUndefined()
+  it('otherwise takes the forwarded entry the proxy wrote, never the visitor-controlled first one', () => {
+    // An ingress that replaces the header, and one that appends to it.
+    expect(getStirVisitorIp(eventWith({ 'x-forwarded-for': '198.51.100.10' }), true)).toBe('198.51.100.10')
+    expect(getStirVisitorIp(eventWith({ 'x-forwarded-for': '203.0.113.9, 198.51.100.10' }), true)).toBe('198.51.100.10')
+  })
+
+  it('has no visitor address behind a proxy that sent neither header', () => {
+    expect(getStirVisitorIp(eventWith({}), true)).toBeUndefined()
   })
 
   it('uses the socket address when the server faces visitors directly', () => {

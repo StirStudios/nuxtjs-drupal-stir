@@ -263,12 +263,12 @@ attributes above; the harness does not depend on project-specific components.
 - `STIR_PRESENTATION_MANIFEST_FIXTURE`: Set to `'1'` only in downstream quality/test workflows without Drupal to use the layer's validated, version-matched fixture; never enable it for deployment builds
 - `DRUPAL_SESSION_COOKIE_NAMES`: Optional comma-separated allowlist for deployments that override Drupal's standard session cookie name
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
-- `DRUPAL_TRUST_PROXY`: Set to `'true'` when Nuxt runs behind nginx, which sets `X-Real-IP` from the visitor's address. The visitor address is then read from `X-Real-IP` and sent to Drupal in both `X-Real-IP` and `X-Forwarded-For`; the incoming `X-Forwarded-For` is never read, because nginx appends to it and the visitor controls its first entry. For Drupal to use the address, its nginx must trust the Nuxt server as a real-IP proxy (default: `false`)
+- `DRUPAL_TRUST_PROXY`: Set to `'true'` when Nuxt runs behind a trusted ingress such as nginx. The visitor address is read from `X-Real-IP`, or else the last `X-Forwarded-For` entry (never the visitor-controlled first one), and sent to Drupal in both `X-Real-IP` and `X-Forwarded-For`. For Drupal to use it, Drupal's nginx must trust the Nuxt server as a real-IP proxy (default: `false`)
 - `PROTECTED_PASSWORD`: Server-only password used by the lightweight `/auth/protected` gate; requires the Turnstile keys below
 - `PROTECTED_RATE_LIMIT_ENABLED`: Set to `'false'` to disable the protected-login limiter (default: enabled)
 - `PROTECTED_RATE_LIMIT_MAX_ATTEMPTS`: Failed attempts allowed per window (default: `5`)
 - `PROTECTED_RATE_LIMIT_WINDOW_SECONDS`: Protected-login window in seconds (default: `900`)
-- `PROTECTED_RATE_LIMIT_TRUST_PROXY`: Set to `'true'` only behind an ingress that replaces, rather than appends to, `X-Forwarded-For` (default: `false`)
+- `PROTECTED_RATE_LIMIT_TRUST_PROXY`: Set to `'true'` only behind a trusted ingress. The visitor address is read from `X-Real-IP`, or else the last `X-Forwarded-For` entry, which the ingress wrote or appended; the visitor-controlled first entry is never used (default: `false`)
 - `NUXT_STIR_AUTH_REGISTER_ALLOWED_FIELDS`: Optional JSON array of keys accepted in the registration `fields` payload, for example `'["first_name","newsletter"]'` (default: any well-formed key except base user entity keys)
 - `DRUPAL_REQUEST_TIMEOUT_MS`: Timeout for custom Nitro-to-Drupal requests in milliseconds (default: `10000`)
 - `WEBFORM_MAX_REQUEST_BYTES`: Maximum webform request size (default: `10485760`, 10 MB)
