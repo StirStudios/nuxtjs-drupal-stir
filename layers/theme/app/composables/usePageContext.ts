@@ -4,17 +4,17 @@ import {
   resolveDrupalPageAccess,
 } from '../utils/editorialAccess'
 import { isDrupalRenderedRoute } from '../utils/drupalPage'
-import { useAuthSession } from '../../../auth/app/composables/useAuthSession'
 
 export function usePageContext(page = useStirDrupalCe().getPage()) {
   const route = useRoute()
-  const session = useAuthSession()
+  // Null when the auth layer is not installed: the page payload alone decides.
+  const session = useOptionalAuthSession()
 
   onMounted(() => {
     // The drupal-session-no-ssr safeguard disables SSR for any request carrying
     // a Drupal session cookie, so a server-rendered load is always anonymous and
     // must never spend a session request on a public page.
-    if (useNuxtApp().payload.serverRendered) return
+    if (!session || useNuxtApp().payload.serverRendered) return
 
     void session.fetchSession().catch(() => {
       // Route payload access remains available if the session check fails.
@@ -28,8 +28,8 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
   const access = computed(() => mergeDrupalPageAccess(
     resolveDrupalPageAccess(page.value),
     resolveAuthSessionAccess({
-      loggedIn: session.loggedIn.value,
-      user: session.user.value,
+      loggedIn: session?.loggedIn.value ?? false,
+      user: session?.user.value ?? null,
     }),
   ))
   const isAuthenticated = computed(() => access.value.isAuthenticated)
