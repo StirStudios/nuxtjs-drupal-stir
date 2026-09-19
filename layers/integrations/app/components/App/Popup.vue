@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PopupMedia, PopupNode, PopupProps } from '#stir/types'
-import { useAuthSession } from '../../../../auth/app/composables/auth/useAuthSession'
+import { useAuthSession } from '../../../../auth/app/composables/useAuthSession'
 
 const appConfig = useAppConfig()
 const { renderCustomElements } = useStirDrupalCe()

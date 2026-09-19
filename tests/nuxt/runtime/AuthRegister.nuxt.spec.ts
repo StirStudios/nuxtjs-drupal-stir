@@ -12,7 +12,7 @@ import RegisterPage from '../../../layers/auth/app/pages/auth/register.vue'
 import {
   useAuthRegister,
   type StirAuthRegisterOptions,
-} from '../../../layers/auth/app/composables/auth/useAuthRegister'
+} from '../../../layers/auth/app/composables/useAuthRegister'
 
 type ExtraState = { first_name: string, newsletter: boolean }
 

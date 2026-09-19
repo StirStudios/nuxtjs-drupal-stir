@@ -1,5 +1,5 @@
-import { useAuthConfig } from '../composables/auth/useAuthConfig'
-import { useAuthSession } from '../composables/auth/useAuthSession'
+import { useAuthConfig } from '../composables/useAuthConfig'
+import { useAuthSession } from '../composables/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
 
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'

@@ -1,4 +1,4 @@
-import { useAuthConfig } from '../composables/auth/useAuthConfig'
+import { useAuthConfig } from '../composables/useAuthConfig'
 
 const ACCOUNT_AUTH_ROUTES = new Set([
   '/auth/login',

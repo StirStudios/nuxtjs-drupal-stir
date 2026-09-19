@@ -4,7 +4,7 @@ import { defineComponent, nextTick, ref } from 'vue'
 import {
   registerAccountNavVisibility,
   useAccountNav,
-} from '../../../layers/auth/app/composables/account/useAccountNav'
+} from '../../../layers/auth/app/composables/useAccountNav'
 
 const state = vi.hoisted(() => ({
   appConfig: {} as Record<string, unknown>,

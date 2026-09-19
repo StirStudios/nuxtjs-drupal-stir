@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 import { clearNuxtData } from '#app'
-import { useAuthActions } from '../../../layers/auth/app/composables/auth/useAuthActions'
+import { useAuthActions } from '../../../layers/auth/app/composables/useAuthActions'
 import { useAppContext, useAppFooterContext, useAppRegionBlocks } from '../../../layers/theme/app/composables/useAppContext'
 
 describe('shared app context', () => {

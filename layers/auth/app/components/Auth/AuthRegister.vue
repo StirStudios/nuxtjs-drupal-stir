@@ -6,8 +6,8 @@
 import {
   useAuthRegister,
   type StirAuthRegisterOptions,
-} from '../../composables/auth/useAuthRegister'
-import { useAuthConfig } from '../../composables/auth/useAuthConfig'
+} from '../../composables/useAuthRegister'
+import { useAuthConfig } from '../../composables/useAuthConfig'
 
 const props = defineProps<{
   /**

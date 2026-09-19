@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createError } from 'h3'
 import { mockNuxtImport, mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
-import { useAuthSession } from '../../../layers/auth/app/composables/auth/useAuthSession'
+import { useAuthSession } from '../../../layers/auth/app/composables/useAuthSession'
 
 mockNuxtImport('useAppConfig', () => {
   return () => ({

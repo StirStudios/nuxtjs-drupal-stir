@@ -1,4 +1,4 @@
-import { useAuthConfig } from '../composables/auth/useAuthConfig'
+import { useAuthConfig } from '../composables/useAuthConfig'
 import type { AuthSessionResponse } from '../types/auth'
 
 const GUEST_ONLY_AUTH_ROUTES = new Set([
