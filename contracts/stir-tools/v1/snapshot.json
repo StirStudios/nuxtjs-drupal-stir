@@ -35,7 +35,7 @@
     "schemas/app-context.schema.json": "dbc3f728a29467abb0c6f6f749066d46b88e51e42f4f8ff94e33a3108b345f66",
     "schemas/auth-register-policy.schema.json": "b3b9c3b4830580f0507e92784e9616c1ed8cabb4f4bbf4d384d45aacaeb4a2e2",
     "schemas/auth-register-response.schema.json": "5a1856aae50df5a5f755110612cd849ca7dd73298884f5ffef5557782955d827",
-    "schemas/auth-session.schema.json": "aaeb0e74c06e48497e12b7524caa6364441d2c7dc7dcb2ff4d8241f9287fe6de",
+    "schemas/auth-session.schema.json": "2d7ece74fc45e18785d229a242d834a75ef1b2da8afb7bc74df7076fed88d76c",
     "schemas/auth-ui-config.schema.json": "cb7b693243fd68fa0e68e5adf68829efbaab6accc0cd3922459e8a7ffda35f05",
     "schemas/component-tree.schema.json": "d529501d9410ebe9a35e9c68416014a9a3798d2f9b13aad1ac2e7e02dfc98d32",
     "schemas/contract-manifest.schema.json": "3f0be56ce6463c29c46e94a4604668d97c813485942c21371a552927c014e3e5",

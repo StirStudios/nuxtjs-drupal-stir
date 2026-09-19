@@ -45,6 +45,30 @@ describe('/api/auth/session', () => {
     })
   })
 
+  it('reports a device-limit sign-out without leaking it into the user', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      public: { api: 'https://cms.example.test' },
+    }))
+    vi.stubGlobal('$fetch', {
+      raw: vi.fn().mockResolvedValue({
+        _data: {
+          authenticated: false,
+          uid: 0,
+          name: '',
+          mail: '',
+          roles: ['anonymous'],
+          signed_out_reason: 'session_limit',
+        },
+      }),
+    })
+
+    const response = await sessionHandler(mockEvent)
+
+    expect(response).toMatchObject({ authenticated: false, signedOutReason: 'session_limit' })
+    expect(response?.user).not.toHaveProperty('signed_out_reason')
+  })
+
   it('returns unauthenticated payload when Drupal base URL is missing', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: '',

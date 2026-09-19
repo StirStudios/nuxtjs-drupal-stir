@@ -9,6 +9,8 @@ export type AuthSessionResponse = {
   authenticated: boolean
   protectedAuthenticated: boolean
   user: AuthSessionUser | null
+  /** Present once when the device limit signed this browser out. */
+  signedOutReason?: 'session_limit'
 }
 
 export type LoginResponse = {

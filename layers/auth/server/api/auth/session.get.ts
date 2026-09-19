@@ -13,6 +13,7 @@ type AuthSessionResponse = {
   mail?: string
   roles?: string[]
   user?: Record<string, unknown> | null
+  signed_out_reason?: string
 } & Record<string, unknown>
 
 export default defineEventHandler(async (event) => {
@@ -31,11 +32,13 @@ export default defineEventHandler(async (event) => {
       },
     )
 
-    const { authenticated, user, ...account } = response || {}
+    // Kept out of the user object: it describes this browser, not the account.
+    const { authenticated, user, signed_out_reason: signedOutReason, ...account } = response || {}
 
     return {
       authenticated: Boolean(response?.authenticated),
       protectedAuthenticated,
+      ...(signedOutReason === 'session_limit' ? { signedOutReason } : {}),
       user: user ?? {
         ...account,
         uid: response?.uid ?? 0,

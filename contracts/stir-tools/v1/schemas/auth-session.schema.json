@@ -25,7 +25,12 @@
       "items": { "type": "string", "minLength": 1 }
     },
     "csrf_token": { "type": "string", "minLength": 1 },
-    "logout_token": { "type": "string", "minLength": 1 }
+    "logout_token": { "type": "string", "minLength": 1 },
+    "signed_out_reason": {
+      "description": "Present once, on an anonymous session, when the Session Limit module signed this browser out because the account signed in on another device.",
+      "type": "string",
+      "enum": ["session_limit"]
+    }
   },
   "allOf": [
     {

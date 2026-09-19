@@ -27,6 +27,11 @@ export function useAuthSession() {
     'auth-session-user',
     () => null,
   )
+  // Why this browser was signed out, until the notice has been shown.
+  const signedOutReason = useState<AuthSessionResponse['signedOutReason'] | null>(
+    'auth-signed-out-reason',
+    () => null,
+  )
   const requestFetch = useRequestFetch()
   const { error, execute } = useAsyncData(
     'stir-auth-session',
@@ -36,6 +41,7 @@ export function useAuthSession() {
       loggedIn.value = Boolean(session?.authenticated)
       protectedLoggedIn.value = Boolean(session?.protectedAuthenticated)
       user.value = session?.user ?? null
+      if (session?.signedOutReason) signedOutReason.value = session.signedOutReason
       ready.value = true
 
       return session
@@ -73,6 +79,7 @@ export function useAuthSession() {
     loggedIn,
     protectedLoggedIn,
     user,
+    signedOutReason,
     fetchSession,
     clearSession,
   }
