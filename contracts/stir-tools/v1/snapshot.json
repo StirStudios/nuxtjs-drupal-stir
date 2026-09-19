@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.25.0",
+  "contractVersion": "1.25.1",
   "files": {
     "fixtures/account-settings-update-error.json": "55b9059ee49f33b77876622afd3dabc30369dec71f6eff56b9698610ab5a678f",
     "fixtures/account-settings-update-success.json": "23fca3887518f9ddbc9f52abae9bf2aab021dc9e0a185cbc83cfe22cea7c5076",
@@ -9,7 +9,7 @@
     "fixtures/account-snapshot-anonymous.json": "e26c7e0966f01816cb1f8b81877cb9b55a6c9bc7f4fa6a7dd5c9820ceb300a5d",
     "fixtures/account-snapshot-authenticated.json": "f4e3273c77132846259ca93f877d86461ba1689fc9e4a558a6141bb37156bba4",
     "fixtures/account-snapshot-editor.json": "cbc569e6dcb3dcea2de50578bf40d880ae3e122d0a0ee999ed08a14c1651d108",
-    "fixtures/app-context.json": "7110555940bfc4de0f807ae0b5cbfce1850522912267a4c0b82f916afcb8aa18",
+    "fixtures/app-context.json": "2a56e85407b86e1aa05dce697aebaaf6f65ed171a52c255c93fab4f28928a856",
     "fixtures/auth-register-admin-approval.json": "8d6a29215bd78a3b866b1e0b53afaabb16ce41a69e061bc7a6a8935384e93e86",
     "fixtures/auth-register-error.json": "39d5b1dbf59ff60588ffffb5941058328a37c420b52cd2113538b8e6c3899cc7",
     "fixtures/auth-register-policy-closed.json": "03a8db4bf720eeedc956b37fc41b3e8d4c14245c777a65b3261e1bb075dc9fde",
@@ -31,7 +31,7 @@
     "fixtures/webform-contact.json": "7074c24531e159b3cc479f538832b1087886cc400ac11f8a34be07581d673ee1",
     "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
     "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
-    "manifest.json": "dc79d109aeb7829cf54889ce7b733e16ce1097328b08a612040aebb7269689b9",
+    "manifest.json": "58f61fc80502f778ae6d08c111e9189b01a15662153e4ce8b6efd27fd36c93b2",
     "schemas/account-settings-update.schema.json": "6f3362b418e3b31afbd54e9f76be2d6bd052f8b4a59383ebdcab4666941ae252",
     "schemas/account-settings-values.schema.json": "189523229869b68ba03c8cbee22c83855d6f869b8a10ab06170463d241efb1ea",
     "schemas/account-snapshot.schema.json": "828e11781e469cae03125aa031ee625d3c8f5861703169eb34c442458cee3656",

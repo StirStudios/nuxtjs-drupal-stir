@@ -9,10 +9,8 @@ const state = vi.hoisted(() => ({
 }))
 
 mockNuxtImport('useStirDrupalCe', () => () => ({ getPage: () => state.page }))
-mockNuxtImport('useAppContext', () => () => ({
-  data: ref(state.appContextBlocks ? { blocks: state.appContextBlocks } : null),
-  status: ref('success'),
-  execute: vi.fn(),
+mockNuxtImport('useAppRegionBlocks', () => (area: string) => ({
+  data: ref(state.appContextBlocks?.[area]),
 }))
 
 const popupBlock = (uuid: string) => [{
@@ -46,29 +44,15 @@ describe('usePopupData', () => {
     state.appContextBlocks = undefined
   })
 
-  it('reads popups from the page popups region', async () => {
-    state.page.value = { blocks: { popups: popupBlock('popups-region') } }
-
-    expect(await resolvePopupUuid()).toBe('popups-region')
-  })
-
-  it('falls back to the legacy decoupled region from unmigrated producers', async () => {
-    state.page.value = { blocks: { decoupled: popupBlock('legacy-region') } }
-
-    expect(await resolvePopupUuid()).toBe('legacy-region')
-  })
-
-  it('prefers the popups region when both regions are present', async () => {
-    state.page.value = {
-      blocks: { popups: popupBlock('popups-region'), decoupled: popupBlock('legacy-region') },
-    }
-
-    expect(await resolvePopupUuid()).toBe('popups-region')
-  })
-
-  it('reads the popups region from app context when the page has no blocks', async () => {
+  it('reads the popups region Drupal rendered for this path', async () => {
     state.appContextBlocks = { popups: popupBlock('app-context-region') }
 
     expect(await resolvePopupUuid()).toBe('app-context-region')
+  })
+
+  it('falls back to a popup placed in the page content', async () => {
+    state.page.value = { content: popupBlock('in-content')[0]?.slots.paragraphBlock }
+
+    expect(await resolvePopupUuid()).toBe('in-content')
   })
 })
