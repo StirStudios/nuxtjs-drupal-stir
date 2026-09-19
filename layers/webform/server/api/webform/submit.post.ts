@@ -2,7 +2,6 @@ import {
   defineEventHandler,
   createError,
   getHeader,
-  setHeader,
   setResponseStatus,
   type H3Event,
 } from 'h3'
@@ -21,6 +20,7 @@ import {
   fetchStirDrupalCsrfToken,
   getStirDrupalApiConfig,
   getStirForwardedCookie,
+  markStirPrivateResponse,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 
 type SubmissionBody = Record<string, unknown>
@@ -137,7 +137,7 @@ async function parseSubmission(
 }
 
 export default defineEventHandler(async (event) => {
-  setHeader(event, 'Cache-Control', 'private, no-store, max-age=0')
+  markStirPrivateResponse(event)
 
   const limits = getWebformSubmissionLimits()
 

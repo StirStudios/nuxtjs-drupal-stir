@@ -1,6 +1,6 @@
-import { getResponseHeader, setResponseHeader } from 'h3'
+import { getResponseHeader } from 'h3'
+import { markStirPrivateResponse } from '../utils/stirDrupalApi'
 
-const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 const PRIVATE_DIRECTIVE = /(?:^|,)\s*(?:private|no-store)\b/i
 const PUBLIC_DIRECTIVE = /(?:^|,)\s*public\b/i
 
@@ -16,7 +16,7 @@ export default defineNitroPlugin((nitroApp) => {
       PRIVATE_DIRECTIVE.test(cacheControl)
       && PUBLIC_DIRECTIVE.test(cacheControl)
     ) {
-      setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
+      markStirPrivateResponse(event)
     }
   })
 })
