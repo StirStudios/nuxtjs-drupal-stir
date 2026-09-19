@@ -9,14 +9,8 @@ type DrupalPageUser = {
   capabilities?: DrupalCapabilities | null
 }
 
-type DrupalLocalTasks = {
-  primary?: unknown
-  secondary?: unknown
-}
-
 type DrupalPageAccessSource = {
   current_user?: DrupalPageUser | null
-  local_tasks?: DrupalLocalTasks | null
 }
 
 const hasPositiveId = (value: unknown): boolean => {
@@ -25,19 +19,10 @@ const hasPositiveId = (value: unknown): boolean => {
   return Number.isInteger(id) && id > 0
 }
 
-const hasEditorialTask = (value: unknown): boolean => {
-  if (!value || typeof value !== 'object') return false
-
-  const label = 'label' in value && typeof value.label === 'string'
-    ? value.label.trim().toLowerCase()
-    : ''
-
-  return label !== '' && !['api', 'view'].includes(label)
-}
-
 /**
- * Reads editorial access from Drupal's own answers: the permission-based
- * `editorialUi` capability, or local tasks Drupal already access-checked.
+ * Reads access from Drupal's own answer. Only the `editorialUi` capability,
+ * backed by the 'access stir editorial ui' permission, grants the editorial
+ * UI; local tasks are displayed but never decide access.
  */
 export function resolveDrupalPageAccess(
   page: DrupalPageAccessSource | null | undefined,
@@ -47,15 +32,10 @@ export function resolveDrupalPageAccess(
     user?.authenticated === true
     || hasPositiveId(user?.uid)
     || hasPositiveId(user?.id)
-  const tasks = page?.local_tasks
-  const hasLocalTasks = [tasks?.primary, tasks?.secondary]
-    .some(group => Array.isArray(group) && group.some(hasEditorialTask))
 
   return {
     isAuthenticated,
-    hasEditorialAccess:
-      user?.capabilities?.editorialUi === true
-      || (isAuthenticated && hasLocalTasks),
+    hasEditorialAccess: user?.capabilities?.editorialUi === true,
   }
 }
 
@@ -88,7 +68,7 @@ export function resolveAuthSessionAccess(
 }
 
 /**
- * Combines route-specific tasks with a stable authenticated-user snapshot.
+ * Combines the page payload's user with the auth session's user.
  */
 export function mergeDrupalPageAccess(
   routeAccess: DrupalPageAccess,
