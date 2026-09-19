@@ -34,6 +34,9 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
   ))
   const isAuthenticated = computed(() => access.value.isAuthenticated)
   const hasEditorialAccess = computed(() => access.value.hasEditorialAccess)
+  // Drupal sends this only when the site has a dashboard route the account
+  // may open, so the frontend never links to a page it cannot reach.
+  const adminDashboardUrl = computed(() => access.value.adminDashboardUrl)
   // Drupal emits editLink only when the entity may be updated; explicit edit
   // targets on node pages rely on the page's editorial access instead. Saves
   // are still access-checked by Drupal.
@@ -46,6 +49,7 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
     isFront,
     isAuthenticated,
     hasEditorialAccess,
+    adminDashboardUrl,
     canEditInline,
     pageLayout,
   }

@@ -720,7 +720,9 @@ describe('layer contract', () => {
     expect(tabs).toContain('execute: executeAccountMenu')
     expect(tabs).toContain('() => route.fullPath')
     expect(tabs).toContain('accountMenuStatus.value !== \'success\'')
-    expect(tabs).toContain('normalizeAdminUrl(\'/admin/dashboard\')')
+    // Drupal sends the dashboard it allows; the frontend assumes no path.
+    expect(tabs).toContain('const dashboard = adminDashboardUrl.value')
+    expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/dashboard\')')
     expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/content\')')
     expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
     expect(tabs).not.toContain('getAccountMenuUrl')

@@ -12,6 +12,7 @@ describe('resolveDrupalPageAccess', () => {
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -36,6 +37,7 @@ describe('resolveDrupalPageAccess', () => {
     } as never)).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 
@@ -51,6 +53,41 @@ describe('resolveDrupalPageAccess', () => {
   })
 })
 
+describe('the dashboard link', () => {
+  it('passes through the URL Drupal sent', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: {
+        id: '1',
+        capabilities: { editorialUi: true },
+        admin_dashboard_url: '/admin/dashboard',
+      },
+    }).adminDashboardUrl).toBe('/admin/dashboard')
+  })
+
+  it('is absent when Drupal sent none, or sent nothing usable', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: { id: '1', capabilities: { editorialUi: true } },
+    }).adminDashboardUrl).toBeNull()
+    expect(resolveDrupalPageAccess({
+      current_user: { id: '1', admin_dashboard_url: '   ' },
+    }).adminDashboardUrl).toBeNull()
+  })
+
+  it('falls back to the session when the page payload has none', () => {
+    expect(mergeDrupalPageAccess(
+      resolveDrupalPageAccess(undefined),
+      resolveAuthSessionAccess({
+        loggedIn: true,
+        user: {
+          uid: 1,
+          capabilities: { editorialUi: true },
+          admin_dashboard_url: '/admin/dashboard',
+        },
+      }),
+    ).adminDashboardUrl).toBe('/admin/dashboard')
+  })
+})
+
 describe('resolveAuthSessionAccess', () => {
   it('reads the editorial capability from the session user', () => {
     expect(resolveAuthSessionAccess({
@@ -59,6 +96,7 @@ describe('resolveAuthSessionAccess', () => {
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -66,6 +104,7 @@ describe('resolveAuthSessionAccess', () => {
     expect(resolveAuthSessionAccess({ loggedIn: false, user: null })).toEqual({
       isAuthenticated: false,
       hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 })
@@ -81,6 +120,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -94,6 +134,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 })

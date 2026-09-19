@@ -18,7 +18,7 @@ const route = useRoute()
 const requestUrl = useRequestURL()
 const config = useRuntimeConfig()
 const user = computed(() => page.value?.current_user || null)
-const { hasEditorialAccess, isAuthenticated } = usePageContext()
+const { adminDashboardUrl, hasEditorialAccess, isAuthenticated } = usePageContext()
 
 type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
@@ -256,18 +256,21 @@ watch(
 )
 
 const links = computed(() => {
-  const dashboardTo = normalizeAdminUrl('/admin/dashboard')
-  const baseLinks = [
-    [
-      {
-        label: 'Drupal CMS',
-        icon: 'i-lucide-layout-dashboard',
-        to: dashboardTo,
-        tooltip: isCompactTabs.value,
-        onSelect: getAdminLinkSelectHandler(dashboardTo),
-      },
-    ],
-  ]
+  const dashboard = adminDashboardUrl.value
+  // Drupal names the dashboard it allows; without one there is no item.
+  const baseLinks = dashboard
+    ? [
+        [
+          {
+            label: 'Drupal CMS',
+            icon: 'i-lucide-layout-dashboard',
+            to: normalizeAdminUrl(dashboard),
+            tooltip: isCompactTabs.value,
+            onSelect: getAdminLinkSelectHandler(normalizeAdminUrl(dashboard)),
+          },
+        ],
+      ]
+    : []
 
   const tasks = editorialTaskLinks.value.length
     ? [editorialTaskLinks.value]
