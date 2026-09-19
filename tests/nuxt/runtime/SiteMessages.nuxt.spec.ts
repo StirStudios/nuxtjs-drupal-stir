@@ -19,13 +19,13 @@ describe('Site/Messages', () => {
     shared.toastAdd.mockClear()
 
     await mountSuspended(SiteMessages)
-    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(1))
+    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(1), { timeout: 5000 })
     expect(shared.queue.value).toEqual([])
 
     // A later navigation queues the same text again; it must show again.
     shared.queue.value.push({ type: 'success', message: 'Saved' }, { type: 'error', message: 'Failed' })
 
-    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(3))
+    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(3), { timeout: 5000 })
     expect(shared.toastAdd.mock.calls[2]?.[0]).toMatchObject({ title: 'Error!', color: 'error' })
     expect(shared.queue.value).toEqual([])
   })

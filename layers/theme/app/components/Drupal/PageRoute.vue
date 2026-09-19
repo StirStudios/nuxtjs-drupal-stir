@@ -42,19 +42,7 @@ const seoConfig = (useAppConfig().cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
 const image = useImage() as unknown as SeoImageResolver
 const runtimeConfig = useRuntimeConfig()
 const drupalOrigin = getDrupalOrigin(runtimeConfig.public)
-const requestOrigin = useRequestURL().origin
-const publicOrigin = (() => {
-  if (import.meta.server && typeof runtimeConfig.siteUrl === 'string') {
-    try {
-      return new URL(runtimeConfig.siteUrl).origin
-    }
-    catch {
-      // Fall back to the request origin for invalid or absent configuration.
-    }
-  }
-
-  return requestOrigin
-})()
+const publicOrigin = resolveStirPublicOrigin()
 
 const page = await fetchPage(
   pageRequest.path.value,

@@ -96,17 +96,6 @@ function withLinkKeys(tags: Array<Record<string, string>> = []): Array<Record<st
   })
 }
 
-function configuredPublicOrigin(value: unknown, fallback: string): string {
-  if (typeof value !== 'string' || !value.trim()) return fallback
-
-  try {
-    return new URL(value).origin
-  }
-  catch {
-    return fallback
-  }
-}
-
 export default defineNuxtPlugin(async () => {
   const route = useRoute()
   const appConfig = useAppConfig()
@@ -123,11 +112,7 @@ export default defineNuxtPlugin(async () => {
   const image = useImage()
   const resolveImage = image as unknown as SeoImageResolver
   const runtimeConfig = useRuntimeConfig()
-  const requestOrigin = useRequestURL().origin
-  const publicOrigin = configuredPublicOrigin(
-    import.meta.server ? runtimeConfig.siteUrl : '',
-    requestOrigin,
-  )
+  const publicOrigin = resolveStirPublicOrigin()
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
