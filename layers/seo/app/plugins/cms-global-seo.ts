@@ -111,7 +111,14 @@ export default defineNuxtPlugin(async () => {
   const route = useRoute()
   const appConfig = useAppConfig()
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
-  const defaults = useState<GlobalSeoResponse | null>('cms-global-seo', () => null)
+  // Started before useHead and awaited at the end, so the head registers while
+  // the plugin context is still active. Missing defaults fall back to empty.
+  const globalSeo = useAsyncData(
+    'cms-global-seo',
+    () => $fetch<GlobalSeoResponse>('/api/seo/global').catch((): GlobalSeoResponse => ({ meta: [], link: [] })),
+    { default: () => null, immediate: config.enabled },
+  )
+  const defaults = globalSeo.data
   const lang = computed(() => defaults.value?.lang || config.lang)
   const image = useImage()
   const resolveImage = image as unknown as SeoImageResolver
@@ -157,10 +164,5 @@ export default defineNuxtPlugin(async () => {
     },
   )
 
-  if (config.enabled && defaults.value === null) {
-    defaults.value = await $fetch<GlobalSeoResponse>('/api/seo/global').catch(() => ({
-      meta: [],
-      link: [],
-    }))
-  }
+  await globalSeo
 })

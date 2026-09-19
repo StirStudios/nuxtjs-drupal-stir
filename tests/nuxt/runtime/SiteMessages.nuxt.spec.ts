@@ -1,6 +1,6 @@
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
-import { nextTick, ref } from 'vue'
+import { ref } from 'vue'
 import SiteMessages from '../../../layers/theme/app/components/Site/Messages.vue'
 
 const shared = vi.hoisted(() => ({
@@ -19,15 +19,13 @@ describe('Site/Messages', () => {
     shared.toastAdd.mockClear()
 
     await mountSuspended(SiteMessages)
-    await nextTick()
-    expect(shared.toastAdd).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(1))
     expect(shared.queue.value).toEqual([])
 
     // A later navigation queues the same text again; it must show again.
     shared.queue.value.push({ type: 'success', message: 'Saved' }, { type: 'error', message: 'Failed' })
-    await nextTick()
 
-    expect(shared.toastAdd).toHaveBeenCalledTimes(3)
+    await vi.waitFor(() => expect(shared.toastAdd).toHaveBeenCalledTimes(3))
     expect(shared.toastAdd.mock.calls[2]?.[0]).toMatchObject({ title: 'Error!', color: 'error' })
     expect(shared.queue.value).toEqual([])
   })
