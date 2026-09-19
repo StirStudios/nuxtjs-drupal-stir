@@ -40,51 +40,7 @@ function emailString(requiredMessage: string, invalidMessage: string) {
   )
 }
 
-const identifier = requiredString('Email or username is required')
-const email = emailString('Email is required', 'Enter a valid email address')
-const password = requiredPassword('Password is required')
 const currentPassword = requiredPassword('Current password is required')
-
-export const loginValidationSchema = object({ identifier, password })
-
-export const registerValidationSchema = object({
-  display_name: custom<string | undefined>(
-    value => value === undefined
-      || (typeof value === 'string' && value.trim().length <= 80),
-    'Display name must be 80 characters or less',
-  ),
-  email,
-  password,
-})
-
-export const passwordRequestValidationSchema = object({ identifier })
-
-export const passwordResetValidationSchema = pipe(
-  object({
-    password,
-    confirmPassword: requiredPassword('Confirm password is required'),
-  }),
-  forward(
-    check(
-      input => input.password === input.confirmPassword,
-      'Passwords do not match',
-    ),
-    ['confirmPassword'],
-  ),
-)
-
-export const accountPasswordChangeValidationSchema = pipe(
-  object({ currentPassword, newPassword: password }),
-  forward(
-    check(
-      input => !input.currentPassword
-        || !input.newPassword
-        || input.currentPassword !== input.newPassword,
-      'New password must be different from current password',
-    ),
-    ['newPassword'],
-  ),
-)
 
 export function createIdentifierValidationSchema(
   field: AuthUiIdentifierField = {},

@@ -289,20 +289,7 @@
       "layers/webform/app/components/global/Paragraph/Webform.vue"
     ],
     "composables": [
-      "layers/auth/app/composables/account/useAccountNav.ts",
-      "layers/auth/app/composables/account/useAccountSettings.ts",
-      "layers/auth/app/composables/auth/useAuthActions.ts",
       "layers/auth/app/composables/auth/useAuthApi.ts",
-      "layers/auth/app/composables/auth/useAuthConfig.ts",
-      "layers/auth/app/composables/auth/useAuthFieldTheme.ts",
-      "layers/auth/app/composables/auth/useAuthLogin.ts",
-      "layers/auth/app/composables/auth/useAuthRegister.ts",
-      "layers/auth/app/composables/auth/useAuthSession.ts",
-      "layers/auth/app/composables/auth/useAuthVerify.ts",
-      "layers/auth/app/composables/auth/usePasswordRequest.ts",
-      "layers/auth/app/composables/auth/usePasswordReset.ts",
-      "layers/auth/app/composables/auth/useProtectedActions.ts",
-      "layers/auth/app/composables/auth/useProtectedLogin.ts",
       "layers/auth/app/composables/auth/useProtectedSession.ts",
       "layers/auth/app/composables/useAccountNav.ts",
       "layers/auth/app/composables/useAccountSettings.ts",
@@ -459,7 +446,6 @@
       "/api/account/settings/values",
       "/api/app-context",
       "/api/auth/config",
-      "/api/auth/csrf",
       "/api/auth/login",
       "/api/auth/logout",
       "/api/auth/password/request",
@@ -654,20 +640,7 @@
         "layers/webform/app/components/global/Paragraph/Webform.vue"
       ],
       "autoImportedComposables": [
-        "layers/auth/app/composables/account/useAccountNav.ts",
-        "layers/auth/app/composables/account/useAccountSettings.ts",
-        "layers/auth/app/composables/auth/useAuthActions.ts",
         "layers/auth/app/composables/auth/useAuthApi.ts",
-        "layers/auth/app/composables/auth/useAuthConfig.ts",
-        "layers/auth/app/composables/auth/useAuthFieldTheme.ts",
-        "layers/auth/app/composables/auth/useAuthLogin.ts",
-        "layers/auth/app/composables/auth/useAuthRegister.ts",
-        "layers/auth/app/composables/auth/useAuthSession.ts",
-        "layers/auth/app/composables/auth/useAuthVerify.ts",
-        "layers/auth/app/composables/auth/usePasswordRequest.ts",
-        "layers/auth/app/composables/auth/usePasswordReset.ts",
-        "layers/auth/app/composables/auth/useProtectedActions.ts",
-        "layers/auth/app/composables/auth/useProtectedLogin.ts",
         "layers/auth/app/composables/auth/useProtectedSession.ts",
         "layers/auth/app/composables/useAccountNav.ts",
         "layers/auth/app/composables/useAccountSettings.ts",
@@ -806,26 +779,25 @@
     },
     "candidateDeprecations": [
       "useApiListing",
-      "useDynamicListingControls",
-      "layers/auth/server/utils/drupalHeaders"
+      "useDynamicListingControls"
     ],
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
     "components": 132,
-    "composables": 80,
+    "composables": 67,
     "utils": 66,
     "plugins": 7,
     "middleware": 4,
-    "serverRoutes": 28,
+    "serverRoutes": 27,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 202,
+    "tests": 203,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 83,
-      "scripts": 4,
+      "scripts": 5,
       "server": 30,
       "unit": 11,
       "utils": 60
@@ -931,6 +903,7 @@
     "tests/nuxt/runtime/useStirDrupalCe.nuxt.spec.ts",
     "tests/scripts/complianceDiscovery.spec.ts",
     "tests/scripts/complianceReview.spec.ts",
+    "tests/scripts/complianceWebforms.spec.ts",
     "tests/scripts/perfGrowth.spec.ts",
     "tests/scripts/seoHtml.spec.ts",
     "tests/server/appContextApi.spec.ts",
@@ -1127,8 +1100,7 @@
     ],
     "candidateDeprecations": [
       "useApiListing",
-      "useDynamicListingControls",
-      "layers/auth/server/utils/drupalHeaders"
+      "useDynamicListingControls"
     ],
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
