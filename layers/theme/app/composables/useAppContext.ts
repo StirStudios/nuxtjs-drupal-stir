@@ -20,10 +20,6 @@ export type AppFooterContextPayload = Pick<
   'footer_menu' | 'site_info'
 >
 
-export function appContextQuery(path = '/') {
-  return { path: path || '/' }
-}
-
 export function useAppContext(options: AppContextOptions = {}) {
   const route = useRoute()
   const path = computed(() => route.path || '/')
@@ -32,7 +28,7 @@ export function useAppContext(options: AppContextOptions = {}) {
     dedupe: 'defer',
     immediate: options.immediate ?? true,
     key: computed(() => `app-context:${path.value}`),
-    query: computed(() => appContextQuery(path.value)),
+    query: computed(() => ({ path: path.value })),
   })
 }
 
