@@ -303,10 +303,7 @@ export const proxyStirDrupalMenuRequest = async (
     getRequestURL(event).search,
   )
 
-  return await proxyRequest(event, target, {
-    ...stirDrupalProxyOptions(event),
-    headers: {
-      'Cache-Control': 'max-age=300',
-    },
-  })
+  // Drupal's response cache headers pass through; menus are access-filtered,
+  // so caching them is Drupal's decision, not the proxy's.
+  return await proxyRequest(event, target, stirDrupalProxyOptions(event))
 }
