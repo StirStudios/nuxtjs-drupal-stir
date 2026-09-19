@@ -3,5 +3,6 @@
   "uid": 0,
   "name": "",
   "mail": "",
-  "roles": []
+  "roles": [],
+  "capabilities": { "editorialUi": false }
 }

@@ -1,0 +1,6 @@
+{
+  "id": "3",
+  "name": "Site Editor",
+  "roles": ["authenticated", "administrator"],
+  "capabilities": { "editorialUi": true }
+}

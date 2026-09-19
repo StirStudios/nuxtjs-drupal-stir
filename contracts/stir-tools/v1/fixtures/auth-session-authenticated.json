@@ -5,6 +5,7 @@
   "account_name": "demo",
   "mail": "demo@example.com",
   "roles": ["authenticated"],
+  "capabilities": { "editorialUi": false },
   "csrf_token": "request-header-token",
   "logout_token": "logout-token",
   "profile_complete": true
