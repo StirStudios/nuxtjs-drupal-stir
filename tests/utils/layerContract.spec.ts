@@ -708,6 +708,27 @@ describe('layer contract', () => {
     expect(header).not.toContain('fetchMenu(\'main\')')
   })
 
+  it('keeps the editorial offset in one place, published by the tabs bar', () => {
+    const tabs = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
+      'utf8',
+    )
+    const header = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
+      'utf8',
+    )
+    const scrollNav = readFileSync(
+      resolve(rootDir, 'layers/theme/app/composables/useScrollNav.ts'),
+      'utf8',
+    )
+
+    expect(tabs).toContain('STIR_EDITORIAL_OFFSET_VAR')
+    expect(header).toContain('top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]')
+    expect(header).not.toContain('3.1rem')
+    expect(scrollNav).toContain('STIR_EDITORIAL_SCROLL_ALLOWANCE')
+    expect(scrollNav).not.toContain('+ 40')
+  })
+
   it('uses the upstream deferred menu lifecycle for the editorial account menu', () => {
     const tabs = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
@@ -719,7 +740,10 @@ describe('layer contract', () => {
     expect(tabs).toContain('server: false')
     expect(tabs).toContain('execute: executeAccountMenu')
     expect(tabs).toContain('() => route.fullPath')
-    expect(tabs).toContain('accountMenuStatus.value !== \'success\'')
+    // One keyed watch decides when a menu is fetched, not a set of flags.
+    expect(tabs).toContain('const accountMenuKey = computed(')
+    expect(tabs).toContain('accountMenuStatus.value === \'success\'')
+    expect(tabs).not.toContain('accountMenuUserId')
     // Drupal sends the dashboard it allows; the frontend assumes no path.
     expect(tabs).toContain('const dashboard = adminDashboardUrl.value')
     expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/dashboard\')')

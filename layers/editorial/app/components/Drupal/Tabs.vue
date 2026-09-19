@@ -3,6 +3,10 @@ import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 import {
+  STIR_EDITORIAL_OFFSET,
+  STIR_EDITORIAL_OFFSET_VAR,
+} from '#stir/utils/editorialOffset'
+import {
   adminUiProps,
   adminUiTheme,
   type EditorialTaskLink,
@@ -17,6 +21,17 @@ const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()
 const config = useRuntimeConfig()
+
+// Publish the space this bar occupies so the theme can offset itself without
+// knowing the editorial layer exists. Nuxt renders it during SSR, so the
+// header is never offset a frame late, and removes it when the bar unmounts.
+useHead({
+  style: [{
+    id: 'stir-editorial-offset',
+    innerHTML: `:root{${STIR_EDITORIAL_OFFSET_VAR}:${STIR_EDITORIAL_OFFSET};}`,
+  }],
+})
+
 const user = computed(() => page.value?.current_user || null)
 const { adminDashboardUrl, hasEditorialAccess, isAuthenticated } = usePageContext()
 
@@ -113,7 +128,6 @@ const {
   immediate: false,
   server: false,
 })
-const accountMenuUserId = ref('')
 const currentUserId = computed(() =>
   String(user.value?.id ?? user.value?.uid ?? 'anon'),
 )
@@ -191,15 +205,14 @@ const accountMenu = computed<MenuLink[]>(() =>
     .filter((item): item is MenuLink => item !== null),
 )
 
-const loadAccountMenu = async () => {
-  if (accountMenuUserId.value !== currentUserId.value) {
-    clearAccountMenu()
-    accountMenuUserId.value = currentUserId.value
-  }
+// One request per editor: the key changes when Drupal's answer about who is
+// looking changes, and nothing else re-fetches a menu already in hand.
+const accountMenuKey = computed(() =>
+  hasEditorialAccess.value && isAuthenticated.value ? currentUserId.value : '',
+)
 
+const loadAccountMenu = async () => {
   if (
-    !hasEditorialAccess.value ||
-    !isAuthenticated.value ||
     accountMenuStatus.value === 'pending' ||
     accountMenuStatus.value === 'success'
   ) {
@@ -217,41 +230,21 @@ const loadAccountMenu = async () => {
   }
 }
 
-onMounted(() => {
-  void loadAccountMenu()
-})
-
 watch(
-  () => currentUserId.value,
-  () => {
-    clearAccountMenu()
-    accountMenuUserId.value = currentUserId.value
-    if (hasEditorialAccess.value) {
-      void loadAccountMenu()
-    }
+  accountMenuKey,
+  (key, previousKey) => {
+    if (key !== previousKey) clearAccountMenu()
+    if (key) void loadAccountMenu()
   },
+  { immediate: import.meta.client },
 )
-
-watch(hasEditorialAccess, (hasAccess) => {
-  if (hasAccess) {
-    clearAccountMenu()
-    void loadAccountMenu()
-  }
-})
 
 // Editorial tabs persist across route changes. Retry a failed upstream menu
 // request when navigation gives the user another opportunity to load it.
 watch(
   () => route.fullPath,
   () => {
-    if (
-      hasEditorialAccess.value &&
-      isAuthenticated.value &&
-      accountMenuStatus.value !== 'pending' &&
-      accountMenuStatus.value !== 'success'
-    ) {
-      void loadAccountMenu()
-    }
+    if (accountMenuKey.value) void loadAccountMenu()
   },
 )
 
