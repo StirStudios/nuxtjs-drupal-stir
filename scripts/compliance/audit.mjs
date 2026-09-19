@@ -5,6 +5,7 @@ import { relative, resolve } from 'node:path'
 import { readUrlArgument, resolveSiteUrl } from '../seo/html.mjs'
 import { collectSignals, evaluateServices, loadLegalText, plainText } from './discovery.mjs'
 import { missingReviewMarkers } from './review.mjs'
+import { webformFindings } from './webforms.mjs'
 
 const projectRoot = resolve(process.cwd())
 const configPath = resolve(projectRoot, 'compliance/site.json')
@@ -64,43 +65,26 @@ async function checkDrupalWebforms() {
     return
   }
 
-  const settingsPath = resolve(directory, 'webform.settings.yml')
+  let settingsSource = null
   try {
-    const settings = await readFile(settingsPath, 'utf8')
-    const disablesIpByDefault = /^\s*default_form_disable_remote_addr:\s*true\s*$/m.test(settings)
-    if (disablesIpByDefault !== (config.dataHandling?.storeSubmitterIpWithSubmission === false)) {
-      error('Drupal Webform IP default conflicts with dataHandling.storeSubmitterIpWithSubmission.')
-    }
+    settingsSource = await readFile(resolve(directory, 'webform.settings.yml'), 'utf8')
   } catch (cause) {
     error(`Unable to verify Drupal Webform defaults: ${cause.message}`)
   }
 
-  const expectedIds = new Set(config.technology?.formIds ?? [])
-  const exportedIds = new Set()
+  const forms = []
   for (const entry of await readdir(directory)) {
-    if (!/^webform\.webform\..+\.yml$/.test(entry)) continue
-    const source = await readFile(resolve(directory, entry), 'utf8')
-    const id = source.match(/^id:\s*['"]?([^'"\s]+)['"]?\s*$/m)?.[1]
-    if (!id) continue
-    exportedIds.add(id)
-
-    const disablesIp = /^\s*form_disable_remote_addr:\s*true\s*$/m.test(source)
-    if (config.dataHandling?.storeSubmitterIpWithSubmission === false && !disablesIp) {
-      error(`Drupal Webform ${id} stores the submitter IP contrary to the inventory.`)
-    }
-
-    const purge = source.match(/^\s*purge:\s*([^\s#]+)\s*$/m)?.[1]
-    if (config.dataHandling?.drupalSubmissionRetention === 'indefinite' && purge !== 'none') {
-      error(`Drupal Webform ${id} has automatic purge enabled contrary to indefinite retention.`)
+    if (/^webform\.webform\..+\.yml$/.test(entry)) {
+      forms.push({ source: await readFile(resolve(directory, entry), 'utf8') })
     }
   }
 
-  for (const id of expectedIds) {
-    if (!exportedIds.has(id)) error(`Declared Drupal Webform ${id} is missing from the config export.`)
-  }
-  for (const id of exportedIds) {
-    if (!expectedIds.has(id)) error(`Drupal Webform ${id} is not declared in technology.formIds.`)
-  }
+  webformFindings({
+    settingsSource,
+    forms,
+    dataHandling: config.dataHandling,
+    formIds: config.technology?.formIds,
+  }).forEach(error)
 }
 
 async function checkPublicDocument(document) {

@@ -52,8 +52,18 @@ untouched do not need one.
   `blocks.decoupled` when `popups` is absent, so deploy this layer before the
   Stir Tools update that renames the region. Consumers that read
   `blocks.decoupled` directly should switch to `blocks.popups`.
+- **`stir-compliance` checks Webform retention.** When
+  `dataHandling.drupalSubmissionRetention` is a day count, every exported
+  Webform must purge completed submissions (`purge: completed` or `all`)
+  within that many days, or the audit fails. New Webforms default to
+  `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- `stir-compliance` no longer reports a Webform as storing submitter IPs when
+  the form's own `form_disable_remote_addr` is `false` but the site-wide
+  `default_form_disable_remote_addr` is on. Webform falls back to the site-wide
+  default at runtime, so those forms store no IP.
 
 - **Security.** `/api/auth/session` no longer copies Drupal's `csrf_token` and
   `logout_token` into the client-side `user` object. Nothing on the client
