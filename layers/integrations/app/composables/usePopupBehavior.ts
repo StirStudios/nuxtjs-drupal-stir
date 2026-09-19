@@ -1,6 +1,5 @@
 import {
   useEventListener,
-  useStorage,
   useTimeoutFn,
   useWindowScroll,
 } from '@vueuse/core'
@@ -75,6 +74,32 @@ export function popupSuppressionIsActive(
     || (typeof suppression === 'number' && suppression > now)
 }
 
+function readDismissals(now = Date.now()): Record<string, PopupSuppression> {
+  if (!import.meta.client) return {}
+
+  try {
+    const parsed = JSON.parse(
+      localStorage.getItem(POPUP_DISMISSALS_STORAGE_KEY) || '{}',
+    ) as Record<string, PopupSuppression>
+
+    return activePopupDismissals(parsed, now)
+  }
+  catch {
+    return {}
+  }
+}
+
+function writeDismissals(dismissals: Record<string, PopupSuppression>) {
+  if (!import.meta.client) return
+
+  try {
+    localStorage.setItem(POPUP_DISMISSALS_STORAGE_KEY, JSON.stringify(dismissals))
+  }
+  catch {
+    // Storage can be unavailable in restricted browsing contexts.
+  }
+}
+
 type PopupBehaviorOptions = {
   popup: Ref<PopupLike | null>
   config: Ref<PopupBehaviorConfig>
@@ -96,14 +121,10 @@ export const usePopupBehavior = ({
   const open = ref(false)
   const hasTriggered = ref(false)
   const dismissalReady = ref(!import.meta.client)
-  // Written straight through to localStorage, and read only after mount so a
-  // server-rendered page and its hydration agree on what is dismissed.
-  const dismissedPopups = useStorage<Record<string, PopupSuppression>>(
-    POPUP_DISMISSALS_STORAGE_KEY,
-    {},
-    undefined,
-    { initOnMounted: true },
-  )
+  // Read after mount so a server-rendered page and its hydration agree on what
+  // is dismissed. VueUse's useStorage would cost ~5 kB gzip in the initial
+  // graph for what these two helpers do.
+  const dismissedPopups = ref<Record<string, PopupSuppression>>({})
   const readyForPopupTriggers = ref(!import.meta.client)
   const popupConfig = computed(() => (appConfig.popup || {}) as PopupAppConfig)
   const dismissalKey = computed(() => popupDismissKey(popup.value))
@@ -199,6 +220,7 @@ export const usePopupBehavior = ({
       ...activePopupDismissals(dismissedPopups.value),
       [dismissalKey.value]: Date.now() + ttlDays * 24 * 60 * 60 * 1000,
     }
+    writeDismissals(dismissedPopups.value)
   }
 
   const markPopupCompleted = () => {
@@ -208,6 +230,7 @@ export const usePopupBehavior = ({
       ...activePopupDismissals(dismissedPopups.value),
       [dismissalKey.value]: POPUP_COMPLETED,
     }
+    writeDismissals(dismissedPopups.value)
   }
 
   const dismissPopup = () => {
@@ -349,6 +372,7 @@ export const usePopupBehavior = ({
   })
 
   onMounted(() => {
+    dismissedPopups.value = readDismissals()
     dismissalReady.value = true
     setupReadyForPopupTriggers()
   })
