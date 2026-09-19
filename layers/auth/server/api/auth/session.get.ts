@@ -12,7 +12,8 @@ type AuthSessionResponse = {
   name?: string
   mail?: string
   roles?: string[]
-  user?: Record<string, unknown> | null
+  csrf_token?: string
+  logout_token?: string
 } & Record<string, unknown>
 
 export default defineEventHandler(async (event) => {
@@ -31,17 +32,24 @@ export default defineEventHandler(async (event) => {
       },
     )
 
-    const { authenticated, user, ...account } = response || {}
+    // Drupal's CSRF and logout tokens stay server-side; projects may still
+    // extend the snapshot with their own fields.
+    const {
+      authenticated,
+      csrf_token: _csrfToken,
+      logout_token: _logoutToken,
+      ...account
+    } = response ?? {}
 
     return {
-      authenticated: Boolean(response?.authenticated),
+      authenticated: Boolean(authenticated),
       protectedAuthenticated,
-      user: user ?? {
+      user: {
         ...account,
-        uid: response?.uid ?? 0,
-        name: response?.name ?? '',
-        mail: response?.mail ?? '',
-        roles: response?.roles ?? [],
+        uid: account.uid ?? 0,
+        name: account.name ?? '',
+        mail: account.mail ?? '',
+        roles: account.roles ?? [],
       },
     }
   } catch (error: unknown) {
