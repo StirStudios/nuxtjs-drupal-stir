@@ -1,15 +1,9 @@
 import { useAuthConfig } from '../composables/useAuthConfig'
 import type { AuthSessionResponse } from '../types/auth'
-
-const GUEST_ONLY_AUTH_ROUTES = new Set([
-  '/auth/login',
-  '/auth/register',
-  '/auth/password/request',
-  '/auth/password/reset',
-])
+import { GUEST_ONLY_AUTH_PATHS } from '../utils/authRoutes'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (!GUEST_ONLY_AUTH_ROUTES.has(to.path)) return
+  if (!GUEST_ONLY_AUTH_PATHS.has(to.path)) return
 
   const { accountsEnabled, auth, ensureLoaded } = useAuthConfig()
 

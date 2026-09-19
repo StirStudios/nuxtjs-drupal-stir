@@ -1,6 +1,7 @@
 import { useAuthConfig } from '../composables/useAuthConfig'
 import { useAuthSession } from '../composables/useAuthSession'
 import { useProtectedSession } from '../composables/auth/useProtectedSession'
+import { AUTH_SYSTEM_PATHS } from '../utils/authRoutes'
 
 const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 
@@ -11,16 +12,7 @@ function markPrivateResponse(): void {
 }
 
 function isAuthSystemRoute(path: string, protectedLoginPath: string): boolean {
-  if (path === protectedLoginPath) return true
-
-  return (
-    path === '/auth/login' ||
-    path === '/auth/logout' ||
-    path === '/auth/verify' ||
-    path === '/auth/register' ||
-    path === '/auth/password/request' ||
-    path === '/auth/password/reset'
-  )
+  return path === protectedLoginPath || AUTH_SYSTEM_PATHS.has(path)
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
