@@ -6,6 +6,7 @@ import {
   adminUiProps,
   adminUiTheme,
   type EditorialTaskLink,
+  adminLinkIcon,
   withUnpublishedTask,
 } from '../../utils/adminUiTheme'
 
@@ -18,24 +19,6 @@ const requestUrl = useRequestURL()
 const config = useRuntimeConfig()
 const user = computed(() => page.value?.current_user || null)
 const { hasEditorialAccess, isAuthenticated } = usePageContext()
-
-const iconMap: Record<string, string> = {
-  'Drupal CMS': 'i-lucide-layout-dashboard',
-  Settings: 'i-lucide-settings',
-  View: 'i-lucide-eye',
-  Edit: 'i-lucide-square-pen',
-  Delete: 'i-lucide-trash',
-  Revisions: 'i-lucide-history',
-  Export: 'i-lucide-file-up',
-  API: 'i-lucide-braces',
-  'Log out': 'i-lucide-log-out',
-  'Log in': 'i-lucide-log-in',
-  'My account': 'i-lucide-circle-user',
-}
-
-const getIconForLabel = (label: string): string | null => {
-  return iconMap[label] || null
-}
 
 type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
@@ -106,7 +89,8 @@ const localTaskLinks = computed(() =>
       return {
         label: tab.label,
         to,
-        icon: getIconForLabel(tab.label),
+        // The active task on a frontend page is Drupal's View tab.
+        icon: tab.active === true ? 'i-lucide-eye' : adminLinkIcon(to),
         tooltip: isCompactTabs.value,
         active: tab.active === true,
         onSelect: getAdminLinkSelectHandler(to),
@@ -199,7 +183,7 @@ const accountMenu = computed<MenuLink[]>(() =>
       return {
         label,
         to,
-        icon: getIconForLabel(label),
+        icon: adminLinkIcon(to),
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(to),
       }
@@ -277,7 +261,7 @@ const links = computed(() => {
     [
       {
         label: 'Drupal CMS',
-        icon: getIconForLabel('Drupal CMS'),
+        icon: 'i-lucide-layout-dashboard',
         to: dashboardTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(dashboardTo),
@@ -292,13 +276,13 @@ const links = computed(() => {
   const accountItem = accountMenu.value.length
     ? {
         label: user.value?.name || 'Account',
-        icon: getIconForLabel('My account'),
+        icon: 'i-lucide-circle-user',
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
-        icon: getIconForLabel('My account'),
+        icon: 'i-lucide-circle-user',
         to: accountTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(accountTo),

@@ -21,7 +21,7 @@ const hasPositiveId = (value: unknown): boolean => {
 
 /**
  * Reads access from Drupal's own answer. Only the `editorialUi` capability,
- * backed by the 'access stir editorial ui' permission, grants the editorial
+ * backed by core's 'access contextual links' permission, grants the editorial
  * UI; local tasks are displayed but never decide access.
  */
 export function resolveDrupalPageAccess(

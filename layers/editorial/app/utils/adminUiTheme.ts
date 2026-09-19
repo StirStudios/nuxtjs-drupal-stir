@@ -102,6 +102,41 @@ export type EditorialTaskLink = {
   onSelect?: (event: Event) => void
 }
 
+// Drupal task and account links keyed by URL shape, which, unlike their
+// labels, does not change with the site language. Suffix matches also cover
+// language-prefixed paths such as /fr/node/1/edit.
+const ADMIN_LINK_ICONS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/(?:^|\/)ce-api(?:\/|$)/, 'i-lucide-braces'],
+  [/\/edit$/, 'i-lucide-square-pen'],
+  [/\/delete$/, 'i-lucide-trash'],
+  [/\/revisions$/, 'i-lucide-history'],
+  [/\/export$/, 'i-lucide-file-up'],
+  [/\/settings$/, 'i-lucide-settings'],
+  [/\/user\/logout$/, 'i-lucide-log-out'],
+  [/\/user\/login$/, 'i-lucide-log-in'],
+  [/\/user(?:\/\d+)?$/, 'i-lucide-circle-user'],
+]
+
+/**
+ * Returns the icon for a Drupal admin link, or null when it has no known shape.
+ */
+export function adminLinkIcon(url: string): string | null {
+  let path: string
+
+  try {
+    path = new URL(url, 'http://drupal.invalid').pathname.replace(/\/+$/, '')
+  }
+  catch {
+    return null
+  }
+
+  return ADMIN_LINK_ICONS.find(([pattern]) => pattern.test(path))?.[1] ?? null
+}
+
+/**
+ * Marks the active task, which on a frontend page is Drupal's View tab, as
+ * unpublished.
+ */
 export function withUnpublishedTask(
   links: EditorialTaskLink[],
   published: unknown,
@@ -109,7 +144,7 @@ export function withUnpublishedTask(
   if (published !== false) return links
 
   return links.map((link) =>
-    link.label === 'View'
+    link.active === true
       ? {
           ...link,
           label: 'Unpublished',
