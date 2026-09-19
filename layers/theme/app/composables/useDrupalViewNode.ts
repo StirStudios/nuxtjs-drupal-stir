@@ -30,15 +30,9 @@ export function getDrupalViewNodeSlots(node: CustomElementNode): Record<string, 
 
 export function getDrupalViewNodeRows(node: CustomElementNode): unknown[] {
   const slots = getDrupalViewNodeSlots(node)
-  const slotRows = slots.rows
 
-  if (Array.isArray(slotRows)) return slotRows
-
-  const legacyRows = (node as Record<string, unknown>).rows
-
-  if (Array.isArray(legacyRows)) return legacyRows
-
-  return []
+  // Drupal renders view rows as the element's rows slot.
+  return Array.isArray(slots.rows) ? slots.rows : []
 }
 
 export function isMatchingDrupalViewNode(
