@@ -21,7 +21,7 @@ const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, refreshPage, renderCustomElements, usePageHead } = useStirDrupalCe()
+const { fetchPage, renderCustomElements, usePageHead } = useStirDrupalCe()
 
 const route = useRoute()
 const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
@@ -62,6 +62,10 @@ const page = await fetchPage(
   customPageError,
 )
 
+// fetchPage() is a keyed useFetch; this route component is keyed per page, so
+// the key is stable for its lifetime.
+const pageDataKey = page.value?.key
+
 provide(drupalPageKey, page)
 const { pageLayout, isAuthenticated, isFront } = usePageContext(page)
 
@@ -82,7 +86,7 @@ const renderablePageContent = computed(() =>
 provide(
   pageRefreshKey,
   async () => {
-    await refreshPage(page, pageRequest.path.value, { query: drupalPageQuery.value })
+    if (pageDataKey) await refreshNuxtData(pageDataKey)
     pageRenderRevision.value += 1
   },
 )

@@ -4,16 +4,18 @@ import { defineComponent, h, inject, ref } from 'vue'
 import PageRoute from '../../../layers/theme/app/components/Drupal/PageRoute.vue'
 import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
 import { layoutEditLinksKey, presentationEditTargetsKey } from '../../../layers/theme/app/utils/layoutEditLinks'
+import { pageRefreshKey } from '../../../layers/theme/app/utils/pageRefresh'
 
-const state = vi.hoisted(() => ({ fetchPage: vi.fn(), getPage: vi.fn() }))
+const state = vi.hoisted(() => ({ fetchPage: vi.fn(), getPage: vi.fn(), refreshNuxtData: vi.fn() }))
 
 mockNuxtImport('useStirDrupalCe', () => () => ({
   fetchPage: state.fetchPage,
   getPage: state.getPage,
-  refreshPage: vi.fn(),
   renderCustomElements: () => h('p', 'Page content'),
   usePageHead: vi.fn(),
 }))
+
+mockNuxtImport('refreshNuxtData', () => state.refreshNuxtData)
 
 const Probe = defineComponent({
   setup() {
@@ -51,6 +53,28 @@ describe('Drupal PageRoute ownership', () => {
     expect(wrapper.get('#edit-targets').text()).toBe('/edit/destination:42')
     expect(wrapper.get('#edit-targets').attributes('data-page-title')).toBe('Destination')
     expect(state.getPage).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('refreshes the page through its keyed useFetch data', async () => {
+    let refresh: (() => Promise<void>) | undefined
+    const RefreshProbe = defineComponent({
+      setup() {
+        refresh = inject<() => Promise<void>>(pageRefreshKey)
+        return () => h('p')
+      },
+    })
+
+    state.refreshNuxtData.mockReset()
+    state.fetchPage.mockResolvedValue(ref({ key: 'page:/about', page_layout: 'clear', content: {} }))
+    const wrapper = await mountSuspended(PageRoute, {
+      global: { stubs: { NuxtLayout: Layout } },
+      slots: { default: () => h(RefreshProbe) },
+    })
+
+    await refresh?.()
+
+    expect(state.refreshNuxtData).toHaveBeenCalledWith('page:/about')
     wrapper.unmount()
   })
 })
