@@ -65,7 +65,8 @@ const tk = useSlotsToolkit(vueSlots)
 const { getPage } = useStirDrupalCe()
 const owningPage = inject(drupalPageKey, null)
 const page = owningPage ?? getPage()
-const { isFront, isAdministrator } = usePageContext(page)
+const { isFront, canEditInline } = usePageContext(page)
+const canEdit = computed(() => Boolean(props.id) && canEditInline(props.editLink))
 const { hero: heroTheme } = useAppConfig().stirTheme
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => {
@@ -119,7 +120,7 @@ const showBackdrop = computed(() =>
 
 const heroSubtitle = computed(() => props.header?.trim() || '')
 const hasVisibleDefaultContent = computed(() =>
-  Boolean(isSection.value && (props.header?.trim() || props.eyebrow?.trim() || (isAdministrator.value && props.id))) ||
+  Boolean(isSection.value && (props.header?.trim() || props.eyebrow?.trim() || canEdit.value)) ||
   Boolean(props.header?.trim()) ||
   Boolean(props.eyebrow?.trim()) ||
   Boolean(props.text?.trim()) ||
@@ -238,10 +239,10 @@ provideRevealMotionScope(() => undefined)
           >
             <slot name="title">
               <template v-if="isSection">
-                <div v-if="header?.trim() || eyebrow?.trim() || (isAdministrator && id)" class="heading-group">
+                <div v-if="header?.trim() || eyebrow?.trim() || canEdit" class="heading-group">
                   <p v-if="eyebrow?.trim()" class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
                 <EditableRichText
-                  v-if="header?.trim() || (isAdministrator && id)"
+                  v-if="header?.trim() || canEdit"
                   :id="id"
                   :edit-link="editLink"
                   :edit-target="{ entityType: 'paragraph', entityId: id, fieldName: 'field_header', editorMode: 'heading' }"
@@ -251,7 +252,7 @@ provideRevealMotionScope(() => undefined)
                   <component :is="sectionHeadingTag" v-if="header?.trim()" class="heading">{{ header }}</component>
                 </EditableRichText>
                 </div>
-                <EditableRichText v-if="text?.trim() || (isAdministrator && id)" :id="id" classes="lead" :edit-link="editLink" :text="text" />
+                <EditableRichText v-if="text?.trim() || canEdit" :id="id" classes="lead" :edit-link="editLink" :text="text" />
               </template>
               <HeroContent
                 v-else

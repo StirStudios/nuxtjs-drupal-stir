@@ -14,7 +14,7 @@ vi.mock('../../../layers/auth/app/composables/useAuthSession', () => ({
 const authSession = {
   fetchSession: hoistedFetchSession,
   loggedIn: ref(false),
-  user: ref<{ uid: string, roles: string[] } | null>(null),
+  user: ref<{ uid: string, capabilities: { editorialUi: boolean } } | null>(null),
 }
 
 const setServerRendered = (value: boolean) => {
@@ -83,9 +83,9 @@ describe('page-local Drupal context', () => {
     wrapper.unmount()
   })
 
-  it('keeps editorial access for an administrator session on a mixed route with no local tasks', async () => {
+  it('keeps editorial access for an editorial session on a mixed route with no local tasks', async () => {
     authSession.loggedIn.value = true
-    authSession.user.value = { uid: '1', roles: ['administrator'] }
+    authSession.user.value = { uid: '1', capabilities: { editorialUi: true } }
     const localPage = ref(createPage())
     const Harness = defineComponent({
       setup() {
@@ -95,7 +95,7 @@ describe('page-local Drupal context', () => {
 
         const context = usePageContext(localPage)
 
-        return () => h('p', `${context.isAdministrator.value}:${context.hasEditorialAccess.value}`)
+        return () => h('p', `${context.isAuthenticated.value}:${context.hasEditorialAccess.value}`)
       },
     })
 
@@ -114,7 +114,7 @@ describe('page-local Drupal context', () => {
 
         const context = usePageContext(localPage)
 
-        return () => h('p', `${context.isAdministrator.value}:${context.hasEditorialAccess.value}`)
+        return () => h('p', `${context.isAuthenticated.value}:${context.hasEditorialAccess.value}`)
       },
     })
 
@@ -122,6 +122,30 @@ describe('page-local Drupal context', () => {
 
     expect(wrapper.text()).toBe('false:false')
     expect(authSession.fetchSession).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('allows inline editing from an entity edit link or editorial access only', async () => {
+    const localPage = ref(createPage({ current_user: { id: '42', capabilities: { editorialUi: false } } }))
+    const Harness = defineComponent({
+      setup() {
+        setServerRendered(true)
+
+        const context = usePageContext(localPage)
+
+        return () => h('p', [
+          context.canEditInline(undefined),
+          context.canEditInline('https://cms.test/paragraph/4/edit'),
+        ].join(':'))
+      },
+    })
+
+    const wrapper = await mountSuspended(Harness)
+
+    expect(wrapper.text()).toBe('false:true')
+    localPage.value = createPage({ current_user: { id: '1', capabilities: { editorialUi: true } } })
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toBe('true:true')
     wrapper.unmount()
   })
 })

@@ -32,17 +32,21 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
       user: session.user.value,
     }),
   ))
-  const isAdministrator = computed(() => access.value.isAdministrator)
   const isAuthenticated = computed(() => access.value.isAuthenticated)
   const hasEditorialAccess = computed(() => access.value.hasEditorialAccess)
+  // Drupal emits editLink only when the entity may be updated; explicit edit
+  // targets on node pages rely on the page's editorial access instead. Saves
+  // are still access-checked by Drupal.
+  const canEditInline = (editLink?: string): boolean =>
+    Boolean(editLink) || hasEditorialAccess.value
 
   const pageLayout = computed(() => page.value?.page_layout || '')
 
   return {
     isFront,
-    isAdministrator,
     isAuthenticated,
     hasEditorialAccess,
+    canEditInline,
     pageLayout,
   }
 }

@@ -6,26 +6,35 @@ import {
 } from '../../layers/theme/app/utils/editorialAccess'
 
 describe('resolveDrupalPageAccess', () => {
-  it('keeps administrators compatible even without local tasks', () => {
+  it('grants editorial access from the Drupal capability without local tasks', () => {
     expect(resolveDrupalPageAccess({
-      current_user: { uid: 1, roles: ['authenticated', 'administrator'] },
+      current_user: { id: '1', capabilities: { editorialUi: true } },
       local_tasks: { primary: [], secondary: [] },
     })).toEqual({
-      isAdministrator: true,
       isAuthenticated: true,
       hasEditorialAccess: true,
     })
   })
 
+  it('ignores role names entirely', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: {
+        id: '1',
+        roles: ['authenticated', 'administrator'],
+        capabilities: { editorialUi: false },
+      },
+      local_tasks: { primary: [], secondary: [] },
+    } as never).hasEditorialAccess).toBe(false)
+  })
+
   it('allows authenticated editors when Drupal exposes accessible tasks', () => {
     expect(resolveDrupalPageAccess({
-      current_user: { uid: 42, roles: ['authenticated', 'content_editor'] },
+      current_user: { uid: 42, capabilities: { editorialUi: false } },
       local_tasks: {
         primary: [{ label: 'Edit', url: '/node/1/edit' }],
         secondary: [],
       },
-    })).toMatchObject({
-      isAdministrator: false,
+    })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
     })
@@ -33,14 +42,14 @@ describe('resolveDrupalPageAccess', () => {
 
   it('does not infer editorial access from authentication alone', () => {
     expect(resolveDrupalPageAccess({
-      current_user: { uid: 42, roles: ['authenticated'] },
+      current_user: { uid: 42 },
       local_tasks: { primary: [], secondary: [] },
     }).hasEditorialAccess).toBe(false)
   })
 
   it('does not treat read-only view and API tasks as editorial access', () => {
     expect(resolveDrupalPageAccess({
-      current_user: { uid: 42, roles: ['authenticated', 'class_subscriber'] },
+      current_user: { uid: 42 },
       local_tasks: {
         primary: [
           { label: 'View', url: '/node/1' },
@@ -53,19 +62,26 @@ describe('resolveDrupalPageAccess', () => {
 
   it('does not expose anonymous local tasks as editorial controls', () => {
     expect(resolveDrupalPageAccess({
-      current_user: { uid: 0, roles: ['anonymous'] },
-      local_tasks: { primary: [{ label: 'View', url: '/node/1' }] },
-    }).hasEditorialAccess).toBe(false)
+      current_user: { id: 0, capabilities: { editorialUi: false } },
+      local_tasks: { primary: [{ label: 'Edit', url: '/node/1/edit' }] },
+    })).toEqual({
+      isAuthenticated: false,
+      hasEditorialAccess: false,
+    })
+  })
+
+  it('accepts Lupus string and numeric user ids', () => {
+    expect(resolveDrupalPageAccess({ current_user: { id: '7' } }).isAuthenticated).toBe(true)
+    expect(resolveDrupalPageAccess({ current_user: { id: 0 } }).isAuthenticated).toBe(false)
   })
 })
 
 describe('resolveAuthSessionAccess', () => {
-  it('treats an administrator session as administrator access', () => {
+  it('reads the editorial capability from the session user', () => {
     expect(resolveAuthSessionAccess({
       loggedIn: true,
-      user: { uid: 1, roles: ['authenticated', 'administrator'] },
+      user: { uid: 1, capabilities: { editorialUi: true } },
     })).toEqual({
-      isAdministrator: true,
       isAuthenticated: true,
       hasEditorialAccess: true,
     })
@@ -73,7 +89,6 @@ describe('resolveAuthSessionAccess', () => {
 
   it('grants nothing without a session user', () => {
     expect(resolveAuthSessionAccess({ loggedIn: false, user: null })).toEqual({
-      isAdministrator: false,
       isAuthenticated: false,
       hasEditorialAccess: false,
     })
@@ -81,35 +96,27 @@ describe('resolveAuthSessionAccess', () => {
 })
 
 describe('mergeDrupalPageAccess', () => {
-  it('keeps administrator controls available when a route has no Drupal page payload', () => {
-    const routeAccess = resolveDrupalPageAccess(undefined)
-    const sessionAccess = resolveDrupalPageAccess({
-      current_user: {
-        authenticated: true,
-        uid: 1,
-        roles: ['authenticated', 'administrator'],
-      },
-    })
-
-    expect(mergeDrupalPageAccess(routeAccess, sessionAccess)).toEqual({
-      isAdministrator: true,
+  it('keeps session editorial access on a route without a Drupal page payload', () => {
+    expect(mergeDrupalPageAccess(
+      resolveDrupalPageAccess(undefined),
+      resolveAuthSessionAccess({
+        loggedIn: true,
+        user: { uid: 1, capabilities: { editorialUi: true } },
+      }),
+    )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
     })
   })
 
-  it('does not give ordinary authenticated users global editorial controls', () => {
-    const routeAccess = resolveDrupalPageAccess(undefined)
-    const sessionAccess = resolveDrupalPageAccess({
-      current_user: {
-        authenticated: true,
-        uid: 42,
-        roles: ['authenticated'],
-      },
-    })
-
-    expect(mergeDrupalPageAccess(routeAccess, sessionAccess)).toEqual({
-      isAdministrator: false,
+  it('does not give ordinary authenticated users editorial controls', () => {
+    expect(mergeDrupalPageAccess(
+      resolveDrupalPageAccess(undefined),
+      resolveAuthSessionAccess({
+        loggedIn: true,
+        user: { uid: 42, capabilities: { editorialUi: false } },
+      }),
+    )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
     })

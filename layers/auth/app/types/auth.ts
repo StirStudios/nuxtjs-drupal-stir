@@ -3,6 +3,7 @@ export type AuthSessionUser = {
   name: string
   mail: string
   roles: string[]
+  capabilities?: { editorialUi?: boolean } & Record<string, boolean>
 } & Record<string, unknown>
 
 export type AuthSessionResponse = {

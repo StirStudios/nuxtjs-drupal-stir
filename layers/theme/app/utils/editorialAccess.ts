@@ -1,8 +1,12 @@
+type DrupalCapabilities = {
+  editorialUi?: unknown
+}
+
 type DrupalPageUser = {
   authenticated?: boolean
   id?: number | string
   uid?: number | string
-  roles?: unknown
+  capabilities?: DrupalCapabilities | null
 }
 
 type DrupalLocalTasks = {
@@ -31,28 +35,27 @@ const hasEditorialTask = (value: unknown): boolean => {
   return label !== '' && !['api', 'view'].includes(label)
 }
 
+/**
+ * Reads editorial access from Drupal's own answers: the permission-based
+ * `editorialUi` capability, or local tasks Drupal already access-checked.
+ */
 export function resolveDrupalPageAccess(
   page: DrupalPageAccessSource | null | undefined,
 ) {
   const user = page?.current_user
-  const roles = Array.isArray(user?.roles)
-    ? user.roles.filter((role): role is string => typeof role === 'string')
-    : []
-  const isAdministrator = roles.includes('administrator')
   const isAuthenticated =
     user?.authenticated === true
     || hasPositiveId(user?.uid)
     || hasPositiveId(user?.id)
-    || roles.includes('authenticated')
-    || isAdministrator
   const tasks = page?.local_tasks
   const hasLocalTasks = [tasks?.primary, tasks?.secondary]
     .some(group => Array.isArray(group) && group.some(hasEditorialTask))
 
   return {
-    isAdministrator,
     isAuthenticated,
-    hasEditorialAccess: isAdministrator || (isAuthenticated && hasLocalTasks),
+    hasEditorialAccess:
+      user?.capabilities?.editorialUi === true
+      || (isAuthenticated && hasLocalTasks),
   }
 }
 
@@ -62,13 +65,13 @@ type AuthSessionAccessSource = {
   loggedIn?: boolean
   user?: {
     uid?: number | string
-    roles?: unknown
+    capabilities?: DrupalCapabilities | null
   } | null
 }
 
 /**
- * Projects an auth-session snapshot onto the page payload shape so role rules
- * stay defined in one place.
+ * Projects an auth-session snapshot onto the page payload shape so access
+ * rules stay defined in one place.
  */
 export function resolveAuthSessionAccess(
   session: AuthSessionAccessSource,
@@ -78,7 +81,7 @@ export function resolveAuthSessionAccess(
       ? {
           authenticated: session.loggedIn,
           uid: session.user.uid,
-          roles: session.user.roles,
+          capabilities: session.user.capabilities,
         }
       : null,
   })
@@ -91,12 +94,8 @@ export function mergeDrupalPageAccess(
   routeAccess: DrupalPageAccess,
   sessionAccess: DrupalPageAccess,
 ): DrupalPageAccess {
-  const isAdministrator = routeAccess.isAdministrator || sessionAccess.isAdministrator
-  const isAuthenticated = routeAccess.isAuthenticated || sessionAccess.isAuthenticated
-
   return {
-    isAdministrator,
-    isAuthenticated,
-    hasEditorialAccess: isAdministrator || routeAccess.hasEditorialAccess,
+    isAuthenticated: routeAccess.isAuthenticated || sessionAccess.isAuthenticated,
+    hasEditorialAccess: routeAccess.hasEditorialAccess || sessionAccess.hasEditorialAccess,
   }
 }

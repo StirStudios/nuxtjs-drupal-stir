@@ -11,7 +11,7 @@ import {
 const props = defineProps<EditableRichTextProps>()
 
 const attrs = useAttrs()
-const { isAdministrator } = usePageContext()
+const { canEditInline } = usePageContext()
 
 const isEditing = ref(false)
 const isLoadingEditor = ref(false)
@@ -51,7 +51,7 @@ const trustedTextHtml = useOptimizedDrupalHtml(
   () => props.classes,
 )
 const canInlineEdit = computed(
-  () => isAdministrator.value && editTarget.value !== null,
+  () => editTarget.value !== null && canEditInline(props.editLink),
 )
 const richTextClass = 'prose max-w-none'
 const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
