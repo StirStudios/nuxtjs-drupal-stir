@@ -55,6 +55,11 @@ untouched do not need one.
 
 ### Fixed
 
+- **Security.** `/api/auth/session` no longer copies Drupal's `csrf_token` and
+  `logout_token` into the client-side `user` object. Nothing on the client
+  read them; the Nitro proxy fetches its own token. Other snapshot fields,
+  including project additions such as DancePlug's `has_class_access`, are
+  unchanged.
 - Sign-in, registration and password-request forms no longer resend a spent
   Turnstile token. Drupal verifies the token on every attempt and Turnstile
   tokens are single-use, so once `stir_account` enforced Turnstile on login a
