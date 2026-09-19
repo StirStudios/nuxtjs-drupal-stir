@@ -55,8 +55,8 @@ describe('node override contract', () => {
     const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
 
     expect(pageRoute).toContain('const currentPage = page.value || {')
-    expect(pageRoute).toContain('prepareGlobalSeoAssets(')
-    expect(pageRoute).toContain('metatags as GlobalSeoResponse')
+    expect(pageRoute).toContain('useDrupalMetatagPreparer()')
+    expect(pageRoute).toContain('prepareMetatags(metatags as unknown as StirDrupalMetatags)')
     expect(pageRoute).toContain('usePageHead(pageHead, [\'meta\', \'link\'])')
   })
 

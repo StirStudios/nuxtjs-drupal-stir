@@ -1,5 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
-import type { SeoImageResolver } from '../utils/globalSeoAssets'
+import type { CmsGlobalSeoAssetConfig, SeoImageResolver } from '../utils/globalSeoAssets'
 import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
@@ -150,4 +150,20 @@ export default defineNuxtPlugin(async () => {
   )
 
   await globalSeo
+
+  // Drupal page metatags get the same image and origin handling. The raw app
+  // config is used on purpose: an unset `enabled` still prepares social images.
+  const pageAssetConfig = (appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
+
+  return {
+    provide: {
+      stirPrepareDrupalMetatags: (metatags: GlobalSeoResponse): GlobalSeoResponse => prepareGlobalSeoAssets(
+        metatags,
+        pageAssetConfig,
+        resolveImage,
+        publicOrigin,
+        drupalOrigin(runtimeConfig.public as Record<string, unknown>),
+      ),
+    },
+  }
 })
