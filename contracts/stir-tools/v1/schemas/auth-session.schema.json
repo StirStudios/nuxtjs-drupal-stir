@@ -24,6 +24,15 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     },
+    "capabilities": {
+      "description": "Frontend capabilities decided by Drupal permissions. Keys are camelCase booleans; project modules add their own through AccountSnapshotBuildEvent.",
+      "type": "object",
+      "required": ["editorialUi"],
+      "additionalProperties": { "type": "boolean" },
+      "properties": {
+        "editorialUi": { "type": "boolean" }
+      }
+    },
     "csrf_token": { "type": "string", "minLength": 1 },
     "logout_token": { "type": "string", "minLength": 1 }
   },

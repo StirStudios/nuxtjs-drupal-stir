@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.24.0",
+  "contractVersion": "1.25.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -79,7 +79,16 @@
       "schema": "schemas/account-snapshot.schema.json",
       "fixtures": [
         "fixtures/account-snapshot-anonymous.json",
-        "fixtures/account-snapshot-authenticated.json"
+        "fixtures/account-snapshot-authenticated.json",
+        "fixtures/account-snapshot-editor.json"
+      ]
+    },
+    "page.user": {
+      "capability": "account.session",
+      "schema": "schemas/page-current-user.schema.json",
+      "fixtures": [
+        "fixtures/page-current-user-anonymous.json",
+        "fixtures/page-current-user-editor.json"
       ]
     },
     "auth.session": {

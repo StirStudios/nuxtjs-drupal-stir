@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/page-current-user.schema.json",
+  "title": "Stir CE page current user",
+  "description": "The current_user object on Lupus CE page responses. lupus_decoupled_ce_api produces id, name and roles; stir_account adds capabilities.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "name", "roles", "capabilities"],
+  "properties": {
+    "id": {
+      "type": ["integer", "string"],
+      "pattern": "^[0-9]+$",
+      "minimum": 0
+    },
+    "name": { "type": "string" },
+    "roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "capabilities": {
+      "description": "Frontend capabilities decided by Drupal permissions. Keys are camelCase booleans.",
+      "type": "object",
+      "required": ["editorialUi"],
+      "additionalProperties": { "type": "boolean" },
+      "properties": {
+        "editorialUi": { "type": "boolean" }
+      }
+    }
+  }
+}

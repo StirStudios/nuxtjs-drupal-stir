@@ -28,7 +28,8 @@ const props = withDefaults(
   },
 )
 
-const { isAdministrator } = usePageContext()
+const { canEditInline } = usePageContext()
+const canEdit = computed(() => Boolean(props.id) && canEditInline(props.editLink))
 const { hero: heroTheme } = useAppConfig().stirTheme
 
 // On the front page, `hero.front.subtitle: 'below'` keeps the page title as the
@@ -57,7 +58,7 @@ defineSlots<{ button?(): unknown }>()
 
 <template>
   <div
-    v-if="heading || eyebrow?.trim() || (isAdministrator && id)"
+    v-if="heading || eyebrow?.trim() || canEdit"
     class="heading-group"
   >
     <p
@@ -77,7 +78,7 @@ defineSlots<{ button?(): unknown }>()
       </h1>
 
       <EditableRichText
-        v-if="secondaryHeading || (isAdministrator && id)"
+        v-if="secondaryHeading || canEdit"
         :id="id"
         :edit-link="editLink"
         :edit-target="headerEditTarget"
@@ -95,7 +96,7 @@ defineSlots<{ button?(): unknown }>()
     </template>
 
     <EditableRichText
-      v-else-if="heading || (isAdministrator && id)"
+      v-else-if="heading || canEdit"
       :id="id"
       :edit-link="editLink"
       :edit-target="headerEditTarget"
@@ -113,7 +114,7 @@ defineSlots<{ button?(): unknown }>()
   </div>
 
   <EditableRichText
-    v-if="showText && (heroText?.trim() || (isAdministrator && id))"
+    v-if="showText && (heroText?.trim() || canEdit)"
     :id="id"
     classes="lead"
     :edit-link="editLink"

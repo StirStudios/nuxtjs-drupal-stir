@@ -1,0 +1,9 @@
+{
+  "authenticated": true,
+  "uid": 3,
+  "name": "Site Editor",
+  "account_name": "editor",
+  "mail": "editor@example.com",
+  "roles": ["authenticated", "administrator"],
+  "capabilities": { "editorialUi": true }
+}

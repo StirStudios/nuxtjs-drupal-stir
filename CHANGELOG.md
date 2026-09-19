@@ -13,8 +13,20 @@ untouched do not need one.
 
 ## Unreleased
 
+### Removed
+
+- **Breaking.** `usePageContext().isAdministrator` and the `isAdministrator`
+  field of `resolveDrupalPageAccess()` / `mergeDrupalPageAccess()` are gone.
+  They string-matched the `administrator` role, which Drupal never uses to
+  decide access. Use `hasEditorialAccess` for editorial chrome and
+  `canEditInline(editLink)` for inline edit controls.
+
 ### Added
 
+- `usePageContext().canEditInline(editLink?)` decides whether inline edit
+  controls render: `TRUE` when Drupal sent an `editLink` for the entity, or
+  the page grants editorial access. `EditableRichText`, `HeroContent` and the
+  hero paragraph use it. Drupal still access-checks every save.
 - `compliance/site.json` accepts `"prelaunch": true` for sites whose public
   domain still serves the outgoing site. Live page findings become warnings
   prefixed `(pre-launch)`, the audit prints a `PRELAUNCH` line, and the
@@ -29,6 +41,12 @@ untouched do not need one.
 
 ### Changed
 
+- **Editorial access comes from Drupal.** `hasEditorialAccess` reads the
+  permission-based `capabilities.editorialUi` from the CE page payload's
+  `current_user` and from the auth session (stir-tools contract 1.25.0), or
+  editorial local tasks Drupal already access-checked. Role names are no
+  longer read. Deploy the stir-tools update first: until a site's Drupal sends
+  `capabilities`, administrators lose the tabs bar on Nuxt-only routes.
 - Popups now come from the Drupal `popups` block region (`blocks.popups`),
   which replaces the hidden `decoupled` region. `usePopupData` still reads
   `blocks.decoupled` when `popups` is absent, so deploy this layer before the
