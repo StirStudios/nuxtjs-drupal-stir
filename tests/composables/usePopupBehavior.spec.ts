@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  activePopupDismissals,
   popupSuppressionIsActive,
   popupUsesPersistentDismissal,
 } from '../../layers/integrations/app/composables/usePopupBehavior'
@@ -19,5 +20,13 @@ describe('popup dismissal policy', () => {
     expect(popupSuppressionIsActive(2_000, 1_000)).toBe(true)
     expect(popupSuppressionIsActive(1_000, 2_000)).toBe(false)
     expect(popupSuppressionIsActive('completed', 2_000)).toBe(true)
+  })
+
+  it('keeps stored dismissals from accumulating once they expire', () => {
+    expect(activePopupDismissals({
+      expired: 1_000,
+      pending: 3_000,
+      finished: 'completed',
+    }, 2_000)).toEqual({ pending: 3_000, finished: 'completed' })
   })
 })
