@@ -10,9 +10,8 @@
  *
  * Usage: node scripts/audit/shadowed-components.mjs <consumer-dir> [...]
  */
-import { readdirSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { resolve, relative, sep } from 'node:path'
-import { readFileSync } from 'node:fs'
 
 const layerRoot = resolve(import.meta.dirname, '../../layers')
 
@@ -21,7 +20,7 @@ function vueFiles(dir) {
   const found = []
 
   const walk = (current) => {
-    let entries = []
+    let entries
 
     try {
       entries = readdirSync(current)
