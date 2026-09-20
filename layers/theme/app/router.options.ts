@@ -1,4 +1,5 @@
 import type { RouterOptions } from '@nuxt/schema'
+import { prefersReducedMotion } from './utils/motion'
 
 const SAVED_POSITION_ATTEMPTS = 60
 const HASH_TARGET_ATTEMPTS = 60
@@ -40,9 +41,7 @@ function getHashElement(hash: string) {
 }
 
 function getHashScrollBehavior() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ? 'auto' as const
-    : 'smooth' as const
+  return prefersReducedMotion() ? 'auto' as const : 'smooth' as const
 }
 
 async function waitForHashElement(hash: string) {
