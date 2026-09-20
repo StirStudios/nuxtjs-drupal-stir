@@ -9,7 +9,7 @@ const nodeProps = computed(() => ({
   ...props,
   ...attrs,
 }))
-const { routeHero } = useAppConfig().stirTheme
+const { node, routeHero } = useAppConfig().stirTheme
 // The layout route hero renders the page hero; skipping the slot avoids a second H1.
 const skipHeroSlot = routeHero.enabled && resolveRouteHeroElements(routeHero.elements).includes('node-page')
 const forwardedSlotNames = computed(() =>
@@ -22,7 +22,7 @@ defineOptions({
 </script>
 
 <template>
-  <NodeDefault v-bind="nodeProps">
+  <NodeDefault :content-class="node?.pageContentClass" v-bind="nodeProps">
     <template
       v-for="slotName in forwardedSlotNames"
       :key="slotName"

@@ -474,12 +474,18 @@ type StirThemeArticleConfig = {
   container?: ClassValue
 } & LooseRecord
 
+type StirThemeNodeConfig = {
+  /** Classes wrapping a page node's content, for example its vertical spacing. */
+  pageContentClass?: ClassValue
+} & LooseRecord
+
 type StirThemeConfig = {
   showPdf?: boolean
   showBreadcrumbs?: boolean
   loadingIndicator?: string | false
   container?: ClassValue
   article?: StirThemeArticleConfig
+  node?: StirThemeNodeConfig
   navigation?: StirThemeNavigationConfig
   hero?: StirThemeHeroConfig
   routeHero?: StirThemeRouteHeroConfig
@@ -546,6 +552,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   showBreadcrumbs: boolean
   container: ClassValue
   article: Required<StirThemeArticleConfig>
+  node: StirThemeNodeConfig
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
   routeHero: StirThemeRouteHeroConfig & {

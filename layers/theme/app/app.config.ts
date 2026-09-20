@@ -28,6 +28,11 @@ export default defineAppConfig({
       container: 'max-w-3xl',
     },
 
+    node: {
+      // Sites set this to space page content without forking node--page.
+      pageContentClass: '',
+    },
+
     auth: {
       backgroundClass: 'bg-muted/50 dark:bg-default',
       showBackgroundDecoration: true,
