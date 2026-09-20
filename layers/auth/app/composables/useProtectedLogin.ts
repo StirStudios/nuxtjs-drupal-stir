@@ -1,4 +1,5 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
+import type { AuthFormState } from '../types/auth'
 import { useProtectedActions } from './useProtectedActions'
 import { resolveStirAuthRedirect } from '../utils/authRedirect'
 
@@ -31,11 +32,11 @@ export function useProtectedLogin() {
   }
 
   const onSubmit = async (
-    event: FormSubmitEvent<{ password: string }>,
+    event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
     try {
-      const hasAccess = await login(event.data.password, turnstileToken.value)
+      const hasAccess = await login(event.data.password || '', turnstileToken.value)
 
       if (hasAccess) {
         await navigateTo(

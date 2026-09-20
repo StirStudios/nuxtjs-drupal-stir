@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
+import type {
+  StirDrupalLocalTask,
+  StirDrupalLocalTasks,
+} from '#stir/types'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 import {
@@ -35,8 +39,8 @@ useHead({
 const user = computed(() => page.value?.current_user || null)
 const { adminDashboardUrl, hasEditorialAccess, isAuthenticated } = usePageContext()
 
-type LocalTask = { label: string; url: string; active?: boolean }
-type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
+type LocalTask = StirDrupalLocalTask
+type LocalTasks = StirDrupalLocalTasks
 type MenuLink = EditorialTaskLink
 type AccountMenuItem = { title?: string; relative?: string; url?: string }
 
@@ -84,7 +88,7 @@ const getAdminLinkSelectHandler = (destination: string) => {
 }
 
 const tabs = computed<LocalTasks>(() => {
-  const localTasks = page.value?.local_tasks as Partial<LocalTasks> | undefined
+  const localTasks = page.value?.local_tasks
 
   return {
     primary: Array.isArray(localTasks?.primary) ? localTasks.primary : [],

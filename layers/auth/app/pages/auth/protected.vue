@@ -37,7 +37,7 @@ useSeoMeta({
       :submit="{ label: 'Continue' }"
       :title="title"
       :validate="validate"
-      @submit="onSubmit($event as never)"
+      @submit="onSubmit"
     >
       <template #validation>
         <FieldTurnstile :key="turnstileKey" v-model="turnstileToken" />

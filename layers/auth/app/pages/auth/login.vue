@@ -28,8 +28,8 @@ useSeoMeta({
       :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
-      @error="onError($event as never)"
-      @submit="onSubmit($event as never)"
+      @error="onError"
+      @submit="onSubmit"
     >
       <template #password-hint>
         <ULink class="text-primary font-medium" to="/auth/password/request">

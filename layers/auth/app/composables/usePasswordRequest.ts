@@ -3,7 +3,7 @@ import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createPasswordRequestValidationSchema } from '../utils/authValidation'
 import { validateForm } from '../utils/validationErrors'
-import type { AuthUiIdentifierField } from '../types/auth'
+import type { AuthFormState, AuthUiIdentifierField } from '../types/auth'
 
 export function usePasswordRequest() {
   const toast = useToast()
@@ -43,13 +43,13 @@ export function usePasswordRequest() {
   }
 
   const onSubmit = async (
-    event: FormSubmitEvent<{ identifier: string }>,
+    event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
 
     try {
       await requestPasswordReset({
-        identifier: event.data.identifier.trim(),
+        identifier: (event.data.identifier || '').trim(),
         turnstile_response: turnstileToken.value,
       })
 

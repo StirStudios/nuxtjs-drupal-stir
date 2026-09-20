@@ -70,6 +70,32 @@ describe('protected login rate limit', () => {
     })).resolves.toEqual({ allowed: false, retryAfterSeconds: 60 })
   })
 
+  // With no limiter injected and no adapter on the request context, the util
+  // falls back to its own in-memory limiter, and rebuilds it when the
+  // configured points or window change.
+  it('falls back to a built-in memory limiter, rebuilt when config changes', async () => {
+    const config = { enabled: true, maxAttempts: 1, trustProxy: false, windowSeconds: 60 }
+
+    expect(await layerAuthConsumeProtectedLoginAttempt(event, {
+      config,
+      identifier: 'memory-limiter',
+    })).toEqual({ allowed: true, retryAfterSeconds: 0 })
+
+    const blocked = await layerAuthConsumeProtectedLoginAttempt(event, {
+      config,
+      identifier: 'memory-limiter',
+    })
+
+    expect(blocked.allowed).toBe(false)
+    expect(blocked.retryAfterSeconds).toBeGreaterThan(0)
+
+    // A different window is a different limiter, so the count starts again.
+    expect(await layerAuthConsumeProtectedLoginAttempt(event, {
+      config: { ...config, windowSeconds: 120 },
+      identifier: 'memory-limiter',
+    })).toEqual({ allowed: true, retryAfterSeconds: 0 })
+  })
+
   it('reserves attempts atomically before overlapping validations run', async () => {
     const dependencies: LayerAuthProtectedRateLimitDependencies = {
       config: { enabled: true, maxAttempts: 5, trustProxy: false, windowSeconds: 60 },

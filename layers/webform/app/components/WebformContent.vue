@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FormErrorEvent } from '@nuxt/ui'
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
@@ -40,7 +41,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'submit', event: { data: Record<string, unknown> }): void
-  (e: 'error', event: unknown): void
+  (e: 'error', event: FormErrorEvent): void
   (e: 'update:turnstileToken', value: string): void
 }>()
 

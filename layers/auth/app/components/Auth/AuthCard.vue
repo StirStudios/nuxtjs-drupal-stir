@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { AuthFormField, FormError } from '@nuxt/ui'
+import type { FormErrorEvent, FormSubmitEvent, AuthFormField, FormError  } from '@nuxt/ui'
+import type { AuthFormState } from '../../types/auth'
 import type { AuthThemeConfig } from '../../types/theme'
 import { authLayoutContextKey } from '../../utils/authLayout'
 
@@ -56,8 +57,8 @@ const formPanelProps = computed(() => ({
 }))
 
 defineEmits<{
-  submit: [event: unknown]
-  error: [event: unknown]
+  submit: [event: FormSubmitEvent<AuthFormState>]
+  error: [event: FormErrorEvent]
 }>()
 
 defineSlots<{

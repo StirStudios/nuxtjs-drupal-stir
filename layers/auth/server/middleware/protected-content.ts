@@ -57,7 +57,7 @@ const isAuthenticatedDrupalSession = async (event: unknown): Promise<boolean> =>
 }
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig() as Record<string, unknown>
+  const config = useRuntimeConfig()
   const protectedRoutes = (config.stirProtectedRoutes
     && typeof config.stirProtectedRoutes === 'object'
     ? config.stirProtectedRoutes

@@ -1,4 +1,3 @@
-import type { AppConfigInput } from 'nuxt/schema'
 import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
@@ -336,5 +335,5 @@ export default defineAppConfig({
     },
   },
 
-  ui: nuxtUiTheme as unknown as NonNullable<AppConfigInput['ui']>,
+  ui: nuxtUiTheme,
 })

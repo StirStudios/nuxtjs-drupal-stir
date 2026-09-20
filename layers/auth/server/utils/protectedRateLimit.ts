@@ -66,7 +66,7 @@ const normalizePositiveInteger = (
 export const layerAuthGetProtectedRateLimitConfig = (
   runtimeConfig: ReturnType<typeof useRuntimeConfig> = useRuntimeConfig(),
 ): LayerAuthProtectedRateLimitConfig => {
-  const rawConfig = (runtimeConfig as Record<string, unknown>).protectedRateLimit
+  const rawConfig = runtimeConfig.protectedRateLimit
   const config = rawConfig && typeof rawConfig === 'object'
     ? rawConfig as Record<string, unknown>
     : {}

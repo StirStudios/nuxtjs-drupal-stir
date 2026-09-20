@@ -1,4 +1,5 @@
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
+import type { AuthFormState } from '../types/auth'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createPasswordResetValidationSchema } from '../utils/authValidation'
@@ -71,7 +72,7 @@ export function usePasswordReset() {
   }
 
   const onSubmit = async (
-    event: FormSubmitEvent<{ password: string; confirmPassword: string }>,
+    event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
 
@@ -80,7 +81,7 @@ export function usePasswordReset() {
         uid: uid.value,
         timestamp: timestamp.value,
         hash: hash.value,
-        password: event.data.password,
+        password: event.data.password || '',
       })
 
       toast.add({

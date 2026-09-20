@@ -98,7 +98,7 @@ useSeoMeta({
       :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
-      @submit="onSubmit($event as never)"
+      @submit="onSubmit"
     >
       <template #password-field="{ state: formState, field }">
         <AuthPasswordField
