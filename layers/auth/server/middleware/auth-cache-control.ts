@@ -1,11 +1,10 @@
-import { defineEventHandler, getRequestURL, setResponseHeader } from 'h3'
-
-const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
+import { defineEventHandler, getRequestURL } from 'h3'
+import { markStirPrivateResponse } from '../../../foundation/server/utils/stirDrupalApi'
 
 export default defineEventHandler((event) => {
   const path = getRequestURL(event).pathname
 
   if (!path.startsWith('/api/auth/') && !path.startsWith('/api/account/')) return
 
-  setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
+  markStirPrivateResponse(event)
 })

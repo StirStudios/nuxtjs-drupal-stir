@@ -6,13 +6,13 @@ import {
 } from '../../layers/theme/app/utils/editorialAccess'
 
 describe('resolveDrupalPageAccess', () => {
-  it('grants editorial access from the Drupal capability without local tasks', () => {
+  it('grants editorial access from the Drupal capability', () => {
     expect(resolveDrupalPageAccess({
       current_user: { id: '1', capabilities: { editorialUi: true } },
-      local_tasks: { primary: [], secondary: [] },
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -27,52 +27,64 @@ describe('resolveDrupalPageAccess', () => {
     } as never).hasEditorialAccess).toBe(false)
   })
 
-  it('allows authenticated editors when Drupal exposes accessible tasks', () => {
+  it('never grants editorial access from local tasks', () => {
     expect(resolveDrupalPageAccess({
       current_user: { uid: 42, capabilities: { editorialUi: false } },
       local_tasks: {
-        primary: [{ label: 'Edit', url: '/node/1/edit' }],
+        primary: [{ label: 'Edit', url: '/user/42/edit' }],
         secondary: [],
       },
-    })).toEqual({
+    } as never)).toEqual({
       isAuthenticated: true,
-      hasEditorialAccess: true,
+      hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 
   it('does not infer editorial access from authentication alone', () => {
     expect(resolveDrupalPageAccess({
       current_user: { uid: 42 },
-      local_tasks: { primary: [], secondary: [] },
     }).hasEditorialAccess).toBe(false)
-  })
-
-  it('does not treat read-only view and API tasks as editorial access', () => {
-    expect(resolveDrupalPageAccess({
-      current_user: { uid: 42 },
-      local_tasks: {
-        primary: [
-          { label: 'View', url: '/node/1' },
-          { label: 'API', url: '/ce-api/node/1' },
-        ],
-        secondary: [],
-      },
-    }).hasEditorialAccess).toBe(false)
-  })
-
-  it('does not expose anonymous local tasks as editorial controls', () => {
-    expect(resolveDrupalPageAccess({
-      current_user: { id: 0, capabilities: { editorialUi: false } },
-      local_tasks: { primary: [{ label: 'Edit', url: '/node/1/edit' }] },
-    })).toEqual({
-      isAuthenticated: false,
-      hasEditorialAccess: false,
-    })
   })
 
   it('accepts Lupus string and numeric user ids', () => {
     expect(resolveDrupalPageAccess({ current_user: { id: '7' } }).isAuthenticated).toBe(true)
     expect(resolveDrupalPageAccess({ current_user: { id: 0 } }).isAuthenticated).toBe(false)
+  })
+})
+
+describe('the dashboard link', () => {
+  it('passes through the URL Drupal sent', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: {
+        id: '1',
+        capabilities: { editorialUi: true },
+        admin_dashboard_url: '/admin/dashboard',
+      },
+    }).adminDashboardUrl).toBe('/admin/dashboard')
+  })
+
+  it('is absent when Drupal sent none, or sent nothing usable', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: { id: '1', capabilities: { editorialUi: true } },
+    }).adminDashboardUrl).toBeNull()
+    expect(resolveDrupalPageAccess({
+      current_user: { id: '1', admin_dashboard_url: '   ' },
+    }).adminDashboardUrl).toBeNull()
+  })
+
+  it('falls back to the session when the page payload has none', () => {
+    expect(mergeDrupalPageAccess(
+      resolveDrupalPageAccess(undefined),
+      resolveAuthSessionAccess({
+        loggedIn: true,
+        user: {
+          uid: 1,
+          capabilities: { editorialUi: true },
+          admin_dashboard_url: '/admin/dashboard',
+        },
+      }),
+    ).adminDashboardUrl).toBe('/admin/dashboard')
   })
 })
 
@@ -84,6 +96,7 @@ describe('resolveAuthSessionAccess', () => {
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -91,6 +104,7 @@ describe('resolveAuthSessionAccess', () => {
     expect(resolveAuthSessionAccess({ loggedIn: false, user: null })).toEqual({
       isAuthenticated: false,
       hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 })
@@ -106,6 +120,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      adminDashboardUrl: null,
     })
   })
 
@@ -119,6 +134,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
+      adminDashboardUrl: null,
     })
   })
 })

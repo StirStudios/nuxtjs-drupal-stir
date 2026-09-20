@@ -8,7 +8,7 @@ import {
   useAuthLogin,
   type StirAuthLoginOptions,
   type StirAuthLoginRedirectContext,
-} from '../../../layers/auth/app/composables/auth/useAuthLogin'
+} from '../../../layers/auth/app/composables/useAuthLogin'
 
 const navigateToMock = vi.fn()
 let currentQuery: Record<string, unknown> = {}

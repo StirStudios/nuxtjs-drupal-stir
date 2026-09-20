@@ -3,9 +3,14 @@ import { useMediaQuery } from '@vueuse/core'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 import { withEditorDestination } from '#stir/utils/layoutEditLinks'
 import {
+  STIR_EDITORIAL_OFFSET,
+  STIR_EDITORIAL_OFFSET_VAR,
+} from '#stir/utils/editorialOffset'
+import {
   adminUiProps,
   adminUiTheme,
   type EditorialTaskLink,
+  adminLinkIcon,
   withUnpublishedTask,
 } from '../../utils/adminUiTheme'
 
@@ -16,26 +21,19 @@ const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()
 const config = useRuntimeConfig()
+
+// Publish the space this bar occupies so the theme can offset itself without
+// knowing the editorial layer exists. Nuxt renders it during SSR, so the
+// header is never offset a frame late, and removes it when the bar unmounts.
+useHead({
+  style: [{
+    id: 'stir-editorial-offset',
+    innerHTML: `:root{${STIR_EDITORIAL_OFFSET_VAR}:${STIR_EDITORIAL_OFFSET};}`,
+  }],
+})
+
 const user = computed(() => page.value?.current_user || null)
-const { hasEditorialAccess, isAuthenticated } = usePageContext()
-
-const iconMap: Record<string, string> = {
-  'Drupal CMS': 'i-lucide-layout-dashboard',
-  Settings: 'i-lucide-settings',
-  View: 'i-lucide-eye',
-  Edit: 'i-lucide-square-pen',
-  Delete: 'i-lucide-trash',
-  Revisions: 'i-lucide-history',
-  Export: 'i-lucide-file-up',
-  API: 'i-lucide-braces',
-  'Log out': 'i-lucide-log-out',
-  'Log in': 'i-lucide-log-in',
-  'My account': 'i-lucide-circle-user',
-}
-
-const getIconForLabel = (label: string): string | null => {
-  return iconMap[label] || null
-}
+const { adminDashboardUrl, hasEditorialAccess, isAuthenticated } = usePageContext()
 
 type LocalTask = { label: string; url: string; active?: boolean }
 type LocalTasks = { primary: LocalTask[]; secondary: LocalTask[] }
@@ -106,7 +104,8 @@ const localTaskLinks = computed(() =>
       return {
         label: tab.label,
         to,
-        icon: getIconForLabel(tab.label),
+        // The active task on a frontend page is Drupal's View tab.
+        icon: tab.active === true ? 'i-lucide-eye' : adminLinkIcon(to),
         tooltip: isCompactTabs.value,
         active: tab.active === true,
         onSelect: getAdminLinkSelectHandler(to),
@@ -129,7 +128,6 @@ const {
   immediate: false,
   server: false,
 })
-const accountMenuUserId = ref('')
 const currentUserId = computed(() =>
   String(user.value?.id ?? user.value?.uid ?? 'anon'),
 )
@@ -199,7 +197,7 @@ const accountMenu = computed<MenuLink[]>(() =>
       return {
         label,
         to,
-        icon: getIconForLabel(label),
+        icon: adminLinkIcon(to),
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(to),
       }
@@ -207,15 +205,14 @@ const accountMenu = computed<MenuLink[]>(() =>
     .filter((item): item is MenuLink => item !== null),
 )
 
-const loadAccountMenu = async () => {
-  if (accountMenuUserId.value !== currentUserId.value) {
-    clearAccountMenu()
-    accountMenuUserId.value = currentUserId.value
-  }
+// One request per editor: the key changes when Drupal's answer about who is
+// looking changes, and nothing else re-fetches a menu already in hand.
+const accountMenuKey = computed(() =>
+  hasEditorialAccess.value && isAuthenticated.value ? currentUserId.value : '',
+)
 
+const loadAccountMenu = async () => {
   if (
-    !hasEditorialAccess.value ||
-    !isAuthenticated.value ||
     accountMenuStatus.value === 'pending' ||
     accountMenuStatus.value === 'success'
   ) {
@@ -233,57 +230,40 @@ const loadAccountMenu = async () => {
   }
 }
 
-onMounted(() => {
-  void loadAccountMenu()
-})
-
 watch(
-  () => currentUserId.value,
-  () => {
-    clearAccountMenu()
-    accountMenuUserId.value = currentUserId.value
-    if (hasEditorialAccess.value) {
-      void loadAccountMenu()
-    }
+  accountMenuKey,
+  (key, previousKey) => {
+    if (key !== previousKey) clearAccountMenu()
+    if (key) void loadAccountMenu()
   },
+  { immediate: import.meta.client },
 )
-
-watch(hasEditorialAccess, (hasAccess) => {
-  if (hasAccess) {
-    clearAccountMenu()
-    void loadAccountMenu()
-  }
-})
 
 // Editorial tabs persist across route changes. Retry a failed upstream menu
 // request when navigation gives the user another opportunity to load it.
 watch(
   () => route.fullPath,
   () => {
-    if (
-      hasEditorialAccess.value &&
-      isAuthenticated.value &&
-      accountMenuStatus.value !== 'pending' &&
-      accountMenuStatus.value !== 'success'
-    ) {
-      void loadAccountMenu()
-    }
+    if (accountMenuKey.value) void loadAccountMenu()
   },
 )
 
 const links = computed(() => {
-  const dashboardTo = normalizeAdminUrl('/admin/dashboard')
-  const baseLinks = [
-    [
-      {
-        label: 'Drupal CMS',
-        icon: getIconForLabel('Drupal CMS'),
-        to: dashboardTo,
-        tooltip: isCompactTabs.value,
-        onSelect: getAdminLinkSelectHandler(dashboardTo),
-      },
-    ],
-  ]
+  const dashboard = adminDashboardUrl.value
+  // Drupal names the dashboard it allows; without one there is no item.
+  const baseLinks = dashboard
+    ? [
+        [
+          {
+            label: 'Drupal CMS',
+            icon: 'i-lucide-layout-dashboard',
+            to: normalizeAdminUrl(dashboard),
+            tooltip: isCompactTabs.value,
+            onSelect: getAdminLinkSelectHandler(normalizeAdminUrl(dashboard)),
+          },
+        ],
+      ]
+    : []
 
   const tasks = editorialTaskLinks.value.length
     ? [editorialTaskLinks.value]
@@ -292,13 +272,13 @@ const links = computed(() => {
   const accountItem = accountMenu.value.length
     ? {
         label: user.value?.name || 'Account',
-        icon: getIconForLabel('My account'),
+        icon: 'i-lucide-circle-user',
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
-        icon: getIconForLabel('My account'),
+        icon: 'i-lucide-circle-user',
         to: accountTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(accountTo),

@@ -18,6 +18,11 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     },
+    "admin_dashboard_url": {
+      "description": "URL of Drupal's dashboard, sent only when the account may open it.",
+      "type": "string",
+      "minLength": 1
+    },
     "capabilities": {
       "description": "Frontend capabilities decided by Drupal permissions. Keys are camelCase booleans.",
       "type": "object",

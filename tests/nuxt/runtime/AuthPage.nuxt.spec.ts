@@ -30,7 +30,12 @@ const state = vi.hoisted(() => ({
 }))
 
 mockNuxtImport('useAppConfig', () => () => state.appConfig)
-mockNuxtImport('useAuthConfig', () => () => ({ auth: ref(state.auth) }))
+mockNuxtImport('useAuthConfig', () => () => ({
+  auth: ref(state.auth),
+  accountsEnabled: computed(() => typeof state.auth.version === 'number' && state.auth.accountsEnabled !== false),
+  status: ref('success'),
+  ensureLoaded: async () => {},
+}))
 mockNuxtImport('useImage', () => () => state.imageResolver)
 
 describe('AuthPage', () => {

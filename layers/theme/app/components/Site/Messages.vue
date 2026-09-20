@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
+type DrupalMessage = { message: string; type: string }
+
 const { getMessages } = useStirDrupalCe()
 const toast = useToast()
-
-// Use an array in state to keep payload serialization simple.
-const shownMessages = useState<string[]>('shownMessages', () => [])
+// drupal-ce queues Drupal status messages from every page response. The
+// layout stays mounted across navigations, so drain the queue whenever it
+// grows instead of reading it once.
+const queue = getMessages() as Ref<DrupalMessage[]>
 
 onMounted(() => {
-  const messages = getMessages().value as Array<{ message: string; type: string }>
-
-  messages.forEach((message) => {
-    // Check if the message has already been shown
-    if (!shownMessages.value.includes(message.message)) {
-      // Show the toast
+  watch(() => queue.value.length, () => {
+    for (const message of queue.value.splice(0)) {
       toast.add({
         title: message.type === 'success' ? 'Success!' : 'Error!',
         description: h('div', {
@@ -22,11 +21,8 @@ onMounted(() => {
         icon: getAlertIcon(message.type),
         color: message.type === 'success' ? 'success' : 'error',
       })
-
-      // Track the shown message
-      shownMessages.value.push(message.message)
     }
-  })
+  }, { immediate: true })
 })
 
 function getAlertIcon(type: string): string {

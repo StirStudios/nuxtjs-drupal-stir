@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { clearNuxtData } from '#app'
 import { defineComponent } from 'vue'
-import { useAuthConfig } from '../../../layers/auth/app/composables/auth/useAuthConfig'
+import { useAuthConfig } from '../../../layers/auth/app/composables/useAuthConfig'
 
 describe('useAuthConfig', () => {
   let authConfigCalls = 0

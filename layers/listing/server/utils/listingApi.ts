@@ -66,3 +66,16 @@ export function isPrivateStirListingResponse(options: {
     || options.setsSessionCookie
     || options.personalized
 }
+
+/**
+ * Encodes a listing query the way Drupal (PHP) reads lists.
+ *
+ * h3 parses `style=a&style=b` into an array, and ofetch sends it back as
+ * repeated `style=` keys, of which PHP keeps only the last. Drupal needs
+ * `style[]=a&style[]=b` to receive every selected value.
+ */
+export function toDrupalListingQuery(query: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(query).map(([key, value]) =>
+    Array.isArray(value) && !key.endsWith('[]') ? [`${key}[]`, value] : [key, value],
+  ))
+}

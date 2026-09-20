@@ -1,5 +1,6 @@
 import { useWindowScroll, useThrottleFn } from '@vueuse/core'
 import { usePageContext } from '#stir/composables/usePageContext'
+import { STIR_EDITORIAL_SCROLL_ALLOWANCE } from '../utils/editorialOffset'
 
 export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
   if (!import.meta.client) {
@@ -16,7 +17,9 @@ export function useScrollNav(baseScrollThreshold = 10, directionDelta = 10) {
 
   const { hasEditorialAccess } = usePageContext()
   const adjustedScrollThreshold = computed(() =>
-    hasEditorialAccess.value ? baseScrollThreshold + 40 : baseScrollThreshold,
+    hasEditorialAccess.value
+      ? baseScrollThreshold + STIR_EDITORIAL_SCROLL_ALLOWANCE
+      : baseScrollThreshold,
   )
 
   const lastScrollPosition = ref(0)

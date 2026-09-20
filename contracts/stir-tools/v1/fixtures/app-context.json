@@ -4,13 +4,7 @@
       {
         "element": "block-content-paragraph",
         "props": {
-          "id": "newsletter",
-          "visibility": {
-            "requestPath": {
-              "mode": "hide",
-              "paths": ["/account/*"]
-            }
-          }
+          "id": "newsletter"
         },
         "slots": {
           "heading": "<h2>Reusable promotion</h2>",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAccountSettings } from '../../composables/account/useAccountSettings'
-import { useAuthConfig } from '../../composables/auth/useAuthConfig'
-import { useAuthSession } from '../../composables/auth/useAuthSession'
+import { useAccountSettings } from '../../composables/useAccountSettings'
+import { useAuthConfig } from '../../composables/useAuthConfig'
+import { useAuthSession } from '../../composables/useAuthSession'
 import { stirAuthLoginTarget } from '../../utils/authRedirect'
 import { createAccountPasswordChangeValidationSchema } from '../../utils/authValidation'
 import { validateForm } from '../../utils/validationErrors'

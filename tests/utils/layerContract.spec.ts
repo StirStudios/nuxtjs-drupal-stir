@@ -594,9 +594,9 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(authConfigComposable).toContain('export { useAuthConfig }')
+    expect(authConfigComposable).toContain('export function useAuthConfig(')
 
-    // The page-level composables are auto-imported through these shims, so a
+    // Page-level composables are auto-imported from these paths, so a
     // downstream override depends on them existing.
     for (const composable of [
       'useAuthActions',
@@ -608,13 +608,13 @@ describe('layer contract', () => {
       'useProtectedActions',
       'useProtectedLogin',
     ]) {
-      const shimPath = resolve(
+      const composablePath = resolve(
         rootDir,
         `layers/auth/app/composables/${composable}.ts`,
       )
 
-      expect(existsSync(shimPath)).toBe(true)
-      expect(readFileSync(shimPath, 'utf8')).toContain(`export { ${composable} }`)
+      expect(existsSync(composablePath)).toBe(true)
+      expect(readFileSync(composablePath, 'utf8')).toMatch(new RegExp(`export function ${composable}[<(]`))
     }
 
     expect(authValidation).toContain('export function createLoginValidationSchema')
@@ -708,6 +708,27 @@ describe('layer contract', () => {
     expect(header).not.toContain('fetchMenu(\'main\')')
   })
 
+  it('keeps the editorial offset in one place, published by the tabs bar', () => {
+    const tabs = readFileSync(
+      resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
+      'utf8',
+    )
+    const header = readFileSync(
+      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
+      'utf8',
+    )
+    const scrollNav = readFileSync(
+      resolve(rootDir, 'layers/theme/app/composables/useScrollNav.ts'),
+      'utf8',
+    )
+
+    expect(tabs).toContain('STIR_EDITORIAL_OFFSET_VAR')
+    expect(header).toContain('top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]')
+    expect(header).not.toContain('3.1rem')
+    expect(scrollNav).toContain('STIR_EDITORIAL_SCROLL_ALLOWANCE')
+    expect(scrollNav).not.toContain('+ 40')
+  })
+
   it('uses the upstream deferred menu lifecycle for the editorial account menu', () => {
     const tabs = readFileSync(
       resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
@@ -719,8 +740,13 @@ describe('layer contract', () => {
     expect(tabs).toContain('server: false')
     expect(tabs).toContain('execute: executeAccountMenu')
     expect(tabs).toContain('() => route.fullPath')
-    expect(tabs).toContain('accountMenuStatus.value !== \'success\'')
-    expect(tabs).toContain('normalizeAdminUrl(\'/admin/dashboard\')')
+    // One keyed watch decides when a menu is fetched, not a set of flags.
+    expect(tabs).toContain('const accountMenuKey = computed(')
+    expect(tabs).toContain('accountMenuStatus.value === \'success\'')
+    expect(tabs).not.toContain('accountMenuUserId')
+    // Drupal sends the dashboard it allows; the frontend assumes no path.
+    expect(tabs).toContain('const dashboard = adminDashboardUrl.value')
+    expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/dashboard\')')
     expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/content\')')
     expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
     expect(tabs).not.toContain('getAccountMenuUrl')

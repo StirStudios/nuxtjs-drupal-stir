@@ -3,11 +3,11 @@ import {
   defineEventHandler,
   getRequestURL,
   parseCookies,
-  setResponseHeader,
-} from 'h3'
+  } from 'h3'
 import {
   getStirDrupalSessionCookieNames,
   isStirDrupalSessionCookieName,
+  markStirPrivateResponse,
 } from '../../../foundation/server/utils/stirDrupalApi'
 import {
   layerAuthGetProtectedAccessSecret,
@@ -23,7 +23,6 @@ import {
 // Vue route would leave that payload fetchable directly, so the same policy is
 // applied at the server boundary.
 const CE_PROXY_PREFIX = '/api/drupal-ce'
-const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 
 type StirProtectedRoutesConfig = {
   requireLoginPaths?: unknown
@@ -73,7 +72,7 @@ export default defineEventHandler(async (event) => {
 
   if (!routePath || !isStirProtectedPath(routePath, protectedPaths)) return
 
-  setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
+  markStirPrivateResponse(event)
 
   const secret = layerAuthGetProtectedAccessSecret()
 

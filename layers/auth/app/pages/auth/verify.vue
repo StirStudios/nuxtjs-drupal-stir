@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuthVerify } from '../../composables/auth/useAuthVerify'
+import { useAuthVerify } from '../../composables/useAuthVerify'
 
 const { isLoading, verified, message, title, loginTarget, verify } = useAuthVerify()
 

@@ -1,5 +1,5 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
-import type { SeoImageResolver } from '../utils/globalSeoAssets'
+import type { CmsGlobalSeoAssetConfig, SeoImageResolver } from '../utils/globalSeoAssets'
 import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
 
 type CmsGlobalSeoConfig = {
@@ -96,31 +96,23 @@ function withLinkKeys(tags: Array<Record<string, string>> = []): Array<Record<st
   })
 }
 
-function configuredPublicOrigin(value: unknown, fallback: string): string {
-  if (typeof value !== 'string' || !value.trim()) return fallback
-
-  try {
-    return new URL(value).origin
-  }
-  catch {
-    return fallback
-  }
-}
-
 export default defineNuxtPlugin(async () => {
   const route = useRoute()
   const appConfig = useAppConfig()
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
-  const defaults = useState<GlobalSeoResponse | null>('cms-global-seo', () => null)
+  // Started before useHead and awaited at the end, so the head registers while
+  // the plugin context is still active. Missing defaults fall back to empty.
+  const globalSeo = useAsyncData(
+    'cms-global-seo',
+    () => $fetch<GlobalSeoResponse>('/api/seo/global').catch((): GlobalSeoResponse => ({ meta: [], link: [] })),
+    { default: () => null, immediate: config.enabled },
+  )
+  const defaults = globalSeo.data
   const lang = computed(() => defaults.value?.lang || config.lang)
   const image = useImage()
   const resolveImage = image as unknown as SeoImageResolver
   const runtimeConfig = useRuntimeConfig()
-  const requestOrigin = useRequestURL().origin
-  const publicOrigin = configuredPublicOrigin(
-    import.meta.server ? runtimeConfig.siteUrl : '',
-    requestOrigin,
-  )
+  const publicOrigin = resolveStirPublicOrigin()
 
   // Register head synchronously before any await so Nuxt keeps plugin context.
   useHead(
@@ -157,10 +149,21 @@ export default defineNuxtPlugin(async () => {
     },
   )
 
-  if (config.enabled && defaults.value === null) {
-    defaults.value = await $fetch<GlobalSeoResponse>('/api/seo/global').catch(() => ({
-      meta: [],
-      link: [],
-    }))
+  await globalSeo
+
+  // Drupal page metatags get the same image and origin handling. The raw app
+  // config is used on purpose: an unset `enabled` still prepares social images.
+  const pageAssetConfig = (appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
+
+  return {
+    provide: {
+      stirPrepareDrupalMetatags: (metatags: GlobalSeoResponse): GlobalSeoResponse => prepareGlobalSeoAssets(
+        metatags,
+        pageAssetConfig,
+        resolveImage,
+        publicOrigin,
+        drupalOrigin(runtimeConfig.public as Record<string, unknown>),
+      ),
+    },
   }
 })

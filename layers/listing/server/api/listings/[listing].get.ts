@@ -8,6 +8,7 @@ import {
   isPrivateStirListingResponse,
   parseStirListingId,
   parseStirListingResponse,
+  toDrupalListingQuery,
 } from '../../utils/listingApi'
 import {
   appendStirDrupalSetCookies,
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
       `${baseUrl}/api/stir/listings/${encodeURIComponent(listing)}`,
       {
         method: 'GET',
-        query: getQuery(event),
+        query: toDrupalListingQuery(getQuery(event)),
         headers: buildStirDrupalHeaders({ apiKey, cookie }),
         redirect: 'manual',
         timeout: requestTimeoutMs,

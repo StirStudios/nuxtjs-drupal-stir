@@ -7,9 +7,9 @@ const shared = vi.hoisted(() => ({ getPage: vi.fn() }))
 const hoistedFetchSession = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 
 mockNuxtImport('useStirDrupalCe', () => () => ({ getPage: shared.getPage }))
-vi.mock('../../../layers/auth/app/composables/useAuthSession', () => ({
-  useAuthSession: () => authSession,
-}))
+const sessionSource = vi.hoisted(() => ({ installed: true }))
+
+mockNuxtImport('useOptionalAuthSession', () => () => sessionSource.installed ? authSession : null)
 
 const authSession = {
   fetchSession: hoistedFetchSession,
@@ -44,6 +44,7 @@ describe('page-local Drupal context', () => {
     authSession.loggedIn.value = false
     authSession.user.value = null
     hoistedFetchSession.mockClear()
+    sessionSource.installed = true
   })
 
   it('uses the supplied page and follows its refresh without reading shared page state', async () => {
@@ -123,6 +124,30 @@ describe('page-local Drupal context', () => {
     expect(wrapper.text()).toBe('false:false')
     expect(authSession.fetchSession).not.toHaveBeenCalled()
     wrapper.unmount()
+  })
+
+  it('uses only the page payload when the auth layer is not installed', async () => {
+    sessionSource.installed = false
+    setServerRendered(false)
+    const page = ref(createPage({
+      current_user: { authenticated: true, uid: 7, capabilities: { editorialUi: true } },
+    }))
+    const Probe = defineComponent({
+      setup() {
+        const context = usePageContext(page)
+
+        return () => h('p', {
+          'data-auth': String(context.isAuthenticated.value),
+          'data-editorial': String(context.hasEditorialAccess.value),
+        })
+      },
+    })
+
+    const wrapper = await mountSuspended(Probe)
+
+    expect(wrapper.get('p').attributes('data-auth')).toBe('true')
+    expect(wrapper.get('p').attributes('data-editorial')).toBe('true')
+    expect(hoistedFetchSession).not.toHaveBeenCalled()
   })
 
   it('allows inline editing from an entity edit link or editorial access only', async () => {

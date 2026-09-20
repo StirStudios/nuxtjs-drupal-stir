@@ -7,21 +7,14 @@ import {
 } from '../../utils/layoutEditLinks'
 import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
-import type {
-  CmsGlobalSeoAssetConfig,
-  SeoImageResolver,
-} from '../../../../seo/app/utils/globalSeoAssets'
-import type { GlobalSeoResponse } from '../../../../seo/shared/types/globalSeo'
-import { prepareGlobalSeoAssets } from '../../../../seo/app/utils/globalSeoAssets'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
-import { getDrupalOrigin } from '../../utils/drupalUrl'
 import { withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
 
 const props = defineProps<{
   forcedLayout?: string
 }>()
 
-const { fetchPage, refreshPage, renderCustomElements, usePageHead } = useStirDrupalCe()
+const { fetchPage, renderCustomElements, usePageHead } = useStirDrupalCe()
 
 const route = useRoute()
 const nuxtApp = useNuxtApp() as { $localePath?: (path: string) => string }
@@ -38,29 +31,16 @@ if ('page' in route.query) {
   )
 }
 const theme = useAppConfig().stirTheme
-const seoConfig = (useAppConfig().cmsGlobalSeo || {}) as CmsGlobalSeoAssetConfig
-const image = useImage() as unknown as SeoImageResolver
-const runtimeConfig = useRuntimeConfig()
-const drupalOrigin = getDrupalOrigin(runtimeConfig.public)
-const requestOrigin = useRequestURL().origin
-const publicOrigin = (() => {
-  if (import.meta.server && typeof runtimeConfig.siteUrl === 'string') {
-    try {
-      return new URL(runtimeConfig.siteUrl).origin
-    }
-    catch {
-      // Fall back to the request origin for invalid or absent configuration.
-    }
-  }
-
-  return requestOrigin
-})()
 
 const page = await fetchPage(
   pageRequest.path.value,
   { query: drupalPageQuery.value },
   customPageError,
 )
+
+// fetchPage() is a keyed useFetch; this route component is keyed per page, so
+// the key is stable for its lifetime.
+const pageDataKey = page.value?.key
 
 provide(drupalPageKey, page)
 const { pageLayout, isAuthenticated, isFront } = usePageContext(page)
@@ -82,7 +62,7 @@ const renderablePageContent = computed(() =>
 provide(
   pageRefreshKey,
   async () => {
-    await refreshPage(page, pageRequest.path.value, { query: drupalPageQuery.value })
+    if (pageDataKey) await refreshNuxtData(pageDataKey)
     pageRenderRevision.value += 1
   },
 )
@@ -140,6 +120,7 @@ const seoTitle = computed(() => {
 })
 
 const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld as JsonLdValue))
+const prepareMetatags = useDrupalMetatagPreparer()
 const pageHead = computed(() => {
   const currentPage = page.value || {
     title: '',
@@ -153,13 +134,7 @@ const pageHead = computed(() => {
 
   if (!metatags) return currentPage
 
-  const prepared = prepareGlobalSeoAssets(
-    metatags as GlobalSeoResponse,
-    seoConfig,
-    image,
-    publicOrigin,
-    drupalOrigin,
-  )
+  const prepared = prepareMetatags(metatags as unknown as StirDrupalMetatags)
 
   return {
     ...currentPage,

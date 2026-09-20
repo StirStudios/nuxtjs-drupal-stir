@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAccountNav } from '../composables/account/useAccountNav'
+import { useAccountNav } from '../composables/useAccountNav'
 
 const sidebarOpen = ref(true)
 const route = useRoute()

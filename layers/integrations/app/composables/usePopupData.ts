@@ -2,8 +2,6 @@ import type { PopupNode } from '#stir/types'
 
 type UnknownRecord = Record<string, unknown>
 
-type VisibilityMode = 'show' | 'hide'
-
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null
 }
@@ -40,103 +38,18 @@ function findPopup(node: unknown): PopupNode | null {
   return null
 }
 
-function normalizeVisibilityRoutePath(path: string): string {
-  if (!path || path === '/') return '/'
+function findPopupInRegionBlocks(regionBlocks: unknown): PopupNode | null {
+  if (!Array.isArray(regionBlocks)) return null
 
-  return `/${path.replace(/^\/+/, '').replace(/\/+$/, '')}`
-}
+  for (const block of regionBlocks) {
+    const paragraphBlocks = isRecord(block) && isRecord(block.slots)
+      ? block.slots.paragraphBlock
+      : undefined
 
-function normalizeVisibilityPattern(pattern: string): string {
-  const trimmed = pattern.trim()
+    for (const entry of Array.isArray(paragraphBlocks) ? paragraphBlocks : []) {
+      const found = findPopup(entry)
 
-  if (!trimmed || trimmed === '<front>') return trimmed
-
-  return `/${trimmed.replace(/^\/+/, '').replace(/\/+$/, '')}`
-}
-
-function visibilityPatternMatches(pattern: string, routePath: string): boolean {
-  const normalizedPattern = normalizeVisibilityPattern(pattern)
-
-  if (normalizedPattern === '<front>') {
-    return routePath === '/'
-  }
-
-  if (!normalizedPattern) return false
-
-  const expression = normalizedPattern
-    .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*/g, '.*')
-
-  return new RegExp(`^${expression}$`).test(routePath)
-}
-
-function getRequestPathVisibility(block: UnknownRecord): { mode: VisibilityMode, paths: string[] } | null {
-  const props = block.props
-
-  if (!isRecord(props) || !isRecord(props.visibility)) return null
-
-  const requestPath = props.visibility.requestPath
-
-  if (!isRecord(requestPath)) return null
-
-  const mode = requestPath.mode === 'hide' ? 'hide' : 'show'
-  const paths = Array.isArray(requestPath.paths)
-    ? requestPath.paths.filter((path): path is string => typeof path === 'string' && path.trim() !== '')
-    : []
-
-  if (!paths.length) return null
-
-  return { mode, paths }
-}
-
-function blockAllowsRoute(block: UnknownRecord, routePath: string): boolean {
-  const visibility = getRequestPathVisibility(block)
-
-  if (!visibility) return true
-
-  const normalizedRoutePath = normalizeVisibilityRoutePath(routePath)
-  const matches = visibility.paths.some(path => visibilityPatternMatches(path, normalizedRoutePath))
-
-  return visibility.mode === 'hide' ? !matches : matches
-}
-
-function findPopupInRegionBlocks(regionBlocks: unknown, routePath: string): PopupNode | null {
-  const stack: unknown[] = [regionBlocks]
-
-  while (stack.length) {
-    const current = stack.pop()
-
-    if (Array.isArray(current)) {
-      for (let i = current.length - 1; i >= 0; i--) {
-        stack.push(current[i])
-      }
-      continue
-    }
-
-    if (!isRecord(current)) continue
-
-    const slots = current.slots
-
-    if (isRecord(slots)) {
-      if (!blockAllowsRoute(current, routePath)) {
-        continue
-      }
-
-      const paragraphBlocks = slots.paragraphBlock
-
-      if (Array.isArray(paragraphBlocks)) {
-        for (const entry of paragraphBlocks) {
-          const found = findPopup(entry)
-
-          if (found) {
-            return found
-          }
-        }
-      }
-    }
-
-    for (const value of Object.values(current)) {
-      stack.push(value)
+      if (found) return found
     }
   }
 
@@ -144,33 +57,17 @@ function findPopupInRegionBlocks(regionBlocks: unknown, routePath: string): Popu
 }
 
 function findPopupInContent(content: unknown): PopupNode | null {
-  if (!content) return null
-
-  if (Array.isArray(content) && content.length) {
+  if (Array.isArray(content)) {
     for (const entry of content) {
       const found = findPopup(entry)
 
-      if (found) {
-        return found
-      }
+      if (found) return found
     }
 
     return null
   }
 
   return findPopup(content)
-}
-
-function findPopupInSources(content: unknown, regionBlocks: unknown, routePath: string): PopupNode | null {
-  return findPopupInRegionBlocks(regionBlocks, routePath) || findPopupInContent(content)
-}
-
-// Drupal renamed the hidden popup region from `decoupled` to `popups`; read the
-// legacy key until every producer has run the stir_layout_block migration.
-function popupRegionBlocks(blocks: unknown): unknown {
-  if (!isRecord(blocks)) return undefined
-
-  return blocks.popups ?? blocks.decoupled
 }
 
 function stringSetting(...values: unknown[]): string | undefined {
@@ -184,73 +81,13 @@ function numberSetting(...values: unknown[]): number | undefined {
 export const usePopupData = () => {
   const { getPage } = useStirDrupalCe()
   const page = getPage()
-  const route = useRoute()
-  const popup = ref<PopupNode | null>(null)
-  const fallbackLoaded = ref(false)
-  let fallbackRequestId = 0
-  const { data: appContext, status: appContextStatus, execute: loadAppContext } = useAppContext({ immediate: false })
-
-  const contentSource = computed(() => page.value?.content)
-  const popupRegionSource = computed(() => popupRegionBlocks(page.value?.blocks))
-  const hasPageBlocksPayload = computed(() => Boolean(page.value?.blocks && typeof page.value.blocks === 'object'))
-  const routePath = computed(() => route.path || '/')
-  const pagePopup = computed(() => findPopupInSources(
-    contentSource.value,
-    popupRegionSource.value,
-    routePath.value,
-  ))
-  const fallbackPopup = computed(() => {
-    if (hasPageBlocksPayload.value) return null
-
-    return findPopupInSources(
-      undefined,
-      popupRegionBlocks(appContext.value?.blocks),
-      routePath.value,
-    )
-  })
-
-  async function loadFallbackPopup() {
-    if (!import.meta.client) return
-    if (fallbackLoaded.value || appContextStatus.value === 'success') return
-
-    fallbackLoaded.value = true
-    const requestId = ++fallbackRequestId
-
-    try {
-      await loadAppContext()
-
-      if (requestId !== fallbackRequestId) return
-    } catch {
-      return
-    }
-  }
-
-  watch(
-    routePath,
-    () => {
-      fallbackLoaded.value = false
-      fallbackRequestId++
-    },
-  )
-
-  watch(
-    [pagePopup, fallbackPopup],
-    ([currentPagePopup, currentFallbackPopup]) => {
-      popup.value = currentPagePopup || currentFallbackPopup || null
-    },
-    { immediate: true },
-  )
-
-  watch(
-    [pagePopup, hasPageBlocksPayload],
-    ([currentPagePopup, currentHasPageBlocksPayload]) => {
-      if (currentPagePopup || currentHasPageBlocksPayload) {
-        return
-      }
-
-      void loadFallbackPopup()
-    },
-    { immediate: true },
+  // Drupal renders the popups region for the requested path with each block's
+  // visibility conditions (aliases included) already applied, so nothing is
+  // matched against the route here. The footer loads the same app context.
+  const { data: popupBlocks } = useAppRegionBlocks('popups')
+  const popup = computed<PopupNode | null>(() =>
+    findPopupInRegionBlocks(popupBlocks.value)
+    ?? findPopupInContent(page.value?.content),
   )
 
   const config = computed(() => {

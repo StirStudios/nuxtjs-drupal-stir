@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
-import { useAccountSettings } from '../../../layers/auth/app/composables/account/useAccountSettings'
+import { useAccountSettings } from '../../../layers/auth/app/composables/useAccountSettings'
 
 const wrappers: Array<{ unmount: () => void }> = []
 const state = vi.hoisted(() => ({

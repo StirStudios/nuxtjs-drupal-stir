@@ -5,5 +5,6 @@
   "account_name": "editor",
   "mail": "editor@example.com",
   "roles": ["authenticated", "administrator"],
-  "capabilities": { "editorialUi": true }
+  "capabilities": { "editorialUi": true },
+  "admin_dashboard_url": "/admin/dashboard"
 }

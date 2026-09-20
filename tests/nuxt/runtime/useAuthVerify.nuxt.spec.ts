@@ -5,7 +5,7 @@ import { defineComponent } from 'vue'
 import {
   type StirAuthVerifyOptions,
   useAuthVerify,
-} from '../../../layers/auth/app/composables/auth/useAuthVerify'
+} from '../../../layers/auth/app/composables/useAuthVerify'
 
 const navigateToMock = vi.fn()
 const verifyEndpoint = vi.fn(() => ({ verified: true }))

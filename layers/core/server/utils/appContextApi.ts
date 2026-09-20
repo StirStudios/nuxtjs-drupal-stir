@@ -100,13 +100,9 @@ export function parseAppContextResponse(value: unknown): AppContextPayload {
   }
 }
 
-export function appContextQuery(path = ''): Record<string, string> {
-  return path ? { path } : {}
-}
-
 export function buildAppContextEndpoint(path = '') {
   return path
-    ? `/api/app-context?${new URLSearchParams(appContextQuery(path)).toString()}`
+    ? `/api/app-context?${new URLSearchParams({ path }).toString()}`
     : '/api/app-context'
 }
 

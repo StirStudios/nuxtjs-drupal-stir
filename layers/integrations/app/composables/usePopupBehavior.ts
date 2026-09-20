@@ -1,4 +1,8 @@
-import { useWindowScroll } from '@vueuse/core'
+import {
+  useEventListener,
+  useTimeoutFn,
+  useWindowScroll,
+} from '@vueuse/core'
 
 type PopupBehaviorConfig = {
   trigger: string
@@ -44,6 +48,20 @@ function popupDismissKey(popup: PopupLike | null): string | null {
   return typeof id === 'string' || typeof id === 'number' ? String(id) : null
 }
 
+/**
+ * Drops entries whose suppression has run out, so storage cannot grow forever.
+ */
+export function activePopupDismissals(
+  dismissals: Record<string, PopupSuppression>,
+  now = Date.now(),
+): Record<string, PopupSuppression> {
+  return Object.fromEntries(
+    Object.entries(dismissals).filter(([, suppression]) =>
+      popupSuppressionIsActive(suppression, now),
+    ),
+  )
+}
+
 export function popupUsesPersistentDismissal(popup: PopupLike | null): boolean {
   return popupDismissKey(popup) !== null
 }
@@ -60,14 +78,11 @@ function readDismissals(now = Date.now()): Record<string, PopupSuppression> {
   if (!import.meta.client) return {}
 
   try {
-    const parsed = JSON.parse(localStorage.getItem(POPUP_DISMISSALS_STORAGE_KEY) || '{}') as Record<string, unknown>
+    const parsed = JSON.parse(
+      localStorage.getItem(POPUP_DISMISSALS_STORAGE_KEY) || '{}',
+    ) as Record<string, PopupSuppression>
 
-    return Object.fromEntries(Object.entries(parsed).filter(
-      (entry): entry is [string, PopupSuppression] => (
-        entry[1] === POPUP_COMPLETED
-        || (typeof entry[1] === 'number' && entry[1] > now)
-      ),
-    ))
+    return activePopupDismissals(parsed, now)
   }
   catch {
     return {}
@@ -106,6 +121,9 @@ export const usePopupBehavior = ({
   const open = ref(false)
   const hasTriggered = ref(false)
   const dismissalReady = ref(!import.meta.client)
+  // Read after mount so a server-rendered page and its hydration agree on what
+  // is dismissed. VueUse's useStorage would cost ~5 kB gzip in the initial
+  // graph for what these two helpers do.
   const dismissedPopups = ref<Record<string, PopupSuppression>>({})
   const readyForPopupTriggers = ref(!import.meta.client)
   const popupConfig = computed(() => (appConfig.popup || {}) as PopupAppConfig)
@@ -123,79 +141,49 @@ export const usePopupBehavior = ({
   ))
   const shouldRenderPopupContent = computed(() => open.value)
 
-  let delayTimer: ReturnType<typeof setTimeout> | null = null
-  let stopScrollWatch: (() => void) | null = null
-  let onExitIntent: ((event: MouseEvent) => void) | null = null
-  let onPointerEnteredDocument: (() => void) | null = null
+  // Every listener and timer below is owned by VueUse, so leaving the scope
+  // tears them down; these stops only exist to re-arm a trigger early.
+  const stopTriggerHandlers: (() => void)[] = []
   let hasPointerEnteredDocument = false
-  let idleTimer: ReturnType<typeof setTimeout> | null = null
-  let removeReadyListeners: (() => void) | null = null
   let closeReason: 'completed' | 'dismissed' | 'suppressed' | null = null
 
+  const { start: startDelayTrigger, stop: stopDelayTrigger } = useTimeoutFn(
+    () => showModalOnce(),
+    () => Math.max(config.value.delay ?? 0, minDelayMs),
+    { immediate: false },
+  )
+
   const cleanupTriggerHandlers = () => {
-    if (delayTimer) {
-      clearTimeout(delayTimer)
-      delayTimer = null
-    }
-
-    if (stopScrollWatch) {
-      stopScrollWatch()
-      stopScrollWatch = null
-    }
-
-    if (onExitIntent && import.meta.client) {
-      document.removeEventListener('mouseout', onExitIntent)
-      onExitIntent = null
-    }
-
-    if (onPointerEnteredDocument && import.meta.client) {
-      document.removeEventListener('mousemove', onPointerEnteredDocument)
-      onPointerEnteredDocument = null
-    }
-
+    stopDelayTrigger()
+    stopTriggerHandlers.splice(0).forEach(stop => stop())
     hasPointerEnteredDocument = false
   }
 
-  const cleanupReadyHandlers = () => {
-    if (idleTimer) {
-      clearTimeout(idleTimer)
-      idleTimer = null
-    }
-
-    if (removeReadyListeners) {
-      removeReadyListeners()
-      removeReadyListeners = null
-    }
-  }
+  const { start: startIdleFallback, stop: stopIdleFallback } = useTimeoutFn(
+    () => markReadyForPopupTriggers(),
+    1500,
+    { immediate: false },
+  )
+  let stopReadyListeners: (() => void) | null = null
 
   const markReadyForPopupTriggers = () => {
     if (readyForPopupTriggers.value) return
     readyForPopupTriggers.value = true
-    cleanupReadyHandlers()
+    stopIdleFallback()
+    stopReadyListeners?.()
+    stopReadyListeners = null
   }
 
   const setupReadyForPopupTriggers = () => {
     if (!import.meta.client) return
     if (readyForPopupTriggers.value) return
 
-    const onFirstInteraction = () => {
-      markReadyForPopupTriggers()
-    }
-
-    const events: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'scroll']
-
-    events.forEach((eventName) => {
-      window.addEventListener(eventName, onFirstInteraction, {
-        once: true,
-        passive: true,
-      })
-    })
-
-    removeReadyListeners = () => {
-      events.forEach((eventName) => {
-        window.removeEventListener(eventName, onFirstInteraction)
-      })
-    }
+    stopReadyListeners = useEventListener(
+      window,
+      ['pointerdown', 'keydown', 'scroll'],
+      () => markReadyForPopupTriggers(),
+      { once: true, passive: true },
+    )
 
     const win = window as Window & {
       requestIdleCallback?: (
@@ -205,15 +193,11 @@ export const usePopupBehavior = ({
     }
 
     if (typeof win.requestIdleCallback === 'function') {
-      win.requestIdleCallback(() => {
-        markReadyForPopupTriggers()
-      }, { timeout: 3000 })
+      win.requestIdleCallback(() => markReadyForPopupTriggers(), { timeout: 3000 })
       return
     }
 
-    idleTimer = setTimeout(() => {
-      markReadyForPopupTriggers()
-    }, 1500)
+    startIdleFallback()
   }
 
   const showModalOnce = () => {
@@ -233,7 +217,7 @@ export const usePopupBehavior = ({
       : DEFAULT_DISMISSAL_TTL_DAYS
 
     dismissedPopups.value = {
-      ...dismissedPopups.value,
+      ...activePopupDismissals(dismissedPopups.value),
       [dismissalKey.value]: Date.now() + ttlDays * 24 * 60 * 60 * 1000,
     }
     writeDismissals(dismissedPopups.value)
@@ -243,7 +227,7 @@ export const usePopupBehavior = ({
     if (!dismissalKey.value) return
 
     dismissedPopups.value = {
-      ...dismissedPopups.value,
+      ...activePopupDismissals(dismissedPopups.value),
       [dismissalKey.value]: POPUP_COMPLETED,
     }
     writeDismissals(dismissedPopups.value)
@@ -259,12 +243,6 @@ export const usePopupBehavior = ({
     open.value = false
   }
 
-  const startDelayTrigger = () => {
-    const safeDelay = Math.max(config.value.delay ?? 0, minDelayMs)
-
-    delayTimer = setTimeout(showModalOnce, safeDelay)
-  }
-
   const handleTrigger = () => {
     if (!import.meta.client) return
     if (isSuppressed.value) return
@@ -278,7 +256,7 @@ export const usePopupBehavior = ({
     }
 
     if (config.value.trigger === 'scroll') {
-      stopScrollWatch = watch(
+      stopTriggerHandlers.push(watch(
         y,
         (val) => {
           const scrollRoot = document.documentElement
@@ -294,7 +272,7 @@ export const usePopupBehavior = ({
           }
         },
         { immediate: true },
-      )
+      ))
     }
 
     if (config.value.trigger === 'exit') {
@@ -306,19 +284,20 @@ export const usePopupBehavior = ({
         return
       }
 
-      onPointerEnteredDocument = () => {
-        hasPointerEnteredDocument = true
-      }
-
-      onExitIntent = (e: MouseEvent) => {
+      stopTriggerHandlers.push(useEventListener(
+        document,
+        'mousemove',
+        () => {
+          hasPointerEnteredDocument = true
+        },
+        { once: true, passive: true },
+      ))
+      stopTriggerHandlers.push(useEventListener(document, 'mouseout', (e: MouseEvent) => {
         if (hasPointerEnteredDocument && e.clientY <= 0 && !e.relatedTarget) {
           showModalOnce()
           cleanupTriggerHandlers()
         }
-      }
-
-      document.addEventListener('mousemove', onPointerEnteredDocument, { once: true, passive: true })
-      document.addEventListener('mouseout', onExitIntent)
+      }))
     }
   }
 
@@ -396,11 +375,6 @@ export const usePopupBehavior = ({
     dismissedPopups.value = readDismissals()
     dismissalReady.value = true
     setupReadyForPopupTriggers()
-  })
-
-  onBeforeUnmount(() => {
-    cleanupTriggerHandlers()
-    cleanupReadyHandlers()
   })
 
   return {

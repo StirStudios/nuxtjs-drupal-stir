@@ -11,6 +11,7 @@ import {
   splitMenuAtMarker,
   type DrupalMenuTreeItem,
 } from '#stir/utils/navigation'
+import { STIR_EDITORIAL_OFFSET_VAR } from '#stir/utils/editorialOffset'
 
 defineOptions({
   inheritAttrs: false,
@@ -151,7 +152,8 @@ const headerPositionClasses = computed(() => {
   return [
     isFixed.value ? 'fixed' : 'sticky',
     'z-50 w-full',
-    hasEditorialAccess.value && !shouldHide.value ? 'top-[3.1rem]' : 'top-0',
+    // The editorial tabs bar publishes its height; without it the var is 0.
+    shouldHide.value ? 'top-0' : `top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]`,
   ].join(' ')
 })
 const shouldHide = computed(() =>

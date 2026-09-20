@@ -98,17 +98,36 @@ describe('Stir listing API contract', () => {
     })
     expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
   })
+  it('forwards multi-value filters as PHP arrays so Drupal keeps every value', async () => {
+    const raw = vi.fn().mockResolvedValue({
+      _data: {
+        items: [],
+        pager: { current_page: 0, total_items: 0, total_pages: 0, items_per_page: 12 },
+        meta: { personalized: false },
+      },
+      headers: new Headers(),
+      status: 200,
+    })
+
+    stubListingRuntime(raw)
+    const { event } = routeEvent('classes', '?style=ballet&style=jazz&level=1')
+
+    await listingHandler(event).catch(() => undefined)
+
+    expect(raw.mock.calls[0]?.[1]?.query).toEqual({ 'style[]': ['ballet', 'jazz'], level: '1' })
+  })
 })
 
-function routeEvent(listing: string) {
+function routeEvent(listing: string, search = '') {
   const headers = new Map<string, string | string[]>()
 
   return {
     event: {
       context: { params: { listing } },
       method: 'GET',
+      path: `/api/listings/${listing}${search}`,
       node: {
-        req: { headers: {}, method: 'GET', url: `/api/listings/${listing}` },
+        req: { headers: {}, method: 'GET', url: `/api/listings/${listing}${search}` },
         res: {
           getHeader: (name: string) => headers.get(name.toLowerCase()),
           setHeader: (name: string, value: string | string[]) => {
