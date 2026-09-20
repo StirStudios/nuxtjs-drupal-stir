@@ -1,4 +1,3 @@
-import type { AppConfigInput } from 'nuxt/schema'
 
 export default defineAppConfig({
   privacyNotice: {
@@ -25,4 +24,4 @@ export default defineAppConfig({
     dismissalTtlDays: 14,
     hideWhenLoggedIn: false,
   },
-} as unknown as AppConfigInput)
+})

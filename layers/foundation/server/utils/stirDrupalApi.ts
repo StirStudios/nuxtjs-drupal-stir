@@ -66,7 +66,7 @@ export const getStirDrupalSessionCookieNames = (
     const config = runtimeConfig || useRuntimeConfig()
 
     return stringList(
-      (config as Record<string, unknown>).drupalSessionCookieNames,
+      config.drupalSessionCookieNames,
     )
   } catch {
     return []
@@ -142,7 +142,7 @@ export function getStirDrupalApiConfig() {
   ).replace(/\/+$/, '')
   const apiKey = String(config.apiKey || '')
   const requestTimeoutMs = normalizePositiveInteger(
-    (config as Record<string, unknown>).drupalRequestTimeoutMs,
+    config.drupalRequestTimeoutMs,
     DEFAULT_DRUPAL_REQUEST_TIMEOUT_MS,
   )
 
@@ -251,7 +251,7 @@ export const getStirVisitorIp = (
 export const getStirForwardedClientIp = (
   event: H3Event,
 ): string | undefined => {
-  const config = useRuntimeConfig() as Record<string, unknown>
+  const config = useRuntimeConfig()
   const rawConfig = config.drupalClientIpForwarding
   const forwarding = rawConfig && typeof rawConfig === 'object'
     ? rawConfig as Record<string, unknown>

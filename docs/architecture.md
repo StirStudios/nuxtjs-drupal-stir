@@ -81,6 +81,8 @@ Recommendation: preserve the current green baseline and move diagnostics only wh
 
 The two repositories describe the same endpoints and payloads independently, but neither CI workflow tests the other repository or validates a shared schema. The only general Nuxt fixture, `tests/fixtures/drupal-contracts.json`, is checked for a handful of key names rather than parsed through the production readers.
 
+**Resolved (2026-09-20).** stir-tools now publishes a versioned contract (`contracts/v1`, currently 1.26.0) that this repository mirrors in `contracts/stir-tools/v1` via `pnpm contracts:sync`, and about ten specs read those fixtures through the production readers. The hand-written `tests/fixtures/drupal-contracts.json` and the spec that checked its key names were deleted: nothing else read the file, so it asserted only against itself.
+
 The combined review found concrete drift:
 
 - `stir_account` returns `approval_required` for administrator-approved registration. The Nuxt `RegisterResponse` omits it, and the registration UI treats a response without email verification as an immediately usable account. An approval-pending user can therefore be told that they can sign in.

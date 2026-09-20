@@ -1,5 +1,5 @@
 import type { AuthFormField, FormError, FormSubmitEvent } from '@nuxt/ui'
-import type { RegisterFieldValue } from '../types/auth'
+import type { AuthFormState, RegisterFieldValue } from '../types/auth'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
 import { createRegisterValidationSchema } from '../utils/authValidation'
@@ -78,10 +78,7 @@ export function useAuthRegister<
   }
 
   const onSubmit = async (
-    event: FormSubmitEvent<{
-      email: string
-      password: string
-    }>,
+    event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
 
@@ -90,8 +87,8 @@ export function useAuthRegister<
         ? options.toFields(state)
         : { ...state } as Record<string, RegisterFieldValue>
       const response = await register({
-        email: event.data.email.trim(),
-        password: event.data.password,
+        email: (event.data.email || '').trim(),
+        password: event.data.password || '',
         turnstile_response: turnstileToken.value,
         ...(Object.keys(extraFields).length ? { fields: extraFields } : {}),
       })

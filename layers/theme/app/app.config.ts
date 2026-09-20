@@ -1,4 +1,3 @@
-import type { AppConfigInput } from 'nuxt/schema'
 import { nuxtUiTheme } from './theme/nuxtUi'
 
 export default defineAppConfig({
@@ -26,6 +25,11 @@ export default defineAppConfig({
 
     article: {
       container: 'max-w-3xl',
+    },
+
+    node: {
+      // Sites set this to space page content without forking node--page.
+      pageContentClass: '',
     },
 
     auth: {
@@ -331,5 +335,5 @@ export default defineAppConfig({
     },
   },
 
-  ui: nuxtUiTheme as unknown as NonNullable<AppConfigInput['ui']>,
+  ui: nuxtUiTheme,
 })

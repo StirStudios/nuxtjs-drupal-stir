@@ -10,11 +10,16 @@ import {
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
+    // Classes for the element wrapping a full node's content, so a site can
+    // space its pages without forking this component. The content is wrapped
+    // only when set, keeping existing markup unchanged.
+    contentClass?: string
     imageDeliveryProfile?: string
     showBeforeMain?: boolean
     teaserModes?: string[]
   }>(),
   {
+    contentClass: undefined,
     imageDeliveryProfile: undefined,
     showBeforeMain: true,
     teaserModes: () => ['teaser', 'listing', 'card'],
@@ -126,7 +131,7 @@ provideRevealMotionScope(
     :node="props"
   />
 
-  <article v-else-if="renderMode === 'article'">
+  <article v-else-if="renderMode === 'article'" :class="props.contentClass">
     <template v-for="slotName in contentSlotNames" :key="slotName">
       <slot :name="slotName" />
     </template>
@@ -136,6 +141,12 @@ provideRevealMotionScope(
     v-else-if="slots.default"
     :node="props"
   />
+
+  <div v-else-if="props.contentClass" :class="props.contentClass">
+    <template v-for="slotName in contentSlotNames" :key="slotName">
+      <slot :name="slotName" />
+    </template>
+  </div>
 
   <template v-else>
     <template v-for="slotName in contentSlotNames" :key="slotName">

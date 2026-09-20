@@ -178,3 +178,11 @@ export type AuthUiConfig = {
   }
   passwordPolicy?: AuthPasswordPolicy
 }
+
+/**
+ * The payload an auth form submits.
+ *
+ * Auth forms are built from a dynamic `fields` array, so the shape really is
+ * a string map; handlers narrow the keys they need.
+ */
+export type AuthFormState = Record<string, string | undefined>

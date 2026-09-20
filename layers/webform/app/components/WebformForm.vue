@@ -343,7 +343,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       :submit-button-label="submitButtonLabel"
       :theme-webform="themeWebform"
       :webform-confirmation="webformConfirmation"
-      @error="onError($event as never)"
+      @error="onError"
       @reset-submission="handleResetSubmission"
       @submit="onSubmit"
     />

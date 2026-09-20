@@ -1,6 +1,12 @@
-type FormErrorEvent = {
-  errors: { id: string; message?: string }[]
-}
+import type { FormErrorEvent } from '@nuxt/ui'
+
+/**
+ * The part of Nuxt UI's error event this helper reads.
+ *
+ * FormErrorEvent is a real SubmitEvent, so narrowing to the errors keeps the
+ * helper callable from tests without constructing a DOM event.
+ */
+type ValidationErrorEvent = Pick<FormErrorEvent, 'errors'>
 
 type ToastLike = {
   add: (payload: {
@@ -15,7 +21,7 @@ type ValidationOptions = {
 }
 
 export function handleValidationError(
-  event: FormErrorEvent,
+  event: ValidationErrorEvent,
   validationContext: {
     isClient: boolean
     showToast?: boolean
@@ -32,7 +38,10 @@ export function handleValidationError(
 
   if (!firstError) return
 
-  const element = validationContext.getElementById(firstError.id)
+  // Nuxt UI only carries an id for errors it could bind to an input.
+  const element = firstError.id
+    ? validationContext.getElementById(firstError.id)
+    : null
 
   element?.focus?.()
   element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })

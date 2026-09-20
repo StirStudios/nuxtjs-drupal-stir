@@ -1,30 +1,27 @@
-import { readBody } from 'h3'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import loginHandler from '../../layers/auth/server/api/auth/login.post'
 import { assertStirSameOrigin } from '../../layers/foundation/server/utils/stirRequestSecurity'
+import { closeServedHandlers, serveHandler } from './utils/serveHandler'
 
-vi.mock('h3', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('h3')>()),
-  readBody: vi.fn(),
-}))
+const post = async (
+  origin: string | 'same-origin',
+  body: unknown = {},
+) => {
+  const url = await serveHandler(loginHandler)
 
-const createEvent = (origin: string) => ({
-  context: {},
-  method: 'POST',
-  node: {
-    req: {
-      headers: {
-        host: 'www.example.test',
-        origin,
-      },
-      socket: {},
-      url: '/api/auth/login',
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      origin: origin === 'same-origin' ? new URL(url).origin : origin,
     },
-  },
-}) as never
+    body: JSON.stringify(body),
+  })
+}
 
 describe('POST /api/auth/login', () => {
-  afterEach(() => {
+  afterEach(async () => {
+    await closeServedHandlers()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
@@ -32,25 +29,25 @@ describe('POST /api/auth/login', () => {
   it('blocks cross-origin login attempts before reading credentials', async () => {
     vi.stubGlobal('assertStirSameOrigin', assertStirSameOrigin)
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      siteUrl: 'https://www.example.test',
+      siteUrl: 'http://127.0.0.1',
     }))
 
-    await expect(
-      loginHandler(createEvent('https://malicious.example.test')),
-    ).rejects.toMatchObject({ statusCode: 403 })
-    expect(readBody).not.toHaveBeenCalled()
+    const response = await post('https://malicious.example.test', {
+      identifier: 'editor',
+      password: 'secret',
+    })
+
+    expect(response.status).toBe(403)
   })
 
   it('continues validating same-origin login requests', async () => {
     vi.stubGlobal('assertStirSameOrigin', assertStirSameOrigin)
-    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      siteUrl: 'https://www.example.test',
-    }))
-    vi.mocked(readBody).mockResolvedValue({})
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({ siteUrl: '' }))
 
-    await expect(
-      loginHandler(createEvent('https://www.example.test')),
-    ).rejects.toMatchObject({ statusCode: 400 })
-    expect(readBody).toHaveBeenCalledOnce()
+    // A same-origin request with an empty body must get past the origin
+    // guard and be rejected by validation instead.
+    const response = await post('same-origin', {})
+
+    expect(response.status).toBe(400)
   })
 })

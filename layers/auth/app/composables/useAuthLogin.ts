@@ -9,7 +9,7 @@ import {
   safeStirAuthRedirect,
 } from '../utils/authRedirect'
 import { validateForm } from '../utils/validationErrors'
-import type { AuthUiIdentifierField } from '../types/auth'
+import type { AuthFormState, AuthUiIdentifierField } from '../types/auth'
 
 export interface StirAuthLoginRedirectContext {
   /**
@@ -90,14 +90,14 @@ export function useAuthLogin(options: StirAuthLoginOptions = {}) {
   }
 
   const onSubmit = async (
-    event: FormSubmitEvent<{ identifier: string; password: string }>,
+    event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
 
     try {
       const loginResult = await login({
-        identifier: event.data.identifier?.trim(),
-        password: event.data.password,
+        identifier: (event.data.identifier || '').trim(),
+        password: event.data.password || '',
         turnstile_response: turnstileToken.value,
       })
 

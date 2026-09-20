@@ -1,12 +1,7 @@
-import { readBody } from 'h3'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import verifyHandler from '../../layers/auth/server/api/auth/verify.post'
 import { layerAuthDrupalApiRequest } from '../../layers/auth/server/utils/drupalApi'
-
-vi.mock('h3', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('h3')>()),
-  readBody: vi.fn(),
-}))
+import { closeServedHandlers, serveHandler } from './utils/serveHandler'
 
 vi.mock('../../layers/auth/server/utils/drupalApi', () => ({
   layerAuthDrupalApiRequest: vi.fn(),
@@ -14,12 +9,14 @@ vi.mock('../../layers/auth/server/utils/drupalApi', () => ({
 
 describe('POST /api/auth/verify', () => {
   beforeEach(() => {
-    vi.mocked(readBody).mockReset()
     vi.mocked(layerAuthDrupalApiRequest).mockReset()
   })
 
+  afterEach(async () => {
+    await closeServedHandlers()
+  })
+
   it('forwards the Drupal session so mismatched accounts are rejected upstream', async () => {
-    const event = {} as never
     const payload = {
       uid: 42,
       timestamp: 1_788_288_851,
@@ -27,18 +24,24 @@ describe('POST /api/auth/verify', () => {
     }
     const response = { verified: true }
 
-    vi.mocked(readBody).mockResolvedValue(payload)
     vi.mocked(layerAuthDrupalApiRequest).mockResolvedValue(response)
 
-    await expect(verifyHandler(event)).resolves.toEqual(response)
-    expect(layerAuthDrupalApiRequest).toHaveBeenCalledWith(
-      event,
-      '/api/auth/verify',
-      {
-        method: 'POST',
-        forwardCookies: true,
-        body: payload,
-      },
-    )
+    const url = await serveHandler(verifyHandler)
+    const served = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    expect(await served.json()).toEqual(response)
+
+    const call = vi.mocked(layerAuthDrupalApiRequest).mock.calls[0]
+
+    expect(call?.[1]).toBe('/api/auth/verify')
+    expect(call?.[2]).toEqual({
+      method: 'POST',
+      forwardCookies: true,
+      body: payload,
+    })
   })
 })

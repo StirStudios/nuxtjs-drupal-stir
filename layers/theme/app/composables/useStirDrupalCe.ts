@@ -2,6 +2,10 @@ import { withoutPresentationEditMetadata } from '../utils/layoutEditLinks'
 import { prepareComponentTreeForDevelopment } from '../utils/componentTreeDiagnostics'
 import type { AppContextPayload } from '../../../core/shared/types/appContext'
 import type { DrupalNodeRelatedItem } from '../types/Node'
+import type {
+  StirDrupalCurrentUser,
+  StirDrupalLocalTasks,
+} from '../types/DrupalPageUser'
 
 type DrupalComposable = ReturnType<typeof useDrupalCe>
 type DrupalPage = ReturnType<DrupalComposable['getPage']>['value']
@@ -16,9 +20,9 @@ type StirPageContent = {
 }
 type StirDrupalPage = Omit<DrupalPage, 'content'> & Partial<AppContextPayload> & {
   content?: StirPageContent
-  current_user?: Record<string, unknown> | null
+  current_user?: StirDrupalCurrentUser | null
   is_front_page?: boolean
-  local_tasks?: Record<string, unknown> | null
+  local_tasks?: Partial<StirDrupalLocalTasks> | null
   published?: boolean
   related?: {
     prevNode?: DrupalNodeRelatedItem | null

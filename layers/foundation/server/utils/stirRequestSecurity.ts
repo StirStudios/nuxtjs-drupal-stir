@@ -12,7 +12,7 @@ const toOrigin = (value: unknown): string => {
 }
 
 export const assertStirSameOrigin = (event: H3Event): void => {
-  const config = useRuntimeConfig() as Record<string, unknown>
+  const config = useRuntimeConfig()
   const allowedOrigins = new Set<string>()
   const configuredOrigin = toOrigin(config.siteUrl)
 

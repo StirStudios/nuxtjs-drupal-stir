@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import type { AuthFormField, AuthFormProps, FormError } from '@nuxt/ui'
+import type {
+  AuthFormField,
+  AuthFormProps,
+  FormError,
+  FormErrorEvent,
+  FormSubmitEvent,
+} from '@nuxt/ui'
+import type { AuthFormState } from '../../types/auth'
 
 const props = defineProps<{
   title: string
@@ -25,8 +32,8 @@ const themedFields = computed<AuthFormField[]>(() => props.fields.map((field) =>
 }))
 
 defineEmits<{
-  submit: [event: unknown]
-  error: [event: unknown]
+  submit: [event: FormSubmitEvent<AuthFormState>]
+  error: [event: FormErrorEvent]
 }>()
 
 defineSlots<{
