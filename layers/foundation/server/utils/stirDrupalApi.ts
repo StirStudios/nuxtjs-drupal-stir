@@ -266,6 +266,32 @@ export const markStirPrivateResponse = (event: H3Event): void => {
   setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
 }
 
+/**
+ * Marks a response publicly cacheable, unless this request is a signed-in one.
+ *
+ * A shared cache must never store a personalized response, so a request
+ * carrying a Drupal session cookie or an Authorization header falls back to
+ * private no-store. `vary` names the request headers the cache key depends
+ * on, and defaults to the two this decision reads.
+ */
+export const markStirPublicResponse = (
+  event: H3Event,
+  options: { maxAge: number, vary?: string[] },
+): void => {
+  const vary = options.vary ?? ['Cookie', 'Authorization']
+
+  if (vary.length > 0) {
+    setResponseHeader(event, 'Vary', vary.join(', '))
+  }
+
+  if (getStirForwardedCookie(event) || getHeader(event, 'authorization')) {
+    markStirPrivateResponse(event)
+    return
+  }
+
+  setResponseHeader(event, 'Cache-Control', `public, max-age=${Math.max(0, Math.trunc(options.maxAge))}`)
+}
+
 export const captureStirDrupalApiError = (
   event: H3Event,
   error: unknown,
