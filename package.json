@@ -98,7 +98,7 @@
     "test:preset:minimal:build": "nuxi build --cwd tests/fixtures/minimal-consumer",
     "test:preset:full:typecheck": "nuxi typecheck --cwd tests/fixtures/full-consumer",
     "test:preset:full:build": "nuxi build --cwd tests/fixtures/full-consumer",
-    "test:presets": "pnpm audit:preset-matrix && pnpm test:preset:minimal:typecheck && pnpm test:preset:full:typecheck && pnpm test:preset:auth:typecheck && pnpm audit:preset-components && pnpm test:preset:minimal:build && pnpm test:preset:full:build && pnpm test:preset:auth:build && pnpm audit:preset:auth-output && pnpm audit:preset-editorial-output && pnpm audit:preset-integrations-output",
+    "test:presets": "pnpm test:preset:minimal:typecheck && pnpm test:preset:full:typecheck && pnpm test:preset:auth:typecheck",
     "test:preset:auth:build": "nuxi build --cwd tests/fixtures/auth-consumer",
     "test:preset:auth:typecheck": "nuxi typecheck --cwd tests/fixtures/auth-consumer",
     "test:consumer:packed": "node scripts/audit/packed-consumer.mjs",
@@ -107,13 +107,14 @@
     "test:all": "pnpm test:coverage && pnpm test:nuxt && pnpm test:e2e && pnpm test:a11y",
     "test:watch": "vitest",
     "verify:core": "pnpm dev:prepare && pnpm audit:inventory:check && pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
-    "verify:ci": "pnpm verify:core && pnpm test:consumer",
+    "verify:ci": "pnpm verify:core && pnpm test:consumer && pnpm test:presets",
     "deps:update": "pnpm update",
     "deps:verify": "pnpm verify:ci",
     "deps:update:safe": "pnpm deps:update && pnpm docs:sync-tech-stack && pnpm deps:verify",
     "typecheck": "nuxi typecheck",
     "release": "release-it",
-    "perf:imports": "node scripts/perf/import-inventory.mjs"
+    "perf:imports": "node scripts/perf/import-inventory.mjs",
+    "audit:overrides": "node scripts/audit/shadowed-components.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.132",

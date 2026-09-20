@@ -101,6 +101,7 @@
     "audit:consumers",
     "audit:inventory",
     "audit:inventory:check",
+    "audit:overrides",
     "audit:preset-components",
     "audit:preset-editorial-output",
     "audit:preset-integrations-output",

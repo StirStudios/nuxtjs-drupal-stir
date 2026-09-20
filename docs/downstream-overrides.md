@@ -306,3 +306,35 @@ Drupal's `ETag` or `X-Stir-Presentation-Revision` header. A difference means a
 new Nuxt build is required before a newly introduced utility can have compiled
 CSS. Deployment automation should use that revision change as its rebuild
 trigger; the health request itself does not query Drupal or trigger deployment.
+
+## Finding forks before they break a deploy
+
+A site component whose resolved Nuxt name matches a layer component replaces
+it silently, and then drifts from it. DancePlug's `AuthCard` fork drifted
+until an upstream type change failed that site's deploy, which is the failure
+mode this check exists to prevent.
+
+```bash
+pnpm audit:overrides /path/to/site-nuxt [...]
+```
+
+It prints each shadowed component with both line counts, for example:
+
+```
+  AuthCard: site 101 lines vs layer 166 (auth/app/components/Auth/AuthCard.vue)
+```
+
+Read the line counts as a triage signal, not a verdict:
+
+- **Site file much smaller than the layer's** — usually a thin fork that
+  exists for one or two differences. Add tokens upstream and delete it, as
+  `stirTheme.auth.showLogo`, `logoClass` and `formUi` replaced DancePlug's
+  `AuthCard`, and `stirTheme.node.pageContentClass` replaced its
+  `node--page`.
+- **Site file much larger** — usually a genuine site implementation, like
+  Piper's `WebformContent` (302 lines against the layer's 171: widget runtime
+  mode, step model and tab groups). Keep it, and keep its props and emits in
+  step with the layer's.
+- **Either way, an override must match the layer component's emit types.**
+  That is what broke the deploy: the fork still said `event: unknown` after
+  the layer emitted `FormSubmitEvent`.
