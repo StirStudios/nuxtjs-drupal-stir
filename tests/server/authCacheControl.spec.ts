@@ -27,6 +27,9 @@ describe('auth API cache control', () => {
       '/api/auth/login',
       '/api/auth/password/reset',
       '/api/account/settings/values',
+      // The prefixes themselves, which a trailing-slash-only match missed.
+      '/api/auth',
+      '/api/account',
     ]) {
       const { event, headers } = createEvent(path)
 
@@ -37,10 +40,12 @@ describe('auth API cache control', () => {
   })
 
   it('does not change unrelated API responses', () => {
-    const { event, headers } = createEvent('/api/health')
+    for (const path of ['/api/health', '/api/authors', '/api/accounts-overview']) {
+      const { event, headers } = createEvent(path)
 
-    authCacheControl(event)
+      authCacheControl(event)
 
-    expect(headers.has('cache-control')).toBe(false)
+      expect(headers.has('cache-control')).toBe(false)
+    }
   })
 })
