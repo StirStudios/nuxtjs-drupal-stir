@@ -46,6 +46,8 @@ const submitButton = computed(() => ({
   ...props.submit,
   label: typeof props.submit?.label === 'string' ? props.submit.label : 'Continue',
 }))
+const showLogo = computed(() => themeAuth.auth?.showLogo === true)
+const logoClass = computed(() => themeAuth.auth?.logoClass || 'h-8')
 const formPanelProps = computed(() => ({
   title: props.title,
   description: props.description,
@@ -53,6 +55,7 @@ const formPanelProps = computed(() => ({
   icon: formIcon.value,
   loading: props.loading,
   submit: submitButton.value,
+  ui: themeAuth.auth?.formUi,
   validate: props.validate,
 }))
 
@@ -88,6 +91,11 @@ defineSlots<{
         @error="$emit('error', $event)"
         @submit="$emit('submit', $event)"
       >
+        <template v-if="showLogo" #leading>
+          <ULink aria-label="Home" class="inline-flex rounded-md" to="/">
+            <AppLogo :add-classes="logoClass" icon-only />
+          </ULink>
+        </template>
         <template #password-field="{ state, field }">
           <slot :field="field" name="password-field" :state="state" />
         </template>
@@ -123,6 +131,11 @@ defineSlots<{
     @error="$emit('error', $event)"
     @submit="$emit('submit', $event)"
   >
+    <template v-if="showLogo" #leading>
+      <ULink aria-label="Home" class="inline-flex rounded-md" to="/">
+        <AppLogo :add-classes="logoClass" icon-only />
+      </ULink>
+    </template>
     <template #password-field="{ state, field }">
       <slot :field="field" name="password-field" :state="state" />
     </template>
@@ -146,6 +159,11 @@ defineSlots<{
       @error="$emit('error', $event)"
       @submit="$emit('submit', $event)"
     >
+      <template v-if="showLogo" #leading>
+        <ULink aria-label="Home" class="inline-flex rounded-md" to="/">
+          <AppLogo :add-classes="logoClass" icon-only />
+        </ULink>
+      </template>
       <template #password-field="{ state, field }">
         <slot :field="field" name="password-field" :state="state" />
       </template>

@@ -65,5 +65,11 @@ export type AuthPageConfig = {
 
 export type AuthThemeConfig = AuthPageConfig & {
   submitButton?: AuthButtonConfig
+  /** Shows the site's AppLogo above the form, linking home. */
+  showLogo?: boolean
+  /** Classes for that logo, e.g. its height. */
+  logoClass?: ClassValue
+  /** Class overrides for the form panel, passed through to UAuthForm's ui. */
+  formUi?: LooseRecord
   pages?: Partial<Record<AuthPageKey, AuthPageConfig>>
 }

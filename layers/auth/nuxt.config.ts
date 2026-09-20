@@ -4,6 +4,9 @@ import { createJiti } from 'jiti'
 import { addTypeTemplate, useNuxt } from '@nuxt/kit'
 import { positiveIntegerEnvironment } from '../../config/runtime'
 
+const resolveAuthPath = (path: string) =>
+  fileURLToPath(new URL(path, import.meta.url))
+
 const loadModule = createJiti(import.meta.url, {
   interopDefault: false,
   moduleCache: false,
@@ -18,6 +21,12 @@ type ProtectedRoutesAppConfig = {
 
 export default defineNuxtConfig({
   extends: ['../turnstile'],
+
+  alias: {
+    // Sites that override an auth component need its event and field types,
+    // e.g. AuthFormState for a shadowed AuthCard's emits.
+    '#stir-auth/types': resolveAuthPath('./app/types'),
+  },
 
   modules: [
     '@nuxt/image',
