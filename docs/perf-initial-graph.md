@@ -31,6 +31,19 @@ Regenerate with `pnpm perf:report`; the raw data lands in
 | 8.7 kB | `consola` | Logger. |
 | 7.6 kB | `@plausible-analytics/tracker` | Consent-gated tracking. |
 
+## First-party share (measured 2026-09-21)
+
+Of the ~675 kB rendered across the tracked initial modules, **9.6 kB is
+first-party**: the theme's `app.config`, which carries the design tokens
+components read at runtime. Everything else is framework or library code —
+Vue (~255 kB across runtime-core, runtime-dom and reactivity), Nuxt UI's
+`tailwind-variants` (~88 kB), `vue-router`, Nuxt, Iconify, unhead and VueUse.
+
+So the initial graph cannot be shrunk meaningfully by trimming layer code: the
+layer already keeps editorial, admin, auth and listing code out of the
+anonymous initial path. Reductions have to come from dependency and design
+decisions, such as the levers below, not from refactoring.
+
 ## Candidate levers, with measured value
 
 Recovering roughly 10 kB would allow the caps to return to their previous
