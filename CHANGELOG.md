@@ -23,6 +23,12 @@ untouched do not need one.
 
 ### Added
 
+- `AppHeader`, `MediaVideo` and `EditPresentation` are split into smaller
+  parts with unchanged props and output: `MediaVideoBackground` (the hero and
+  bare background mode), `EditPresentationLayout` and `EditPresentationFields`,
+  and the `header*` helpers in `utils/headerTheme.ts`. These names are now
+  auto-imported, so a site that defines a component or helper with the same
+  name shadows the layer's.
 - `usePageContext().canEditInline(editLink?)` decides whether inline edit
   controls render: `TRUE` when Drupal sent an `editLink` for the entity, or
   the page grants editorial access. `EditableRichText`, `HeroContent` and the

@@ -2,7 +2,6 @@
 import type {
   EditAction,
   ParagraphLayoutContract,
-  ParagraphLayoutOption,
   ParagraphPresentationField,
   ParagraphPresentationKey,
   ParagraphPresentationResponse,
@@ -13,7 +12,6 @@ import {
   areParagraphLayoutMappingsValid,
   createParagraphLayoutMappings,
 } from '#stir/utils/paragraphLayoutTransition'
-import { adminUiTheme } from '../../utils/adminUiTheme'
 
 const props = defineProps<{
   action: EditAction
@@ -65,9 +63,6 @@ const selectedLayoutOption = computed(
       (option) => option.value === selectedLayout.value,
     ) ?? null,
 )
-const layoutSummary = computed(
-  () => selectedLayoutOption.value?.label ?? 'Choose layout',
-)
 const layoutDirty = computed(() =>
   Boolean(layout.value && selectedLayout.value !== layout.value.current),
 )
@@ -115,24 +110,6 @@ function cloneValue(
   value: boolean | string | string[],
 ): boolean | string | string[] {
   return Array.isArray(value) ? [...value] : value
-}
-
-function selectableOptions(field: ParagraphPresentationField) {
-  return field.options?.filter((option) => option.value !== '') ?? []
-}
-
-function updateSelectValue(
-  field: ParagraphPresentationField,
-  value?: string | null,
-): void {
-  updateValue(field.key, value ?? '')
-}
-
-function updateMultiselectValue(
-  field: ParagraphPresentationField,
-  value?: string[] | null,
-): void {
-  updateValue(field.key, value ?? [])
 }
 
 async function refreshPageAfterSave(): Promise<void> {
@@ -330,178 +307,22 @@ async function handleArrangementSaved(
         </div>
 
         <div v-else-if="fields.length || layout" class="space-y-3">
-          <UCollapsible
+          <EditPresentationLayout
             v-if="layout"
-            class="border-muted rounded-md border"
-            :ui="{ content: 'border-t border-muted' }"
-          >
-            <template #default="{ open: layoutOpen }">
-              <UButton
-                block
-                color="neutral"
-                :icon="
-                  layoutDirty
-                    ? 'i-lucide-layout-dashboard'
-                    : 'i-lucide-layout-template'
-                "
-                :label="`Layout · ${layoutSummary}`"
-                :trailing-icon="
-                  layoutOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
-                "
-                :ui="{ base: 'justify-between rounded-md px-3 py-2' }"
-                variant="ghost"
-              />
-            </template>
+            v-model:mappings="layoutMappings"
+            :dirty="layoutDirty"
+            :layout="layout"
+            :option="selectedLayoutOption"
+            :selected="selectedLayout"
+            @arrange="openArrangement"
+            @select="updateLayout"
+          />
 
-            <template #content>
-              <div class="space-y-3 p-3">
-                <URadioGroup
-                  :items="layout.options"
-                  :model-value="selectedLayout"
-                  orientation="horizontal"
-                  size="sm"
-                  :ui="{
-                    fieldset: 'grid grid-cols-2 gap-2',
-                    item: 'min-w-0',
-                    wrapper: 'min-w-0 w-full',
-                    label: 'w-full',
-                  }"
-                  value-key="value"
-                  variant="card"
-                  @update:model-value="updateLayout"
-                >
-                  <template #label="{ item }">
-                    <span class="flex min-w-0 flex-col gap-1.5">
-                      <span
-                        aria-hidden="true"
-                        class="border-muted flex h-8 flex-col gap-0.5 rounded-sm border p-1"
-                      >
-                        <span
-                          v-for="(row, rowIndex) in (
-                            item as ParagraphLayoutOption
-                          ).iconMap"
-                          :key="rowIndex"
-                          class="flex min-h-0 flex-1 gap-0.5"
-                        >
-                          <span
-                            v-for="(region, regionIndex) in row"
-                            :key="`${region}-${regionIndex}`"
-                            class="bg-accented min-w-0 flex-1"
-                          />
-                        </span>
-                      </span>
-                      <span class="truncate text-xs">{{ item.label }}</span>
-                    </span>
-                  </template>
-                </URadioGroup>
-
-                <UAlert
-                  v-if="layoutDirty && selectedLayoutOption?.moves.length"
-                  color="warning"
-                  icon="i-lucide-move-right"
-                  title="Content movement"
-                  variant="subtle"
-                >
-                  <template #description>
-                    <div class="mt-2 grid gap-3">
-                      <UFormField
-                        v-for="move in selectedLayoutOption.moves"
-                        :key="move.source"
-                        :label="`${move.sourceLabel} (${move.count})`"
-                      >
-                        <USelect
-                          v-model="layoutMappings[move.source]"
-                          class="w-full"
-                          :items="selectedLayoutOption.regions"
-                          label-key="label"
-                          size="sm"
-                          value-key="value"
-                        />
-                      </UFormField>
-                    </div>
-                  </template>
-                </UAlert>
-
-                <UButton
-                  v-if="layout.children"
-                  block
-                  color="neutral"
-                  icon="i-lucide-panels-top-left"
-                  label="Arrange content"
-                  variant="soft"
-                  @click="openArrangement"
-                />
-              </div>
-            </template>
-          </UCollapsible>
-
-          <div
+          <EditPresentationFields
             v-if="fields.length"
-            class="grid grid-cols-2 gap-x-3 gap-y-4"
-          >
-            <template v-for="(field, index) in fields" :key="field.key">
-              <USeparator
-                v-if="index > 0 && field.group !== fields[index - 1]?.group"
-                class="admin-ui-settings-separator col-span-2"
-              />
-              <UFormField :label="field.label">
-                <template v-if="field.description" #label>
-                  <span class="inline-flex items-center gap-1">
-                    <span>{{ field.label }}</span>
-                    <UTooltip
-                      :text="field.description"
-                      :ui="{
-                        content: `${adminUiTheme.tooltip.content} max-w-64`,
-                      }"
-                    >
-                      <UButton
-                        :aria-label="`About ${field.label}`"
-                        color="neutral"
-                        icon="i-lucide-circle-help"
-                        size="xs"
-                        :ui="{ base: 'min-h-0 p-0 text-muted' }"
-                        variant="link"
-                      />
-                    </UTooltip>
-                  </span>
-                </template>
-                <USwitch
-                  v-if="field.type === 'boolean'"
-                  :model-value="field.value as boolean"
-                  @update:model-value="(value) => updateValue(field.key, value)"
-                />
-                <USelectMenu
-                  v-else-if="field.type === 'select'"
-                  class="w-full"
-                  clear
-                  :items="selectableOptions(field)"
-                  label-key="label"
-                  :model-value="field.value as string"
-                  placeholder="- None -"
-                  size="sm"
-                  value-key="value"
-                  @update:model-value="
-                    (value) => updateSelectValue(field, value)
-                  "
-                />
-                <USelectMenu
-                  v-else
-                  class="w-full"
-                  clear
-                  :items="selectableOptions(field)"
-                  label-key="label"
-                  :model-value="field.value as string[]"
-                  multiple
-                  placeholder="- None -"
-                  size="sm"
-                  value-key="value"
-                  @update:model-value="
-                    (value) => updateMultiselectValue(field, value)
-                  "
-                />
-              </UFormField>
-            </template>
-          </div>
+            :fields="fields"
+            @update="updateValue"
+          />
         </div>
 
         <p v-else-if="!error" class="text-muted text-sm">

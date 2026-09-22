@@ -212,7 +212,7 @@
       }
     ]
   },
-  "generatedAt": "2026-09-22T03:18:34.460Z",
+  "generatedAt": "2026-09-22T03:50:46.445Z",
   "environment": {
     "node": "v24.13.0",
     "platform": "darwin",
@@ -223,19 +223,19 @@
     "vue": "3.5.42"
   },
   "buildTimings": {
-    "clientMs": 7775,
-    "serverMs": 6523
+    "clientMs": 5637,
+    "serverMs": 4535
   },
   "initialClient": {
     "sizeKb": 796.49,
-    "gzipKb": 237,
+    "gzipKb": 237.01,
     "assets": [
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/Chc5oaP2.js",
+        "file": "_nuxt/CLBGLoCu.js",
         "sizeKb": 126.523,
-        "gzipKb": 42.944
+        "gzipKb": 42.952
       },
       {
         "label": "_DtVSoRCV",
@@ -413,11 +413,11 @@
         "gzipKb": 1.499
       },
       {
-        "label": "_CrRhe3fK",
+        "label": "_DSHhH9Or",
         "role": "initial",
-        "file": "_nuxt/CrRhe3fK.js",
+        "file": "_nuxt/DSHhH9Or.js",
         "sizeKb": 2.857,
-        "gzipKb": 1.365
+        "gzipKb": 1.367
       },
       {
         "label": "_bW6NxFOP",
@@ -848,9 +848,9 @@
     {
       "label": "app-entry",
       "role": "initial",
-      "file": "_nuxt/Chc5oaP2.js",
+      "file": "_nuxt/CLBGLoCu.js",
       "sizeKb": 126.523,
-      "gzipKb": 42.944
+      "gzipKb": 42.952
     },
     {
       "label": "_DtVSoRCV",
@@ -883,9 +883,9 @@
     {
       "label": "editorial:app/components/Edit/Presentation",
       "role": "async",
-      "file": "_nuxt/ClPVIxcI.js",
-      "sizeKb": 58.862,
-      "gzipKb": 20.249
+      "file": "_nuxt/DI_tcLst.js",
+      "sizeKb": 59.658,
+      "gzipKb": 21.039
     },
     {
       "label": "_Drjxfzpx",
