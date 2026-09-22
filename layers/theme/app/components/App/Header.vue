@@ -11,6 +11,15 @@ import {
   splitMenuAtMarker,
   type DrupalMenuTreeItem,
 } from '#stir/utils/navigation'
+import {
+  headerClassName,
+  headerConfigString,
+  headerDesktopLayout,
+  headerLogoSurface,
+  headerMenuAngleStyle,
+  headerToggleDirection,
+  joinHeaderClasses,
+} from '#stir/utils/headerTheme'
 import { STIR_EDITORIAL_OFFSET_VAR } from '#stir/utils/editorialOffset'
 
 defineOptions({
@@ -55,77 +64,44 @@ const centeredToggleUi = {
   right: 'flex items-center justify-self-end justify-end gap-1.5',
 } as const
 
-type ToggleDirection = 'left' | 'right' | 'top' | 'bottom'
-type HeaderToggleSide = 'left' | 'right'
-type DesktopHeaderLayout = 'default' | 'split-logo' | 'centered-toggle'
-type LogoSurface = 'auto' | 'light' | 'dark'
 type ComponentProps<T> = T extends new () => { $props: infer P } ? P : never
 type NavigationMenuProps = ComponentProps<typeof UNavigationMenuComponent>
-type SlideoverProps = ComponentProps<typeof USlideoverComponent>
 type NavigationMenuColor = Extract<NonNullable<NavigationMenuProps['color']>, string>
 type NavigationMenuVariant = Extract<NonNullable<NavigationMenuProps['variant']>, string>
-type SlideoverContent = NonNullable<SlideoverProps['content']>
+type SlideoverContent = NonNullable<ComponentProps<typeof USlideoverComponent>['content']>
 type SlideoverContentAttrs = SlideoverContent & {
   'aria-label'?: string
   id?: string
   style?: Record<`--${string}`, string>
 }
 
-const toToggleDirection = (value: unknown): ToggleDirection => {
-  return value === 'left' || value === 'right' || value === 'top' || value === 'bottom'
-    ? value
-    : 'right'
-}
-const toHeaderToggleSide = (value: unknown): HeaderToggleSide => (value === 'left' ? 'left' : 'right')
-const toDesktopHeaderLayout = (value: unknown): DesktopHeaderLayout =>
-  value === 'split-logo' || value === 'centered-toggle' ? value : 'default'
-const toLogoSurface = (value: unknown): LogoSurface =>
-  value === 'light' || value === 'dark' ? value : 'auto'
-
-const toStringProp = <T extends string>(value: unknown): T | undefined =>
-  typeof value === 'string' && value.trim() ? value.trim() as T : undefined
-
-const toNavigationColor = (value: unknown): NavigationMenuColor | undefined =>
-  toStringProp<NavigationMenuColor>(value)
-
-const toNavigationVariant = (value: unknown): NavigationMenuVariant | undefined =>
-  toStringProp<NavigationMenuVariant>(value)
-
-const toClassName = (value: unknown): string => {
-  if (!value) return ''
-  if (typeof value === 'string') return value.trim()
-
-  if (Array.isArray(value)) {
-    return value
-      .map((entry) => toClassName(entry))
-      .filter(Boolean)
-      .join(' ')
-  }
-
-  return ''
-}
-
 const toRegisteredComponent = (value: unknown) => {
-  const name = toStringProp<string>(value)
+  const name = headerConfigString<string>(value)
 
   return name ? nuxtApp.vueApp.component(name) ?? null : null
 }
 
-const menuSide = computed(() => toToggleDirection(theme.navigation?.toggleDirection))
-const menuToggleSide = computed(() => toHeaderToggleSide(menuSide.value))
-const headerNavColor = computed(() => toNavigationColor(theme.navigation?.color))
-const headerHighlightColor = computed(() =>
-  theme.navigation?.highlight?.show ? toNavigationColor(theme.navigation.highlight?.color) : undefined,
-)
-const headerNavVariant = computed(() => toNavigationVariant(theme.navigation?.variant))
-const headerNavContentOrientation = computed(() =>
-  theme.navigation?.contentOrientation === 'vertical' ? 'vertical' : 'horizontal',
-)
-const desktopHeaderLayout = computed(() => toDesktopHeaderLayout(theme.navigation?.desktopLayout))
+const menuSide = computed(() => headerToggleDirection(theme.navigation?.toggleDirection))
+const menuToggleSide = computed(() => (menuSide.value === 'left' ? 'left' : 'right'))
+const desktopHeaderLayout = computed(() => headerDesktopLayout(theme.navigation?.desktopLayout))
 const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-logo')
 const isCenteredToggleLayout = computed(() => desktopHeaderLayout.value === 'centered-toggle')
 // The centred toggle is the only navigation at every breakpoint.
 const mobileOnlyClass = computed(() => isCenteredToggleLayout.value ? '' : 'lg:hidden')
+// Shared by every desktop menu the header renders.
+const navProps = computed(() => {
+  const navigation = theme.navigation
+  const highlight = Boolean(navigation.highlight?.show)
+
+  return {
+    color: headerConfigString<NavigationMenuColor>(navigation.color),
+    contentOrientation: navigation.contentOrientation === 'vertical' ? 'vertical' as const : 'horizontal' as const,
+    highlight,
+    highlightColor: highlight ? headerConfigString<NavigationMenuColor>(navigation.highlight?.color) : undefined,
+    variant: headerConfigString<NavigationMenuVariant>(navigation.variant),
+  }
+})
+const menuAngled = computed(() => Boolean(theme.navigation.slideover?.angle))
 const toggleComponent = computed(() => toRegisteredComponent(theme.navigation?.toggleComponent))
 const actionsComponent = computed(() => toRegisteredComponent(theme.navigation?.actionsComponent))
 const siteTitle = computed(() => page.value?.site_info?.name ?? '')
@@ -139,7 +115,7 @@ const isTransparentHeader = computed(() =>
 )
 const logoSurface = computed(() =>
   isTransparentHeader.value
-    ? toLogoSurface(theme.navigation.transparentSurface)
+    ? headerLogoSurface(theme.navigation.transparentSurface)
     : 'auto',
 )
 const headerMode = computed<HeaderMode>(() => props.mode ?? 'fixed')
@@ -163,165 +139,105 @@ const shouldHide = computed(() =>
       scrollDirection.value === 'down' &&
       !atBottom.value)),
 )
-const headerClasses = computed(() =>
-  [
-    'stir-header transition-all',
-    toClassName(theme.navigation.base),
-    headerPositionClasses.value,
-    toClassName(
-      isTransparentHeader.value
-        ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
-        : theme.navigation.background,
-    ),
-    finalIsScrolled.value ? 'is-scrolled stir-header--scrolled' : '',
-    shouldHide.value ? '-translate-y-full' : '',
-  ].filter(Boolean).join(' '),
-)
-const headerContainerClasses = computed(() =>
-  [
-    isCenteredToggleLayout.value ? centeredToggleUi.container : headerUi.container,
-    toClassName(theme.navigation.container),
-    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.container) : '',
-  ].filter(Boolean).join(' '),
-)
-const navigationConfig = computed(() => theme.navigation as Record<string, unknown>)
-const logoClasses = computed(() =>
-  [
-    'app-logo',
-    'transition-all duration-300',
-    finalIsScrolled.value
-      ? navigationConfig.value.logoScrolledClass || navigationConfig.value.logoClass
-      : navigationConfig.value.logoClass,
-  ].join(' '),
-)
-const mobileLogoClasses = computed(() =>
-  [
-    toClassName(theme.navigation.splitLogo?.mobileLogo),
-    logoClasses.value,
-  ].filter(Boolean).join(' '),
-)
+const headerClasses = computed(() => [
+  'stir-header transition-all',
+  theme.navigation.base,
+  headerPositionClasses.value,
+  isTransparentHeader.value
+    ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
+    : theme.navigation.background,
+  finalIsScrolled.value && 'is-scrolled stir-header--scrolled',
+  shouldHide.value && '-translate-y-full',
+])
+const headerContainerClasses = computed(() => [
+  isCenteredToggleLayout.value ? centeredToggleUi.container : headerUi.container,
+  theme.navigation.container,
+  isSplitLogoLayout.value && theme.navigation.splitLogo?.container,
+])
+const logoClasses = computed(() => joinHeaderClasses(
+  'app-logo',
+  'transition-all duration-300',
+  finalIsScrolled.value
+    ? theme.navigation.logoScrolledClass || theme.navigation.logoClass
+    : theme.navigation.logoClass,
+))
+const mobileLogoClasses = computed(() => joinHeaderClasses(
+  theme.navigation.splitLogo?.mobileLogo,
+  logoClasses.value,
+))
 const headerLeftClasses = computed(() => {
   if (isCenteredToggleLayout.value) return centeredToggleUi.left
 
   return isSplitLogoLayout.value
-    ? toClassName(theme.navigation.splitLogo?.mobileLeft) || headerUi.left
+    ? headerClassName(theme.navigation.splitLogo?.mobileLeft) || headerUi.left
     : headerUi.left
 })
 const headerCenterClasses = computed(() => {
   if (isCenteredToggleLayout.value) return centeredToggleUi.center
 
-  return [
-    headerUi.center,
-    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.center) : '',
-  ].filter(Boolean).join(' ')
+  return [headerUi.center, isSplitLogoLayout.value && theme.navigation.splitLogo?.center]
 })
-const menuContent = computed<SlideoverContentAttrs>(() => {
-  const slideover = theme.navigation.slideover
-  const angleEnabled = Boolean(slideover?.angle)
-
-  if (!angleEnabled) {
-    return {
-      id: menuId,
-      'aria-label': 'Site navigation menu',
-    }
-  }
-
-  const degRaw = Number(slideover?.angleDeg ?? 35)
-  const angleDeg = Number.isFinite(degRaw) ? degRaw : 35
-  const angleEdge = Math.min(48, Math.max(12, angleDeg * 0.65))
-  const offsetX = slideover?.angleOffsetX
-
-  return {
-    id: menuId,
-    'aria-label': 'Site navigation menu',
-    style: {
-      '--stir-menu-angle-edge': `${angleEdge}%`,
-      ...(offsetX !== undefined
-        ? {
-            '--stir-menu-offset-x':
-              typeof offsetX === 'number' ? `${offsetX}px` : String(offsetX),
-          }
-        : {}),
-    },
-  }
-})
-const menuOverlayClasses = computed(() =>
-  [
-    mobileOnlyClass.value,
-    theme.navigation.slideover?.angle ? '!bg-transparent' : '',
-  ].filter(Boolean).join(' '),
-)
-const menuContentClasses = computed(() => {
-  const angleEnabled = Boolean(theme.navigation.slideover?.angle)
-
-  return [
+const menuContent = computed<SlideoverContentAttrs>(() => ({
+  id: menuId,
+  'aria-label': 'Site navigation menu',
+  style: headerMenuAngleStyle(theme.navigation.slideover),
+}))
+const menuUi = computed(() => ({
+  overlay: joinHeaderClasses(mobileOnlyClass.value, menuAngled.value && '!bg-transparent'),
+  content: joinHeaderClasses(
     headerUi.content,
     mobileOnlyClass.value,
-    angleEnabled
-      ? 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-none !ring-0 sm:!ring-0'
-      : '',
-    toClassName(theme.navigation.slideover?.content) || (angleEnabled ? '!bg-default' : ''),
-  ].filter(Boolean).join(' ')
-})
-const menuHeaderClasses = computed(() =>
-  [
+    menuAngled.value
+      && 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-none !ring-0 sm:!ring-0',
+    headerClassName(theme.navigation.slideover?.content) || (menuAngled.value && '!bg-default'),
+  ),
+  header: joinHeaderClasses(
     headerUi.header,
-    toClassName(theme.navigation.header),
-    theme.navigation.slideover?.angle ? 'bg-transparent' : '',
-  ].filter(Boolean).join(' '),
-)
-const menuBodyClasses = computed(() =>
-  [
+    theme.navigation.header,
+    menuAngled.value && 'bg-transparent',
+  ),
+  body: joinHeaderClasses(
     headerUi.body,
-    toClassName(theme.navigation.slideover?.body),
-    theme.navigation.slideover?.angle ? 'bg-transparent' : '',
-  ].filter(Boolean).join(' '),
-)
+    theme.navigation.slideover?.body,
+    menuAngled.value && 'bg-transparent',
+  ),
+}))
 const headerRightClasses = computed(() => {
   if (isCenteredToggleLayout.value) return centeredToggleUi.right
 
-  return [
+  return joinHeaderClasses(
     headerUi.right,
     (appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false) && !hasDesktopActions.value
       ? 'block lg:hidden lg:flex-0'
       : 'lg:flex-1',
-    isSplitLogoLayout.value ? toClassName(theme.navigation.splitLogo?.right) : '',
-  ].filter(Boolean).join(' ')
+    isSplitLogoLayout.value && theme.navigation.splitLogo?.right,
+  )
 })
-const baseToggleClasses = computed(() =>
-  [
-    headerUi.toggle,
-    mobileOnlyClass.value,
-    isCenteredToggleLayout.value ? '' : menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5',
-  ].filter(Boolean).join(' '),
-)
-const toggleClasses = computed(() =>
-  [
-    baseToggleClasses.value,
-    isTransparentHeader.value ? toClassName(theme.navigation.toggleTransparentClass) : '',
-    toClassName(theme.navigation.toggleClass),
-  ].filter(Boolean).join(' '),
-)
+const baseToggleClasses = computed(() => joinHeaderClasses(
+  headerUi.toggle,
+  mobileOnlyClass.value,
+  !isCenteredToggleLayout.value && (menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5'),
+))
+const toggleClasses = computed(() => [
+  baseToggleClasses.value,
+  isTransparentHeader.value && theme.navigation.toggleTransparentClass,
+  theme.navigation.toggleClass,
+])
 const toggleIcon = computed(() => {
   const icons = (appConfig.ui as { icons?: Partial<Record<'close' | 'menu', string>> } | undefined)?.icons
 
   return menuOpen.value ? icons?.close || 'i-lucide-x' : icons?.menu || 'i-lucide-menu'
 })
 const toggleIconClass = computed(() =>
-  toClassName(theme.navigation.toggleIcon) || 'size-7',
+  headerClassName(theme.navigation.toggleIcon) || 'size-7',
 )
 
 const { data: mainMenu } = await useMenu('main')
-const splitLogoMarker = computed(() => toStringProp(theme.navigation?.logoMenuMarker))
+const splitLogoMarker = computed(() => headerConfigString(theme.navigation?.logoMenuMarker))
 const splitDesktopNavClasses = computed(() =>
-  toClassName(theme.navigation.splitLogo?.desktopNav) || 'hidden lg:flex',
+  headerClassName(theme.navigation.splitLogo?.desktopNav) || 'hidden lg:flex',
 )
-const splitLeftNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.leftNav))
-const splitRightNavClasses = computed(() => toClassName(theme.navigation.splitLogo?.rightNav))
-const splitLogoLinkClasses = computed(() => toClassName(theme.navigation.splitLogo?.logoLink))
 const showSlideoverBrand = computed(() => theme.navigation.slideover?.logo !== false)
-const slideoverLinkClasses = computed(() => toClassName(theme.navigation.slideover?.link))
-const slideoverListClasses = computed(() => toClassName(theme.navigation.slideover?.list))
 
 const navLinks = computed<NavigationMenuItem[]>(() =>
   (Array.isArray(mainMenu.value) ? mainMenu.value : [])
@@ -497,20 +413,16 @@ watch(menuOpen, (val) => {
         <template v-else-if="isSplitLogoLayout">
           <LazyUNavigationMenu
             v-if="beforeLogo.length"
+            v-bind="navProps"
             aria-label="Primary navigation"
-            :class="[splitDesktopNavClasses, splitLeftNavClasses]"
-            :color="headerNavColor"
-            :content-orientation="headerNavContentOrientation"
-            :highlight="theme.navigation.highlight.show"
-            :highlight-color="headerHighlightColor"
+            :class="[splitDesktopNavClasses, theme.navigation.splitLogo?.leftNav]"
             :items="beforeLogo"
-            :variant="headerNavVariant"
           />
 
           <ULink
             v-if="theme.navigation.logo"
             aria-label="Site Logo"
-            :class="splitLogoLinkClasses"
+            :class="theme.navigation.splitLogo?.logoLink"
             to="/"
           >
             <AppLogo
@@ -521,27 +433,19 @@ watch(menuOpen, (val) => {
 
           <LazyUNavigationMenu
             v-if="afterLogo.length"
+            v-bind="navProps"
             :aria-label="splitRightNavigationLabel"
-            :class="[splitDesktopNavClasses, splitRightNavClasses]"
-            :color="headerNavColor"
-            :content-orientation="headerNavContentOrientation"
-            :highlight="theme.navigation.highlight.show"
-            :highlight-color="headerHighlightColor"
+            :class="[splitDesktopNavClasses, theme.navigation.splitLogo?.rightNav]"
             :items="afterLogo"
-            :variant="headerNavVariant"
           />
         </template>
 
         <LazyUNavigationMenu
           v-else
+          v-bind="navProps"
           aria-label="Site Navigation"
           class="app-nav app-nav-desktop"
-          :color="headerNavColor"
-          :content-orientation="headerNavContentOrientation"
-          :highlight="theme.navigation.highlight.show"
-          :highlight-color="headerHighlightColor"
           :items="headerActions.items"
-          :variant="headerNavVariant"
         />
       </div>
 
@@ -565,14 +469,10 @@ watch(menuOpen, (val) => {
 
         <LazyUNavigationMenu
           v-if="actionNavLinks.length"
+          v-bind="navProps"
           aria-label="Secondary navigation"
           class="app-nav app-nav-actions app-nav-desktop hidden lg:flex"
-          :color="headerNavColor"
-          :content-orientation="headerNavContentOrientation"
-          :highlight="theme.navigation.highlight.show"
-          :highlight-color="headerHighlightColor"
           :items="actionNavLinks"
-          :variant="headerNavVariant"
         />
 
         <component
@@ -598,18 +498,13 @@ watch(menuOpen, (val) => {
     :portal="theme.navigation.slideover?.portal ?? true"
     :side="menuSide"
     title="Navigation"
-    :ui="{
-      overlay: menuOverlayClasses,
-      content: menuContentClasses,
-      header: menuHeaderClasses,
-      body: menuBodyClasses,
-    }"
+    :ui="menuUi"
     :unmount-on-hide="theme.navigation.slideover?.unmountOnHide ?? true"
     @after:leave="restoreMenuFocus"
   >
     <template #content>
       <div
-        :class="menuHeaderClasses"
+        :class="menuUi.header"
         data-slot="header"
       >
         <LazyAppHeaderOverlayHeader
@@ -630,14 +525,14 @@ watch(menuOpen, (val) => {
       </div>
 
       <div
-        :class="menuBodyClasses"
+        :class="menuUi.body"
         data-slot="body"
       >
         <LazyAppHeaderMobileMenu
           :actions="mobileActionButtons"
           :items="mobileNavLinks"
-          :link-class="slideoverLinkClasses"
-          :list-class="slideoverListClasses"
+          :link-class="headerClassName(theme.navigation.slideover?.link)"
+          :list-class="headerClassName(theme.navigation.slideover?.list)"
         />
       </div>
     </template>

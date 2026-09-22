@@ -23,6 +23,12 @@ untouched do not need one.
 
 ### Added
 
+- `AppHeader`, `MediaVideo` and `EditPresentation` are split into smaller
+  parts with unchanged props and output: `MediaVideoBackground` (the hero and
+  bare background mode), `EditPresentationLayout` and `EditPresentationFields`,
+  and the `header*` helpers in `utils/headerTheme.ts`. These names are now
+  auto-imported, so a site that defines a component or helper with the same
+  name shadows the layer's.
 - `usePageContext().canEditInline(editLink?)` decides whether inline edit
   controls render: `TRUE` when Drupal sent an `editLink` for the entity, or
   the page grants editorial access. `EditableRichText`, `HeroContent` and the
@@ -41,6 +47,11 @@ untouched do not need one.
 
 ### Changed
 
+- Plausible's tracker is no longer in the initial bundle (2.4 kB gzip). The
+  analytics layer's bridge plugin loads it on demand once tracking is enabled
+  and consent allows it, and `@nuxtjs/plausible`'s own client plugin is
+  removed. `useTrackEvent`, `useTrackPageview` and `$plausible` behave as
+  before; events sent before the tracker arrives are sent once it loads.
 - **Editorial access comes from Drupal.** `hasEditorialAccess` reads the
   permission-based `capabilities.editorialUi` from the CE page payload's
   `current_user` and from the auth session (stir-tools contract 1.25.0), or

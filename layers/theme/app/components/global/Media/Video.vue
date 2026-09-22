@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useElementVisibility, useMediaQuery } from '@vueuse/core'
 import { mediaPreviewClasses } from '#stir/utils/mediaPreviewClasses'
-import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import { isDirectVideoFile, resolveHeroVideoSource } from '../../../utils/heroVideoSource'
@@ -103,19 +102,14 @@ const forwardedAttrs = computed(() => {
 
   return safeAttrs
 })
-const { initializePlayers, registerIframe, videoPlayers } = useVideoPlayers()
+const { initializePlayers, registerIframe } = useVideoPlayers()
 const injectedIsHero = inject<boolean>('isHero', false)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const videoElement = ref<HTMLVideoElement | null>(null)
-const resolvedPosterSrc = ref<string>()
 const iframeElement = ref<HTMLIFrameElement | null>(null)
-const backgroundPlayerId = useId()
-const backgroundPlayerKey = computed(() =>
-  props.mid === undefined ? `background-${backgroundPlayerId}` : String(props.mid),
-)
 const localVideoSrc = computed(() => {
   if (props.mediaEmbed || !isDirectVideoFile(props.src)) return undefined
 
@@ -126,33 +120,6 @@ const localVideoSrc = computed(() => {
 const playbackSource = computed(() =>
   resolveHeroVideoSource(props.mediaEmbed || localVideoSrc.value),
 )
-const heroVideoSource = computed(() =>
-  isBare.value ? playbackSource.value : undefined,
-)
-const directHeroVideoSrc = computed(() =>
-  heroVideoSource.value?.kind === 'direct' ? heroVideoSource.value.src : undefined,
-)
-const remoteHeroVideoSrc = computed(() =>
-  heroVideoSource.value?.kind === 'embed' ? heroVideoSource.value.src : undefined,
-)
-const pauseWhenHidden = computed(() =>
-  props.pauseWhenHidden ?? isBare.value,
-)
-const bareVideoLoadStrategy = computed<'after-load' | 'immediate'>(() => {
-  const strategy = props.loadStrategy ?? mediaTheme.video?.loadStrategy
-
-  return strategy === 'immediate' ? 'immediate' : 'after-load'
-})
-const bareVideoLoadMinWidth = computed(
-  () => props.loadMinWidth ?? mediaTheme.video?.loadMinWidth ?? 0,
-)
-const { isActive: isBareVideoSourceActive } = useDeferredVideoSource({
-  enabled: isBare,
-  minWidth: bareVideoLoadMinWidth,
-  source: () => heroVideoSource.value?.src,
-  strategy: bareVideoLoadStrategy,
-  videoElement,
-})
 const isProcessing = computed(() => {
   if (props.thumbnailStatus) {
     return props.thumbnailStatus === 'processing'
@@ -165,18 +132,6 @@ const isAnimatedPreviewHovered = ref(false)
 const previewRoot = ref<HTMLElement | null>(null)
 const isPreviewVisible = useElementVisibility(previewRoot, {
   rootMargin: '200px 0px',
-})
-const directBackgroundTarget = computed(() =>
-  pauseWhenHidden.value && isBare.value ? videoElement.value : null,
-)
-const remoteBackgroundTarget = computed(() =>
-  pauseWhenHidden.value && isBare.value ? iframeElement.value : null,
-)
-const isDirectBackgroundVisible = useElementVisibility(directBackgroundTarget, {
-  threshold: 0.1,
-})
-const isRemoteBackgroundVisible = useElementVisibility(remoteBackgroundTarget, {
-  threshold: 0.1,
 })
 const isPreviewViewport = useMediaQuery(
   () => `(min-width: ${props.previewMinWidth}px)`,
@@ -245,8 +200,7 @@ const shouldShowIframe = computed(
   () => playbackSource.value?.kind === 'embed' && !isProcessing.value && isEmbedActive.value,
 )
 const shouldShowDirectVideo = computed(
-  () => !isBare.value
-    && playbackSource.value?.kind === 'direct'
+  () => playbackSource.value?.kind === 'direct'
     && !isProcessing.value
     && isEmbedActive.value,
 )
@@ -262,8 +216,6 @@ const previewSrc = computed(() => {
 
   return localVideoSrc.value ? undefined : props.src
 })
-
-watch(previewSrc, () => { resolvedPosterSrc.value = undefined })
 
 const staticPosterOriginalSrc = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.originalSrc,
@@ -310,61 +262,16 @@ function deactivateAnimatedPreview(): void {
   isAnimatedPreviewHovered.value = false
 }
 
-function syncDirectBackgroundPlayback(visible: boolean): void {
-  if (!pauseWhenHidden.value || !isBare.value || !videoElement.value) return
-
-  if (visible && isBareVideoSourceActive.value) {
-    void videoElement.value.play().catch(() => {})
-    return
-  }
-
-  videoElement.value.pause()
-}
-
-function syncRemoteBackgroundPlayback(visible: boolean): void {
-  if (!pauseWhenHidden.value || !isBare.value || !backgroundPlayerKey.value) return
-
-  const player = videoPlayers.value.get(backgroundPlayerKey.value)
-
-  if (!player?.isReady) return
-
-  const method = visible ? 'play' : 'pause'
-
-  if (!player.supports('method', method)) return
-
-  player[method]()
-}
-
 onMounted(() => {
-  if (!isBare.value && !props.deferEmbed) {
+  if (isBare.value) return
+
+  if (!props.deferEmbed) {
     isEmbedActive.value = true
   }
 
-  if (!isBare.value && shouldShowIframe.value) {
+  if (shouldShowIframe.value) {
     void scheduleInitializePlayers()
   }
-
-})
-
-watch(
-  [remoteHeroVideoSrc, isBareVideoSourceActive, iframeElement],
-  ([source, active, iframe]) => {
-    if (isBare.value && source && active && iframe) {
-      void scheduleInitializePlayers()
-    }
-  },
-  { flush: 'post', immediate: true },
-)
-
-watch([isDirectBackgroundVisible, directBackgroundTarget, isBareVideoSourceActive], ([visible]) => {
-  syncDirectBackgroundPlayback(visible)
-}, {
-  flush: 'post',
-  immediate: true,
-})
-
-watchEffect(() => {
-  syncRemoteBackgroundPlayback(isRemoteBackgroundVisible.value)
 })
 
 watch(
@@ -379,61 +286,27 @@ watch(
 </script>
 
 <template>
-  <template v-if="isBare">
-    <MediaImage
-      v-if="previewSrc"
-      v-bind="forwardedAttrs"
-      :alt="alt || ''"
-      aria-hidden="true"
-      :delivery-profile="staticPosterDeliveryProfile"
-      :delivery-sizes="deliverySizes"
-      :fetchpriority="fetchpriority"
-      :height="height"
-      image-class="absolute inset-0 h-full w-full object-cover"
-      :is-hero="isHero"
-      :loading="loading"
-      no-wrapper
-      :original-revision="staticPosterOriginalRevision"
-      :original-src="staticPosterOriginalSrc"
-      :src="previewSrc"
-      :width="width"
-      @resolved-src="resolvedPosterSrc = $event"
-    />
-
-    <video
-      v-if="directHeroVideoSrc"
-      ref="videoElement"
-      v-bind="forwardedAttrs"
-      aria-hidden="true"
-      autoplay
-      class="pointer-events-none absolute inset-0 h-full w-full object-cover"
-      disablepictureinpicture
-      disableremoteplayback
-      loop
-      muted
-      playsinline
-      :poster="resolvedPosterSrc"
-      :preload="isBareVideoSourceActive ? 'metadata' : 'none'"
-      tabindex="-1"
-    >
-      <source
-        v-if="isBareVideoSourceActive"
-        :src="directHeroVideoSrc"
-      />
-    </video>
-
-    <iframe
-      v-if="remoteHeroVideoSrc && isBareVideoSourceActive"
-      ref="iframeElement"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      aria-hidden="true"
-      class="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
-      :data-mid="backgroundPlayerKey || undefined"
-      :src="remoteHeroVideoSrc"
-      tabindex="-1"
-      :title="title || 'Background video'"
-    />
-  </template>
+  <MediaVideoBackground
+    v-if="isBare"
+    v-bind="forwardedAttrs"
+    :alt="alt"
+    :delivery-profile="deliveryProfile"
+    :delivery-sizes="deliverySizes"
+    :fetchpriority="fetchpriority"
+    :height="height"
+    :is-hero="isHero"
+    :load-min-width="loadMinWidth"
+    :load-strategy="loadStrategy"
+    :loading="loading"
+    :mid="mid"
+    :original-revision="originalRevision"
+    :original-src="originalSrc"
+    :pause-when-hidden="pauseWhenHidden ?? true"
+    :poster-src="localVideoSrc ? undefined : src"
+    :source="playbackSource"
+    :title="title"
+    :width="width"
+  />
 
   <div
     v-else

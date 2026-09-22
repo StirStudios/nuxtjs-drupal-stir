@@ -172,6 +172,8 @@
       "layers/editorial/app/components/Edit/LayoutArrangement.vue",
       "layers/editorial/app/components/Edit/Link.vue",
       "layers/editorial/app/components/Edit/LoadingState.vue",
+      "layers/editorial/app/components/Edit/Presentation/Fields.vue",
+      "layers/editorial/app/components/Edit/Presentation/Layout.vue",
       "layers/editorial/app/components/Edit/Presentation.vue",
       "layers/editorial/app/components/Edit/Text.vue",
       "layers/integrations/app/components/App/Integrations.vue",
@@ -204,6 +206,7 @@
       "layers/theme/app/components/HeroContent.vue",
       "layers/theme/app/components/Icons/ColorMode.vue",
       "layers/theme/app/components/Icons/Social.vue",
+      "layers/theme/app/components/Media/VideoBackground.vue",
       "layers/theme/app/components/NavigationPrevNext.vue",
       "layers/theme/app/components/PageRevealScope.vue",
       "layers/theme/app/components/ParagraphReveal.vue",
@@ -400,6 +403,7 @@
       "layers/theme/app/utils/formattedTextEditTarget.ts",
       "layers/theme/app/utils/getHiddenDefaults.ts",
       "layers/theme/app/utils/gridClasses.ts",
+      "layers/theme/app/utils/headerTheme.ts",
       "layers/theme/app/utils/headingTag.ts",
       "layers/theme/app/utils/heroVideoSource.ts",
       "layers/theme/app/utils/imageDelivery.ts",
@@ -531,6 +535,8 @@
         "layers/editorial/app/components/Edit/LayoutArrangement.vue",
         "layers/editorial/app/components/Edit/Link.vue",
         "layers/editorial/app/components/Edit/LoadingState.vue",
+        "layers/editorial/app/components/Edit/Presentation/Fields.vue",
+        "layers/editorial/app/components/Edit/Presentation/Layout.vue",
         "layers/editorial/app/components/Edit/Presentation.vue",
         "layers/editorial/app/components/Edit/Text.vue",
         "layers/integrations/app/components/App/Integrations.vue",
@@ -563,6 +569,7 @@
         "layers/theme/app/components/HeroContent.vue",
         "layers/theme/app/components/Icons/ColorMode.vue",
         "layers/theme/app/components/Icons/Social.vue",
+        "layers/theme/app/components/Media/VideoBackground.vue",
         "layers/theme/app/components/NavigationPrevNext.vue",
         "layers/theme/app/components/PageRevealScope.vue",
         "layers/theme/app/components/ParagraphReveal.vue",
@@ -759,6 +766,7 @@
         "layers/theme/app/utils/formattedTextEditTarget.ts",
         "layers/theme/app/utils/getHiddenDefaults.ts",
         "layers/theme/app/utils/gridClasses.ts",
+        "layers/theme/app/utils/headerTheme.ts",
         "layers/theme/app/utils/headingTag.ts",
         "layers/theme/app/utils/heroVideoSource.ts",
         "layers/theme/app/utils/imageDelivery.ts",
@@ -800,23 +808,23 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 132,
+    "components": 135,
     "composables": 70,
-    "utils": 70,
+    "utils": 71,
     "plugins": 8,
     "middleware": 4,
     "serverRoutes": 27,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 204,
+    "tests": 206,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 85,
+      "nuxt": 86,
       "scripts": 5,
       "server": 30,
       "unit": 11,
-      "utils": 59
+      "utils": 60
     }
   },
   "tests": [
@@ -885,6 +893,7 @@
     "tests/nuxt/runtime/ParagraphTextCard.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphTimeline.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphView.nuxt.spec.ts",
+    "tests/nuxt/runtime/PlausibleBridge.nuxt.spec.ts",
     "tests/nuxt/runtime/Popup.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
@@ -985,6 +994,7 @@
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/globalSeoAssets.spec.ts",
     "tests/utils/gridClasses.spec.ts",
+    "tests/utils/headerTheme.spec.ts",
     "tests/utils/headingTag.spec.ts",
     "tests/utils/headingText.spec.ts",
     "tests/utils/heroMotionAccessibility.spec.ts",
@@ -1124,15 +1134,15 @@
   "performanceBaseline": {
     "schemaVersion": 4,
     "initialClient": {
-      "sizeKb": 796.39,
-      "gzipKb": 236.95,
+      "sizeKb": 789.55,
+      "gzipKb": 234.62,
       "assets": [
         {
           "label": "app-entry",
           "role": "initial",
-          "file": "_nuxt/HwOCFbVz.js",
-          "sizeKb": 126.454,
-          "gzipKb": 42.895
+          "file": "_nuxt/Dr02ZpFH.js",
+          "sizeKb": 119.584,
+          "gzipKb": 40.57
         },
         {
           "label": "_DtVSoRCV",
@@ -1177,11 +1187,11 @@
           "gzipKb": 6.833
         },
         {
-          "label": "_CWAHDZ1J",
+          "label": "_CEs55nV1",
           "role": "initial",
-          "file": "_nuxt/CWAHDZ1J.js",
+          "file": "_nuxt/CEs55nV1.js",
           "sizeKb": 16.652,
-          "gzipKb": 6.28
+          "gzipKb": 6.277
         },
         {
           "label": "theme:app/app.config",
@@ -1198,11 +1208,11 @@
           "gzipKb": 5.382
         },
         {
-          "label": "_JXb_whg-",
+          "label": "_BFEtH2jY",
           "role": "initial",
-          "file": "_nuxt/JXb_whg-.js",
+          "file": "_nuxt/BFEtH2jY.js",
           "sizeKb": 10.254,
-          "gzipKb": 4.099
+          "gzipKb": 4.101
         },
         {
           "label": "_BpGJ2NnD",
@@ -1226,18 +1236,18 @@
           "gzipKb": 3.463
         },
         {
-          "label": "_OOTvmENr",
+          "label": "_BxH4ywDQ",
           "role": "initial",
-          "file": "_nuxt/OOTvmENr.js",
+          "file": "_nuxt/BxH4ywDQ.js",
           "sizeKb": 9.589,
-          "gzipKb": 3.437
+          "gzipKb": 3.435
         },
         {
           "label": "theme:app/router.options",
           "role": "initial",
-          "file": "_nuxt/D8Vtk416.js",
-          "sizeKb": 8.512,
-          "gzipKb": 3.344
+          "file": "_nuxt/DWBpfY4y.js",
+          "sizeKb": 8.545,
+          "gzipKb": 3.355
         },
         {
           "label": "_B1-1XunG",
@@ -1247,11 +1257,11 @@
           "gzipKb": 3.182
         },
         {
-          "label": "_DZWUuIiU",
+          "label": "_DGy9rkFH",
           "role": "initial",
-          "file": "_nuxt/DZWUuIiU.js",
+          "file": "_nuxt/DGy9rkFH.js",
           "sizeKb": 16.114,
-          "gzipKb": 3.15
+          "gzipKb": 3.148
         },
         {
           "label": "_1RnXxUOZ",
@@ -1310,11 +1320,11 @@
           "gzipKb": 1.499
         },
         {
-          "label": "_OYxoASmn",
+          "label": "_DSHhH9Or",
           "role": "initial",
-          "file": "_nuxt/OYxoASmn.js",
+          "file": "_nuxt/DSHhH9Or.js",
           "sizeKb": 2.857,
-          "gzipKb": 1.372
+          "gzipKb": 1.367
         },
         {
           "label": "_bW6NxFOP",
@@ -1380,9 +1390,9 @@
           "gzipKb": 0.593
         },
         {
-          "label": "_CtD-Le9U",
+          "label": "_AzD95Xoc",
           "role": "initial",
-          "file": "_nuxt/CtD-Le9U.js",
+          "file": "_nuxt/AzD95Xoc.js",
           "sizeKb": 1.03,
           "gzipKb": 0.561
         },
@@ -1591,7 +1601,10 @@
         }
       ]
     },
-    "totalOutputSize": null,
+    "totalOutputSize": {
+      "total": "31.5 MB",
+      "gzip": "11.7 MB gzip"
+    },
     "topClientChunks": [
       {
         "label": "_DQVxDzBj",
@@ -1610,16 +1623,16 @@
       {
         "label": "editorial:app/components/Edit/Text",
         "role": "admin-deferred",
-        "file": "_nuxt/CJ_EbdDJ.js",
+        "file": "_nuxt/6rEmMWnv.js",
         "sizeKb": 173.291,
-        "gzipKb": 53.999
+        "gzipKb": 54.001
       },
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/HwOCFbVz.js",
-        "sizeKb": 126.454,
-        "gzipKb": 42.895
+        "file": "_nuxt/Dr02ZpFH.js",
+        "sizeKb": 119.584,
+        "gzipKb": 40.57
       },
       {
         "label": "_DtVSoRCV",
@@ -1652,16 +1665,16 @@
       {
         "label": "editorial:app/components/Edit/Presentation",
         "role": "async",
-        "file": "_nuxt/D6XPfEw3.js",
-        "sizeKb": 58.862,
-        "gzipKb": 20.251
+        "file": "_nuxt/DI_tcLst.js",
+        "sizeKb": 59.658,
+        "gzipKb": 21.039
       },
       {
-        "label": "_dBVNTXef",
+        "label": "_Drjxfzpx",
         "role": "async",
-        "file": "_nuxt/dBVNTXef.js",
+        "file": "_nuxt/Drjxfzpx.js",
         "sizeKb": 55.329,
-        "gzipKb": 14.802
+        "gzipKb": 14.803
       },
       {
         "label": "_BxypOYYi",
@@ -1680,16 +1693,16 @@
       {
         "label": "auth:app/layouts/account",
         "role": "async",
-        "file": "_nuxt/Bbe79Rat.js",
+        "file": "_nuxt/16TknD2a.js",
         "sizeKb": 42.146,
-        "gzipKb": 11.829
+        "gzipKb": 11.828
       },
       {
         "label": "theme:app/components/global/drupal-view--default",
         "role": "async",
-        "file": "_nuxt/a827qhGl.js",
+        "file": "_nuxt/0IaL4YDv.js",
         "sizeKb": 33.514,
-        "gzipKb": 11.283
+        "gzipKb": 11.281
       },
       {
         "label": "_B8JSa42k",

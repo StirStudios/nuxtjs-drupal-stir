@@ -29,22 +29,34 @@ Regenerate with `pnpm perf:report`; the raw data lands in
 | 13.6 kB | nuxt-icon client bundle | 46 icons. |
 | 13.4 kB | `ui/button` | Nuxt UI component. |
 | 8.7 kB | `consola` | Logger. |
-| 7.6 kB | `@plausible-analytics/tracker` | Consent-gated tracking. |
+
+## First-party share (measured 2026-09-21)
+
+Of the ~675 kB rendered across the tracked initial modules, **9.6 kB is
+first-party**: the theme's `app.config`, which carries the design tokens
+components read at runtime. Everything else is framework or library code —
+Vue (~255 kB across runtime-core, runtime-dom and reactivity), Nuxt UI's
+`tailwind-variants` (~88 kB), `vue-router`, Nuxt, Iconify, unhead and VueUse.
+
+So the initial graph cannot be shrunk meaningfully by trimming layer code: the
+layer already keeps editorial, admin, auth and listing code out of the
+anonymous initial path. Reductions have to come from dependency and design
+decisions, such as the levers below, not from refactoring.
 
 ## Candidate levers, with measured value
 
 Recovering roughly 10 kB would allow the caps to return to their previous
 229 / 192.5. Measured candidates:
 
-- **`@plausible-analytics/tracker` (~2.8 kB gzip).** Tracking is consent-gated,
-  but the tracker is in the initial graph because both
-  `layers/analytics/app/plugins/plausible-config-bridge.client.ts` *and*
-  `@nuxtjs/plausible`'s own `plugin.client.js` import `init`/`track`
-  statically. Lazy-loading only the layer plugin changes nothing; the module's
-  plugin would have to be patched too (the repo already patches
-  `nuxtjs-drupal-ce`, so the mechanism exists). Note the bridge plugin already
-  reimplements init/track for the consent-deferred path, so the module is
-  partly redundant — dropping it is an alternative to patching it.
+- **`@plausible-analytics/tracker` — done (2.4 kB gzip recovered).** The
+  layer's bridge plugin now owns the tracker and loads it with a dynamic
+  import once tracking is enabled and consent allows it, and the analytics
+  layer drops `@nuxtjs/plausible`'s own client plugin (which imported it
+  statically) through the `app:resolve` hook. The initial graph went from
+  237.01 to 234.62 kB. Lighthouse medians of three mobile runs were unchanged
+  before and after (score 80, FCP 3.09 s, LCP 4.30 s, 0.76 MB transfer; TBT
+  varied 50–73 ms in both builds), as expected for a saving below its
+  reporting precision.
 - **`consola` (~3 kB gzip).** A logger in the production client entry. It
   arrives through Nuxt/ofetch internals rather than application code, so
   aliasing it out is fragile and risks losing error reporting.
@@ -53,8 +65,8 @@ Recovering roughly 10 kB would allow the caps to return to their previous
   43 come from Nuxt UI's own declared icons. Trimming them makes those icons
   fall back to the runtime icon endpoint, trading bundle bytes for a request.
 
-Even taken together the two low-risk levers total roughly 5.8 kB, so no
-combination of them reaches the older cap on its own. Getting there means
+With the tracker lever taken, consola is the remaining low-risk candidate at
+roughly 3 kB, which does not reach the older cap on its own. Getting there means
 reducing the Nuxt UI surface in the initial graph, which is a design change
 rather than a configuration one.
 
