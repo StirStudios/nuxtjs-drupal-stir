@@ -8,6 +8,14 @@ export default defineNuxtConfig({
 
   modules: [...(!isTestEnv ? ['@nuxtjs/plausible'] : [])],
 
+  hooks: {
+    // plausible-config-bridge.client.ts owns the tracker and loads it on
+    // demand; the module's own plugin would import it into the entry bundle.
+    'app:resolve'(app) {
+      app.plugins = app.plugins.filter(plugin => !/@nuxtjs[\\/]plausible[\\/]dist[\\/]runtime[\\/]plugin\.client(\.[cm]?js)?$/.test(plugin.src))
+    },
+  },
+
   runtimeConfig: {
     public: {
       plausible: {

@@ -816,11 +816,11 @@
     "serverRoutes": 27,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 205,
+    "tests": 206,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
-      "nuxt": 85,
+      "nuxt": 86,
       "scripts": 5,
       "server": 30,
       "unit": 11,
@@ -893,6 +893,7 @@
     "tests/nuxt/runtime/ParagraphTextCard.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphTimeline.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphView.nuxt.spec.ts",
+    "tests/nuxt/runtime/PlausibleBridge.nuxt.spec.ts",
     "tests/nuxt/runtime/Popup.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
@@ -1133,15 +1134,15 @@
   "performanceBaseline": {
     "schemaVersion": 4,
     "initialClient": {
-      "sizeKb": 796.49,
-      "gzipKb": 237.01,
+      "sizeKb": 789.55,
+      "gzipKb": 234.62,
       "assets": [
         {
           "label": "app-entry",
           "role": "initial",
-          "file": "_nuxt/CLBGLoCu.js",
-          "sizeKb": 126.523,
-          "gzipKb": 42.952
+          "file": "_nuxt/Dr02ZpFH.js",
+          "sizeKb": 119.584,
+          "gzipKb": 40.57
         },
         {
           "label": "_DtVSoRCV",
@@ -1629,9 +1630,9 @@
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/CLBGLoCu.js",
-        "sizeKb": 126.523,
-        "gzipKb": 42.952
+        "file": "_nuxt/Dr02ZpFH.js",
+        "sizeKb": 119.584,
+        "gzipKb": 40.57
       },
       {
         "label": "_DtVSoRCV",
