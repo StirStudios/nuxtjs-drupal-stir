@@ -51,6 +51,38 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
+  // Content migrated from free-text classes must render exactly as before.
+  it.each([
+    { choice: { surface: 'muted' }, legacy: 'bg-muted' },
+    { choice: { presentationVariant: 'action-group' }, legacy: 'action-group' },
+    { choice: { presentationVariant: 'action-group-center' }, legacy: 'action-group action-group--center' },
+    { choice: { presentationVariant: 'action-group-right' }, legacy: 'action-group action-group--right' },
+    { choice: { surface: 'inverted', presentationVariant: 'action-group' }, legacy: 'bg-inverted text-inverted action-group' },
+  ])('renders $choice exactly like the classes "$legacy"', async ({ choice, legacy }) => {
+    const render = async (props: Record<string, unknown>) => {
+      const wrapper = await mountSuspended(ParagraphLayout, {
+        props: { id: 'presentation', gridClass: {}, ...props },
+        slots: { first: '<p>First</p>', second: '<p>Second</p>' },
+      })
+      const html = wrapper.html()
+
+      wrapper.unmount()
+      return html
+    }
+
+    expect(await render(choice)).toBe(await render({ classes: legacy }))
+  })
+
+  it('keeps the free-text classes when no known choice is set', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: { id: 'legacy', gridClass: {}, classes: 'showcase-row', surface: 'unknown' },
+      slots: { first: '<p>First</p>' },
+    })
+
+    expect(wrapper.get('#section-legacy').classes()).toContain('showcase-row')
+    wrapper.unmount()
+  })
+
   it('allows headed subsections inside a headed layout', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: { id: 'outer', header: 'Collection' },

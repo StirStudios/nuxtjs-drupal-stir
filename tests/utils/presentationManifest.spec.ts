@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   buildPresentationSource,
+  catalogueUtilities,
+  emptyPresentationManifest,
   inlinePresentationSource,
   layoutVocabulary,
   loadPresentationManifest,
@@ -179,6 +181,23 @@ describe('CMS presentation manifest', () => {
     }
 
     expect([...produced].filter(utility => !vocabulary.has(utility))).toEqual([])
+  })
+
+  it('compiles every class the presentation catalogue and rich-text list declare', () => {
+    const warnings: string[] = []
+    const utilities = catalogueUtilities({
+      surfaces: { spotlight: { class: 'dp-spotlight bg-muted/50' } },
+      variants: { card: { class: 'p-7 lg:p-12' } },
+      richText: ['mb-4', 'text-center', 'bad"token'],
+    }, { warn: message => warnings.push(message) })
+
+    expect(utilities).toEqual(['bg-muted/50', 'dp-spotlight', 'lg:p-12', 'mb-4', 'p-7', 'text-center'])
+    expect(warnings).toEqual(['Ignored unsafe CMS presentation class token: bad"token'])
+
+    const { source } = buildPresentationSource(emptyPresentationManifest(), { extraUtilities: utilities })
+
+    expect(source).toContain('lg:p-12')
+    expect(source).toContain('md:grid-cols-5')
   })
 
   it('emits literal Tailwind 4 inline sources', () => {
