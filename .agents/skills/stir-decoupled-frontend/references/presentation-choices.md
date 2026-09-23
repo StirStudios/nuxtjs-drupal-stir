@@ -89,7 +89,11 @@ affected page; the only allowed differences are removed classes with no CSS.
    real server's content; local databases drift. It covers Layout and Text
    paragraphs in every revision, drafts and history included.
 4. Deploy step A: fields, exported config and catalogue, no content change.
-   Compare pages.
+   The post-updates create the fields, but `drush deploy` imports config
+   afterwards and removes any field the site's config/sync lacks. So update
+   stir-tools locally, run `drush cim`, then `drush updb`, then `drush cex`,
+   and commit the new `field_surface` and `field_presentation_variant` files
+   with step A. Compare pages.
 5. Deploy step B: a `hook_deploy_NAME()` in the site module runs the migrator
    with the map, the Nuxt project sets `manifest: false`, and the CMS
    `config/deploy.rb` sets `set :drupal_manifest_sensitive_paths, []`. Compare
