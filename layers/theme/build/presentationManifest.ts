@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import * as v from 'valibot'
-import { WIDTH_MAX_WIDTH_CLASSES } from '../app/utils/gridClasses'
+import { GRID_BREAKPOINTS, WIDTH_MAX_WIDTH_CLASSES } from '../app/utils/gridClasses'
 
 const breakpointSchema = v.record(
   v.string(),
@@ -262,6 +262,16 @@ function addSpacing(
   }
 }
 
+const ALIGNMENT_RECIPES: Record<string, string> = {
+  justify_left: 'justify-start', justify_center: 'justify-center', justify_right: 'justify-end',
+  align_top: 'items-start', align_center: 'items-center', align_bottom: 'items-end',
+  text_left: 'text-start', text_center: 'text-center', text_right: 'text-end',
+}
+
+// Mirrors the allowed values of stir_layout_builder's field_spacing.
+const SPACING_OPTIONS = ['p', 'pt', 'pr', 'pb', 'pl', 'px', 'py']
+  .flatMap(side => [2, 5, 10, 20].map(size => `${side}-${size}`))
+
 function addLiteralUtilities(
   classes: Set<string>,
   value: string,
@@ -334,14 +344,8 @@ export function presentationUtilities(
     recipe.forEach(utility => classes.add(utility))
   }
 
-  const alignmentRecipes: Record<string, string> = {
-    justify_left: 'justify-start', justify_center: 'justify-center', justify_right: 'justify-end',
-    align_top: 'items-start', align_center: 'items-center', align_bottom: 'items-end',
-    text_left: 'text-start', text_center: 'text-center', text_right: 'text-end',
-  }
-
   for (const value of manifest.used.alignment) {
-    const utility = alignmentRecipes[value]
+    const utility = ALIGNMENT_RECIPES[value]
 
     if (!utility) {
       addLiteralUtilities(classes, value, warn)
@@ -359,6 +363,38 @@ export function presentationUtilities(
     classes.add(utility)
   }
   return [...classes].sort()
+}
+
+const range = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, index) => from + index)
+
+/**
+ * Every utility the layout fields can produce, compiled whether or not
+ * content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint
+ * the grid field offers, plus every spacing, width and alignment option.
+ * Without it, a value an editor picks for the first time has no CSS until
+ * the next build. Recipes come from presentationUtilities, so they cannot
+ * drift from the manifest path.
+ */
+export function layoutVocabulary(): string[] {
+  return presentationUtilities({
+    schemaVersion: 2,
+    site: { uuid: '', name: '', theme: '' },
+    capabilities: ['layout'],
+    used: {
+      grid: {
+        columns: Object.fromEntries(GRID_BREAKPOINTS.map(breakpoint => [breakpoint, range(1, 12)])),
+        gap: Object.fromEntries(GRID_BREAKPOINTS.map(breakpoint => [breakpoint, range(0, 20)])),
+        matrix: false,
+      },
+      spacing: SPACING_OPTIONS,
+      width: Object.keys(WIDTH_MAX_WIDTH_CLASSES).map(token => `w-${token}`),
+      alignment: Object.keys(ALIGNMENT_RECIPES),
+    },
+    legacyClasses: [],
+    diagnostics: { rejectedLegacyClassCount: 0 },
+    revision: '',
+  })
 }
 
 export function inlinePresentationSource(classes: string[]): string {
@@ -388,7 +424,10 @@ export function buildPresentationSource(
   rejectedLegacyUtilityCount: number
   sourceBytes: number
 } {
-  const utilities = presentationUtilities(manifest, options)
+  const utilities = [...new Set([
+    ...layoutVocabulary(),
+    ...presentationUtilities(manifest, options),
+  ])].sort()
   const source = inlinePresentationSource(utilities)
   const sourceRevision = createHash('sha256')
     .update(source)

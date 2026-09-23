@@ -268,9 +268,17 @@ slot to replace the default `UButton`s, for example with analytics buttons.
 
 ## CMS presentation manifest
 
-Every build consumes Drupal's presentation usage manifest and compiles only the
-semantic recipes and safe class tokens that the site currently uses. There is
-no compatibility mode or general-purpose utility safelist.
+Every build compiles every option the layout fields offer, whether or not
+content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint, and
+each spacing, width and alignment option. A value an editor picks for the first
+time therefore has CSS without a rebuild. `layoutVocabulary()` generates this
+set from the same recipes as the manifest, and a test checks it covers every
+class the grid, alignment and width resolvers can produce.
+
+The build also consumes Drupal's presentation usage manifest and compiles the
+free-text class tokens (`field_classes`, classes in formatted text) the site
+currently uses. There is no compatibility mode or general-purpose utility
+safelist.
 
 The widened safe-token grammar is manifest schema version 2. During an
 independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
