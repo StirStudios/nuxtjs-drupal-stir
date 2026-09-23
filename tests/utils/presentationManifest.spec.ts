@@ -208,9 +208,9 @@ describe('CMS presentation manifest', () => {
       { surfaces: { muted: { label: 'Muted', class: 'bg-muted' }, inverted: { label: 'Inverted', class: 'bg-inverted' } } },
     ])
 
-    expect(merged.surfaces.muted.class).toBe('bg-muted/50')
-    expect(merged.surfaces.inverted.class).toBe('bg-inverted')
-    expect(merged.variants.card.class).toBe('p-7')
+    expect(merged.surfaces.muted?.class).toBe('bg-muted/50')
+    expect(merged.surfaces.inverted?.class).toBe('bg-inverted')
+    expect(merged.variants.card?.class).toBe('p-7')
     expect(merged.richText).toEqual(['mb-4', 'mt-6'])
     expect(merged.manifest).toBe(false)
     expect(mergePresentationConfigs([{}]).manifest).toBe(true)
