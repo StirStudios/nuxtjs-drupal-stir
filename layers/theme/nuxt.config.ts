@@ -15,6 +15,8 @@ import {
   catalogueUtilities,
   emptyPresentationManifest,
   loadPresentationManifest,
+  mergePresentationConfigs,
+  type PresentationConfig,
   resolvePresentationManifestSource,
 } from './build/presentationManifest'
 import {
@@ -129,22 +131,10 @@ export default defineNuxtConfig({
         nuxt.options.css.push(themeCss)
       }
 
-      const rootAppConfigPath = await findPath(
-        resolvePath(nuxt.options.srcDir, 'app.config'),
-      )
-      let rootAppConfig: {
+      const importAppConfig = async (path: string): Promise<{
         ui?: { colors?: Record<string, unknown> }
-        stirTheme?: {
-          presentation?: {
-            manifest?: boolean
-            surfaces?: Record<string, { label: string, class: string }>
-            variants?: Record<string, { label: string, class: string }>
-            richText?: string[]
-          }
-        }
-      } = {}
-
-      if (rootAppConfigPath) {
+        stirTheme?: { presentation?: PresentationConfig }
+      }> => {
         const globals = globalThis as typeof globalThis & {
           defineAppConfig?: (config: unknown) => unknown
         }
@@ -154,16 +144,37 @@ export default defineNuxtConfig({
 
         try {
           const loadedAppConfig = await loadModule.import<{
-            default?: typeof rootAppConfig
-          }>(rootAppConfigPath)
+            default?: Awaited<ReturnType<typeof importAppConfig>>
+          }>(path)
 
-          rootAppConfig = loadedAppConfig.default || {}
+          return loadedAppConfig.default || {}
         } finally {
           if (previousDefineAppConfig) {
             globals.defineAppConfig = previousDefineAppConfig
           } else {
             delete globals.defineAppConfig
           }
+        }
+      }
+
+      const rootAppConfigPath = await findPath(
+        resolvePath(nuxt.options.srcDir, 'app.config'),
+      )
+      const rootAppConfig = rootAppConfigPath ? await importAppConfig(rootAppConfigPath) : {}
+
+      // Every layer's app config, nearest first, as Nuxt merges them: a
+      // catalogue declared in an intermediate layer must be compiled too.
+      const layerPresentations: PresentationConfig[] = []
+
+      for (const layer of nuxt.options._layers) {
+        const layerAppConfigPath = await findPath(resolvePath(layer.config.srcDir, 'app.config'))
+
+        if (layerAppConfigPath) {
+          const layerAppConfig = layerAppConfigPath === rootAppConfigPath
+            ? rootAppConfig
+            : await importAppConfig(layerAppConfigPath)
+
+          layerPresentations.push(layerAppConfig.stirTheme?.presentation || {})
         }
       }
 
@@ -200,15 +211,13 @@ export default defineNuxtConfig({
         repositoryBuild: isRepositoryBuild,
         drupalUrl,
       })
-      const projectPresentation = rootAppConfig.stirTheme?.presentation || {}
-      const presentation = {
-        surfaces: { ...STIR_PRESENTATION_DEFAULTS.surfaces, ...projectPresentation.surfaces },
-        variants: { ...STIR_PRESENTATION_DEFAULTS.variants, ...projectPresentation.variants },
-        richText: projectPresentation.richText || [],
-      }
+      const presentation = mergePresentationConfigs([
+        ...layerPresentations,
+        STIR_PRESENTATION_DEFAULTS,
+      ])
       // A site that no longer stores free-text classes turns the manifest off,
       // so its build needs nothing from Drupal.
-      const usesManifest = projectPresentation.manifest !== false
+      const usesManifest = presentation.manifest
       const manifest = usesManifest
         ? await loadPresentationManifest({
             source: manifestSource,

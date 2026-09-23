@@ -21,13 +21,13 @@ describe('presentation choices', () => {
     expect(resolvePresentationClasses(catalogue, {})).toBeUndefined()
   })
 
-  it('publishes IDs and labels only, with a revision that follows the choices', () => {
-    const published = buildPresentationCatalogue(catalogue)
+  it('publishes IDs and labels only, with a revision that follows the choices', async () => {
+    const published = await buildPresentationCatalogue(catalogue)
 
     expect(published.surfaces).toContainEqual({ id: 'spotlight', label: 'Spotlight' })
     expect(JSON.stringify(published)).not.toContain('dp-spotlight')
     expect(published.revision).toMatch(/^[a-f0-9]{64}$/u)
-    expect(buildPresentationCatalogue(catalogue).revision).toBe(published.revision)
-    expect(buildPresentationCatalogue({ surfaces: {} }).revision).not.toBe(published.revision)
+    expect((await buildPresentationCatalogue(catalogue)).revision).toBe(published.revision)
+    expect((await buildPresentationCatalogue({ surfaces: {} })).revision).not.toBe(published.revision)
   })
 })

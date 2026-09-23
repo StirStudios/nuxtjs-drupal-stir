@@ -397,6 +397,30 @@ export function layoutVocabulary(): string[] {
   })
 }
 
+export type PresentationConfig = {
+  manifest?: boolean
+  surfaces?: Record<string, { label: string, class: string }>
+  variants?: Record<string, { label: string, class: string }>
+  richText?: string[]
+}
+
+/**
+ * Merges `stirTheme.presentation` from every Nuxt layer, nearest first, the
+ * way Nuxt merges app config: nearer layers override choices with the same
+ * ID, rich-text lists combine, and the nearest layer that sets `manifest`
+ * decides it.
+ */
+export function mergePresentationConfigs(configs: PresentationConfig[]): Required<PresentationConfig> {
+  const farthestFirst = [...configs].reverse()
+
+  return {
+    manifest: configs.find(config => config.manifest !== undefined)?.manifest ?? true,
+    surfaces: Object.assign({}, ...farthestFirst.map(config => config.surfaces || {})),
+    variants: Object.assign({}, ...farthestFirst.map(config => config.variants || {})),
+    richText: [...new Set(configs.flatMap(config => config.richText || []))],
+  }
+}
+
 /**
  * Classes a project's presentation catalogue and rich-text list declare, so
  * they are compiled whether or not the manifest runs. Unsafe tokens are

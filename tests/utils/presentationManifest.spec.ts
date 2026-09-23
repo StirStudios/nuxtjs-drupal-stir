@@ -6,6 +6,7 @@ import {
   emptyPresentationManifest,
   inlinePresentationSource,
   layoutVocabulary,
+  mergePresentationConfigs,
   loadPresentationManifest,
   parsePresentationManifest,
   presentationUtilities,
@@ -198,6 +199,21 @@ describe('CMS presentation manifest', () => {
 
     expect(source).toContain('lg:p-12')
     expect(source).toContain('md:grid-cols-5')
+  })
+
+  it('merges presentation config from every layer, nearest first', () => {
+    const merged = mergePresentationConfigs([
+      { surfaces: { muted: { label: 'Project muted', class: 'bg-muted/50' } }, richText: ['mb-4'] },
+      { manifest: false, variants: { card: { label: 'Card', class: 'p-7' } }, richText: ['mb-4', 'mt-6'] },
+      { surfaces: { muted: { label: 'Muted', class: 'bg-muted' }, inverted: { label: 'Inverted', class: 'bg-inverted' } } },
+    ])
+
+    expect(merged.surfaces.muted.class).toBe('bg-muted/50')
+    expect(merged.surfaces.inverted.class).toBe('bg-inverted')
+    expect(merged.variants.card.class).toBe('p-7')
+    expect(merged.richText).toEqual(['mb-4', 'mt-6'])
+    expect(merged.manifest).toBe(false)
+    expect(mergePresentationConfigs([{}]).manifest).toBe(true)
   })
 
   it('emits literal Tailwind 4 inline sources', () => {
