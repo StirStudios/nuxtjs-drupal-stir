@@ -12,6 +12,8 @@ import {
 import { createJiti } from 'jiti'
 import {
   buildPresentationSource,
+  catalogueUtilities,
+  emptyPresentationManifest,
   loadPresentationManifest,
   resolvePresentationManifestSource,
 } from './build/presentationManifest'
@@ -21,6 +23,7 @@ import {
 } from './build/imageCdn'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
+import { STIR_PRESENTATION_DEFAULTS } from './app/utils/presentationDefaults'
 import { overrideFallbackComponent } from '../../config/componentOverrides'
 
 const themeLayerDir = dirname(fileURLToPath(import.meta.url))
@@ -131,6 +134,14 @@ export default defineNuxtConfig({
       )
       let rootAppConfig: {
         ui?: { colors?: Record<string, unknown> }
+        stirTheme?: {
+          presentation?: {
+            manifest?: boolean
+            surfaces?: Record<string, { label: string, class: string }>
+            variants?: Record<string, { label: string, class: string }>
+            richText?: string[]
+          }
+        }
       } = {}
 
       if (rootAppConfigPath) {
@@ -189,15 +200,26 @@ export default defineNuxtConfig({
         repositoryBuild: isRepositoryBuild,
         drupalUrl,
       })
-      const manifest = await loadPresentationManifest({
-        source: manifestSource,
-        apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY
-          || process.env.DRUPAL_API_KEY,
-        lastKnownPath: process.env.STIR_PRESENTATION_MANIFEST_LAST_KNOWN,
-        retry: {
-          onRetry: message => presentationManifestLogger.warn(message),
-        },
-      })
+      const projectPresentation = rootAppConfig.stirTheme?.presentation || {}
+      const presentation = {
+        surfaces: { ...STIR_PRESENTATION_DEFAULTS.surfaces, ...projectPresentation.surfaces },
+        variants: { ...STIR_PRESENTATION_DEFAULTS.variants, ...projectPresentation.variants },
+        richText: projectPresentation.richText || [],
+      }
+      // A site that no longer stores free-text classes turns the manifest off,
+      // so its build needs nothing from Drupal.
+      const usesManifest = projectPresentation.manifest !== false
+      const manifest = usesManifest
+        ? await loadPresentationManifest({
+            source: manifestSource,
+            apiKey: process.env.STIR_PRESENTATION_MANIFEST_API_KEY
+              || process.env.DRUPAL_API_KEY,
+            lastKnownPath: process.env.STIR_PRESENTATION_MANIFEST_LAST_KNOWN,
+            retry: {
+              onRetry: message => presentationManifestLogger.warn(message),
+            },
+          })
+        : emptyPresentationManifest()
 
       if (manifest.diagnostics.rejectedLegacyClassCount > 0) {
         const rejected = manifest.diagnostics.rejectedLegacyClasses
@@ -211,8 +233,10 @@ export default defineNuxtConfig({
         nuxt.options.rootDir,
         'node_modules/.cache/stir-presentation',
       )
+      const warnPresentation = (message: string) => presentationManifestLogger.warn(message)
       const presentationSource = buildPresentationSource(manifest, {
-        warn: message => presentationManifestLogger.warn(message),
+        warn: warnPresentation,
+        extraUtilities: catalogueUtilities(presentation, { warn: warnPresentation }),
       })
       const generatedCss = resolvePath(
         generatedDir,
@@ -225,6 +249,7 @@ export default defineNuxtConfig({
       nuxt.options.runtimeConfig.public.stirPresentationManifestRevision = manifest.revision
       nuxt.options.runtimeConfig.public.stirPresentationBuild = {
         manifestRevision: manifest.revision,
+        usesManifest,
         sourceRevision: presentationSource.sourceRevision,
         utilityCount: presentationSource.utilityCount,
         manifestUsageCount: presentationSource.manifestUsageCount,

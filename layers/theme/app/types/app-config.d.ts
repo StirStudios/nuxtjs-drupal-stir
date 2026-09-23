@@ -479,7 +479,21 @@ type StirThemeNodeConfig = {
   pageContentClass?: ClassValue
 } & LooseRecord
 
+type StirThemePresentationOption = {
+  label: string
+  class: string
+}
+
+type StirThemePresentationConfig = {
+  /** Set false once the site no longer uses free-text classes. */
+  manifest?: boolean
+  surfaces?: Record<string, StirThemePresentationOption>
+  variants?: Record<string, StirThemePresentationOption>
+  richText?: string[]
+}
+
 type StirThemeConfig = {
+  presentation?: StirThemePresentationConfig
   showPdf?: boolean
   showBreadcrumbs?: boolean
   loadingIndicator?: string | false

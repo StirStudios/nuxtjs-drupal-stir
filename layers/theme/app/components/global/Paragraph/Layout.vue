@@ -12,6 +12,7 @@ import {
 } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveAlignClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
+import { resolvePresentationClasses } from '#stir/utils/presentationClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -37,6 +38,8 @@ const props = defineProps<{
   spacing?: string
   gridClass?: GridConfig
   classes?: string
+  surface?: string
+  variant?: string
   regionAlign?: Record<string, AlignConfig>
   reverseMobile?: boolean
 
@@ -50,7 +53,13 @@ const props = defineProps<{
 const layoutTag = computed(() => props.layoutTag === 'div' ? 'div' : 'section')
 const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 
-const classNames = computed(() => props.classes?.split(/\s+/) || [])
+const presentation = useAppConfig().stirTheme?.presentation
+const presentationClasses = computed(() => resolvePresentationClasses(
+  presentation,
+  { surface: props.surface, variant: props.variant },
+  props.classes,
+))
+const classNames = computed(() => presentationClasses.value?.split(/\s+/) || [])
 const isActionGroup = computed(() => classNames.value.includes('action-group'))
 
 const vueSlots = useSlots()
@@ -122,7 +131,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
     :id="sectionId"
     :key="`layout-${id}-${'whileInView' in layoutMotionProps ? revealMotionKey : 0}`"
     :as="layoutTag"
-    :class="[classes || 'content', spacing]"
+    :class="[presentationClasses || 'content', spacing]"
     :motion-props="layoutMotionProps"
   >
     <WrapGrid
