@@ -819,7 +819,7 @@ describe('layer contract', () => {
     expect(paragraphText).not.toContain('v-html')
     expect(paragraphText).toContain('inheritAttrs: false')
     expect(paragraphText).toContain('textEdit?: unknown')
-    expect(paragraphText).toContain('toEditableRichTextProps(props)')
+    expect(paragraphText).toContain('toEditableRichTextProps(props, ')
     expect(readFileSync(
       resolve(rootDir, 'layers/theme/app/utils/editableRichText.ts'),
       'utf8',

@@ -3,6 +3,7 @@ import type { EditableRichTextProps } from '#stir/types'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { toEditableRichTextProps } from '#stir/utils/editableRichText'
 import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
+import { resolvePresentationClasses } from '#stir/utils/presentationClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -17,11 +18,18 @@ const props = defineProps<
     width?: string
     spacing?: string
     region?: string
+    surface?: string
+    presentationVariant?: string
     textEdit?: unknown
   }
 >()
 
-const richTextProps = computed(() => toEditableRichTextProps(props))
+const presentation = useAppConfig().stirTheme?.presentation
+const richTextProps = computed(() => toEditableRichTextProps(props, resolvePresentationClasses(
+  presentation,
+  { surface: props.surface, variant: props.presentationVariant },
+  props.classes,
+)))
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapStyles = computed(() =>
   [resolveWidthClasses(props.width, props.align), props.spacing].filter(
