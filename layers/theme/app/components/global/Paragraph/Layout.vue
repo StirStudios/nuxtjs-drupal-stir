@@ -39,7 +39,7 @@ const props = defineProps<{
   gridClass?: GridConfig
   classes?: string
   surface?: string
-  variant?: string
+  presentationVariant?: string
   regionAlign?: Record<string, AlignConfig>
   reverseMobile?: boolean
 
@@ -56,7 +56,7 @@ const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const presentation = useAppConfig().stirTheme?.presentation
 const presentationClasses = computed(() => resolvePresentationClasses(
   presentation,
-  { surface: props.surface, variant: props.variant },
+  { surface: props.surface, variant: props.presentationVariant },
   props.classes,
 ))
 const classNames = computed(() => presentationClasses.value?.split(/\s+/) || [])

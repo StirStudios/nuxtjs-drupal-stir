@@ -54,10 +54,10 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
   // Content migrated from free-text classes must render exactly as before.
   it.each([
     { choice: { surface: 'muted' }, legacy: 'bg-muted' },
-    { choice: { variant: 'action-group' }, legacy: 'action-group' },
-    { choice: { variant: 'action-group-center' }, legacy: 'action-group action-group--center' },
-    { choice: { variant: 'action-group-right' }, legacy: 'action-group action-group--right' },
-    { choice: { surface: 'inverted', variant: 'action-group' }, legacy: 'bg-inverted text-inverted action-group' },
+    { choice: { presentationVariant: 'action-group' }, legacy: 'action-group' },
+    { choice: { presentationVariant: 'action-group-center' }, legacy: 'action-group action-group--center' },
+    { choice: { presentationVariant: 'action-group-right' }, legacy: 'action-group action-group--right' },
+    { choice: { surface: 'inverted', presentationVariant: 'action-group' }, legacy: 'bg-inverted text-inverted action-group' },
   ])('renders $choice exactly like the classes "$legacy"', async ({ choice, legacy }) => {
     const render = async (props: Record<string, unknown>) => {
       const wrapper = await mountSuspended(ParagraphLayout, {
