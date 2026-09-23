@@ -1,4 +1,5 @@
 import { nuxtUiTheme } from './theme/nuxtUi'
+import { STIR_PRESENTATION_DEFAULTS } from './utils/presentationDefaults'
 
 export default defineAppConfig({
   colorMode: {
@@ -19,6 +20,15 @@ export default defineAppConfig({
   stirTheme: {
     showPdf: false,
     showBreadcrumbs: false,
+
+    // Choices editors make in Drupal's Surface and Variant fields. Projects
+    // add their own entries; Drupal reads the list from
+    // /api/stir/presentation-catalogue.
+    presentation: {
+      ...STIR_PRESENTATION_DEFAULTS,
+      // Tailwind utilities used inside rich text, compiled without the manifest.
+      richText: [],
+    },
 
     container: 'mx-auto max-w-(--ui-container) px-4 md:px-5 lg:px-8',
     clientComponents: [],

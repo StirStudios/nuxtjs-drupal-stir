@@ -417,6 +417,8 @@
       "layers/theme/app/utils/pageRequest.ts",
       "layers/theme/app/utils/paragraphLayoutArrangement.ts",
       "layers/theme/app/utils/paragraphLayoutTransition.ts",
+      "layers/theme/app/utils/presentationClasses.ts",
+      "layers/theme/app/utils/presentationDefaults.ts",
       "layers/theme/app/utils/responsiveGrid.ts",
       "layers/theme/app/utils/routeHero.ts",
       "layers/theme/app/utils/schedule.ts",
@@ -479,6 +481,7 @@
       "/api/paragraph/:paragraphId/text",
       "/api/seo/global",
       "/api/sitemap",
+      "/api/stir/presentation-catalogue",
       "/api/view/:paragraphId",
       "/api/webform/submit"
     ]
@@ -780,6 +783,8 @@
         "layers/theme/app/utils/pageRequest.ts",
         "layers/theme/app/utils/paragraphLayoutArrangement.ts",
         "layers/theme/app/utils/paragraphLayoutTransition.ts",
+        "layers/theme/app/utils/presentationClasses.ts",
+        "layers/theme/app/utils/presentationDefaults.ts",
         "layers/theme/app/utils/responsiveGrid.ts",
         "layers/theme/app/utils/routeHero.ts",
         "layers/theme/app/utils/schedule.ts",
@@ -810,13 +815,13 @@
   "counts": {
     "components": 135,
     "composables": 70,
-    "utils": 71,
+    "utils": 73,
     "plugins": 8,
     "middleware": 4,
-    "serverRoutes": 27,
+    "serverRoutes": 28,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 206,
+    "tests": 207,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -824,7 +829,7 @@
       "scripts": 5,
       "server": 30,
       "unit": 11,
-      "utils": 60
+      "utils": 61
     }
   },
   "tests": [
@@ -1011,6 +1016,7 @@
     "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
     "tests/utils/paragraphRevealOwnership.spec.ts",
+    "tests/utils/presentationClasses.spec.ts",
     "tests/utils/presentationManifest.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
     "tests/utils/profileValidation.spec.ts",

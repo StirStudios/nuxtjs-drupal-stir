@@ -397,6 +397,76 @@ export function layoutVocabulary(): string[] {
   })
 }
 
+export type PresentationConfig = {
+  manifest?: boolean
+  surfaces?: Record<string, { label: string, class: string }>
+  variants?: Record<string, { label: string, class: string }>
+  richText?: string[]
+}
+
+/**
+ * Merges `stirTheme.presentation` from every Nuxt layer, nearest first, the
+ * way Nuxt merges app config: nearer layers override choices with the same
+ * ID, rich-text lists combine, and the nearest layer that sets `manifest`
+ * decides it.
+ */
+export function mergePresentationConfigs(configs: PresentationConfig[]): Required<PresentationConfig> {
+  const farthestFirst = [...configs].reverse()
+
+  return {
+    manifest: configs.find(config => config.manifest !== undefined)?.manifest ?? true,
+    surfaces: Object.assign({}, ...farthestFirst.map(config => config.surfaces || {})),
+    variants: Object.assign({}, ...farthestFirst.map(config => config.variants || {})),
+    richText: [...new Set(configs.flatMap(config => config.richText || []))],
+  }
+}
+
+/**
+ * Classes a project's presentation catalogue and rich-text list declare, so
+ * they are compiled whether or not the manifest runs. Unsafe tokens are
+ * skipped with a warning, as manifest tokens are.
+ */
+export function catalogueUtilities(
+  presentation: {
+    surfaces?: Record<string, { class: string }>
+    variants?: Record<string, { class: string }>
+    richText?: string[]
+  },
+  options: { warn?: PresentationWarningHandler } = {},
+): string[] {
+  const classes = new Set<string>()
+  const warn = options.warn || (() => {})
+  const declared = [
+    ...Object.values(presentation.surfaces || {}).map(option => option.class),
+    ...Object.values(presentation.variants || {}).map(option => option.class),
+    ...(presentation.richText || []),
+  ]
+
+  for (const value of declared) addLiteralUtilities(classes, value, warn)
+  return [...classes].sort()
+}
+
+/**
+ * Stand-in for a site that no longer uses free-text classes
+ * (`stirTheme.presentation.manifest: false`): nothing is fetched from Drupal.
+ */
+export function emptyPresentationManifest(): PresentationManifest {
+  return {
+    schemaVersion: 2,
+    site: { uuid: '', name: '', theme: '' },
+    capabilities: ['layout'],
+    used: {
+      grid: { columns: {}, gap: {}, matrix: false },
+      spacing: [],
+      width: [],
+      alignment: [],
+    },
+    legacyClasses: [],
+    diagnostics: { rejectedLegacyClassCount: 0 },
+    revision: 'disabled',
+  }
+}
+
 export function inlinePresentationSource(classes: string[]): string {
   const lines: string[] = []
 
@@ -414,7 +484,7 @@ export function inlinePresentationSource(classes: string[]): string {
  */
 export function buildPresentationSource(
   manifest: PresentationManifest,
-  options: { warn?: PresentationWarningHandler } = {},
+  options: { warn?: PresentationWarningHandler, extraUtilities?: string[] } = {},
 ): {
   source: string
   sourceRevision: string
@@ -426,6 +496,7 @@ export function buildPresentationSource(
 } {
   const utilities = [...new Set([
     ...layoutVocabulary(),
+    ...(options.extraUtilities || []),
     ...presentationUtilities(manifest, options),
   ])].sort()
   const source = inlinePresentationSource(utilities)

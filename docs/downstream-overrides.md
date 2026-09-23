@@ -266,6 +266,42 @@ slot to replace the default `UButton`s, for example with analytics buttons.
 - App-context edit links appear when authenticated.
 - Webform submit proxy still works.
 
+## Presentation choices (Surface and Variant)
+
+Editors style Layout paragraphs by picking a Surface and a Variant in Drupal
+instead of typing classes. The choices, and the classes they render, live in
+`app.config.ts`:
+
+```ts
+stirTheme: {
+  presentation: {
+    surfaces: {
+      spotlight: { label: 'Spotlight', class: 'bg-muted/50 py-10 lg:py-20' },
+    },
+    variants: {
+      'grid-card': { label: 'Grid card', class: 'p-7 lg:p-12 border' },
+    },
+    // Tailwind utilities used inside rich text.
+    richText: ['mb-4', 'text-center'],
+    // Once no content stores free-text classes.
+    manifest: false,
+  },
+},
+```
+
+- The layer adds Default, Muted and Inverted surfaces and the `action-group`,
+  `action-group-center` and `action-group-right` variants. Every declared class
+  is compiled.
+- `/api/stir/presentation-catalogue` serves the IDs and labels. Deploys run
+  `drush stir-layout:presentation-catalogue-refresh`, so Drupal offers exactly
+  what the deployed frontend renders.
+- Drupal sends the choices as the `surface` and `presentation_variant`
+  attributes. Without a known choice, the free-text `classes` still apply.
+- Moving existing content: map each stored `field_classes` value to choices
+  that render the same classes, then run
+  `drush stir-layout:presentation-classes-migrate --map=<file>` (with
+  `--dry-run` first). Compare rendered pages before and after.
+
 ## CMS presentation manifest
 
 Every build compiles every option the layout fields offer, whether or not
