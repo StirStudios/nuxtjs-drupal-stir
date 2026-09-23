@@ -23,6 +23,18 @@ untouched do not need one.
 
 ### Added
 
+- `stirTheme.presentation` declares the Surface and Variant choices editors
+  pick in Drupal, replacing free-text classes. The layer provides Default,
+  Muted and Inverted surfaces and the three `action-group` variants; projects
+  add their own as `{ label, class }`, plus a `richText` list of Tailwind
+  utilities used in rich text. The Layout paragraph renders the `surface` and
+  `presentationVariant` props as exactly those classes, so migrated content
+  looks the same. `/api/stir/presentation-catalogue` serves the choices' IDs
+  and labels for Drupal. Every declared class is compiled.
+- `stirTheme.presentation.manifest: false` stops the build fetching the CMS
+  presentation manifest, for sites whose content no longer stores free-text
+  classes. The build then needs nothing from Drupal.
+
 - `AppHeader`, `MediaVideo` and `EditPresentation` are split into smaller
   parts with unchanged props and output: `MediaVideoBackground` (the hero and
   bare background mode), `EditPresentationLayout` and `EditPresentationFields`,
