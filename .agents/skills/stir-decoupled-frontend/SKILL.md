@@ -23,6 +23,8 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 - Preserve Drupal status and access semantics. Do not turn upstream 401, 403, 404, validation, or redirect behavior into generic 200 responses.
 - Keep public origins deterministic across canonical URLs, sitemaps, redirects, media and metadata.
 - Document producer and consumer changes together. Maintain compatibility or introduce an explicit migration/version boundary.
+- Treat a layer component's props, emits and slots as consumer API too. A site component with the same resolved name replaces the layer's silently, so before changing them run `pnpm audit:overrides <site>` on each consumer; an override must match the layer's emit types or the site fails typecheck at deploy.
+- Type form events with Nuxt UI's own `FormSubmitEvent` and `FormErrorEvent`, and expose payload types through a public alias such as `#stir-auth/types`, so an override can name them instead of restating their shape.
 
 ## Build for SSR
 
@@ -32,6 +34,7 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 - Never place request-specific mutable refs at module scope. Use SSR-safe state with stable explicit keys.
 - Use typed, serializable runtime configuration. Put only intentionally public values under `runtimeConfig.public`.
 - Prefer semantic Nuxt UI components, theme tokens, variants, and Tailwind utilities before custom wrappers or CSS.
+- Style CMS content only through presentation choices: Surface and Variant entries and the `richText` list in `stirTheme.presentation`, never free-text classes, safelists or CMS-only `@source inline`. Read [presentation-choices.md](references/presentation-choices.md) before adding a style editors can pick, or before migrating a site off `field_classes`.
 - Prefer Nuxt Scripts and its registry, triggers, consent, lifecycle and loading-state APIs for third-party scripts. Keep a component-scoped loader only when a verified vendor contract requires DOM placement Nuxt Scripts cannot express; preserve origin allowlisting, cleanup, error state and regression coverage.
 - Declare every package imported by a published layer as its own direct dependency or peer dependency; do not rely on a consumer or another package exposing a transitive install.
 - Preserve accessible native semantics when mapping Drupal custom elements. Unknown elements must fail visibly and diagnostically, not silently disappear.
@@ -44,6 +47,7 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 - Validate mutation input server-side, enforce same-origin/CSRF protections as applicable, bound bodies and uploads, normalize upstream errors, and set explicit timeouts.
 - Do not expose raw upstream errors, tokens, internal hosts or stack traces.
 - Avoid speculative performance work. Measure production builds and representative Drupal payloads.
+- Every composable pulled into the initial graph is paid for by every visitor. Prefer ones already in the graph, and check `pnpm perf:report` before adding another: VueUse's `useStorage` alone added ~5 kB gzip to replace two small helpers.
 - Optimize LCP media, font delivery, hydration and bundle cost without degrading content semantics or interaction readiness.
 
 ## Verify proportionately
@@ -51,8 +55,8 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 1. Run focused unit/component tests for changed logic.
 2. Run Nuxt runtime tests for auto-imports, layers, plugins, composables, SSR and hydration behavior.
 3. Run contract tests when payloads, CE mappings, endpoints, auth, redirects, metadata or Webforms change.
-4. Run lint, typecheck and a production build; use `pnpm verify:ci` as the default production-impacting gate because it includes the core and downstream-consumer jobs.
-5. Smoke-test homepage, one inner CE route, menus, errors, and any affected mutation/auth path.
+4. Run lint, typecheck and a production build; use `pnpm verify:ci` as the default production-impacting gate because it includes the core and downstream-consumer jobs. Do not skip the build for server or layer-boundary changes: vitest and `vue-tsc` can pass while Nitro cannot load the code, for example when a consumer imports a layer's TypeScript server util without its `.ts` extension.
+5. Smoke-test homepage, one inner CE route, menus, errors, and any affected mutation/auth path. To see a page, build and serve the output (`node .output/server/index.mjs`): the in-app browser cannot render a `nuxt dev` server, because it blocks Vite's `/_nuxt/@fs/` asset URLs. If the build fails on `realpath '@img/sharp-…'`, `node_modules/@img` holds dangling platform links; run `rm -rf node_modules/@img && pnpm install`.
 6. Inspect initial HTML, Nuxt payload, response status/headers and browser console. Verify no hydration mismatch or duplicated request.
 7. Run accessibility checks for UI changes and manual keyboard/focus checks where interaction changes.
 8. For performance claims, compare at least three mobile production runs and report medians for LCP, INP or TBT as available, CLS, transfer and relevant request counts.
@@ -65,6 +69,9 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 4. Derive responsive media behavior from the configuration used by the active layout, not stale settings from an inactive rendering branch.
 5. Push, confirm GitHub reports the PR mergeable, and watch required checks to completion. Local green tests alone are not completion.
 6. Convert review findings into regression coverage when they describe behavior, compatibility, accessibility, SSR, hydration, or consumer risk.
+7. To move a consumer onto a new layer release, use `pnpm update @stir/base --latest`: plain `pnpm update` keeps the cached GitHub resolution. Confirm the lockfile's tarball commit changed before verifying.
+8. When dependencies update, re-check each pnpm override, patch and compatibility shim against the new versions and remove what the release fixed; record why each one that stays is still needed.
+9. Keep third-party scripts out of the initial bundle: load them with a dynamic `import()` once consent and configuration allow, and remove a module's client plugin through the `app:resolve` hook rather than patching it when it would import them eagerly.
 
 ## Report clearly
 
