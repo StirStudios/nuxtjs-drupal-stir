@@ -52,6 +52,8 @@ layer compiles all of them through `layoutVocabulary()`).
   surface, variant or `richText` entry instead.
 - Never branch Vue code on arbitrary class names from content. Model the switch
   as a variant and read the resolved classes, as `Paragraph/Layout.vue` does.
+- Layout and Text paragraphs share the same surfaces and variants, so name
+  choices for what they look like, not for one paragraph type.
 - Leave rich-text markup as it is: sites rely on iframes, embeds, inline styles
   and custom elements, so do not add an HTML filter to "clean" classes.
 - Removing an option leaves content that uses it selectable as "(no longer
@@ -66,8 +68,9 @@ layer compiles all of them through `layoutVocabulary()`).
    Drupal only after the Nuxt code declaring it is deployed.
 3. Drupal sends the stored IDs as the `surface` and `presentation_variant`
    Custom Elements attributes (`field_surface`, `field_presentation_variant`).
-4. `Paragraph/Layout.vue` resolves them with `resolvePresentationClasses()` to
-   the declared classes; with no known choice, legacy `classes` still apply.
+4. `Paragraph/Layout.vue` and `Paragraph/Text.vue` resolve them with
+   `resolvePresentationClasses()` to the declared classes, applied where the
+   free-text classes were; with no known choice, legacy `classes` still apply.
 
 ## Migrating a site off free-text classes
 
@@ -83,7 +86,8 @@ affected page; the only allowed differences are removed classes with no CSS.
 3. Write `config/presentation-classes.map.yml` (value to `{ surface, variant }`,
    `{  }` to drop a no-effect value) and dry-run
    `drush stir-layout:presentation-classes-migrate --map=… --dry-run` against the
-   real server's content; local databases drift.
+   real server's content; local databases drift. It covers Layout and Text
+   paragraphs in every revision, drafts and history included.
 4. Deploy step A: fields, exported config and catalogue, no content change.
    Compare pages.
 5. Deploy step B: a `hook_deploy_NAME()` in the site module runs the migrator
