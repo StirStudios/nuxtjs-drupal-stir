@@ -47,6 +47,13 @@ untouched do not need one.
 
 ### Changed
 
+- Every layout field option is now compiled whether or not content uses it
+  yet: grid columns 1-12 and gaps 0-20 at every breakpoint, plus each spacing,
+  width and alignment option. Before, a value an editor picked for the first
+  time had no CSS until the next build. Costs about 0.7 KB brotli on a site
+  with typical content, up to about 3 KB gzip on a near-empty one. The
+  presentation manifest still supplies free-text classes.
+
 - Plausible's tracker is no longer in the initial bundle (2.4 kB gzip). The
   analytics layer's bridge plugin loads it on demand once tracking is enabled
   and consent allows it, and `@nuxtjs/plausible`'s own client plugin is

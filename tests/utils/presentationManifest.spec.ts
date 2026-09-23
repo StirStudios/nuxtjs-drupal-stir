@@ -3,11 +3,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   buildPresentationSource,
   inlinePresentationSource,
+  layoutVocabulary,
   loadPresentationManifest,
   parsePresentationManifest,
   presentationUtilities,
   resolvePresentationManifestSource,
 } from '../../layers/theme/build/presentationManifest'
+import {
+  GRID_BREAKPOINTS,
+  WIDTH_MAX_WIDTH_CLASSES,
+  resolveAlignClasses,
+  resolveGridClasses,
+  resolveWidthClasses,
+  type AlignAxisValue,
+} from '../../layers/theme/app/utils/gridClasses'
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize)
@@ -125,6 +134,51 @@ describe('CMS presentation manifest', () => {
       'xl:px-[calc((100vw-72rem)/2+1.5rem)]',
       'lg:grid-cols-[8fr_4fr]',
     ]))
+  })
+
+  it('compiles every layout option whether or not content uses it', () => {
+    const manifest = parsePresentationManifest(fixture())
+    const { source } = buildPresentationSource({
+      ...manifest,
+      used: {
+        grid: { columns: {}, gap: {}, matrix: false },
+        spacing: [],
+        width: [],
+        alignment: [],
+      },
+      legacyClasses: [],
+    })
+
+    for (const utility of ['md:grid-cols-5', '2xl:gap-17', 'xs:basis-1/9', 'pt-10', 'lg:pt-20', 'lg:max-w-6xl', 'items-end']) {
+      expect(source).toContain(utility)
+    }
+  })
+
+  it('covers every class the layout resolvers can produce', () => {
+    const vocabulary = new Set(layoutVocabulary())
+    const produced = new Set<string>()
+    const collect = (classes: string) => classes.split(' ').filter(Boolean).forEach(utility => produced.add(utility))
+    const axis: Array<AlignAxisValue | undefined> = [undefined, 'start', 'center', 'end']
+
+    for (const breakpoint of GRID_BREAKPOINTS) {
+      for (let columns = 1; columns <= 12; columns++) {
+        collect(resolveGridClasses({ columns: { [breakpoint]: columns } }))
+        collect(resolveGridClasses({ columns: { [breakpoint]: columns } }, 'carousel'))
+      }
+      for (let gap = 0; gap <= 20; gap++) collect(resolveGridClasses({ gap: { [breakpoint]: gap } }))
+    }
+    for (const justify of axis) {
+      for (const items of axis) {
+        for (const text of axis) {
+          const align = { justify, items, text }
+
+          collect(resolveAlignClasses(align))
+          for (const width of Object.keys(WIDTH_MAX_WIDTH_CLASSES)) collect(resolveWidthClasses(width, align))
+        }
+      }
+    }
+
+    expect([...produced].filter(utility => !vocabulary.has(utility))).toEqual([])
   })
 
   it('emits literal Tailwind 4 inline sources', () => {

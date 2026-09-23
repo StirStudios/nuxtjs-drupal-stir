@@ -3,28 +3,23 @@
   "fixture": "tests/fixtures/minimal-consumer",
   "manifest": "contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json",
   "presentation": {
-    "bytes": 228047,
-    "gzipBytes": 30082,
+    "bytes": 247959,
+    "gzipBytes": 33132,
     "assets": [
       {
-        "file": "Carousel.-vknDqc8.css",
-        "bytes": 234,
-        "gzipBytes": 127
+        "file": "Carousel.CTV-5Fjp.css",
+        "bytes": 313,
+        "gzipBytes": 171
       },
       {
-        "file": "MediaModal.BtaPd4iw.css",
-        "bytes": 160,
-        "gzipBytes": 145
-      },
-      {
-        "file": "Tabs.D5X58FDo.css",
+        "file": "Tabs.c7xAGRrg.css",
         "bytes": 236,
-        "gzipBytes": 175
+        "gzipBytes": 174
       },
       {
-        "file": "entry.DVF4FBxG.css",
-        "bytes": 227417,
-        "gzipBytes": 29635
+        "file": "entry.tu_kmCn3.css",
+        "bytes": 247410,
+        "gzipBytes": 32787
       }
     ]
   }
