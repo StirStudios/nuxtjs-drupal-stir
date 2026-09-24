@@ -189,7 +189,7 @@ const menuUi = computed(() => ({
     headerUi.content,
     mobileOnlyClass.value,
     menuAngled.value
-      && 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-[0_0_2.5rem_-0.5rem_rgb(0_0_0/0.15)] !ring-0 sm:!ring-0',
+      && 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-(--stir-menu-shadow) !ring-0 sm:!ring-0',
     headerClassName(theme.navigation.slideover?.content) || (menuAngled.value && '!bg-default'),
   ),
   header: joinHeaderClasses(
