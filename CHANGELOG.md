@@ -60,11 +60,12 @@ untouched do not need one.
 ### Changed
 
 - The angled mobile menu panel (`navigation.slideover.angle`) now casts a
-  soft shadow off its inner edge (`0 0 2.5rem -0.5rem`, 15% black), where
-  before it had no shadow at all.
-  Its open-state clip path reaches `--stir-menu-shadow-room` (3rem) past the
-  inner edge so the shadow is not cropped. Opt out with `!shadow-none` in
-  `navigation.slideover.content`.
+  soft shadow off its inner edge, where before it had none. It fades in over
+  `--stir-menu-shadow-duration` (480ms) once the panel has landed, and fades
+  out before the panel closes. Tune it with `--stir-menu-shadow` (defaults to
+  `0 0 2.5rem -0.5rem` at `--stir-menu-shadow-strength`, 0.15) or opt out with
+  `!shadow-none` in `navigation.slideover.content`. The panel's angled edge now
+  eases to rest on the panel edge instead of stopping short of the curve's end.
 
 - Every layout field option is now compiled whether or not content uses it
   yet: grid columns 1-12 and gaps 0-20 at every breakpoint, plus each spacing,
