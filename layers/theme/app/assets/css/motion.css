@@ -1,11 +1,4 @@
 /* Slideover animation system (single source of truth via CSS vars) */
-@property --stir-menu-shadow-alpha {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 0;
-}
-
-/* The angled edge lands exactly on the panel edge so it eases to rest. */
 @keyframes stir-menu-panel-in {
   from {
     clip-path: var(--stir-menu-clip-from);
@@ -13,80 +6,52 @@
   }
 
   to {
-    clip-path: var(--stir-menu-clip-edge);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transform: translate3d(0, 0, 0);
   }
 }
 
-/* Then the clip widens while the shadow is transparent, and it fades in. */
-@keyframes stir-menu-shadow-in {
+@keyframes stir-menu-panel-out {
   from {
-    clip-path: var(--stir-menu-clip-open);
-    --stir-menu-shadow-alpha: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    clip-path: var(--stir-menu-clip-open);
+    clip-path: var(--stir-menu-clip-from);
+    transform: translate3d(var(--stir-menu-content-x), 0, 0);
   }
 }
 
-/*
-One animation, because Reka unmounts the panel when any of its animations
-ends. The shadow fades during the closing curve's near-still start, then the
-clip returns to the edge.
-*/
-@keyframes stir-menu-panel-out {
-  0% {
-    clip-path: var(--stir-menu-clip-open);
-    transform: translate3d(0, 0, 0);
-    --stir-menu-shadow-alpha: var(--stir-menu-shadow-strength);
-    animation-timing-function: ease-out;
+@keyframes stir-menu-shadow-in {
+  from {
+    opacity: 0;
   }
+}
 
-  15% {
-    clip-path: var(--stir-menu-clip-open);
-    transform: translate3d(0, 0, 0);
-    --stir-menu-shadow-alpha: 0;
-    animation-timing-function: step-end;
-  }
-
-  15.1% {
-    clip-path: var(--stir-menu-clip-edge);
-    transform: translate3d(0, 0, 0);
-    --stir-menu-shadow-alpha: 0;
-    animation-timing-function: var(--stir-menu-ease-out);
-  }
-
-  100% {
-    clip-path: var(--stir-menu-clip-from);
-    transform: translate3d(var(--stir-menu-content-x), 0, 0);
-    --stir-menu-shadow-alpha: 0;
+@keyframes stir-menu-shadow-out {
+  to {
+    opacity: 0;
   }
 }
 
 @layer components {
-  .stir-menu-panel {
+  .stir-menu-panel,
+  .stir-menu-overlay {
     --stir-menu-duration: 980ms;
     --stir-menu-ease-in: cubic-bezier(0.16, 0.72, 0.28, 1);
     --stir-menu-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
     --stir-menu-offset-x: 1.5rem;
-    /* Open state reaches past the inner edge so the panel's shadow shows. */
-    --stir-menu-shadow-room: 3rem;
     --stir-menu-shadow-duration: 480ms;
-    --stir-menu-shadow-strength: 0.15;
-    --stir-menu-shadow: 0 0 2.5rem -0.5rem rgb(0 0 0 / var(--stir-menu-shadow-alpha));
-    --stir-menu-clip-edge: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
 
+  .stir-menu-panel {
     background: var(--stir-menu-panel-bg, var(--ui-bg));
   }
 
   .stir-menu-panel[data-state='open'] {
-    --stir-menu-shadow-alpha: var(--stir-menu-shadow-strength);
-
-    animation:
-      stir-menu-panel-in var(--stir-menu-duration) var(--stir-menu-ease-in) both,
-      stir-menu-shadow-in var(--stir-menu-shadow-duration) ease-out
-        var(--stir-menu-duration) forwards !important;
+    animation: stir-menu-panel-in var(--stir-menu-duration)
+      var(--stir-menu-ease-in) both !important;
   }
 
   .stir-menu-panel[data-state='closed'] {
@@ -101,12 +66,6 @@ clip returns to the edge.
       0 100%,
       0 100%
     );
-    --stir-menu-clip-open: polygon(
-      0 0,
-      calc(100% + var(--stir-menu-shadow-room)) 0,
-      calc(100% + var(--stir-menu-shadow-room)) 100%,
-      0 100%
-    );
     --stir-menu-content-x: calc(var(--stir-menu-offset-x) * -1);
   }
 
@@ -117,16 +76,48 @@ clip returns to the edge.
       100% 100%,
       100% 100%
     );
-    --stir-menu-clip-open: polygon(
-      calc(var(--stir-menu-shadow-room) * -1) 0,
-      100% 0,
-      100% 100%,
-      calc(var(--stir-menu-shadow-room) * -1) 100%
-    );
     --stir-menu-content-x: var(--stir-menu-offset-x);
   }
 
+  /*
+  The panel's clip-path would crop its own shadow, so the overlay draws it: a
+  soft gradient, matching a shadow-lg/5, from the panel edge (the panel is min(100%, --stir-menu-width) wide)
+  that fades in once the panel lands and fades out as it starts to close.
+  */
+  .stir-menu-overlay {
+    --stir-menu-width: 28rem;
+    --stir-menu-shadow-color: rgb(0 0 0 / 0.05);
+    --stir-menu-shadow-size: 1rem;
+    --stir-menu-shadow-direction: to left;
+    --stir-menu-edge: min(100%, var(--stir-menu-width));
+
+    /* Eased falloff like a shadow-lg/5, not a linear stripe. */
+    background-image: linear-gradient(
+      var(--stir-menu-shadow-direction),
+      transparent var(--stir-menu-edge),
+      var(--stir-menu-shadow-color) var(--stir-menu-edge),
+      color-mix(in oklab, var(--stir-menu-shadow-color) 40%, transparent)
+        calc(var(--stir-menu-edge) + var(--stir-menu-shadow-size) * 0.35),
+      transparent calc(var(--stir-menu-edge) + var(--stir-menu-shadow-size))
+    );
+  }
+
+  .stir-menu-overlay-left {
+    --stir-menu-shadow-direction: to right;
+  }
+
+  .stir-menu-overlay[data-state='open'] {
+    animation: stir-menu-shadow-in var(--stir-menu-shadow-duration) ease-out
+      var(--stir-menu-duration) both !important;
+  }
+
+  .stir-menu-overlay[data-state='closed'] {
+    animation: stir-menu-shadow-out var(--stir-menu-shadow-duration) ease-out
+      both !important;
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .stir-menu-overlay[data-state],
     .stir-menu-panel[data-state] {
       animation: none !important;
     }

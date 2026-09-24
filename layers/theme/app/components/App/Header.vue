@@ -184,12 +184,16 @@ const menuContent = computed<SlideoverContentAttrs>(() => ({
   style: headerMenuAngleStyle(theme.navigation.slideover),
 }))
 const menuUi = computed(() => ({
-  overlay: joinHeaderClasses(mobileOnlyClass.value, menuAngled.value && '!bg-transparent'),
+  overlay: joinHeaderClasses(
+    mobileOnlyClass.value,
+    menuAngled.value && '!bg-transparent stir-menu-overlay',
+    menuAngled.value && menuSide.value === 'left' && 'stir-menu-overlay-left',
+  ),
   content: joinHeaderClasses(
     headerUi.content,
     mobileOnlyClass.value,
     menuAngled.value
-      && 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-(--stir-menu-shadow) !ring-0 sm:!ring-0',
+      && 'stir-menu-panel !overflow-hidden !border-0 !divide-y-0 !shadow-none !ring-0 sm:!ring-0',
     headerClassName(theme.navigation.slideover?.content) || (menuAngled.value && '!bg-default'),
   ),
   header: joinHeaderClasses(
