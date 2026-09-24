@@ -140,8 +140,10 @@ export function resolvePageRouteHeroImages(page: RouteHeroPage): RouteHeroImage[
 
 /**
  * Builds a hero from a Drupal page payload: the first Hero paragraph in the
- * `hero` slot supplies copy, actions and media; the page title and metatag
- * description fill anything left blank.
+ * `hero` slot supplies copy, actions and media, and the page title fills a
+ * blank header. The description is only ever the authored Hero text: a meta
+ * description is written for search results and usually repeats the page's
+ * opening paragraph.
  */
 export function resolvePageRouteHero(
   page: RouteHeroPage,
@@ -161,7 +163,7 @@ export function resolvePageRouteHero(
       || text(page?.title)
       || withoutSiteSuffix(metaContent(page, 'title'), siteName),
     eyebrow: text(heroNode?.props?.eyebrow),
-    description: plainText(heroNode?.props?.text) || metaContent(page, 'description'),
+    description: plainText(heroNode?.props?.text),
     actions: slotNodes(heroNode, 'button')
       .map(payloadAction)
       .filter((action): action is RouteHeroAction => Boolean(action)),

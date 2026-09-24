@@ -59,6 +59,12 @@ untouched do not need one.
 
 ### Changed
 
+- Drupal page heroes no longer fall back to the page's meta description. A
+  meta description is written for search results and usually repeats the
+  page's opening paragraph, so a page without Hero paragraph text now shows
+  just its title. Projects that relied on the fallback should add the copy as
+  Hero paragraph text.
+
 - The angled mobile menu (`navigation.slideover.angle`) now has a soft shadow
   off its inner edge, where before it had none. The overlay draws it as a
   gradient, since the panel's clip-path would crop its own shadow. It fades in
