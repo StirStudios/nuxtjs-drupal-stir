@@ -6,6 +6,14 @@ export type ThirdPartyScriptKind = 'calculator' | 'enzuzo'
 type ThirdPartyScriptOptions = {
   allowedOrigins?: MaybeRefOrGetter<readonly string[] | undefined>
   attrs?: Record<string, string>
+  /**
+   * Set to false for a host that answers every request with one fixed
+   * `Access-Control-Allow-Origin`. `useScript` adds `crossorigin="anonymous"`
+   * to every cross-origin script, which makes the browser enforce CORS and
+   * block the response. Without the attribute the script loads as an ordinary
+   * no-CORS script. Leave unset to keep the stricter default.
+   */
+  crossorigin?: false
   id?: string
   immediate?: boolean
   isReady?: () => boolean
@@ -105,6 +113,12 @@ export function useThirdPartyScript(
       try {
         const script = await nuxtApp.runWithContext(() => useScript({
           ...options.attrs,
+          // unhead types this attribute as its CORS values only, but its DOM
+          // renderer skips any prop set to false. That is the only way to stop
+          // it defaulting a cross-origin script to crossorigin="anonymous".
+          ...(options.crossorigin === false
+            ? { crossorigin: false as unknown as 'anonymous' }
+            : {}),
           src: url,
           id: options.id,
           defer: true,

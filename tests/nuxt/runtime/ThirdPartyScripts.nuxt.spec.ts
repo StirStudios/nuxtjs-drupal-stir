@@ -41,6 +41,10 @@ mockNuxtImport('useCookie', () => () => consentCookie)
 
 const ScriptHarness = defineComponent({
   props: {
+    crossorigin: {
+      type: Boolean,
+      default: true,
+    },
     immediate: {
       type: Boolean,
       default: true,
@@ -60,6 +64,7 @@ const ScriptHarness = defineComponent({
     const { requestLoad, isLoaded, error } = useThirdPartyScript(toRef(props, 'src'), {
       // Prevent happy-dom from auto-completing disabled external script loads.
       attrs: { type: 'application/x-stir-test' },
+      crossorigin: props.crossorigin ? undefined : false,
       immediate: props.immediate,
       kind: 'enzuzo',
       requiresConsent: props.requiresConsent,
@@ -201,6 +206,32 @@ describe('useThirdPartyScript (Nuxt runtime)', () => {
     })
     document.querySelector(`script[src="${src}"]`)!.dispatchEvent(new Event('load'))
     await vi.waitFor(() => expect(wrapper.get('.loaded').text()).toBe('true'))
+    wrapper.unmount()
+  })
+
+  it('requests cross-origin scripts with CORS by default', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/crossorigin-default'
+
+    appConfig.value.privacyNotice.mode = 'notice'
+    const wrapper = await mountSuspended(ScriptHarness, { props: { src } })
+
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
+    expect(document.querySelector(`script[src="${src}"]`)?.getAttribute('crossorigin'))
+      .toBe('anonymous')
+    wrapper.unmount()
+  })
+
+  it('omits crossorigin when the host cannot answer CORS requests', async () => {
+    const src = 'https://app.enzuzo.com/scripts/privacy/crossorigin-opt-out'
+
+    appConfig.value.privacyNotice.mode = 'notice'
+    const wrapper = await mountSuspended(ScriptHarness, {
+      props: { crossorigin: false, src },
+    })
+
+    await vi.waitFor(() => expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull())
+    expect(document.querySelector(`script[src="${src}"]`)?.hasAttribute('crossorigin'))
+      .toBe(false)
     wrapper.unmount()
   })
 

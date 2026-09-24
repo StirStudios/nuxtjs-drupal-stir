@@ -90,6 +90,14 @@ untouched do not need one.
 
 ### Fixed
 
+- The Calendly paragraph loads again. `useScript` adds
+  `crossorigin="anonymous"` to every cross-origin script, and Calendly's CDN
+  answers every origin with `Access-Control-Allow-Origin: https://calendly.com`,
+  so browsers blocked the widget script. `useThirdPartyScript` takes a new
+  `crossorigin: false` option that omits the attribute, and the Calendly
+  composable sets it. Other third-party scripts keep the stricter default, and
+  the allowed-origin check is unchanged.
+
 - `stir-compliance` no longer reports a Webform as storing submitter IPs when
   the form's own `form_disable_remote_addr` is `false` but the site-wide
   `default_form_disable_remote_addr` is on. Webform falls back to the site-wide
