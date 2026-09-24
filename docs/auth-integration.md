@@ -29,6 +29,7 @@ From `stir_account`:
 - `POST /api/auth/password/validate`
 - `POST /api/auth/password/reset`
 - `POST /api/auth/verify`
+- `POST /api/auth/verify/resend`
 
 ## Source of truth
 

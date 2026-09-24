@@ -471,6 +471,7 @@
       "/api/auth/register-policy",
       "/api/auth/session",
       "/api/auth/verify",
+      "/api/auth/verify/resend",
       "/api/drupal-ce",
       "/api/drupal-ce/**",
       "/api/formatted-text/:entityType/:entityId/:fieldName",
@@ -818,18 +819,18 @@
     "utils": 73,
     "plugins": 8,
     "middleware": 4,
-    "serverRoutes": 28,
+    "serverRoutes": 29,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 208,
+    "tests": 210,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
       "nuxt": 87,
       "scripts": 5,
-      "server": 30,
+      "server": 31,
       "unit": 11,
-      "utils": 61
+      "utils": 62
     }
   },
   "tests": [
@@ -946,6 +947,7 @@
     "tests/server/authSession.spec.ts",
     "tests/server/authUiConfigApi.spec.ts",
     "tests/server/authVerify.spec.ts",
+    "tests/server/authVerifyResend.spec.ts",
     "tests/server/componentTree.spec.ts",
     "tests/server/drupalCeProxy.spec.ts",
     "tests/server/drupalOneTimeLoginRedirect.spec.ts",
@@ -995,6 +997,7 @@
     "tests/utils/drupalViewQueryNamespace.spec.ts",
     "tests/utils/drupalViewState.spec.ts",
     "tests/utils/editableRichText.spec.ts",
+    "tests/utils/fetchError.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",

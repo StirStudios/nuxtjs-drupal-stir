@@ -47,6 +47,12 @@ export function useAuthApi() {
       body: payload,
     })
 
+  const resendVerification = (identifier: string) =>
+    $fetch('/api/auth/verify/resend', {
+      method: 'POST',
+      body: { identifier },
+    })
+
   const loginProtected = (password: string, turnstileResponse: string) =>
     $fetch('/api/auth/protected', {
       method: 'POST',
@@ -69,6 +75,7 @@ export function useAuthApi() {
     requestPasswordReset,
     resetPassword,
     validatePasswordReset,
+    resendVerification,
     loginProtected,
     logoutProtected,
   }

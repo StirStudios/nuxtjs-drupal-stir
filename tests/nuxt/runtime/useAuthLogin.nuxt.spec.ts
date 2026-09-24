@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
-import { clearNuxtData } from '#app'
-import { defineComponent } from 'vue'
-import { createError } from 'h3'
+import { clearNuxtData, useState } from '#app'
+import { defineComponent, nextTick, type Ref } from 'vue'
+import { createError, readBody } from 'h3'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import {
   useAuthLogin,
@@ -179,6 +179,128 @@ describe('useAuthLogin Turnstile token', () => {
     await login!.onSubmit(submitEvent)
 
     expect(login!.turnstileToken.value).toBe('')
+    wrapper.unmount()
+  })
+})
+
+describe('useAuthLogin failures', () => {
+  let unregister: Array<() => void> = []
+  let resendBodies: unknown[] = []
+
+  /**
+   * Mounts the composable, submits once and returns it with the toasts shown.
+   */
+  async function failSignIn(options?: StirAuthLoginOptions) {
+    let login: ReturnType<typeof useAuthLogin> | undefined
+    let toasts: Ref<Array<Record<string, unknown>>> | undefined
+
+    const LoginHarness = defineComponent({
+      setup() {
+        login = useAuthLogin(options)
+        toasts = useState('toasts')
+
+        return () => null
+      },
+    })
+
+    const wrapper = await mountSuspended(LoginHarness)
+
+    toasts!.value = []
+    await login!.onSubmit(submitEvent)
+    await nextTick()
+    await nextTick()
+
+    return { login: login!, toasts: toasts!, wrapper }
+  }
+
+  const rejectLogin = (statusCode: number, message: string, code?: string) => {
+    unregister.push(registerEndpoint('/api/auth/login', () => {
+      throw createError({
+        statusCode,
+        statusMessage: message,
+        ...(code ? { data: { code } } : {}),
+      })
+    }))
+  }
+
+  beforeEach(() => {
+    resendBodies = []
+    clearNuxtData('stir-auth-ui-config')
+    unregister = [
+      registerEndpoint('/api/auth/config', () => ({
+        version: 2,
+        accountsEnabled: true,
+      })),
+      registerEndpoint('/api/auth/verify/resend', {
+        method: 'POST',
+        handler: async (event) => {
+          resendBodies.push(await readBody(event))
+
+          return { accepted: true }
+        },
+      }),
+    ]
+  })
+
+  afterEach(() => {
+    for (const remove of unregister) remove()
+    unregister = []
+    clearNuxtData('stir-auth-ui-config')
+  })
+
+  it('shows Drupal\'s message once, under a distinct title', async () => {
+    rejectLogin(401, 'The email or password is incorrect.', 'invalid_credentials')
+
+    const { login, toasts, wrapper } = await failSignIn()
+
+    expect(login.error.value).toEqual({
+      title: 'Couldn\'t sign you in',
+      message: 'The email or password is incorrect.',
+      code: 'invalid_credentials',
+    })
+    expect(login.errorActions.value).toEqual([])
+    expect(toasts.value).toHaveLength(1)
+    expect(toasts.value[0]).toMatchObject({
+      title: 'Couldn\'t sign you in',
+      description: 'The email or password is incorrect.',
+      color: 'error',
+    })
+    wrapper.unmount()
+  })
+
+  it('offers to resend the verification email', async () => {
+    rejectLogin(
+      403,
+      'Please verify your email address before signing in.',
+      'verification_required',
+    )
+
+    const { login, toasts, wrapper } = await failSignIn()
+    const [action] = login.errorActions.value
+
+    expect(action?.label).toBe('Resend verification email')
+    expect((toasts.value[0]?.actions as unknown[])).toHaveLength(1)
+
+    await login.resendVerification()
+    await nextTick()
+
+    expect(resendBodies).toEqual([{ identifier: 'demo@example.com' }])
+    expect(toasts.value.at(-1)).toMatchObject({
+      description:
+        'If that address has an account waiting for verification, we\'ve sent a new link.',
+      color: 'success',
+    })
+    wrapper.unmount()
+  })
+
+  it('leaves the failure to the page when toasts are off', async () => {
+    rejectLogin(401, 'The email or password is incorrect.')
+
+    const { login, toasts, wrapper } = await failSignIn({ toastErrors: false })
+
+    expect(login.error.value?.message).toBe('The email or password is incorrect.')
+    expect(login.error.value?.code).toBe('')
+    expect(toasts.value).toEqual([])
     wrapper.unmount()
   })
 })

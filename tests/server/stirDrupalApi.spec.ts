@@ -431,6 +431,35 @@ describe('Stir Drupal API boundary', () => {
     }))
   })
 
+  it('forwards the Drupal error code for a user-facing 4xx', () => {
+    expect(() => throwStirDrupalApiError({
+      status: 403,
+      data: {
+        error: 'Please verify your email address before signing in.',
+        code: 'verification_required',
+      },
+    }, 'Invalid credentials', 401)).toThrow(expect.objectContaining({
+      statusCode: 403,
+      statusMessage: 'Please verify your email address before signing in.',
+      data: { code: 'verification_required' },
+    }))
+  })
+
+  it('does not forward codes from server errors or free-form values', () => {
+    const thrown = (error: unknown): unknown => {
+      try {
+        throwStirDrupalApiError(error)
+      } catch (caught) {
+        return caught
+      }
+    }
+
+    expect(thrown({ status: 500, data: { code: 'db_down' } }))
+      .toHaveProperty('data', undefined)
+    expect(thrown({ status: 401, data: { code: 'Stack trace: at /var/www' } }))
+      .toHaveProperty('data', undefined)
+  })
+
   it('reports upstream failures through the Nitro error hook', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',

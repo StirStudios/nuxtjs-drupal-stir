@@ -90,6 +90,26 @@ untouched do not need one.
 
 ### Fixed
 
+- **A failed sign-in shows Drupal's reason.** `getFetchErrorMessage()` (and so
+  `useAuthLogin`, `useAuthRegister`, `usePasswordRequest`, `usePasswordReset`)
+  read only `error.statusMessage`, which is empty over HTTP/2, and a string
+  `data.error`, which Nitro sends as `true`. Every failure showed the generic
+  fallback, such as "Sign-in failed." twice. It now reads the response body's
+  `statusMessage` and `message` first. `throwStirDrupalApiError()` forwards
+  Drupal's snake_case `code` on 4xx responses as `data.code`, read with the new
+  `getFetchErrorCode()`.
+- `useAuthLogin` titles a failure "Couldn't sign you in" with the server's
+  message, falling back to "Check your email and password and try again.".
+  When Drupal answers `verification_required` (stir-tools login contract), the
+  toast offers "Resend verification email", sent through the new
+  `POST /api/auth/verify/resend` proxy to stir_account's non-enumerating
+  endpoint. The composable also returns `error`, `errorActions`,
+  `isResending` and `resendVerification`, and takes `toastErrors: false` for
+  pages that show the error inline. The layer's `/auth/login` page now does
+  that with a `role="alert"` `UAlert` in the form. Pages that override the
+  login page keep the toast and need no change; to show the error inline,
+  render the alert in the `#validation` slot and pass `toastErrors: false`.
+
 - The Calendly paragraph loads again. `useScript` adds
   `crossorigin="anonymous"` to every cross-origin script, and Calendly's CDN
   answers every origin with `Access-Control-Allow-Origin: https://calendly.com`,
