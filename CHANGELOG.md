@@ -63,9 +63,10 @@ untouched do not need one.
   off its inner edge, where before it had none. The overlay draws it as a
   gradient, since the panel's clip-path would crop its own shadow. It fades in
   over `--stir-menu-shadow-duration` (480ms) once the panel lands and fades out
-  over the same time as the panel starts to close. Tune it with
-  `--stir-menu-shadow-color` and `--stir-menu-width` (28rem, the panel's
-  `max-w-md`) on `.stir-menu-overlay`.
+  over the same time as the panel starts to close. It matches a
+  `shadow-lg/5`: 5% black at the edge, easing out over 1rem. Tune it with
+  `--stir-menu-shadow-color`, `--stir-menu-shadow-size` and `--stir-menu-width`
+  (28rem, the panel's `max-w-md`) on `.stir-menu-overlay`.
 
 - Every layout field option is now compiled whether or not content uses it
   yet: grid columns 1-12 and gaps 0-20 at every breakpoint, plus each spacing,

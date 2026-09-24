@@ -81,20 +81,24 @@
 
   /*
   The panel's clip-path would crop its own shadow, so the overlay draws it: a
-  gradient from the panel edge (the panel is min(100%, --stir-menu-width) wide)
+  soft gradient, matching a shadow-lg/5, from the panel edge (the panel is min(100%, --stir-menu-width) wide)
   that fades in once the panel lands and fades out as it starts to close.
   */
   .stir-menu-overlay {
     --stir-menu-width: 28rem;
-    --stir-menu-shadow-color: rgb(0 0 0 / 0.1);
+    --stir-menu-shadow-color: rgb(0 0 0 / 0.05);
+    --stir-menu-shadow-size: 1rem;
     --stir-menu-shadow-direction: to left;
     --stir-menu-edge: min(100%, var(--stir-menu-width));
 
+    /* Eased falloff like a shadow-lg/5, not a linear stripe. */
     background-image: linear-gradient(
       var(--stir-menu-shadow-direction),
       transparent var(--stir-menu-edge),
       var(--stir-menu-shadow-color) var(--stir-menu-edge),
-      transparent calc(var(--stir-menu-edge) + 2.5rem)
+      color-mix(in oklab, var(--stir-menu-shadow-color) 40%, transparent)
+        calc(var(--stir-menu-edge) + var(--stir-menu-shadow-size) * 0.35),
+      transparent calc(var(--stir-menu-edge) + var(--stir-menu-shadow-size))
     );
   }
 
