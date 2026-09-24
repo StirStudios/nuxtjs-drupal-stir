@@ -2,8 +2,16 @@
 import { useAuthLogin } from '../../composables/useAuthLogin'
 import { useAuthConfig } from '../../composables/useAuthConfig'
 
-const { fields, turnstileToken, validate, onSubmit, onError, isLoading } =
-  useAuthLogin()
+const {
+  fields,
+  turnstileToken,
+  validate,
+  onSubmit,
+  onError,
+  isLoading,
+  error,
+  errorActions,
+} = useAuthLogin({ toastErrors: false })
 const { auth } = useAuthConfig()
 
 const title = computed(() => auth.value.login?.title || 'Sign in')
@@ -38,6 +46,16 @@ useSeoMeta({
       </template>
       <template #validation>
         <FieldTurnstile v-model="turnstileToken" />
+        <UAlert
+          v-if="error"
+          :actions="errorActions"
+          color="error"
+          :description="error.message"
+          icon="i-lucide-circle-alert"
+          role="alert"
+          :title="error.title"
+          variant="subtle"
+        />
       </template>
     </AuthCard>
   </AuthPage>

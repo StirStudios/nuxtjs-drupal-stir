@@ -1,4 +1,4 @@
-import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
+import type { AuthFormField, ButtonProps, FormSubmitEvent } from '@nuxt/ui'
 import type { RouteLocationRaw } from 'vue-router'
 import { useAuthActions } from './useAuthActions'
 import { useAuthConfig } from './useAuthConfig'
@@ -27,6 +27,19 @@ export type StirAuthLoginRedirectResult =
   | RouteLocationRaw
   | false
 
+export interface StirAuthLoginError {
+  title: string
+  /**
+   * Drupal's message, or a generic hint when the response carried none.
+   */
+  message: string
+  /**
+   * Drupal's machine-readable reason, such as `invalid_credentials` or
+   * `verification_required`; empty when the response carried none.
+   */
+  code: string
+}
+
 export interface StirAuthLoginOptions {
   /**
    * Chooses where to send the visitor after a successful sign-in.
@@ -42,13 +55,25 @@ export interface StirAuthLoginOptions {
   redirectTo?: (
     context: StirAuthLoginRedirectContext,
   ) => StirAuthLoginRedirectResult | Promise<StirAuthLoginRedirectResult>
+  /**
+   * Shows a failed sign-in as a toast. Set to `false` when the page renders
+   * the returned `error` inline, so the failure is not announced twice.
+   */
+  toastErrors?: boolean
 }
 
 export function useAuthLogin(options: StirAuthLoginOptions = {}) {
   const toast = useToast()
   const isLoading = ref(false)
   const turnstileToken = ref('')
-  const { login, getFetchErrorMessage } = useAuthActions()
+  const error = ref<StirAuthLoginError | null>(null)
+  const isResending = ref(false)
+  const {
+    login,
+    resendVerification: requestVerificationEmail,
+    getFetchErrorMessage,
+    getFetchErrorCode,
+  } = useAuthActions()
   const { auth } = useAuthConfig()
   const session = useAuthSession()
   const route = useRoute()
@@ -89,14 +114,55 @@ export function useAuthLogin(options: StirAuthLoginOptions = {}) {
     )
   }
 
+  let lastIdentifier = ''
+
+  const resendVerification = async () => {
+    if (!lastIdentifier || isResending.value) return
+
+    isResending.value = true
+
+    try {
+      await requestVerificationEmail(lastIdentifier)
+      toast.add({
+        title: 'Check your inbox',
+        description:
+          'If that address has an account waiting for verification, we\'ve sent a new link.',
+        color: 'success',
+      })
+    } catch (resendError: unknown) {
+      toast.add({
+        title: 'Couldn\'t send the email',
+        description: getFetchErrorMessage(
+          resendError,
+          'Please try again in a few minutes.',
+        ),
+        color: 'error',
+      })
+    } finally {
+      isResending.value = false
+    }
+  }
+
+  const errorActions = computed<ButtonProps[]>(() =>
+    error.value?.code === 'verification_required'
+      ? [{
+          label: 'Resend verification email',
+          loading: isResending.value,
+          onClick: resendVerification,
+        }]
+      : [],
+  )
+
   const onSubmit = async (
     event: FormSubmitEvent<AuthFormState>,
   ) => {
     isLoading.value = true
+    error.value = null
+    lastIdentifier = (event.data.identifier || '').trim()
 
     try {
       const loginResult = await login({
-        identifier: (event.data.identifier || '').trim(),
+        identifier: lastIdentifier,
         password: event.data.password || '',
         turnstile_response: turnstileToken.value,
       })
@@ -135,12 +201,26 @@ export function useAuthLogin(options: StirAuthLoginOptions = {}) {
           color: 'warning',
         })
       }
-    } catch (error: unknown) {
-      toast.add({
-        title: 'Sign-in failed',
-        description: getFetchErrorMessage(error, 'Sign-in failed.'),
-        color: 'error',
-      })
+    } catch (loginError: unknown) {
+      error.value = {
+        title: 'Couldn\'t sign you in',
+        message: getFetchErrorMessage(
+          loginError,
+          'Check your email and password and try again.',
+        ),
+        code: getFetchErrorCode(loginError),
+      }
+
+      if (options.toastErrors !== false) {
+        toast.add({
+          // A fixed id replaces the previous failure instead of stacking.
+          id: 'stir-auth-login-error',
+          title: error.value.title,
+          description: error.value.message,
+          color: 'error',
+          actions: errorActions.value,
+        })
+      }
       session.clearSession()
     } finally {
       isLoading.value = false
@@ -157,5 +237,9 @@ export function useAuthLogin(options: StirAuthLoginOptions = {}) {
     onSubmit,
     onError,
     isLoading,
+    error,
+    errorActions,
+    isResending,
+    resendVerification,
   }
 }

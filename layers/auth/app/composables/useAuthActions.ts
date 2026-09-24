@@ -1,5 +1,5 @@
 import type { RegisterPayload } from '../types/auth'
-import { getFetchErrorMessage } from '../utils/fetchError'
+import { getFetchErrorCode, getFetchErrorMessage } from '../utils/fetchError'
 import { useAuthApi } from './auth/useAuthApi'
 import { useAuthSession } from './useAuthSession'
 
@@ -59,6 +59,9 @@ export function useAuthActions() {
     hash: string
   }) => authApi.validatePasswordReset(payload)
 
+  const resendVerification = (identifier: string) =>
+    authApi.resendVerification(identifier)
+
   return {
     login,
     logout,
@@ -66,6 +69,8 @@ export function useAuthActions() {
     requestPasswordReset,
     resetPassword,
     validatePasswordReset,
+    resendVerification,
     getFetchErrorMessage,
+    getFetchErrorCode,
   }
 }

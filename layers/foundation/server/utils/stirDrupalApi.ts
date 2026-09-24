@@ -419,6 +419,24 @@ export const extractStirDrupalErrorDetail = (error: unknown): string => {
   return primary
 }
 
+/**
+ * Reads the machine-readable `code` from a Drupal error body, such as
+ * `verification_required`. Only a short snake_case identifier passes, so
+ * nothing free-form from the upstream body reaches the client this way.
+ */
+const extractStirDrupalErrorCode = (error: unknown): string => {
+  const data = error && typeof error === 'object'
+    ? (error as { data?: unknown }).data
+    : undefined
+  const code = data && typeof data === 'object'
+    ? (data as Record<string, unknown>).code
+    : undefined
+
+  return typeof code === 'string' && /^[a-z][a-z0-9_]{0,63}$/.test(code)
+    ? code
+    : ''
+}
+
 export const throwStirDrupalApiError = (
   error: unknown,
   fallbackMessage = 'Request failed',
@@ -449,10 +467,14 @@ export const throwStirDrupalApiError = (
   const upstreamDetail = safeUpstreamError
     ? extractStirDrupalErrorDetail(error).trim()
     : ''
+  const upstreamCode = safeUpstreamError
+    ? extractStirDrupalErrorCode(error)
+    : ''
 
   throw createError({
     statusCode,
     statusMessage: upstreamDetail || fallbackMessage,
+    ...(upstreamCode ? { data: { code: upstreamCode } } : {}),
   })
 }
 

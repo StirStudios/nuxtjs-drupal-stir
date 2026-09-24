@@ -220,6 +220,36 @@ given, so pass a query parameter through `redirect` from the context rather
 than reading one yourself. Return `false` to navigate nowhere and let the page
 take over.
 
+### Sign-in errors
+
+A failed sign-in shows Drupal's message under the title "Couldn't sign you in".
+When Drupal answers with `code: 'verification_required'`, the error carries a
+"Resend verification email" action that posts the entered identifier to
+`/api/auth/verify/resend`. Drupal's reply does not reveal whether the account
+exists.
+
+By default the error is a toast. The layer's `/auth/login` page shows it inline
+instead, which stays on screen and is announced once:
+
+```vue
+<script setup lang="ts">
+const { error, errorActions, ...login } = useAuthLogin({ toastErrors: false })
+</script>
+
+<!-- Inside <AuthCard>, after any Turnstile field. -->
+<template #validation>
+  <UAlert
+    v-if="error"
+    :actions="errorActions"
+    color="error"
+    :description="error.message"
+    role="alert"
+    :title="error.title"
+    variant="subtle"
+  />
+</template>
+```
+
 ### Verification redirect
 
 `/auth/verify` carries a safe same-site `?redirect=` through to the sign-in
