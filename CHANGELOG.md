@@ -23,6 +23,10 @@ untouched do not need one.
 
 ### Added
 
+- `stir-compliance` detects Calendly from the Calendly paragraph module or its
+  paragraph type, and then requires Calendly in `technology.vendors` and the
+  Privacy Policy (or `technology.inactive.calendly` with the reason). Sites
+  without the paragraph are not asked about it.
 - `stirTheme.presentation` declares the Surface and Variant choices editors
   pick in Drupal, replacing free-text classes. The layer provides Default,
   Muted and Inverted surfaces and the three `action-group` variants; projects

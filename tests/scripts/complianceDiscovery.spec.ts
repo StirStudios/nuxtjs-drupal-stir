@@ -139,6 +139,30 @@ describe('compliance service discovery', () => {
     expect(result.warnings).toContain('privacy disclosures were not verified; add compliance/legal/<alias>.html or publish the page at owner.domain.')
   })
 
+  it('holds a site to Calendly only when it has the Calendly paragraph', () => {
+    const inventory = { technology: { vendors: [] }, consent: { mode: 'not-required' } }
+
+    expect(evaluateServices(signals(), inventory, { privacy: 'No third parties.' }).errors).toEqual([])
+
+    for (const evidence of [
+      { modules: new Set(['stir_layout_builder_paragraph_calendly']) },
+      { configNames: new Set(['paragraphs.paragraphs_type.calendly']) },
+    ]) {
+      expect(evaluateServices(signals(evidence), inventory, { privacy: 'No third parties.' }).errors).toEqual([
+        expect.stringMatching(/^Calendly scheduling is active \(Drupal (?:module|config) .+\) but not declared in technology\.vendors\.$/),
+        'Calendly scheduling is active, but the privacy document does not cover Calendly.',
+      ])
+    }
+
+    const disclosed = evaluateServices(
+      signals({ configNames: new Set(['paragraphs.paragraphs_type.calendly']) }),
+      { technology: { vendors: ['Calendly'] }, consent: { mode: 'not-required' } },
+      { privacy: 'We use Calendly to book consultations.' },
+    )
+
+    expect(disclosed.errors).toEqual([])
+  })
+
   it('accepts a documented inactive service and rejects an undocumented one', () => {
     const active = signals({ modules: new Set(['stir_bunny']) })
 

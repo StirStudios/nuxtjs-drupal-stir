@@ -196,6 +196,18 @@ export const SERVICE_RULES = [
     disclosures: [{ document: 'privacy', label: 'Instagram', pattern: /instagram/i }],
   },
   {
+    // The Calendly paragraph loads Calendly's scheduling widget, so a site
+    // with the bundle must disclose it or record why it is unused.
+    id: 'calendly',
+    label: 'Calendly scheduling',
+    detect: signals => [
+      ...modules(signals, /^stir_layout_builder_paragraph_calendly$/),
+      ...configs(signals, /^paragraphs\.paragraphs_type\.calendly$/),
+    ],
+    inventory: { path: 'technology.vendors', pattern: /calendly/i },
+    disclosures: [{ document: 'privacy', label: 'Calendly', pattern: /calendly/i }],
+  },
+  {
     id: 'accounts',
     label: 'Public user accounts',
     detect: signals =>
