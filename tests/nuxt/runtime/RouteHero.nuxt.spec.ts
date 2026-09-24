@@ -81,12 +81,11 @@ describe('route hero resolution', () => {
     })
   })
 
-  it('falls back to the page title and metatag description for blank authored values', () => {
+  it('falls back to the page title, never the metatag description, for blank authored values', () => {
     const blank = heroParagraph({ header: '  ', eyebrow: ' ', text: '<p> </p>' }, { button: [], media: [{ props: { src: ' ' } }] })
 
     expect(resolvePageRouteHero(drupalPage('node-page', [blank]))).toEqual({
       title: 'Drupal title',
-      description: 'Meta description',
       hideTitle: false,
       variant: 'simple',
     })

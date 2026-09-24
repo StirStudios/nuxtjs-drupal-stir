@@ -23,6 +23,10 @@ untouched do not need one.
 
 ### Added
 
+- `stir-compliance` detects Calendly from the Calendly paragraph module or its
+  paragraph type, and then requires Calendly in `technology.vendors` and the
+  Privacy Policy (or `technology.inactive.calendly` with the reason). Sites
+  without the paragraph are not asked about it.
 - `stirTheme.presentation` declares the Surface and Variant choices editors
   pick in Drupal, replacing free-text classes. The layer provides Default,
   Muted and Inverted surfaces and the three `action-group` variants; projects
@@ -58,6 +62,12 @@ untouched do not need one.
   open item; the default `'horizontal'` keeps Nuxt UI's two-column panel.
 
 ### Changed
+
+- Drupal page heroes no longer fall back to the page's meta description. A
+  meta description is written for search results and usually repeats the
+  page's opening paragraph, so a page without Hero paragraph text now shows
+  just its title. Projects that relied on the fallback should add the copy as
+  Hero paragraph text.
 
 - The angled mobile menu (`navigation.slideover.angle`) now has a soft shadow
   off its inner edge, where before it had none. The overlay draws it as a
