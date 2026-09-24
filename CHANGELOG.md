@@ -59,8 +59,9 @@ untouched do not need one.
 
 ### Changed
 
-- The angled mobile menu panel (`navigation.slideover.angle`) now has a
-  `shadow-lg/5` to lift it off the page, where before it had no shadow at all.
+- The angled mobile menu panel (`navigation.slideover.angle`) now casts a
+  soft shadow off its inner edge (`0 0 2.5rem -0.5rem`, 15% black), where
+  before it had no shadow at all.
   Its open-state clip path reaches `--stir-menu-shadow-room` (3rem) past the
   inner edge so the shadow is not cropped. Opt out with `!shadow-none` in
   `navigation.slideover.content`.
