@@ -67,6 +67,10 @@ export function useCalendlyWidget(
   const initialized = ref(false)
   const { isLoaded } = useThirdPartyScript(CALENDLY_SCRIPT_URL, {
     allowedOrigins: [CALENDLY_SCRIPT_ORIGIN],
+    // Calendly's CDN answers every origin with Access-Control-Allow-Origin:
+    // https://calendly.com, so a CORS request for the widget is always
+    // rejected. The origin is still restricted by allowedOrigins above.
+    crossorigin: false,
     isReady: () => typeof window.Calendly?.initInlineWidget === 'function',
   })
 

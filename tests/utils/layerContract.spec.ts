@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { STIR_EDITORIAL_OFFSET_VAR } from '../../layers/theme/app/utils/editorialOffset'
 
 const rootDir = resolve(__dirname, '../..')
 
@@ -723,7 +724,10 @@ describe('layer contract', () => {
     )
 
     expect(tabs).toContain('STIR_EDITORIAL_OFFSET_VAR')
-    expect(header).toContain('top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]')
+    // Tailwind only compiles classes written out in source, so the header
+    // spells the variable out; it must match the one the tabs bar publishes.
+    expect(header).toContain(`top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]`)
+    expect(header).not.toContain('top-[var(${')
     expect(header).not.toContain('3.1rem')
     expect(scrollNav).toContain('STIR_EDITORIAL_SCROLL_ALLOWANCE')
     expect(scrollNav).not.toContain('+ 40')

@@ -20,7 +20,6 @@ import {
   headerToggleDirection,
   joinHeaderClasses,
 } from '#stir/utils/headerTheme'
-import { STIR_EDITORIAL_OFFSET_VAR } from '#stir/utils/editorialOffset'
 
 defineOptions({
   inheritAttrs: false,
@@ -129,7 +128,9 @@ const headerPositionClasses = computed(() => {
     isFixed.value ? 'fixed' : 'sticky',
     'z-50 w-full',
     // The editorial tabs bar publishes its height; without it the var is 0.
-    shouldHide.value ? 'top-0' : `top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]`,
+    // Written out in full: Tailwind finds classes by reading source text, so
+    // a class built from the constant would never be compiled.
+    shouldHide.value ? 'top-0' : 'top-[var(--stir-editorial-offset,0px)]',
   ].join(' ')
 })
 const shouldHide = computed(() =>
