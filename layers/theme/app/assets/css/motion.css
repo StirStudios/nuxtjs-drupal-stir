@@ -6,14 +6,14 @@
   }
 
   to {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: var(--stir-menu-clip-open);
     transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes stir-menu-panel-out {
   from {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: var(--stir-menu-clip-open);
     transform: translate3d(0, 0, 0);
   }
 
@@ -29,6 +29,8 @@
     --stir-menu-ease-in: cubic-bezier(0.16, 0.72, 0.28, 1);
     --stir-menu-ease-out: cubic-bezier(0.84, 0, 0.97, 0.1);
     --stir-menu-offset-x: 1.5rem;
+    /* Open state reaches past the inner edge so the panel's shadow shows. */
+    --stir-menu-shadow-room: 3rem;
 
     background: var(--stir-menu-panel-bg, var(--ui-bg));
   }
@@ -50,6 +52,12 @@
       0 100%,
       0 100%
     );
+    --stir-menu-clip-open: polygon(
+      0 0,
+      calc(100% + var(--stir-menu-shadow-room)) 0,
+      calc(100% + var(--stir-menu-shadow-room)) 100%,
+      0 100%
+    );
     --stir-menu-content-x: calc(var(--stir-menu-offset-x) * -1);
   }
 
@@ -59,6 +67,12 @@
       100% 0,
       100% 100%,
       100% 100%
+    );
+    --stir-menu-clip-open: polygon(
+      calc(var(--stir-menu-shadow-room) * -1) 0,
+      100% 0,
+      100% 100%,
+      calc(var(--stir-menu-shadow-room) * -1) 100%
     );
     --stir-menu-content-x: var(--stir-menu-offset-x);
   }

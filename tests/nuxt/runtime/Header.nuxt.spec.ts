@@ -153,6 +153,7 @@ describe('App header', () => {
     expect(slideover.props()).toMatchObject({ open: false, portal: false, overlay: false, unmountOnHide: false })
     expect(contentClasses).toContain('project-panel')
     expect(contentClasses).toContain('stir-menu-panel')
+    expect(contentClasses).toContain('!shadow-lg/5')
     expect(contentClasses).not.toContain('!bg-default')
     expect(contentClasses).not.toContain('lg:hidden')
     expect(wrapper.get('[data-test="toggle-icon"]').attributes('data-open')).toBe('false')

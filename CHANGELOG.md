@@ -59,6 +59,12 @@ untouched do not need one.
 
 ### Changed
 
+- The angled mobile menu panel (`navigation.slideover.angle`) now has a
+  `shadow-lg/5` to lift it off the page, where before it had no shadow at all.
+  Its open-state clip path reaches `--stir-menu-shadow-room` (3rem) past the
+  inner edge so the shadow is not cropped. Opt out with `!shadow-none` in
+  `navigation.slideover.content`.
+
 - Every layout field option is now compiled whether or not content uses it
   yet: grid columns 1-12 and gaps 0-20 at every breakpoint, plus each spacing,
   width and alignment option. Before, a value an editor picked for the first
