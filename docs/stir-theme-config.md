@@ -373,7 +373,8 @@ navigation: {
   modeRoutes: {
     sticky: ['/work*'],
   },
-  logo: true,
+  logo: true, // false shows the site title text in place of the logo
+  brand: true, // false renders neither logo nor site title in the header
   logoClass: 'h-[5rem]',
   hidden: false,
   transparentAtTop: false,
@@ -382,7 +383,7 @@ navigation: {
   color: 'primary',
   variant: 'link',
   contentOrientation: 'horizontal', // 'vertical' stacks dropdown links under the open item
-  desktopLayout: 'default', // 'default' or 'split-logo'
+  desktopLayout: 'default', // 'default', 'split-logo', 'centered-toggle' or 'toggle'
   logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'
   toggleIcon: 'size-7',
@@ -439,6 +440,27 @@ to the right, and the marker is removed from the mobile menu.
 For a header whose menu toggle is the only navigation at every breakpoint, set
 `navigation.desktopLayout` to `'centered-toggle'`. The logo sits left, the
 toggle in the centre and project actions on the right.
+
+For a header that is only the menu toggle at every breakpoint, beside the
+brand rather than centred, set `navigation.desktopLayout` to `'toggle'`. The
+toggle sits on the side set by `navigation.toggleDirection` (`'left'` or
+`'right'`; `'top'` and `'bottom'` place it right), the slideover opens at every
+breakpoint, and no inline menu renders. Configured `navigation.actionItems`
+and `navigation.actionsComponent` still render in the right region.
+
+Set `navigation.brand: false` to drop the logo and site title from the header,
+for example when the page hero carries the site name. It applies to every
+layout. `navigation.logo: false` alone swaps the logo for the site-title text.
+The slideover's own brand is controlled separately by
+`navigation.slideover.logo`.
+
+```ts
+navigation: {
+  desktopLayout: 'toggle',
+  toggleDirection: 'left',
+  brand: false,
+},
+```
 
 Project hooks, all optional:
 

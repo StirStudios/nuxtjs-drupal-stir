@@ -54,6 +54,7 @@ export default defineAppConfig({
     navigation: {
       mode: 'fixed',
       logo: true,
+      brand: true,
       logoClass: 'h-[5rem]',
       // logoScrolledClass: 'h-[4rem]',
       hidden: false,
