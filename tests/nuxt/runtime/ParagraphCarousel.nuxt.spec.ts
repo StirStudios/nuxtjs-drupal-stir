@@ -48,6 +48,20 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
+  it.each([
+    [true, 'carousel', true],
+    [false, 'carousel', false],
+    [true, 'marquee', false],
+  ])('pads for dot indicators only when they show (dots %s, %s)', async (carouselIndicators, presentation, padded) => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { carouselIndicators, presentation, items: [h('article', 'One'), h('article', 'Two')] },
+    })
+    const padding = useAppConfig().stirTheme.carousel.padding
+
+    expect(wrapper.classes().includes(padding)).toBe(padded)
+    wrapper.unmount()
+  })
+
   it('passes the exact Drupal interval to Nuxt UI without starting off-screen', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
