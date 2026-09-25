@@ -32,6 +32,20 @@ export function normalizeScriptOrigin(value: string): string {
   }
 }
 
+/**
+ * An entry is an exact origin (`https://app.enzuzo.com`) or a subdomain
+ * wildcard (`https://*.piperavenue.com`). A wildcard matches any subdomain on
+ * the default HTTPS port, at a dot boundary, but not the bare domain.
+ */
+function allowsScriptOrigin(entry: string, url: URL): boolean {
+  const wildcard = /^https:\/\/\*\.([a-z0-9-]+(?:\.[a-z0-9-]+)+)$/i.exec(entry.trim())
+
+  if (wildcard) {
+    return url.port === '' && url.hostname.endsWith(`.${wildcard[1]!.toLowerCase()}`)
+  }
+  return normalizeScriptOrigin(entry) === url.origin
+}
+
 export function resolveAllowedScriptUrl(
   value: string,
   allowedOrigins: readonly string[],
@@ -42,11 +56,8 @@ export function resolveAllowedScriptUrl(
 
   try {
     const url = new URL(raw.startsWith('//') ? `https:${raw}` : raw)
-    const normalizedOrigins = new Set(
-      allowedOrigins.map(normalizeScriptOrigin).filter(Boolean),
-    )
 
-    if (url.protocol !== 'https:' || !normalizedOrigins.has(url.origin)) {
+    if (url.protocol !== 'https:' || !allowedOrigins.some(entry => allowsScriptOrigin(entry, url))) {
       return ''
     }
 
@@ -77,6 +88,21 @@ export function useThirdPartyScript(
   const safeSrc = computed(() =>
     resolveAllowedScriptUrl(toValue(src), configuredOrigins.value),
   )
+
+  if (import.meta.dev) {
+    watch(
+      () => [toValue(src).trim(), safeSrc.value] as const,
+      ([raw, allowed]) => {
+        if (raw && !allowed) {
+          console.warn(
+            `[useThirdPartyScript] Refused ${options.kind || 'script'} URL ${raw}: `
+            + 'its origin is not HTTPS or not in thirdPartyScripts.allowedOrigins.',
+          )
+        }
+      },
+      { immediate: true },
+    )
+  }
   const canLoad = computed(() =>
     Boolean(
       import.meta.client &&
