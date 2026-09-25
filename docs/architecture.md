@@ -311,6 +311,8 @@ Nuxt only performs production runtime replacement through matching `NUXT_*` name
 
 Recommendation: give runtime config empty, serializable defaults and standardize on names such as `NUXT_STIR_DRUPAL_API_KEY`, `NUXT_STIR_PROTECTED_PASSWORD`, and `NUXT_PUBLIC_STIR_DRUPAL_BASE_URL`. Keep the old names temporarily as build-time compatibility aliases with warnings. If every deployment always rebuilds, document that constraint clearly.
 
+Status (2026-09-25): the current runtime names and a migration proposal are in [Runtime environment](runtime-environment.md).
+
 ### P1 — The three layers are not independent capabilities
 
 The root config always extends `core`, `theme`, and `auth`, then always installs Nuxt UI, Scripts, Vitalizer, Turnstile, Robots, Sitemap, and Drupal CE; Plausible is present outside tests. See [`nuxt.config.ts` lines 31–33 and 199–242](https://github.com/StirStudios/nuxtjs-drupal-stir/blob/dev/nuxt.config.ts#L31-L33).
