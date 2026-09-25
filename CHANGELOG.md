@@ -119,6 +119,14 @@ untouched do not need one.
 
 ### Fixed
 
+- `thirdPartyScripts.allowedOrigins` accepts subdomain wildcards such as
+  `https://*.piperavenue.com`. The calculator allows `https://*.piperavenue.com`,
+  `https://*.stirstudiosdesign.com` and `https://piper.b-cdn.net` by default, so
+  it needs no project override. **Behaviour change:** the calculator no longer
+  derives `data-piper-origin` from the loader URL. Piper's loader works out its
+  own API address, and an explicit `apiOrigin` still sets it. In dev, a refused
+  third-party script URL logs a console warning instead of failing silently.
+
 - A carousel without dot indicators (and a marquee) no longer takes
   `stirTheme.carousel.padding`, the bottom space kept for the dots. Sites that
   set `carousel.padding: ''` to hide that gap can drop the override.

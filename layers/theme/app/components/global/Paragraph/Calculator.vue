@@ -47,9 +47,9 @@ const appOrigin = computed(() =>
   ),
 )
 
-const apiBase = computed(() =>
-  toOrigin(appOrigin.value) || toOrigin(loaderSrc.value),
-)
+// Piper's loader works out its own API address. An explicit origin is only an
+// override for a non-standard setup.
+const apiBase = computed(() => toOrigin(appOrigin.value))
 
 const widgetAttrs = computed<Record<string, string>>(() => {
   const elementAttrs: Record<string, string> = {
