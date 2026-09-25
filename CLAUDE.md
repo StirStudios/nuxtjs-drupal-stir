@@ -6,9 +6,9 @@ Use these rules for all changes.
 
 ## Required skills
 
-- For Nuxt, Vue, Nuxt UI, Nitro, Custom Elements, SSR, hydration, frontend caching, proxy, or cross-stack work, use `.claude/skills/stir-decoupled-frontend/SKILL.md`.
-- For metadata, canonical URLs, robots, sitemaps, redirects, structured data, social previews, or indexing work, also use `.claude/skills/stir-decoupled-seo/SKILL.md`.
-- For components, content, forms, navigation, media, animation, or accessibility audits, also use `.claude/skills/stir-accessibility/SKILL.md`.
+- For Nuxt, Vue, Nuxt UI, Nitro, Custom Elements, SSR, hydration, frontend caching, proxy, or cross-stack work, use the `stir:stir-decoupled-frontend` skill.
+- For metadata, canonical URLs, robots, sitemaps, redirects, structured data, social previews, or indexing work, also use the `stir:stir-decoupled-seo` skill.
+- For components, content, forms, navigation, media, animation, or accessibility audits, also use the `stir:stir-accessibility` skill.
 
 ## Primary goals
 
@@ -220,6 +220,6 @@ PR readiness:
 
 ## Working notes
 
-- `.claude/skills` holds copies of the shared Stir skills, plus the layer-only `code-audit` skill. stir-tools `.claude/skills` is canonical for the shared ones: change a skill there, then copy it here.
+- The shared skills come from the `stir` Claude Code plugin (StirStudios/stir-claude), enabled in `.claude/settings.json`; change them there. `.claude/skills` holds only the layer's own `code-audit` skill.
 - The Nuxt UI MCP server is configured in `.mcp.json` as `nuxt-ui`. Use it first for Nuxt UI component APIs, props, slots, and theming.
 - Commit and push changes to the current branch by default once they're complete. Hold off and let the user review first only when actively debugging/fixing something they want to inspect, or during POC/exploratory work — ask before committing in those cases. Still never open PRs, force-push, or push to `main` without being asked.

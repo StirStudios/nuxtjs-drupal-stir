@@ -22,5 +22,16 @@
       "Read(./.env.*)"
     ]
   },
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "extraKnownMarketplaces": {
+    "stir-studios": {
+      "source": {
+        "source": "github",
+        "repo": "StirStudios/stir-claude"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "stir@stir-studios": true
+  }
 }
