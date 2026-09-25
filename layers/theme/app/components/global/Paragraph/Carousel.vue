@@ -143,6 +143,11 @@ const slides = computed(() => {
 })
 
 const isMarquee = computed(() => props.presentation === 'marquee')
+// The padding makes room for the dot indicators, so a carousel without them
+// (and a marquee, which has none) takes no bottom padding.
+const indicatorPadding = computed(() =>
+  !isMarquee.value && props.carouselIndicators ? theme.carousel.padding : '',
+)
 const marqueeStyle = computed(() => props.marqueeDuration
   ? { '--duration': `${Math.max(1, props.marqueeDuration)}s` }
   : undefined)
@@ -258,7 +263,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
   <RevealMotionElement
     :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
     class="relative z-10"
-    :class="[theme.carousel.padding, widthClasses, spacing]"
+    :class="[indicatorPadding, widthClasses, spacing]"
     :motion-props="carouselMotionProps"
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"

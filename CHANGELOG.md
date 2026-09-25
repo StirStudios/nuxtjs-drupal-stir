@@ -119,6 +119,10 @@ untouched do not need one.
 
 ### Fixed
 
+- A carousel without dot indicators (and a marquee) no longer takes
+  `stirTheme.carousel.padding`, the bottom space kept for the dots. Sites that
+  set `carousel.padding: ''` to hide that gap can drop the override.
+
 - **A failed sign-in shows Drupal's reason.** `getFetchErrorMessage()` (and so
   `useAuthLogin`, `useAuthRegister`, `usePasswordRequest`, `usePasswordReset`)
   read only `error.statusMessage`, which is empty over HTTP/2, and a string

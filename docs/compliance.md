@@ -21,7 +21,11 @@ agent-generated edits.
    verified project fact.
 5. The initializer adds separate `audit:compliance` and `audit:seo` scripts plus
    a combined `audit:site` command without replacing existing scripts. Run the
-   focused command while iterating and `audit:site` in CI and periodic reviews.
+   focused command while iterating, and `audit:site` at launch, on each
+   `nextReview` date and after adding a form, vendor, tracker or embed. Keep
+   both out of `verify:core`: they check the live site, so they must not gate
+   code deploys. CI runs only `stir-compliance-init --check`, which confirms the
+   compliance files are present and current.
 
 The audit validates the inventory, review schedule, Drupal page contract,
 consent rationale, and common tracker references. SEO audits use `owner.domain`
