@@ -90,7 +90,7 @@ spoofing through the proxy.
 
 - **CE machine-name ↔ Vue filename mapping:** every Drupal paragraph-bundle CE
   display config must have a matching kebab-case Vue component filename (per
-  `AGENTS.md`'s 1:1 mapping rule). Renaming a bundle on Drupal breaks rendering
+  `CLAUDE.md`'s 1:1 mapping rule). Renaming a bundle on Drupal breaks rendering
   unless the Nuxt component is renamed in lockstep.
 - **Menu endpoint path:** the public-menu carve-out
   (`/ce-api/api/menu_items/*`) is hardcoded identically on both sides

@@ -4,7 +4,7 @@ Run this review on the `nextReview` date in `compliance/site.json`, every six
 months afterward, and whenever a change adds a form, vendor, tracker, embed,
 payment flow, account feature, user content, or browser storage.
 
-## Codex task
+## Agent task
 
 Audit this repository, its Drupal content, and the production domain declared
 in `compliance/site.json`. Treat that file as the verified technology and review

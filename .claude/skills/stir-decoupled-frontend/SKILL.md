@@ -9,11 +9,21 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 
 ## Establish ownership
 
-1. Read every applicable `AGENTS.md` and the Drupal, SEO, or accessibility skills triggered by the work.
+1. Read every applicable `CLAUDE.md` and the Drupal, SEO, or accessibility skills triggered by the work.
 2. Identify the source-of-truth checkout and downstream copies before editing.
 3. Put reusable Nuxt behavior in `nuxtjs-drupal-stir`, generic CE behavior in `nuxtjs-drupal-ce`, portable project assembly in `stir-nuxt`, Drupal producer behavior in `stir-tools`, and client-specific content/brand decisions in the client app.
 4. Search existing Nuxt UI components, layer components, composables, server utilities, and CE helpers before adding abstractions.
 5. Read [current-sources.md](references/current-sources.md) for version-sensitive official guidance and verify live sources for dependency decisions. For inline editing, rich-text schemas, or collaboration, also read [editorial-stack.md](references/editorial-stack.md).
+
+## Build client projects the fleet way
+
+These rules apply in a client app cloned from the Stir Nuxt starter, not in the layer or the starters.
+
+- Before building anything, read these skills and look at how sibling client projects solved the same problem. Build it the same way; a project must not invent its own pattern.
+- Style in this order and stop at the first that works: `app.config` (Nuxt UI theme and existing `stirTheme` keys), a component's `ui`, CSS, and only then a layer component override. Do not override layer components or add `stirTheme` keys unless nothing earlier can do it. In CSS, use `@apply` partials only where inline Tailwind cannot reach.
+- Project Paragraph components use inline Tailwind classes. Style a one-off Nuxt UI instance with `:ui`, not `tv()`.
+- Propose a capability the layer lacks upstream. A proof of concept may live in the project only until it is proven worth promoting, and must be flagged as a POC.
+- The designer's mocks are the design. Improve only responsiveness and accessibility, such as nudging a colour just enough to pass contrast. Keep their colours, compositions and copy, and never invent copy.
 
 ## Preserve the contract
 
@@ -49,6 +59,7 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 - Avoid speculative performance work. Measure production builds and representative Drupal payloads.
 - Every composable pulled into the initial graph is paid for by every visitor. Prefer ones already in the graph, and check `pnpm perf:report` before adding another: VueUse's `useStorage` alone added ~5 kB gzip to replace two small helpers.
 - Optimize LCP media, font delivery, hydration and bundle cost without degrading content semantics or interaction readiness.
+- Nuxt Fonts resolves only the first family in a `font-family` stack and treats the rest as fallbacks, so a licensed font listed first (`'MADE Mirage', 'Cormorant Garamond', serif`) silently loads nothing. List a family a provider can serve first until the licensed file is self-hosted.
 
 ## Verify proportionately
 

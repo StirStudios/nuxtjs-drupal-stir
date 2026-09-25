@@ -23,6 +23,16 @@ untouched do not need one.
 
 ### Added
 
+- `stirTheme.navigation.desktopLayout: 'toggle'` keeps the menu toggle and
+  slideover at every breakpoint, on the side set by `toggleDirection`, and
+  renders no inline desktop menu. `stirTheme.navigation.brand: false` removes
+  the logo and site title from the header in any layout, without the
+  site-title fallback that `logo: false` gives. Existing layouts are
+  unchanged.
+- The slideover's close button no longer takes the header's right-region
+  classes, so it stays visible from `lg` up when colour mode is forced or its
+  toggle is hidden. Only sites that show the slideover on desktop could see
+  the missing button.
 - `stir-compliance` detects Calendly from the Calendly paragraph module or its
   paragraph type, and then requires Calendly in `technology.vendors` and the
   Privacy Policy (or `technology.inactive.calendly` with the reason). Sites

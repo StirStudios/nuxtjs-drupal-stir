@@ -14,6 +14,7 @@ describe('header theme', () => {
     expect(headerToggleDirection('left')).toBe('left')
     expect(headerToggleDirection('diagonal')).toBe('right')
     expect(headerDesktopLayout('split-logo')).toBe('split-logo')
+    expect(headerDesktopLayout('toggle')).toBe('toggle')
     expect(headerDesktopLayout(undefined)).toBe('default')
     expect(headerLogoSurface('dark')).toBe('dark')
     expect(headerLogoSurface(1)).toBe('auto')

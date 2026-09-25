@@ -44,6 +44,8 @@ afterEach(() => {
 // The Nuxt UI slideover teleports its panel, so assert on the component itself.
 const findSlideover = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
   wrapper.findComponent({ name: 'USlideover' })
+const findOverlayHeader = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
+  wrapper.findComponent({ name: 'AppHeaderOverlayHeader' })
 
 describe('App header', () => {
   it('keeps the default mobile toggle and returns focus after the visitor closes the menu', async () => {
@@ -61,6 +63,9 @@ describe('App header', () => {
 
     expect(slideover.props()).toMatchObject({ open: true, portal: true, overlay: true, unmountOnHide: true })
     expect(slideover.props('ui').content).toContain('lg:hidden')
+    // Sites that show the slideover on desktop must keep its close button.
+    await vi.waitFor(() => expect(findOverlayHeader(wrapper).exists()).toBe(true))
+    expect(findOverlayHeader(wrapper).props('rightClass')).not.toContain('lg:hidden')
     await toggle.trigger('click')
     slideover.vm.$emit('after:leave')
     await nextTick()
@@ -159,6 +164,76 @@ describe('App header', () => {
     expect(wrapper.get('[data-test="toggle-icon"]').attributes('data-open')).toBe('false')
     await toggle.trigger('click')
     expect(wrapper.get('[data-test="toggle-icon"]').attributes('data-open')).toBe('true')
+    wrapper.unmount()
+  })
+
+  it.each(['left', 'right'] as const)('keeps a %s toggle and its menu at every breakpoint in the toggle layout', async (side) => {
+    const colorMode = useAppConfig().colorMode as Record<string, unknown>
+    const showToggle = colorMode.showToggle
+
+    // Without a colour-mode toggle or actions, the default layout hides the
+    // right region from lg up; the toggle layout must not.
+    colorMode.showToggle = false
+    setNavigation({ desktopLayout: 'toggle', toggleDirection: side })
+
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const toggle = wrapper.get(`[data-slot="${side}"] [data-slot="toggle"]`)
+
+    expect(wrapper.findAll('[data-slot="toggle"]')).toHaveLength(1)
+    expect(toggle.classes()).not.toContain('lg:hidden')
+    expect(wrapper.get(`[data-slot="${side}"]`).classes()).not.toContain('lg:hidden')
+    expect(toggle.classes()).toContain(side === 'left' ? '-ms-1.5' : '-me-1.5')
+    expect(wrapper.find('[data-slot="center"]').exists()).toBe(false)
+    expect(wrapper.find('nav').exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'UNavigationMenu' }).exists()).toBe(false)
+    expect(wrapper.find('[data-slot="title"]').exists()).toBe(true)
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+
+    await toggle.trigger('click')
+    await vi.waitFor(() => expect(findSlideover(wrapper).exists()).toBe(true))
+    const slideover = findSlideover(wrapper)
+
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect(toggle.attributes('aria-controls')).toBe(slideover.props('content').id)
+    expect(slideover.props('side')).toBe(side)
+    expect(slideover.props('ui').content).not.toContain('lg:hidden')
+    expect(slideover.props('ui').overlay).not.toContain('lg:hidden')
+    // The close button lives in the slideover header, which must stay visible
+    // from lg up even when the colour-mode toggle is off or forced.
+    await vi.waitFor(() => expect(findOverlayHeader(wrapper).exists()).toBe(true))
+    const overlayHeader = findOverlayHeader(wrapper)
+    const close = overlayHeader.get('button[aria-label="Close navigation menu"]')
+
+    expect(overlayHeader.props('rightClass')).not.toContain('lg:hidden')
+    expect(close.classes()).not.toContain('lg:hidden')
+    expect(close.attributes('aria-controls')).toBe(toggle.attributes('aria-controls'))
+    await toggle.trigger('click')
+    slideover.vm.$emit('after:leave')
+    await nextTick()
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(toggle.element)
+    colorMode.showToggle = showToggle
+    wrapper.unmount()
+  })
+
+  it('hides the header brand without falling back to the site title', async () => {
+    setNavigation({ desktopLayout: 'toggle', toggleDirection: 'left', brand: false })
+
+    const wrapper = await mountSuspended(Header)
+
+    expect(wrapper.find('[data-slot="title"]').exists()).toBe(false)
+    expect(wrapper.find('.app-logo').exists()).toBe(false)
+    expect(wrapper.get('header').text()).not.toContain('Example site')
+    expect(wrapper.find('[data-slot="left"] [data-slot="toggle"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('falls back to the site title when only the logo is off', async () => {
+    setNavigation({ logo: false })
+
+    const wrapper = await mountSuspended(Header)
+
+    expect(wrapper.get('[data-slot="title"]').text()).toBe('Example site')
     wrapper.unmount()
   })
 

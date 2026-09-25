@@ -679,7 +679,7 @@ describe('layer contract', () => {
 
     expect(header).not.toContain(':icon="toggleIcon"')
     expect(header).toContain('toggle: \'size-11 justify-center p-0\'')
-    expect(header).toContain('isCenteredToggleLayout.value ? \'\' : \'lg:hidden\'')
+    expect(header).toContain('isCenteredToggleLayout.value || isToggleLayout.value ? \'\' : \'lg:hidden\'')
     // One toggle definition, reused in the left, centre or right region.
     expect(header.match(/data-slot="leadingIcon"/g)).toHaveLength(1)
     expect(header.match(/:class="toggleIconClass"/g)).toHaveLength(1)

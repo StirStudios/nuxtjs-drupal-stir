@@ -3,7 +3,7 @@
 // documented default instead of passing an unknown value to Nuxt UI.
 
 export type HeaderToggleDirection = 'left' | 'right' | 'top' | 'bottom'
-export type HeaderDesktopLayout = 'default' | 'split-logo' | 'centered-toggle'
+export type HeaderDesktopLayout = 'default' | 'split-logo' | 'centered-toggle' | 'toggle'
 export type HeaderLogoSurface = 'auto' | 'light' | 'dark'
 
 type HeaderSlideoverConfig = {
@@ -18,7 +18,7 @@ export const headerToggleDirection = (value: unknown): HeaderToggleDirection =>
     : 'right'
 
 export const headerDesktopLayout = (value: unknown): HeaderDesktopLayout =>
-  value === 'split-logo' || value === 'centered-toggle' ? value : 'default'
+  value === 'split-logo' || value === 'centered-toggle' || value === 'toggle' ? value : 'default'
 
 export const headerLogoSurface = (value: unknown): HeaderLogoSurface =>
   value === 'light' || value === 'dark' ? value : 'auto'

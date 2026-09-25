@@ -50,6 +50,9 @@ const headerUi = {
   left: 'lg:flex-1 flex items-center gap-1.5',
   center: 'hidden lg:flex',
   right: 'flex items-center justify-end lg:flex-1 gap-1.5',
+  // The slideover's own close region; header-only responsive classes, such as
+  // hiding the right region from lg up, must not hide its close button.
+  overlayRight: 'flex items-center justify-end gap-1.5',
   title: 'shrink-0 font-bold text-xl text-highlighted flex items-end gap-1.5',
   toggle: 'size-11 justify-center p-0',
   content: 'sm:max-w-md',
@@ -85,8 +88,10 @@ const menuToggleSide = computed(() => (menuSide.value === 'left' ? 'left' : 'rig
 const desktopHeaderLayout = computed(() => headerDesktopLayout(theme.navigation?.desktopLayout))
 const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-logo')
 const isCenteredToggleLayout = computed(() => desktopHeaderLayout.value === 'centered-toggle')
-// The centred toggle is the only navigation at every breakpoint.
-const mobileOnlyClass = computed(() => isCenteredToggleLayout.value ? '' : 'lg:hidden')
+const isToggleLayout = computed(() => desktopHeaderLayout.value === 'toggle')
+// Toggle layouts make the menu toggle the only navigation at every breakpoint.
+const mobileOnlyClass = computed(() => isCenteredToggleLayout.value || isToggleLayout.value ? '' : 'lg:hidden')
+const showBrand = computed(() => theme.navigation.brand !== false)
 // Shared by every desktop menu the header renders.
 const navProps = computed(() => {
   const navigation = theme.navigation
@@ -209,6 +214,7 @@ const menuUi = computed(() => ({
 }))
 const headerRightClasses = computed(() => {
   if (isCenteredToggleLayout.value) return centeredToggleUi.right
+  if (isToggleLayout.value) return headerUi.right
 
   return joinHeaderClasses(
     headerUi.right,
@@ -393,6 +399,7 @@ watch(menuOpen, (val) => {
         <ReuseMenuToggle v-if="!isCenteredToggleLayout && menuToggleSide === 'left'" />
 
         <ULink
+          v-if="showBrand"
           aria-label="Home"
           :class="headerUi.title"
           data-slot="title"
@@ -410,6 +417,7 @@ watch(menuOpen, (val) => {
       </div>
 
       <div
+        v-if="!isToggleLayout"
         :class="headerCenterClasses"
         data-slot="center"
       >
@@ -425,7 +433,7 @@ watch(menuOpen, (val) => {
           />
 
           <ULink
-            v-if="theme.navigation.logo"
+            v-if="showBrand && theme.navigation.logo"
             aria-label="Site Logo"
             :class="theme.navigation.splitLogo?.logoLink"
             to="/"
@@ -516,7 +524,7 @@ watch(menuOpen, (val) => {
           :left-class="headerUi.left"
           :logo-classes="logoClasses"
           :menu-id="menuId"
-          :right-class="headerRightClasses"
+          :right-class="headerUi.overlayRight"
           :show-brand="showSlideoverBrand"
           :show-color-mode-toggle="showColorModeToggle"
           :show-logo="Boolean(theme.navigation.logo)"

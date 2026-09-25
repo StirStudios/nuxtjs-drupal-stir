@@ -130,6 +130,7 @@ type StirThemeNavigationConfig = {
   mode?: 'fixed' | 'sticky'
   modeRoutes?: Partial<Record<'fixed' | 'sticky', string[]>>
   logo?: boolean
+  brand?: boolean
   logoClass?: ClassValue
   logoScrolledClass?: ClassValue
   hidden?: boolean
@@ -141,7 +142,7 @@ type StirThemeNavigationConfig = {
   color?: UiColorName
   variant?: UiNavigationVariantName
   contentOrientation?: 'horizontal' | 'vertical'
-  desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | string
+  desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | 'toggle' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   toggleIcon?: ClassValue

@@ -9,7 +9,7 @@ Target WCAG 2.2 AA and inclusive real-world use. Combine automation with keyboar
 
 ## Establish scope
 
-1. Read the repository `AGENTS.md` and frontend or Drupal skills relevant to the change.
+1. Read the repository `CLAUDE.md` and frontend or Drupal skills relevant to the change.
 2. Identify affected routes, components, breakpoints, states, content types, languages, input methods and assistive-technology interactions.
 3. Inspect Drupal authoring constraints as well as Nuxt rendering. Prevent inaccessible content at the source where practical.
 4. Read [current-sources.md](references/current-sources.md) for normative and framework guidance.
