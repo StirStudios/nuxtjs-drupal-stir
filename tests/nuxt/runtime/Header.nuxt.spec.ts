@@ -44,6 +44,8 @@ afterEach(() => {
 // The Nuxt UI slideover teleports its panel, so assert on the component itself.
 const findSlideover = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
   wrapper.findComponent({ name: 'USlideover' })
+const findOverlayHeader = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
+  wrapper.findComponent({ name: 'AppHeaderOverlayHeader' })
 
 describe('App header', () => {
   it('keeps the default mobile toggle and returns focus after the visitor closes the menu', async () => {
@@ -61,6 +63,9 @@ describe('App header', () => {
 
     expect(slideover.props()).toMatchObject({ open: true, portal: true, overlay: true, unmountOnHide: true })
     expect(slideover.props('ui').content).toContain('lg:hidden')
+    // Sites that show the slideover on desktop must keep its close button.
+    await vi.waitFor(() => expect(findOverlayHeader(wrapper).exists()).toBe(true))
+    expect(findOverlayHeader(wrapper).props('rightClass')).not.toContain('lg:hidden')
     await toggle.trigger('click')
     slideover.vm.$emit('after:leave')
     await nextTick()
@@ -193,6 +198,15 @@ describe('App header', () => {
     expect(slideover.props('side')).toBe(side)
     expect(slideover.props('ui').content).not.toContain('lg:hidden')
     expect(slideover.props('ui').overlay).not.toContain('lg:hidden')
+    // The close button lives in the slideover header, which must stay visible
+    // from lg up even when the colour-mode toggle is off or forced.
+    await vi.waitFor(() => expect(findOverlayHeader(wrapper).exists()).toBe(true))
+    const overlayHeader = findOverlayHeader(wrapper)
+    const close = overlayHeader.get('button[aria-label="Close navigation menu"]')
+
+    expect(overlayHeader.props('rightClass')).not.toContain('lg:hidden')
+    expect(close.classes()).not.toContain('lg:hidden')
+    expect(close.attributes('aria-controls')).toBe(toggle.attributes('aria-controls'))
     await toggle.trigger('click')
     slideover.vm.$emit('after:leave')
     await nextTick()

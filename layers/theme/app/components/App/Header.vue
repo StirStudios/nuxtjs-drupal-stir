@@ -50,6 +50,9 @@ const headerUi = {
   left: 'lg:flex-1 flex items-center gap-1.5',
   center: 'hidden lg:flex',
   right: 'flex items-center justify-end lg:flex-1 gap-1.5',
+  // The slideover's own close region; header-only responsive classes, such as
+  // hiding the right region from lg up, must not hide its close button.
+  overlayRight: 'flex items-center justify-end gap-1.5',
   title: 'shrink-0 font-bold text-xl text-highlighted flex items-end gap-1.5',
   toggle: 'size-11 justify-center p-0',
   content: 'sm:max-w-md',
@@ -521,7 +524,7 @@ watch(menuOpen, (val) => {
           :left-class="headerUi.left"
           :logo-classes="logoClasses"
           :menu-id="menuId"
-          :right-class="headerRightClasses"
+          :right-class="headerUi.overlayRight"
           :show-brand="showSlideoverBrand"
           :show-color-mode-toggle="showColorModeToggle"
           :show-logo="Boolean(theme.navigation.logo)"
