@@ -330,6 +330,10 @@ independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
   connect to Drupal. Do not set it for deployment builds.
 - `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
   approved local fallback when the primary source is unavailable.
+- `nuxi prepare`, which the starter runs as `postinstall`, also reads the
+  manifest. On a new project, install with
+  `pnpm install --frozen-lockfile --ignore-scripts`, install Drupal, then run
+  `pnpm rebuild`. Stir Decoupled's `setup.sh` does this.
 
 Builds fail when the manifest is missing, invalid, uses an unknown semantic
 value, contains an unsafe accepted class token, or has a mismatched revision.
