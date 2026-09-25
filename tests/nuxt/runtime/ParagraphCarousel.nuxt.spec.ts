@@ -56,8 +56,9 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: { carouselIndicators, presentation, items: [h('article', 'One'), h('article', 'Two')] },
     })
-    const padding = useAppConfig().stirTheme.carousel.padding
+    const padding = useAppConfig().stirTheme.carousel.padding ?? ''
 
+    expect(padding).not.toBe('')
     expect(wrapper.classes().includes(padding)).toBe(padded)
     wrapper.unmount()
   })
