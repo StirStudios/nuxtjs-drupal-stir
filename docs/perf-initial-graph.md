@@ -72,7 +72,7 @@ rather than a configuration one.
 
 ## Validation requirement
 
-Per `AGENTS.md`, any LCP, loading-priority or critical-rendering change must be
+Per `CLAUDE.md`, any LCP, loading-priority or critical-rendering change must be
 validated with `pnpm perf:lighthouse` against a representative Drupal payload:
 at least three mobile runs, comparing medians before and after, reporting
 score, FCP, LCP, TBT, total transfer, media transfer and video request count.

@@ -1,10 +1,225 @@
 # CLAUDE.md
 
-@AGENTS.md
+This repository is a **Nuxt 4 layer/base theme** using **Nuxt UI 4 + Tailwind 4** with
+**Lupus Decoupled Drupal (Custom Elements)** via **nuxtjs-drupal-ce**.
+Use these rules for all changes.
 
-## Claude Code notes
+## Required skills
 
-- `AGENTS.md` is the single source of truth for project rules and is shared with Codex. Add or change project rules there, not here. Keep this file for Claude-specific notes only.
-- `.claude/skills` is a symlink to `.agents/skills`. Add or edit skills in `.agents/skills` so Claude and Codex stay in sync.
+- For Nuxt, Vue, Nuxt UI, Nitro, Custom Elements, SSR, hydration, frontend caching, proxy, or cross-stack work, use `.claude/skills/stir-decoupled-frontend/SKILL.md`.
+- For metadata, canonical URLs, robots, sitemaps, redirects, structured data, social previews, or indexing work, also use `.claude/skills/stir-decoupled-seo/SKILL.md`.
+- For components, content, forms, navigation, media, animation, or accessibility audits, also use `.claude/skills/stir-accessibility/SKILL.md`.
+
+## Primary goals
+
+- Keep the layer production-safe for SSR and reusable across downstream projects.
+- Preserve Drupal CE compatibility and predictable custom-element rendering.
+- Favor explicit, typed, and documented configuration over implicit behavior.
+
+## Project overview
+
+- **Framework:** Nuxt 4 (SSR by default, Nitro runtime)
+- **UI:** Nuxt UI 4 + Tailwind CSS 4
+- **CMS integration:** `nuxtjs-drupal-ce` (Lupus Decoupled Custom Elements)
+- **Performance modules:** `nuxt-vitalizer`
+- **Additional modules:** robots, sitemap, turnstile, scripts, eslint
+
+## Repository structure (high level)
+
+- `app/` - Nuxt app code (pages, components, composables, plugins)
+- `server/` - Nitro server routes/middleware/utilities
+- `assets/` - global CSS and static assets
+- `docs/` - integration and project docs
+- `types/` - shared TS types/interfaces
+- `nuxt.config.ts` - runtime/build/module configuration
+- `app.config.ts` - Nuxt UI/theme-level app configuration
+
+## Environment and configuration rules
+
+- Keep `.env`-driven config aligned with `nuxt.config.ts`; avoid hardcoded URLs/secrets.
+- If adding/renaming env vars, update `readme.md` and mention in your summary.
+- When changed, explicitly document purpose and expected values for:
+  - `DRUPAL_URL`
+  - `DRUPAL_API_KEY`
+  - `NUXT_URL`
+  - `NUXT_NAME`
+  - `NUXT_ENV`
+  - `NUXT_INDEXABLE`
+  - `SERVER_DOMAIN_CLIENT`
+  - `TURNSTILE_KEY`
+  - `TURNSTILE_SECRET`
+- Call out runtime overrides via `NUXT_PUBLIC_DRUPAL_CE_*` variables whenever used.
+- If route rules/redirects change (for example `/admincontrol` or `/front`), document user-facing impact.
+
+## Coding conventions
+
+- TypeScript-first: prefer typed params, return types, and narrow interfaces near usage.
+- Keep one-use implementation types inline, app-only public contracts in the owning layer's `app/types`, and app/server contracts in its `shared/types`.
+- Prefer Nuxt auto-imports for Nuxt/Vue runtime APIs in normal `app/*` code. Keep types, external packages, cross-layer dependencies, server code, configuration, scripts, and isolated tests explicitly imported.
+- Use Nuxt/Vue idioms: composables for shared logic, focused components, minimal cross-layer coupling.
+- Prefer Nuxt UI tokens/variants and Tailwind utilities before writing custom CSS.
+- Prefer nested CSS for readability when using Tailwind v4 CSS features.
+- In scoped styles, use `:global(...)` with `:deep(...)` when targeting global theme/state classes.
+- Prefer stable class hooks (for example `app-nav`) over ARIA/attribute selectors for reusable styling targets.
+- Treat `app/assets/css/custom.css` as an import/index file; place new styles in focused partials under `app/assets/css/custom/`.
+- If custom styles in one file grow beyond roughly 80-120 lines or mix unrelated concerns, split them in the same PR.
+- Keep comments minimal and only for non-obvious logic or external constraints.
+- Do not wrap imports in `try/catch` (project-wide rule).
+- Reuse existing elements before adding markup. Add a wrapper only when required for correct semantics, layout, or behavior; verify the rendered DOM and preserve native controls.
+- Prefer the smallest complete solution. Preserve existing behavior, reuse existing code paths, and add only what the requirement demonstrably needs.
+- Before finishing, remove duplicated logic or markup, unnecessary fallbacks, speculative abstractions, redundant state, superseded paths, and unused dependencies.
+- Do not sacrifice correctness, accessibility, security, readability, maintainability, or proportionate regression coverage merely to reduce line count.
+- Use single-quoted strings in JS/TS/Vue config and code unless escaping would reduce readability; keep style aligned with ESLint/Prettier.
+- In `<script setup>`, group related declarations with a single blank line between logical blocks (imports, props/emits, composables/context, local types, refs/state, computed values, methods/watch/lifecycle). Avoid extra blank lines within a single block.
+- Naming:
+  - Vue components: PascalCase unless Drupal custom-element mapping requires kebab-case.
+  - Composables: camelCase with `use*` naming.
+  - Server utilities/routes: clear, purpose-driven names that match Nitro conventions.
+
+## Nuxt UI reference priority
+
+- For Nuxt UI component/composable APIs, props, slots, events, theming, and patterns, prefer official sources in this order:
+  - Nuxt UI MCP server: `https://ui.nuxt.com/mcp`
+  - Nuxt UI LLM index: `https://ui.nuxt.com/llms.txt`
+  - Nuxt UI docs pages (`https://ui.nuxt.com/docs/...`)
+- This is recommended guidance, not a hard requirement; do not block work if MCP is unavailable.
+
+## UI architecture and reuse
+
+- Use Nuxt UI components, composables, and generated themes before building local equivalents.
+- Configure shared Nuxt UI behavior in `app.config.ts`; downstream projects should inherit these defaults and override only genuine project requirements.
+- Prefer semantic colors such as `primary`, `neutral`, `success`, and `error` in application UI. Reserve direct brand utilities for intentional artwork, gradients, and brand-specific treatments.
+- Use Tailwind utilities directly in templates for one-off layout and presentation. Do not create custom CSS classes or TypeScript string constants that only rename a utility recipe.
+- Extract a local component when a repeated composition has semantic meaning, behavior, slots, or variants. Keep wrappers thin and delegate primitives such as containers, buttons, forms, and overlays to Nuxt UI.
+- Before adding an abstraction, search for an existing Nuxt UI component, local component, theme variant, composable, or token. Remove superseded styles and duplicate wrappers in the same change.
+- Centralize stable defaults in the layer; keep application content, brand exceptions, and deployment-specific behavior in downstream projects.
+
+## Drupal CE integration guidance
+
+- Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
+- Preserve internal Nuxt CE proxy behavior (`/api/*`) when changing auth/header middleware.
+- API key responsibilities must stay explicit:
+  - Nuxt layer: forwards `x-api-key` on internal proxy/server calls to Drupal.
+  - Drupal/edge: enforces access policy for CE/data endpoints.
+- Do not narrow API-key middleware scope without verifying homepage, CE page fetch, and menu endpoint behavior.
+- Keep schema and mapping assumptions explicit with types or concise inline notes.
+- For custom elements, prefer 1:1 filename mapping in kebab-case
+  (example: `node-article-teaser.vue`); fallback components may use `--default` suffix.
+- Place globally reused custom-element components in `components/global` when appropriate.
+- Default Custom Elements JSON format is `explicit`; use `legacy` only for old backends and document why.
+- If changed, document these module options and expected behavior:
+  - `drupalBaseUrl`
+  - `serverDrupalBaseUrl`
+  - `ceApiEndpoint`
+  - `customElementJsonFormat`
+  - menu endpoint overrides
+- Any change affecting Drupal-driven layout/block/custom-element rendering must be clearly called out in summaries.
+- If a feature requires new Drupal fields, CE config, or JSON:API include changes, document in `docs/` or `readme.md`.
+
+## Auth, protected routes, and Drupal API proxy guidance
+
+- Keep Drupal user authentication separate from simple password-protected page access.
+- Drupal auth routes (`/api/auth/login`, `/api/auth/logout`, `/api/auth/session`, password reset, registration) should use shared Nitro server utilities for:
+  - Drupal base URL resolution
+  - API key forwarding
+  - request cookie forwarding
+  - `set-cookie` response forwarding
+  - upstream error normalization
+- Prefer aligning custom auth proxy behavior with `nuxtjs-drupal-ce` proxy/header conventions before adding custom behavior.
+- Do not route custom auth endpoints through CE page-fetch helpers unless explicitly supported.
+- Protected page access should remain lightweight and local to Nuxt unless Drupal auth is intentionally required.
+- Global route middleware should only gate configured protected routes.
+- Auth system routes must remain public unless explicitly configured otherwise:
+  - `/auth/login`
+  - `/auth/logout`
+  - `/auth/register`
+  - `/auth/password/request`
+  - `/auth/password/reset`
+  - `/auth/protected`
+- Do not couple protected route middleware to Drupal user login redirects.
+- Use explicit redirect config for Drupal auth login/logout behavior.
+- Use `?redirect=/path` for protected page return paths when possible.
+
+## SSR, runtime, and performance safeguards
+
+- No browser-only APIs at module top-level.
+- Use `import.meta.client`/`import.meta.server` (or Nuxt-safe guards) where runtime-specific logic is required.
+- Keep server/client behavior consistent when touching hydration-sensitive UI.
+- When changing `nuxt-vitalizer`, hydration timing, or motion behavior, verify no regression in interaction readiness.
+- For LCP, loading-priority, media, or critical-rendering changes, test a production
+  build with `pnpm perf:lighthouse` against a representative Drupal payload.
+  Use at least three mobile runs, compare medians before and after, and report
+  score, FCP, LCP, TBT, total transfer, media transfer, and video request count.
+  Component tests alone are not performance evidence.
+- Avoid breaking public interfaces/config defaults unless explicitly requested.
+
+## Validation checklist
+
+Run relevant checks after changes:
+
+- `pnpm lint`
+- `pnpm build`
+- `pnpm generate` (when static output behavior is affected)
+- `pnpm dev` (for local/manual verification when needed)
+
+Validation policy:
+
+- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts, then run `pnpm verify:ci`.
+- If debugging failures, run the individual commands:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm test:nuxt`
+  - `pnpm build`
+- For docs-only or clearly isolated non-runtime edits, targeted validation is acceptable, but state what was intentionally skipped.
+- Any change touching auth, headers, route middleware, CE fetch/proxy behavior, or runtime config must run the full validation set above.
+
+Security change smoke checklist (required when auth/header/routing behavior changes):
+
+- Homepage load (`/`) succeeds.
+- One inner CE route succeeds.
+- Menu fetch succeeds.
+- Webform submit proxy path behaves as expected.
+- Paragraph read/update endpoints behave as expected (if enabled).
+
+CI parity:
+
+- Keep CI tool versions aligned with repository declarations (for example `pnpm/action-setup` version must match `packageManager` in `package.json`).
+
+If checks are skipped, state exactly which were not run and why.
+
+PR readiness:
+
+- After pushing, confirm GitHub reports the PR mergeable and watch every required check to completion; local green checks alone are not completion.
+- Treat review findings about behavior, accessibility, SSR/hydration, or downstream compatibility as regression-test requirements.
+- For shared CMS components, cover blank authored values and accessible naming. Derive responsive media delivery from the active layout configuration rather than settings used by an inactive branch.
+
+## Release and safety rules
+
+- Do **not** run `pnpm release` unless explicitly requested.
+- Do not introduce breaking changes to shared layer contracts without approval.
+- Before removing or renaming an exported symbol, run `pnpm audit:consumers`
+  with the relevant `STIR_CONSUMER_*` paths set. It packs the layer and runs
+  each consumer's typecheck and build against it. A grep of this repository
+  proves only that the layer does not use a symbol; it says nothing about
+  downstream projects, which is how a rename-only cleanup has already broken a
+  consumer's typecheck.
+- Record consumer-affecting changes in `CHANGELOG.md`: removed or renamed
+  exports, changed public composable or component contracts, new or altered
+  server routes, behavioural changes, and new required environment variables.
+  Downstream projects track this repository as a git branch, so a GitHub
+  release is not a signal they receive.
+
+## PR / handoff expectations
+
+- Summaries must include:
+  - user-facing changes
+  - Drupal integration impact (if any)
+  - config/env changes
+  - verification performed (or skipped with reason)
+
+## Working notes
+
+- `.claude/skills` holds copies of the shared Stir skills, plus the layer-only `code-audit` skill. stir-tools `.claude/skills` is canonical for the shared ones: change a skill there, then copy it here.
 - The Nuxt UI MCP server is configured in `.mcp.json` as `nuxt-ui`. Use it first for Nuxt UI component APIs, props, slots, and theming.
 - Commit and push changes to the current branch by default once they're complete. Hold off and let the user review first only when actively debugging/fixing something they want to inspect, or during POC/exploratory work — ask before committing in those cases. Still never open PRs, force-push, or push to `main` without being asked.

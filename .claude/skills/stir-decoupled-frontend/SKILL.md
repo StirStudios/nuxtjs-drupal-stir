@@ -9,7 +9,7 @@ Preserve a reusable Nuxt layer, a thin project base, and explicit Drupal-to-Nuxt
 
 ## Establish ownership
 
-1. Read every applicable `AGENTS.md` and the Drupal, SEO, or accessibility skills triggered by the work.
+1. Read every applicable `CLAUDE.md` and the Drupal, SEO, or accessibility skills triggered by the work.
 2. Identify the source-of-truth checkout and downstream copies before editing.
 3. Put reusable Nuxt behavior in `nuxtjs-drupal-stir`, generic CE behavior in `nuxtjs-drupal-ce`, portable project assembly in `stir-nuxt`, Drupal producer behavior in `stir-tools`, and client-specific content/brand decisions in the client app.
 4. Search existing Nuxt UI components, layer components, composables, server utilities, and CE helpers before adding abstractions.
@@ -59,6 +59,7 @@ These rules apply in a client app cloned from the Stir Nuxt starter, not in the 
 - Avoid speculative performance work. Measure production builds and representative Drupal payloads.
 - Every composable pulled into the initial graph is paid for by every visitor. Prefer ones already in the graph, and check `pnpm perf:report` before adding another: VueUse's `useStorage` alone added ~5 kB gzip to replace two small helpers.
 - Optimize LCP media, font delivery, hydration and bundle cost without degrading content semantics or interaction readiness.
+- Nuxt Fonts resolves only the first family in a `font-family` stack and treats the rest as fallbacks, so a licensed font listed first (`'MADE Mirage', 'Cormorant Garamond', serif`) silently loads nothing. List a family a provider can serve first until the licensed file is self-hosted.
 
 ## Verify proportionately
 

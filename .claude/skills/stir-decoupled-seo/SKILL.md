@@ -9,7 +9,7 @@ Use Drupal as the editorial source of truth and Nuxt SSR as the public delivery 
 
 ## Establish context
 
-1. Read the repository `AGENTS.md` and its required Drupal skill.
+1. Read the repository `CLAUDE.md` and its required Drupal skill.
 2. Identify source and installed package copies before editing. Put reusable Drupal behavior in `stir-tools/modules/stir_seo` or `stir_sitemap`, portable recipes in `stir-decoupled`, and client-specific models and organization data in the client project.
 3. Record the production frontend origin, Drupal origin, languages, indexable environments, content types, and redirect/sitemap ownership.
 4. Inspect the Drupal page response or SEO endpoint and Nuxt server-rendered HTML before proposing changes.
