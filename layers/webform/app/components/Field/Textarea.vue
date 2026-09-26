@@ -18,6 +18,7 @@ const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const id = computed(() => injectedInputId?.value ?? props.fieldName)
 // Drupal's #rows sets the starting height; autoresize grows from there.
+const isRequired = computed(() => props.field['#required'] === true)
 const rows = computed(() => Number(props.field['#rows']) || 1)
 </script>
 
@@ -25,6 +26,7 @@ const rows = computed(() => Number(props.field['#rows']) || 1)
   <UTextarea
     :id="id"
     v-model="props.state[props.fieldName]"
+    :aria-required="isRequired || undefined"
     autoresize
     :class="['w-full', webform.fieldText]"
     :placeholder="props.floatingLabel ? ' ' : ''"
@@ -34,7 +36,7 @@ const rows = computed(() => Number(props.field['#rows']) || 1)
   >
     <label
       v-if="props.floatingLabel"
-      :class="webform.labels.floatingClass"
+      :class="[webform.labels.floatingClass, isRequired && webform.labels.requiredClass]"
       :for="id"
     >
       <span class="inline-flex">

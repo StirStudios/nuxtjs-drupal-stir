@@ -179,6 +179,15 @@ untouched do not need one.
 
 ### Fixed
 
+- Floating webform labels show the required asterisk that `UFormField` shows
+  on static labels, for text, email, tel, textarea, select, date and address
+  fields. The marker comes from Nuxt UI's `formField` required variant, so an
+  `ui.formField` override in app config applies to both label styles. Required text, email, tel, textarea and address inputs now carry
+  `aria-required="true"` in both label modes. Address parts follow the
+  validation schema: a part is required when the address or the part is.
+  Selects get the visual marker only, because Reka's `required` would add
+  native validation to its hidden select and pre-empt the form's own errors.
+
 - Client navigation between Drupal pages keeps the current layout until the
   next page names its own. `NuxtLayout` reads the router's route, which changes
   when a navigation is confirmed, before `Drupal/PageRoute.vue` has loaded the

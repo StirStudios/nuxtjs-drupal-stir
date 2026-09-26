@@ -133,7 +133,7 @@ const calendarModel = computed({
     </UPopover>
     <label
       v-if="floatingLabel"
-      :class="webform.labels.staticFloatingClass"
+      :class="[webform.labels.staticFloatingClass, field['#required'] === true && webform.labels.requiredClass]"
       :for="id"
     >
       {{ field['#title'] }}

@@ -24,6 +24,7 @@ const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
+const isRequired = computed(() => props.field['#required'] === true)
 const isNumber = computed(() => props.field['#type'] === 'number')
 const isTel = computed(() => props.field['#type'] === 'tel')
 const fieldPlaceholder = computed(() => {
@@ -90,6 +91,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
 <template>
   <UInput
     :id="id"
+    :aria-required="isRequired || undefined"
     :autocomplete="inputAutocomplete"
     :class="[webform.fieldInput, webform.fieldText]"
     :inputmode="isTel ? 'tel' : undefined"
@@ -108,7 +110,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
   >
     <label
       v-if="floatingLabel"
-      :class="webform.labels.floatingClass"
+      :class="[webform.labels.floatingClass, isRequired && webform.labels.requiredClass]"
       :for="id"
     >
       <span class="inline-flex">
