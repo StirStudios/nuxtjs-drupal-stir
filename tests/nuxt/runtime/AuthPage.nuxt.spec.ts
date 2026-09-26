@@ -3,6 +3,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { useRouter } from '#app'
 import { ref } from 'vue'
 import AuthPage from '../../../layers/auth/app/components/Auth/AuthPage.vue'
+import DefaultLayout from '../../../layers/theme/app/layouts/default.vue'
 
 const state = vi.hoisted(() => ({
   appConfig: {
@@ -136,5 +137,73 @@ describe('AuthPage', () => {
     expect(canvas.classes()).toContain('bg-elevated')
     expect(canvas.findAll('[aria-hidden="true"]')).toHaveLength(0)
     wrapper.unmount()
+  })
+
+  describe('site chrome', () => {
+    // Records what AuthPage asks of the site layout.
+    const NuxtLayout = {
+      props: ['name', 'footer'],
+      template: '<div data-test-layout :data-name="String(name)" :data-footer="String(footer)"><slot /></div>',
+    }
+    const mountAuth = () => mountSuspended(AuthPage, {
+      slots: { default: '<div>Auth form</div>' },
+      global: { stubs: { NuxtLayout } },
+    })
+
+    it.each([
+      [undefined, 'false', false],
+      ['none', 'false', false],
+      ['header', 'default', false],
+      ['full', 'default', true],
+    ])('renders chrome %s in the %s layout', async (chrome, name, footer) => {
+      state.appConfig.stirTheme = { auth: { chrome } }
+
+      const wrapper = await mountAuth()
+      const layout = wrapper.get('[data-test-layout]')
+
+      expect(layout.attributes('data-name')).toBe(name)
+      expect(layout.attributes('data-footer')).toBe(String(footer))
+      // The site layout owns <main>, so the auth content never nests one.
+      expect(wrapper.find('main').exists()).toBe(name === 'false')
+      wrapper.unmount()
+    })
+
+    it('fills the viewport under a fixed header and marks a full-bleed background', async () => {
+      state.appConfig.stirTheme = {
+        auth: { chrome: 'header', layout: 'card', backgroundImage: 'https://example.com/gate.jpg' },
+      }
+
+      const wrapper = await mountAuth()
+      const canvas = wrapper.get('[role="presentation"]')
+
+      expect(canvas.classes()).toEqual(expect.arrayContaining(['min-h-dvh', 'auth-background']))
+      wrapper.unmount()
+    })
+
+    it('leaves room for a sticky header', async () => {
+      state.appConfig.stirTheme = {
+        auth: { chrome: 'header' },
+        navigation: { mode: 'sticky' },
+      }
+
+      const wrapper = await mountAuth()
+
+      expect(wrapper.get('[role="presentation"]').classes())
+        .toContain('min-h-[calc(100dvh-var(--ui-header-height))]')
+      wrapper.unmount()
+    })
+
+    it('lets the default layout drop its footer', async () => {
+      state.appConfig.stirTheme = { routeHero: { enabled: false }, navigation: { mode: 'fixed' } }
+      const stubs = { AppHeader: true, SiteMessages: true, AppFooter: { template: '<footer data-test-footer />' }, LazyAppFooter: { template: '<footer data-test-footer />' } }
+
+      const withFooter = await mountSuspended(DefaultLayout, { global: { stubs } })
+      const withoutFooter = await mountSuspended(DefaultLayout, { props: { footer: false }, global: { stubs } })
+
+      expect(withFooter.find('[data-test-footer]').exists()).toBe(true)
+      expect(withoutFooter.find('[data-test-footer]').exists()).toBe(false)
+      withFooter.unmount()
+      withoutFooter.unmount()
+    })
   })
 })

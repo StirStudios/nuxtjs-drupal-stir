@@ -51,7 +51,14 @@ export type AuthCardConfig = {
   variant?: 'solid' | 'outline' | 'soft' | 'subtle'
 }
 
+/**
+ * Site chrome around an auth page: none (the page alone), header (the site
+ * header), or full (the site header and footer).
+ */
+export type AuthChrome = 'none' | 'header' | 'full'
+
 export type AuthPageConfig = {
+  chrome?: AuthChrome
   backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'

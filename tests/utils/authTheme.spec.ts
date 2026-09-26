@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   resolveAuthCardConfig,
+  resolveAuthChrome,
   resolveAuthPageKey,
 } from '../../layers/auth/app/utils/authTheme'
 
@@ -51,5 +52,18 @@ describe('auth theme utilities', () => {
         footer: 'text-center',
       },
     })
+  })
+
+  it('resolves auth chrome from the page, then the auth theme, then none', () => {
+    const theme = {
+      chrome: 'full' as const,
+      pages: { protectedPage: { chrome: 'header' as const }, login: {} },
+    }
+
+    expect(resolveAuthChrome(theme, 'protectedPage')).toBe('header')
+    expect(resolveAuthChrome(theme, 'login')).toBe('full')
+    expect(resolveAuthChrome(theme, null)).toBe('full')
+    expect(resolveAuthChrome({}, 'login')).toBe('none')
+    expect(resolveAuthChrome({ chrome: 'sideways' } as never, 'login')).toBe('none')
   })
 })

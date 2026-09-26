@@ -1,5 +1,6 @@
 import type {
   AuthCardConfig,
+  AuthChrome,
   AuthPageKey,
   AuthThemeConfig,
 } from '../types/theme'
@@ -71,4 +72,18 @@ export const resolveAuthCardConfig = (
       ...pageCard.ui,
     },
   }
+}
+
+const isAuthChrome = (value: unknown): value is AuthChrome =>
+  value === 'none' || value === 'header' || value === 'full'
+
+/** The page's chrome, then the auth-wide chrome, then none. */
+export const resolveAuthChrome = (
+  authTheme: AuthThemeConfig,
+  pageKey: AuthPageKey | null,
+): AuthChrome => {
+  const pageChrome = pageKey ? authTheme.pages?.[pageKey]?.chrome : undefined
+
+  if (isAuthChrome(pageChrome)) return pageChrome
+  return isAuthChrome(authTheme.chrome) ? authTheme.chrome : 'none'
 }
