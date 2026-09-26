@@ -1,3 +1,5 @@
+import formFieldTheme from '#build/ui/form-field'
+
 type StirWebformTheme = {
   showToasts?: boolean
   scrollToTopOnSuccess?: boolean
@@ -30,6 +32,7 @@ type ResolvedStirWebformTheme = StirWebformTheme & {
   labels: NonNullable<StirWebformTheme['labels']> & {
     floatingClass: string[]
     staticFloatingClass: string[]
+    requiredClass: string
   }
 }
 
@@ -39,8 +42,13 @@ const defaultLabelBase = [
   'peer-focus:text-primary peer-focus:text-sm peer-focus:font-medium',
 ]
 
+type FormFieldRequiredOverride = {
+  formField?: { variants?: { required?: { true?: { label?: string } } } }
+}
+
 export function useStirWebformTheme(): ResolvedStirWebformTheme {
-  const stirTheme = useAppConfig().stirTheme as { webform?: StirWebformTheme }
+  const appConfig = useAppConfig()
+  const stirTheme = appConfig.stirTheme as { webform?: StirWebformTheme }
   const forms = useStirFormTheme()
   const webform = stirTheme.webform ?? {}
   const fieldVariant = webform.fieldVariant ?? forms.variant
@@ -80,6 +88,11 @@ export function useStirWebformTheme(): ResolvedStirWebformTheme {
         ...defaultLabelBase,
         ...resolvedLabelBase,
       ].filter(Boolean),
+      // Floating labels replace UFormField's label, so they take its required
+      // marker from the Nuxt UI theme, honouring a project override.
+      requiredClass:
+        (appConfig.ui as FormFieldRequiredOverride | undefined)?.formField?.variants?.required?.true?.label
+        ?? formFieldTheme.variants.required.true.label,
     },
   }
 }

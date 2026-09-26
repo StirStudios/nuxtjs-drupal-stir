@@ -288,6 +288,133 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.find(`[id="${controlId}"]`).exists()).toBe(true)
   })
 
+  // The marker UFormField puts on a required label, from the Nuxt UI theme.
+  const requiredMarker = 'after:content-[\'*\']'
+
+  it.each([
+    ['textfield', undefined],
+    ['email', undefined],
+    ['tel', undefined],
+    ['textarea', undefined],
+  ] as const)('marks a required floating %s label and its control', async (type, options) => {
+    const mount = (required: boolean) => mountSuspended(FieldRenderer, {
+      props: {
+        field: {
+          '#type': type,
+          '#name': 'example_field',
+          '#title': 'Example field',
+          '#floatingLabel': true,
+          '#required': required,
+          ...(options ? { '#options': options } : {}),
+        },
+        fieldName: 'example_field',
+        state: {},
+      },
+    })
+    const required = await mount(true)
+    const label = required.get('label')
+
+    expect(label.text()).toBe('Example field')
+    expect(label.classes()).toContain(requiredMarker)
+    expect(required.get(`[id="${label.attributes('for')}"]`).attributes('aria-required')).toBe('true')
+
+    const optional = await mount(false)
+    const optionalLabel = optional.get('label')
+
+    expect(optionalLabel.classes()).not.toContain(requiredMarker)
+    expect(optional.get(`[id="${optionalLabel.attributes('for')}"]`).attributes('aria-required')).not.toBe('true')
+  })
+
+  // Reka's select trigger sets aria-required from its own required prop, which
+  // would also make its hidden native select block submission, so the select
+  // gets the visual marker only.
+  it('marks a required floating select label', async () => {
+    const mount = (required: boolean) => mountSuspended(FieldRenderer, {
+      props: {
+        field: {
+          '#type': 'select',
+          '#name': 'region',
+          '#title': 'Region',
+          '#floatingLabel': true,
+          '#required': required,
+          '#options': { west: 'West' },
+        },
+        fieldName: 'region',
+        state: {},
+      },
+    })
+
+    expect((await mount(true)).get('label').classes()).toContain(requiredMarker)
+    expect((await mount(false)).get('label').classes()).not.toContain(requiredMarker)
+  })
+
+  it('announces required static-label inputs too', async () => {
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field: {
+          '#type': 'textfield',
+          '#name': 'full_name',
+          '#title': 'Full name',
+          '#floatingLabel': false,
+          '#required': true,
+        },
+        fieldName: 'full_name',
+        state: {},
+      },
+    })
+
+    expect(wrapper.get('input').attributes('aria-required')).toBe('true')
+  })
+
+  it('marks a required floating date label', async () => {
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field: {
+          '#type': 'date',
+          '#name': 'start_date',
+          '#title': 'Start date',
+          '#floatingLabel': true,
+          '#required': true,
+        },
+        fieldName: 'start_date',
+        state: {},
+      },
+    })
+
+    expect(wrapper.get('label').classes()).toContain(requiredMarker)
+  })
+
+  it('marks each required floating address part', async () => {
+    // InputType does not list 'address', although the renderer maps it.
+    const field = {
+      '#type': 'address',
+      '#name': 'address',
+      '#title': 'Address',
+      '#floatingLabel': true,
+      '#composite': {
+        address: { label: 'Street', '#required': true },
+        address_2: { label: 'Street line 2' },
+        country: { label: 'Country', '#required': true, options: { GB: 'United Kingdom' } },
+      },
+    } as unknown as WebformFieldProps
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field,
+        fieldName: 'address',
+        state: {},
+      },
+    })
+    const labels = wrapper.findAll('label')
+    const controlOf = (index: number) =>
+      wrapper.get(`[id="${labels[index]!.attributes('for')}"]`)
+
+    expect(labels.map(label => label.text())).toEqual(['Street', 'Street line 2', 'Country'])
+    expect(labels.map(label => label.classes().includes(requiredMarker))).toEqual([true, false, true])
+    expect(controlOf(0).attributes('aria-required')).toBe('true')
+    expect(controlOf(1).attributes('aria-required')).toBeUndefined()
+    expect(controlOf(2).attributes('aria-required')).toBe('true')
+  })
+
   it('preserves the form-field contract for selects', async () => {
     const field: WebformFieldProps = {
       '#type': 'select',

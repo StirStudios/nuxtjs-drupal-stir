@@ -60,7 +60,11 @@ untouched do not need one.
   per page. With chrome, the layout owns `<main>`, the auth page fills the
   screen under a fixed header (or below a sticky one), and a full-bleed
   background carries the `auth-background` class, so a site can style the
-  header over the photo. `layouts/default.vue` accepts `footer: false`.
+  header over the photo. `layouts/default.vue` accepts `footer: false` and
+  provides its header mode as `stirHeaderMode`; a project that overrides that
+  layout should `provide('stirHeaderMode', useHeaderMode())` too, or auth
+  pages size themselves for a fixed header. The auth layer still works
+  without the theme layer.
 - `stirTheme.navigation.toggleVariant` and `toggleColor` set the Nuxt UI
   variant and colour of the menu toggle and the slideover close button
   (default `ghost` and `neutral`), so a site can use `link` over a hero image
@@ -120,13 +124,16 @@ untouched do not need one.
   renders one `<NuxtLayout>` around `<NuxtPage>`, so the header, footer and
   other layout components keep their DOM (and state) between pages that share
   a layout, instead of being rebuilt on every click. Drupal pages choose their
-  layout before render: `plugins/drupalPageLayout.server.ts` reads
-  `page_layout` on the server (pages opt in with `definePageMeta({ drupalPage:
-  true })`, as `[...slug].vue` does), and `Drupal/PageRoute.vue` sets it on
-  client navigation. Auth chrome is set by `middleware/authChrome.global.ts`.
+  layout before render: `plugins/drupalPageLayout.ts` reads `page_layout` on
+  the server (pages opt in with `definePageMeta({ drupalPage: true })`, as
+  `[...slug].vue` does), and `Drupal/PageRoute.vue` sets it on client
+  navigation. Auth chrome is set by `middleware/authChrome.global.ts`.
   **Consumer action:** a site page that renders its own `<NuxtLayout>` must add
   `definePageMeta({ layout: false })`, and so must a page that should stay
-  without a layout; otherwise the default layout wraps it. A site page that
+  without a layout; otherwise the default layout wraps it. Such a page must
+  also name its layout, as in `<NuxtLayout name="default">`: an unnamed one
+  reads the page's own `layout: false` and renders no layout at all, so the
+  header and navigation disappear. A site page that
   renders `<DrupalPageRoute>` should add `drupalPage: true` so its layout is
   resolved on the server.
 
@@ -175,6 +182,15 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- Floating webform labels show the required asterisk that `UFormField` shows
+  on static labels, for text, email, tel, textarea, select, date and address
+  fields. The marker comes from Nuxt UI's `formField` required variant, so an
+  `ui.formField` override in app config applies to both label styles. Required text, email, tel, textarea and address inputs now carry
+  `aria-required="true"` in both label modes. Address parts follow the
+  validation schema: a part is required when the address or the part is.
+  Selects get the visual marker only, because Reka's `required` would add
+  native validation to its hidden select and pre-empt the form's own errors.
 
 - Client navigation between Drupal pages keeps the current layout until the
   next page names its own. `NuxtLayout` reads the router's route, which changes

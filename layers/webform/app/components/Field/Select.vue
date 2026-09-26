@@ -25,6 +25,7 @@ const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
 const buttonVariant = computed(() => resolveUiButtonVariant(webform.fieldVariant, 'outline'))
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
+const isRequired = computed(() => props.field?.['#required'] === true)
 const selectUi = computed(() => props.floatingLabel
   ? { base: webform.compactControlClass }
   : {})
@@ -79,7 +80,7 @@ const handleButtonClick = (value: string) => {
     />
     <label
       v-if="floatingLabel"
-      :class="webform.labels.staticFloatingClass"
+      :class="[webform.labels.staticFloatingClass, isRequired && webform.labels.requiredClass]"
       :for="id"
     >
       {{ field?.['#title'] }}

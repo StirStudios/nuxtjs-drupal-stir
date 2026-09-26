@@ -1,3 +1,4 @@
+import type { LayoutKey } from '#app'
 import type { AuthThemeConfig } from '../types/theme'
 import { authChromeLayout, resolveAuthChrome, resolveAuthPageKey } from '../utils/authTheme'
 
@@ -12,7 +13,9 @@ export default defineNuxtRouteMiddleware((to) => {
   const authTheme = ((useAppConfig().stirTheme || {}) as { auth?: AuthThemeConfig }).auth || {}
   const layout = authChromeLayout(resolveAuthChrome(authTheme, pageKey))
 
-  // Runs the same way on the server and client, so the route meta agrees.
-  to.meta.layout = layout.name === false ? false : 'default'
+  // Runs the same way on the server and client, so the route meta agrees. The
+  // chrome layout comes from the theme layer, so it is not a LayoutKey when
+  // the auth layer is used on its own.
+  to.meta.layout = layout.name === false ? false : layout.name as LayoutKey
   to.meta.layoutProps = layout.props
 })

@@ -57,6 +57,10 @@ if (!props.state[props.fieldName]) {
   props.state[props.fieldName] = {}
 }
 
+// Mirrors the validation schema: a part is required when the address or the
+// part itself is.
+const isPartRequired = (fieldData: WebformFieldProps) =>
+  props.field['#required'] === true || fieldData['#required'] === true
 const getFieldId = (key: string) => `${props.fieldName}-${key}`
 </script>
 
@@ -69,12 +73,13 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
       "
       :name="`${fieldName}.${key}`"
-      :required="field['#required']"
+      :required="isPartRequired(fieldData)"
     >
       <UInput
         v-if="key !== 'country'"
         :id="getFieldId(String(key))"
         v-model="state[fieldName]![String(key)]"
+        :aria-required="isPartRequired(fieldData) || undefined"
         class="w-full"
         :placeholder="useFloatingLabels ? ' ' : ''"
         :ui="inputUi"
@@ -82,7 +87,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
       >
         <label
           v-if="useFloatingLabels"
-          :class="webform.labels.floatingClass"
+          :class="[webform.labels.floatingClass, isPartRequired(fieldData) && webform.labels.requiredClass]"
           :for="getFieldId(String(key))"
         >
           <span class="inline-flex">
@@ -95,6 +100,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         <USelectMenu
           :id="getFieldId(String(key))"
           v-model="state[fieldName]!.country"
+          :aria-required="isPartRequired(fieldData) || undefined"
           class="w-full"
           :items="countryOptions"
           label-key="label"
@@ -106,7 +112,7 @@ const getFieldId = (key: string) => `${props.fieldName}-${key}`
         />
         <label
           v-if="useFloatingLabels"
-          :class="webform.labels.staticFloatingClass"
+          :class="[webform.labels.staticFloatingClass, isPartRequired(fieldData) && webform.labels.requiredClass]"
           :for="getFieldId(String(key))"
         >
           {{ getCompositeLabel(fieldData, String(key)) }}
