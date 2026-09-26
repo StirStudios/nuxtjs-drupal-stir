@@ -49,7 +49,6 @@ describe('componentTree', () => {
         props: {
           uuid: '00000000-0000-4000-8000-000000000042',
           layout: 'two_column',
-          card: false,
           container: true,
           header: 'Layout section',
           headerTag: 'h2',
