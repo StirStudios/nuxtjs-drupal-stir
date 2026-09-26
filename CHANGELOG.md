@@ -223,9 +223,11 @@ untouched do not need one.
   editor bar whose setup cleared and reloaded the shared account menu, so the
   visible dropdown lost its chevron and the bar narrowed. On client
   navigation to a Drupal page, the current layout and its props (including an
-  auth page's chrome) now carry over until the page names its own. One plugin,
-  `plugins/drupalPageLayout.ts`, holds both the server and client layout
-  decisions; it replaces `drupalPageLayout.server.ts`. No consumer action.
+  auth page's chrome) now carry over until the page names its own:
+  `plugins/drupalPageLayout.server.ts` sets the layout from the fetched page
+  and `plugins/drupalPageLayout.client.ts` carries it over. They stay separate
+  so the Drupal CE client stays out of the initial browser bundle. No
+  consumer action.
 
 - `Drupal/Tabs.vue` caches the account menu per user
   (`menu-account--<user id>`) instead of clearing and reloading one shared

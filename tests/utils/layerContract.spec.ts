@@ -671,7 +671,9 @@ describe('layer contract', () => {
       expect(read(page)).not.toContain('<NuxtLayout')
     }
     expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
-    expect(read('layers/theme/app/plugins/drupalPageLayout.ts')).toContain('setDrupalPageLayout(')
+    expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
+    // A universal plugin would keep the Drupal CE client in the browser bundle.
+    expect(read('layers/theme/app/plugins/drupalPageLayout.client.ts')).not.toMatch(/useStirDrupalCe|fetchPage/)
     expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
   })
 

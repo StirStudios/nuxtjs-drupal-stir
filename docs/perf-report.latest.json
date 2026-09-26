@@ -5,7 +5,7 @@
     "editorExcludedFromInitialGraph": true
   },
   "editorExclusive": {
-    "gzipKb": 307.729,
+    "gzipKb": 307.7320000000001,
     "assets": [
       {
         "label": "_Cg3pmXaQ",
@@ -24,9 +24,9 @@
       {
         "label": "editorial:app/components/Edit/Text",
         "role": "admin-deferred",
-        "file": "_nuxt/CGozI9mO.js",
+        "file": "_nuxt/BVeDcQii.js",
         "sizeKb": 173.291,
-        "gzipKb": 54.006
+        "gzipKb": 54.008
       },
       {
         "label": "_C4Wvkzn3",
@@ -43,11 +43,11 @@
         "gzipKb": 10.551
       },
       {
-        "label": "_BgAI8FeV",
+        "label": "_B5eMGRMS",
         "role": "admin-deferred",
-        "file": "_nuxt/BgAI8FeV.js",
+        "file": "_nuxt/B5eMGRMS.js",
         "sizeKb": 34.914,
-        "gzipKb": 9.395
+        "gzipKb": 9.396
       },
       {
         "label": "_DCOqhVol",
@@ -57,11 +57,11 @@
         "gzipKb": 8.084
       },
       {
-        "label": "_C1kb1vy6",
+        "label": "_BDm_T72b",
         "role": "admin-deferred",
-        "file": "_nuxt/C1kb1vy6.js",
+        "file": "_nuxt/BDm_T72b.js",
         "sizeKb": 18.341,
-        "gzipKb": 4.893
+        "gzipKb": 4.894
       },
       {
         "label": "_CTuAAWL1",
@@ -78,11 +78,11 @@
         "gzipKb": 3.824
       },
       {
-        "label": "_1iRBaabo",
+        "label": "_G5a4h-AG",
         "role": "admin-deferred",
-        "file": "_nuxt/1iRBaabo.js",
+        "file": "_nuxt/G5a4h-AG.js",
         "sizeKb": 10.127,
-        "gzipKb": 2.912
+        "gzipKb": 2.911
       },
       {
         "label": "_CBnmHvHO",
@@ -92,9 +92,9 @@
         "gzipKb": 2.809
       },
       {
-        "label": "_GsIUsFO6",
+        "label": "_C3P800P4",
         "role": "admin-deferred",
-        "file": "_nuxt/GsIUsFO6.js",
+        "file": "_nuxt/C3P800P4.js",
         "sizeKb": 9.553,
         "gzipKb": 2.737
       },
@@ -212,30 +212,37 @@
       }
     ]
   },
-  "generatedAt": "2026-09-26T01:43:05.366Z",
+  "generatedAt": "2026-09-26T18:10:20.225Z",
   "environment": {
     "node": "v24.13.0",
     "platform": "darwin",
-    "arch": "arm64"
+    "arch": "arm64",
+    "nuxt": "4.5.2",
+    "nitro": "2.13.4",
+    "vite": "8.3.0",
+    "vue": "3.5.43"
   },
-  "buildTimings": {},
+  "buildTimings": {
+    "clientMs": 5484,
+    "serverMs": 4880
+  },
   "initialClient": {
-    "sizeKb": 808.92,
-    "gzipKb": 238.73,
+    "sizeKb": 808.46,
+    "gzipKb": 238.64,
     "assets": [
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/9VaZAFsO.js",
-        "sizeKb": 120.134,
-        "gzipKb": 40.734
+        "file": "_nuxt/CdyFFmkT.js",
+        "sizeKb": 120.428,
+        "gzipKb": 40.811
       },
       {
-        "label": "entry.Cka9mL8r.css",
+        "label": "entry.-YEuYuWZ.css",
         "role": "initial",
-        "file": "_nuxt/entry.Cka9mL8r.css",
-        "sizeKb": 262.938,
-        "gzipKb": 35.483
+        "file": "_nuxt/entry.-YEuYuWZ.css",
+        "sizeKb": 262.039,
+        "gzipKb": 35.282
       },
       {
         "label": "_P_6KZL5i",
@@ -252,9 +259,9 @@
         "gzipKb": 13.782
       },
       {
-        "label": "_DV1Htx9z",
+        "label": "_DiOoaMAQ",
         "role": "initial",
-        "file": "_nuxt/DV1Htx9z.js",
+        "file": "_nuxt/DiOoaMAQ.js",
         "sizeKb": 42.337,
         "gzipKb": 13.162
       },
@@ -273,11 +280,11 @@
         "gzipKb": 6.835
       },
       {
-        "label": "_Dqqi9dK0",
+        "label": "_B_mjOOIi",
         "role": "initial",
-        "file": "_nuxt/Dqqi9dK0.js",
+        "file": "_nuxt/B_mjOOIi.js",
         "sizeKb": 16.889,
-        "gzipKb": 6.387
+        "gzipKb": 6.386
       },
       {
         "label": "theme:app/app.config",
@@ -294,16 +301,16 @@
         "gzipKb": 5.383
       },
       {
-        "label": "_lbgtSZsK",
+        "label": "_VWdxaOf4",
         "role": "initial",
-        "file": "_nuxt/lbgtSZsK.js",
+        "file": "_nuxt/VWdxaOf4.js",
         "sizeKb": 10.337,
-        "gzipKb": 3.746
+        "gzipKb": 3.745
       },
       {
-        "label": "_BGe4bZeX",
+        "label": "_DG2-jDps",
         "role": "initial",
-        "file": "_nuxt/BGe4bZeX.js",
+        "file": "_nuxt/DG2-jDps.js",
         "sizeKb": 9.086,
         "gzipKb": 3.682
       },
@@ -322,32 +329,32 @@
         "gzipKb": 3.472
       },
       {
-        "label": "_DrKEACgU",
+        "label": "_BLn5pSLF",
         "role": "initial",
-        "file": "_nuxt/DrKEACgU.js",
-        "sizeKb": 9.617,
-        "gzipKb": 3.454
+        "file": "_nuxt/BLn5pSLF.js",
+        "sizeKb": 9.622,
+        "gzipKb": 3.456
       },
       {
         "label": "theme:app/router.options",
         "role": "initial",
-        "file": "_nuxt/DgEqNVvD.js",
-        "sizeKb": 8.54,
-        "gzipKb": 3.356
+        "file": "_nuxt/Dh4NKxFx.js",
+        "sizeKb": 8.545,
+        "gzipKb": 3.357
       },
       {
-        "label": "_DIexpuCu",
+        "label": "_CPq-0Hny",
         "role": "initial",
-        "file": "_nuxt/DIexpuCu.js",
+        "file": "_nuxt/CPq-0Hny.js",
         "sizeKb": 8.84,
-        "gzipKb": 3.184
+        "gzipKb": 3.183
       },
       {
-        "label": "_BD7cR0lG",
+        "label": "_XHbwARx8",
         "role": "initial",
-        "file": "_nuxt/BD7cR0lG.js",
+        "file": "_nuxt/XHbwARx8.js",
         "sizeKb": 16.114,
-        "gzipKb": 3.152
+        "gzipKb": 3.15
       },
       {
         "label": "_Cu-tHZGS",
@@ -373,9 +380,9 @@
       {
         "label": "theme:build/imageCdn",
         "role": "initial",
-        "file": "_nuxt/Sr1lFWvd.js",
-        "sizeKb": 5.957,
-        "gzipKb": 2.68
+        "file": "_nuxt/DDOv9G7q.js",
+        "sizeKb": 5.931,
+        "gzipKb": 2.664
       },
       {
         "label": "_CK5a5lEU",
@@ -385,18 +392,18 @@
         "gzipKb": 2.64
       },
       {
-        "label": "_CJM_n1Yl",
+        "label": "_B5MXbpBh",
         "role": "initial",
-        "file": "_nuxt/CJM_n1Yl.js",
-        "sizeKb": 4.922,
-        "gzipKb": 2.349
+        "file": "_nuxt/B5MXbpBh.js",
+        "sizeKb": 4.907,
+        "gzipKb": 2.334
       },
       {
-        "label": "_khTdfCEx",
+        "label": "_CE2GoSKa",
         "role": "initial",
-        "file": "_nuxt/khTdfCEx.js",
-        "sizeKb": 4.639,
-        "gzipKb": 2.085
+        "file": "_nuxt/CE2GoSKa.js",
+        "sizeKb": 4.822,
+        "gzipKb": 2.151
       },
       {
         "label": "_0cZM9QsX",
@@ -483,11 +490,11 @@
         "gzipKb": 0.593
       },
       {
-        "label": "_BcX6rn_F",
+        "label": "_DEtJO6j1",
         "role": "initial",
-        "file": "_nuxt/BcX6rn_F.js",
+        "file": "_nuxt/DEtJO6j1.js",
         "sizeKb": 1.03,
-        "gzipKb": 0.562
+        "gzipKb": 0.563
       },
       {
         "label": "_CFBAD8Fv",
@@ -520,7 +527,7 @@
       {
         "label": "auth:app/composables/useAuthSession",
         "role": "initial",
-        "file": "_nuxt/o2X_hmEM.js",
+        "file": "_nuxt/DQ2mW5tO.js",
         "sizeKb": 0.91,
         "gzipKb": 0.481
       },
@@ -569,14 +576,14 @@
       {
         "label": "auth:app/composables/auth/useProtectedSession",
         "role": "initial",
-        "file": "_nuxt/VKzH5GoF.js",
+        "file": "_nuxt/DMFd2OZ_.js",
         "sizeKb": 0.581,
-        "gzipKb": 0.345
+        "gzipKb": 0.347
       },
       {
-        "label": "_BZFVRCj-",
+        "label": "_DI9Q5oAb",
         "role": "initial",
-        "file": "_nuxt/BZFVRCj-.js",
+        "file": "_nuxt/DI9Q5oAb.js",
         "sizeKb": 0.54,
         "gzipKb": 0.337
       },
@@ -590,9 +597,9 @@
       {
         "label": "auth:app/composables/useAuthConfig",
         "role": "initial",
-        "file": "_nuxt/C1XVvVEW.js",
+        "file": "_nuxt/DUtn_X6W.js",
         "sizeKb": 0.459,
-        "gzipKb": 0.303
+        "gzipKb": 0.304
       },
       {
         "label": "_DGZOFxO_",
@@ -632,9 +639,9 @@
       {
         "label": "theme:app/utils/pageRequest",
         "role": "initial",
-        "file": "_nuxt/C3kZPeO_.js",
+        "file": "_nuxt/jWtPT4FI.js",
         "sizeKb": 0.32,
-        "gzipKb": 0.22
+        "gzipKb": 0.222
       },
       {
         "label": "_Cvfb1ASi",
@@ -841,23 +848,23 @@
     {
       "label": "editorial:app/components/Edit/Text",
       "role": "admin-deferred",
-      "file": "_nuxt/CGozI9mO.js",
+      "file": "_nuxt/BVeDcQii.js",
       "sizeKb": 173.291,
-      "gzipKb": 54.006
+      "gzipKb": 54.008
     },
     {
       "label": "app-entry",
       "role": "initial",
-      "file": "_nuxt/9VaZAFsO.js",
-      "sizeKb": 120.134,
-      "gzipKb": 40.734
+      "file": "_nuxt/CdyFFmkT.js",
+      "sizeKb": 120.428,
+      "gzipKb": 40.811
     },
     {
-      "label": "entry.Cka9mL8r.css",
+      "label": "entry.-YEuYuWZ.css",
       "role": "initial",
-      "file": "_nuxt/entry.Cka9mL8r.css",
-      "sizeKb": 262.938,
-      "gzipKb": 35.483
+      "file": "_nuxt/entry.-YEuYuWZ.css",
+      "sizeKb": 262.039,
+      "gzipKb": 35.282
     },
     {
       "label": "_P_6KZL5i",
@@ -883,14 +890,14 @@
     {
       "label": "editorial:app/components/Edit/Presentation",
       "role": "async",
-      "file": "_nuxt/BVS2mFUq.js",
+      "file": "_nuxt/FnTVelsJ.js",
       "sizeKb": 59.658,
-      "gzipKb": 21.043
+      "gzipKb": 21.042
     },
     {
-      "label": "_DzFbabuA",
+      "label": "_jsWnneGM",
       "role": "async",
-      "file": "_nuxt/DzFbabuA.js",
+      "file": "_nuxt/jsWnneGM.js",
       "sizeKb": 55.504,
       "gzipKb": 14.871
     },
@@ -902,33 +909,36 @@
       "gzipKb": 13.782
     },
     {
-      "label": "_DV1Htx9z",
+      "label": "_DiOoaMAQ",
       "role": "initial",
-      "file": "_nuxt/DV1Htx9z.js",
+      "file": "_nuxt/DiOoaMAQ.js",
       "sizeKb": 42.337,
       "gzipKb": 13.162
     },
     {
       "label": "auth:app/layouts/account",
       "role": "async",
-      "file": "_nuxt/C_iVZIyM.js",
+      "file": "_nuxt/DMed6MUM.js",
       "sizeKb": 42.146,
       "gzipKb": 11.827
     },
     {
       "label": "theme:app/components/global/drupal-view--default",
       "role": "async",
-      "file": "_nuxt/whQ_ZO0F.js",
-      "sizeKb": 33.513,
-      "gzipKb": 11.277
+      "file": "_nuxt/5rrABHzz.js",
+      "sizeKb": 33.516,
+      "gzipKb": 11.272
     },
     {
-      "label": "_BWXVw2v6",
+      "label": "_BR8aG7-R",
       "role": "async",
-      "file": "_nuxt/BWXVw2v6.js",
+      "file": "_nuxt/BR8aG7-R.js",
       "sizeKb": 41.194,
       "gzipKb": 11.258
     }
   ],
-  "totalOutputSize": null
+  "totalOutputSize": {
+    "total": "31.6 MB",
+    "gzip": "11.7 MB gzip"
+  }
 }
