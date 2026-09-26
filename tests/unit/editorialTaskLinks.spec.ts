@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import {
   type EditorialTaskLink,
   adminLinkIcon,
   withUnpublishedTask,
+  ADMIN_TAB_ICONS,
+  toIconifyName,
 } from '../../layers/editorial/app/utils/adminUiTheme'
 
 function buildLinks(): EditorialTaskLink[] {
@@ -72,5 +76,27 @@ describe('adminLinkIcon', () => {
   it('returns null for links with no known shape', () => {
     expect(adminLinkIcon('/node/42')).toBeNull()
     expect(adminLinkIcon('/admin/content')).toBeNull()
+  })
+
+  it('preloads every editor tab icon outside the shared icon bundle', () => {
+    const urls = [
+      'https://cms.example/ce-api/node/1', '/node/1/edit', '/node/1/delete', '/node/1/revisions',
+      '/node/1/export', '/admin/settings', '/user/logout', '/user/login', '/user/7',
+    ]
+
+    for (const url of urls) {
+      expect(ADMIN_TAB_ICONS).toContain(adminLinkIcon(url))
+    }
+    expect(ADMIN_TAB_ICONS).toEqual(expect.arrayContaining([
+      'i-lucide-eye', 'i-lucide-eye-off', 'i-lucide-layout-dashboard', 'i-lucide-circle-user',
+    ]))
+    expect(toIconifyName('i-lucide-square-pen')).toBe('lucide:square-pen')
+
+    const root = resolve(import.meta.dirname, '../..')
+
+    expect(readFileSync(resolve(root, 'layers/editorial/app/components/Drupal/Tabs.vue'), 'utf8'))
+      .toContain('onMounted(() => loadIcons(ADMIN_TAB_ICONS.map(toIconifyName)))')
+    // Editor-only icons stay out of the bundle every visitor downloads.
+    expect(readFileSync(resolve(root, 'layers/platform/nuxt.config.ts'), 'utf8')).not.toContain('lucide:square-pen')
   })
 })

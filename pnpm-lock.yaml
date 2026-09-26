@@ -21,6 +21,9 @@ importers:
       '@iconify-json/lucide':
         specifier: ^1.2.136
         version: 1.2.136
+      '@iconify/vue':
+        specifier: ^5.0.3
+        version: 5.0.3(vue@3.5.43(typescript@5.9.3))
       '@internationalized/date':
         specifier: ^3.12.4
         version: 3.12.4

@@ -27,6 +27,7 @@
   "dependencies": {
     "production": [
       "@iconify-json/lucide",
+      "@iconify/vue",
       "@internationalized/date",
       "@nuxt/image",
       "@nuxt/kit",
@@ -828,7 +829,7 @@
     "plugins": 9,
     "middleware": 5,
     "serverRoutes": 29,
-    "productionDependencies": 39,
+    "productionDependencies": 40,
     "developmentDependencies": 27,
     "tests": 211,
     "testsByArea": {
