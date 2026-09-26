@@ -76,6 +76,8 @@ export type AuthThemeConfig = AuthPageConfig & {
   showLogo?: boolean
   /** Classes for that logo, e.g. its height. */
   logoClass?: ClassValue
+  /** Classes for the form and status titles; defaults to the standard size and weight. */
+  titleClass?: ClassValue
   /** Class overrides for the form panel, passed through to UAuthForm's ui. */
   formUi?: LooseRecord
   pages?: Partial<Record<AuthPageKey, AuthPageConfig>>

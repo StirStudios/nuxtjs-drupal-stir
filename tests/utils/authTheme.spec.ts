@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveAuthCardConfig,
   resolveAuthChrome,
+  resolveAuthTitleClass,
   resolveAuthPageKey,
 } from '../../layers/auth/app/utils/authTheme'
 
@@ -65,5 +66,11 @@ describe('auth theme utilities', () => {
     expect(resolveAuthChrome(theme, null)).toBe('full')
     expect(resolveAuthChrome({}, 'login')).toBe('none')
     expect(resolveAuthChrome({ chrome: 'sideways' } as never, 'login')).toBe('none')
+  })
+
+  it('uses the configured auth title class, else the standard title look', () => {
+    expect(resolveAuthTitleClass({ titleClass: ' font-heading text-4xl ' })).toBe('font-heading text-4xl')
+    expect(resolveAuthTitleClass({})).toBe('mb-0 text-xl leading-7 font-semibold')
+    expect(resolveAuthTitleClass(undefined)).toBe('mb-0 text-xl leading-7 font-semibold')
   })
 })

@@ -650,7 +650,9 @@ describe('layer contract', () => {
     )
 
     expect(authFormPanel).toContain('<template #title>')
-    expect(authFormPanel).toContain('<h1 class="mb-0! text-xl! leading-7! font-semibold!">{{ title }}</h1>')
+    expect(authFormPanel).toContain('<h1 :class="titleClass">{{ title }}</h1>')
+    expect(readFileSync(resolve(rootDir, 'layers/auth/app/utils/authTheme.ts'), 'utf8'))
+      .toContain('defaultAuthTitleClass = \'mb-0 text-xl leading-7 font-semibold\'')
     expect(themeConfig).toMatch(/class:\s*['"]min-h-12['"]/)
     expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })

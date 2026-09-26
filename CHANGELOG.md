@@ -131,6 +131,11 @@ untouched do not need one.
 
 ### Fixed
 
+- Auth form and status titles take `stirTheme.auth.titleClass` (default
+  `mb-0 text-xl leading-7 font-semibold`). They no longer use `!important`
+  classes, which blocked site styling; utilities already beat the base `h1`
+  styles.
+
 - `thirdPartyScripts.allowedOrigins` accepts subdomain wildcards such as
   `https://*.piperavenue.com`. The calculator allows `https://*.piperavenue.com`,
   `https://*.stirstudiosdesign.com` and `https://piper.b-cdn.net` by default, so

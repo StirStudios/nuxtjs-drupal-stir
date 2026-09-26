@@ -4,6 +4,7 @@ import { useRouter } from '#app'
 import { ref } from 'vue'
 import AuthPage from '../../../layers/auth/app/components/Auth/AuthPage.vue'
 import DefaultLayout from '../../../layers/theme/app/layouts/default.vue'
+import AuthStatusPanel from '../../../layers/auth/app/components/Auth/AuthStatusPanel.vue'
 
 const state = vi.hoisted(() => ({
   appConfig: {
@@ -205,5 +206,18 @@ describe('AuthPage', () => {
       withFooter.unmount()
       withoutFooter.unmount()
     })
+  })
+
+  it('styles auth titles from stirTheme.auth.titleClass', async () => {
+    state.appConfig.stirTheme = { auth: { titleClass: 'font-heading text-4xl font-light uppercase' } }
+
+    const wrapper = await mountSuspended(AuthStatusPanel, {
+      props: { title: 'Verified', description: 'All set.' },
+    })
+    const title = wrapper.get('h1')
+
+    expect(title.classes()).toEqual(expect.arrayContaining(['font-heading', 'text-4xl', 'font-light', 'uppercase']))
+    expect(title.classes().some(name => name.endsWith('!'))).toBe(false)
+    wrapper.unmount()
   })
 })

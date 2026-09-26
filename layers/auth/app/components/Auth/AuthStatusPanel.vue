@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { AuthThemeConfig } from '../../types/theme'
+import { resolveAuthTitleClass } from '../../utils/authTheme'
+
 const props = withDefaults(defineProps<{
   tone?: 'neutral' | 'success' | 'warning' | 'error'
   title: string
@@ -23,6 +26,10 @@ const toneClasses = computed(() => {
       return 'text-muted'
   }
 })
+
+const titleClass = computed(() =>
+  resolveAuthTitleClass((useAppConfig().stirTheme as { auth?: AuthThemeConfig } | undefined)?.auth),
+)
 </script>
 
 <template>
@@ -40,7 +47,7 @@ const toneClasses = computed(() => {
       />
     </div>
     <div class="space-y-2">
-      <h1 class="text-highlighted mb-0! text-xl! leading-7! font-semibold!">
+      <h1 class="text-highlighted" :class="titleClass">
         {{ title }}
       </h1>
       <p class="text-muted mx-auto max-w-sm text-sm leading-6">
