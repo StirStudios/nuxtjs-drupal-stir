@@ -209,6 +209,12 @@ untouched do not need one.
 
 ### Fixed
 
+- A Layout paragraph's text alignment (`field_align`, for example "Text
+  Center") now applies to its heading and content. Drupal sent it as
+  `align.text`, but `Wrap/Grid.vue` only used `align.justify`, so it was
+  dropped. Only Layouts with a text alignment set change; across the fleet,
+  only WOTW has any.
+
 - The calculator paragraph initialises Piper's widget on a repeat client
   navigation. With the loader already loaded, it called `initPiperWidget()`
   during setup, before `<ClientOnly>` rendered the widget element, so the
