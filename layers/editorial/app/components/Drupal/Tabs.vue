@@ -122,19 +122,26 @@ const editorialTaskLinks = computed(() =>
   withUnpublishedTask(localTaskLinks.value, page.value?.published),
 )
 
+const currentUserId = computed(() =>
+  String(user.value?.id ?? user.value?.uid ?? 'anon'),
+)
+// One cached menu per editor: the key changes when Drupal's answer about who
+// is looking changes, so an account switch gets its own menu. A key already in
+// hand is never cleared or re-fetched, including by a second bar instance.
+const accountMenuKey = computed(() =>
+  hasEditorialAccess.value && isAuthenticated.value ? currentUserId.value : '',
+)
+
 const {
-  clear: clearAccountMenu,
   data: rawAccountMenu,
   error: accountMenuError,
   execute: executeAccountMenu,
   status: accountMenuStatus,
 } = useMenu('account', {
+  key: computed(() => `menu-account--${accountMenuKey.value}`),
   immediate: false,
   server: false,
 })
-const currentUserId = computed(() =>
-  String(user.value?.id ?? user.value?.uid ?? 'anon'),
-)
 const drupalOrigin = computed(() =>
   getDrupalOrigin(config.public as Record<string, unknown>),
 )
@@ -209,12 +216,6 @@ const accountMenu = computed<MenuLink[]>(() =>
     .filter((item): item is MenuLink => item !== null),
 )
 
-// One request per editor: the key changes when Drupal's answer about who is
-// looking changes, and nothing else re-fetches a menu already in hand.
-const accountMenuKey = computed(() =>
-  hasEditorialAccess.value && isAuthenticated.value ? currentUserId.value : '',
-)
-
 const loadAccountMenu = async () => {
   if (
     accountMenuStatus.value === 'pending' ||
@@ -236,8 +237,7 @@ const loadAccountMenu = async () => {
 
 watch(
   accountMenuKey,
-  (key, previousKey) => {
-    if (key !== previousKey) clearAccountMenu()
+  (key) => {
     if (key) void loadAccountMenu()
   },
   { immediate: import.meta.client },

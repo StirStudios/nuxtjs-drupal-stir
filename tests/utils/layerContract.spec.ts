@@ -671,7 +671,7 @@ describe('layer contract', () => {
       expect(read(page)).not.toContain('<NuxtLayout')
     }
     expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
-    expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
+    expect(read('layers/theme/app/plugins/drupalPageLayout.ts')).toContain('setDrupalPageLayout(')
     expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
   })
 
