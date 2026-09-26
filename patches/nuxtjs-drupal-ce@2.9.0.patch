@@ -1,6 +1,8 @@
+diff --git a/dist/runtime/composables/useDrupalCe/index.js b/dist/runtime/composables/useDrupalCe/index.js
+index ab0cace1f86e709c1e4010ddfc9f5f2d26488a4c..bd56390587d4ba09a8c9c71765aab59b40d3f2ee 100644
 --- a/dist/runtime/composables/useDrupalCe/index.js
 +++ b/dist/runtime/composables/useDrupalCe/index.js
-@@ -86,9 +86,47 @@
+@@ -86,9 +86,47 @@ export const useDrupalCe = () => {
      }
      return properKey;
    };
@@ -48,7 +50,7 @@
      const skipProxy = !(config.serverApiProxy && !skipDrupalCeApiProxy);
      if (!useFetchOptions.key) {
        useFetchOptions.key = computePageKey(skipProxy, nuxtApp);
-@@ -108,9 +146,14 @@
+@@ -108,9 +146,14 @@ export const useDrupalCe = () => {
        pageRef = result.data;
        error = result.error.value;
      }
@@ -63,7 +65,7 @@
      if (pageRef.value?.redirect) {
        const redirect = pageRef.value.redirect;
        await callWithNuxt(nuxtApp, navigateTo, [
-@@ -135,7 +178,13 @@
+@@ -135,7 +178,13 @@ export const useDrupalCe = () => {
        pageRef.value = createEmptyPage();
      }
      pageRef.value.key = useFetchOptions.key;
@@ -78,9 +80,11 @@
      return pageRef;
    };
    const useMenu = (name, useFetchOptions = {}, skipDrupalCeApiProxy = false) => {
-@@ -177,29 +226,7 @@
+@@ -176,36 +225,19 @@ export const useDrupalCe = () => {
+   const getPage = (customKey) => {
      const nuxtApp = useNuxtApp();
      const currentPageKey = useState("drupal-ce-current-page-key", () => "");
++    const pendingPageKey = useState("drupal-ce-pending-page-key", () => "");
      if (!customKey && import.meta.client) {
 -      const watcherInitialized = useState("drupal-ce-watcher-init", () => false);
 -      const pendingPageKey = useState("drupal-ce-pending-page-key", () => "");
@@ -109,3 +113,13 @@
      }
      return computed(() => {
        const key = customKey || currentPageKey.value;
+       if (key && nuxtApp.payload.data[key]) {
+         return nuxtApp.payload.data[key];
+       }
++      const pending = !customKey && pendingPageKey.value && nuxtApp.payload.data[pendingPageKey.value];
++      if (pending && !pending.redirect) {
++        return pending;
++      }
+       return createEmptyPage();
+     });
+   };

@@ -150,6 +150,15 @@ untouched do not need one.
 
 ### Fixed
 
+- The editor bar's account dropdown no longer loses its items, and the bar no
+  longer narrows, on each client navigation. Nuxt 4 purges the outgoing page's
+  data before the patched Drupal CE `getPage()` promotes the destination, so for
+  one tick it returned an empty page, and `Drupal/Tabs.vue` cleared and
+  refetched the account menu. The patch now returns the fetched destination in
+  that gap. **Consumer action:** copy the updated
+  `patches/nuxtjs-drupal-ce@2.9.0.patch` into the application and run
+  `pnpm install`.
+
 - `MediaImage` no longer blinks when it re-renders an image the browser has
   already loaded, such as a menu photo each time the menu opens: loaded
   sources are remembered and start visible. Eager server-rendered images also

@@ -6,6 +6,9 @@
 is patched. The normal upstream package remains the dependency; no fork is used.
 
 Shared `getPage()` retains the outgoing page until Nuxt completes the destination.
+One addition beyond the PR: Nuxt 4 purges the outgoing page's data when its
+component unmounts, just before `page:finish` promotes the destination, so
+`getPage()` then returns the fetched destination instead of an empty page.
 Page-local components must use their returned `fetchPage()` ref. Existing route
 snapshots remain in place. This patch does not change CDN keys or claim a speed gain.
 
