@@ -137,6 +137,15 @@ untouched do not need one.
 
 ### Changed
 
+- The hero's header clearance follows Nuxt UI's `--ui-header-height`.
+  `stirTheme.hero.hide` and `hero.noMediaSpacing` are now the header height
+  plus a gap, so a site that changes `--ui-header-height` keeps the right
+  space. At the default 4rem they equal the old `pt-15 lg:pt-30` and
+  `pt-20 lg:pt-54` exactly. Sites that override either value are unchanged. A
+  site whose `--ui-header-height` is not a length (for example `auto`) and uses
+  the default must set its own values, because an invalid `calc()` drops the
+  padding.
+
 - **Behaviour change:** the site layout persists across navigations. `app.vue`
   renders one `<NuxtLayout>` around `<NuxtPage>`, so the header, footer and
   other layout components keep their DOM (and state) between pages that share
