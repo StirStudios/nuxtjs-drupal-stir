@@ -90,6 +90,20 @@ untouched do not need one.
 
 ### Changed
 
+- **Behaviour change:** the site layout persists across navigations. `app.vue`
+  renders one `<NuxtLayout>` around `<NuxtPage>`, so the header, footer and
+  other layout components keep their DOM (and state) between pages that share
+  a layout, instead of being rebuilt on every click. Drupal pages choose their
+  layout before render: `middleware/drupalPageLayout.global.ts` reads
+  `page_layout` on the server (pages opt in with `definePageMeta({ drupalPage:
+  true })`, as `[...slug].vue` does), and `Drupal/PageRoute.vue` sets it on
+  client navigation. Auth chrome is set by `middleware/authChrome.global.ts`.
+  **Consumer action:** a site page that renders its own `<NuxtLayout>` must add
+  `definePageMeta({ layout: false })`, and so must a page that should stay
+  without a layout; otherwise the default layout wraps it. A site page that
+  renders `<DrupalPageRoute>` should add `drupalPage: true` so its layout is
+  resolved on the server.
+
 - Drupal page heroes no longer fall back to the page's meta description. A
   meta description is written for search results and usually repeats the
   page's opening paragraph, so a page without Hero paragraph text now shows
