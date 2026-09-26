@@ -107,8 +107,6 @@
       {
         "element": "paragraph-accordion",
         "props": {
-          "header": "Frequently asked questions",
-          "headerTag": "h2",
           "text": "<p>Helpful booking information.</p>"
         },
         "slots": {
@@ -152,8 +150,6 @@
         "element": "paragraph-media",
         "props": {
           "direction": "up",
-          "header": "Project gallery",
-          "headerTag": "h2",
           "overlay": true,
           "randomize": false
         },
@@ -176,8 +172,6 @@
       {
         "element": "paragraph-carousel",
         "props": {
-          "header": "Featured media",
-          "headerTag": "h2",
           "carouselArrows": true,
           "carouselAutoheight": false,
           "carouselAutoscroll": false,
