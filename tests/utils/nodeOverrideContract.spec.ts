@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { resolveDrupalPageLayout } from '../../layers/theme/app/utils/pageLayout'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -36,9 +37,12 @@ describe('node override contract', () => {
   })
 
   it('uses the accessible default layout when Drupal omits page_layout', () => {
-    const pageRoute = source('layers/theme/app/components/Drupal/PageRoute.vue')
-
-    expect(pageRoute).toContain('pageLayout.value || \'default\'')
+    // PageRoute and middleware/drupalPageLayout.global.ts both resolve through this.
+    expect(resolveDrupalPageLayout(undefined)).toBe('default')
+    expect(resolveDrupalPageLayout('  ')).toBe('default')
+    expect(resolveDrupalPageLayout('clear')).toBe('clear')
+    expect(source('layers/theme/app/components/Drupal/PageRoute.vue'))
+      .toContain('resolveDrupalPageLayout(props.forcedLayout || pageLayout.value)')
   })
 
   it('redirects the configured Drupal front-page alias to the public root', () => {

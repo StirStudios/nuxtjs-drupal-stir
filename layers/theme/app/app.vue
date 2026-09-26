@@ -31,7 +31,11 @@ const clientComponents = computed(() =>
         Skip to main content
       </a>
     </nav>
-    <NuxtPage />
+    <!-- One layout instance persists across pages that share it, so the
+         header and footer aren't rebuilt on every navigation. -->
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
     <LazyAppScrollToTop v-if="scrollButtonEnabled" />
     <LazyAppIntegrations />
     <ClientOnly v-if="clientComponents.length">

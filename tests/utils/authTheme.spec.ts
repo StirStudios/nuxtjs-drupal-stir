@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  authChromeLayout,
   resolveAuthCardConfig,
   hasConfiguredSecondaryAction,
   resolveAuthChrome,
@@ -87,5 +88,11 @@ describe('auth theme utilities', () => {
       secondaryAction: enquiry,
       pages: { protectedPage: { secondaryAction: { enabled: false } } },
     }, 'protectedPage')).toBe(false)
+  })
+
+  it('maps auth chrome to the layout app.vue renders', () => {
+    expect(authChromeLayout('none')).toEqual({ name: false })
+    expect(authChromeLayout('header')).toEqual({ name: 'default', props: { footer: false } })
+    expect(authChromeLayout('full')).toEqual({ name: 'default', props: { footer: true } })
   })
 })

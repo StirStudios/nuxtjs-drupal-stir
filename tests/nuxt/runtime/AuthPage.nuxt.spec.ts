@@ -141,31 +141,22 @@ describe('AuthPage', () => {
   })
 
   describe('site chrome', () => {
-    // Records what AuthPage asks of the site layout.
-    const NuxtLayout = {
-      props: ['name', 'footer'],
-      template: '<div data-test-layout :data-name="String(name)" :data-footer="String(footer)"><slot /></div>',
-    }
     const mountAuth = () => mountSuspended(AuthPage, {
       slots: { default: '<div>Auth form</div>' },
-      global: { stubs: { NuxtLayout } },
     })
 
     it.each([
-      [undefined, 'false', false],
-      ['none', 'false', false],
-      ['header', 'default', false],
-      ['full', 'default', true],
-    ])('renders chrome %s in the %s layout', async (chrome, name, footer) => {
+      [undefined, true],
+      ['none', true],
+      ['header', false],
+      ['full', false],
+    ])('owns <main> only without chrome (%s)', async (chrome, ownsMain) => {
       state.appConfig.stirTheme = { auth: { chrome } }
 
       const wrapper = await mountAuth()
-      const layout = wrapper.get('[data-test-layout]')
 
-      expect(layout.attributes('data-name')).toBe(name)
-      expect(layout.attributes('data-footer')).toBe(String(footer))
-      // The site layout owns <main>, so the auth content never nests one.
-      expect(wrapper.find('main').exists()).toBe(name === 'false')
+      // With chrome, the site layout app.vue renders owns <main>.
+      expect(wrapper.find('main').exists()).toBe(ownsMain)
       wrapper.unmount()
     })
 

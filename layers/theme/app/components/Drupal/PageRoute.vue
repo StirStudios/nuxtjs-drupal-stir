@@ -8,7 +8,7 @@ import {
 import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
-import { withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
+import { serverPageFetchOptions, withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
 
 const props = defineProps<{
   forcedLayout?: string
@@ -34,7 +34,7 @@ const theme = useAppConfig().stirTheme
 
 const page = await fetchPage(
   pageRequest.path.value,
-  { query: drupalPageQuery.value },
+  { query: drupalPageQuery.value, ...serverPageFetchOptions() },
   customPageError,
 )
 
@@ -87,8 +87,15 @@ const pageAnimation = computed(() => pageContentProps.value.pageAnimation)
 const pageAnimationStagger = computed(() =>
   resolveBooleanProp(pageContentProps.value.pageAnimationStagger))
 const layout = computed(() =>
-  (props.forcedLayout || pageLayout.value || 'default') as 'default' | 'clear' | 'links',
+  resolveDrupalPageLayout(props.forcedLayout || pageLayout.value),
 )
+
+// app.vue renders the layout. The server resolved it in
+// middleware/drupalPageLayout.global.ts; on client navigation it follows the
+// page loaded here.
+if (import.meta.client) {
+  watch(layout, name => setDrupalPageLayout(name), { immediate: true })
+}
 const isLinkHubLayout = computed(() => layout.value === 'links')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
@@ -211,8 +218,7 @@ function getErrorPayload(
 </script>
 
 <template>
-  <NuxtLayout :name="layout">
-    <slot
+  <slot
       :layout="layout"
       :page="page"
       :render-custom-elements="renderCustomElements"
@@ -235,6 +241,5 @@ function getErrorPayload(
           as="aside"
         />
       </PageRevealScope>
-    </slot>
-  </NuxtLayout>
+  </slot>
 </template>

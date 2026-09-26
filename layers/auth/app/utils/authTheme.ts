@@ -122,3 +122,11 @@ export const hasConfiguredSecondaryAction = (
 
   return action.enabled !== false && Boolean(action.label && action.to)
 }
+
+/** The Nuxt layout and props that render an auth page's chrome. */
+export const authChromeLayout = (
+  chrome: AuthChrome,
+): { name: string | false, props?: { footer: boolean } } =>
+  chrome === 'none'
+    ? { name: false }
+    : { name: 'default', props: { footer: chrome === 'full' } }

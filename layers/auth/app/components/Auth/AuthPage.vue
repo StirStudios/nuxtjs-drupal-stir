@@ -55,7 +55,8 @@ const themePageConfig = computed<AuthPageConfig>(() =>
   authPageKey.value ? themeAuth.value.pages?.[authPageKey.value] || {} : {},
 )
 
-// Inside the site layout, the layout owns <main> and the header's space.
+// middleware/authChrome.global.ts renders the layout; with chrome it owns
+// <main> and the header's space.
 const chrome = computed<AuthChrome>(() =>
   resolveAuthChrome(themeAuth.value, authPageKey.value),
 )
@@ -255,7 +256,6 @@ provide(authLayoutContextKey, layoutContext)
     </div>
   </DefineAuthContent>
 
-  <NuxtLayout :footer="chrome === 'full'" :name="hasChrome ? 'default' : false">
   <div
     class="w-full"
     :class="[pageMinHeightClass, pageContainerClass, { 'auth-background': hasFullBleedBackground }]"
@@ -298,7 +298,6 @@ provide(authLayoutContextKey, layoutContext)
       :style="imagePanelStyle"
     />
   </div>
-  </NuxtLayout>
 
   <UButton
     v-if="backButtonProps.show"

@@ -415,6 +415,7 @@
       "layers/theme/app/utils/motion.ts",
       "layers/theme/app/utils/navigation.ts",
       "layers/theme/app/utils/nuxtUiProps.ts",
+      "layers/theme/app/utils/pageLayout.ts",
       "layers/theme/app/utils/pageRefresh.ts",
       "layers/theme/app/utils/pageRequest.ts",
       "layers/theme/app/utils/paragraphLayoutArrangement.ts",
@@ -455,7 +456,9 @@
       "layers/auth/app/middleware/auth-account.global.ts",
       "layers/auth/app/middleware/auth-guest.global.ts",
       "layers/auth/app/middleware/auth.global.ts",
-      "layers/theme/app/middleware/colorMode.global.ts"
+      "layers/auth/app/middleware/authChrome.global.ts",
+      "layers/theme/app/middleware/colorMode.global.ts",
+      "layers/theme/app/middleware/drupalPageLayout.global.ts"
     ],
     "serverRoutes": [
       "/api/account/settings/cancel",
@@ -784,6 +787,7 @@
         "layers/theme/app/utils/motion.ts",
         "layers/theme/app/utils/navigation.ts",
         "layers/theme/app/utils/nuxtUiProps.ts",
+        "layers/theme/app/utils/pageLayout.ts",
         "layers/theme/app/utils/pageRefresh.ts",
         "layers/theme/app/utils/pageRequest.ts",
         "layers/theme/app/utils/paragraphLayoutArrangement.ts",
@@ -820,9 +824,9 @@
   "counts": {
     "components": 135,
     "composables": 71,
-    "utils": 74,
+    "utils": 75,
     "plugins": 8,
-    "middleware": 4,
+    "middleware": 6,
     "serverRoutes": 29,
     "productionDependencies": 39,
     "developmentDependencies": 27,
