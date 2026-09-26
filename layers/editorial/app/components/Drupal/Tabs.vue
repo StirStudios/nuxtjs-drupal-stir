@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { loadIcons } from '@iconify/vue'
 import { useMediaQuery } from '@vueuse/core'
 import type {
   StirDrupalLocalTask,
@@ -12,22 +11,16 @@ import {
   STIR_EDITORIAL_OFFSET_VAR,
 } from '#stir/utils/editorialOffset'
 import {
-  ADMIN_TAB_ICONS,
   adminUiProps,
   adminUiTheme,
   type EditorialTaskLink,
   adminLinkIcon,
-  toIconifyName,
   withUnpublishedTask,
 } from '../../utils/adminUiTheme'
 
 const { getPage, useMenu } = useStirDrupalCe()
 
 useAdminUiStyles()
-// Only editors load this component, so its icons stay out of the shared
-// bundle. Fetch the whole set in one request up front: a tab icon then
-// renders at once, instead of popping in as each first appears.
-onMounted(() => loadIcons(ADMIN_TAB_ICONS.map(toIconifyName)))
 const page = getPage()
 const route = useRoute()
 const requestUrl = useRequestURL()

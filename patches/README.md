@@ -2,10 +2,13 @@
 
 `nuxtjs-drupal-ce@2.9.0.patch` carries the navigation-state changes from
 [PR #538](https://github.com/drunomics/nuxtjs-drupal-ce/pull/538), reviewed commit
-`b2673397288d0a91b9b523ac17a6e1121285a5f6`. Only the affected runtime composable
+`7984b8ac63554df6a6df8d6fe2edecd6fe3bbcd3`. Only the affected runtime composable
 is patched. The normal upstream package remains the dependency; no fork is used.
 
 Shared `getPage()` retains the outgoing page until Nuxt completes the destination.
+Nuxt 4 purges the outgoing page's data when its component unmounts, just before
+`page:finish` promotes the destination, so `getPage()` then returns the fetched
+destination instead of an empty page.
 Page-local components must use their returned `fetchPage()` ref. Existing route
 snapshots remain in place. This patch does not change CDN keys or claim a speed gain.
 

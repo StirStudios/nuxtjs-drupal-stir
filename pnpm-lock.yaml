@@ -11,7 +11,7 @@ packageExtensionsChecksum: sha256-LlBPMHC1imeaC2yi3/R5PDNKwW5zfgeMsNH7hh03g5Q=
 
 patchedDependencies:
   nuxtjs-drupal-ce@2.9.0:
-    hash: 521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e
+    hash: 50980233c4baae108a8ef0c52326d6f354f58c9b0ee465d61f4dfde92b4b86cd
     path: patches/nuxtjs-drupal-ce@2.9.0.patch
 
 importers:
@@ -21,9 +21,6 @@ importers:
       '@iconify-json/lucide':
         specifier: ^1.2.136
         version: 1.2.136
-      '@iconify/vue':
-        specifier: ^5.0.3
-        version: 5.0.3(vue@3.5.43(typescript@5.9.3))
       '@internationalized/date':
         specifier: ^3.12.4
         version: 3.12.4
@@ -119,7 +116,7 @@ importers:
         version: 2.0.0(magic-string@1.4.1)(magicast@0.5.5)(oxc-parser@0.140.0)(rolldown@1.2.9)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.9)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)))
       nuxtjs-drupal-ce:
         specifier: 2.9.0
-        version: 2.9.0(patch_hash=521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e)(typescript@5.9.3)
+        version: 2.9.0(patch_hash=50980233c4baae108a8ef0c52326d6f354f58c9b0ee465d61f4dfde92b4b86cd)(typescript@5.9.3)
       rate-limiter-flexible:
         specifier: ^11.2.1
         version: 11.2.1
@@ -12992,7 +12989,7 @@ snapshots:
       - xml2js
       - yaml
 
-  nuxtjs-drupal-ce@2.9.0(patch_hash=521cd0397d64adb191056e927fadce60e0e4aa20875906a730bd22128676246e)(typescript@5.9.3):
+  nuxtjs-drupal-ce@2.9.0(patch_hash=50980233c4baae108a8ef0c52326d6f354f58c9b0ee465d61f4dfde92b4b86cd)(typescript@5.9.3):
     dependencies:
       defu: 6.1.7
       h3: 1.15.11
