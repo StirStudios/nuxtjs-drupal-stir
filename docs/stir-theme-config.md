@@ -923,8 +923,9 @@ and the project's global `ui.card` overrides.
 
 ```ts
 carousel: {
-  padding: 'pb-12',
- root: '',
+  base: '', // always on the wrapper that holds the heading and carousel
+  padding: 'pb-12', // room for the dot indicators; only when they show
+  root: '', // the inner UCarousel
   arrows: {
 	prev: { color: 'neutral', variant: 'outline', size: 'md' },
 	next: { color: 'neutral', variant: 'outline', size: 'md' },
