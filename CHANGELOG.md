@@ -60,7 +60,11 @@ untouched do not need one.
   per page. With chrome, the layout owns `<main>`, the auth page fills the
   screen under a fixed header (or below a sticky one), and a full-bleed
   background carries the `auth-background` class, so a site can style the
-  header over the photo. `layouts/default.vue` accepts `footer: false`.
+  header over the photo. `layouts/default.vue` accepts `footer: false` and
+  provides its header mode as `stirHeaderMode`; a project that overrides that
+  layout should `provide('stirHeaderMode', useHeaderMode())` too, or auth
+  pages size themselves for a fixed header. The auth layer still works
+  without the theme layer.
 - `stirTheme.navigation.toggleVariant` and `toggleColor` set the Nuxt UI
   variant and colour of the menu toggle and the slideover close button
   (default `ghost` and `neutral`), so a site can use `link` over a hero image

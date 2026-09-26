@@ -4,6 +4,9 @@ withDefaults(defineProps<{ footer?: boolean }>(), { footer: true })
 
 const { routeHero } = useAppConfig().stirTheme
 const normalizedNavigationMode = useHeaderMode()
+
+// Pages rendered in this layout, such as auth pages, size themselves to it.
+provide('stirHeaderMode', normalizedNavigationMode)
 </script>
 
 <template>

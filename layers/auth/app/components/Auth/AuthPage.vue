@@ -61,7 +61,9 @@ const chrome = computed<AuthChrome>(() =>
   resolveAuthChrome(themeAuth.value, authPageKey.value),
 )
 const hasChrome = computed(() => chrome.value !== 'none')
-const headerMode = useHeaderMode()
+// The theme's default layout provides its header mode; the auth layer does
+// not depend on the theme, so a page without that layout assumes fixed.
+const headerMode = inject<Ref<'fixed' | 'sticky'>>('stirHeaderMode', ref('fixed'))
 const pageMinHeightClass = computed(() => {
   if (!hasChrome.value) return 'min-h-screen'
 

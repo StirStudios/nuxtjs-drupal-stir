@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { useRouter } from '#app'
-import { ref } from 'vue'
+import { h, ref } from 'vue'
 import AuthPage from '../../../layers/auth/app/components/Auth/AuthPage.vue'
 import DefaultLayout from '../../../layers/theme/app/layouts/default.vue'
 import AuthStatusPanel from '../../../layers/auth/app/components/Auth/AuthStatusPanel.vue'
@@ -172,13 +172,30 @@ describe('AuthPage', () => {
       wrapper.unmount()
     })
 
-    it('leaves room for a sticky header', async () => {
+    it('leaves room for the sticky header its layout provides', async () => {
+      state.appConfig.stirTheme = { auth: { chrome: 'header' } }
+
+      const wrapper = await mountSuspended(AuthPage, {
+        slots: { default: '<div>Auth form</div>' },
+        global: { provide: { stirHeaderMode: ref('sticky') } },
+      })
+
+      expect(wrapper.get('[role="presentation"]').classes())
+        .toContain('min-h-[calc(100dvh-var(--ui-header-height))]')
+      wrapper.unmount()
+    })
+
+    it('takes the sticky header mode from the default layout', async () => {
       state.appConfig.stirTheme = {
         auth: { chrome: 'header' },
+        routeHero: { enabled: false },
         navigation: { mode: 'sticky' },
       }
 
-      const wrapper = await mountAuth()
+      const wrapper = await mountSuspended(DefaultLayout, {
+        slots: { default: () => h(AuthPage, null, { default: () => 'Auth form' }) },
+        global: { stubs: { AppHeader: true, SiteMessages: true, LazyAppFooter: true } },
+      })
 
       expect(wrapper.get('[role="presentation"]').classes())
         .toContain('min-h-[calc(100dvh-var(--ui-header-height))]')
