@@ -150,14 +150,24 @@ untouched do not need one.
 
 ### Fixed
 
-- The editor bar's account dropdown no longer loses its items, and the bar no
-  longer narrows, on each client navigation. Nuxt 4 purges the outgoing page's
-  data before the patched Drupal CE `getPage()` promotes the destination, so for
-  one tick it returned an empty page, and `Drupal/Tabs.vue` cleared and
-  refetched the account menu. The patch now returns the fetched destination in
-  that gap. **Consumer action:** copy the updated
-  `patches/nuxtjs-drupal-ce@2.9.0.patch` into the application and run
-  `pnpm install`.
+- Client navigation between Drupal pages keeps the current layout until the
+  next page names its own. `NuxtLayout` reads the router's route, which changes
+  when a navigation is confirmed, before `Drupal/PageRoute.vue` has loaded the
+  page and set its layout. So every client navigation after the first, which
+  Nuxt carries over from hydration, briefly built the `default` layout. On a
+  site-layout page such as `clients`, that meant a throwaway header and
+  editor bar whose setup cleared and reloaded the shared account menu, so the
+  visible dropdown lost its chevron and the bar narrowed. A client-only route
+  middleware (`plugins/drupalPageLayout.client.ts`) now carries the layout
+  forward between Drupal pages. No consumer action.
+
+- The patched Drupal CE `getPage()` no longer returns an empty page for the
+  tick between Nuxt 4 purging the outgoing page's data and `page:finish`
+  promoting the destination; it returns the fetched destination instead.
+  Anything that watched the page, such as the editor bar's account-menu key,
+  saw that empty tick. The change is also on upstream PR #538. **Consumer
+  action:** copy the updated `patches/nuxtjs-drupal-ce@2.9.0.patch` into the
+  application and run `pnpm install`.
 
 - `MediaImage` no longer blinks when it re-renders an image the browser has
   already loaded, such as a menu photo each time the menu opens: loaded
