@@ -91,8 +91,8 @@ const layout = computed(() =>
 )
 
 // app.vue renders the layout. The server resolved it in
-// plugins/drupalPageLayout.server.ts; on client navigation it follows the
-// page loaded here.
+// plugins/drupalPageLayout.ts; on client navigation that plugin carries the
+// current layout over and it follows the page loaded here.
 if (import.meta.client) {
   watch(layout, name => setDrupalPageLayout(name), { immediate: true })
 }

@@ -157,9 +157,18 @@ untouched do not need one.
   Nuxt carries over from hydration, briefly built the `default` layout. On a
   site-layout page such as `clients`, that meant a throwaway header and
   editor bar whose setup cleared and reloaded the shared account menu, so the
-  visible dropdown lost its chevron and the bar narrowed. A client-only route
-  middleware (`plugins/drupalPageLayout.client.ts`) now carries the layout
-  forward between Drupal pages. No consumer action.
+  visible dropdown lost its chevron and the bar narrowed. On client
+  navigation to a Drupal page, the current layout and its props (including an
+  auth page's chrome) now carry over until the page names its own. One plugin,
+  `plugins/drupalPageLayout.ts`, holds both the server and client layout
+  decisions; it replaces `drupalPageLayout.server.ts`. No consumer action.
+
+- `Drupal/Tabs.vue` caches the account menu per user
+  (`menu-account--<user id>`) instead of clearing and reloading one shared
+  menu whenever a bar mounts. An account switch gets its own menu, and a second
+  bar or a data refresh reuses the menu in hand, so it never renders empty.
+  `docs/debugging-navigation-flicker.md` records the two probes that found
+  this.
 
 - The patched Drupal CE `getPage()` no longer returns an empty page for the
   tick between Nuxt 4 purging the outgoing page's data and `page:finish`
