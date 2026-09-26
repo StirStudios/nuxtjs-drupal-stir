@@ -60,6 +60,16 @@ untouched do not need one.
 
 ### Added
 
+- Surfaces can be cards: `card: true`, or a Text card's variant (`'outline'`,
+  `'solid'`, `'soft'`, `'subtle'`). A Layout on a card surface renders in the
+  theme card with its gradient; a Text paragraph renders in a Nuxt UI card.
+  This replaces the Card and Card style fields, which keep working until a site
+  runs the Stir Tools migration. **Consumer action (sites using cards):** add
+  card surfaces to `stirTheme.presentation.surfaces` before taking the Stir
+  Tools release: `card` (`card: true`), `<surface>-card` for each surface used
+  together with Card (same class plus `card: true`), and `<style>-card` for
+  each Text card style other than outline.
+
 - Presentation choices take `colorMode: 'dark'`. A surface or variant that sets
   it gets the `dark` class, so Nuxt UI's colour tokens and `dark:` utilities
   switch inside it, instead of `dark` being typed into its class string (which

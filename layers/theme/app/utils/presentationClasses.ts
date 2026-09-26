@@ -1,13 +1,31 @@
+/** A card surface: true, or a Text card's Nuxt UI card variant. */
+export type StirPresentationCard = true | 'outline' | 'solid' | 'soft' | 'subtle'
+
 export type StirPresentationOption = {
   label: string
   class: string
   /** A dark choice: Nuxt UI's colour tokens switch to their dark values. */
   colorMode?: 'dark'
+  /**
+   * Renders the paragraph as a card: a Layout in the theme card, a Text
+   * paragraph in a Nuxt UI card of this variant (outline when true).
+   */
+  card?: StirPresentationCard
 }
 
 export type StirPresentationCatalogue = {
   surfaces?: Record<string, StirPresentationOption>
   variants?: Record<string, StirPresentationOption>
+}
+
+/**
+ * The card setting of a paragraph's Surface choice, if it is a card surface.
+ */
+export function resolvePresentationCard(
+  catalogue: StirPresentationCatalogue | undefined,
+  surface: string | undefined,
+): StirPresentationCard | undefined {
+  return surface ? catalogue?.surfaces?.[surface]?.card : undefined
 }
 
 /**

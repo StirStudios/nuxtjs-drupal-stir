@@ -3,7 +3,7 @@ import type { EditableRichTextProps } from '#stir/types'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { toEditableRichTextProps } from '#stir/utils/editableRichText'
 import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
-import { resolvePresentationClasses } from '#stir/utils/presentationClasses'
+import { resolvePresentationCard, resolvePresentationClasses } from '#stir/utils/presentationClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -35,12 +35,15 @@ const wrapStyles = computed(() =>
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )
-const isCard = computed(() => resolveBooleanProp(props.card))
+// A card surface, or the legacy Card and Card style fields.
+const surfaceCard = computed(() => resolvePresentationCard(presentation, props.surface))
+const isCard = computed(() => Boolean(surfaceCard.value) || resolveBooleanProp(props.card))
 
 const cardVariant = computed(() => {
   const variants = ['outline', 'solid', 'soft', 'subtle'] as const
+  const requested = typeof surfaceCard.value === 'string' ? surfaceCard.value : props.cardVariant
 
-  return variants.find((variant) => variant === props.cardVariant) ?? 'outline'
+  return variants.find((variant) => variant === requested) ?? 'outline'
 })
 </script>
 
