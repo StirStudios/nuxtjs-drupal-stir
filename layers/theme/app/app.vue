@@ -24,7 +24,7 @@ const clientComponents = computed(() =>
     <nav aria-label="Skip links">
       <a
         aria-label="Skip to main content"
-        class="absolute top-0 left-0 z-50 m-3 -translate-y-96 p-3 transition focus:translate-y-0"
+        class="fixed top-0 left-0 z-50 m-3 -translate-y-96 rounded-md bg-default px-4 py-3 text-sm font-semibold text-highlighted shadow-lg ring-2 ring-primary transition focus:translate-y-0 focus-visible:outline-none"
         href="#main-content"
         tabindex="0"
       >
