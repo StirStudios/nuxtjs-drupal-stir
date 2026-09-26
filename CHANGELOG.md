@@ -150,16 +150,10 @@ untouched do not need one.
 
 ### Fixed
 
-- Editor tab icons no longer pop in one by one. `Drupal/Tabs.vue`, which only
-  editors load, fetches the whole set (`ADMIN_TAB_ICONS`, including every
-  `adminLinkIcon()` result) in one request when it mounts. They stay out of the
-  shared client icon bundle, so visitors download nothing extra. Header and
-  navigation icons were already bundled through Nuxt UI's defaults.
-
 - `MediaImage` no longer blinks when it re-renders an image the browser has
-  already loaded, such as a nav photo on every page: loaded sources are
-  remembered and start visible. Eager server-rendered images also start
-  visible instead of waiting for JavaScript. New images still fade in.
+  already loaded, such as a menu photo each time the menu opens: loaded
+  sources are remembered and start visible. Eager server-rendered images also
+  start visible instead of waiting for JavaScript. New images still fade in.
 
 - The "Skip to main content" link is visible when focused: it's fixed to the
   top of the viewport, with a solid token-based surface, highlighted text and
