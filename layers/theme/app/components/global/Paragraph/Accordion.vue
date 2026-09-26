@@ -15,8 +15,6 @@ const props = defineProps<{
   parentUuid?: string
   region?: string
 
-  header?: string
-  headerTag?: string
   text?: string
   align?: AlignConfig
   classes?: string
@@ -58,7 +56,6 @@ function headingLevelOf(tag: string): number | null {
 
 const slots = useSlots()
 const trustedTextHtml = computed(() => trustedDrupalHtml(props.text))
-const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const sectionClasses = computed(() =>
   [
     'paragraph-accordion space-y-6',
@@ -106,16 +103,11 @@ const items = computed<AccordionEntry[]>(() =>
   >
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid" />
 
-    <div v-if="header || trustedTextHtml" class="space-y-3">
-      <component :is="headingTag" v-if="header">
-        {{ header }}
-      </component>
-      <div
-        v-if="trustedTextHtml"
-        class="prose text-muted max-w-none"
-        v-html="trustedTextHtml"
-      />
-    </div>
+    <div
+      v-if="trustedTextHtml"
+      class="prose text-muted max-w-none"
+      v-html="trustedTextHtml"
+    />
 
     <UAccordion
       v-if="items.length"

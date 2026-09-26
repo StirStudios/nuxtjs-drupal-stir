@@ -70,10 +70,15 @@ const { isLoaded } = useThirdPartyScript(loaderSrc, {
   isReady: () => typeof getInitPiperWidget() === 'function',
 })
 
+// On a repeat visit the loader is already loaded during setup, before
+// <ClientOnly> renders the widget element, so wait for both. The loader skips
+// hosts it has already initialised.
+const widgetEl = useTemplateRef<HTMLElement>('widgetEl')
+
 watch(
-  isLoaded,
-  (loaded) => {
-    if (loaded && venueId.value) getInitPiperWidget()?.()
+  [isLoaded, widgetEl],
+  ([loaded, el]) => {
+    if (loaded && el && venueId.value) getInitPiperWidget()?.()
   },
   { immediate: true },
 )
@@ -82,7 +87,7 @@ watch(
 <template>
   <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
     <ClientOnly>
-      <div v-bind="widgetAttrs" />
+      <div ref="widgetEl" v-bind="widgetAttrs" />
     </ClientOnly>
   </EditLink>
 </template>

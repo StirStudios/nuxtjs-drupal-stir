@@ -15,6 +15,17 @@ untouched do not need one.
 
 ### Removed
 
+- **Behaviour change.** Section headings now come only from the Layout
+  paragraph. The Carousel, Media and Accordion paragraphs no longer render
+  their `field_header` (`header` / `headerTag`); item headings (accordion
+  items, tabs, features, timeline items, the hero) are unchanged, and the
+  Accordion's intro text still renders. **Migration:** wrap a carousel,
+  media or accordion that shows a heading in a Layout paragraph and move the
+  heading to the Layout's `field_header`; section spacing and heading styles
+  follow the Layout too. Across the Stir sites this affected four paragraphs,
+  all on Tri-Link. Drupal still sends `field_header` until Stir Tools removes
+  it; the layer ignores it.
+
 - **Breaking.** The CMS presentation manifest and free-text classes are gone.
   Every site now styles paragraphs with Surface and Variant choices, so builds
   compile the layout vocabulary plus the project's catalogue and `richText`
@@ -48,6 +59,12 @@ untouched do not need one.
   `canEditInline(editLink)` for inline edit controls.
 
 ### Added
+
+- `stirTheme.embedded` (default `false`): an app embedded in another site,
+  such as Piper's calculator widget, renders only its layout and page. The
+  skip link, route announcer, loading indicator, scroll-to-top button, popup,
+  privacy notice and client components are left to the host page. Set it at
+  runtime with `updateAppConfig({ stirTheme: { embedded: true } })`.
 
 - The protected page gate renders `stirTheme.auth.secondaryAction` (or
   `auth.pages.protectedPage.secondaryAction`) under its form when a label and
@@ -182,6 +199,11 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- The calculator paragraph initialises Piper's widget on a repeat client
+  navigation. With the loader already loaded, it called `initPiperWidget()`
+  during setup, before `<ClientOnly>` rendered the widget element, so the
+  widget never appeared. It now waits for both the loader and the element.
 
 - Floating webform labels show the required asterisk that `UFormField` shows
   on static labels, for text, email, tel, textarea, select, date and address

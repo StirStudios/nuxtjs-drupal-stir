@@ -685,7 +685,8 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(appShell).toContain('<nav aria-label="Skip links">')
+    // Omitted only for an app embedded in another site, whose page owns it.
+    expect(appShell).toContain('<nav v-if="!embedded" aria-label="Skip links">')
     expect(appShell).toContain('href="#main-content"')
     // Visible and legible once focused, over any page content (WCAG 2.4.7, 1.4.3).
     const skipLink = appShell.match(/<a[^>]*href="#main-content"[^>]*>/s)?.[0] ?? ''

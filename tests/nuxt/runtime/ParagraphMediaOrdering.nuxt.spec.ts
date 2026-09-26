@@ -21,6 +21,20 @@ const Modal = defineComponent({
 })
 
 describe('Drupal media ordering', () => {
+  // Section headings belong to the Layout paragraph.
+  it('ignores a legacy section heading without leaking it as an attribute', async () => {
+    const wrapper = await mountSuspended(ParagraphMedia, {
+      props: { header: 'Project gallery', headerTag: 'h2' },
+      slots: { media: () => [h('div', { mid: 'image', type: 'image' })] },
+      global: { stubs: { MediaItem: Item, ParagraphMediaModal: Modal } },
+    })
+
+    expect(wrapper.find('h2').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Project gallery')
+    expect(wrapper.find('[header]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('passes the Small preset to image and video previews', async () => {
     const wrapper = await mountSuspended(ParagraphMedia, {
       props: { mediaHeight: 'small', overlay: true },
