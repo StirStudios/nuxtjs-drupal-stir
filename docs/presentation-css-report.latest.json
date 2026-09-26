@@ -1,10 +1,9 @@
 {
   "schemaVersion": 1,
   "fixture": "tests/fixtures/minimal-consumer",
-  "manifest": "contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json",
   "presentation": {
-    "bytes": 247959,
-    "gzipBytes": 33132,
+    "bytes": 249176,
+    "gzipBytes": 33296,
     "assets": [
       {
         "file": "Carousel.CTV-5Fjp.css",
@@ -17,9 +16,9 @@
         "gzipBytes": 174
       },
       {
-        "file": "entry.tu_kmCn3.css",
-        "bytes": 247410,
-        "gzipBytes": 32787
+        "file": "entry.DE9PErSy.css",
+        "bytes": 248627,
+        "gzipBytes": 32951
       }
     ]
   }

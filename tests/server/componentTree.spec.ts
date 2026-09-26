@@ -38,7 +38,6 @@ describe('componentTree', () => {
         element: 'paragraph-text',
         props: {
           text: '<p>Reusable component content.</p>',
-          classes: 'lead',
           direction: 'up',
           align: 'center',
           width: 'w-lg',
@@ -51,7 +50,6 @@ describe('componentTree', () => {
           uuid: '00000000-0000-4000-8000-000000000042',
           layout: 'two_column',
           card: false,
-          classes: 'feature-layout',
           container: true,
           header: 'Layout section',
           headerTag: 'h2',
