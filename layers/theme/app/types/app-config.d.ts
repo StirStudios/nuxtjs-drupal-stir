@@ -486,6 +486,12 @@ type StirThemeNodeConfig = {
 type StirThemePresentationOption = {
   label: string
   class: string
+  /**
+   * 'dark' renders the choice in dark mode: the layer adds the `dark` class,
+   * so Nuxt UI's colour tokens and dark: utilities switch, and native controls
+   * follow. Default: the page's colour mode.
+   */
+  colorMode?: 'dark'
 }
 
 type StirThemePresentationConfig = {

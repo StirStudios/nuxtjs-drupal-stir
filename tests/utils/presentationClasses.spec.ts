@@ -15,6 +15,22 @@ describe('presentation choices', () => {
     expect(resolvePresentationClasses(catalogue, { surface: 'muted', variant: 'action-group' })).toBe('bg-muted action-group')
   })
 
+  it('adds dark for a choice with colorMode dark, once', () => {
+    const dark = {
+      surfaces: { navy: { label: 'Navy', class: 'bg-navy text-default', colorMode: 'dark' as const } },
+      variants: { framed: { label: 'Framed', class: 'dark p-6', colorMode: 'dark' as const } },
+    }
+
+    expect(resolvePresentationClasses(dark, { surface: 'navy' })).toBe('dark bg-navy text-default')
+    expect(resolvePresentationClasses(dark, { surface: 'navy', variant: 'framed' })).toBe('bg-navy text-default dark p-6')
+  })
+
+  it('keeps a hand-written dark class working', () => {
+    const legacy = { surfaces: { navy: { label: 'Navy', class: 'dark bg-navy text-default' } } }
+
+    expect(resolvePresentationClasses(legacy, { surface: 'navy' })).toBe('dark bg-navy text-default')
+  })
+
   it('resolves nothing without a known choice', () => {
     expect(resolvePresentationClasses(catalogue, {})).toBeUndefined()
     expect(resolvePresentationClasses(catalogue, { surface: 'gone' })).toBeUndefined()

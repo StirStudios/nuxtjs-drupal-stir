@@ -77,8 +77,8 @@ export function layoutVocabulary(): string[] {
 }
 
 export type PresentationConfig = {
-  surfaces?: Record<string, { label: string, class: string }>
-  variants?: Record<string, { label: string, class: string }>
+  surfaces?: Record<string, { label: string, class: string, colorMode?: 'dark' }>
+  variants?: Record<string, { label: string, class: string, colorMode?: 'dark' }>
   richText?: string[]
 }
 

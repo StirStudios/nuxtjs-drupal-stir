@@ -1,4 +1,9 @@
 @layer base {
+  /* Native controls (date pickers, scrollbars) follow a dark page or section. */
+  .dark {
+    color-scheme: dark;
+  }
+
   ::selection {
     @apply bg-primary/20 text-inherit;
   }
