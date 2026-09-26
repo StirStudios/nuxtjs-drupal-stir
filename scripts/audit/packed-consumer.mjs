@@ -197,13 +197,6 @@ async function main() {
         throw new Error('Compliance initialization removed project-specific review content.')
       }
     }
-    const presentationManifest = join(
-      consumerDir,
-      'node_modules/@stir/base/contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
-    )
-    const consumerEnvironment = {
-      STIR_PRESENTATION_MANIFEST: presentationManifest,
-    }
     for (const layer of consumerLayers) {
       // Each entry point is an independent consumer contract. Do not let Nuxt's
       // generated component, import, or app-config types leak across them.
@@ -213,12 +206,9 @@ async function main() {
         join(consumerDir, 'nuxt.config.ts'),
         `export default defineNuxtConfig({ extends: ['${layer.specifier}'] })\n`,
       )
-      await run('pnpm', ['typecheck'], consumerDir, consumerEnvironment)
+      await run('pnpm', ['typecheck'], consumerDir)
       await assertPresetComponents(consumerDir, layer.label)
-      await run('pnpm', ['build'], consumerDir, {
-        ...consumerEnvironment,
-        STIR_PERF_ANALYZE: 'true',
-      })
+      await run('pnpm', ['build'], consumerDir, { STIR_PERF_ANALYZE: 'true' })
       await assertPresetOutput(consumerDir, layer.label)
       const installedReport = join(
         consumerDir,
@@ -245,7 +235,7 @@ async function main() {
             spaLoadingTemplate: false,
             hooks: { ready(nuxt) { if (nuxt.options.spaLoadingTemplate !== false) throw new Error('Disabled SPA loader was overwritten') } },
           })\n`)
-          await run('pnpm', ['exec', 'nuxi', 'prepare'], consumerDir, consumerEnvironment)
+          await run('pnpm', ['exec', 'nuxi', 'prepare'], consumerDir)
           const declarations = await readFile(join(consumerDir, '.nuxt/components.d.ts'), 'utf8')
           for (const name of ['EditLink', 'DrupalTabs', 'AppIntegrations']) {
             if (!declarations.includes(`${owner}/components/${name}.vue`)) throw new Error(`${owner} override lost: ${name}`)

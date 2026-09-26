@@ -489,8 +489,6 @@ type StirThemePresentationOption = {
 }
 
 type StirThemePresentationConfig = {
-  /** Set false once the site no longer uses free-text classes. */
-  manifest?: boolean
   surfaces?: Record<string, StirThemePresentationOption>
   variants?: Record<string, StirThemePresentationOption>
   richText?: string[]

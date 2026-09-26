@@ -39,7 +39,6 @@ if (!address || typeof address === 'string') {
 process.env.DRUPAL_URL = `http://127.0.0.1:${address.port}`
 process.env.NUXT_ENV = 'production'
 process.env.NUXT_URL = 'https://www.example.com'
-process.env.STIR_PRESENTATION_MANIFEST_FIXTURE = '1'
 Reflect.deleteProperty(process.env, 'NUXT_INDEXABLE')
 
 afterAll(async () => {

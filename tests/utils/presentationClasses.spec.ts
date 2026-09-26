@@ -15,10 +15,9 @@ describe('presentation choices', () => {
     expect(resolvePresentationClasses(catalogue, { surface: 'muted', variant: 'action-group' })).toBe('bg-muted action-group')
   })
 
-  it('falls back to free-text classes when no known choice is set', () => {
-    expect(resolvePresentationClasses(catalogue, {}, 'legacy classes')).toBe('legacy classes')
-    expect(resolvePresentationClasses(catalogue, { surface: 'gone' }, 'legacy')).toBe('legacy')
+  it('resolves nothing without a known choice', () => {
     expect(resolvePresentationClasses(catalogue, {})).toBeUndefined()
+    expect(resolvePresentationClasses(catalogue, { surface: 'gone' })).toBeUndefined()
   })
 
   it('publishes IDs and labels only, with a revision that follows the choices', async () => {

@@ -6,13 +6,7 @@ export default defineEventHandler(() => {
     ? value as Record<string, unknown>
     : null
   const presentation = build
-    ? {
-        manifestRevision: String(build.manifestRevision || ''),
-        sourceRevision: String(build.sourceRevision || ''),
-        schemaVersion: Number(build.schemaVersion || 0),
-        siteUuid: String(build.siteUuid || ''),
-        theme: String(build.theme || ''),
-      }
+    ? { sourceRevision: String(build.sourceRevision || '') }
     : null
 
   return {

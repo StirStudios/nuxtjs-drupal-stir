@@ -27,13 +27,14 @@ describe('toEditableRichTextProps', () => {
   })
 
   it('drops wrongly typed values from blank or malformed payloads', () => {
+    // A payload's own classes never apply: only the caller's resolved choices do.
     expect(toEditableRichTextProps({ id: {}, text: 42, classes: 'prose' })).toEqual({
       id: undefined,
       uuid: undefined,
       parentUuid: undefined,
       text: undefined,
       textSource: undefined,
-      classes: 'prose',
+      classes: undefined,
       direction: undefined,
       editLink: undefined,
       editTarget: undefined,

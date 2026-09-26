@@ -257,10 +257,6 @@ attributes above; the harness does not depend on project-specific components.
 
 - `DRUPAL_URL`: Base Drupal URL (for CE and API calls), e.g. `https://cms.example.com`
 - `DRUPAL_API_KEY`: API key for secured server-side Drupal requests; required by standard Stir downstream deployments
-- `STIR_PRESENTATION_MANIFEST`: Optional build-time URL or local file override for the CMS presentation manifest; defaults to the protected Drupal endpoint derived from `DRUPAL_URL`
-- `STIR_PRESENTATION_MANIFEST_API_KEY`: Optional API-key override used only when fetching `STIR_PRESENTATION_MANIFEST`
-- `STIR_PRESENTATION_MANIFEST_LAST_KNOWN`: Optional local fallback manifest used only when the primary source is unavailable
-- `STIR_PRESENTATION_MANIFEST_FIXTURE`: Set to `'1'` only in downstream quality/test workflows without Drupal to use the layer's validated, version-matched fixture; never enable it for deployment builds
 - `DRUPAL_SESSION_COOKIE_NAMES`: Optional comma-separated allowlist for deployments that override Drupal's standard session cookie name
 - `DRUPAL_FORWARD_CLIENT_IP`: Set to `'true'` to forward a normalized client IP on auth/account proxy calls (default: `false`)
 - `DRUPAL_TRUST_PROXY`: Set to `'true'` when Nuxt runs behind a trusted ingress such as nginx. The visitor address is read from `X-Real-IP`, or else the last `X-Forwarded-For` entry (never the visitor-controlled first one), and sent to Drupal in both `X-Real-IP` and `X-Forwarded-For`. For Drupal to use it, Drupal's nginx must trust the Nuxt server as a real-IP proxy (default: `false`)
@@ -372,7 +368,7 @@ pnpm test:all   # Run unit, Nuxt runtime, E2E, and accessibility tests
 pnpm test:watch # Run unit tests in watch mode
 pnpm verify:core # Tests, lint, typecheck, and root production build
 pnpm verify:ci  # Full gate, including downstream consumer compatibility
-pnpm perf:presentation     # Compare compatibility and CMS-manifest CSS output
+pnpm perf:presentation     # Measure the presentation CSS output
 pnpm perf:report # Build + output top client chunk size report
 pnpm deps:update:safe # Safe dependency update flow
 pnpm release    # Verify, version, tag, and create the GitHub release
