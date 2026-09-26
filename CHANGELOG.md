@@ -131,6 +131,10 @@ untouched do not need one.
 
 ### Fixed
 
+- The "Skip to main content" link is visible when focused: it's fixed to the
+  top of the viewport, with a solid token-based surface, highlighted text and
+  a primary focus ring, so it reads over hero photos (WCAG 2.4.7 and 1.4.3).
+
 - Auth form and status titles take `stirTheme.auth.titleClass` (default
   `mb-0 text-xl leading-7 font-semibold`). They no longer use `!important`
   classes, which blocked site styling; utilities already beat the base `h1`

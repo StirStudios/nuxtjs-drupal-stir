@@ -669,6 +669,12 @@ describe('layer contract', () => {
 
     expect(appShell).toContain('<nav aria-label="Skip links">')
     expect(appShell).toContain('href="#main-content"')
+    // Visible and legible once focused, over any page content (WCAG 2.4.7, 1.4.3).
+    const skipLink = appShell.match(/<a[^>]*href="#main-content"[^>]*>/s)?.[0] ?? ''
+
+    for (const token of ['fixed', 'bg-default', 'text-highlighted', 'ring-2', 'ring-primary', 'focus:translate-y-0']) {
+      expect(skipLink.split(/[\s"]+/)).toContain(token)
+    }
     expect(authPage.match(/id="main-content"/g)).toHaveLength(1)
     expect(authPage.match(/tabindex="-1"/g)).toHaveLength(1)
   })
