@@ -118,6 +118,24 @@ const ADMIN_LINK_ICONS: ReadonlyArray<readonly [RegExp, string]> = [
 ]
 
 /**
+ * Every icon the editor tabs can show. They're left out of the shared client
+ * icon bundle, since only editors see them, and Drupal/Tabs.vue preloads them
+ * together when it mounts so none pops in.
+ */
+export const ADMIN_TAB_ICONS: readonly string[] = [...new Set([
+  ...ADMIN_LINK_ICONS.map(([, icon]) => icon),
+  'i-lucide-eye',
+  'i-lucide-eye-off',
+  'i-lucide-layout-dashboard',
+  'i-lucide-circle-user',
+])]
+
+/** Iconify names (lucide:eye) for Nuxt UI icon classes (i-lucide-eye). */
+export function toIconifyName(icon: string): string {
+  return icon.replace(/^i-([a-z0-9]+)-/, '$1:')
+}
+
+/**
  * Returns the icon for a Drupal admin link, or null when it has no known shape.
  */
 export function adminLinkIcon(url: string): string | null {
