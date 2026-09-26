@@ -8,6 +8,12 @@ previous 229 / 192.5 pair predated that measurement, had been exceeded ever
 since, and was only ever warned about -- so it created no pressure to come down
 and no protection against going further up.
 
+The total cap then moved from 237 to 240 kB when `app.vue` took over the site
+layout: one persistent `<NuxtLayout>` keeps the header and footer mounted
+across navigations, and costs 1.79 kB of entry JavaScript (auth chrome
+middleware and layout wiring) against the previous 236.94 kB build. CSS was
+unchanged.
+
 Recovering those bytes is still worthwhile, and the caps should be ratcheted
 back down as it happens. This file records what the graph is actually made of
 so that work starts from measurement rather than guesswork.

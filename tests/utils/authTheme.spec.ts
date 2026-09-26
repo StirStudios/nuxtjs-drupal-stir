@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  authChromeLayout,
   resolveAuthCardConfig,
+  hasConfiguredSecondaryAction,
   resolveAuthChrome,
   resolveAuthTitleClass,
   resolveAuthPageKey,
@@ -72,5 +74,25 @@ describe('auth theme utilities', () => {
     expect(resolveAuthTitleClass({ titleClass: ' font-heading text-4xl ' })).toBe('font-heading text-4xl')
     expect(resolveAuthTitleClass({})).toBe('mb-0 text-xl leading-7 font-semibold')
     expect(resolveAuthTitleClass(undefined)).toBe('mb-0 text-xl leading-7 font-semibold')
+  })
+
+  it('shows a secondary action on a page without a default link only when fully configured', () => {
+    const enquiry = { label: 'Click here to inquire for more information', to: '/inquire' }
+
+    expect(hasConfiguredSecondaryAction({}, 'protectedPage')).toBe(false)
+    // Global styling for the other pages' back links doesn't add one to the gate.
+    expect(hasConfiguredSecondaryAction({ secondaryAction: { variant: 'ghost' } }, 'protectedPage')).toBe(false)
+    expect(hasConfiguredSecondaryAction({ pages: { protectedPage: { secondaryAction: enquiry } } }, 'protectedPage')).toBe(true)
+    expect(hasConfiguredSecondaryAction({ secondaryAction: enquiry }, 'protectedPage')).toBe(true)
+    expect(hasConfiguredSecondaryAction({
+      secondaryAction: enquiry,
+      pages: { protectedPage: { secondaryAction: { enabled: false } } },
+    }, 'protectedPage')).toBe(false)
+  })
+
+  it('maps auth chrome to the layout app.vue renders', () => {
+    expect(authChromeLayout('none')).toEqual({ name: false })
+    expect(authChromeLayout('header')).toEqual({ name: 'default', props: { footer: false } })
+    expect(authChromeLayout('full')).toEqual({ name: 'default', props: { footer: true } })
   })
 })

@@ -23,6 +23,11 @@ untouched do not need one.
 
 ### Added
 
+- The protected page gate renders `stirTheme.auth.secondaryAction` (or
+  `auth.pages.protectedPage.secondaryAction`) under its form when a label and
+  destination are set, e.g. an enquiry link. By default it shows nothing,
+  since the gate has no login to fall back to.
+
 - `stirTheme.auth.chrome` (`'none'`, `'header'` or `'full'`, default
   `'none'`) renders auth pages inside the site layout with the site header,
   or the header and footer. `stirTheme.auth.pages.<key>.chrome` overrides it
@@ -85,6 +90,20 @@ untouched do not need one.
 
 ### Changed
 
+- **Behaviour change:** the site layout persists across navigations. `app.vue`
+  renders one `<NuxtLayout>` around `<NuxtPage>`, so the header, footer and
+  other layout components keep their DOM (and state) between pages that share
+  a layout, instead of being rebuilt on every click. Drupal pages choose their
+  layout before render: `plugins/drupalPageLayout.server.ts` reads
+  `page_layout` on the server (pages opt in with `definePageMeta({ drupalPage:
+  true })`, as `[...slug].vue` does), and `Drupal/PageRoute.vue` sets it on
+  client navigation. Auth chrome is set by `middleware/authChrome.global.ts`.
+  **Consumer action:** a site page that renders its own `<NuxtLayout>` must add
+  `definePageMeta({ layout: false })`, and so must a page that should stay
+  without a layout; otherwise the default layout wraps it. A site page that
+  renders `<DrupalPageRoute>` should add `drupalPage: true` so its layout is
+  resolved on the server.
+
 - Drupal page heroes no longer fall back to the page's meta description. A
   meta description is written for search results and usually repeats the
   page's opening paragraph, so a page without Hero paragraph text now shows
@@ -130,6 +149,11 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- `MediaImage` no longer blinks when it re-renders an image the browser has
+  already loaded, such as a nav photo on every page: loaded sources are
+  remembered and start visible. Eager server-rendered images also start
+  visible instead of waiting for JavaScript. New images still fade in.
 
 - The "Skip to main content" link is visible when focused: it's fixed to the
   top of the viewport, with a solid token-based surface, highlighted text and

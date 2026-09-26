@@ -1,3 +1,4 @@
+import { useRoute } from '#imports'
 import { describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, inject, ref } from 'vue'
@@ -49,7 +50,8 @@ describe('Drupal PageRoute ownership', () => {
       slots: { default: () => h(Probe) },
     })
 
-    expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe('clear')
+    // app.vue renders the layout; PageRoute sets it from the destination page.
+    expect(useRoute().meta.layout).toBe('clear')
     expect(wrapper.get('#edit-targets').text()).toBe('/edit/destination:42')
     expect(wrapper.get('#edit-targets').attributes('data-page-title')).toBe('Destination')
     expect(state.getPage).not.toHaveBeenCalled()

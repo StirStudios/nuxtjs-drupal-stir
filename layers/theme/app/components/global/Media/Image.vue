@@ -175,7 +175,15 @@ const { isSupported, stop } = useIntersectionObserver(
   },
 )
 
-const isLoaded = ref(!hasImageSource.value)
+const nuxtApp = useNuxtApp()
+// An image starts visible when it has no source, when this browser already
+// loaded it, or when it's eager and server-rendered (the server and hydration
+// agree, and the image isn't hidden until JavaScript runs). Others fade in.
+const startsVisible = () =>
+  !hasImageSource.value ||
+  isImageSourceLoaded(providerSource.value) ||
+  (isEager.value && (import.meta.server || nuxtApp.isHydrating))
+const isLoaded = ref(startsVisible())
 
 function syncLoadedFromImageElement() {
   if (!hasImageSource.value) {
@@ -188,6 +196,7 @@ function syncLoadedFromImageElement() {
   if (!img) return
   if (img.complete) {
     isLoaded.value = true
+    if (img.naturalWidth) markImageSourceLoaded(providerSource.value)
     emit('resolved-src', img.naturalWidth ? img.currentSrc || img.src : undefined)
   }
 }
@@ -195,7 +204,7 @@ function syncLoadedFromImageElement() {
 watch(
   () => [providerSource.value, providerSizes.value, props.width, props.height],
   () => {
-    isLoaded.value = !hasImageSource.value
+    isLoaded.value = startsVisible()
     emit('resolved-src', undefined)
     nextTick(syncLoadedFromImageElement)
   },
@@ -204,6 +213,7 @@ watch(
 
 function handleLoad() {
   isLoaded.value = true
+  markImageSourceLoaded(providerSource.value)
   syncLoadedFromImageElement()
 }
 

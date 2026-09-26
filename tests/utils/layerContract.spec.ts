@@ -657,6 +657,24 @@ describe('layer contract', () => {
     expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
   })
 
+  it('renders one persistent layout in app.vue instead of inside pages', () => {
+    const read = (path: string) => readFileSync(resolve(rootDir, path), 'utf8')
+    const appShell = read('layers/theme/app/app.vue')
+
+    // A layout inside a page is rebuilt on every navigation, with the header
+    // and footer. Pages choose their layout before render instead.
+    expect(appShell).toMatch(/<NuxtLayout>\s*<NuxtPage \/>\s*<\/NuxtLayout>/)
+    for (const page of [
+      'layers/theme/app/components/Drupal/PageRoute.vue',
+      'layers/auth/app/components/Auth/AuthPage.vue',
+    ]) {
+      expect(read(page)).not.toContain('<NuxtLayout')
+    }
+    expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
+    expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
+    expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
+  })
+
   it('keeps the global skip link in a landmark with a focusable auth target', () => {
     const appShell = readFileSync(
       resolve(rootDir, 'layers/theme/app/app.vue'),
@@ -1074,7 +1092,8 @@ describe('layer contract', () => {
     // Ratchet: these track the enforced baseline in docs/perf-budget.json and
     // only ever move down. Raising them is a deliberate re-baseline, not a way
     // to absorb a regression -- see docs/perf-initial-graph.md.
-    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(237)
+    // 240: persistent app-level layout (docs/perf-budget.json rationale).
+    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(240)
     expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(204)
     expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36.5)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
