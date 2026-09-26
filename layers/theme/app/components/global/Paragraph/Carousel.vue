@@ -17,7 +17,6 @@ import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
-import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveGridClasses, resolveWidthClasses, type GridConfig } from '#stir/utils/gridClasses'
 
 const props = withDefaults(defineProps<{
@@ -33,6 +32,8 @@ const props = withDefaults(defineProps<{
   width?: string
   spacing?: string
 
+  // Section headings belong to the Layout paragraph. Declared so Drupal's
+  // field_header, until it is removed, is not rendered as an HTML attribute.
   header?: string
   headerTag?: string
   direction?: string
@@ -72,7 +73,6 @@ const props = withDefaults(defineProps<{
 })
 
 const theme = useAppConfig().stirTheme
-const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 const slots = useSlots()
 const mounted = ref(false)
 const carouselRoot = useTemplateRef<HTMLElement>('carouselRoot')
@@ -269,10 +269,6 @@ function releasePointerArrowFocus(event: PointerEvent) {
     @pointerup.capture="releasePointerArrowFocus"
   >
     <div ref="carouselRoot">
-      <component :is="headingTag" v-if="header">
-        {{ header }}
-      </component>
-
       <UButton
         v-if="slides.length > 1 && preferredMotion !== 'reduce'"
         :aria-controls="mounted ? contentId : undefined"

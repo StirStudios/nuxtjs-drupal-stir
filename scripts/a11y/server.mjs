@@ -16,6 +16,13 @@ const paragraphText = (uuid, text) => ({
   slots: {},
 })
 
+// Section headings belong to the Layout paragraph, which wraps a component.
+const layoutSection = (uuid, header, child) => ({
+  element: 'paragraph-layout',
+  props: { uuid, layout: 'one_column', header, headerTag: 'h2' },
+  slots: { first: [child] },
+})
+
 // Interactive custom elements carry most of the keyboard, focus and accessible
 // naming risk, so the audited page renders them rather than markup alone.
 const pageFixture = {
@@ -38,37 +45,39 @@ const pageFixture = {
           },
           slots: {},
         },
-        {
-          element: 'paragraph-accordion',
-          props: {
-            uuid: '00000000-0000-4000-8000-0000000000a1',
-            header: 'Accordion section',
-            headerTag: 'h2',
-          },
-          slots: {
-            items: [
-              {
-                element: 'paragraph-accordion-item',
-                props: {
-                  uuid: '00000000-0000-4000-8000-0000000000a2',
-                  header: 'First question',
-                  text: '<p>First answer.</p>',
+        layoutSection(
+          '00000000-0000-4000-8000-0000000000a0',
+          'Accordion section',
+          {
+            element: 'paragraph-accordion',
+            props: {
+              uuid: '00000000-0000-4000-8000-0000000000a1',
+            },
+            slots: {
+              items: [
+                {
+                  element: 'paragraph-accordion-item',
+                  props: {
+                    uuid: '00000000-0000-4000-8000-0000000000a2',
+                    header: 'First question',
+                    text: '<p>First answer.</p>',
+                  },
+                  slots: {},
                 },
-                slots: {},
-              },
-              {
-                // A blank authored header must still expose an accessible name.
-                element: 'paragraph-accordion-item',
-                props: {
-                  uuid: '00000000-0000-4000-8000-0000000000a3',
-                  header: '   ',
-                  text: '<p>Second answer.</p>',
+                {
+                  // A blank authored header must still expose an accessible name.
+                  element: 'paragraph-accordion-item',
+                  props: {
+                    uuid: '00000000-0000-4000-8000-0000000000a3',
+                    header: '   ',
+                    text: '<p>Second answer.</p>',
+                  },
+                  slots: {},
                 },
-                slots: {},
-              },
-            ],
+              ],
+            },
           },
-        },
+        ),
         {
           element: 'paragraph-tabs',
           props: { uuid: '00000000-0000-4000-8000-0000000000b1' },
@@ -107,36 +116,38 @@ const pageFixture = {
             ],
           },
         },
-        {
-          element: 'paragraph-carousel',
-          props: {
-            uuid: '00000000-0000-4000-8000-0000000000d1',
-            header: 'Carousel section',
-            headerTag: 'h2',
-            carouselArrows: true,
-            carouselIndicators: true,
-          },
-          slots: {
-            items: [
-              {
-                element: 'paragraph-carousel-item',
-                props: {
-                  uuid: '00000000-0000-4000-8000-0000000000d2',
-                  label: 'First slide',
+        layoutSection(
+          '00000000-0000-4000-8000-0000000000d0',
+          'Carousel section',
+          {
+            element: 'paragraph-carousel',
+            props: {
+              uuid: '00000000-0000-4000-8000-0000000000d1',
+              carouselArrows: true,
+              carouselIndicators: true,
+            },
+            slots: {
+              items: [
+                {
+                  element: 'paragraph-carousel-item',
+                  props: {
+                    uuid: '00000000-0000-4000-8000-0000000000d2',
+                    label: 'First slide',
+                  },
+                  slots: {},
                 },
-                slots: {},
-              },
-              {
-                element: 'paragraph-carousel-item',
-                props: {
-                  uuid: '00000000-0000-4000-8000-0000000000d3',
-                  label: 'Second slide',
+                {
+                  element: 'paragraph-carousel-item',
+                  props: {
+                    uuid: '00000000-0000-4000-8000-0000000000d3',
+                    label: 'Second slide',
+                  },
+                  slots: {},
                 },
-                slots: {},
-              },
-            ],
+              ],
+            },
           },
-        },
+        ),
         {
           element: 'paragraph-timeline',
           props: { uuid: '00000000-0000-4000-8000-0000000000e1' },

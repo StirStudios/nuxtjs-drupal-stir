@@ -15,6 +15,17 @@ untouched do not need one.
 
 ### Removed
 
+- **Behaviour change.** Section headings now come only from the Layout
+  paragraph. The Carousel, Media and Accordion paragraphs no longer render
+  their `field_header` (`header` / `headerTag`); item headings (accordion
+  items, tabs, features, timeline items, the hero) are unchanged, and the
+  Accordion's intro text still renders. **Migration:** wrap a carousel,
+  media or accordion that shows a heading in a Layout paragraph and move the
+  heading to the Layout's `field_header`; section spacing and heading styles
+  follow the Layout too. Across the Stir sites this affected four paragraphs,
+  all on Tri-Link. Drupal still sends `field_header` until Stir Tools removes
+  it; the layer ignores it.
+
 - **Breaking.** The CMS presentation manifest and free-text classes are gone.
   Every site now styles paragraphs with Surface and Variant choices, so builds
   compile the layout vocabulary plus the project's catalogue and `richText`

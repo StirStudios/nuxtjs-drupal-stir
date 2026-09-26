@@ -4,6 +4,22 @@ import { describe, expect, it } from 'vitest'
 import ParagraphAccordion from '../../../layers/theme/app/components/global/Paragraph/Accordion.vue'
 
 describe('ParagraphAccordion', () => {
+  // Section headings belong to the Layout paragraph; the intro text stays.
+  it('ignores a legacy group heading and keeps the intro text', async () => {
+    const wrapper = await mountSuspended(ParagraphAccordion, {
+      attrs: { header: 'Frequently asked questions', headerTag: 'h2' },
+      props: { text: '<p>Common questions.</p>' },
+      slots: {
+        items: () => [h('paragraph-accordion-item', { header: 'Question', id: 1, text: '<p>Answer</p>' })],
+      },
+    })
+
+    expect(wrapper.find('h2').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Frequently asked questions')
+    expect(wrapper.find('[header]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Common questions.')
+  })
+
   it('gives blank authored headers an accessible fallback label', async () => {
     const wrapper = await mountSuspended(ParagraphAccordion, {
       slots: {
