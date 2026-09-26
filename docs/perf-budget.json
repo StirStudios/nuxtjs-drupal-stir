@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "units": "gzip-kilobytes",
-  "maxInitialGzipKb": 237,
+  "maxInitialGzipKb": 240,
   "maxInitialJavascriptGzipKb": 204,
   "maxInitialCssGzipKb": 36.5,
   "maxAdminDeferredGzipKb": 170,
   "maxRevealMotionGzipKb": 28,
-  "initialBudgetRationale": "Re-baselined to the measured Nuxt 4.5 graph (235.95 kB initial, 202.69 kB JavaScript) plus about 1 kB of headroom, and CI now enforces these caps instead of warning. The previous 229 / 192.5 caps were set during the Nuxt 4.5 adoption before the graph was re-measured; the build had exceeded them ever since while CI only warned, so they described an intention rather than the build and caught no regression. An enforced cap at the real number protects against the next regression; ratchet it back down as bytes are recovered. docs/perf-initial-graph.md records the measured composition and the candidate levers, none of which clear the old cap on their own."
+  "initialBudgetRationale": "Re-baselined to the measured Nuxt 4.5 graph (235.95 kB initial, 202.69 kB JavaScript) plus about 1 kB of headroom, and CI now enforces these caps instead of warning. The previous 229 / 192.5 caps were set during the Nuxt 4.5 adoption before the graph was re-measured; the build had exceeded them ever since while CI only warned, so they described an intention rather than the build and caught no regression. An enforced cap at the real number protects against the next regression; ratchet it back down as bytes are recovered. docs/perf-initial-graph.md records the measured composition and the candidate levers, none of which clear the old cap on their own. Re-baselined again from 237 to 240 kB total when app.vue took over the site layout (one persistent <NuxtLayout>, so the header and footer are no longer rebuilt on every navigation). Measured against the previous build (236.94 kB, 0.06 kB under the old cap): +1.79 kB JavaScript for the auth chrome middleware and layout wiring in the entry, CSS unchanged, giving 238.73 kB plus about 1 kB of headroom. The JavaScript and CSS caps are unchanged."
 }

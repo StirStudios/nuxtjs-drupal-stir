@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   key: (route) => useResolvedPageRequest(route).key.value,
-  // Resolved from the Drupal payload by middleware/drupalPageLayout.global.ts.
+  // Resolved from the Drupal payload by plugins/drupalPageLayout.server.ts.
   drupalPage: true,
 })
 </script>

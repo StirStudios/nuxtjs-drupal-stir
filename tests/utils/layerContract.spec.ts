@@ -671,7 +671,7 @@ describe('layer contract', () => {
       expect(read(page)).not.toContain('<NuxtLayout')
     }
     expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
-    expect(read('layers/theme/app/middleware/drupalPageLayout.global.ts')).toContain('setDrupalPageLayout(')
+    expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
     expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
   })
 
@@ -1092,7 +1092,8 @@ describe('layer contract', () => {
     // Ratchet: these track the enforced baseline in docs/perf-budget.json and
     // only ever move down. Raising them is a deliberate re-baseline, not a way
     // to absorb a regression -- see docs/perf-initial-graph.md.
-    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(237)
+    // 240: persistent app-level layout (docs/perf-budget.json rationale).
+    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(240)
     expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(204)
     expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36.5)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)

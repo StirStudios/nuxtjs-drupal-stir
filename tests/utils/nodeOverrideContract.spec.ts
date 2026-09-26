@@ -37,7 +37,7 @@ describe('node override contract', () => {
   })
 
   it('uses the accessible default layout when Drupal omits page_layout', () => {
-    // PageRoute and middleware/drupalPageLayout.global.ts both resolve through this.
+    // PageRoute and plugins/drupalPageLayout.server.ts both resolve through this.
     expect(resolveDrupalPageLayout(undefined)).toBe('default')
     expect(resolveDrupalPageLayout('  ')).toBe('default')
     expect(resolveDrupalPageLayout('clear')).toBe('clear')

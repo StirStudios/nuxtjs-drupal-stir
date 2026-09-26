@@ -94,7 +94,7 @@ untouched do not need one.
   renders one `<NuxtLayout>` around `<NuxtPage>`, so the header, footer and
   other layout components keep their DOM (and state) between pages that share
   a layout, instead of being rebuilt on every click. Drupal pages choose their
-  layout before render: `middleware/drupalPageLayout.global.ts` reads
+  layout before render: `plugins/drupalPageLayout.server.ts` reads
   `page_layout` on the server (pages opt in with `definePageMeta({ drupalPage:
   true })`, as `[...slug].vue` does), and `Drupal/PageRoute.vue` sets it on
   client navigation. Auth chrome is set by `middleware/authChrome.global.ts`.
