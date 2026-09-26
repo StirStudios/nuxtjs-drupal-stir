@@ -60,6 +60,12 @@ untouched do not need one.
 
 ### Added
 
+- `stirTheme.embedded` (default `false`): an app embedded in another site,
+  such as Piper's calculator widget, renders only its layout and page. The
+  skip link, route announcer, loading indicator, scroll-to-top button, popup,
+  privacy notice and client components are left to the host page. Set it at
+  runtime with `updateAppConfig({ stirTheme: { embedded: true } })`.
+
 - The protected page gate renders `stirTheme.auth.secondaryAction` (or
   `auth.pages.protectedPage.secondaryAction`) under its form when a label and
   destination are set, e.g. an enquiry link. By default it shows nothing,
@@ -193,6 +199,11 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- The calculator paragraph initialises Piper's widget on a repeat client
+  navigation. With the loader already loaded, it called `initPiperWidget()`
+  during setup, before `<ClientOnly>` rendered the widget element, so the
+  widget never appeared. It now waits for both the loader and the element.
 
 - Floating webform labels show the required asterisk that `UFormField` shows
   on static labels, for text, email, tel, textarea, select, date and address

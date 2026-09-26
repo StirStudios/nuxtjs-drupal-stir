@@ -520,6 +520,13 @@ type StirThemeConfig = {
   gradients?: Record<string, ClassValue>
   animations?: StirThemeAnimationsConfig
   scrollButton?: StirThemeScrollButtonConfig
+  /**
+   * Render only the page and its layout, without the skip link, route
+   * announcer, loading indicator, scroll-to-top button, popup, privacy notice
+   * or client components. For an app embedded in another site, which owns
+   * those; set at runtime with updateAppConfig(). Default false.
+   */
+  embedded?: boolean
   error?: StirThemeErrorConfig
   auth?: StirThemeAuthConfig
 } & LooseRecord
