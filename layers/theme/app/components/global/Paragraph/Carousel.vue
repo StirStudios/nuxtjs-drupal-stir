@@ -263,7 +263,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
   <RevealMotionElement
     :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
     class="relative z-10"
-    :class="[theme.carousel.base, indicatorPadding, widthClasses, spacing]"
+    :class="[indicatorPadding, widthClasses, spacing]"
     :motion-props="carouselMotionProps"
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"

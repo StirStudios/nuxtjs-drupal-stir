@@ -63,25 +63,6 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
-  it.each([
-    [true, 'carousel'],
-    [false, 'carousel'],
-    [true, 'marquee'],
-  ])('always applies the wrapper base classes (dots %s, %s)', async (carouselIndicators, presentation) => {
-    const carousel = useAppConfig().stirTheme.carousel as Record<string, unknown>
-    const base = carousel.base
-
-    carousel.base = 'project-carousel [&_h2]:uppercase'
-    const wrapper = await mountSuspended(ParagraphCarousel, {
-      props: { carouselIndicators, presentation, header: 'Trusted by', items: [h('article', 'One'), h('article', 'Two')] },
-    })
-
-    expect(wrapper.classes()).toEqual(expect.arrayContaining(['project-carousel', '[&_h2]:uppercase']))
-    expect(wrapper.find('h2').text()).toBe('Trusted by')
-    carousel.base = base
-    wrapper.unmount()
-  })
-
   it('passes the exact Drupal interval to Nuxt UI without starting off-screen', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {

@@ -245,11 +245,6 @@ untouched do not need one.
 - A carousel without dot indicators (and a marquee) no longer takes
   `stirTheme.carousel.padding`, the bottom space kept for the dots. Sites that
   set `carousel.padding: ''` to hide that gap can drop the override.
-  **Migration:** `stirTheme.carousel.base` is new and always applies to the
-  wrapper that holds the carousel heading. A site that put section spacing or
-  heading styles (for example `[&_h2]:…`) in `carousel.padding` should move
-  them to `carousel.base` and keep only the dot spacing in `padding`;
-  otherwise they vanish on carousels without dots and on marquees.
 
 - **A failed sign-in shows Drupal's reason.** `getFetchErrorMessage()` (and so
   `useAuthLogin`, `useAuthRegister`, `usePasswordRequest`, `usePasswordReset`)

@@ -334,7 +334,6 @@ type StirThemeMediaConfig = {
 
 type StirThemeCarouselConfig = {
   marqueeRepeat?: Partial<Record<'horizontal' | 'vertical', number>>
-  base?: ClassValue
   padding?: ClassValue
   root?: ClassValue
   arrows?: {
