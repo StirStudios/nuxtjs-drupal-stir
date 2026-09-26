@@ -33,6 +33,8 @@ const contentWrapperClasses = computed(() => {
     resolveWidthClasses(props.width, props.align) || null,
     props.spacing || null,
     containerAlignment.value,
+    // The paragraph's text alignment, as Text paragraphs apply their own.
+    props.align?.text ? `text-${props.align.text}` : null,
   ].filter((value): value is string => typeof value === 'string' && value.length > 0)
 })
 const cardUi = computed(() => ({
