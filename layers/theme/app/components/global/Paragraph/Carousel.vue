@@ -32,10 +32,6 @@ const props = withDefaults(defineProps<{
   width?: string
   spacing?: string
 
-  // Section headings belong to the Layout paragraph. Declared so Drupal's
-  // field_header, until it is removed, is not rendered as an HTML attribute.
-  header?: string
-  headerTag?: string
   direction?: string
 
   carouselIndicators?: boolean
@@ -57,8 +53,6 @@ const props = withDefaults(defineProps<{
   direction: undefined,
   editLink: undefined,
   gridItems: undefined,
-  header: undefined,
-  headerTag: undefined,
   id: undefined,
   items: undefined,
   marqueeDuration: undefined,

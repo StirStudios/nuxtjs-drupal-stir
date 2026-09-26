@@ -63,19 +63,6 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
-  // Section headings belong to the Layout paragraph.
-  it('ignores a legacy section heading without leaking it as an attribute', async () => {
-    const wrapper = await mountSuspended(ParagraphCarousel, {
-      props: { header: 'Trusted by', headerTag: 'h2', items: [h('article', 'One'), h('article', 'Two')] },
-    })
-
-    expect(wrapper.find('h2').exists()).toBe(false)
-    expect(wrapper.text()).not.toContain('Trusted by')
-    expect(wrapper.find('[header]').exists()).toBe(false)
-    expect(wrapper.attributes('header')).toBeUndefined()
-    wrapper.unmount()
-  })
-
   it('passes the exact Drupal interval to Nuxt UI without starting off-screen', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
