@@ -12,7 +12,7 @@ import {
 } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveAlignClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
-import { resolvePresentationClasses } from '#stir/utils/presentationClasses'
+import { resolvePresentationCard, resolvePresentationClasses } from '#stir/utils/presentationClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -58,6 +58,10 @@ const presentationClasses = computed(() => resolvePresentationClasses(
   { surface: props.surface, variant: props.presentationVariant },
 ))
 const classNames = computed(() => presentationClasses.value?.split(/\s+/) || [])
+// A card surface, or the legacy Card field.
+const isCard = computed(() =>
+  Boolean(resolvePresentationCard(presentation, props.surface)) || resolveBooleanProp(props.card),
+)
 const isActionGroup = computed(() => classNames.value.includes('action-group'))
 
 const vueSlots = useSlots()
@@ -134,7 +138,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
   >
     <WrapGrid
       :align="align"
-      :card="card"
+      :card="isCard"
       :container="container"
       :grid-items="gridClass"
       :width="width"

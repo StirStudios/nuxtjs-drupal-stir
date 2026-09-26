@@ -492,6 +492,12 @@ type StirThemePresentationOption = {
    * follow. Default: the page's colour mode.
    */
   colorMode?: 'dark'
+  /**
+   * Surfaces only: render the paragraph as a card. A Layout uses the theme
+   * card; a Text paragraph uses a Nuxt UI card of this variant (outline when
+   * true). Replaces the Card and Card style fields.
+   */
+  card?: true | 'outline' | 'solid' | 'soft' | 'subtle'
 }
 
 type StirThemePresentationConfig = {
