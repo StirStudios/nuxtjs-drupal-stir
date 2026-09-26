@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router'
 import type { AuthThemeConfig } from '../../types/theme'
-import { resolveAuthPageKey } from '../../utils/authTheme'
+import { resolveAuthPageKey, resolveAuthSecondaryAction } from '../../utils/authTheme'
 import { resolveUiButtonVariant, resolveUiColor } from '../../utils/nuxtUiProps'
 
 const {
@@ -18,10 +18,7 @@ const authTheme = computed<AuthThemeConfig>(() =>
   ((appConfig.stirTheme || {}) as { auth?: AuthThemeConfig }).auth || {},
 )
 const pageKey = computed(() => resolveAuthPageKey(route))
-const config = computed(() => ({
-  ...authTheme.value.secondaryAction,
-  ...(pageKey.value ? authTheme.value.pages?.[pageKey.value]?.secondaryAction : {}),
-}))
+const config = computed(() => resolveAuthSecondaryAction(authTheme.value, pageKey.value))
 </script>
 
 <template>

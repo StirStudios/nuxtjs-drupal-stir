@@ -1,6 +1,7 @@
 import type {
   AuthCardConfig,
   AuthChrome,
+  AuthSecondaryActionConfig,
   AuthPageKey,
   AuthThemeConfig,
 } from '../types/theme'
@@ -98,3 +99,26 @@ export const resolveAuthTitleClass = (authTheme: AuthThemeConfig | undefined): s
   typeof authTheme?.titleClass === 'string' && authTheme.titleClass.trim()
     ? authTheme.titleClass.trim()
     : defaultAuthTitleClass
+
+/** The page's secondary action merged over the auth-wide one. */
+export const resolveAuthSecondaryAction = (
+  authTheme: AuthThemeConfig,
+  pageKey: AuthPageKey | null,
+): AuthSecondaryActionConfig => ({
+  ...authTheme.secondaryAction,
+  ...(pageKey ? authTheme.pages?.[pageKey]?.secondaryAction : {}),
+})
+
+/**
+ * Whether a page without its own default link, such as the protected gate,
+ * shows the secondary action: only when a label and destination are set and
+ * it isn't disabled.
+ */
+export const hasConfiguredSecondaryAction = (
+  authTheme: AuthThemeConfig,
+  pageKey: AuthPageKey | null,
+): boolean => {
+  const action = resolveAuthSecondaryAction(authTheme, pageKey)
+
+  return action.enabled !== false && Boolean(action.label && action.to)
+}
