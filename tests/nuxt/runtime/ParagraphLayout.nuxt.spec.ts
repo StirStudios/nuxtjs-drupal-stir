@@ -40,46 +40,42 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     { layoutTag: 'script', header: '', tag: 'SECTION' },
   ])('uses $tag for a layout with heading "$header"', async ({ layoutTag, header, tag }) => {
     const wrapper = await mountSuspended(ParagraphLayout, {
-      props: { id: 'semantics', layoutTag, header, classes: 'showcase-row', gridClass: {} },
+      props: { id: 'semantics', layoutTag, header, surface: 'muted', gridClass: {} },
       slots: { first: '<h3>Independent child heading</h3>' },
     })
 
     expect(wrapper.get('#section-semantics').element.tagName).toBe(tag)
-    expect(wrapper.get('#section-semantics').classes()).toContain('showcase-row')
+    expect(wrapper.get('#section-semantics').classes()).toContain('bg-muted')
     expect(wrapper.find('h2').exists()).toBe(Boolean(header))
     expect(wrapper.get('h3').text()).toBe('Independent child heading')
     wrapper.unmount()
   })
 
-  // Content migrated from free-text classes must render exactly as before.
   it.each([
-    { choice: { surface: 'muted' }, legacy: 'bg-muted' },
-    { choice: { presentationVariant: 'action-group' }, legacy: 'action-group' },
-    { choice: { presentationVariant: 'action-group-center' }, legacy: 'action-group action-group--center' },
-    { choice: { presentationVariant: 'action-group-right' }, legacy: 'action-group action-group--right' },
-    { choice: { surface: 'inverted', presentationVariant: 'action-group' }, legacy: 'bg-inverted text-inverted action-group' },
-  ])('renders $choice exactly like the classes "$legacy"', async ({ choice, legacy }) => {
-    const render = async (props: Record<string, unknown>) => {
-      const wrapper = await mountSuspended(ParagraphLayout, {
-        props: { id: 'presentation', gridClass: {}, ...props },
-        slots: { first: '<p>First</p>', second: '<p>Second</p>' },
-      })
-      const html = wrapper.html()
+    { choice: { surface: 'muted' }, classes: ['bg-muted'] },
+    { choice: { presentationVariant: 'action-group' }, classes: ['action-group'] },
+    { choice: { presentationVariant: 'action-group-center' }, classes: ['action-group', 'action-group--center'] },
+    { choice: { presentationVariant: 'action-group-right' }, classes: ['action-group', 'action-group--right'] },
+    { choice: { surface: 'inverted', presentationVariant: 'action-group' }, classes: ['bg-inverted', 'text-inverted', 'action-group'] },
+  ])('renders $choice with its catalogue classes', async ({ choice, classes }) => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: { id: 'presentation', gridClass: {}, ...choice },
+      slots: { first: '<p>First</p>', second: '<p>Second</p>' },
+    })
 
-      wrapper.unmount()
-      return html
-    }
-
-    expect(await render(choice)).toBe(await render({ classes: legacy }))
+    for (const name of classes) expect(wrapper.find(`.${name}`).exists(), name).toBe(true)
+    wrapper.unmount()
   })
 
-  it('keeps the free-text classes when no known choice is set', async () => {
+  it('applies no presentation classes without a known choice, even from a payload classes value', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
-      props: { id: 'legacy', gridClass: {}, classes: 'showcase-row', surface: 'unknown' },
+      props: { id: 'unknown', gridClass: {}, surface: 'unknown' },
+      attrs: { classes: 'showcase-row' },
       slots: { first: '<p>First</p>' },
     })
 
-    expect(wrapper.get('#section-legacy').classes()).toContain('showcase-row')
+    expect(wrapper.find('.showcase-row').exists()).toBe(false)
+    expect(wrapper.get('#section-unknown').classes()).not.toContain('bg-muted')
     wrapper.unmount()
   })
 

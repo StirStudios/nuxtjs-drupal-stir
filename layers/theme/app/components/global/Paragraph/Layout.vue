@@ -37,7 +37,6 @@ const props = defineProps<{
   width?: string
   spacing?: string
   gridClass?: GridConfig
-  classes?: string
   surface?: string
   presentationVariant?: string
   regionAlign?: Record<string, AlignConfig>
@@ -57,7 +56,6 @@ const presentation = useAppConfig().stirTheme?.presentation
 const presentationClasses = computed(() => resolvePresentationClasses(
   presentation,
   { surface: props.surface, variant: props.presentationVariant },
-  props.classes,
 ))
 const classNames = computed(() => presentationClasses.value?.split(/\s+/) || [])
 const isActionGroup = computed(() => classNames.value.includes('action-group'))

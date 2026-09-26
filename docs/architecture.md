@@ -120,6 +120,8 @@ Recommendation: new contracts should emit constrained semantic values such as sp
 
 Add a versioned **CMS presentation-usage manifest** to that migration path:
 
+> Update (2026-09): the manifest was built and later retired. Once every site moved from free-text `field_classes` to Surface and Variant choices, builds compile the layout vocabulary plus each project's catalogue and rich-text utilities, and fetch nothing from Drupal.
+
 - Stir Tools owns an exporter service with an authenticated build endpoint and a Drush/local-file adapter. The manifest contains its schema version, site/theme identity, deterministic revision/hash, used semantic presentation values, enabled presentation capabilities, and filtered legacy classes. It contains no content or arbitrary unvalidated CSS.
 - Nuxt validates the manifest during prepare/build, maps semantic values through its finite presentation recipes, combines them with any validated legacy utilities, and generates a Tailwind 4 source containing literal `@source inline()` utilities. Tailwind documents this as its current [specific-utility safelisting mechanism](https://tailwindcss.com/docs/detecting-classes-in-source-files#safelisting-specific-utilities).
 - A content/configuration change that introduces a new used value changes the manifest hash and triggers the Nuxt deployment webhook. The production artifact records the manifest hash it was built against, making Drupal content and CSS compatibility observable.

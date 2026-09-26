@@ -6,14 +6,11 @@ import { resolve } from 'node:path'
 const fixture = 'tests/fixtures/minimal-consumer'
 const outputDirectory = resolve(fixture, '.output/public/_nuxt')
 const reportPath = 'docs/presentation-css-report.latest.json'
-const manifestPath = resolve(
-  'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
-)
 
-function runBuild(environment) {
+function runBuild() {
   return new Promise((resolveBuild, reject) => {
     const child = spawn('pnpm', ['exec', 'nuxi', 'build', '--cwd', fixture], {
-      env: { ...process.env, ...environment },
+      env: process.env,
       stdio: 'inherit',
     })
 
@@ -25,9 +22,9 @@ function runBuild(environment) {
   })
 }
 
-async function measure(environment) {
+async function measure() {
   await rm(resolve(fixture, '.output'), { recursive: true, force: true })
-  await runBuild(environment)
+  await runBuild()
 
   const files = (await readdir(outputDirectory))
     .filter(file => file.endsWith('.css'))
@@ -51,14 +48,11 @@ async function measure(environment) {
   }
 }
 
-const presentation = await measure({
-  STIR_PRESENTATION_MANIFEST: manifestPath,
-})
+const presentation = await measure()
 
 const report = {
   schemaVersion: 1,
   fixture,
-  manifest: 'contracts/stir-tools/v1/fixtures/presentation-usage-manifest.json',
   presentation,
 }
 

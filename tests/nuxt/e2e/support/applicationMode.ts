@@ -8,8 +8,7 @@ export function describeApplicationMode(fixture: string, label: string) {
   process.env.DRUPAL_URL = 'http://127.0.0.1:9'
   process.env.NUXT_ENV = 'production'
   process.env.NUXT_URL = 'https://app.example.com'
-  process.env.STIR_PRESENTATION_MANIFEST_FIXTURE = '1'
-  Reflect.deleteProperty(process.env, 'NUXT_INDEXABLE')
+    Reflect.deleteProperty(process.env, 'NUXT_INDEXABLE')
 
   describe(`Production ${label} without the SEO capability`, async () => {
     await setup({

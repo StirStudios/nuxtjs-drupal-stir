@@ -4,8 +4,9 @@ const optionalString = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined
 
 /**
- * Maps Drupal text paragraph props onto EditableRichText props. The payload's
- * `textEdit` target is used when no explicit `editTarget` is set.
+ * Maps Drupal text paragraph props onto EditableRichText props, with the
+ * presentation classes the caller resolved. The payload's `textEdit` target is
+ * used when no explicit `editTarget` is set.
  */
 export function toEditableRichTextProps(
   props: object,
@@ -20,7 +21,7 @@ export function toEditableRichTextProps(
     parentUuid: optionalString(source.parentUuid),
     text: optionalString(source.text),
     textSource: optionalString(source.textSource),
-    classes: classes ?? optionalString(source.classes),
+    classes,
     direction: optionalString(source.direction),
     editLink: optionalString(source.editLink),
     editTarget: source.editTarget ?? source.textEdit,

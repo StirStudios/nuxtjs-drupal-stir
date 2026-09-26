@@ -92,11 +92,10 @@ Use whole-number counts of at least two for continuous scrolling. If overriding 
 
 ## Media and presentation prerequisites
 
-Configure Drupal/CDN image origins, and keep canonical original image URLs plus source revisions in the Drupal payload. Immutable image caching assumes versioned source keys: replacing an image must change its revision/URL. Keep the existing presentation-manifest export available at build time, or provide a reviewed snapshot through `STIR_PRESENTATION_MANIFEST`. Do not use the repository fixture as a production manifest.
+Configure Drupal/CDN image origins, and keep canonical original image URLs plus source revisions in the Drupal payload. Immutable image caching assumes versioned source keys: replacing an image must change its revision/URL.
 
 | Symptom | First useful check |
 |---|---|
-| Presentation manifest request/schema failure | Drupal origin, server API key, producer version and snapshot revision |
 | Blank custom element | Filename/CE mapping and installed capability profile |
 | Component override seems ignored | Use the normal component name/path; regenerate Nuxt types and check selected implementation |
 | CMS page/menu times out | Backend health and `DRUPAL_REQUEST_TIMEOUT_MS` (default 10 seconds) |

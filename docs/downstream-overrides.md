@@ -283,8 +283,6 @@ stirTheme: {
     },
     // Tailwind utilities used inside rich text.
     richText: ['mb-4', 'text-center'],
-    // Once no content stores free-text classes.
-    manifest: false,
   },
 },
 ```
@@ -296,64 +294,24 @@ stirTheme: {
   `drush stir-layout:presentation-catalogue-refresh`, so Drupal offers exactly
   what the deployed frontend renders.
 - Drupal sends the choices as the `surface` and `presentation_variant`
-  attributes. Without a known choice, the free-text `classes` still apply.
-- Moving existing content: map each stored `field_classes` value to choices
-  that render the same classes, then run
-  `drush stir-layout:presentation-classes-migrate --map=<file>` (with
-  `--dry-run` first). Compare rendered pages before and after.
+  attributes. A paragraph without a known choice gets no presentation classes.
+- Tailwind utilities used inside rich text go in `richText`, so they are
+  compiled too.
 
-## CMS presentation manifest
+## Presentation CSS
 
 Every build compiles every option the layout fields offer, whether or not
 content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint, and
 each spacing, width and alignment option. A value an editor picks for the first
 time therefore has CSS without a rebuild. `layoutVocabulary()` generates this
-set from the same recipes as the manifest, and a test checks it covers every
-class the grid, alignment and width resolvers can produce.
+set, and a test checks it covers every class the grid, alignment and width
+resolvers can produce. The build adds every class the presentation catalogue
+and `richText` declare; unsafe tokens are skipped with a warning.
 
-The build also consumes Drupal's presentation usage manifest and compiles the
-free-text class tokens (`field_classes`, classes in formatted text) the site
-currently uses. There is no compatibility mode or general-purpose utility
-safelist.
-
-The widened safe-token grammar is manifest schema version 2. During an
-independent rollout, deploy the schema-v2 Nuxt consumer before updating Drupal.
-
-- By default Nuxt reads
-  `${DRUPAL_URL}/ce-api/stir-layout-builder/presentation-manifest` and uses
-  `DRUPAL_API_KEY` when configured.
-- `STIR_PRESENTATION_MANIFEST` may override the endpoint with another URL or a
-  local JSON file exported with `drush stir-layout:presentation-manifest`.
-- `STIR_PRESENTATION_MANIFEST_API_KEY` may override the API key for that URL.
-- `STIR_PRESENTATION_MANIFEST_FIXTURE=1` explicitly uses the layer's validated,
-  version-matched fixture for downstream quality/test workflows that do not
-  connect to Drupal. Do not set it for deployment builds.
-- `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` optionally identifies an explicitly
-  approved local fallback when the primary source is unavailable.
-- `nuxi prepare`, which the starter runs as `postinstall`, also reads the
-  manifest. On a new project, install with
-  `pnpm install --frozen-lockfile --ignore-scripts`, install Drupal, then run
-  `pnpm rebuild`. Stir Decoupled's `setup.sh` does this.
-
-Builds fail when the manifest is missing, invalid, uses an unknown semantic
-value, contains an unsafe accepted class token, or has a mismatched revision.
-Rejected historical class values are omitted and reported as a warning. Ordinary
-Tailwind utilities, responsive/state variants, slash modifiers such as
-`border-white/10`, bounded safe bracket utilities, and project CSS hooks are
-preserved. Bracket values containing unsafe CSS sources such as `url(...)`
-remain rejected. The verified Drupal revision remains available in
-public runtime config as `stirPresentationManifestRevision`.
-`stirPresentationBuild` records the manifest and generated-source revisions,
-manifest usage count, generated utility count and source bytes,
-accepted/rejected class-token counts, generation duration, schema version,
-site UUID, and Drupal theme.
-
-The same non-secret build identity is exposed at `/api/health` as
-`presentation`. Deployment monitoring can compare its `manifestRevision` with
-Drupal's `ETag` or `X-Stir-Presentation-Revision` header. A difference means a
-new Nuxt build is required before a newly introduced utility can have compiled
-CSS. Deployment automation should use that revision change as its rebuild
-trigger; the health request itself does not query Drupal or trigger deployment.
+Nothing is fetched from Drupal, so a build needs no CMS connection.
+`stirPresentationBuild` in public runtime config records the generated-source
+revision, utility count, source bytes and generation duration, and
+`/api/health` exposes the source revision as `presentation.sourceRevision`.
 
 ## Finding forks before they break a deploy
 

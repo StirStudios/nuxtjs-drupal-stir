@@ -76,8 +76,8 @@ the internal proxy implementation is swapped.
 
 **API key enforcement:** Drupal-side, in
 `stir-tools/modules/stir_layout_builder/src/EventSubscriber/ApiAuthSubscriber.php`
-— a kernel event subscriber gating `/ce-api`, `/*/ce-api/*`, and the
-`presentation-manifest` route, with an explicit public carve-out for menu endpoints
+— a kernel event subscriber gating `/ce-api` and `/*/ce-api/*`, with an
+explicit public carve-out for menu endpoints
 (`/ce-api/api/menu_items/*`, no key required). Validates `X-API-Key` via
 `hash_equals()` against `drupal_api_key` (settings or `$_SERVER['DRUPAL_API_KEY']`);
 anonymous/invalid requests get a 403 JSON envelope. Nuxt side:
@@ -162,22 +162,21 @@ to an empty shell on failure rather than throwing).
 The largest layer — the Nuxt UI 4 + Tailwind 4 application shell: layouts, the
 catch-all Drupal page route (`app/pages/[...slug].vue`), the full component
 library for rendering Drupal custom elements/paragraphs, navigation, media, motion,
-image/CDN delivery, and a build-time "presentation manifest" pipeline that
-generates Tailwind utility CSS from a Drupal-declared usage manifest.
+image/CDN delivery, and a build-time presentation source that compiles the
+layout vocabulary plus each project's Surface/Variant catalogue and rich-text
+utilities into Tailwind CSS, with nothing fetched from Drupal.
 
 - **Consumes:** wraps `nuxtjs-drupal-ce`'s `useDrupalCe()` with a typed
   `StirDrupalPage` shape (`content.element/props/slots`, `metatags`,
   `is_front_page`, `local_tasks`, `related.prevNode/nextNode`); proxies Drupal
   Views refreshes to a hardcoded `stir-layout-builder/paragraph/{id}/view` path;
-  fetches and validates a `schemaVersion: 2` presentation-manifest at build time
-  from `stir-layout-builder/presentation-manifest`; directly imports SEO-layer
-  utilities for global meta injection.
+  directly imports SEO-layer utilities for global meta injection.
 - **Custom vs. stock:** `useDrupalCe()`/`resolveCustomElement`/render helpers are
   stock `nuxtjs-drupal-ce`; everything wrapping them (typed page composable,
-  manifest-driven CSS generation, custom IPX image provider) is custom.
-- **Coupling:** high — hardcoded `stir-layout-builder` paths; the presentation
-  manifest's `schemaVersion: 2` vocabulary (grid/spacing/width/alignment,
-  `legacyClasses`) would break silently on schema drift; core field names
+  presentation CSS generation, custom IPX image provider) is custom.
+- **Coupling:** high — hardcoded `stir-layout-builder` paths; the layout
+  vocabulary mirrors `stir_layout_builder`'s grid, spacing, width and alignment
+  options; core field names
   (`content.element/props/slots`, `is_front_page`, `local_tasks`) are assumed
   Drupal CE response shape, not independently contract-versioned the way SEO/
   listing are.
@@ -342,9 +341,9 @@ the other, ranked roughly by blast radius:
    checks.
 4. **`app-context` and `component-tree` shapes** (`core` layer) — strict
    validation, fails safe (empty shell) rather than partially rendering.
-5. **Presentation manifest `schemaVersion: 2`** (`theme` layer, build-time) —
-   grid/spacing/width/alignment vocabulary and `legacyClasses` are a strict
-   contract; a mismatch throws at build time.
+5. **Layout vocabulary** (`theme` layer, build-time) — the grid, spacing,
+   width and alignment options Drupal offers are compiled from a copy in
+   `build/presentationSource.ts`; a new Drupal option needs the copy updated.
 6. **Listing response schema** (`listing` layer) — `additionalProperties: false`;
    any Drupal-side field addition/rename 502s the endpoint at runtime.
 7. **Auth config contract version** (`auth` layer) — `version: literal(2)` hard
@@ -352,7 +351,7 @@ the other, ranked roughly by blast radius:
 8. **Webform `turnstile_response` + `webform_id` requirements** — hardcoded on
    both sides outside the versioned schema.
 9. **`stir-layout-builder` CE namespace paths** — used directly (not via a
-   generic contract) by `theme` (Views refresh, presentation manifest) and
+   generic contract) by `theme` (Views refresh) and
    `editorial` (paragraph text/presentation editing).
 10. **Menu endpoint template and public-key carve-out** — identical hardcoded
     path pattern on both sides (`api/menu_items/$$$NAME$$$` /

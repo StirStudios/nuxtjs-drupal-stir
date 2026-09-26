@@ -1032,7 +1032,7 @@
     "tests/utils/pageRequest.spec.ts",
     "tests/utils/paragraphRevealOwnership.spec.ts",
     "tests/utils/presentationClasses.spec.ts",
-    "tests/utils/presentationManifest.spec.ts",
+    "tests/utils/presentationSource.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
     "tests/utils/profileValidation.spec.ts",
     "tests/utils/registrationCompletion.spec.ts",

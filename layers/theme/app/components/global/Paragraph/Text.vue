@@ -28,7 +28,6 @@ const presentation = useAppConfig().stirTheme?.presentation
 const richTextProps = computed(() => toEditableRichTextProps(props, resolvePresentationClasses(
   presentation,
   { surface: props.surface, variant: props.presentationVariant },
-  props.classes,
 )))
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapStyles = computed(() =>

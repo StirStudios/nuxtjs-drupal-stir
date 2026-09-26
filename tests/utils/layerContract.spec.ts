@@ -1108,8 +1108,8 @@ describe('layer contract', () => {
     expect(themeConfig).toContain('async \'modules:done\'()')
     expect(themeConfig).toContain('const nuxt = useNuxt()')
     expect(themeConfig).not.toContain('async \'ready\'(nuxt)')
-    expect(themeConfig).toContain('stirPresentationManifestRevision = manifest.revision')
     expect(themeConfig).toContain('stirPresentationBuild = {')
+    expect(themeConfig).not.toContain('Manifest')
   })
 
   it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {

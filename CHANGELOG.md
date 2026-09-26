@@ -15,6 +15,32 @@ untouched do not need one.
 
 ### Removed
 
+- **Breaking.** The CMS presentation manifest and free-text classes are gone.
+  Every site now styles paragraphs with Surface and Variant choices, so builds
+  compile the layout vocabulary plus the project's catalogue and `richText`
+  utilities and fetch nothing from Drupal. For a site that already set
+  `presentation.manifest: false`, the generated CSS is byte-identical.
+  - `stirTheme.presentation.manifest` is removed from the app config type.
+  - `STIR_PRESENTATION_MANIFEST`, `STIR_PRESENTATION_MANIFEST_API_KEY`,
+    `STIR_PRESENTATION_MANIFEST_LAST_KNOWN` and
+    `STIR_PRESENTATION_MANIFEST_FIXTURE` are no longer read; the shared client
+    CI stops setting the fixture.
+  - `build/presentationManifest.ts` is replaced by `build/presentationSource.ts`,
+    and the presentation-usage manifest contract is no longer shipped.
+  - Paragraph `Layout` and `Text` no longer fall back to a payload `classes`
+    value, and `toEditableRichTextProps()` no longer copies one.
+    `resolvePresentationClasses()` takes the catalogue and choices only.
+  - Public runtime config drops `stirPresentationManifestRevision`, and
+    `stirPresentationBuild` keeps `sourceRevision`, `utilityCount`,
+    `sourceBytes` and `generationDurationMs`. `/api/health` returns
+    `presentation: { sourceRevision }`.
+
+  **Consumer action:** delete `manifest: false` (and its comment) from
+  `stirTheme.presentation` in `app/app.config.ts`; typecheck fails until it is
+  gone. Remove any `STIR_PRESENTATION_MANIFEST*` variables from `.env` files and
+  CI. Take the stir-tools release that removes `field_classes` in the same
+  rollout.
+
 - **Breaking.** `usePageContext().isAdministrator` and the `isAdministrator`
   field of `resolveDrupalPageAccess()` / `mergeDrupalPageAccess()` are gone.
   They string-matched the `administrator` role, which Drupal never uses to

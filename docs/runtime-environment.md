@@ -66,8 +66,7 @@ The layer's documented names (`DRUPAL_API_KEY`, `TURNSTILE_SECRET`,
   at runtime would leave those pointing at the old host, so change Drupal
   hosts with a deploy.
 - `NUXT_IMAGE_CDN`, `NUXT_NAME` (runtime `NUXT_SITE_NAME` exists but is not
-  used by Stir), `SERVER_DOMAIN_CLIENT`, `STIR_PRESENTATION_MANIFEST*` and
-  `NODE_ENV`.
+  used by Stir), `SERVER_DOMAIN_CLIENT` and `NODE_ENV`.
 
 The keys generated `.env` files contain today (`NUXT_ENV`, `NUXT_NAME`,
 `NUXT_INDEXABLE`, `NUXT_URL`, `NUXT_IMAGE_CDN`) match no `runtimeConfig` path,
