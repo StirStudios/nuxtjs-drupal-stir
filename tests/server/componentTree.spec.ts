@@ -115,8 +115,6 @@ describe('componentTree', () => {
       {
         element: 'paragraph-accordion',
         props: {
-          header: 'Frequently asked questions',
-          headerTag: 'h2',
           text: '<p>Helpful booking information.</p>',
         },
         slots: {
@@ -151,8 +149,6 @@ describe('componentTree', () => {
         element: 'paragraph-media',
         props: {
           direction: 'up',
-          header: 'Project gallery',
-          headerTag: 'h2',
           overlay: true,
         },
         slots: {
@@ -171,8 +167,6 @@ describe('componentTree', () => {
       {
         element: 'paragraph-carousel',
         props: {
-          header: 'Featured media',
-          headerTag: 'h2',
           carouselArrows: true,
           carouselAutoheight: false,
           carouselAutoscroll: false,
