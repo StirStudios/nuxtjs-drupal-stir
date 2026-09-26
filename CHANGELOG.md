@@ -60,6 +60,12 @@ untouched do not need one.
 
 ### Added
 
+- Presentation choices take `colorMode: 'dark'`. A surface or variant that sets
+  it gets the `dark` class, so Nuxt UI's colour tokens and `dark:` utilities
+  switch inside it, instead of `dark` being typed into its class string (which
+  keeps working). `.dark` now also sets `color-scheme: dark`, so native
+  controls such as date pickers and scrollbars match dark pages and sections.
+
 - `stirTheme.embedded` (default `false`): an app embedded in another site,
   such as Piper's calculator widget, renders only its layout and page. The
   skip link, route announcer, loading indicator, scroll-to-top button, popup,
