@@ -27,6 +27,35 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
+  it('shows a re-rendered image this browser already loaded without fading it in again', async () => {
+    // Keep images "loading" so only the load event marks them loaded.
+    const complete = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(false)
+    const faded = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
+      wrapper.get('img').classes().includes('opacity-0')
+
+    try {
+      const first = await mountSuspended(MediaImage, { props: { src: '/nav-tile-loaded.jpg' } })
+
+      expect(faded(first)).toBe(true)
+      await first.get('img').trigger('load')
+      expect(faded(first)).toBe(false)
+      first.unmount()
+
+      const again = await mountSuspended(MediaImage, { props: { src: '/nav-tile-loaded.jpg' } })
+
+      expect(faded(again)).toBe(false)
+      again.unmount()
+
+      const unseen = await mountSuspended(MediaImage, { props: { src: '/nav-tile-unseen.jpg' } })
+
+      expect(faded(unseen)).toBe(true)
+      unseen.unmount()
+    }
+    finally {
+      complete.mockRestore()
+    }
+  })
+
   it.each([false, true])('uses native viewport loading for reused media (bare: %s)', async (noWrapper) => {
     const wrapper = await mountSuspended(MediaImage, {
       global: { provide: { [viewportImageLoadingKey as symbol]: true } },
@@ -356,7 +385,8 @@ describe('MediaImage (Nuxt runtime)', () => {
       const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Example image',
-          src: '/image.webp',
+          // Loaded images are remembered, so use a source no other test loads.
+          src: '/placeholder-a11y.webp',
         },
       })
 

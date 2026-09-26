@@ -23,6 +23,11 @@ untouched do not need one.
 
 ### Added
 
+- The protected page gate renders `stirTheme.auth.secondaryAction` (or
+  `auth.pages.protectedPage.secondaryAction`) under its form when a label and
+  destination are set, e.g. an enquiry link. By default it shows nothing,
+  since the gate has no login to fall back to.
+
 - `stirTheme.auth.chrome` (`'none'`, `'header'` or `'full'`, default
   `'none'`) renders auth pages inside the site layout with the site header,
   or the header and footer. `stirTheme.auth.pages.<key>.chrome` overrides it
@@ -130,6 +135,11 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- `MediaImage` no longer blinks when it re-renders an image the browser has
+  already loaded, such as a nav photo on every page: loaded sources are
+  remembered and start visible. Eager server-rendered images also start
+  visible instead of waiting for JavaScript. New images still fade in.
 
 - The "Skip to main content" link is visible when focused: it's fixed to the
   top of the viewport, with a solid token-based surface, highlighted text and
