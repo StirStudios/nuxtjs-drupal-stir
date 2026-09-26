@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AuthThemeConfig } from '../../types/theme'
+import { resolveAuthTitleClass } from '../../utils/authTheme'
 import type {
   AuthFormField,
   AuthFormProps,
@@ -44,6 +46,10 @@ defineSlots<{
   validation?: () => unknown
   footer?: () => unknown
 }>()
+
+const titleClass = computed(() =>
+  resolveAuthTitleClass((useAppConfig().stirTheme as { auth?: AuthThemeConfig } | undefined)?.auth),
+)
 </script>
 
 <template>
@@ -61,7 +67,7 @@ defineSlots<{
     @submit="$emit('submit', $event)"
   >
     <template #title>
-      <h1 class="mb-0! text-xl! leading-7! font-semibold!">{{ title }}</h1>
+      <h1 :class="titleClass">{{ title }}</h1>
     </template>
     <template v-if="$slots.leading" #leading>
       <slot name="leading" />

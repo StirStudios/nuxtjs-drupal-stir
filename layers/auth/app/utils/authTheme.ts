@@ -1,5 +1,6 @@
 import type {
   AuthCardConfig,
+  AuthChrome,
   AuthPageKey,
   AuthThemeConfig,
 } from '../types/theme'
@@ -72,3 +73,28 @@ export const resolveAuthCardConfig = (
     },
   }
 }
+
+const isAuthChrome = (value: unknown): value is AuthChrome =>
+  value === 'none' || value === 'header' || value === 'full'
+
+/** The page's chrome, then the auth-wide chrome, then none. */
+export const resolveAuthChrome = (
+  authTheme: AuthThemeConfig,
+  pageKey: AuthPageKey | null,
+): AuthChrome => {
+  const pageChrome = pageKey ? authTheme.pages?.[pageKey]?.chrome : undefined
+
+  if (isAuthChrome(pageChrome)) return pageChrome
+  return isAuthChrome(authTheme.chrome) ? authTheme.chrome : 'none'
+}
+
+/**
+ * Title classes for the auth form and status panels. Utilities beat the base
+ * h1 styles on their own, so a site's titleClass replaces these without `!`.
+ */
+export const defaultAuthTitleClass = 'mb-0 text-xl leading-7 font-semibold'
+
+export const resolveAuthTitleClass = (authTheme: AuthThemeConfig | undefined): string =>
+  typeof authTheme?.titleClass === 'string' && authTheme.titleClass.trim()
+    ? authTheme.titleClass.trim()
+    : defaultAuthTitleClass

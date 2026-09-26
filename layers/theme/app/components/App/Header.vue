@@ -229,6 +229,12 @@ const baseToggleClasses = computed(() => joinHeaderClasses(
   mobileOnlyClass.value,
   !isCenteredToggleLayout.value && (menuToggleSide.value === 'left' ? '-ms-1.5' : '-me-1.5'),
 ))
+// Sites pick a Nuxt UI variant, such as link over a hero image, instead of
+// patching the ghost variant's hover and focus states with classes.
+const toggleButton = computed(() => ({
+  color: resolveUiColor(theme.navigation.toggleColor, 'neutral'),
+  variant: resolveUiButtonVariant(theme.navigation.toggleVariant, 'ghost'),
+}))
 const toggleClasses = computed(() => [
   baseToggleClasses.value,
   isTransparentHeader.value && theme.navigation.toggleTransparentClass,
@@ -356,9 +362,9 @@ watch(menuOpen, (val) => {
       :aria-expanded="menuOpen"
       :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
       :class="toggleClasses"
-      color="neutral"
+      :color="toggleButton.color"
       data-slot="toggle"
-      variant="ghost"
+      :variant="toggleButton.variant"
       @click="toggleMenu"
     >
       <template #leading>
@@ -531,8 +537,10 @@ watch(menuOpen, (val) => {
           :site-title="siteTitle"
           :title-class="headerUi.title"
           :toggle-class="baseToggleClasses"
+          :toggle-color="toggleButton.color"
           :toggle-icon="toggleIcon"
           :toggle-icon-class="toggleIconClass"
+          :toggle-variant="toggleButton.variant"
           @close="menuOpen = false"
         />
       </div>

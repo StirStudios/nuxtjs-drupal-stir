@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ButtonProps } from '@nuxt/ui'
+
 defineProps<{
   leftClass?: string
   logoClasses: string
@@ -10,8 +12,10 @@ defineProps<{
   siteTitle: string
   titleClass?: string
   toggleClass?: string
+  toggleColor?: ButtonProps['color']
   toggleIcon: string
   toggleIconClass?: string
+  toggleVariant?: ButtonProps['variant']
 }>()
 
 defineEmits<{
@@ -42,8 +46,8 @@ defineEmits<{
       :aria-controls="menuId"
       aria-label="Close navigation menu"
       :class="toggleClass"
-      color="neutral"
-      variant="ghost"
+      :color="toggleColor ?? 'neutral'"
+      :variant="toggleVariant ?? 'ghost'"
       @click="$emit('close')"
     >
       <template #leading>

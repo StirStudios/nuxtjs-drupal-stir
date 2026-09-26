@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { createReusableTemplate } from '@vueuse/core'
 import {
   resolveUiButtonVariant,
   resolveUiColor,
@@ -13,15 +14,18 @@ import {
   type AuthLayout,
 } from '../../utils/authLayout'
 import type {
+  AuthChrome,
   AuthPageConfig,
   AuthThemeConfig,
 } from '../../types/theme'
 import {
   resolveAuthCardConfig,
+  resolveAuthChrome,
   resolveAuthPageKey,
 } from '../../utils/authTheme'
 
 const route = useRoute()
+const [DefineAuthContent, ReuseAuthContent] = createReusableTemplate()
 const runtimeConfig = useRuntimeConfig()
 const appConfig = useAppConfig()
 const $img = useImage()
@@ -50,6 +54,22 @@ const themeAuth = computed<AuthThemeConfig>(() => {
 const themePageConfig = computed<AuthPageConfig>(() =>
   authPageKey.value ? themeAuth.value.pages?.[authPageKey.value] || {} : {},
 )
+
+// Inside the site layout, the layout owns <main> and the header's space.
+const chrome = computed<AuthChrome>(() =>
+  resolveAuthChrome(themeAuth.value, authPageKey.value),
+)
+const hasChrome = computed(() => chrome.value !== 'none')
+const headerMode = useHeaderMode()
+const pageMinHeightClass = computed(() => {
+  if (!hasChrome.value) return 'min-h-screen'
+
+  // A fixed header sits over the page, so the page still fills the viewport;
+  // a sticky header takes its own space.
+  return headerMode.value === 'sticky'
+    ? 'min-h-[calc(100dvh-var(--ui-header-height))]'
+    : 'min-h-dvh'
+})
 
 const pageBackgroundClass = computed(() =>
   resolveConfigString(
@@ -185,6 +205,9 @@ const pageContainerClass = computed(() =>
       ],
 )
 
+// A stable hook for site CSS, e.g. a header styled over the photo.
+const hasFullBleedBackground = computed(() => Boolean(pageStyle.value))
+
 const pageContainerStyle = computed(() =>
   isResolvedPageSplit.value ? imagePanelStyle.value : pageStyle.value,
 )
@@ -220,9 +243,22 @@ provide(authLayoutContextKey, layoutContext)
 </script>
 
 <template>
+  <DefineAuthContent>
+    <div :class="{ 'w-full max-w-md': isResolvedPageSplit }">
+      <div
+        v-if="$slots['secondary-action']"
+        class="mb-4 text-left"
+      >
+        <slot name="secondary-action" />
+      </div>
+      <slot />
+    </div>
+  </DefineAuthContent>
+
+  <NuxtLayout :footer="chrome === 'full'" :name="hasChrome ? 'default' : false">
   <div
-    class="min-h-screen w-full"
-    :class="pageContainerClass"
+    class="w-full"
+    :class="[pageMinHeightClass, pageContainerClass, { 'auth-background': hasFullBleedBackground }]"
     role="presentation"
     :style="pageContainerStyle"
   >
@@ -242,22 +278,19 @@ provide(authLayoutContextKey, layoutContext)
       aria-hidden="true"
       class="pointer-events-none absolute -right-24 -bottom-32 size-80 rounded-full bg-primary/10 blur-3xl sm:size-96"
     />
+    <!-- The site layout owns <main> when chrome is on. -->
     <main
+      v-if="!hasChrome"
       id="main-content"
       :class="mainClass"
       role="main"
       tabindex="-1"
     >
-      <div :class="{ 'w-full max-w-md': isResolvedPageSplit }">
-        <div
-          v-if="$slots['secondary-action']"
-          class="mb-4 text-left"
-        >
-          <slot name="secondary-action" />
-        </div>
-        <slot />
-      </div>
+      <ReuseAuthContent />
     </main>
+    <div v-else :class="mainClass">
+      <ReuseAuthContent />
+    </div>
     <div
       v-if="isResolvedPageSplit && !isSplitImageFirst"
       aria-hidden="true"
@@ -265,6 +298,7 @@ provide(authLayoutContextKey, layoutContext)
       :style="imagePanelStyle"
     />
   </div>
+  </NuxtLayout>
 
   <UButton
     v-if="backButtonProps.show"

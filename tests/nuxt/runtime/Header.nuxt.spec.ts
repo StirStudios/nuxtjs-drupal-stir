@@ -48,6 +48,21 @@ const findOverlayHeader = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) 
   wrapper.findComponent({ name: 'AppHeaderOverlayHeader' })
 
 describe('App header', () => {
+  it('passes the configured Nuxt UI variant and colour to the toggle and the close button', async () => {
+    setNavigation({ toggleVariant: 'link', toggleColor: 'primary' })
+
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const toggle = wrapper.findAllComponents({ name: 'UButton' })
+      .find(button => button.attributes('data-slot') === 'toggle')
+
+    expect(toggle?.props()).toMatchObject({ variant: 'link', color: 'primary' })
+
+    await wrapper.get('[data-slot="toggle"]').trigger('click')
+    await vi.waitFor(() => expect(findOverlayHeader(wrapper).exists()).toBe(true))
+    expect(findOverlayHeader(wrapper).props()).toMatchObject({ toggleVariant: 'link', toggleColor: 'primary' })
+    wrapper.unmount()
+  })
+
   it('keeps the default mobile toggle and returns focus after the visitor closes the menu', async () => {
     const wrapper = await mountSuspended(Header, { attachTo: document.body })
     const toggle = wrapper.get('[data-slot="right"] [data-slot="toggle"]')

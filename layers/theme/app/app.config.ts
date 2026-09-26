@@ -79,6 +79,8 @@ export default defineAppConfig({
       toggleIcon: 'size-7',
       toggleTransparentClass: '',
       toggleClass: '',
+      toggleVariant: 'ghost',
+      toggleColor: 'neutral',
       toggleComponent: '',
       actionsComponent: '',
       actionItems: [],

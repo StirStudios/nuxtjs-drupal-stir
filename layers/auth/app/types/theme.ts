@@ -51,7 +51,14 @@ export type AuthCardConfig = {
   variant?: 'solid' | 'outline' | 'soft' | 'subtle'
 }
 
+/**
+ * Site chrome around an auth page: none (the page alone), header (the site
+ * header), or full (the site header and footer).
+ */
+export type AuthChrome = 'none' | 'header' | 'full'
+
 export type AuthPageConfig = {
+  chrome?: AuthChrome
   backgroundClass?: ClassValue
   backgroundImage?: string
   layout?: 'card' | 'page-split' | 'card-split'
@@ -69,6 +76,8 @@ export type AuthThemeConfig = AuthPageConfig & {
   showLogo?: boolean
   /** Classes for that logo, e.g. its height. */
   logoClass?: ClassValue
+  /** Classes for the form and status titles; defaults to the standard size and weight. */
+  titleClass?: ClassValue
   /** Class overrides for the form panel, passed through to UAuthForm's ui. */
   formUi?: LooseRecord
   pages?: Partial<Record<AuthPageKey, AuthPageConfig>>

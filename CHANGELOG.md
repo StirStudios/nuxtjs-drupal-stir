@@ -23,6 +23,18 @@ untouched do not need one.
 
 ### Added
 
+- `stirTheme.auth.chrome` (`'none'`, `'header'` or `'full'`, default
+  `'none'`) renders auth pages inside the site layout with the site header,
+  or the header and footer. `stirTheme.auth.pages.<key>.chrome` overrides it
+  per page. With chrome, the layout owns `<main>`, the auth page fills the
+  screen under a fixed header (or below a sticky one), and a full-bleed
+  background carries the `auth-background` class, so a site can style the
+  header over the photo. `layouts/default.vue` accepts `footer: false`.
+- `stirTheme.navigation.toggleVariant` and `toggleColor` set the Nuxt UI
+  variant and colour of the menu toggle and the slideover close button
+  (default `ghost` and `neutral`), so a site can use `link` over a hero image
+  instead of overriding hover and focus states with classes.
+
 - `stirTheme.navigation.desktopLayout: 'toggle'` keeps the menu toggle and
   slideover at every breakpoint, on the side set by `toggleDirection`, and
   renders no inline desktop menu. `stirTheme.navigation.brand: false` removes
@@ -118,6 +130,11 @@ untouched do not need one.
   `purge: none`, so set purge on each form before updating.
 
 ### Fixed
+
+- Auth form and status titles take `stirTheme.auth.titleClass` (default
+  `mb-0 text-xl leading-7 font-semibold`). They no longer use `!important`
+  classes, which blocked site styling; utilities already beat the base `h1`
+  styles.
 
 - `thirdPartyScripts.allowedOrigins` accepts subdomain wildcards such as
   `https://*.piperavenue.com`. The calculator allows `https://*.piperavenue.com`,

@@ -148,6 +148,9 @@ type StirThemeNavigationConfig = {
   toggleIcon?: ClassValue
   toggleTransparentClass?: ClassValue
   toggleClass?: ClassValue
+  /** Nuxt UI variant and colour of the menu toggle and the slideover close button. */
+  toggleVariant?: UiButtonVariantName
+  toggleColor?: UiColorName
   toggleComponent?: string
   actionsComponent?: string
   actionItems?: StirThemeNavigationActionItem[]

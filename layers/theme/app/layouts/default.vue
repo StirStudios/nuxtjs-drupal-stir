@@ -1,23 +1,9 @@
 <script setup lang="ts">
-type HeaderMode = 'fixed' | 'sticky'
+// Auth pages pass footer: false for header-only chrome.
+withDefaults(defineProps<{ footer?: boolean }>(), { footer: true })
 
-const route = useRoute()
-const { navigation, routeHero } = useAppConfig().stirTheme
-
-const toHeaderMode = (value: unknown): HeaderMode =>
-  value === 'sticky' ? 'sticky' : 'fixed'
-
-const normalizedNavigationMode = computed<HeaderMode>(() => {
-  const modeRoutes = (navigation as Record<string, unknown> | undefined)?.modeRoutes as
-    | Partial<Record<HeaderMode, string[]>>
-    | undefined
-
-  return (['fixed', 'sticky'] as const).find((mode) =>
-    modeRoutes?.[mode]?.some((pattern) =>
-      matchesRoutePattern(route.path, pattern),
-    ),
-  ) ?? toHeaderMode(navigation?.mode)
-})
+const { routeHero } = useAppConfig().stirTheme
+const normalizedNavigationMode = useHeaderMode()
 </script>
 
 <template>
@@ -30,6 +16,6 @@ const normalizedNavigationMode = computed<HeaderMode>(() => {
       <slot />
     </UMain>
 
-    <LazyAppFooter hydrate-on-visible />
+    <LazyAppFooter v-if="footer" hydrate-on-visible />
   </div>
 </template>
