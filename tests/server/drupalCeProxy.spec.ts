@@ -9,7 +9,10 @@ import {
   proxyStirDrupalCeRequest,
   proxyStirDrupalMenuRequest,
 } from '../../layers/core/server/utils/drupalCeProxy'
-import { replaceStirDrupalSetCookies } from '../../layers/foundation/server/utils/stirDrupalApi'
+import {
+  markStirPrivateResponse,
+  replaceStirDrupalSetCookies,
+} from '../../layers/foundation/server/utils/stirDrupalApi'
 
 vi.mock('h3', async (importOriginal) => ({
   ...(await importOriginal<typeof import('h3')>()),
@@ -397,6 +400,23 @@ describe('Drupal CE proxy boundary', () => {
     responseHeaders.set('cache-control', 'private, max-age=60')
     handleStirDrupalProxyResponse(event, new Response('{}', {
       headers: { 'cache-control': 'private, max-age=60' },
+    }))
+
+    expect(responseHeaders.get('cache-control')).toBe(
+      'private, no-store, max-age=0',
+    )
+  })
+
+  // proxyRequest copies Drupal's headers over an earlier private marker, such
+  // as the protected-content boundary's, before this handler runs.
+  it('keeps a response private that was marked private before Drupal answered', () => {
+    stubRuntimeConfig()
+    const { event, responseHeaders } = createEvent()
+
+    markStirPrivateResponse(event)
+    responseHeaders.set('cache-control', 'max-age=3600, public')
+    handleStirDrupalProxyResponse(event, new Response('{}', {
+      headers: { 'cache-control': 'max-age=3600, public' },
     }))
 
     expect(responseHeaders.get('cache-control')).toBe(

@@ -263,6 +263,9 @@ export const getStirForwardedClientIp = (
 }
 
 export const markStirPrivateResponse = (event: H3Event): void => {
+  // A proxied upstream response overwrites this header, so the decision is
+  // also kept on the event for the proxy to reapply.
+  event.context.stirPrivateResponse = true
   setResponseHeader(event, 'Cache-Control', PRIVATE_NO_STORE)
 }
 
