@@ -19,6 +19,24 @@ type ProtectedRoutesAppConfig = {
   }
 }
 
+type StirProtectedRoutesRuntimeConfig = {
+  requireLoginPaths: string[]
+  allowAuthenticatedUserBypass: boolean
+}
+
+// Nuxt copies runtimeConfig into Nitro before 'app:resolve' collects the
+// app configs, so the resolved routes must also be written onto the Nitro
+// instance. Without this the server bundle keeps the empty default and the
+// protected-content boundary never gates anything.
+let resolvedProtectedRoutes: StirProtectedRoutesRuntimeConfig | undefined
+let initializedNitro: { options: { runtimeConfig: Record<string, unknown> } } | undefined
+
+const applyProtectedRoutesToNitro = () => {
+  if (resolvedProtectedRoutes && initializedNitro) {
+    initializedNitro.options.runtimeConfig.stirProtectedRoutes = resolvedProtectedRoutes
+  }
+}
+
 export default defineNuxtConfig({
   extends: ['../turnstile'],
 
@@ -72,6 +90,11 @@ export default defineNuxtConfig({
   },
 
   hooks: {
+    'nitro:init'(nitro) {
+      initializedNitro = nitro
+      applyProtectedRoutesToNitro()
+    },
+
     // 'app:resolve' fires after Nuxt has collected every layer's app.config
     // path onto app.configs (project root first, most-extended layer last).
     // Reading only the project's own srcDir file here would silently drop
@@ -124,13 +147,15 @@ export default defineNuxtConfig({
         routes => typeof routes.allowAuthenticatedUserBypass !== 'undefined',
       )
 
-      const runtimeConfig = nuxt.options.runtimeConfig as Record<string, unknown>
-
-      runtimeConfig.stirProtectedRoutes = {
+      const stirProtectedRoutes = {
         requireLoginPaths,
         allowAuthenticatedUserBypass:
           allowAuthenticatedUserBypassSource?.allowAuthenticatedUserBypass !== false,
       }
+
+      ;(nuxt.options.runtimeConfig as Record<string, unknown>).stirProtectedRoutes = stirProtectedRoutes
+      resolvedProtectedRoutes = stirProtectedRoutes
+      applyProtectedRoutesToNitro()
     },
   },
 })
