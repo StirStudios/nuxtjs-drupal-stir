@@ -13,6 +13,24 @@ untouched do not need one.
 
 ## Unreleased
 
+### Security
+
+- **Protected-page content is now refused without access at the server.**
+  The auth layer copies `protectedRoutes` from `app.config.ts` into the server
+  runtime config at build time, but Nuxt had already handed Nitro its own copy
+  of the runtime config, so every server build kept `requireLoginPaths: []`.
+  The page route still redirected to `/auth/protected` (that check runs in the
+  browser bundle), but the page's content at `/api/drupal-ce/<protected path>`
+  was served to anyone, marked public, and could be cached by Varnish. The
+  layer now also writes the resolved routes onto the Nitro instance, so the
+  server boundary gates them. **Action:** rebuild and redeploy every site that
+  sets `protectedRoutes.requireLoginPaths`, then purge Varnish.
+  `allowAuthenticatedUserBypass` now also reaches the server; unset, it
+  defaults to `true` as documented, so signed-in Drupal users keep access.
+- A private SSR child payload appended to an already private page no longer
+  repeats the directive: the page's `Cache-Control` stays exactly
+  `private, no-store, max-age=0`.
+
 ### Removed
 
 - **Behaviour change.** Section headings now come only from the Layout
