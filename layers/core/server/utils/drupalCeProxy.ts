@@ -217,7 +217,8 @@ export const handleStirDrupalProxyResponse = (
   }
 
   if (
-    getStirForwardedCookie(event)
+    event.context.stirPrivateResponse
+    || getStirForwardedCookie(event)
     || setsDrupalSession
     || /(?:^|,)\s*(?:private|no-store)\b/i.test(upstreamCacheControl)
   ) {
