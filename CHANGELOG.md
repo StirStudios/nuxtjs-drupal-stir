@@ -225,6 +225,14 @@ untouched do not need one.
 
 ### Fixed
 
+- **Behaviour change.** A CE proxy response marked private before Drupal
+  answers stays `private, no-store, max-age=0`. The proxy copies Drupal's
+  headers over the earlier marker, so a password-protected page's
+  `/api/drupal-ce` payload came back publicly cacheable whenever Drupal sent
+  `Cache-Control: public` for it. `markStirPrivateResponse` now also sets
+  `event.context.stirPrivateResponse`, which the proxy honours. Test mocks
+  that call it need an `event.context` object, as real H3 events have.
+
 - A Layout paragraph's text alignment (`field_align`, for example "Text
   Center") now applies to its heading and content. Drupal sent it as
   `align.text`, but `Wrap/Grid.vue` only used `align.justify`, so it was

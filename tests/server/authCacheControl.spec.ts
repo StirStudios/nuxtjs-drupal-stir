@@ -6,6 +6,7 @@ const createEvent = (url: string) => {
 
   return {
     event: {
+      context: {},
       node: {
         req: { headers: { host: 'example.test' }, originalUrl: url, url },
         res: {

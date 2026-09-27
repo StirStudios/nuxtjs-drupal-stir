@@ -21,6 +21,7 @@ const createEvent = (headers: Record<string, string> = {}): TestEvent => {
   const responseHeaders = new Map<string, string | string[]>()
 
   return {
+    context: {},
     node: {
       req: { headers },
       res: {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { layerAuthDrupalApiRequest } from '../../layers/auth/server/utils/drupalApi'
 import protectedContentMiddleware from '../../layers/auth/server/middleware/protected-content'
 import { layerAuthCreateProtectedAccessToken } from '../../layers/auth/server/utils/protectedAccessToken'
+import { handleStirDrupalProxyResponse } from '../../layers/core/server/utils/drupalCeProxy'
 
 vi.mock('../../layers/auth/server/utils/drupalApi', () => ({
   layerAuthDrupalApiRequest: vi.fn(),
@@ -60,6 +61,41 @@ describe('protected content boundary', () => {
         createEvent('/api/drupal-ce/private/report', `protected_access=${token}`),
       ),
     ).resolves.toBeUndefined()
+  })
+
+  // Drupal may mark CE responses public; the proxy copies that header over the
+  // private marker set here, which must still win.
+  it('keeps an authorized protected payload private when Drupal sends public', async () => {
+    stubRuntimeConfig(['/private/'])
+    const token = await layerAuthCreateProtectedAccessToken(SECRET, 3600)
+    const headers = new Map<string, string | string[]>()
+    const event = {
+      context: {},
+      method: 'GET',
+      path: '/api/drupal-ce/private/report',
+      node: {
+        req: {
+          headers: { cookie: `protected_access=${token}` },
+          method: 'GET',
+          url: '/api/drupal-ce/private/report',
+        },
+        res: {
+          getHeader: (name: string) => headers.get(name.toLowerCase()),
+          removeHeader: (name: string) => headers.delete(name.toLowerCase()),
+          setHeader: (name: string, value: string | string[]) => {
+            headers.set(name.toLowerCase(), value)
+          },
+        },
+      },
+    } as never
+
+    await protectedContentMiddleware(event)
+    headers.set('cache-control', 'max-age=3600, public')
+    handleStirDrupalProxyResponse(event, new Response('{}', {
+      headers: { 'cache-control': 'max-age=3600, public' },
+    }))
+
+    expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
   })
 
   it('rejects a protected-access cookie signed with a different secret', async () => {
