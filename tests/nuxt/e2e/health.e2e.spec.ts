@@ -291,6 +291,13 @@ describe('Nuxt E2E smoke', async () => {
     expect(normalizeNuxtPayload(secondHtml)).toBe(normalizeNuxtPayload(firstHtml))
   })
 
+  it('refuses protected CE payloads without access at the server boundary', async () => {
+    const response = await fetch(url('/api/drupal-ce/protected-fixture'))
+
+    expect(response.status).toBe(403)
+    expect(response.headers.get('cache-control')).toBe('private, no-store, max-age=0')
+  })
+
   it('prevents shared caching of authenticated protected HTML', async () => {
     const token = await layerAuthCreateProtectedAccessToken(
       'fixture-protected-password',
