@@ -247,6 +247,8 @@ popup: {
   component: '', // optional globally registered popup body
   dismissalTtlDays: 14, // days before a dismissed campaign may appear again
   hideWhenLoggedIn: false, // hide from signed-in Drupal users (auth layer)
+  mobilePresentation: 'modal', // 'modal' | 'drawer': below md, render a bottom sheet
+  mobileTrigger: undefined, // 'delay' | 'scroll': phone trigger fallback
 }
 ```
 
@@ -271,6 +273,25 @@ Storage semantics: suppression is stored per campaign (`uuid`, else `id`) in
 `hideWhenLoggedIn: true` renders nothing until `/api/auth/session` resolves, so
 signed-in visitors never see a flash; the popup then stays hidden for them. It
 requires the auth layer. If the session request fails, the popup stays hidden.
+
+**Phones.** With `mobilePresentation: 'drawer'`, viewports below `md` (767px)
+render the popup in a `UDrawer` (`direction: 'bottom'`) instead of `UModal`;
+`md` and up keep the modal. Title, description, focus trap and dismissal
+(swipe down, overlay, close button, Escape) behave as in the modal, and
+completion still hides the campaign for good. The popup body component receives
+`presentation: 'modal' | 'drawer'` so a site component can render a condensed
+layout; keep it short, since a tall sheet is still an intrusive interstitial to
+search engines. The sheet content is capped at `50dvh` and scrolls. Test the
+on-screen keyboard on real devices.
+
+**Phone trigger.** Below `md` the trigger is the paragraph's
+`field_popup_mobile_trigger` (`popupMobileTrigger`), else `popup.mobileTrigger`,
+else the popup's own trigger. Values are `delay` or `scroll`; anything else is
+ignored. Exit intent cannot fire on touch, so on phones `exit` becomes
+`scroll`. The trigger re-arms if the viewport crosses `md`.
+
+`popupDelay` and `popupThreshold` are accepted as numbers or numeric strings,
+as Drupal's CE payload sends them (`"5000"`, `"0.25"`).
 
 Each time the popup opens, the layer calls the `stir:popup:shown` Nuxt app hook
 with `{ key, popup }`, where `key` is the campaign key above. Use it for

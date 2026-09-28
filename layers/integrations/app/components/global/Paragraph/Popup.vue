@@ -13,6 +13,7 @@ const props = defineProps<{
   webform?: WebformDefinition
 
   direction?: string
+  presentation?: 'modal' | 'drawer'
   onClose?: () => void
   onComplete?: () => void
 

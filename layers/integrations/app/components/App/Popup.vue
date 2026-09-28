@@ -20,11 +20,34 @@ const sessionBlocksPopup = computed(() => Boolean(session && (!session.ready.val
 const hasPopup = computed(() => !!popup.value && !sessionBlocksPopup.value)
 const popupProps = computed(() => getPopupProps(popup.value))
 
-const { completePopup, dismissPopup, open, shouldRenderPopupContent } = usePopupBehavior({
+const { completePopup, dismissPopup, isPhone, open, shouldRenderPopupContent } = usePopupBehavior({
   popup,
   config,
   suppress: sessionBlocksPopup,
 })
+const presentation = computed<'modal' | 'drawer'>(() =>
+  appConfig.popup?.mobilePresentation === 'drawer' && isPhone.value ? 'drawer' : 'modal',
+)
+const overlays = { drawer: resolveComponent('UDrawer'), modal: resolveComponent('UModal') }
+const overlayComponent = computed(() => overlays[presentation.value])
+const overlayProps = computed(() => presentation.value === 'drawer'
+  ? {
+      direction: 'bottom',
+      ui: {
+        content: 'popup ring-0',
+        header: 'sr-only',
+        container: 'gap-0 p-0 max-h-[50dvh]',
+      },
+    }
+  : {
+      close: false,
+      ui: {
+        overlay: 'fixed inset-0 bg-black/60',
+        content: 'popup divide-none ring-0',
+        header: 'sr-only',
+        body: 'p-0 sm:p-0',
+      },
+    })
 const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
 const popupComponent = computed(() => {
@@ -106,19 +129,14 @@ watch(open, (isOpen) => {
 
 <template>
   <ClientOnly>
-    <UModal
+    <component
+      :is="overlayComponent"
       v-if="hasPopup"
       v-model:open="open"
-      :close="false"
+      v-bind="overlayProps"
       :description="description"
       :portal="portal"
       :title="title"
-      :ui="{
-        overlay: 'fixed inset-0 bg-black/60',
-        content: 'popup divide-none ring-0',
-        header: 'sr-only',
-        body: 'p-0 sm:p-0',
-      }"
     >
       <template #body>
         <template v-if="shouldRenderPopupContent">
@@ -137,6 +155,7 @@ watch(open, (isOpen) => {
             v-bind="popupRenderProps"
             :on-close="dismissPopup"
             :on-complete="completePopup"
+            :presentation="presentation"
           >
             <template #media>
               <component
@@ -147,6 +166,6 @@ watch(open, (isOpen) => {
           </component>
         </template>
       </template>
-    </UModal>
+    </component>
   </ClientOnly>
 </template>

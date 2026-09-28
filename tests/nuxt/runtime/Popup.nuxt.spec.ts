@@ -63,6 +63,60 @@ describe('App popup', () => {
     wrapper.unmount()
   })
 
+  describe('presentation', () => {
+    const findDrawer = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
+      wrapper.findComponent({ name: 'UDrawer' })
+    const originalMatchMedia = window.matchMedia
+    const setPhone = (matches: boolean) => {
+      window.matchMedia = ((query: string) => ({
+        matches: query.includes('max-width') && matches,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+      })) as unknown as typeof window.matchMedia
+    }
+
+    afterEach(() => {
+      window.matchMedia = originalMatchMedia
+      delete popupConfig().mobilePresentation
+    })
+
+    it('keeps the modal on phones by default', async () => {
+      setPhone(true)
+
+      const wrapper = await mountSuspended(Popup)
+
+      await vi.waitFor(() => expect(findModal(wrapper).exists()).toBe(true))
+      expect(findDrawer(wrapper).exists()).toBe(false)
+      wrapper.unmount()
+    })
+
+    it('renders a bottom drawer below md when opted in', async () => {
+      popupConfig().mobilePresentation = 'drawer'
+      setPhone(true)
+
+      const wrapper = await mountSuspended(Popup)
+
+      await vi.waitFor(() => expect(findDrawer(wrapper).exists()).toBe(true))
+      expect(findDrawer(wrapper).props('direction')).toBe('bottom')
+      expect(findModal(wrapper).exists()).toBe(false)
+      wrapper.unmount()
+    })
+
+    it('keeps the modal at md and up when opted in', async () => {
+      popupConfig().mobilePresentation = 'drawer'
+      setPhone(false)
+
+      const wrapper = await mountSuspended(Popup)
+
+      await vi.waitFor(() => expect(findModal(wrapper).exists()).toBe(true))
+      expect(findDrawer(wrapper).exists()).toBe(false)
+      wrapper.unmount()
+    })
+  })
+
   it('calls the stir:popup:shown hook once per show', async () => {
     const shown = vi.fn()
     const removeHook = useNuxtApp().hook('stir:popup:shown', shown)

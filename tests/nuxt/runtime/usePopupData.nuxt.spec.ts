@@ -21,6 +21,32 @@ const popupBlock = (uuid: string) => [{
   },
 }]
 
+// Shaped like Drupal's CE payload, which serialises numbers as strings.
+const stringPopup = (props: Record<string, unknown>) => [{
+  element: 'block-content-paragraph',
+  props: { id: 'p' },
+  slots: {
+    paragraphBlock: [{ element: 'paragraph-popup', props: { uuid: 'p', ...props } }],
+  },
+}]
+
+async function resolvePopupConfig() {
+  let config: ReturnType<typeof usePopupData>['config'] | undefined
+  const Harness = defineComponent({
+    setup() {
+      config = usePopupData().config
+
+      return () => null
+    },
+  })
+  const wrapper = await mountSuspended(Harness)
+  const value = config?.value
+
+  wrapper.unmount()
+
+  return value
+}
+
 async function resolvePopupUuid(): Promise<unknown> {
   let popup: ReturnType<typeof usePopupData>['popup'] | undefined
   const Harness = defineComponent({
@@ -54,5 +80,40 @@ describe('usePopupData', () => {
     state.page.value = { content: popupBlock('in-content')[0]?.slots.paragraphBlock }
 
     expect(await resolvePopupUuid()).toBe('in-content')
+  })
+
+  it('honours numeric strings for the delay and threshold', async () => {
+    state.appContextBlocks = {
+      popups: stringPopup({
+        popupTrigger: 'scroll',
+        popupMobileTrigger: 'delay',
+        popupDelay: '5000',
+        popupThreshold: '0.4',
+      }),
+    }
+
+    expect(await resolvePopupConfig()).toEqual({
+      trigger: 'scroll',
+      mobileTrigger: 'delay',
+      delay: 5000,
+      scrollThreshold: 0.4,
+    })
+  })
+
+  it('ignores non-numeric and blank settings, and unknown phone triggers', async () => {
+    state.appContextBlocks = {
+      popups: stringPopup({
+        popupMobileTrigger: 'exit',
+        popupDelay: 'soon',
+        popupThreshold: ' ',
+      }),
+    }
+
+    expect(await resolvePopupConfig()).toEqual({
+      trigger: 'delay',
+      mobileTrigger: undefined,
+      delay: 100,
+      scrollThreshold: 0.25,
+    })
   })
 })

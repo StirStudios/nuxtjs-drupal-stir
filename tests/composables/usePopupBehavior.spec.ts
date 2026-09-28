@@ -3,6 +3,7 @@ import {
   activePopupDismissals,
   popupSuppressionIsActive,
   popupUsesPersistentDismissal,
+  resolvePopupTrigger,
 } from '../../layers/integrations/app/composables/usePopupBehavior'
 
 describe('popup dismissal policy', () => {
@@ -28,5 +29,27 @@ describe('popup dismissal policy', () => {
       pending: 3_000,
       finished: 'completed',
     }, 2_000)).toEqual({ pending: 3_000, finished: 'completed' })
+  })
+})
+
+describe('popup trigger selection', () => {
+  it('keeps the configured trigger on larger screens', () => {
+    expect(resolvePopupTrigger('exit', 'scroll', false)).toBe('exit')
+    expect(resolvePopupTrigger('scroll', 'delay', false)).toBe('scroll')
+    expect(resolvePopupTrigger('bogus', undefined, false)).toBe('delay')
+  })
+
+  it('uses the phone trigger below md', () => {
+    expect(resolvePopupTrigger('delay', 'scroll', true)).toBe('scroll')
+    expect(resolvePopupTrigger('scroll', 'delay', true)).toBe('delay')
+  })
+
+  it('falls back to the popup trigger on phones when none is set', () => {
+    expect(resolvePopupTrigger('delay', undefined, true)).toBe('delay')
+    expect(resolvePopupTrigger('scroll', undefined, true)).toBe('scroll')
+  })
+
+  it('treats exit intent as scroll on phones', () => {
+    expect(resolvePopupTrigger('exit', undefined, true)).toBe('scroll')
   })
 })

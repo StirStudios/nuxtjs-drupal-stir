@@ -44,6 +44,10 @@ type PopupConfig = {
   component?: string
   dismissalTtlDays?: number
   hideWhenLoggedIn?: boolean
+  /** Below `md`, render the popup as a bottom sheet. Default 'modal'. */
+  mobilePresentation?: 'modal' | 'drawer'
+  /** Phone trigger fallback when the paragraph sets none; unset uses the popup trigger. */
+  mobileTrigger?: 'delay' | 'scroll'
 } & LooseRecord
 
 export type StirThemeButtonLikeConfig = {

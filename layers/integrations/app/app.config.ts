@@ -23,5 +23,6 @@ export default defineAppConfig({
     component: '',
     dismissalTtlDays: 14,
     hideWhenLoggedIn: false,
+    mobilePresentation: 'modal',
   },
 })
