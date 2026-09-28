@@ -1,11 +1,15 @@
 import {
   useEventListener,
+  useMediaQuery,
   useTimeoutFn,
   useWindowScroll,
 } from '@vueuse/core'
 
+export type PopupTrigger = 'delay' | 'scroll' | 'exit'
+
 type PopupBehaviorConfig = {
   trigger: string
+  mobileTrigger?: string
   delay?: number
   scrollThreshold: number
 }
@@ -19,6 +23,7 @@ type PopupLike = {
 
 type PopupAppConfig = {
   dismissalTtlDays?: number
+  mobileTrigger?: string
 }
 
 const POPUP_DISMISSALS_STORAGE_KEY = 'stir:marketing-popup-dismissals'
@@ -36,6 +41,23 @@ declare module '#app' {
   interface RuntimeNuxtHooks {
     'stir:popup:shown': (payload: PopupShownPayload) => void | Promise<void>
   }
+}
+
+/**
+ * Below `md` a phone trigger (paragraph, then app config) replaces the trigger
+ * for every device. Exit intent cannot fire on touch, so it becomes scroll.
+ */
+export function resolvePopupTrigger(
+  trigger: string,
+  mobileTrigger: string | undefined,
+  isPhone: boolean,
+): PopupTrigger {
+  if (isPhone) {
+    if (mobileTrigger === 'delay' || mobileTrigger === 'scroll') return mobileTrigger
+    if (trigger === 'exit') return 'scroll'
+  }
+
+  return trigger === 'scroll' || trigger === 'exit' ? trigger : 'delay'
 }
 
 function popupDismissKey(popup: PopupLike | null): string | null {
@@ -127,6 +149,12 @@ export const usePopupBehavior = ({
   const dismissedPopups = ref<Record<string, PopupSuppression>>({})
   const readyForPopupTriggers = ref(!import.meta.client)
   const popupConfig = computed(() => (appConfig.popup || {}) as PopupAppConfig)
+  const isPhone = useMediaQuery('(max-width: 767px)')
+  const trigger = computed(() => resolvePopupTrigger(
+    config.value.trigger,
+    config.value.mobileTrigger ?? popupConfig.value.mobileTrigger,
+    isPhone.value,
+  ))
   const dismissalKey = computed(() => popupDismissKey(popup.value))
   const isPersistentlyDismissed = computed(() => {
     if (!dismissalKey.value) return false
@@ -251,11 +279,11 @@ export const usePopupBehavior = ({
 
     hasTriggered.value = true
 
-    if (config.value.trigger === 'delay') {
+    if (trigger.value === 'delay') {
       startDelayTrigger()
     }
 
-    if (config.value.trigger === 'scroll') {
+    if (trigger.value === 'scroll') {
       stopTriggerHandlers.push(watch(
         y,
         (val) => {
@@ -275,7 +303,7 @@ export const usePopupBehavior = ({
       ))
     }
 
-    if (config.value.trigger === 'exit') {
+    if (trigger.value === 'exit') {
       const lacksExitIntent = typeof window.matchMedia === 'function'
         && window.matchMedia('(hover: none), (pointer: coarse)').matches
 
@@ -326,8 +354,13 @@ export const usePopupBehavior = ({
     { deep: true },
   )
 
+  watch(trigger, () => {
+    cleanupTriggerHandlers()
+    hasTriggered.value = false
+  })
+
   watch(
-    [popup, readyForPopupTriggers, isSuppressed],
+    [popup, readyForPopupTriggers, isSuppressed, trigger],
     ([popupNode, isReady, suppressed]) => {
       cleanupTriggerHandlers()
       if (popupNode && isReady && !suppressed) {
@@ -380,6 +413,7 @@ export const usePopupBehavior = ({
   return {
     completePopup,
     dismissPopup,
+    isPhone,
     open,
     shouldRenderPopupContent,
   }

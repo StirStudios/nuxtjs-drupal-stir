@@ -74,8 +74,15 @@ function stringSetting(...values: unknown[]): string | undefined {
   return values.find((value): value is string => typeof value === 'string')
 }
 
+// Drupal's CE payload serialises numeric fields as strings ("5000", "0.25").
+function toNumber(value: unknown): number | undefined {
+  if (typeof value === 'string' && value.trim()) value = Number(value)
+
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
+}
+
 function numberSetting(...values: unknown[]): number | undefined {
-  return values.find((value): value is number => typeof value === 'number' && Number.isFinite(value))
+  return values.map(toNumber).find(value => value !== undefined)
 }
 
 export const usePopupData = () => {
@@ -93,6 +100,7 @@ export const usePopupData = () => {
   const config = computed(() => {
     const p = popup.value?.props ?? {}
     const trigger = stringSetting(p.popupTrigger, p.popup_trigger)
+    const mobileTrigger = stringSetting(p.popupMobileTrigger, p.popup_mobile_trigger)
     const delay = numberSetting(p.popupDelay, p.popup_delay)
     const scrollThreshold = numberSetting(
       p.popupThreshold,
@@ -108,6 +116,10 @@ export const usePopupData = () => {
         trigger === 'exit'
           ? trigger
           : 'delay',
+      mobileTrigger:
+        mobileTrigger === 'delay' || mobileTrigger === 'scroll'
+          ? mobileTrigger
+          : undefined,
       delay: delay ?? 100,
       scrollThreshold: scrollThreshold ?? 0.25,
     }

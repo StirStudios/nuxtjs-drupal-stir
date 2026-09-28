@@ -274,6 +274,7 @@
         "props": {
           "alert": "<p>Limited availability.</p>",
           "popupDelay": 2500,
+          "popupMobileTrigger": "delay",
           "popupOnce": true,
           "popupThreshold": 0.5,
           "popupTrigger": "scroll",

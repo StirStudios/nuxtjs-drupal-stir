@@ -31,6 +31,24 @@ untouched do not need one.
   repeats the directive: the page's `Cache-Control` stays exactly
   `private, no-store, max-age=0`.
 
+### Added
+
+- Popup: opt-in `popup.mobilePresentation: 'drawer'` renders a bottom
+  `UDrawer` below `md`, and the popup body component receives a
+  `presentation` prop (`'modal' | 'drawer'`). Optional phone trigger via
+  `popup.mobileTrigger` or the paragraph field `field_popup_mobile_trigger`
+  (`popupMobileTrigger`; the field ships in Stir Tools contract 1.30.0 —
+  run `drush updb` on the Drupal site).
+  Defaults keep today's modal and trigger.
+
+### Fixed
+
+- **Behaviour change.** Popup `popupDelay` and `popupThreshold` are now read
+  when Drupal sends them as strings (`"5000"`, `"0.25"`), which is how the CE
+  payload serialises them. Sites whose configured delay or threshold was being
+  silently ignored will now see it apply. On phones (below `md`) an `exit`
+  trigger now behaves as `scroll` instead of `delay`.
+
 ### Removed
 
 - **Behaviour change.** Section headings now come only from the Layout
