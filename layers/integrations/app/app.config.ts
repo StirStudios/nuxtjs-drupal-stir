@@ -21,6 +21,7 @@ export default defineAppConfig({
   popup: {
     enabled: false,
     component: '',
+    title: '',
     dismissalTtlDays: 14,
     hideWhenLoggedIn: false,
     mobilePresentation: 'modal',

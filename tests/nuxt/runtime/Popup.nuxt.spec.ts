@@ -5,8 +5,10 @@ import { defineComponent, nextTick, ref } from 'vue'
 import Popup from '../../../layers/integrations/app/components/App/Popup.vue'
 import { usePopupBehavior } from '../../../layers/integrations/app/composables/usePopupBehavior'
 
+const popupData = ref<Record<string, unknown>>({ props: { id: 1, uuid: 'campaign' } })
+
 mockNuxtImport('usePopupData', () => () => ({
-  popup: ref({ props: { id: 1, uuid: 'campaign' } }),
+  popup: popupData,
   config: ref({ trigger: 'delay', scrollThreshold: 0.5 }),
 }))
 
@@ -105,7 +107,8 @@ describe('App popup', () => {
       expect(drawer.props('direction')).toBe('bottom')
       expect(drawer.props('close')).toBe(true)
       expect(drawer.props('title')).toBe('Announcement')
-      expect(drawer.props('ui')).toMatchObject({ content: 'popup-drawer', container: 'max-h-[50dvh]' })
+      expect(drawer.props('ui')).toMatchObject({ content: 'popup-drawer', description: 'sr-only', container: 'max-h-[50dvh]' })
+      expect(drawer.props('ui')).not.toHaveProperty('title')
       expect(findModal(wrapper).exists()).toBe(false)
       wrapper.unmount()
     })
@@ -118,6 +121,34 @@ describe('App popup', () => {
 
       await vi.waitFor(() => expect(findModal(wrapper).exists()).toBe(true))
       expect(findDrawer(wrapper).exists()).toBe(false)
+      wrapper.unmount()
+    })
+  })
+
+  describe('title', () => {
+    afterEach(() => {
+      delete popupConfig().title
+      popupData.value = { props: { id: 1, uuid: 'campaign' } }
+    })
+
+    it('uses popup.title when the webform has no title', async () => {
+      popupConfig().title = 'News'
+
+      const wrapper = await mountSuspended(Popup)
+
+      await vi.waitFor(() => expect(findModal(wrapper).props('title')).toBe('News'))
+      wrapper.unmount()
+    })
+
+    it('prefers the webform title and skips blank values', async () => {
+      popupConfig().title = '  '
+      popupData.value = { props: { id: 1, uuid: 'campaign', webform: { webformTitle: 'Join us' } } }
+
+      const wrapper = await mountSuspended(Popup)
+
+      await vi.waitFor(() => expect(findModal(wrapper).props('title')).toBe('Join us'))
+      popupData.value = { props: { id: 1, uuid: 'campaign', webform: { webformTitle: ' ' } } }
+      await vi.waitFor(() => expect(findModal(wrapper).props('title')).toBe('Announcement'))
       wrapper.unmount()
     })
   })
