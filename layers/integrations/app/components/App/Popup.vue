@@ -33,10 +33,12 @@ const overlayComponent = computed(() => overlays[presentation.value])
 const overlayProps = computed(() => presentation.value === 'drawer'
   ? {
       direction: 'bottom',
+      close: true,
       ui: {
-        content: 'popup ring-0',
-        header: 'sr-only',
-        container: 'gap-0 p-0 max-h-[50dvh]',
+        content: 'popup-drawer',
+        title: 'sr-only',
+        description: 'sr-only',
+        container: 'max-h-[50dvh]',
       },
     }
   : {
@@ -141,6 +143,7 @@ watch(open, (isOpen) => {
       <template #body>
         <template v-if="shouldRenderPopupContent">
           <UButton
+            v-if="presentation === 'modal'"
             aria-label="Close"
             class="absolute end-5 top-5 z-100"
             color="neutral"

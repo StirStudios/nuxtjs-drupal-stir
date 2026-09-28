@@ -31,6 +31,14 @@ untouched do not need one.
   repeats the directive: the page's `Cache-Control` stays exactly
   `private, no-store, max-age=0`.
 
+### Changed
+
+- Popup drawer (`mobilePresentation: 'drawer'`) now keeps UDrawer's default
+  `gap-4 p-4` padding, uses its own `popup-drawer` class hook instead of the
+  modal's `popup` (site `.popup` sizing no longer pulls the sheet off-edge),
+  and replaces the modal's corner close button with UDrawer's standard header
+  close. Sites can drop drawer padding/close workarounds.
+
 ### Added
 
 - Popup: opt-in `popup.mobilePresentation: 'drawer'` renders a bottom
