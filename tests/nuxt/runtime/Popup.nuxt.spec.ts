@@ -100,7 +100,12 @@ describe('App popup', () => {
       const wrapper = await mountSuspended(Popup)
 
       await vi.waitFor(() => expect(findDrawer(wrapper).exists()).toBe(true))
-      expect(findDrawer(wrapper).props('direction')).toBe('bottom')
+      const drawer = findDrawer(wrapper)
+
+      expect(drawer.props('direction')).toBe('bottom')
+      expect(drawer.props('close')).toBe(true)
+      expect(drawer.props('title')).toBe('Announcement')
+      expect(drawer.props('ui')).toMatchObject({ content: 'popup-drawer', container: 'max-h-[50dvh]' })
       expect(findModal(wrapper).exists()).toBe(false)
       wrapper.unmount()
     })

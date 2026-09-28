@@ -284,6 +284,13 @@ layout; keep it short, since a tall sheet is still an intrusive interstitial to
 search engines. The sheet content is capped at `50dvh` and scrolls. Test the
 on-screen keyboard on real devices.
 
+The drawer uses Nuxt UI's default frame (`gap-4 p-4` container, handle) and
+does not carry the modal's `popup` class, so site `.popup` sizing only affects
+the centred modal; style the sheet through `.popup-drawer` if needed. Instead of
+the modal's corner button, the drawer uses UDrawer's standard header `close`
+button (title and description stay visually hidden); handle, swipe, overlay
+tap and Escape also dismiss.
+
 **Phone trigger.** Below `md` the trigger is the paragraph's
 `field_popup_mobile_trigger` (`popupMobileTrigger`, Stir Tools contract
 1.30.0; run `drush updb`), else `popup.mobileTrigger`,
