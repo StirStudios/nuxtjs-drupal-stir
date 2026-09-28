@@ -33,6 +33,11 @@ untouched do not need one.
 
 ### Changed
 
+- Popup drawer now shows its title in UDrawer's header row next to the close
+  button (the description stays `sr-only`); modal unchanged. Site popup bodies
+  can drop their own drawer heading. New `popup.title` app config sets the
+  title when the webform has none (webform title → `popup.title` →
+  `'Announcement'`), which also names the modal.
 - Popup drawer (`mobilePresentation: 'drawer'`) now keeps UDrawer's default
   `gap-4 p-4` padding, uses its own `popup-drawer` class hook instead of the
   modal's `popup` (site `.popup` sizing no longer pulls the sheet off-edge),

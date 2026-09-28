@@ -245,6 +245,7 @@ loader URL. UserWay remains ungated as an accessibility-essential service.
 popup: {
   enabled: false, // global mount switch for <LazyAppPopup />
   component: '', // optional globally registered popup body
+  title: '', // title when the webform has none; blank falls back to 'Announcement'
   dismissalTtlDays: 14, // days before a dismissed campaign may appear again
   hideWhenLoggedIn: false, // hide from signed-in Drupal users (auth layer)
   mobilePresentation: 'modal', // 'modal' | 'drawer': below md, render a bottom sheet
@@ -274,10 +275,17 @@ Storage semantics: suppression is stored per campaign (`uuid`, else `id`) in
 signed-in visitors never see a flash; the popup then stays hidden for them. It
 requires the auth layer. If the session request fails, the popup stays hidden.
 
+The popup's accessible name comes from the webform title, then `popup.title`,
+then `'Announcement'`; blank values fall through. The modal keeps it
+visually hidden.
+
 **Phones.** With `mobilePresentation: 'drawer'`, viewports below `md` (767px)
 render the popup in a `UDrawer` (`direction: 'bottom'`) instead of `UModal`;
 `md` and up keep the modal. Title, description, focus trap and dismissal
-(swipe down, overlay, close button, Escape) behave as in the modal, and
+(swipe down, overlay, close button, Escape) behave as in the modal, except
+that the title is visible in UDrawer's header row beside the close button (the
+description stays screen-reader only), so a site body component should not
+render its own heading in the drawer, and
 completion still hides the campaign for good. The popup body component receives
 `presentation: 'modal' | 'drawer'` so a site component can render a condensed
 layout; keep it short, since a tall sheet is still an intrusive interstitial to

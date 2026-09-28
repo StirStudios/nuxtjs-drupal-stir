@@ -36,7 +36,6 @@ const overlayProps = computed(() => presentation.value === 'drawer'
       close: true,
       ui: {
         content: 'popup-drawer',
-        title: 'sr-only',
         description: 'sr-only',
         container: 'max-h-[50dvh]',
       },
@@ -50,7 +49,11 @@ const overlayProps = computed(() => presentation.value === 'drawer'
         body: 'p-0 sm:p-0',
       },
     })
-const title = computed(() => popupProps.value.webform?.webformTitle ?? 'Announcement')
+// Blank authored values fall through to the next source.
+const title = computed(() =>
+  popupProps.value.webform?.webformTitle?.trim()
+  || appConfig.popup?.title?.trim()
+  || 'Announcement')
 const description = computed(() => popupProps.value.text ?? '')
 const popupComponent = computed(() => {
   const componentName = typeof appConfig.popup?.component === 'string'

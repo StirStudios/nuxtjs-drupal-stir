@@ -42,6 +42,8 @@ type PrivacyNoticeConfig = {
 type PopupConfig = {
   enabled?: boolean
   component?: string
+  /** Popup title when the paragraph's webform has none; blank falls back to 'Announcement'. */
+  title?: string
   dismissalTtlDays?: number
   hideWhenLoggedIn?: boolean
   /** Below `md`, render the popup as a bottom sheet. Default 'modal'. */
