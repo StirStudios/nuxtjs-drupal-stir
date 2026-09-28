@@ -37,7 +37,8 @@ untouched do not need one.
   `UDrawer` below `md`, and the popup body component receives a
   `presentation` prop (`'modal' | 'drawer'`). Optional phone trigger via
   `popup.mobileTrigger` or the paragraph field `field_popup_mobile_trigger`
-  (`popupMobileTrigger`; needs a Stir Tools field to be authored per popup).
+  (`popupMobileTrigger`; the field ships in Stir Tools contract 1.30.0 —
+  run `drush updb` on the Drupal site).
   Defaults keep today's modal and trigger.
 
 ### Fixed

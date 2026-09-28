@@ -285,7 +285,8 @@ search engines. The sheet content is capped at `50dvh` and scrolls. Test the
 on-screen keyboard on real devices.
 
 **Phone trigger.** Below `md` the trigger is the paragraph's
-`field_popup_mobile_trigger` (`popupMobileTrigger`), else `popup.mobileTrigger`,
+`field_popup_mobile_trigger` (`popupMobileTrigger`, Stir Tools contract
+1.30.0; run `drush updb`), else `popup.mobileTrigger`,
 else the popup's own trigger. Values are `delay` or `scroll`; anything else is
 ignored. Exit intent cannot fire on touch, so on phones `exit` becomes
 `scroll`. The trigger re-arms if the viewport crosses `md`.
