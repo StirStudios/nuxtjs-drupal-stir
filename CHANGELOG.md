@@ -54,6 +54,13 @@ untouched do not need one.
 
 ### Added
 
+- `useStirErrorPage(error)` holds the error page's logic: it classifies an
+  error (`notFound`, `maintenance`, `backend`, `generic`), returns its title
+  and message, shows Drupal's maintenance message for a 503 and sets
+  `Retry-After`. Wording for each kind can be set under `stirTheme.error`. A
+  project that overrides `error.vue` for its design should call it instead of
+  repeating the logic.
+
 - Popup: opt-in `popup.mobilePresentation: 'drawer'` renders a bottom
   `UDrawer` below `md`, and the popup body component receives a
   `presentation` prop (`'modal' | 'drawer'`). Optional phone trigger via

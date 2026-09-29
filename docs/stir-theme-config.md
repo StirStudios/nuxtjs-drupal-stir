@@ -979,21 +979,33 @@ mediaModal: { title: true },
 
 ### 🧊 Error
 
-A 503 is treated as planned maintenance, because Drupal answers 503 while its
-Maintenance mode is on: the page shows `maintenance.title` and **Drupal's own
-maintenance message** (falling back to `maintenance.message` if Drupal sent
-none), sends `Retry-After` (`maintenance.retryAfter`, default
-300 seconds) and drops the clear button. 502 and 504 keep the "Content service
-unavailable" wording. Drupal's Maintenance mode is the switch; this is only the
-wording.
+`useStirErrorPage(error)` decides what an error page says, for the layer's
+`error.vue` and for a project that replaces it with its own design (use the
+composable; keep only your markup). It classifies the error and returns
+`kind`, `title`, `message`, `statusCode` and `isNotFound` / `isMaintenance` /
+`isBackendError`:
+
+- **404** → `notFound`.
+- **503** → `maintenance`: Drupal answers 503 while its Maintenance mode is on.
+  The message is **Drupal's own maintenance message**, with
+  `maintenance.message` as the fallback; the page sends `Retry-After`
+  (`maintenance.retryAfter`, default 300 seconds). The layer's page drops its
+  clear button.
+- **502 / 504** → `backend`: the CMS failing.
+- anything else → `generic`, which keeps the error's own message unless
+  `generic` is set.
 
 ```ts
 error: {
+  notFound: { title: 'Page not found', message: 'The page you are looking for does not exist.' },
   maintenance: {
     title: 'Back shortly',
     message: 'We are making some improvements. Please check back in a few minutes.',
     retryAfter: 300,
   },
+  backend: { title: 'Content service unavailable', message: 'We cannot reach the CMS right now. Please try again later.' },
+  generic: { title: 'Something went wrong', message: 'Please try again.' },
+  // The clear button:
   label: 'Back to home',
   color: 'primary',
   size: 'xl',
