@@ -39,7 +39,8 @@ export function useAppContext(options: AppContextOptions = {}) {
     const error = context.error.value
 
     if (error?.statusCode !== 503) return
-    const message = (error.data as { message?: unknown } | undefined)?.message
+    // The route's error body carries Drupal's message as data.maintenanceMessage.
+    const message = (error.data as { data?: { maintenanceMessage?: unknown } } | undefined)?.data?.maintenanceMessage
 
     nuxtApp.runWithContext(() => showError({
       statusCode: 503,

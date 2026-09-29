@@ -115,7 +115,7 @@ describe('appContextApi', () => {
 
     await expect(fetchAppContext({} as Parameters<typeof fetchAppContext>[0], '/')).rejects.toMatchObject({
       statusCode: 503,
-      message: 'DancePlug is currently under maintenance.',
+      data: { maintenanceMessage: 'DancePlug is currently under maintenance.' },
     })
   })
 
@@ -128,7 +128,7 @@ describe('appContextApi', () => {
     const error = await fetchAppContext({} as Parameters<typeof fetchAppContext>[0], '/').catch(caught => caught)
 
     expect(error.statusCode).toBe(503)
-    expect(String(error.message)).not.toContain('<')
+    expect(error.data).toBeUndefined()
   })
 
   it('logs app context fetch failures while preserving the fallback response', async () => {
