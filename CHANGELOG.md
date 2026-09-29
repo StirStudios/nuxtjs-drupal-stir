@@ -33,6 +33,14 @@ untouched do not need one.
 
 ### Changed
 
+- The error page treats a 503 as planned maintenance, because Drupal answers
+  503 while its Maintenance mode is on: it shows Drupal's maintenance message
+  (passed through the page fetch as `error.data.maintenanceMessage`) under the
+  `stirTheme.error.maintenance.title`, with `maintenance.message` as the
+  fallback (defaults "Back shortly" / "We are making some improvements…"),
+  sends `Retry-After` and hides the clear button. 502 and 504 keep "Content
+  service unavailable". Projects that override `error.vue` should do the same.
+
 - Popup drawer now shows its title in UDrawer's header row next to the close
   button (the description stays `sr-only`); modal unchanged. Site popup bodies
   can drop their own drawer heading. New `popup.title` app config sets the
@@ -55,6 +63,11 @@ untouched do not need one.
   Defaults keep today's modal and trigger.
 
 ### Fixed
+
+- `useStirSiteName()` read `useRuntimeConfig()` inside its computed, which can
+  first run after the Nuxt context has gone. With Drupal unavailable (for
+  example in Maintenance mode) the error page itself then threw, and visitors
+  got a bare 500 instead of the 503 page.
 
 - **Behaviour change.** Popup `popupDelay` and `popupThreshold` are now read
   when Drupal sends them as strings (`"5000"`, `"0.25"`), which is how the CE

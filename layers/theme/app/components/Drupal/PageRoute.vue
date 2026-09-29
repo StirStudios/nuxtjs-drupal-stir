@@ -194,17 +194,23 @@ function customPageError(error: unknown) {
   const payload = getErrorPayload(error)
   const code = payload?.statusCode ?? 500
   const message = payload?.statusMessage ?? 'Page not found'
+  // In Maintenance mode Drupal answers 503 with its maintenance message as
+  // the body. Keep it, so the error page shows Drupal's own words.
+  const maintenanceMessage = code === 503 && typeof payload?.data === 'string'
+    ? payload.data.trim()
+    : ''
 
   throw createError({
     statusCode: code,
     statusMessage: message,
+    ...(maintenanceMessage ? { data: { maintenanceMessage } } : {}),
     fatal: true,
   })
 }
 
 function getErrorPayload(
   error: unknown,
-): { statusCode?: number; statusMessage?: string } | null {
+): { statusCode?: number; statusMessage?: string; data?: unknown } | null {
   if (!error || typeof error !== 'object') return null
   const value = (error as { value?: unknown }).value
 
@@ -212,6 +218,7 @@ function getErrorPayload(
   const payload = value as {
     statusCode?: number
     statusMessage?: string
+    data?: unknown
   }
 
   return payload

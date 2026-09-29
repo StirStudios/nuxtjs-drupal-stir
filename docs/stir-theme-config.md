@@ -979,8 +979,21 @@ mediaModal: { title: true },
 
 ### 🧊 Error
 
+A 503 is treated as planned maintenance, because Drupal answers 503 while its
+Maintenance mode is on: the page shows `maintenance.title` and **Drupal's own
+maintenance message** (falling back to `maintenance.message` if Drupal sent
+none), sends `Retry-After` (`maintenance.retryAfter`, default
+300 seconds) and drops the clear button. 502 and 504 keep the "Content service
+unavailable" wording. Drupal's Maintenance mode is the switch; this is only the
+wording.
+
 ```ts
 error: {
+  maintenance: {
+    title: 'Back shortly',
+    message: 'We are making some improvements. Please check back in a few minutes.',
+    retryAfter: 300,
+  },
   label: 'Back to home',
   color: 'primary',
   size: 'xl',
