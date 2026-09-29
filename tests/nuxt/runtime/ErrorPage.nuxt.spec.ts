@@ -11,8 +11,8 @@ mockNuxtImport('useAppConfig', () => () => ({
   ui: {},
 }))
 
-const render = async (statusCode: number) =>
-  (await mountSuspended(ErrorPage, { props: { error: { statusCode, statusMessage: 'Service Unavailable', message: 'Service Unavailable' } } })).text()
+const render = async (statusCode: number, data?: Record<string, unknown>) =>
+  (await mountSuspended(ErrorPage, { props: { error: { statusCode, statusMessage: 'Service Unavailable', message: 'Service Unavailable', data } } })).text()
 
 describe('error page', () => {
   it('shows planned maintenance for a 503, which Drupal sends in Maintenance mode', async () => {
@@ -23,6 +23,14 @@ describe('error page', () => {
     expect(text).toContain('We are making some improvements')
     expect(text).not.toContain('Content service unavailable')
     expect(text).not.toContain('Back to home')
+  })
+
+  it('shows the maintenance message Drupal sends, ahead of the project fallback', async () => {
+    errorConfig.value = { maintenance: { message: 'Fallback wording.' } }
+    const text = await render(503, { maintenanceMessage: 'DancePlug is currently under maintenance.' })
+
+    expect(text).toContain('DancePlug is currently under maintenance.')
+    expect(text).not.toContain('Fallback wording.')
   })
 
   it('uses the project wording for maintenance', async () => {

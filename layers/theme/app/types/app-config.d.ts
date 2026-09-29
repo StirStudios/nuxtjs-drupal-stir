@@ -410,7 +410,8 @@ type StirThemeScrollButtonConfig = {
 type StirThemeErrorConfig = {
   /**
    * The page shown when Drupal answers 503, which it does while its
-   * Maintenance mode is on: Drupal is the switch, this is the wording.
+   * Maintenance mode is on. Drupal is the switch, and its maintenance
+   * message is shown when it sends one; `message` is the fallback.
    */
   maintenance?: {
     title?: string

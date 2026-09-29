@@ -34,8 +34,10 @@ untouched do not need one.
 ### Changed
 
 - The error page treats a 503 as planned maintenance, because Drupal answers
-  503 while its Maintenance mode is on: it shows `stirTheme.error.maintenance`
-  wording (defaults "Back shortly" / "We are making some improvements…"),
+  503 while its Maintenance mode is on: it shows Drupal's maintenance message
+  (passed through the page fetch as `error.data.maintenanceMessage`) under the
+  `stirTheme.error.maintenance.title`, with `maintenance.message` as the
+  fallback (defaults "Back shortly" / "We are making some improvements…"),
   sends `Retry-After` and hides the clear button. 502 and 504 keep "Content
   service unavailable". Projects that override `error.vue` should do the same.
 
