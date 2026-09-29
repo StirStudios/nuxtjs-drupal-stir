@@ -407,18 +407,27 @@ type StirThemeScrollButtonConfig = {
   showAtScrollY?: number
 } & LooseRecord
 
+type StirThemeErrorCopy = {
+  title?: string
+  message?: string
+}
+
+/** Error page wording and clear button; see useStirErrorPage(). */
 type StirThemeErrorConfig = {
+  /** 404. */
+  notFound?: StirThemeErrorCopy
   /**
-   * The page shown when Drupal answers 503, which it does while its
-   * Maintenance mode is on. Drupal is the switch, and its maintenance
-   * message is shown when it sends one; `message` is the fallback.
+   * 503: Drupal's Maintenance mode is on. Drupal is the switch, and its
+   * maintenance message is shown when it sends one; `message` is the fallback.
    */
-  maintenance?: {
-    title?: string
-    message?: string
+  maintenance?: StirThemeErrorCopy & {
     /** Seconds sent as Retry-After, so browsers and crawlers come back. */
     retryAfter?: number
   }
+  /** 502 and 504: the backend failing. */
+  backend?: StirThemeErrorCopy
+  /** Anything else; without it the error keeps its own status message. */
+  generic?: StirThemeErrorCopy
   label?: string
   color?: UiColorName
   size?: UiSizeName

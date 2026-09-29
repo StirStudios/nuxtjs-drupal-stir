@@ -12,9 +12,9 @@ mockNuxtImport('useAppConfig', () => () => ({
   ui: {},
 }))
 
-const render = async (statusCode: number, data?: Record<string, unknown>) =>
+const render = async (statusCode: number, data?: Record<string, unknown>, statusMessage = 'Service Unavailable') =>
   (await mountSuspended(ErrorPage, {
-    props: { error: { statusCode, statusMessage: 'Service Unavailable', message: 'Service Unavailable', data } as unknown as NuxtError },
+    props: { error: { statusCode, statusMessage, message: statusMessage, data } as unknown as NuxtError },
   })).text()
 
 describe('error page', () => {
@@ -53,5 +53,24 @@ describe('error page', () => {
       expect(text).toContain('Content service unavailable')
       expect(text).not.toContain('Back shortly')
     }
+  })
+
+  it('uses the project wording for not-found, backend and generic errors', async () => {
+    errorConfig.value = {
+      notFound: { title: 'This page missed its cue', message: 'Head back home.' },
+      backend: { title: 'Offstage', message: 'Back soon.' },
+      generic: { title: 'Something slipped', message: 'Try again.' },
+    }
+
+    expect(await render(404)).toContain('This page missed its cue')
+    expect(await render(502)).toContain('Offstage')
+    expect(await render(500)).toContain('Something slipped')
+  })
+
+  it('keeps a generic error\'s own message when no wording is set', async () => {
+    errorConfig.value = {}
+
+    expect(await render(500, undefined, 'Checkout failed')).toContain('Checkout failed')
+    expect(await render(404)).toContain('Page not found')
   })
 })
