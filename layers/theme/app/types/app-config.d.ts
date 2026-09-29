@@ -408,6 +408,16 @@ type StirThemeScrollButtonConfig = {
 } & LooseRecord
 
 type StirThemeErrorConfig = {
+  /**
+   * The page shown when Drupal answers 503, which it does while its
+   * Maintenance mode is on: Drupal is the switch, this is the wording.
+   */
+  maintenance?: {
+    title?: string
+    message?: string
+    /** Seconds sent as Retry-After, so browsers and crawlers come back. */
+    retryAfter?: number
+  }
   label?: string
   color?: UiColorName
   size?: UiSizeName

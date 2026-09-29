@@ -9,6 +9,10 @@ export function useStirSiteName(fallback = '') {
   const globalSeo = useNuxtData<{ meta?: Array<Record<string, string>> } | null>(
     'cms-global-seo',
   )
+  // Read here, not inside the computed: the computed can first run after the
+  // Nuxt context has gone (an error page rendered while Drupal is in
+  // maintenance), where useRuntimeConfig() throws.
+  const configuredName = (useRuntimeConfig().public.site as { name?: string } | undefined)?.name
 
   return computed(() => {
     const published = globalSeo.data.value?.meta?.find(
@@ -17,9 +21,7 @@ export function useStirSiteName(fallback = '') {
 
     if (published) return published
 
-    const configured = (useRuntimeConfig().public.site as { name?: string } | undefined)?.name
-
-    return configured?.trim() || fallback
+    return configuredName?.trim() || fallback
   })
 }
 
