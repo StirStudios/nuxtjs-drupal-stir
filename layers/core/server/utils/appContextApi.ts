@@ -1,7 +1,8 @@
 import type { H3Event } from 'h3'
-import { createError } from 'h3'
 import {
   captureStirDrupalApiError,
+  createStirDrupalUpstreamError,
+  getStirDrupalStatusCode,
   markStirPrivateResponse,
   stirDrupalApiRequest,
 } from '../../../foundation/server/utils/stirDrupalApi'
@@ -152,23 +153,11 @@ export async function fetchAppContext(event: H3Event, path = '') {
     return parseAppContextResponse(response)
   }
   catch (error) {
-    // Drupal answers 503 in Maintenance mode, with its message as the body.
-    // Pass that on so pages can show maintenance; any other failure still
-    // degrades to an empty context so the page renders.
-    const errorRecord = error && typeof error === 'object' ? error as Record<string, unknown> : {}
-
-    if (errorRecord.statusCode === 503) {
+    // Maintenance mode is passed on so every page shows it; any other
+    // failure degrades to an empty context so the page still renders.
+    if (getStirDrupalStatusCode(error) === 503) {
       markStirPrivateResponse(event)
-      // Only a plain-text body is Drupal's message; its HTML maintenance
-      // page is not. It travels in its own field, so the framework's default
-      // message ("Service Unavailable") is never mistaken for it.
-      const body = typeof errorRecord.data === 'string' ? errorRecord.data.trim() : ''
-
-      throw createError({
-        statusCode: 503,
-        statusMessage: 'Service Unavailable',
-        data: body && !/<[a-z!/]/i.test(body) ? { maintenanceMessage: body } : undefined,
-      })
+      throw createStirDrupalUpstreamError(error, 'Service Unavailable')
     }
 
     logAppContextFetchError(event, path, error)

@@ -17,6 +17,7 @@ import {
   assertStirDrupalResponseNotRedirect,
   buildStirDrupalHeaders,
   captureStirDrupalApiError,
+  createStirDrupalUpstreamError,
   fetchStirDrupalCsrfToken,
   getStirDrupalApiConfig,
   getStirForwardedCookie,
@@ -28,17 +29,6 @@ type ParsedSubmission = {
   body: SubmissionBody
   forwardBody: SubmissionBody | FormData
   contentType?: string
-}
-
-function normalizeUpstreamErrorStatus(error: unknown): number {
-  if (!error || typeof error !== 'object') return 502
-  const statusCode =
-    (error as { statusCode?: unknown; status?: unknown }).statusCode ??
-    (error as { status?: unknown }).status
-
-  return typeof statusCode === 'number' && statusCode >= 400 && statusCode < 500
-    ? statusCode
-    : 502
 }
 
 function setBodyValue(
@@ -197,16 +187,12 @@ export default defineEventHandler(async (event) => {
     }
 
     if (response.status >= 500) {
-      throw createError({ statusCode: 502 })
+      throw createError({ statusCode: response.status, data: response._data })
     }
 
     return response._data
   } catch (error) {
     captureStirDrupalApiError(event, error)
-
-    throw createError({
-      statusCode: normalizeUpstreamErrorStatus(error),
-      statusMessage: 'Form submission failed. Please try again later.',
-    })
+    throw createStirDrupalUpstreamError(error, 'Form submission failed. Please try again later.')
   }
 })

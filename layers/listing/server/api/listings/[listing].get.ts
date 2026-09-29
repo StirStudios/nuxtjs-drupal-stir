@@ -15,6 +15,7 @@ import {
   assertStirDrupalResponseNotRedirect,
   buildStirDrupalHeaders,
   captureStirDrupalApiError,
+  createStirDrupalUpstreamError,
   filterStirDrupalSetCookies,
   getStirDrupalApiConfig,
   getStirDrupalSetCookies,
@@ -82,17 +83,6 @@ export default defineEventHandler(async (event) => {
     // listing representations. Never let a CDN retain them as public output.
     markStirPrivateResponse(event)
     captureStirDrupalApiError(event, error)
-    const upstreamStatus = Number(
-      (error as { statusCode?: unknown; status?: unknown })?.statusCode
-      ?? (error as { status?: unknown }).status,
-    )
-
-    throw createError({
-      // 503 is Drupal's Maintenance mode, which pages show as maintenance.
-      statusCode: (upstreamStatus >= 400 && upstreamStatus < 500) || upstreamStatus === 503
-        ? upstreamStatus
-        : 502,
-      statusMessage: 'Failed to load Drupal listing.',
-    })
+    throw createStirDrupalUpstreamError(error, 'Failed to load Drupal listing.')
   }
 })

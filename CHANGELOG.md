@@ -33,6 +33,24 @@ untouched do not need one.
 
 ### Changed
 
+- **One place maps Drupal errors: `createStirDrupalUpstreamError()` in the
+  foundation layer.** Client errors keep their status, a 503 (Drupal's
+  Maintenance mode) stays a 503 carrying Drupal's message as
+  `data.maintenanceMessage`, and anything else becomes a 502. The listing,
+  paragraph-view, editorial and Webform routes use it in place of their own
+  copies, and `throwStirDrupalApiError()` now passes a 503 on the same way
+  instead of a 502, so auth, account and project routes built on it show
+  maintenance too. `readStirDrupalMaintenanceMessage()` is the single check
+  that a 503 body is a message and not an HTML page (Drupal's themed page, or
+  a proxy's while Drupal is down); `useStirErrorPage()` no longer repeats it.
+  Pairs with Stir Tools declaring `_format: 'json'` on its JSON routes, which
+  makes Drupal send its maintenance message as plain text on every one of
+  them; with an older Stir Tools, pages show the configured wording instead.
+- **`throwStirDrupalApiError()` shows users only Stir's `error` field.** Once
+  Drupal answers JSON routes' errors as `{"message": ...}`, that text could
+  name permissions or tokens ("X-CSRF-Token request header is invalid"), so
+  `message` is no longer read. Drupal controllers that want to show users a
+  reason return it as `error`, as `stir_account` does.
 - Drupal's Maintenance mode now covers every page, not only Drupal pages. The
   app-context route passes Drupal's 503 on (other failures still degrade to
   an empty context), `useAppContext()` then shows the maintenance error for

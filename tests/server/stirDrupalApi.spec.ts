@@ -7,6 +7,7 @@ import {
   splitStirSetCookieHeader,
   stirDrupalApiRequest,
   throwStirDrupalApiError,
+  createStirDrupalUpstreamError,
 } from '../../layers/foundation/server/utils/stirDrupalApi'
 
 const SESSION_NAME = `SSESS${'a'.repeat(32)}`
@@ -413,6 +414,49 @@ describe('Stir Drupal API boundary', () => {
       statusCode: 502,
       statusMessage: 'Registration failed',
     }))
+  })
+
+  it('never shows Drupal\'s own error message to users', () => {
+    expect(() => throwStirDrupalApiError({
+      status: 403,
+      data: { message: 'X-CSRF-Token request header is invalid' },
+    }, 'Could not save')).toThrow(expect.objectContaining({
+      statusCode: 403,
+      statusMessage: 'Could not save',
+    }))
+  })
+
+  it('passes Drupal Maintenance mode on as a 503 with its message', () => {
+    const maintenance = {
+      statusCode: 503,
+      data: 'Example is currently under maintenance.',
+    }
+    const expected = expect.objectContaining({
+      statusCode: 503,
+      data: { maintenanceMessage: 'Example is currently under maintenance.' },
+    })
+
+    expect(() => throwStirDrupalApiError(maintenance, 'Sign in failed')).toThrow(expected)
+    expect(createStirDrupalUpstreamError(maintenance, 'Failed to load')).toEqual(expected)
+  })
+
+  it('never passes an HTML page on as the maintenance message', () => {
+    const error = createStirDrupalUpstreamError({
+      status: 503,
+      data: '<!DOCTYPE html><html><body>Backend fetch failed</body></html>',
+    }, 'Failed to load')
+
+    expect(error.statusCode).toBe(503)
+    expect(error.data).toBeUndefined()
+  })
+
+  it('keeps client errors and turns other upstream failures into a 502', () => {
+    expect(createStirDrupalUpstreamError({ status: 404, data: { message: 'x' } }, 'Failed to load'))
+      .toEqual(expect.objectContaining({ statusCode: 404, statusMessage: 'Failed to load' }))
+    expect(createStirDrupalUpstreamError({ status: 500 }, 'Failed to load'))
+      .toEqual(expect.objectContaining({ statusCode: 502, statusMessage: 'Failed to load' }))
+    expect(createStirDrupalUpstreamError(new Error('timeout'), 'Failed to load'))
+      .toEqual(expect.objectContaining({ statusCode: 502 }))
   })
 
   it('preserves stir_account user-facing 4xx contract errors', () => {
