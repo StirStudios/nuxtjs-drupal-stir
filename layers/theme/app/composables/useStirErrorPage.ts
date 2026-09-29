@@ -46,7 +46,11 @@ export function useStirErrorPage(error: MaybeRefOrGetter<NuxtError | null | unde
   const drupalMaintenanceMessage = computed(() => {
     const data = toValue(error)?.data as { maintenanceMessage?: unknown } | undefined
 
-    return typeof data?.maintenanceMessage === 'string' ? data.maintenanceMessage.trim() : ''
+    const text = typeof data?.maintenanceMessage === 'string' ? data.maintenanceMessage.trim() : ''
+
+    // Drupal sends the plain message for an API path, but its whole HTML
+    // maintenance page for other paths; that is not a message to show.
+    return /<[a-z!/]/i.test(text) ? '' : text
   })
 
   const title = computed(() => {
