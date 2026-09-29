@@ -22,14 +22,33 @@ export type AppFooterContextPayload = Pick<
 
 export function useAppContext(options: AppContextOptions = {}) {
   const route = useRoute()
+  const nuxtApp = useNuxtApp()
   const path = computed(() => route.path || '/')
 
-  return useFetch<AppContextPayload>('/api/app-context', {
+  const context = useFetch<AppContextPayload>('/api/app-context', {
     dedupe: 'defer',
     immediate: options.immediate ?? true,
     key: computed(() => `app-context:${path.value}`),
     query: computed(() => ({ path: path.value })),
   })
+
+  // Every page asks for app context, so it is how a page Nuxt builds itself
+  // (not a Drupal page) learns that Drupal is in Maintenance mode: the whole
+  // page then shows the maintenance error, with Drupal's message.
+  void context.then(() => {
+    const error = context.error.value
+
+    if (error?.statusCode !== 503) return
+    const message = (error.data as { message?: unknown } | undefined)?.message
+
+    nuxtApp.runWithContext(() => showError({
+      statusCode: 503,
+      statusMessage: 'Service Unavailable',
+      data: typeof message === 'string' ? { maintenanceMessage: message } : undefined,
+    }))
+  })
+
+  return context
 }
 
 function selectAppContext<T>(

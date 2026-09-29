@@ -88,7 +88,8 @@ export default defineEventHandler(async (event) => {
     )
 
     throw createError({
-      statusCode: upstreamStatus >= 400 && upstreamStatus < 500
+      // 503 is Drupal's Maintenance mode, which pages show as maintenance.
+      statusCode: (upstreamStatus >= 400 && upstreamStatus < 500) || upstreamStatus === 503
         ? upstreamStatus
         : 502,
       statusMessage: 'Failed to load Drupal listing.',

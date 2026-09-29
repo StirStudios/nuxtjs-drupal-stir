@@ -88,7 +88,7 @@ describe('Stir listing API contract', () => {
     const { event, headers } = routeEvent('articles')
     const raw = vi.fn().mockRejectedValue(Object.assign(
       new Error('Drupal unavailable'),
-      { statusCode: 503 },
+      { statusCode: 500 },
     ))
 
     stubListingRuntime(raw)
@@ -97,6 +97,14 @@ describe('Stir listing API contract', () => {
       statusCode: 502,
     })
     expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
+  })
+
+  it('passes Drupal Maintenance mode through as a 503', async () => {
+    const { event } = routeEvent('articles')
+
+    stubListingRuntime(vi.fn().mockRejectedValue(Object.assign(new Error('Service Unavailable'), { statusCode: 503 })))
+
+    await expect(listingHandler(event)).rejects.toMatchObject({ statusCode: 503 })
   })
   it('forwards multi-value filters as PHP arrays so Drupal keeps every value', async () => {
     const raw = vi.fn().mockResolvedValue({

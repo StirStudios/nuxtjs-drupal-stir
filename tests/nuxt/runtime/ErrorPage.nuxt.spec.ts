@@ -36,6 +36,14 @@ describe('error page', () => {
     expect(text).not.toContain('Fallback wording.')
   })
 
+  it('falls back to the project wording when Drupal sends its HTML maintenance page', async () => {
+    errorConfig.value = { maintenance: { message: 'Fallback wording.' } }
+    const text = await render(503, { maintenanceMessage: '<!DOCTYPE html><html><body>Site under maintenance</body></html>' })
+
+    expect(text).toContain('Fallback wording.')
+    expect(text).not.toContain('DOCTYPE')
+  })
+
   it('uses the project wording for maintenance', async () => {
     errorConfig.value = { maintenance: { title: 'Improving DancePlug', message: 'Classes are back in a few minutes.' } }
     const text = await render(503)

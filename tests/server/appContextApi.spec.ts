@@ -14,6 +14,7 @@ import {
 vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
   stirDrupalApiRequest: vi.fn(),
   captureStirDrupalApiError: vi.fn(),
+  markStirPrivateResponse: vi.fn(),
 }))
 
 describe('appContextApi', () => {
@@ -106,12 +107,36 @@ describe('appContextApi', () => {
     })
   })
 
+  it('passes Drupal Maintenance mode on as a 503 with its message', async () => {
+    vi.mocked(stirDrupalApiRequest).mockRejectedValue(Object.assign(new Error('Service Unavailable'), {
+      statusCode: 503,
+      data: 'DancePlug is currently under maintenance.',
+    }))
+
+    await expect(fetchAppContext({} as Parameters<typeof fetchAppContext>[0], '/')).rejects.toMatchObject({
+      statusCode: 503,
+      message: 'DancePlug is currently under maintenance.',
+    })
+  })
+
+  it('never passes Drupal\'s HTML maintenance page on as the message', async () => {
+    vi.mocked(stirDrupalApiRequest).mockRejectedValue(Object.assign(new Error('Service Unavailable'), {
+      statusCode: 503,
+      data: '<!DOCTYPE html><html><body>Site under maintenance</body></html>',
+    }))
+
+    const error = await fetchAppContext({} as Parameters<typeof fetchAppContext>[0], '/').catch(caught => caught)
+
+    expect(error.statusCode).toBe(503)
+    expect(String(error.message)).not.toContain('<')
+  })
+
   it('logs app context fetch failures while preserving the fallback response', async () => {
     const error = new Error('Drupal unavailable')
 
     Object.assign(error, {
-      statusCode: 503,
-      statusMessage: 'Service Unavailable',
+      statusCode: 500,
+      statusMessage: 'Internal Server Error',
       request: {
         headers: {
           cookie: 'SSESS=secret',
@@ -139,7 +164,7 @@ describe('appContextApi', () => {
     expect(capturedEvent).toBe(event)
     expect(capturedError.message).toBe(
       'Failed to fetch Drupal app context at /broken: Drupal unavailable'
-      + ' (upstream 503 Service Unavailable)',
+      + ' (upstream 500 Internal Server Error)',
     )
     expect(capturedError.cause).toBe(error)
 

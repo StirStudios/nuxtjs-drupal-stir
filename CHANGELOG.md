@@ -33,6 +33,15 @@ untouched do not need one.
 
 ### Changed
 
+- Drupal's Maintenance mode now covers every page, not only Drupal pages. The
+  app-context route passes Drupal's 503 on (other failures still degrade to
+  an empty context), `useAppContext()` then shows the maintenance error for
+  the whole page, and the listings route passes a 503 through instead of
+  turning it into a 502. Pages Nuxt builds itself show
+  `stirTheme.error.maintenance.message`, because Drupal answers those
+  requests with its HTML maintenance page rather than the plain message.
+  Nothing in Drupal changes.
+
 - The error page treats a 503 as planned maintenance, because Drupal answers
   503 while its Maintenance mode is on: it shows Drupal's maintenance message
   (passed through the page fetch as `error.data.maintenanceMessage`) under the
