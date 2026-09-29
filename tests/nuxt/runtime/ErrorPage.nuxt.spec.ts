@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { NuxtError } from '#app'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { ref } from 'vue'
 import ErrorPage from '../../../layers/theme/app/error.vue'
@@ -12,7 +13,9 @@ mockNuxtImport('useAppConfig', () => () => ({
 }))
 
 const render = async (statusCode: number, data?: Record<string, unknown>) =>
-  (await mountSuspended(ErrorPage, { props: { error: { statusCode, statusMessage: 'Service Unavailable', message: 'Service Unavailable', data } } })).text()
+  (await mountSuspended(ErrorPage, {
+    props: { error: { statusCode, statusMessage: 'Service Unavailable', message: 'Service Unavailable', data } as unknown as NuxtError },
+  })).text()
 
 describe('error page', () => {
   it('shows planned maintenance for a 503, which Drupal sends in Maintenance mode', async () => {
