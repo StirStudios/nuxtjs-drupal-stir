@@ -1,4 +1,4 @@
-import { createError } from 'h3'
+import { createStirDrupalUpstreamError } from '../../../foundation/server/utils/stirDrupalApi'
 
 export function buildParagraphPresentationPath(
   ceApiEndpoint: string,
@@ -8,15 +8,5 @@ export function buildParagraphPresentationPath(
 }
 
 export function createUpstreamParagraphPresentationError(error: unknown) {
-  const upstreamStatus = Number(
-    (error as { statusCode?: number; status?: number })?.statusCode
-      ?? (error as { status?: number })?.status,
-  )
-
-  return createError({
-    statusCode: upstreamStatus >= 400 && upstreamStatus < 500
-      ? upstreamStatus
-      : 502,
-    statusMessage: 'Failed to update paragraph presentation settings.',
-  })
+  return createStirDrupalUpstreamError(error, 'Failed to update paragraph presentation settings.')
 }

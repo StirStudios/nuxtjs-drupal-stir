@@ -7,6 +7,7 @@ import {
   setResponseHeader,
   type H3Event,
 } from 'h3'
+import { readStirDrupalMaintenanceMessage } from '../../shared/utils/drupalMaintenance'
 import { assertStirSameOrigin } from './stirRequestSecurity'
 
 // Shared by focused server capabilities and the full Drupal CE platform.
@@ -392,13 +393,10 @@ export const extractStirDrupalErrorDetail = (error: unknown): string => {
     return ''
   }
 
+  // Only Stir's `error` field is written for users. Drupal's own error body,
+  // `{"message": ...}`, can name permissions, tokens or internal failures.
   const dataRecord = data as Record<string, unknown>
-  const primary =
-    typeof dataRecord.error === 'string'
-      ? dataRecord.error
-      : typeof dataRecord.message === 'string'
-        ? dataRecord.message
-        : ''
+  const primary = typeof dataRecord.error === 'string' ? dataRecord.error : ''
 
   const fieldErrors =
     typeof dataRecord.errors === 'object' && dataRecord.errors !== null
@@ -440,23 +438,59 @@ const extractStirDrupalErrorCode = (error: unknown): string => {
     : ''
 }
 
+export const getStirDrupalStatusCode = (error: unknown): number | undefined => {
+  if (!error || typeof error !== 'object') return undefined
+
+  const { statusCode, status } = error as { statusCode?: unknown; status?: unknown }
+  const code = statusCode ?? status
+
+  return typeof code === 'number' ? code : undefined
+}
+
+/**
+ * A 503 from Drupal is its Maintenance mode. The error carries Drupal's
+ * message as `data.maintenanceMessage` for the error page.
+ */
+const createStirDrupalMaintenanceError = (error: unknown) => {
+  const message = readStirDrupalMaintenanceMessage((error as { data?: unknown }).data)
+
+  return createError({
+    statusCode: 503,
+    statusMessage: 'Service Unavailable',
+    ...(message ? { data: { maintenanceMessage: message } } : {}),
+  })
+}
+
+/**
+ * The error a Nuxt server route returns for a failed Drupal request: client
+ * errors keep their status, Drupal's Maintenance mode stays a 503 with its
+ * message, and anything else is a 502. Upstream bodies are never forwarded.
+ */
+export const createStirDrupalUpstreamError = (
+  error: unknown,
+  statusMessage: string,
+) => {
+  const statusCode = getStirDrupalStatusCode(error)
+
+  if (statusCode === 503) return createStirDrupalMaintenanceError(error)
+
+  return createError({
+    statusCode: statusCode !== undefined && statusCode >= 400 && statusCode < 500
+      ? statusCode
+      : 502,
+    statusMessage,
+  })
+}
+
 export const throwStirDrupalApiError = (
   error: unknown,
   fallbackMessage = 'Request failed',
   fallbackStatusCode = 500,
 ): never => {
-  const upstreamStatusCode =
-    typeof error === 'object' &&
-    error !== null &&
-    (('statusCode' in error &&
-      typeof (error as { statusCode?: unknown }).statusCode === 'number') ||
-      ('status' in error &&
-        typeof (error as { status?: unknown }).status === 'number'))
-      ? Number(
-          (error as { statusCode?: number; status?: number }).statusCode
-          ?? (error as { status?: number }).status,
-        )
-      : undefined
+  const upstreamStatusCode = getStirDrupalStatusCode(error)
+
+  if (upstreamStatusCode === 503) throw createStirDrupalMaintenanceError(error)
+
   const safeUpstreamError = upstreamStatusCode !== undefined &&
     SAFE_UPSTREAM_STATUS_CODES.has(upstreamStatusCode)
   const statusCode = upstreamStatusCode !== undefined

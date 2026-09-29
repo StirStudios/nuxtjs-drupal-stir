@@ -5,6 +5,7 @@ import {
   layoutEditLinksKey,
   presentationEditTargetsKey,
 } from '../../utils/layoutEditLinks'
+import { readStirDrupalMaintenanceMessage } from '../../../../foundation/shared/utils/drupalMaintenance'
 import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
@@ -196,8 +197,8 @@ function customPageError(error: unknown) {
   const message = payload?.statusMessage ?? 'Page not found'
   // In Maintenance mode Drupal answers 503 with its maintenance message as
   // the body. Keep it, so the error page shows Drupal's own words.
-  const maintenanceMessage = code === 503 && typeof payload?.data === 'string'
-    ? payload.data.trim()
+  const maintenanceMessage = code === 503
+    ? readStirDrupalMaintenanceMessage(payload?.data)
     : ''
 
   throw createError({

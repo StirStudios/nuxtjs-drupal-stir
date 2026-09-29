@@ -1,5 +1,4 @@
 import {
-  createError,
   defineEventHandler,
   getQuery,
   setResponseHeader,
@@ -8,6 +7,7 @@ import {
   assertStirDrupalResponseNotRedirect,
   buildStirDrupalHeaders,
   captureStirDrupalApiError,
+  createStirDrupalUpstreamError,
   getStirForwardedCookie,
   markStirPrivateResponse,
 } from '../../../../foundation/server/utils/stirDrupalApi'
@@ -59,17 +59,6 @@ export default defineEventHandler(async (event) => {
     return response._data
   } catch (error) {
     captureStirDrupalApiError(event, error)
-
-    const upstreamStatus = Number(
-      (error as { statusCode?: unknown; status?: unknown })?.statusCode
-      ?? (error as { status?: unknown })?.status,
-    )
-
-    throw createError({
-      statusCode: upstreamStatus >= 400 && upstreamStatus < 500
-        ? upstreamStatus
-        : 502,
-      statusMessage: 'Failed to refresh Drupal View.',
-    })
+    throw createStirDrupalUpstreamError(error, 'Failed to refresh Drupal View.')
   }
 })

@@ -11,7 +11,8 @@ import {
   parseAppContextResponse,
 } from '../../layers/core/server/utils/appContextApi'
 
-vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
+vi.mock('../../layers/foundation/server/utils/stirDrupalApi', async importOriginal => ({
+  ...await importOriginal<typeof import('../../layers/foundation/server/utils/stirDrupalApi')>(),
   stirDrupalApiRequest: vi.fn(),
   captureStirDrupalApiError: vi.fn(),
   markStirPrivateResponse: vi.fn(),

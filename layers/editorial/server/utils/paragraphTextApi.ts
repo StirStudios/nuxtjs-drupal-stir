@@ -1,4 +1,8 @@
 import { createError } from 'h3'
+import {
+  createStirDrupalUpstreamError,
+  getStirDrupalStatusCode,
+} from '../../../foundation/server/utils/stirDrupalApi'
 
 export function parseParagraphId(value: unknown): number {
   const paragraphId = Number(value)
@@ -18,24 +22,12 @@ export function buildParagraphTextPath(ceApiEndpoint: string, paragraphId: numbe
 }
 
 export function createUpstreamParagraphTextError(error: unknown, fallbackMessage: string) {
-  const upstreamStatusCode =
-    typeof (error as { statusCode?: unknown })?.statusCode === 'number'
-      ? Number((error as { statusCode: number }).statusCode)
-      : typeof (error as { status?: unknown })?.status === 'number'
-        ? Number((error as { status: number }).status)
-        : undefined
-  const statusCode = upstreamStatusCode !== undefined
-    && upstreamStatusCode >= 400
-    && upstreamStatusCode < 500
-    ? upstreamStatusCode
-    : 502
-
-  return createError({
-    statusCode,
-    statusMessage: statusCode === 409
+  return createStirDrupalUpstreamError(
+    error,
+    getStirDrupalStatusCode(error) === 409
       ? 'This content has changed or requires editing in Drupal. Reload before trying again.'
       : fallbackMessage,
-  })
+  )
 }
 
 export function parseTextValue(value: unknown): string {
