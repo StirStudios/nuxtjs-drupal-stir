@@ -159,14 +159,15 @@ export async function fetchAppContext(event: H3Event, path = '') {
 
     if (errorRecord.statusCode === 503) {
       markStirPrivateResponse(event)
+      // Only a plain-text body is Drupal's message; its HTML maintenance
+      // page is not. It travels in its own field, so the framework's default
+      // message ("Service Unavailable") is never mistaken for it.
+      const body = typeof errorRecord.data === 'string' ? errorRecord.data.trim() : ''
+
       throw createError({
         statusCode: 503,
         statusMessage: 'Service Unavailable',
-        // Only a plain-text body is Drupal's message; its HTML maintenance
-        // page is not.
-        message: typeof errorRecord.data === 'string' && !/<[a-z!/]/i.test(errorRecord.data)
-          ? errorRecord.data.trim()
-          : undefined,
+        data: body && !/<[a-z!/]/i.test(body) ? { maintenanceMessage: body } : undefined,
       })
     }
 
