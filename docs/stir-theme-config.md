@@ -632,7 +632,9 @@ footer: {
 Footer `sections` accepts these atoms: `logo`, `menu`, `socials`,
 `slogan`, `email`, `legal`, `copyright`, and `poweredBy`. The default `legal`
 atom preserves the original single copyright/powered-by paragraph. Use
-`layout: 'stacked'` for a single centered footer column, or keep
+`layout: 'stacked'` for a single centered footer column (the row is centred
+with `lg:justify-center`, placed before `footer.container` so a site's own
+classes can override it), or keep
 `default`/`columns` for the standard left/center/right `UFooter` slots.
 Project-specific CTA links should be implemented in the downstream project by
 overriding the footer component or adding a project footer region.
