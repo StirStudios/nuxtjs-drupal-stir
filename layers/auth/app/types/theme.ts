@@ -20,6 +20,8 @@ type UiSizeName = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
 type AuthButtonConfig = {
   class?: ClassValue
+  /** Nuxt UI slot classes, added after the layer's own so a site's win. */
+  ui?: Record<string, string>
   color?: UiColorName
   icon?: string
   size?: UiSizeName

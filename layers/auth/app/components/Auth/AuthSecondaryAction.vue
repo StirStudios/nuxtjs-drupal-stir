@@ -19,6 +19,12 @@ const authTheme = computed<AuthThemeConfig>(() =>
 )
 const pageKey = computed(() => resolveAuthPageKey(route))
 const config = computed(() => resolveAuthSecondaryAction(authTheme.value, pageKey.value))
+// A label longer than the card wraps instead of Nuxt UI's single-line
+// truncate. A site's ui.label classes come after, so they can change that.
+const buttonUi = computed(() => ({
+  ...config.value.ui,
+  label: ['whitespace-normal text-center', config.value.ui?.label].filter(Boolean).join(' '),
+}))
 </script>
 
 <template>
@@ -29,7 +35,7 @@ const config = computed(() => resolveAuthSecondaryAction(authTheme.value, pageKe
       :icon="config.icon"
       :label="config.label || label"
       :to="config.to || to"
-      :ui="{ label: 'whitespace-normal text-center' }"
+      :ui="buttonUi"
       :variant="resolveUiButtonVariant(config.variant, 'link')"
     />
   </div>

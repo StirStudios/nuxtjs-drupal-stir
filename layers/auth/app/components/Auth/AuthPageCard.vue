@@ -30,12 +30,12 @@ const cardUi = computed(() => {
   }
 
   // Flex children default to min-width: auto, so one wide child (a long
-  // unbroken label) would stretch the card past its max width. A theme's own
-  // container or wrapper classes keep this.
+  // unbroken label) would stretch the card past its max width. min-w-0 comes
+  // first, so a theme's own container or wrapper classes still override it.
   return {
     ...ui,
-    container: [ui.container, 'min-w-0'].filter(Boolean).join(' '),
-    wrapper: [ui.wrapper, 'min-w-0'].filter(Boolean).join(' '),
+    container: ['min-w-0', ui.container].filter(Boolean).join(' '),
+    wrapper: ['min-w-0', ui.wrapper].filter(Boolean).join(' '),
   }
 })
 </script>
