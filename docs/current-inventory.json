@@ -104,6 +104,7 @@
     "audit:preset-matrix",
     "audit:preset:auth-output",
     "audit:seo",
+    "audit:single-versions",
     "audit:site",
     "build",
     "contracts:check",
