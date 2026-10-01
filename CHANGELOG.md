@@ -33,6 +33,18 @@ untouched do not need one.
 
 ### Changed
 
+- **The account settings page names its layout in page meta** (`layout:
+  'account'`) instead of rendering `<NuxtLayout>` itself. With app.vue's
+  persistent `<NuxtLayout>`, a page that renders its own layout relies on the
+  app-level one switching off at exactly the right moment, and a late switch
+  shows two site shells until a refresh. `tests/utils/layoutContract.spec.ts`
+  now fails if a layer page renders `<NuxtLayout>`, or if a layout or shell
+  makes the page slot conditional or renders it twice: moving the page to a
+  new parent while a browser-rendered (signed-in) first load is pending leaves
+  it on the loader. **Action for consumers:** replace `layout: false` plus an
+  in-page `<NuxtLayout name="…">` with `layout: '…'` in `definePageMeta`, or set
+  `to.meta.layout` in route middleware when it depends on state.
+
 - **One place maps Drupal errors: `createStirDrupalUpstreamError()` in the
   foundation layer.** Client errors keep their status, a 503 (Drupal's
   Maintenance mode) stays a 503 carrying Drupal's message as

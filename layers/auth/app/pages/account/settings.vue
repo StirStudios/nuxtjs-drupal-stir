@@ -7,7 +7,7 @@ import { createAccountPasswordChangeValidationSchema } from '../../utils/authVal
 import { validateForm } from '../../utils/validationErrors'
 
 definePageMeta({
-  layout: false,
+  layout: 'account',
   accountTitle: 'Settings',
   accountSubtitle: 'Manage your login details and account security.',
 })
@@ -194,34 +194,32 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <NuxtLayout name="account">
-    <UTabs v-if="!loading && isReady" class="w-full" :items="settingsTabs" variant="link">
-      <template #settings>
-        <AccountProfileForm
-          :editable-fields-count="editableSettingsFieldsCount"
-          :fields="displaySettingsFields"
-          :has-profile-save="hasChanges"
-          heading="Settings"
-          :requires-current-password="requiresCurrentPassword"
-          :saving="saving"
-          subheading="Update your account login details."
-          :values="values"
-          @submit="onSubmitSettings"
-        />
-      </template>
+  <UTabs v-if="!loading && isReady" class="w-full" :items="settingsTabs" variant="link">
+    <template #settings>
+      <AccountProfileForm
+        :editable-fields-count="editableSettingsFieldsCount"
+        :fields="displaySettingsFields"
+        :has-profile-save="hasChanges"
+        heading="Settings"
+        :requires-current-password="requiresCurrentPassword"
+        :saving="saving"
+        subheading="Update your account login details."
+        :values="values"
+        @submit="onSubmitSettings"
+      />
+    </template>
 
-      <template #security>
-        <AccountSecurityForm
-          v-model:cancel-modal-open="cancelModalOpen"
-          v-model:current-password="currentPassword"
-          v-model:new-password="newPassword"
-          :canceling-account="cancelingAccount"
-          :changing-password="changingPassword"
-          :portal="portal"
-          @cancel-account="onCancelAccount"
-          @change-password="onChangePassword"
-        />
-      </template>
-    </UTabs>
-  </NuxtLayout>
+    <template #security>
+      <AccountSecurityForm
+        v-model:cancel-modal-open="cancelModalOpen"
+        v-model:current-password="currentPassword"
+        v-model:new-password="newPassword"
+        :canceling-account="cancelingAccount"
+        :changing-password="changingPassword"
+        :portal="portal"
+        @cancel-account="onCancelAccount"
+        @change-password="onChangePassword"
+      />
+    </template>
+  </UTabs>
 </template>
