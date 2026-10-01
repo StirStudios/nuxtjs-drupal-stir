@@ -1,3 +1,4 @@
+import { stirServerEnv } from './stirServerEnv'
 import {
   appendResponseHeader,
   createError,
@@ -141,7 +142,7 @@ export function getStirDrupalApiConfig() {
     || config.public.api
     || '',
   ).replace(/\/+$/, '')
-  const apiKey = String(config.apiKey || '')
+  const apiKey = stirServerEnv('DRUPAL_API_KEY', config.apiKey)
   const requestTimeoutMs = normalizePositiveInteger(
     config.drupalRequestTimeoutMs,
     DEFAULT_DRUPAL_REQUEST_TIMEOUT_MS,

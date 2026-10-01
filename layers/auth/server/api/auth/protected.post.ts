@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const submittedPassword = typeof body?.password === 'string' ? body.password : ''
-  const expectedPassword = String(useRuntimeConfig().protectedPassword || '')
+  const expectedPassword = layerAuthGetProtectedAccessSecret()
 
   if (
     !submittedPassword ||
