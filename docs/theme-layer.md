@@ -76,9 +76,10 @@ output stays wrapper-free; editable fields own their control positioning.
 ### Nuxt Image delivery
 
 Nuxt Image with the local IPX provider is the default image delivery path. The
-Drupal origin hostname is allowed automatically from `DRUPAL_URL`. Set the same
-`DRUPAL_CDN` value in Nuxt when Drupal rewrites original media to an asset CDN;
-the layer automatically trusts both origins as IPX sources. Projects using IPX
+Drupal origin hostname is allowed automatically from `DRUPAL_URL`, and IPX
+fetches originals from there; visitors receive IPX variants (through
+`NUXT_IMAGE_CDN` when set), so Drupal file URLs need no CDN of their own.
+Projects using IPX
 must also permit the package manager to build Sharp in their
 trusted-dependency policy. Nuxt Image is the single frontend image-delivery
 path; Drupal supplies the original asset, revision, intrinsic dimensions, and

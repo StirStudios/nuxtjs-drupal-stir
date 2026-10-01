@@ -61,7 +61,7 @@ The layer's documented names (`DRUPAL_API_KEY`, `TURNSTILE_SECRET`,
 
 - `NUXT_ENV` and `NUXT_INDEXABLE`: indexability, application mode and whether
   the Plausible client plugin is bundled.
-- `DRUPAL_URL` and `DRUPAL_CDN`: also shape image providers, route rules and
+- `DRUPAL_URL`: also shapes image providers, route rules and
   SEO proxying at build. Overriding only `NUXT_API` or the Drupal CE base URLs
   at runtime would leave those pointing at the old host, so change Drupal
   hosts with a deploy.
