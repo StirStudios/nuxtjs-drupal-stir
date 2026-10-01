@@ -8,7 +8,9 @@
  * without a rebuild.
  */
 export function stirServerEnv(name: string, buildTimeValue: unknown): string {
-  const runtimeValue = process.env[name]?.trim()
+  // Through globalThis, so consumers type-check without Node's types.
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  const runtimeValue = env?.[name]?.trim()
 
   return runtimeValue || String(buildTimeValue || '')
 }
