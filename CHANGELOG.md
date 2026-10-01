@@ -56,7 +56,11 @@ untouched do not need one.
   Drupal page that names its layout in `definePageMeta` now keeps it (the
   server overrode it before). PageRoute's `forcedLayout` prop no longer sets
   the layout, which it never did on the server: use
-  `definePageMeta({ layout })`. No consumer change is needed otherwise.
+  `definePageMeta({ layout })`. No consumer change is needed otherwise. Both
+  layout plugins are named `stir:drupal-page-layout`: a site that maps the
+  layout per navigation (DancePlug's member app shell) registers its own route
+  middleware in a plugin with `dependsOn: ['stir:drupal-page-layout']`, so it
+  runs after the Drupal page's layout is set.
 
 - **The account settings page names its layout in page meta** (`layout:
   'account'`) instead of rendering `<NuxtLayout>` itself. With app.vue's

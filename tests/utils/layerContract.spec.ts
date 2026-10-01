@@ -679,6 +679,10 @@ describe('layer contract', () => {
     expect(clientLayout).toContain('await import(\'../composables/useStirDrupalCe\')')
     expect(clientLayout).not.toMatch(/^import .*useStirDrupalCe/m)
     expect(clientLayout).toContain('to.meta.layout =')
+    // Sites map the layout after these with dependsOn (DancePlug's app shell).
+    for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {
+      expect(read(`layers/theme/app/plugins/${plugin}`)).toContain('name: \'stir:drupal-page-layout\'')
+    }
     // Pages never write the layout: a late write lands on whichever route is
     // current by then.
     expect(read('layers/theme/app/components/Drupal/PageRoute.vue')).not.toMatch(/setDrupalPageLayout|setPageLayout|meta\.layout =/)

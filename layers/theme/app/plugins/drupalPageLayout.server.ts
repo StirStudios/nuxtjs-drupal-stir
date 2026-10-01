@@ -9,27 +9,31 @@ import { pageFetchOptions, withoutLegacyDrupalViewPage } from '#stir/utils/pageR
 // This stays a separate server-only plugin: in a universal plugin the Drupal
 // CE client lands in the initial browser bundle even behind an
 // import.meta.server guard, because its import is kept.
-export default defineNuxtPlugin((nuxtApp) => {
-  addRouteMiddleware('drupal-page-layout', async (to) => {
-    if (!takesDrupalPageLayout(to)) return
+export default defineNuxtPlugin({
+  // Named so a site can map the layout after it with dependsOn.
+  name: 'stir:drupal-page-layout',
+  setup(nuxtApp) {
+    addRouteMiddleware('drupal-page-layout', async (to) => {
+      if (!takesDrupalPageLayout(to)) return
 
-    const { fetchPage } = useStirDrupalCe()
-    const { path } = useResolvedPageRequest(to)
-    let pageLayout: unknown
+      const { fetchPage } = useStirDrupalCe()
+      const { path } = useResolvedPageRequest(to)
+      let pageLayout: unknown
 
-    try {
-      const page = await fetchPage(path.value, {
-        query: withoutLegacyDrupalViewPage(to.query),
-        ...pageFetchOptions(),
-      })
+      try {
+        const page = await fetchPage(path.value, {
+          query: withoutLegacyDrupalViewPage(to.query),
+          ...pageFetchOptions(),
+        })
 
-      pageLayout = page.value?.page_layout
-    } catch {
-      // Drupal/PageRoute.vue reports the error when it fetches the page.
-      return
-    }
+        pageLayout = page.value?.page_layout
+      } catch {
+        // Drupal/PageRoute.vue reports the error when it fetches the page.
+        return
+      }
 
-    // An inline middleware loses the Nuxt context after an await.
-    nuxtApp.runWithContext(() => setDrupalPageLayout(resolveDrupalPageLayout(pageLayout)))
-  }, { global: true })
+      // An inline middleware loses the Nuxt context after an await.
+      nuxtApp.runWithContext(() => setDrupalPageLayout(resolveDrupalPageLayout(pageLayout)))
+    }, { global: true })
+  },
 })
