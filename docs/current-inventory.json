@@ -833,7 +833,7 @@
     "serverRoutes": 29,
     "productionDependencies": 39,
     "developmentDependencies": 27,
-    "tests": 218,
+    "tests": 219,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -841,7 +841,7 @@
       "scripts": 5,
       "server": 31,
       "unit": 11,
-      "utils": 62
+      "utils": 63
     }
   },
   "tests": [
@@ -1030,6 +1030,7 @@
     "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",
     "tests/utils/layerContract.spec.ts",
+    "tests/utils/layoutContract.spec.ts",
     "tests/utils/linkHubHeroImage.spec.ts",
     "tests/utils/linkHubLayout.spec.ts",
     "tests/utils/navigation.spec.ts",

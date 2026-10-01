@@ -7,7 +7,7 @@ import { createAccountPasswordChangeValidationSchema } from '../../utils/authVal
 import { validateForm } from '../../utils/validationErrors'
 
 definePageMeta({
-  layout: false,
+  layout: 'account',
   accountTitle: 'Settings',
   accountSubtitle: 'Manage your login details and account security.',
 })
@@ -194,7 +194,7 @@ const onCancelAccount = async () => {
 </script>
 
 <template>
-  <NuxtLayout name="account">
+  <div>
     <UTabs v-if="!loading && isReady" class="w-full" :items="settingsTabs" variant="link">
       <template #settings>
         <AccountProfileForm
@@ -223,5 +223,5 @@ const onCancelAccount = async () => {
         />
       </template>
     </UTabs>
-  </NuxtLayout>
+  </div>
 </template>
