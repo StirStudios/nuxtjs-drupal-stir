@@ -9,7 +9,7 @@ import { readStirDrupalMaintenanceMessage } from '../../../../foundation/shared/
 import { drupalPageKey } from '../../utils/drupalPage'
 import { pageRefreshKey } from '../../utils/pageRefresh'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
-import { serverPageFetchOptions, withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
+import { pageFetchOptions, withoutLegacyDrupalViewPage } from '../../utils/pageRequest'
 
 const props = defineProps<{
   forcedLayout?: string
@@ -35,7 +35,7 @@ const theme = useAppConfig().stirTheme
 
 const page = await fetchPage(
   pageRequest.path.value,
-  { query: drupalPageQuery.value, ...serverPageFetchOptions() },
+  { query: drupalPageQuery.value, ...pageFetchOptions() },
   customPageError,
 )
 
@@ -91,13 +91,6 @@ const layout = computed(() =>
   resolveDrupalPageLayout(props.forcedLayout || pageLayout.value),
 )
 
-// app.vue renders the layout. The server resolved it in
-// plugins/drupalPageLayout.server.ts; on client navigation
-// drupalPageLayout.client.ts carries the current layout over and it follows
-// the page loaded here.
-if (import.meta.client) {
-  watch(layout, name => setDrupalPageLayout(name), { immediate: true })
-}
 const isLinkHubLayout = computed(() => layout.value === 'links')
 const routeSlugClass = computed(() => {
   if (Array.isArray(route.params.slug)) return route.params.slug[0] || ''
