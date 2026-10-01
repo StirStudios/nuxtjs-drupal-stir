@@ -63,7 +63,14 @@ const footerAtomProps = computed(() => ({
   year: currentYear,
 }))
 
-const footerContainerClass = computed(() => [themeContainer.value, footerConfig.value.container].filter(Boolean).join(' '))
+// Stacked keeps only the centre slot, and Nuxt UI's lg:justify-between would
+// push that lone slot to the left edge. Placed before the site's own container
+// classes, so a site can still override it.
+const footerContainerClass = computed(() => [
+  themeContainer.value,
+  stackedLayout.value ? 'lg:justify-center' : '',
+  footerConfig.value.container,
+].filter(Boolean).join(' '))
 const footerSectionClasses = computed(() => ({
   left: footerConfig.value.left,
   center: footerConfig.value.content,
