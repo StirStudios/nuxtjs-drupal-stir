@@ -10,8 +10,10 @@
  *
  * Usage: node scripts/audit/single-versions.mjs [--fix] [path/to/pnpm-lock.yaml]
  *
- * --fix drops those packages' entries from the lockfile, so the next
- * `pnpm install` resolves them afresh to the newest version every range allows.
+ * --fix drops every Tiptap entry from the lockfile, not only the duplicated
+ * ones: a package still locked to the old release would pull the old tree back
+ * in through its exact peers. The next `pnpm install` then resolves the whole
+ * family afresh to the newest version every range allows.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -39,7 +41,7 @@ for (const [, name, version] of content.matchAll(
 const duplicated = [...versions].filter(([, found]) => found.size > 1)
 
 if (duplicated.length && fix) {
-  const names = new Set(duplicated.map(([name]) => name))
+  const names = new Set(versions.keys())
   // Each entry is its key line plus the indented lines below it.
   const kept = content.replace(
     /^ {2}'?(@?[^@\s']+)@[^\n]*:\n(?:(?: {4}[^\n]*)?\n)*?(?=^ {2}\S|^\S|(?![\s\S]))/gm,
@@ -47,7 +49,7 @@ if (duplicated.length && fix) {
   )
   writeFileSync(lockfile, kept)
   console.log(
-    `Dropped ${names.size} packages from ${lockfile}; run pnpm install to resolve them afresh.`,
+    `Dropped ${names.size} ${PREFIXES.join(', ')} packages from ${lockfile}; run pnpm install to resolve them afresh.`,
   )
   process.exit(0)
 }
