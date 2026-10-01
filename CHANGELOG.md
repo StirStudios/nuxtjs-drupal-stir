@@ -33,6 +33,35 @@ untouched do not need one.
 
 ### Changed
 
+- **Drupal pages choose their layout in route middleware in the browser too,
+  before the page renders.** On the server this was already so; in the
+  browser `Drupal/PageRoute.vue` set the layout from a watcher once its
+  payload loaded, so the layout changed after the page had started rendering.
+  On a signed-in first load (rendered in the browser) of a page whose
+  `page_layout` is not `default` (`clear`, `links`, a site's `clients`), the
+  page mounted in `default`, was remounted in its own layout and fetched
+  Drupal twice: one Drupal round trip slower, and the same mid-load remount
+  that left DancePlug on the loader. A late write could also land on whichever
+  route was current by then. `plugins/drupalPageLayout.client.ts` now fetches
+  the page (importing the Drupal CE client lazily, so the initial bundle does
+  not grow) and sets `to.meta.layout`; the page's `fetchPage()` reuses that
+  payload once through `pageFetchOptions()` (`serverPageFetchOptions()`
+  remains as a deprecated alias), so Drupal is asked once per navigation, and a
+  refresh still refetches. PageRoute no longer writes the layout.
+  What a consumer can notice: on client navigation the address bar changes
+  when the next page is ready rather than at the click (the loading bar runs
+  meanwhile); on a signed-in first load the layout's own requests (menus, app
+  context) start after the page request rather than beside it; a page Drupal
+  answers with an error is requested twice, so PageRoute can report it. A
+  Drupal page that names its layout in `definePageMeta` now keeps it (the
+  server overrode it before). PageRoute's `forcedLayout` prop no longer sets
+  the layout, which it never did on the server: use
+  `definePageMeta({ layout })`. No consumer change is needed otherwise. Both
+  layout plugins are named `stir:drupal-page-layout`: a site that maps the
+  layout per navigation (DancePlug's member app shell) registers its own route
+  middleware in a plugin with `dependsOn: ['stir:drupal-page-layout']`, so it
+  runs after the Drupal page's layout is set.
+
 - **The account settings page names its layout in page meta** (`layout:
   'account'`) instead of rendering `<NuxtLayout>` itself. With app.vue's
   persistent `<NuxtLayout>`, a page that renders its own layout relies on the

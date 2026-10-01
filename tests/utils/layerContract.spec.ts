@@ -672,8 +672,20 @@ describe('layer contract', () => {
     }
     expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
     expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
-    // A universal plugin would keep the Drupal CE client in the browser bundle.
-    expect(read('layers/theme/app/plugins/drupalPageLayout.client.ts')).not.toMatch(/useStirDrupalCe|fetchPage/)
+    // A universal plugin would keep the Drupal CE client in the browser bundle;
+    // the client plugin imports it lazily.
+    const clientLayout = read('layers/theme/app/plugins/drupalPageLayout.client.ts')
+
+    expect(clientLayout).toContain('await import(\'../composables/useStirDrupalCe\')')
+    expect(clientLayout).not.toMatch(/^import .*useStirDrupalCe/m)
+    expect(clientLayout).toContain('to.meta.layout =')
+    // Sites map the layout after these with dependsOn (DancePlug's app shell).
+    for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {
+      expect(read(`layers/theme/app/plugins/${plugin}`)).toContain('name: \'stir:drupal-page-layout\'')
+    }
+    // Pages never write the layout: a late write lands on whichever route is
+    // current by then.
+    expect(read('layers/theme/app/components/Drupal/PageRoute.vue')).not.toMatch(/setDrupalPageLayout|setPageLayout|meta\.layout =/)
     expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
   })
 
