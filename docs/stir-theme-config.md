@@ -175,7 +175,12 @@ stirTheme: {
   and Nuxt UI `variant`; use it to remove or replace the default shadow.
 - `secondaryAction` controls page navigation rendered above the card, such as
   “Back to login”. It accepts `enabled`, `label`, `to`, `class`,
-  `wrapperClass`, `icon`, `color`, and `variant`.
+  `wrapperClass`, `icon`, `color`, `variant`, and `ui` (Nuxt UI button slot
+  classes). Its label wraps when it is longer than the card; `ui.label`
+  classes are added after that default, so a site can change it.
+- The auth card's body and content column may shrink (`min-w-0`) so nothing
+  pushes the card past its max width; `card.ui.container` and `card.ui.wrapper`
+  classes come after that default and can override it.
 - `backgroundImage` should reference the original Drupal image. Auth layouts
   automatically deliver it through Nuxt Image/IPX as a 1920px WebP background.
 - Auth layouts and visuals are read only from `stirTheme.auth`, never from
