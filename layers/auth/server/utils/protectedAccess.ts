@@ -1,3 +1,4 @@
+import { stirServerEnv } from '../../../foundation/server/utils/stirServerEnv'
 import { getCookie, getHeader, setCookie, type H3Event } from 'h3'
 import {
   layerAuthCreateProtectedAccessToken,
@@ -51,7 +52,7 @@ const getCookieSecureFlag = (event: H3Event): boolean => {
 export const layerAuthGetProtectedAccessSecret = (): string => {
   const config = useRuntimeConfig()
 
-  return String(config.protectedPassword || '')
+  return stirServerEnv('PROTECTED_PASSWORD', config.protectedPassword)
 }
 
 
