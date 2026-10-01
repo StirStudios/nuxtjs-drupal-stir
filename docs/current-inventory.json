@@ -1165,15 +1165,15 @@
   "performanceBaseline": {
     "schemaVersion": 4,
     "initialClient": {
-      "sizeKb": 808.64,
-      "gzipKb": 237.86,
+      "sizeKb": 808.68,
+      "gzipKb": 237.87,
       "assets": [
         {
           "label": "app-entry",
           "role": "initial",
-          "file": "_nuxt/BsCp0i2-.js",
-          "sizeKb": 124.636,
-          "gzipKb": 42.25
+          "file": "_nuxt/WBLGOijZ.js",
+          "sizeKb": 124.674,
+          "gzipKb": 42.259
         },
         {
           "label": "entry.Dw1wkuwz.css",
@@ -1423,9 +1423,9 @@
         {
           "label": "theme:app/utils/pageRequest",
           "role": "initial",
-          "file": "_nuxt/DuM6SGFN.js",
-          "sizeKb": 0.873,
-          "gzipKb": 0.509
+          "file": "_nuxt/Cmtb-IuX.js",
+          "sizeKb": 0.876,
+          "gzipKb": 0.511
         },
         {
           "label": "_DZcGTsqz",
@@ -1654,9 +1654,9 @@
       {
         "label": "app-entry",
         "role": "initial",
-        "file": "_nuxt/BsCp0i2-.js",
-        "sizeKb": 124.636,
-        "gzipKb": 42.25
+        "file": "_nuxt/WBLGOijZ.js",
+        "sizeKb": 124.674,
+        "gzipKb": 42.259
       },
       {
         "label": "entry.Dw1wkuwz.css",
