@@ -1,3 +1,15 @@
+import type { RouteLocationNormalized } from 'vue-router'
+
+/**
+ * A Drupal page route takes its layout from Drupal's page_layout, unless the
+ * page names its own in definePageMeta. ?page= routes redirect first.
+ */
+export function takesDrupalPageLayout(to: Pick<RouteLocationNormalized, 'matched' | 'meta' | 'query'>): boolean {
+  return to.meta.drupalPage === true
+    && !('page' in to.query)
+    && to.matched.at(-1)?.meta.layout === undefined
+}
+
 /** The Nuxt layout for a Drupal page: its page_layout, or default. */
 export function resolveDrupalPageLayout(value: unknown): string {
   return typeof value === 'string' && value.trim() ? value.trim() : 'default'

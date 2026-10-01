@@ -35,7 +35,7 @@ const Layout = defineComponent({
 })
 
 describe('Drupal PageRoute ownership', () => {
-  it('renders destination layout and editor targets independently of shared current-page state', async () => {
+  it('renders editor targets, without writing the layout, independently of shared current-page state', async () => {
     state.getPage.mockReturnValue(ref({ page_layout: 'links', content: {} }))
     state.fetchPage.mockResolvedValue(ref({
       page_layout: 'clear',
@@ -45,13 +45,15 @@ describe('Drupal PageRoute ownership', () => {
         props: { uuid: 'destination', editLink: '/edit/destination', presentationEdit: { paragraphId: 42 } },
       },
     }))
+    const layoutBefore = useRoute().meta.layout
     const wrapper = await mountSuspended(PageRoute, {
       global: { stubs: { NuxtLayout: Layout } },
       slots: { default: () => h(Probe) },
     })
 
-    // app.vue renders the layout; PageRoute sets it from the destination page.
-    expect(useRoute().meta.layout).toBe('clear')
+    // app.vue renders the layout, chosen in route middleware before render.
+    // The page never writes it: a late write lands on whichever route is current.
+    expect(useRoute().meta.layout).toBe(layoutBefore)
     expect(wrapper.get('#edit-targets').text()).toBe('/edit/destination:42')
     expect(wrapper.get('#edit-targets').attributes('data-page-title')).toBe('Destination')
     expect(state.getPage).not.toHaveBeenCalled()

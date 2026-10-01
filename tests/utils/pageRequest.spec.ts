@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  forgetPrefetchedPage,
+  pageFetchOptions,
+  rememberPrefetchedPage,
   resolvePageRequest,
   withoutLegacyDrupalViewPage,
 } from '../../layers/theme/app/utils/pageRequest'
@@ -47,5 +50,39 @@ describe('withoutLegacyDrupalViewPage', () => {
     }
 
     expect(withoutLegacyDrupalViewPage(query)).toEqual(query)
+  })
+})
+
+describe('pageFetchOptions in the browser', () => {
+  const app = (fullPath: string, isHydrating = false) => ({
+    isHydrating,
+    payload: { data: { key: 'server payload' } },
+    static: { data: { key: 'static payload' } },
+    $router: { currentRoute: { value: { fullPath } } },
+  })
+
+  it('reuses a prefetched page once, for the route it was fetched for', () => {
+    const nuxtApp = app('/about#team')
+    const { getCachedData } = pageFetchOptions()
+
+    rememberPrefetchedPage(nuxtApp, '/about', 'prefetched')
+    expect(getCachedData('key', nuxtApp, { cause: 'initial' })).toBe('prefetched')
+    expect(getCachedData('key', nuxtApp, { cause: 'initial' })).toBe('static payload')
+
+    rememberPrefetchedPage(nuxtApp, '/elsewhere', 'prefetched')
+    expect(getCachedData('key', nuxtApp, { cause: 'initial' })).toBe('static payload')
+  })
+
+  it('keeps Nuxt defaults: the server payload while hydrating, nothing on refresh', () => {
+    const { getCachedData } = pageFetchOptions()
+
+    expect(getCachedData('key', app('/', true), { cause: 'initial' })).toBe('server payload')
+    expect(getCachedData('key', app('/'), { cause: 'refresh:manual' })).toBeUndefined()
+
+    const nuxtApp = app('/about')
+
+    rememberPrefetchedPage(nuxtApp, '/about', 'prefetched')
+    expect(getCachedData('key', nuxtApp, { cause: 'refresh:hook' })).toBeUndefined()
+    forgetPrefetchedPage(nuxtApp)
   })
 })
