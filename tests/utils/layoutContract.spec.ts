@@ -13,8 +13,7 @@ import { describe, expect, it } from 'vitest'
  *   Pages name their layout in definePageMeta or set it in route middleware.
  * - A layout or shell that moves the page slot to a different parent on
  *   changing state remounts the page mid-load, and Vue never resolves the
- *   layout: the page stays on the loader with no error (found on DancePlug,
- *   2026-09-30).
+ *   layout: the page stays on the loader with no error.
  *
  * Consumer projects should carry the same test for their own app/ directory.
  */

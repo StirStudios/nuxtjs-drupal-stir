@@ -33,21 +33,17 @@ untouched do not need one.
 
 ### Changed
 
-- **Pages choose their layout in page meta; the account settings page no
-  longer renders its own `<NuxtLayout>`.** Since app.vue renders one persistent
-  `<NuxtLayout>` around `<NuxtPage>`, a page that wraps itself in a layout needs
-  the app-level one switched off at the exact moment it mounts, and a late
-  switch shows two site shells until a refresh (seen on DancePlug). The auth
-  layer's `account/settings` page now sets `layout: 'account'` instead.
-  `tests/utils/layoutContract.spec.ts` fails if a layer page renders
-  `<NuxtLayout>`, or a layout or shell makes the page slot conditional or
-  renders it twice: moving the page between parents mid-load, on a signed-in
-  first load (rendered in the browser), leaves it on the loader for good.
-  **Action for consumers:** pages that use `layout: false` with their own
-  `<NuxtLayout name="…">` should name the layout in `definePageMeta` instead
-  (or set it in route middleware when it depends on state), and should carry
-  the same test for their own `app/` directory; DancePlug's
-  `tests/unit/layoutContract.test.ts` is a ready copy.
+- **The account settings page names its layout in page meta** (`layout:
+  'account'`) instead of rendering `<NuxtLayout>` itself. With app.vue's
+  persistent `<NuxtLayout>`, a page that renders its own layout relies on the
+  app-level one switching off at exactly the right moment, and a late switch
+  shows two site shells until a refresh. `tests/utils/layoutContract.spec.ts`
+  now fails if a layer page renders `<NuxtLayout>`, or if a layout or shell
+  makes the page slot conditional or renders it twice: moving the page to a
+  new parent while a browser-rendered (signed-in) first load is pending leaves
+  it on the loader. **Action for consumers:** replace `layout: false` plus an
+  in-page `<NuxtLayout name="…">` with `layout: '…'` in `definePageMeta`, or set
+  `to.meta.layout` in route middleware when it depends on state.
 
 - **One place maps Drupal errors: `createStirDrupalUpstreamError()` in the
   foundation layer.** Client errors keep their status, a 503 (Drupal's
