@@ -29,6 +29,7 @@ const config = computed(() => resolveAuthSecondaryAction(authTheme.value, pageKe
       :icon="config.icon"
       :label="config.label || label"
       :to="config.to || to"
+      :ui="{ label: 'whitespace-normal text-center' }"
       :variant="resolveUiButtonVariant(config.variant, 'link')"
     />
   </div>

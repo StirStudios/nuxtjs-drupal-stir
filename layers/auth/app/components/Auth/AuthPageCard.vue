@@ -20,13 +20,24 @@ const cardConfig = computed(() =>
   resolveAuthCardConfig(authTheme.value, pageKey.value),
 )
 const cardClass = computed(() => cardConfig.value.class || 'shadow-lg')
-const cardUi = computed(() => ({
-  container: props.split ? 'p-0 sm:p-0' : 'p-6 sm:p-6',
-  footer: 'text-center text-sm text-muted',
-  wrapper: 'w-full',
-  ...cardConfig.value.ui,
-  ...(props.headerFull ? { header: 'w-full' } : {}),
-}))
+const cardUi = computed(() => {
+  const ui = {
+    container: props.split ? 'p-0 sm:p-0' : 'p-6 sm:p-6',
+    footer: 'text-center text-sm text-muted',
+    wrapper: 'w-full',
+    ...cardConfig.value.ui,
+    ...(props.headerFull ? { header: 'w-full' } : {}),
+  }
+
+  // Flex children default to min-width: auto, so one wide child (a long
+  // unbroken label) would stretch the card past its max width. A theme's own
+  // container or wrapper classes keep this.
+  return {
+    ...ui,
+    container: [ui.container, 'min-w-0'].filter(Boolean).join(' '),
+    wrapper: [ui.wrapper, 'min-w-0'].filter(Boolean).join(' '),
+  }
+})
 </script>
 
 <template>
