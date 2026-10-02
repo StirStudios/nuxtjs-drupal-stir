@@ -275,7 +275,6 @@ attributes above; the harness does not depend on project-specific components.
 - `NUXT_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable
 - `NUXT_INDEXABLE`: Set to `'false'` to temporarily hide a website (a composition with the SEO capability) even when `NUXT_ENV=production`. Applications without the SEO capability are never indexable and do not need it
-- `DRUPAL_CDN`: Optional Drupal asset CDN origin. When set in the Nuxt environment, its host is automatically trusted as an IPX source alongside `DRUPAL_URL`
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required
 - `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
