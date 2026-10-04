@@ -20,31 +20,53 @@ type ValidationOptions = {
   showToast?: boolean
 }
 
+type ValidationField = {
+  focus?: () => void
+  scrollIntoView?: (scrollOptions?: ScrollIntoViewOptions) => void
+  compareDocumentPosition?: (other: Node) => number
+  getBoundingClientRect?: () => { top: number, bottom: number }
+}
+
+// Node.DOCUMENT_POSITION_FOLLOWING: the other node comes after this one.
+const DOCUMENT_POSITION_FOLLOWING = 4
+
+// A field already on screen is only focused. Scrolling it towards the centre
+// would move the page while a sticky panel holding it stays put.
+function isOnScreen(field: ValidationField): boolean {
+  const box = field.getBoundingClientRect?.()
+
+  return !!box && box.top >= 0 && box.bottom <= window.innerHeight
+}
+
+function comesBefore(field: ValidationField, other: ValidationField): boolean {
+  return !!field.compareDocumentPosition
+    && (field.compareDocumentPosition(other as Node) & DOCUMENT_POSITION_FOLLOWING) !== 0
+}
+
 export function handleValidationError(
   event: ValidationErrorEvent,
   validationContext: {
     isClient: boolean
     showToast?: boolean
     toast: ToastLike
-    getElementById: (id: string) => {
-      focus?: () => void
-      scrollIntoView?: (scrollOptions?: ScrollIntoViewOptions) => void
-    } | null
+    getElementById: (id: string) => ValidationField | null
   },
 ) {
   if (!validationContext.isClient || !event?.errors?.length) return
 
-  const firstError = event.errors[0]
+  // Nuxt UI lists errors in its own order, not the page's, so take the
+  // invalid field that comes first on the page. It only carries an id for
+  // errors it could bind to an input.
+  const element = event.errors.reduce<ValidationField | null>((first, error) => {
+    const field = error.id ? validationContext.getElementById(error.id) : null
 
-  if (!firstError) return
-
-  // Nuxt UI only carries an id for errors it could bind to an input.
-  const element = firstError.id
-    ? validationContext.getElementById(firstError.id)
-    : null
+    return field && (!first || comesBefore(field, first)) ? field : first
+  }, null)
 
   element?.focus?.()
-  element?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+  if (element && !isOnScreen(element)) {
+    element.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+  }
 
   if (validationContext.showToast === false) return
 
