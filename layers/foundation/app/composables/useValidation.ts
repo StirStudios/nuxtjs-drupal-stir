@@ -57,13 +57,25 @@ export function handleValidationError(
 
 export function useValidation(options: ValidationOptions = {}) {
   const toast = useToast()
+  const instance = getCurrentInstance()
 
   const onError = (event: FormErrorEvent) => {
-    handleValidationError(event, {
-      isClient: import.meta.client,
-      showToast: options.showToast,
-      toast,
-      getElementById: id => document.getElementById(id),
+    // A form inside a shadow DOM, such as an embedded widget, is out of
+    // document's reach, so look its fields up from the form's own root.
+    // Nuxt UI's error event is a copy without the form as its target.
+    const root = (instance?.proxy?.$el as Node | null | undefined)?.getRootNode?.()
+    const scope = root instanceof ShadowRoot ? root : document
+
+    // Nuxt UI disables the fields while it validates and emits this error
+    // before enabling them again. A disabled field cannot take focus, so wait
+    // for the render that enables it.
+    setTimeout(() => {
+      handleValidationError(event, {
+        isClient: import.meta.client,
+        showToast: options.showToast,
+        toast,
+        getElementById: id => scope.getElementById(id),
+      })
     })
   }
 
