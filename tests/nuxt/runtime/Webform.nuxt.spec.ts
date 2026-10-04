@@ -151,6 +151,37 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.html()).not.toContain('[object Object]')
   })
 
+  it('keeps the visitor\'s place when a submission is refused', async () => {
+    runtime.fetch.mockClear()
+    runtime.fetch.mockRejectedValue(Object.assign(new Error('Bad Request'), {
+      response: { _data: { message: 'CAPTCHA validation failed' } },
+    }))
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: { name: { ...webform.fields.name, '#required': false } },
+        },
+      },
+    })
+
+    await flushPromises()
+    const content = wrapper.findComponent(WebformContent)
+
+    content.vm.$emit('update:turnstileToken', 'spent-token')
+    content.props('state').name = 'Ada'
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(runtime.fetch).toHaveBeenCalledWith('/api/webform/submit', expect.anything())
+    // The same form stays mounted, so the visitor keeps their place and what
+    // they entered; clearing the spent token asks Turnstile for a fresh one.
+    expect(wrapper.findComponent(WebformContent).vm.$.uid).toBe(content.vm.$.uid)
+    expect(wrapper.findComponent(WebformContent).props('state').name).toBe('Ada')
+    expect(wrapper.findComponent(WebformContent).props('turnstileToken')).toBe('')
+  })
+
   it('does not submit display-only markup as an empty field', async () => {
     runtime.fetch.mockClear()
     runtime.fetch.mockResolvedValue(undefined)
