@@ -6,6 +6,33 @@ import type { FormErrorEvent } from '@nuxt/ui'
 import { useValidation } from '../../../layers/foundation/app/composables/useValidation'
 
 describe('useValidation', () => {
+  it('focuses the invalid field first on the page, however Nuxt UI orders the errors', async () => {
+    const TwoFieldForm = defineComponent({
+      setup() {
+        const { onError } = useValidation({ showToast: false })
+        const state = reactive({})
+        // Reported bottom field first, as Nuxt UI may list them.
+        const validate = () => [
+          { name: 'email', message: 'Required' },
+          { name: 'guests', message: 'Required' },
+        ]
+
+        return () => h(UForm, { state, validate, onError }, () => [
+          h(UFormField, { name: 'guests', label: 'Guests' }, () => h(UInput)),
+          h(UFormField, { name: 'email', label: 'Email' }, () => h(UInput)),
+        ])
+      },
+    })
+
+    const wrapper = await mountSuspended(TwoFieldForm, { attachTo: document.body })
+    const [guests] = wrapper.findAll('input')
+
+    await wrapper.get('form').trigger('submit')
+
+    await vi.waitFor(() => expect(document.activeElement).toBe(guests!.element))
+    wrapper.unmount()
+  })
+
   it('focuses the first invalid field once Nuxt UI enables it again', async () => {
     const SignupForm = defineComponent({
       setup() {
@@ -54,6 +81,8 @@ describe('useValidation', () => {
     const scrollIntoView = vi.fn()
 
     field.scrollIntoView = scrollIntoView
+    // Far down the page, off screen.
+    field.getBoundingClientRect = () => ({ top: 3000, bottom: 3040 }) as DOMRect
 
     expect(document.getElementById('guest-count')).toBeNull()
 
