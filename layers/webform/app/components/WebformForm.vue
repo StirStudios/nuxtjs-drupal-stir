@@ -292,8 +292,9 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     isFormSubmitted.value = true
   } catch (error) {
     console.error('Submission Error:', error)
+    // Drupal spent the token; clearing it asks FieldTurnstile for a fresh one.
+    // The form stays mounted, so the visitor keeps their place.
     turnstileToken.value = ''
-    formResetKey.value += 1
     const errorData = (
       error as { response?: { _data?: Record<string, unknown> } }
     )?.response?._data as
