@@ -7,6 +7,7 @@ import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
 
 type WebformThemeConfig = {
   buttonClass?: string
+  showToasts?: boolean
   submitButtonSize?: unknown
   formClass?: string
   fieldGroup?: string
@@ -35,6 +36,7 @@ const props = defineProps<{
   submitButtonLabel: string
   webformConfirmation: string
   turnstileToken: string
+  submissionError?: string
   editLink?: string
   parentUuid?: string
 }>()
@@ -161,6 +163,14 @@ const submitButtonProps = computed(() => ({
         v-bind="submitButtonProps"
       />
     </WrapDiv>
+    <!-- With toasts on, the toast reports a refusal instead. -->
+    <p
+      v-if="submissionError && themeWebform.showToasts === false"
+      class="text-sm text-error"
+      role="alert"
+    >
+      {{ submissionError }}
+    </p>
   </UForm>
 
   <div v-else :class="themeWebform.response">
