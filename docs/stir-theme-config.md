@@ -1078,6 +1078,7 @@ webform: {
 ```
 
 - `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
+- `showToasts: false` drops the success and error toasts. A refused submission is then shown under the Submit button instead (`role="alert"`), so the visitor still learns why. Forms that override `WebformContent` receive it as the `submissionError` prop.
 - `submitComponent` optionally names a globally registered custom submit action component. When empty or unresolved, the default `UButton` submit action is used.
 - Most projects do not need a `webform` override. Override only values that genuinely differ from these defaults.
 - `spacing` controls the root form rhythm, while `fieldGroup` controls fields inside each Drupal group and the space after that group. There is no separate `spacingLarge` setting.

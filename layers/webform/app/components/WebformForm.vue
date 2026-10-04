@@ -72,6 +72,8 @@ const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
+// The last refusal, for forms that show it inline instead of as a toast.
+const submissionError = ref('')
 const schema = shallowRef<WebformValidationSchema>()
 const isSchemaReady = ref(false)
 let buildSchema: BuildValidationSchema | undefined
@@ -246,6 +248,7 @@ const handleResetSubmission = async () => {
 async function onSubmit(_event: { data: Record<string, unknown> }) {
   isLoading.value = true
   errors.value = {}
+  submissionError.value = ''
 
   try {
     const hiddenDefaults = getHiddenDefaults(fields)
@@ -309,10 +312,12 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       errorData?.message ||
       'Form submission failed. Please try again.'
 
+    submissionError.value = `Error submitting form: ${errorMessage}`
+
     if (shouldShowToasts.value) {
       toast.add({
         title: 'Error',
-        description: `Error submitting form: ${errorMessage}`,
+        description: submissionError.value,
         color: 'error',
       })
     }
@@ -341,6 +346,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       :should-render-group-container="shouldRenderGroupContainer"
       :should-render-individual-field="shouldRenderIndividualField"
       :state="state"
+      :submission-error="submissionError"
       :submit-button-label="submitButtonLabel"
       :theme-webform="themeWebform"
       :webform-confirmation="webformConfirmation"

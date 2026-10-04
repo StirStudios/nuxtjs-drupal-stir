@@ -180,6 +180,39 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.findComponent(WebformContent).vm.$.uid).toBe(content.vm.$.uid)
     expect(wrapper.findComponent(WebformContent).props('state').name).toBe('Ada')
     expect(wrapper.findComponent(WebformContent).props('turnstileToken')).toBe('')
+    expect(wrapper.findComponent(WebformContent).props('submissionError'))
+      .toBe('Error submitting form: CAPTCHA validation failed')
+  })
+
+  it('shows a refusal inline only when toasts are off', async () => {
+    const props = {
+      fields: {},
+      state: {},
+      isFormSubmitted: false,
+      isLoading: false,
+      isSchemaReady: true,
+      orderedFieldNames: [],
+      groupedFields: {},
+      shouldRenderGroupContainer: () => false,
+      shouldRenderIndividualField: () => false,
+      getGroupFields: () => [],
+      isContainerVisible: () => true,
+      submitButtonLabel: 'Submit',
+      webformConfirmation: '',
+      turnstileToken: 'token',
+      submissionError: 'Error submitting form: CAPTCHA validation failed',
+    }
+    const silent = await mountSuspended(WebformContent, {
+      props: { ...props, themeWebform: { showToasts: false } },
+    })
+    const toasting = await mountSuspended(WebformContent, {
+      props: { ...props, themeWebform: {} },
+    })
+
+    await flushPromises()
+
+    expect(silent.get('[role="alert"]').text()).toBe('Error submitting form: CAPTCHA validation failed')
+    expect(toasting.find('[role="alert"]').exists()).toBe(false)
   })
 
   it('does not submit display-only markup as an empty field', async () => {
