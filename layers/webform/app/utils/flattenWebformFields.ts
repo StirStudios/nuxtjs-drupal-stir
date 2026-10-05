@@ -19,12 +19,14 @@ export function flattenWebformFields(
     if (!field || typeof field !== 'object') continue
 
     const type = field['#type']
+    // Drupal puts the fields of any container under `children` with their
+    // `#name`, so a container type this list does not know still groups.
     const isGroup = [
       'section',
       'fieldset',
       'details',
       'webform_section',
-    ].includes(type)
+    ].includes(type) || 'children' in field
 
     const hasChildren =
       'children' in field ||
