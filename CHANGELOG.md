@@ -44,8 +44,8 @@ The `nuxt` range stays `^4.5.2`, so a site is not forced to upgrade.
 - **Changed:** route hero class keys (`stirTheme.routeHero.*` other than
   `image`, and each variant's keys) accept a list of classes as well as a
   string. `routeHero.variants` accepts a site's own variant names alongside
-  `cover`, `simple` and `overlap`. The runtime already did both; the types now
-  match.
+  `cover`, `simple` and `overlap`. `stirTheme.carousel.root` also accepts a
+  list. The runtime already did all three; the types now match.
 - Upgrading a site to Nuxt 4.6 needs Node.js `^22.22.3 || ^24.15.0 || >=26`
   on every build and deploy host. Nuxt 4.6 also auto-imports types from
   `app/types`, so `nuxt prepare` warns that `ExposedFilter` and `ExposedSort`

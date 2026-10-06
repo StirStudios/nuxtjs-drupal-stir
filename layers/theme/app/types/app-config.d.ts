@@ -7,7 +7,7 @@ export type { UiFieldVariantName } from '../../../foundation/app/types/ui'
 // project-specific keys without augmenting every branch up front.
 type LooseRecord = Record<string, unknown>
 type ClassValue = string
-// Values bound straight to Vue's `:class`, which also accepts a list.
+// Values bound straight to Vue's `:class` or a Nuxt UI `ui` slot, which also accept a list.
 type ClassListValue = ClassValue | ClassValue[]
 type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
@@ -344,7 +344,7 @@ type StirThemeMediaConfig = {
 type StirThemeCarouselConfig = {
   marqueeRepeat?: Partial<Record<'horizontal' | 'vertical', number>>
   padding?: ClassValue
-  root?: ClassValue
+  root?: ClassListValue
   arrows?: {
     prev?: StirThemeButtonLikeConfig
     next?: StirThemeButtonLikeConfig
