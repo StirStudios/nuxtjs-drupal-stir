@@ -133,7 +133,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     const wrapper = await mountSuspended(defineComponent({
       setup: () => () => h(UApp, {}, { default: () => h(MediaImage, {
         src: '/image.webp', alt: 'Project', link: 'https://example.com/project',
-        editActions: [{ key: 'full', tooltip: 'Edit', ariaLabel: 'Edit image', icon: 'i-lucide-pencil', variant: 'soft', buttonClass: '', to: '/edit' }],
+        editActions: [{ key: 'full', tooltip: 'Edit', ariaLabel: 'Edit image', icon: 'i-lucide-square-pen', variant: 'soft', buttonClass: '', to: '/edit' }],
       }) }),
     }))
 
