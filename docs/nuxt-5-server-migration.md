@@ -41,8 +41,8 @@ Nitro plugins (`private-cache-control`, `robots-client-rendered-meta`) have no
 | `useRuntimeConfig(event)` | `useRuntimeConfig()` only, no per-request form |
 | `getHeader` | `getRequestHeader` |
 
-Audit every `useRuntimeConfig(event)` call: a per-request override must find
-another route before that call moves.
+The layer's server code makes no `useRuntimeConfig(event)` calls today, so
+the loss of the per-request form does not block it. Keep it that way.
 
 ## Order
 
