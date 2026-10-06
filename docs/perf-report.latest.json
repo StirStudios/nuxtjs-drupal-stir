@@ -282,13 +282,20 @@
       }
     ]
   },
-  "generatedAt": "2026-10-06T21:44:21.352Z",
+  "generatedAt": "2026-10-06T21:52:29.840Z",
   "environment": {
     "node": "v26.8.2",
     "platform": "darwin",
-    "arch": "arm64"
+    "arch": "arm64",
+    "nuxt": "4.6.0",
+    "nitro": "2.13.4",
+    "vite": "8.3.3",
+    "vue": "3.5.43"
   },
-  "buildTimings": {},
+  "buildTimings": {
+    "clientMs": 21354,
+    "serverMs": 27726
+  },
   "initialClient": {
     "sizeKb": 801.45,
     "gzipKb": 231.65,
@@ -804,5 +811,8 @@
       "gzipKb": 11.203
     }
   ],
-  "totalOutputSize": null
+  "totalOutputSize": {
+    "total": "32.3 MB",
+    "gzip": "11.7 MB gzip"
+  }
 }
