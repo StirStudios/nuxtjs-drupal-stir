@@ -132,6 +132,9 @@ export default defineNuxtConfig({
   experimental: {
     appManifest: false,
     entryImportMap: false,
+    // Render error.vue inside the failed request, keeping its headers and
+    // cookies, instead of re-entering Nitro via /__nuxt_error (Nuxt 4.6).
+    inlineErrorRendering: true,
     payloadExtraction: true,
   },
 

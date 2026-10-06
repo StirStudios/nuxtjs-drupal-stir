@@ -59,6 +59,17 @@ untouched do not need one.
 
 ### Nuxt 4.6
 
+- **Changed: error pages render inside the failed request**
+  (`experimental.inlineErrorRendering`). Nuxt no longer re-enters the server
+  through `/__nuxt_error`, so an error page keeps the headers and cookies the
+  failed render had set. Middleware and route rules do not run a second time,
+  and `render:html` sees the original request: a 404 page now carries the
+  robots meta tag, as well as the `X-Robots-Tag` header it already had.
+  Status codes and the maintenance page's `Retry-After` are unchanged. Nitro's
+  error handler, which inline rendering bypasses, set `Cache-Control: no-cache`.
+  The layer now sets it on any HTML error response that has no cache
+  directive, and leaves a private page's `private, no-store` alone. A site
+  that sets `experimental.inlineErrorRendering: false` keeps the old path.
 - **Breaking: the layer now requires Nuxt 4.6 and Node.js
   `^22.22.3 || ^24.15.0 || >=26`.** `nuxt`, `@nuxt/kit` and `@nuxt/schema`
   move to `^4.6.0`, so the layer can adopt 4.6-only APIs such as
