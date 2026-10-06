@@ -98,9 +98,10 @@ one zone answers both `/_ipx/**` and original files. A zone whose origin is the
 Drupal host cannot serve `/_ipx` and answers 404.
 
 Only the zone caches originals. The route sends
-`Cloudflare-CDN-Cache-Control: no-store`, and the shared Nuxt vhost
-(`nuxt.tpl` in `stir-server-config`) sends `/sites/default/files/` straight to
-the app, past Varnish, which would otherwise keep a file for 30 days. A
+`Cloudflare-CDN-Cache-Control: no-store`, and the shared Nuxt nginx include
+(`defaults-varnish-nuxt.conf` in `stir-server-config`) sends
+`/sites/default/files/` straight to the app, past Varnish, which would
+otherwise keep a file for 30 days. A
 replaced file then needs one purge, which `stir_cdn` sends to the zone. `pnpm audit:seo` fails when an image or icon handed to search engines is
 blocked by its host's `robots.txt`.
 
