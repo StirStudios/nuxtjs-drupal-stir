@@ -41,8 +41,6 @@ import { resolveDrupalViewQueryNamespace, resolveLegacyDrupalViewQueryNamespace 
 
 import { drupalViewQueryIdentityKey } from '#stir/utils/drupalViewContext'
 
-export type { ExposedFilter, ExposedSort } from '#stir/types/View'
-
 interface UseDrupalViewControlsProps {
   randomOrder?: unknown
 

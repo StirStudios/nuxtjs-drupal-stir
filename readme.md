@@ -52,7 +52,7 @@ Without the private backend, you can inspect the code and run the self-contained
 
 ### Try without a private backend
 
-Clone this repository and use Node `^22.13.0`, `^24.11.0` or `>=26.0.0`, with `pnpm@10.33.1` as declared in `package.json`.
+Clone this repository and use Node `^22.22.3`, `^24.15.0` or `>=26.0.0`, with `pnpm@10.33.1` as declared in `package.json`.
 
 ```bash
 git clone https://github.com/StirStudios/nuxtjs-drupal-stir.git
@@ -80,7 +80,7 @@ GitHub source in `nuxt.config.ts`.
 {
   "dependencies": {
     "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#4.5.1",
-    "nuxt": "^4.5.2"
+    "nuxt": "^4.6.0"
   }
 }
 ```
@@ -149,7 +149,7 @@ parameters so campaign attribution and query-driven state are not lost.
 
 <!-- tech-stack:start -->
 
-- **[Nuxt 4](https://nuxt.com/)**: `^4.5.2`
+- **[Nuxt 4](https://nuxt.com/)**: `^4.6.0`
 - **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.11.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.3`
 - **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.9.0`
