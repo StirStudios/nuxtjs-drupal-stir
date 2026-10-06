@@ -13,6 +13,30 @@ untouched do not need one.
 
 ## Unreleased
 
+### Dependency security
+
+- **Refresh sharp to 0.35.5 in each site's lockfile.** sharp ships in the
+  production server through `@nuxt/image`'s IPX provider, and 0.35.4 bundles a
+  vulnerable librsvg (GHSA-wq5f-xc86-pv6w). The layer's lockfile now resolves
+  0.35.5, but a site resolves its own: run
+  `pnpm update sharp shell-quote @modelcontextprotocol/client`, which stays
+  inside the existing ranges and also clears GHSA-pqg4-j6r4-53mv and
+  GHSA-6qxp-vccf-f47h (dev-only).
+- **pnpm overrides in the layer do not reach sites.** To clear the dev-only
+  simple-git and undici alerts, add these to the site's `pnpm-workspace.yaml`:
+
+  ```yaml
+  overrides:
+    simple-git@3>@simple-git/argv-parser: 2.0.1
+    release-it>undici: ^7.29.1 # only if the site uses release-it
+  ```
+
+  Do not override `simple-git` itself to v4: `@nuxt/devtools` 3.4 default-imports
+  it, and v4 removed that export. The argv-parser override fixes
+  GHSA-v5rq-49vh-5v5c; the remaining simple-git 3 advisories need a devtools
+  release on simple-git 4. `braces` 3.0.3 and `node-forge` 1.4.0 have no patched
+  release yet; both are build and dev-server only and absent from `.output`.
+
 ### Rich text
 
 - **Document links embedded in rich text sit on their own line and follow the
