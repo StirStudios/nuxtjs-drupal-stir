@@ -13,6 +13,53 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+Requires nothing new from Drupal; with Stir Tools contract 1.32 (which sends
+`#conditions`, every composite's parts, resolved option sets and likert keys),
+every element family renders and submits correctly. Older payloads are adapted
+at the boundary.
+
+- **Fixed: conditions never matched snake_case fields.** Custom Elements sends
+  `#states` selectors camel-cased (`eventType`), which named no field, so a
+  field shown or required by another field's value never appeared. Conditions
+  are now read from `#conditions` (or rebuilt from `#states` against the form's
+  names) and evaluated as Webform evaluates them: all states (`invisible`,
+  `required`, `optional`, `enabled`…) and all triggers (`checked`, `filled`,
+  `!value`, `pattern`, `between`…), with `and`/`or`/`xor`. A conditionally
+  required field is now required in the browser too.
+- **Fixed: element types without a component rendered an empty label and
+  blocked the form when required.** Aliases now resolve to their family
+  (`webform_checkboxes_other`, `webform_toggles`, `webform_buttons`,
+  `webform_rating`, `webform_scale`, `webform_terms_of_service`,
+  `webform_email_confirm`, `webform_time`, `url`…); anything else is reported
+  with `console.error` and left to Drupal.
+- **Added:** every composite (name, contact, link, telephone, custom) renders
+  its parts through `FieldComposite`; likert (`FieldLikert`); several values
+  for a `#multiple` text input (`FieldMultiple`), up to its cardinality; a
+  multiple select; searchable selects for long lists.
+- **Fixed: composite and multiple values had the wrong shape.** A composite
+  that takes several values is submitted as a list of rows, and a multiple
+  text field as a list.
+- **Fixed: a required composite required every part.** Webform enforces only
+  each part's `#required`; the composite's own is display only.
+- **Fixed: upload limits were never applied in the browser.** `#fileExtensions`
+  and `#maxFilesize` arrive camel-cased; a bare `#maxFilesize` is megabytes,
+  as in Webform.
+- **Fixed:** a required select now announces `aria-required`.
+- **Changed: numbers are bounded only by Drupal's `#min` and `#max`.** The
+  browser no longer refuses values below 1 when the element sets no `#min`.
+  **Action (Piper):** `demo2`, `demo3` and `wotw` set `'#min': 1` on
+  `venue_guest_count` in Piper `dev` (3853044); deploy that, and set the same
+  minimum on production for `villa_vine` and `28vic`, which are in
+  `config_ignore`, before taking this release.
+- **Removed:** `useEvaluateState`, `evaluateCondition`, `getNestedStateValue`
+  and `matchesCondition`. Use `resolveWebformFieldStates` from
+  `#stir-webform/utils/webformConditions`. No site used them.
+- **Added:** `createWebformState` (`#stir-webform/utils/webformState`) builds
+  the form's values in Webform's stored shapes; `FieldRenderer` takes an
+  optional `formName` (validation path) for nested fields.
+
 ### Security
 
 - **Protected-page content is now refused without access at the server.**

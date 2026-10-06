@@ -1,0 +1,666 @@
+{
+    "schemaVersion": 1,
+    "webformId": "stir_contract_kitchen_sink",
+    "webformTitle": "Kitchen sink",
+    "fields": {
+        "intro": {
+            "#type": "processed_text",
+            "#text": "<p>&lt;p&gt;Tell us about your event.&lt;/p&gt;</p>",
+            "#format": "plain_text",
+            "#name": "intro",
+            "#conditions": [],
+            "#states": []
+        },
+        "contactDetails": {
+            "#type": "fieldset",
+            "#title": "Contact details",
+            "#name": "contact_details",
+            "#conditions": [],
+            "#states": [],
+            "children": {
+                "fullName": {
+                    "#type": "textfield",
+                    "#title": "Full name",
+                    "#required": true,
+                    "#name": "full_name",
+                    "#conditions": [],
+                    "#states": []
+                },
+                "emailAddress": {
+                    "#type": "email",
+                    "#title": "Email",
+                    "#required": true,
+                    "#name": "email_address",
+                    "#conditions": [],
+                    "#states": []
+                },
+                "phoneNumber": {
+                    "#type": "tel",
+                    "#title": "Phone",
+                    "#name": "phone_number",
+                    "#conditions": [],
+                    "#states": []
+                },
+                "websiteUrl": {
+                    "#type": "url",
+                    "#title": "Website",
+                    "#name": "website_url",
+                    "#conditions": [],
+                    "#states": []
+                },
+                "referrer": {
+                    "#type": "textfield",
+                    "#title": "Referrer",
+                    "#name": "referrer",
+                    "#conditions": [],
+                    "#states": [],
+                    "#defaultValue": "Stir"
+                }
+            }
+        },
+        "eventType": {
+            "#type": "radio",
+            "#title": "Event type",
+            "#options": {
+                "paidShow": "Paid show",
+                "freeEvent": "Free event"
+            },
+            "#required": true,
+            "#name": "event_type",
+            "#conditions": [],
+            "#states": [],
+            "#optionKeys": [
+                "paid_show",
+                "free_event"
+            ]
+        },
+        "ticketFee": {
+            "#type": "number",
+            "#title": "Ticket fee",
+            "#states": {
+                "visible": {
+                    ":input[name=\"eventType\"]": {
+                        "value": "paid_show"
+                    }
+                },
+                "required": {
+                    ":input[name=\"eventType\"]": {
+                        "value": "paid_show"
+                    }
+                }
+            },
+            "#name": "ticket_fee",
+            "#conditions": [
+                {
+                    "state": "visible",
+                    "logic": "and",
+                    "rules": [
+                        {
+                            "name": "event_type",
+                            "selector": ":input[name=\"event_type\"]",
+                            "triggers": [
+                                {
+                                    "trigger": "value",
+                                    "value": "paid_show"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "state": "required",
+                    "logic": "and",
+                    "rules": [
+                        {
+                            "name": "event_type",
+                            "selector": ":input[name=\"event_type\"]",
+                            "triggers": [
+                                {
+                                    "trigger": "value",
+                                    "value": "paid_show"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "needsAccess": {
+            "#type": "select",
+            "#title": "Access needs?",
+            "#options": {
+                "Yes": "Yes",
+                "No": "No"
+            },
+            "#name": "needs_access",
+            "#conditions": [],
+            "#states": [],
+            "#optionKeys": [
+                "Yes",
+                "No"
+            ]
+        },
+        "extras": {
+            "#type": "checkboxes",
+            "#title": "Extras",
+            "#options": {
+                "earlyBird": "Early bird",
+                "lateEntry": "Late entry"
+            },
+            "#name": "extras",
+            "#conditions": [],
+            "#states": [],
+            "#optionKeys": [
+                "early_bird",
+                "late-entry"
+            ],
+            "#multiple": true,
+            "#cardinality": 1
+        },
+        "extrasNote": {
+            "#type": "textfield",
+            "#title": "Early bird note",
+            "#states": {
+                "visible": {
+                    ":input[name=\"extras[earlyBird]\"]": {
+                        "checked": true
+                    }
+                }
+            },
+            "#name": "extras_note",
+            "#conditions": [
+                {
+                    "state": "visible",
+                    "logic": "and",
+                    "rules": [
+                        {
+                            "name": "extras.early_bird",
+                            "selector": ":input[name=\"extras[early_bird]\"]",
+                            "triggers": [
+                                {
+                                    "trigger": "checked",
+                                    "value": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "moreDetails": {
+            "#type": "details",
+            "#title": "More details",
+            "#name": "more_details",
+            "#conditions": [],
+            "#states": [],
+            "children": {
+                "startsOn": {
+                    "#type": "date",
+                    "#title": "Starts on",
+                    "#name": "starts_on",
+                    "#conditions": [],
+                    "#states": [],
+                    "#timezone": "Australia/Sydney"
+                },
+                "startTime": {
+                    "#type": "webform_time",
+                    "#title": "Start time",
+                    "#name": "start_time",
+                    "#conditions": [],
+                    "#states": []
+                },
+                "attendeeNames": {
+                    "#type": "textfield",
+                    "#title": "Attendees",
+                    "#multiple": 3,
+                    "#name": "attendee_names",
+                    "#conditions": [],
+                    "#states": [],
+                    "#cardinality": 3
+                },
+                "interests": {
+                    "#type": "webform_checkboxes_other",
+                    "#title": "Interests",
+                    "#options": {
+                        "danceClasses": "Dance classes",
+                        "masterClasses": "Master classes"
+                    },
+                    "#name": "interests",
+                    "#conditions": [],
+                    "#states": [],
+                    "#optionKeys": [
+                        "dance_classes",
+                        "master_classes"
+                    ],
+                    "#multiple": true,
+                    "#cardinality": 1
+                }
+            }
+        },
+        "venueAddress": {
+            "#type": "address",
+            "#title": "Venue",
+            "#name": "venue_address",
+            "#conditions": [],
+            "#states": [],
+            "#composite": {
+                "address": {
+                    "#type": "textfield",
+                    "#title": "Address",
+                    "#adminTitle": "Address",
+                    "#name": "address",
+                    "#required": false,
+                    "label": "Address",
+                    "value": ""
+                },
+                "city": {
+                    "#type": "textfield",
+                    "#title": "City/Town",
+                    "#required": true,
+                    "#adminTitle": "City/Town",
+                    "#name": "city",
+                    "label": "City/Town",
+                    "value": ""
+                },
+                "stateProvince": {
+                    "#type": "select",
+                    "#title": "State/Province",
+                    "#options": {
+                        "Alabama": "Alabama",
+                        "Alaska": "Alaska",
+                        "American Samoa": "American Samoa",
+                        "Arizona": "Arizona",
+                        "Arkansas": "Arkansas",
+                        "Armed Forces (Canada, Europe, Africa, or Middle East)": "Armed Forces (Canada, Europe, Africa, or Middle East)",
+                        "Armed Forces Americas": "Armed Forces Americas",
+                        "Armed Forces Pacific": "Armed Forces Pacific",
+                        "California": "California",
+                        "Colorado": "Colorado",
+                        "Connecticut": "Connecticut",
+                        "Delaware": "Delaware",
+                        "District of Columbia": "District of Columbia",
+                        "Federated States of Micronesia": "Federated States of Micronesia",
+                        "Florida": "Florida",
+                        "Georgia": "Georgia",
+                        "Guam": "Guam",
+                        "Hawaii": "Hawaii",
+                        "Idaho": "Idaho",
+                        "Illinois": "Illinois",
+                        "Indiana": "Indiana",
+                        "Iowa": "Iowa",
+                        "Kansas": "Kansas",
+                        "Kentucky": "Kentucky",
+                        "Louisiana": "Louisiana",
+                        "Maine": "Maine",
+                        "Marshall Islands": "Marshall Islands",
+                        "Maryland": "Maryland",
+                        "Massachusetts": "Massachusetts",
+                        "Michigan": "Michigan",
+                        "Minnesota": "Minnesota",
+                        "Mississippi": "Mississippi",
+                        "Missouri": "Missouri",
+                        "Montana": "Montana",
+                        "Nebraska": "Nebraska",
+                        "Nevada": "Nevada",
+                        "New Hampshire": "New Hampshire",
+                        "New Jersey": "New Jersey",
+                        "New Mexico": "New Mexico",
+                        "New York": "New York",
+                        "North Carolina": "North Carolina",
+                        "North Dakota": "North Dakota",
+                        "Northern Mariana Islands": "Northern Mariana Islands",
+                        "Ohio": "Ohio",
+                        "Oklahoma": "Oklahoma",
+                        "Oregon": "Oregon",
+                        "Palau": "Palau",
+                        "Pennsylvania": "Pennsylvania",
+                        "Puerto Rico": "Puerto Rico",
+                        "Rhode Island": "Rhode Island",
+                        "South Carolina": "South Carolina",
+                        "South Dakota": "South Dakota",
+                        "Tennessee": "Tennessee",
+                        "Texas": "Texas",
+                        "Utah": "Utah",
+                        "Vermont": "Vermont",
+                        "Virgin Islands": "Virgin Islands",
+                        "Virginia": "Virginia",
+                        "Washington": "Washington",
+                        "West Virginia": "West Virginia",
+                        "Wisconsin": "Wisconsin",
+                        "Wyoming": "Wyoming",
+                        "Alberta": "Alberta",
+                        "British Columbia": "British Columbia",
+                        "Manitoba": "Manitoba",
+                        "New Brunswick": "New Brunswick",
+                        "Newfoundland and Labrador": "Newfoundland and Labrador",
+                        "Nova Scotia": "Nova Scotia",
+                        "Northwest Territories": "Northwest Territories",
+                        "Nunavut": "Nunavut",
+                        "Ontario": "Ontario",
+                        "Prince Edward Island": "Prince Edward Island",
+                        "Quebec": "Quebec",
+                        "Saskatchewan": "Saskatchewan",
+                        "Yukon": "Yukon"
+                    },
+                    "#adminTitle": "State/Province",
+                    "#name": "state_province",
+                    "#required": false,
+                    "#optionKeys": [
+                        "Alabama",
+                        "Alaska",
+                        "American Samoa",
+                        "Arizona",
+                        "Arkansas",
+                        "Armed Forces (Canada, Europe, Africa, or Middle East)",
+                        "Armed Forces Americas",
+                        "Armed Forces Pacific",
+                        "California",
+                        "Colorado",
+                        "Connecticut",
+                        "Delaware",
+                        "District of Columbia",
+                        "Federated States of Micronesia",
+                        "Florida",
+                        "Georgia",
+                        "Guam",
+                        "Hawaii",
+                        "Idaho",
+                        "Illinois",
+                        "Indiana",
+                        "Iowa",
+                        "Kansas",
+                        "Kentucky",
+                        "Louisiana",
+                        "Maine",
+                        "Marshall Islands",
+                        "Maryland",
+                        "Massachusetts",
+                        "Michigan",
+                        "Minnesota",
+                        "Mississippi",
+                        "Missouri",
+                        "Montana",
+                        "Nebraska",
+                        "Nevada",
+                        "New Hampshire",
+                        "New Jersey",
+                        "New Mexico",
+                        "New York",
+                        "North Carolina",
+                        "North Dakota",
+                        "Northern Mariana Islands",
+                        "Ohio",
+                        "Oklahoma",
+                        "Oregon",
+                        "Palau",
+                        "Pennsylvania",
+                        "Puerto Rico",
+                        "Rhode Island",
+                        "South Carolina",
+                        "South Dakota",
+                        "Tennessee",
+                        "Texas",
+                        "Utah",
+                        "Vermont",
+                        "Virgin Islands",
+                        "Virginia",
+                        "Washington",
+                        "West Virginia",
+                        "Wisconsin",
+                        "Wyoming",
+                        "Alberta",
+                        "British Columbia",
+                        "Manitoba",
+                        "New Brunswick",
+                        "Newfoundland and Labrador",
+                        "Nova Scotia",
+                        "Northwest Territories",
+                        "Nunavut",
+                        "Ontario",
+                        "Prince Edward Island",
+                        "Quebec",
+                        "Saskatchewan",
+                        "Yukon"
+                    ],
+                    "label": "State/Province",
+                    "value": ""
+                },
+                "postalCode": {
+                    "#type": "textfield",
+                    "#title": "ZIP/Postal Code",
+                    "#adminTitle": "ZIP/Postal Code",
+                    "#name": "postal_code",
+                    "#required": false,
+                    "label": "ZIP/Postal Code",
+                    "value": ""
+                },
+                "country": {
+                    "#type": "select",
+                    "#title": "Country",
+                    "#options": {
+                        "United States": "United States",
+                        "Canada": "Canada"
+                    },
+                    "#adminTitle": "Country",
+                    "#name": "country",
+                    "#required": false,
+                    "#optionKeys": [
+                        "United States",
+                        "Canada"
+                    ],
+                    "label": "Country",
+                    "value": ""
+                }
+            }
+        },
+        "organizerName": {
+            "#type": "webform_name",
+            "#title": "Organizer",
+            "#required": true,
+            "#name": "organizer_name",
+            "#conditions": [],
+            "#states": [],
+            "#composite": {
+                "title": {
+                    "#type": "select",
+                    "#title": "Title",
+                    "#options": {
+                        "Miss": "Miss",
+                        "Ms": "Ms",
+                        "Mr": "Mr",
+                        "Mrs": "Mrs",
+                        "Dr": "Dr"
+                    },
+                    "#adminTitle": "Title",
+                    "#name": "title",
+                    "#required": false,
+                    "#optionKeys": [
+                        "Miss",
+                        "Ms",
+                        "Mr",
+                        "Mrs",
+                        "Dr"
+                    ],
+                    "label": "Title",
+                    "value": ""
+                },
+                "first": {
+                    "#type": "textfield",
+                    "#title": "First",
+                    "#adminTitle": "First",
+                    "#name": "first",
+                    "#required": false,
+                    "label": "First",
+                    "value": ""
+                },
+                "middle": {
+                    "#type": "textfield",
+                    "#title": "Middle",
+                    "#adminTitle": "Middle",
+                    "#name": "middle",
+                    "#required": false,
+                    "label": "Middle",
+                    "value": ""
+                },
+                "last": {
+                    "#type": "textfield",
+                    "#title": "Last",
+                    "#adminTitle": "Last",
+                    "#name": "last",
+                    "#required": false,
+                    "label": "Last",
+                    "value": ""
+                },
+                "suffix": {
+                    "#type": "textfield",
+                    "#title": "Suffix",
+                    "#adminTitle": "Suffix",
+                    "#name": "suffix",
+                    "#required": false,
+                    "label": "Suffix",
+                    "value": ""
+                },
+                "degree": {
+                    "#type": "textfield",
+                    "#title": "Degree",
+                    "#adminTitle": "Degree",
+                    "#name": "degree",
+                    "#required": false,
+                    "label": "Degree",
+                    "value": ""
+                }
+            }
+        },
+        "eventLink": {
+            "#type": "webform_link",
+            "#title": "Event link",
+            "#name": "event_link",
+            "#conditions": [],
+            "#states": [],
+            "#composite": {
+                "title": {
+                    "#type": "textfield",
+                    "#title": "Link Title",
+                    "#maxlength": 255,
+                    "#adminTitle": "Link Title",
+                    "#name": "title",
+                    "#required": false,
+                    "label": "Link Title",
+                    "value": ""
+                },
+                "url": {
+                    "#type": "url",
+                    "#title": "Link URL",
+                    "#adminTitle": "Link URL",
+                    "#name": "url",
+                    "#required": false,
+                    "label": "Link URL",
+                    "value": ""
+                }
+            }
+        },
+        "lineup": {
+            "#type": "webform_custom_composite",
+            "#title": "Lineup",
+            "#name": "lineup",
+            "#conditions": [],
+            "#states": [],
+            "#multiple": true,
+            "#cardinality": 1,
+            "#composite": {
+                "performerName": {
+                    "#type": "textfield",
+                    "#title": "Performer",
+                    "#adminTitle": "Performer",
+                    "#name": "performer_name",
+                    "#required": false,
+                    "label": "Performer",
+                    "value": ""
+                },
+                "setLength": {
+                    "#type": "number",
+                    "#title": "Set length",
+                    "#adminTitle": "Set length",
+                    "#name": "set_length",
+                    "#required": false,
+                    "label": "Set length",
+                    "value": ""
+                }
+            }
+        },
+        "feedback": {
+            "#type": "section",
+            "#title": "Feedback",
+            "#name": "feedback",
+            "#conditions": [],
+            "#states": [],
+            "children": {
+                "satisfaction": {
+                    "#type": "webform_likert",
+                    "#title": "Satisfaction",
+                    "#questions": {
+                        "customerService": "Customer service",
+                        "valueForMoney": "Value for money"
+                    },
+                    "#answers": {
+                        "1": "Strongly Disagree",
+                        "2": "Disagree",
+                        "3": "Neutral",
+                        "4": "Agree",
+                        "5": "Strongly Agree"
+                    },
+                    "#name": "satisfaction",
+                    "#conditions": [],
+                    "#states": [],
+                    "#questionKeys": [
+                        "customer_service",
+                        "value-for-money"
+                    ],
+                    "#answerKeys": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ]
+                }
+            }
+        },
+        "posterImage": {
+            "#type": "webform_image_file",
+            "#title": "Poster",
+            "#uriScheme": "public",
+            "#fileExtensions": "png",
+            "#maxFilesize": 2,
+            "#name": "poster_image",
+            "#conditions": [],
+            "#states": []
+        },
+        "internalNote": {
+            "#type": "hidden",
+            "#name": "internal_note",
+            "#conditions": [],
+            "#states": [],
+            "#defaultValue": "from-form"
+        },
+        "agreeTerms": {
+            "#type": "checkbox",
+            "#title": "I agree",
+            "#required": true,
+            "#name": "agree_terms",
+            "#conditions": [],
+            "#states": [],
+            "#defaultValue": false
+        }
+    },
+    "actions": [
+        {
+            "#type": "webform_actions",
+            "#submitLabel": "Send"
+        }
+    ],
+    "webformConfirmation": "",
+    "webformConfirmationType": "page",
+    "webformRedirect": null,
+    "webformSubmissions": null
+}

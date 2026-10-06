@@ -271,6 +271,7 @@
       "layers/webform/app/components/Field/Address.vue",
       "layers/webform/app/components/Field/Checkbox.vue",
       "layers/webform/app/components/Field/Checkboxes.vue",
+      "layers/webform/app/components/Field/Composite.vue",
       "layers/webform/app/components/Field/Date.vue",
       "layers/webform/app/components/Field/DateTime/Calendar.vue",
       "layers/webform/app/components/Field/DateTime/Select.vue",
@@ -279,6 +280,8 @@
       "layers/webform/app/components/Field/Input/Number.vue",
       "layers/webform/app/components/Field/Input/Slider.vue",
       "layers/webform/app/components/Field/Input.vue",
+      "layers/webform/app/components/Field/Likert.vue",
+      "layers/webform/app/components/Field/Multiple.vue",
       "layers/webform/app/components/Field/ProcessedText.vue",
       "layers/webform/app/components/Field/Radio.vue",
       "layers/webform/app/components/Field/Relocated.vue",
@@ -360,7 +363,6 @@
       "layers/theme/app/composables/useThirdPartyScript.ts",
       "layers/theme/app/composables/useVideoPlayers.ts",
       "layers/webform/app/composables/useContainerVisibility.ts",
-      "layers/webform/app/composables/useEvaluateState.ts",
       "layers/webform/app/composables/useStirWebformTheme.ts"
     ],
     "utils": [
@@ -428,17 +430,18 @@
       "layers/theme/app/utils/trustedDrupalHtml.ts",
       "layers/theme/app/utils/uiVariants.ts",
       "layers/webform/app/utils/buildValidationSchema.ts",
-      "layers/webform/app/utils/evaluateUtils.ts",
       "layers/webform/app/utils/flattenWebformFields.ts",
       "layers/webform/app/utils/selectionUtils.ts",
-      "layers/webform/app/utils/stateUtils.ts",
       "layers/webform/app/utils/transformUtils.ts",
       "layers/webform/app/utils/visibilityUtils.ts",
+      "layers/webform/app/utils/webformConditions.ts",
       "layers/webform/app/utils/webformDisplayUtils.ts",
+      "layers/webform/app/utils/webformFieldTypes.ts",
       "layers/webform/app/utils/webformFieldUtils.ts",
       "layers/webform/app/utils/webformFileUtils.ts",
       "layers/webform/app/utils/webformRedirect.ts",
-      "layers/webform/app/utils/webformScrollToTop.ts"
+      "layers/webform/app/utils/webformScrollToTop.ts",
+      "layers/webform/app/utils/webformState.ts"
     ],
     "plugins": [
       "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
@@ -646,6 +649,7 @@
         "layers/webform/app/components/Field/Address.vue",
         "layers/webform/app/components/Field/Checkbox.vue",
         "layers/webform/app/components/Field/Checkboxes.vue",
+        "layers/webform/app/components/Field/Composite.vue",
         "layers/webform/app/components/Field/Date.vue",
         "layers/webform/app/components/Field/DateTime/Calendar.vue",
         "layers/webform/app/components/Field/DateTime/Select.vue",
@@ -654,6 +658,8 @@
         "layers/webform/app/components/Field/Input/Number.vue",
         "layers/webform/app/components/Field/Input/Slider.vue",
         "layers/webform/app/components/Field/Input.vue",
+        "layers/webform/app/components/Field/Likert.vue",
+        "layers/webform/app/components/Field/Multiple.vue",
         "layers/webform/app/components/Field/ProcessedText.vue",
         "layers/webform/app/components/Field/Radio.vue",
         "layers/webform/app/components/Field/Relocated.vue",
@@ -735,7 +741,6 @@
         "layers/theme/app/composables/useThirdPartyScript.ts",
         "layers/theme/app/composables/useVideoPlayers.ts",
         "layers/webform/app/composables/useContainerVisibility.ts",
-        "layers/webform/app/composables/useEvaluateState.ts",
         "layers/webform/app/composables/useStirWebformTheme.ts"
       ],
       "autoImportedUtils": [
@@ -803,17 +808,18 @@
         "layers/theme/app/utils/trustedDrupalHtml.ts",
         "layers/theme/app/utils/uiVariants.ts",
         "layers/webform/app/utils/buildValidationSchema.ts",
-        "layers/webform/app/utils/evaluateUtils.ts",
         "layers/webform/app/utils/flattenWebformFields.ts",
         "layers/webform/app/utils/selectionUtils.ts",
-        "layers/webform/app/utils/stateUtils.ts",
         "layers/webform/app/utils/transformUtils.ts",
         "layers/webform/app/utils/visibilityUtils.ts",
+        "layers/webform/app/utils/webformConditions.ts",
         "layers/webform/app/utils/webformDisplayUtils.ts",
+        "layers/webform/app/utils/webformFieldTypes.ts",
         "layers/webform/app/utils/webformFieldUtils.ts",
         "layers/webform/app/utils/webformFileUtils.ts",
         "layers/webform/app/utils/webformRedirect.ts",
-        "layers/webform/app/utils/webformScrollToTop.ts"
+        "layers/webform/app/utils/webformScrollToTop.ts",
+        "layers/webform/app/utils/webformState.ts"
       ]
     },
     "candidateDeprecations": [
@@ -823,23 +829,23 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 135,
-    "composables": 72,
-    "utils": 75,
+    "components": 138,
+    "composables": 71,
+    "utils": 76,
     "plugins": 10,
     "middleware": 5,
     "serverRoutes": 30,
     "productionDependencies": 35,
     "developmentDependencies": 27,
-    "tests": 223,
+    "tests": 225,
     "testsByArea": {
       "composables": 13,
-      "contracts": 1,
+      "contracts": 2,
       "nuxt": 97,
       "scripts": 5,
       "server": 31,
       "unit": 11,
-      "utils": 65
+      "utils": 66
     }
   },
   "tests": [
@@ -857,6 +863,7 @@
     "tests/composables/useTeaserPost.spec.ts",
     "tests/composables/useValidation.spec.ts",
     "tests/contracts/stirToolsContract.spec.ts",
+    "tests/contracts/webformKitchenSink.spec.ts",
     "tests/nuxt/e2e/actionSpacing.e2e.spec.ts",
     "tests/nuxt/e2e/application.e2e.spec.ts",
     "tests/nuxt/e2e/editorial.e2e.spec.ts",
@@ -1060,6 +1067,7 @@
     "tests/utils/transformUtils.spec.ts",
     "tests/utils/trustedDrupalHtml.spec.ts",
     "tests/utils/validationErrors.spec.ts",
+    "tests/utils/webformConditions.spec.ts",
     "tests/utils/webformDisplayUtils.spec.ts",
     "tests/utils/webformFieldUtils.spec.ts",
     "tests/utils/webformFileUtils.spec.ts",

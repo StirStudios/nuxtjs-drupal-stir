@@ -1,0 +1,60 @@
+{
+    "webformId": "stir_contract_kitchen_sink",
+    "data": {
+        "full_name": "Ada Lovelace",
+        "email_address": "ada@example.com",
+        "phone_number": "+1 555 0100",
+        "website_url": "https://example.com",
+        "referrer": "Stir",
+        "event_type": "paid_show",
+        "ticket_fee": "25",
+        "needs_access": "Yes",
+        "extras": [
+            "early_bird",
+            "late-entry"
+        ],
+        "extras_note": "Front row",
+        "starts_on": "2026-11-01",
+        "start_time": "19:30:00",
+        "attendee_names": [
+            "Ada",
+            "Grace"
+        ],
+        "interests": [
+            "dance_classes",
+            "Tap"
+        ],
+        "venue_address": {
+            "address": "1 Main St",
+            "city": "Springfield",
+            "state_province": "California",
+            "postal_code": "90001",
+            "country": "United States"
+        },
+        "organizer_name": {
+            "title": "Dr",
+            "first": "Ada",
+            "middle": "",
+            "last": "Lovelace",
+            "suffix": "",
+            "degree": ""
+        },
+        "event_link": {
+            "title": "Tickets",
+            "url": "https://example.com/tickets"
+        },
+        "lineup": [
+            {
+                "performer_name": "The Steps",
+                "set_length": "30"
+            }
+        ],
+        "satisfaction": {
+            "customer_service": "4",
+            "value-for-money": "5"
+        },
+        "poster_image": 1,
+        "internal_note": "from-form",
+        "agree_terms": "1"
+    }
+}

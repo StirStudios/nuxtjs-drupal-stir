@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { WebformFieldProps, WebformState } from '#stir/types'
-import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
+import {
+  applyWebformFieldStates,
+  resolveWebformFieldStates,
+} from '#stir-webform/utils/webformConditions'
 import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
+import {
+  isCompositeField,
+  isSupportedWebformField,
+  takesMultipleInputs,
+} from '#stir-webform/utils/webformFieldTypes'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 
 import {
@@ -15,6 +23,9 @@ import {
   LazyFieldDate,
   LazyFieldDateTime,
   LazyFieldAddress,
+  LazyFieldComposite,
+  LazyFieldLikert,
+  LazyFieldMultiple,
   LazyFieldProcessedText,
   LazyFieldInputNumber,
   LazyFieldInputSlider,
@@ -29,10 +40,13 @@ const props = withDefaults(
     fields?: Record<string, WebformFieldProps>
     orderedFieldNames?: string[]
     bypassRelocatedFilter?: boolean
+    /** Validation path, when it differs from fieldName (composite parts). */
+    formName?: string
   }>(),
   {
     fields: () => ({}),
     orderedFieldNames: () => [],
+    formName: undefined,
   },
 )
 
@@ -40,6 +54,8 @@ const webform = useStirWebformTheme()
 const componentMap: Record<string, Component> = {
   textfield: LazyFieldInput,
   email: LazyFieldInput,
+  url: LazyFieldInput,
+  time: LazyFieldInput,
   number: LazyFieldInputNumber,
   range: LazyFieldInputSlider,
   tel: LazyFieldInput,
@@ -51,6 +67,7 @@ const componentMap: Record<string, Component> = {
   datetime: LazyFieldDateTime,
   date: LazyFieldDate,
   address: LazyFieldAddress,
+  webform_likert: LazyFieldLikert,
   processed_text: LazyFieldProcessedText,
   webform_markup: LazyFieldProcessedText,
   file: LazyFieldFile,
@@ -66,6 +83,8 @@ const materialTextFieldTypes = new Set([
   'email',
   'number',
   'tel',
+  'url',
+  'time',
   'textarea',
 ])
 
@@ -76,6 +95,17 @@ const shouldRender = computed(() => {
   )
 })
 
+// Conditions decide visibility and whether the field is required or
+// disabled, as Drupal will when it validates the submission.
+const fieldStates = computed(() => resolveWebformFieldStates(props.field, props.state))
+const visible = computed(() => fieldStates.value.visible)
+const disabled = computed(() => fieldStates.value.disabled)
+const effectiveField = computed(() => applyWebformFieldStates(props.field, fieldStates.value))
+
+if (!isSupportedWebformField(props.field)) {
+  console.error(`[stir-webform] ${props.fieldName}: the Webform element type ${props.field['#type']} has no field component, so it is not shown and Drupal alone validates it.`)
+}
+
 const useFloatingLabels = computed(
   () =>
     props.field['#floatingLabel'] === undefined
@@ -85,9 +115,14 @@ const useFloatingLabels = computed(
 const resolvedFieldType = computed(() => props.field['#type'])
 const isDisplayElement = computed(() => isWebformDisplayElement(props.field))
 
-const resolvedComponent = computed(
-  () => componentMap[resolvedFieldType.value] || null,
-)
+const resolvedComponent = computed(() => {
+  if (isCompositeField(props.field) && resolvedFieldType.value !== 'address') {
+    return LazyFieldComposite
+  }
+
+  return componentMap[resolvedFieldType.value] || null
+})
+const isMultipleInput = computed(() => takesMultipleInputs(props.field))
 const resolvedComponentProps = computed(() =>
   resolvedFieldType.value === 'checkboxes'
     ? { fields: props.fields }
@@ -110,11 +145,6 @@ const shouldShowDescription = computed(
   () =>
     resolvedFieldType.value !== 'checkbox' &&
     resolvedFieldType.value !== 'hidden',
-)
-
-const { visible, disabled } = useEvaluateState(
-  props.field['#states'] ?? {},
-  props.state,
 )
 
 const descriptionContent = computed(() =>
@@ -167,15 +197,15 @@ const fieldUi = computed(() => {
     v-if="resolvedFieldType === 'hidden'"
     :name="fieldName"
     type="hidden"
-    :value="field['#defaultValue']"
+    :value="effectiveField['#defaultValue']"
   />
 
   <template
     v-else-if="visible && shouldRender && isDisplayElement && resolvedComponent"
   >
     <LazyButtonModal
-      v-if="field['#modal']"
-      :modal-id="field['#name']"
+      v-if="effectiveField['#modal']"
+      :modal-id="effectiveField['#name']"
     />
 
     <div
@@ -187,7 +217,7 @@ const fieldUi = computed(() => {
     <component
       :is="resolvedComponent"
       v-bind="resolvedComponentProps"
-      :field="field"
+      :field="effectiveField"
       :field-name="fieldName"
       :state="state"
     />
@@ -196,15 +226,15 @@ const fieldUi = computed(() => {
   </template>
 
   <UFormField
-    v-else-if="visible && shouldRender"
-    :label="shouldShowLabel ? field['#title'] : undefined"
-    :name="fieldName"
-    :required="field['#required']"
+    v-else-if="visible && shouldRender && resolvedComponent"
+    :label="shouldShowLabel ? effectiveField['#title'] : undefined"
+    :name="formName ?? fieldName"
+    :required="effectiveField['#required']"
     :ui="fieldUi"
   >
     <LazyButtonModal
-      v-if="field['#modal']"
-      :modal-id="field['#name']"
+      v-if="effectiveField['#modal']"
+      :modal-id="effectiveField['#name']"
     />
 
     <div
@@ -213,12 +243,19 @@ const fieldUi = computed(() => {
       v-html="descriptionContent"
     />
 
+    <LazyFieldMultiple
+      v-if="isMultipleInput"
+      :component="resolvedComponent"
+      :field="effectiveField"
+      :field-name="fieldName"
+      :state="state"
+    />
     <component
       :is="resolvedComponent"
-      v-if="resolvedComponent"
+      v-else
       v-bind="resolvedComponentProps"
       :disabled="resolvedFieldType === 'select' ? disabled : undefined"
-      :field="field"
+      :field="effectiveField"
       :field-name="fieldName"
       :floating-label="
         resolvedFieldType === 'checkbox' ||

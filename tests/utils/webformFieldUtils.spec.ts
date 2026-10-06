@@ -144,6 +144,7 @@ describe('normalizeWebformDefinition', () => {
 
     expect(webform.fields).toEqual({
       validName: {
+        '#conditions': [],
         '#name': 'validName',
         '#type': 'textfield',
       },

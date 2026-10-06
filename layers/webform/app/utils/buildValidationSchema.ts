@@ -1,12 +1,16 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import {
+  array,
   custom,
   object,
-  optional,
   type GenericSchema,
 } from 'valibot'
-import { evaluateCondition } from './evaluateUtils'
+import {
+  applyWebformFieldStates,
+  resolveWebformFieldStates,
+} from './webformConditions'
 import { isWebformDisplayElement } from './webformDisplayUtils'
+import { isSupportedWebformField } from './webformFieldTypes'
 import {
   allowsMultipleFiles,
   getFileExtensions,
@@ -51,14 +55,21 @@ function fieldSignature(field: WebformFieldProps): string {
   })
 }
 
+/**
+ * The fields to validate, as their conditions currently leave them: shown,
+ * and required or not.
+ */
 function getVisibleEntries(
   fields: Record<string, WebformFieldProps>,
   state: WebformState,
 ): Array<[string, WebformFieldProps]> {
-  return Object.entries(fields).filter(([, field]) =>
-    !isWebformDisplayElement(field) &&
-    evaluateCondition(field['#states']?.visible, state, true),
-  )
+  return Object.entries(fields).flatMap(([key, field]) => {
+    if (isWebformDisplayElement(field) || !isSupportedWebformField(field)) return []
+
+    const states = resolveWebformFieldStates(field, state)
+
+    return states.visible ? [[key, applyWebformFieldStates(field, states)]] : []
+  })
 }
 
 function getSchemaCacheKey(
@@ -108,23 +119,31 @@ function createFieldSchema(field: WebformFieldProps): GenericSchema {
   const composite = field['#composite']
 
   if (composite && typeof composite === 'object') {
+    // Webform enforces only each part's own #required; the composite's
+    // #required just marks it.
     const entries: Record<string, GenericSchema> = {}
 
-    for (const [key, subField] of Object.entries(
+    for (const [key, part] of Object.entries(
       composite as Record<string, WebformFieldProps>,
     )) {
-      const required = field['#required'] === true || subField['#required'] === true
-      const message = field['#requiredError'] || 'This field is required'
-
-      entries[key] = valueSchema(value =>
-        required && isEmpty(value) ? message : null,
-      )
+      entries[key] = valueSchema(value => fieldValidationMessage(part, value))
     }
-    const requiresComposite =
-      field['#required'] === true ||
-      Object.values(composite).some(subField => subField['#required'] === true)
+    const row = object(entries)
 
-    return requiresComposite ? object(entries) : optional(object(entries))
+    return field['#multiple'] === true ? array(row) : row
+  }
+
+  if (field['#type'] === 'webform_likert') {
+    const questions = Object.keys(field['#questions'] ?? {})
+    const requiredError = field['#requiredError'] || 'Please answer every question'
+
+    return valueSchema((value) => {
+      const answers = value && typeof value === 'object' ? value as Record<string, unknown> : {}
+
+      return field['#required'] === true && questions.some(question => isEmpty(answers[question]))
+        ? requiredError
+        : null
+    })
   }
 
   return valueSchema(value => fieldValidationMessage(field, value))
@@ -172,7 +191,7 @@ function fieldValidationMessage(
   }
 
   if (type === 'checkboxes' || multiple) {
-    const values = Array.isArray(value) ? value : []
+    const values = Array.isArray(value) ? value.filter(item => !isEmpty(item)) : []
     const multipleCount = field['#cardinality'] ?? 1
     const requiredCount = (type === 'date' || type === 'datetime')
       && Number.isFinite(multipleCount)
@@ -204,20 +223,18 @@ function fieldValidationMessage(
 
     if (!Number.isFinite(numeric)) return 'Must be a number'
 
-    const minimumAllowedValue = 1
-    const rawMin = Number(field['#min'])
-    const min = Number.isFinite(rawMin)
-      ? Math.max(minimumAllowedValue, rawMin)
-      : minimumAllowedValue
+    // Only the bounds Drupal enforces; a minimum belongs in the element's #min.
+    const bound = (raw: unknown): number | undefined => {
+      const parsed = raw === undefined || raw === null || raw === '' ? Number.NaN : Number(raw)
 
-    if (numeric < min) return `Minimum value is ${min}`
+      return Number.isFinite(parsed) ? parsed : undefined
+    }
+    const min = bound(field['#min'])
+    const max = bound(field['#max'])
 
-    const rawMax = Number(field['#max'])
-
-    if (Number.isFinite(rawMax)) {
-      const max = Math.max(min, rawMax)
-
-      if (numeric > max) return `Maximum value is ${max}`
+    if (min !== undefined && numeric < min) return `Minimum value is ${min}`
+    if (max !== undefined && numeric > Math.max(min ?? max, max)) {
+      return `Maximum value is ${Math.max(min ?? max, max)}`
     }
   }
 

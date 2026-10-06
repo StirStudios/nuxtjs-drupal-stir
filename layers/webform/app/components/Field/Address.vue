@@ -1,123 +1,15 @@
 <script setup lang="ts">
-import type { WebformFieldProps } from '#stir/types'
-import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
+import type { WebformFieldProps, WebformState } from '#stir/types'
 
-const props = defineProps<{
+// An address is a composite like any other; this keeps FieldAddress
+// available to sites that override it.
+defineProps<{
   field: WebformFieldProps
   fieldName: string
-  state: Record<string, Record<string, string>>
-  floatingLabel?: boolean
+  state: WebformState
 }>()
-
-const webform = useStirWebformTheme()
-const portal = useOverlayPortal()
-const inputUi = computed(() => useFloatingLabels.value
-  ? { base: webform.floatingControlClass }
-  : {})
-const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
-
-const compositeFields = computed<Record<string, WebformFieldProps>>(() =>
-  typeof props.field['#composite'] === 'object' &&
-  props.field['#composite'] !== null
-    ? props.field['#composite']
-    : {},
-)
-
-const getCompositeLabel = (fieldData: WebformFieldProps, key: string) =>
-  String(fieldData.label ?? key)
-
-const countryOptions = computed(() => {
-  const countryField = compositeFields.value.country
-  const options =
-    (typeof props.field.options === 'object'
-      ? props.field.options
-      : undefined) ??
-    (countryField && typeof countryField.options === 'object'
-      ? countryField.options
-      : undefined) ??
-    (countryField && typeof countryField['#options'] === 'object'
-      ? countryField['#options']
-      : undefined)
-
-  return options
-    ? Object.entries(options).map(([key, label]) => ({
-        value: key,
-        label: String(label),
-      }))
-    : []
-})
-
-const useFloatingLabels = computed(() =>
-  props.field['#floatingLabel'] !== undefined
-    ? props.field['#floatingLabel']
-    : webform.labels.floating,
-)
-
-if (!props.state[props.fieldName]) {
-  props.state[props.fieldName] = {}
-}
-
-// Mirrors the validation schema: a part is required when the address or the
-// part itself is.
-const isPartRequired = (fieldData: WebformFieldProps) =>
-  props.field['#required'] === true || fieldData['#required'] === true
-const getFieldId = (key: string) => `${props.fieldName}-${key}`
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-    <UFormField
-      v-for="(fieldData, key) in compositeFields"
-      :key="key"
-      :label="
-        !useFloatingLabels ? getCompositeLabel(fieldData, String(key)) : ''
-      "
-      :name="`${fieldName}.${key}`"
-      :required="isPartRequired(fieldData)"
-    >
-      <UInput
-        v-if="key !== 'country'"
-        :id="getFieldId(String(key))"
-        v-model="state[fieldName]![String(key)]"
-        :aria-required="isPartRequired(fieldData) || undefined"
-        class="w-full"
-        :placeholder="useFloatingLabels ? ' ' : ''"
-        :ui="inputUi"
-        :variant="fieldVariant"
-      >
-        <label
-          v-if="useFloatingLabels"
-          :class="[webform.labels.floatingClass, isPartRequired(fieldData) && webform.labels.requiredClass]"
-          :for="getFieldId(String(key))"
-        >
-          <span class="inline-flex">
-            {{ getCompositeLabel(fieldData, String(key)) }}
-          </span>
-        </label>
-      </UInput>
-
-      <div v-else class="relative">
-        <USelectMenu
-          :id="getFieldId(String(key))"
-          v-model="state[fieldName]!.country"
-          :aria-required="isPartRequired(fieldData) || undefined"
-          class="w-full"
-          :items="countryOptions"
-          label-key="label"
-          placeholder="Select Country"
-          :portal="portal"
-          :ui="{ base: useFloatingLabels ? webform.compactControlClass : [] }"
-          value-key="value"
-          :variant="fieldVariant"
-        />
-        <label
-          v-if="useFloatingLabels"
-          :class="[webform.labels.staticFloatingClass, isPartRequired(fieldData) && webform.labels.requiredClass]"
-          :for="getFieldId(String(key))"
-        >
-          {{ getCompositeLabel(fieldData, String(key)) }}
-        </label>
-      </div>
-    </UFormField>
-  </div>
+  <FieldComposite :field="field" :field-name="fieldName" :state="state" />
 </template>

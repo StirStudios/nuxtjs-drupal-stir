@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.31.0",
+  "contractVersion": "1.32.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -165,8 +165,14 @@
       "fixtures": [
         "fixtures/webform-contact.json",
         "fixtures/webform-calculator.json",
-        "fixtures/webform-event.json"
+        "fixtures/webform-event.json",
+        "fixtures/webform-kitchen-sink.json"
       ]
+    },
+    "layout.webform.submission.sample": {
+      "capability": "layout.webform",
+      "schema": "schemas/webform-submission-sample.schema.json",
+      "fixtures": ["fixtures/webform-kitchen-sink-submission.json"]
     },
     "webform.submission.response": {
       "capability": "webform.submission",

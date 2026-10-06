@@ -24,6 +24,8 @@ export type InputType =
   | 'hidden'
   | 'processed_text'
   | 'webform_markup'
+  | 'webform_likert'
+  | 'address'
   | 'datetime'
   | 'section'
   | 'file'
@@ -77,6 +79,33 @@ export interface States {
   checked?: ConditionType
 }
 
+/**
+ * A Webform #states group with every element name carried as a value.
+ *
+ * Drupal sends these as `#conditions`, because Custom Elements camel-cases
+ * the selector keys of `#states`. Rule names are submission paths, dotted
+ * for nested values (`address.city`, `extras.early_bird`).
+ */
+export interface WebformConditionTrigger {
+  trigger: string
+  value: unknown
+}
+
+export interface WebformConditionRule {
+  name: string | null
+  selector: string
+  triggers: WebformConditionTrigger[]
+}
+
+export interface WebformConditionGroup {
+  logic: 'and' | 'or' | 'xor'
+  rules: Array<WebformConditionRule | WebformConditionGroup>
+}
+
+export interface WebformStateCondition extends WebformConditionGroup {
+  state: string
+}
+
 export interface WebformOptionProperties {
   price?: number
   description?: string
@@ -123,6 +152,9 @@ export interface WebformFieldProps {
   '#modal'?: boolean
   '#relocated'?: boolean
   '#states'?: States
+  '#conditions'?: WebformStateCondition[]
+  '#questions'?: Record<string, string>
+  '#answers'?: Record<string, string>
   '#group'?: string
   '#groupMaxSelected'?: number
   '#perGuest'?: boolean

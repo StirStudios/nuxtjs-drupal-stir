@@ -2,6 +2,7 @@
 import type { WebformFieldProps } from '#stir/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import { useEventBus } from '@vueuse/core'
+import { USelect, USelectMenu } from '#components'
 import { transformOptions } from '#stir-webform/utils/transformUtils'
 import {
   resolveUiButtonVariant,
@@ -41,6 +42,13 @@ const selectItems = computed(() => {
 })
 
 const renderAsButtons = computed(() => props.fieldName === 'tabs')
+// Webform stores a list for a multiple select.
+const isMultiple = computed(() => props.field?.['#multiple'] === true)
+// Long lists, such as countries, and selects Webform enhances are searchable.
+const isSearchable = computed(() =>
+  selectItems.value.length > 50
+  || Boolean(props.field?.['#select2'] || props.field?.['#choices'] || props.field?.['#chosen']),
+)
 
 const handleButtonClick = (value: string) => {
   if (props.disabled) return
@@ -67,15 +75,19 @@ const handleButtonClick = (value: string) => {
     </div>
   </template>
   <div v-else class="relative">
-    <USelect
+    <component
+      :is="isSearchable ? USelectMenu : USelect"
       :id="id"
       v-model="state[fieldName]"
       :class="['w-full', webform.fieldText]"
       :disabled="props.disabled"
       :items="selectItems"
+      :multiple="isMultiple"
       :placeholder="placeholder || 'Select'"
       :portal="portal"
+      :required="isRequired"
       :ui="selectUi"
+      value-key="value"
       :variant="fieldVariant"
     />
     <label

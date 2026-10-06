@@ -5,6 +5,20 @@ import WebformContent from '../../../layers/webform/app/components/WebformConten
 import Webform from '../../../layers/webform/app/components/WebformForm.vue'
 import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
+import kitchenSink from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink.json'
+import kitchenSinkSubmission from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink-submission.json'
+
+// The kitchen sink without anything required, so an untouched form submits.
+function optional(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(optional)
+  if (!value || typeof value !== 'object') return value
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !['#required', '#conditions', '#states'].includes(key))
+      .map(([key, item]) => [key, optional(item)]),
+  )
+}
 
 const runtime = vi.hoisted(() => ({
   fetch: vi.fn(),
@@ -248,5 +262,34 @@ describe('Webform (Nuxt runtime)', () => {
       webform_id: 'contact',
       turnstile_response: '',
     })
+  })
+
+  it('renders every element of Drupal\'s kitchen sink and submits under Drupal\'s keys', async () => {
+    runtime.fetch.mockClear()
+    runtime.fetch.mockResolvedValue(undefined)
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const wrapper = await mountSuspended(Webform, {
+      props: { webform: optional(kitchenSink) as WebformDefinition },
+    })
+
+    await flushPromises()
+
+    for (const label of ['Full name', 'Venue', 'Organizer', 'Lineup', 'Satisfaction', 'Value for money', 'Attendees']) {
+      expect(wrapper.text(), label).toContain(label)
+    }
+    expect(errors).not.toHaveBeenCalled()
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    const submissions = runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')
+    const body = JSON.parse((submissions[0]?.[1] as { body: string }).body) as Record<string, unknown>
+    // An untouched file field sends nothing; Drupal keeps no upload.
+    const { poster_image: _file, ...stored } = kitchenSinkSubmission.data
+
+    expect(Object.keys(body).sort()).toEqual(['turnstile_response', 'webform_id', ...Object.keys(stored)].sort())
+    expect(Object.keys(body.venue_address as object).sort()).toEqual(Object.keys(stored.venue_address).sort())
+    expect(Object.keys((body.lineup as object[])[0]!).sort()).toEqual(Object.keys(stored.lineup[0]!).sort())
+    errors.mockRestore()
   })
 })

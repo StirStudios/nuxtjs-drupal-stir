@@ -37,7 +37,9 @@ export function getFileExtensions(field: WebformFieldProps): string[] {
   )
     ? validators.file_validate_extensions[0]
     : undefined
+  // Custom Elements sends #file_extensions as #fileExtensions.
   const raw =
+    field['#fileExtensions'] ??
     field['#file_extensions'] ??
     field['#extensions'] ??
     validatorExtensions ??
@@ -68,9 +70,14 @@ export function getFileMaxSize(field: WebformFieldProps): number | undefined {
   const validatorSize = Array.isArray(validators?.file_validate_size)
     ? validators.file_validate_size[0]
     : undefined
-  const raw = field['#max_filesize'] ?? field['#max_size'] ?? validatorSize
+  // Custom Elements sends #max_filesize as #maxFilesize.
+  const raw = field['#maxFilesize'] ?? field['#max_filesize'] ?? field['#max_size'] ?? validatorSize
 
-  if (typeof raw === 'number' && Number.isFinite(raw)) return raw
+  // A validator's size is in bytes; Webform's #max_filesize is in megabytes
+  // unless it names a unit.
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    return raw === validatorSize ? raw : Math.round(raw * 1024 ** 2)
+  }
   if (typeof raw !== 'string') return undefined
 
   const match = raw.trim().match(/^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb)?$/i)
@@ -78,7 +85,7 @@ export function getFileMaxSize(field: WebformFieldProps): number | undefined {
   if (!match) return undefined
 
   const value = Number(match[1])
-  const unit = String(match[2] ?? 'b').toLowerCase()
+  const unit = String(match[2] ?? (raw === validatorSize ? 'b' : 'mb')).toLowerCase()
   const multiplier =
     unit === 'gb'
       ? 1024 ** 3

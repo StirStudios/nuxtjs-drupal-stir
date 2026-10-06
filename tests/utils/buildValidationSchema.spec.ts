@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { parse, parseAsync } from 'valibot'
 import { buildValidationSchema } from '../../layers/webform/app/utils/buildValidationSchema'
+import { normalizeWebformDefinition } from '../../layers/webform/app/utils/webformFieldUtils'
 import type { WebformFieldProps, WebformState } from '../../layers/theme/app/types'
+
+// Fields reach validation through the payload boundary, which turns
+// `#states` into `#conditions` and keys fields by their Drupal names.
+function normalizeFields(
+  fields: Record<string, WebformFieldProps>,
+): Record<string, WebformFieldProps> {
+  return normalizeWebformDefinition({ webformId: 'test', fields }).fields
+}
 
 function createDateTimeField(
   overrides: Partial<WebformFieldProps> = {},
@@ -85,7 +94,7 @@ describe('buildValidationSchema', () => {
   })
 
   it('rebuilds schema when visibility changes and enforces newly visible required fields', async () => {
-    const fields: Record<string, WebformFieldProps> = {
+    const fields = normalizeFields({
       mode: {
         '#type': 'text',
         '#title': 'Mode',
@@ -102,7 +111,7 @@ describe('buildValidationSchema', () => {
           },
         },
       },
-    }
+    })
     const state: WebformState = { mode: 'none' }
 
     const hiddenSchema = buildValidationSchema(fields, state)
@@ -118,13 +127,14 @@ describe('buildValidationSchema', () => {
     await expect(
       parseAsync(visibleSchema, {
         mode: 'email',
-        contactEmail: 'team@example.com',
+        contact_email: 'team@example.com',
       }),
     ).resolves.toBeTruthy()
   })
 
   it('does not validate hidden required datetime fields until they become visible', async () => {
-    const fields: Record<string, WebformFieldProps> = {
+    // The selector arrives camel-cased, as Custom Elements sends #states.
+    const fields = normalizeFields({
       showDates: {
         '#type': 'text',
         '#title': 'Show Dates',
@@ -140,22 +150,22 @@ describe('buildValidationSchema', () => {
           },
         },
       }),
-    }
-    const state: WebformState = { showDates: 'no' }
+    })
+    const state: WebformState = { show_dates: 'no' }
 
     const hiddenSchema = buildValidationSchema(fields, state)
 
-    await expect(parseAsync(hiddenSchema, { showDates: 'no' })).resolves.toBeTruthy()
+    await expect(parseAsync(hiddenSchema, { show_dates: 'no' })).resolves.toBeTruthy()
 
-    state.showDates = 'yes'
+    state.show_dates = 'yes'
     const visibleSchema = buildValidationSchema(fields, state)
 
-    await expect(parseAsync(visibleSchema, { showDates: 'yes' })).rejects.toBeTruthy()
+    await expect(parseAsync(visibleSchema, { show_dates: 'yes' })).rejects.toBeTruthy()
 
     await expect(
       parseAsync(visibleSchema, {
-        showDates: 'yes',
-        eventDate: [
+        show_dates: 'yes',
+        event_date: [
           '2026-02-19T10:30:00-0800',
           '2026-02-20T10:30:00-0800',
           '2026-02-21T10:30:00-0800',
@@ -271,5 +281,87 @@ describe('buildValidationSchema', () => {
     expect(() => parse(schema, { interests: ['a'] })).toThrow()
     expect(() => parse(schema, { interests: ['a', 'b', 'c', 'd'] })).toThrow()
     expect(parse(schema, { interests: ['a', 'b'] })).toBeTruthy()
+  })
+
+  it('enforces only the number bounds Drupal sets', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      children: { '#type': 'number', '#name': 'children' },
+      guests: { '#type': 'number', '#name': 'guests', '#min': 1, '#max': 10 },
+    }
+    const schema = buildValidationSchema(fields, {})
+
+    expect(() => parse(schema, { children: 0, guests: 1 })).not.toThrow()
+    expect(() => parse(schema, { children: 0, guests: 0 })).toThrow('Minimum value is 1')
+    expect(() => parse(schema, { children: 0, guests: 11 })).toThrow('Maximum value is 10')
+  })
+
+  it('requires only the composite parts Webform requires', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      venue: {
+        '#type': 'address',
+        '#name': 'venue',
+        // Display only: Webform enforces each part's own #required.
+        '#required': true,
+        '#composite': {
+          city: { '#type': 'textfield', '#name': 'city', '#required': true },
+          address_2: { '#type': 'textfield', '#name': 'address_2' },
+        },
+      },
+    }
+    const schema = buildValidationSchema(fields, {})
+
+    expect(() => parse(schema, { venue: { city: 'Springfield', address_2: '' } })).not.toThrow()
+    expect(() => parse(schema, { venue: { city: '', address_2: 'Unit 4' } })).toThrow()
+  })
+
+  it('validates each row of a composite that takes several values', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      lineup: {
+        '#type': 'webform_custom_composite' as never,
+        '#name': 'lineup',
+        '#multiple': true,
+        '#composite': {
+          performer: { '#type': 'textfield', '#name': 'performer', '#required': true },
+        },
+      },
+    }
+    const schema = buildValidationSchema(fields, {})
+
+    expect(() => parse(schema, { lineup: [{ performer: 'The Steps' }] })).not.toThrow()
+    expect(() => parse(schema, { lineup: [{ performer: '' }] })).toThrow()
+  })
+
+  it('requires an answer to every likert question when required', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      survey: {
+        '#type': 'webform_likert',
+        '#name': 'survey',
+        '#required': true,
+        '#questions': { service: 'Service', value: 'Value' },
+        '#answers': { 1: 'Bad', 5: 'Good' },
+      },
+    }
+    const schema = buildValidationSchema(fields, {})
+
+    expect(() => parse(schema, { survey: { service: '5', value: '1' } })).not.toThrow()
+    expect(() => parse(schema, { survey: { service: '5' } })).toThrow('Please answer every question')
+  })
+
+  it('counts only filled values of a multiple field', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      names: { '#type': 'textfield', '#name': 'names', '#multiple': true, '#required': true },
+    }
+    const schema = buildValidationSchema(fields, {})
+
+    expect(() => parse(schema, { names: ['Ada'] })).not.toThrow()
+    expect(() => parse(schema, { names: [''] })).toThrow()
+  })
+
+  it('leaves an element type the layer cannot show to Drupal', () => {
+    const fields: Record<string, WebformFieldProps> = {
+      signature: { '#type': 'webform_signature' as never, '#name': 'signature', '#required': true },
+    }
+
+    expect(() => parse(buildValidationSchema(fields, {}), {})).not.toThrow()
   })
 })
