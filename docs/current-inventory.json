@@ -830,7 +830,7 @@
     "serverRoutes": 29,
     "productionDependencies": 35,
     "developmentDependencies": 27,
-    "tests": 221,
+    "tests": 222,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -838,7 +838,7 @@
       "scripts": 5,
       "server": 31,
       "unit": 11,
-      "utils": 63
+      "utils": 64
     }
   },
   "tests": [
@@ -1017,6 +1017,7 @@
     "tests/utils/editableRichText.spec.ts",
     "tests/utils/fetchError.spec.ts",
     "tests/utils/fieldRendererLayerOverride.spec.ts",
+    "tests/utils/flattenWebformFields.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
     "tests/utils/globalSeoAssets.spec.ts",
