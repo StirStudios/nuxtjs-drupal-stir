@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { createJiti } from 'jiti'
 import { addTypeTemplate, useNuxt } from '@nuxt/kit'
@@ -55,7 +54,7 @@ export default defineNuxtConfig({
 
       addTypeTemplate({
         filename: 'types/stir-auth-app-config.d.ts',
-        getContents: () => readFileSync(appConfigTypes, 'utf8'),
+        getContents: () => `/// <reference path="${appConfigTypes}" />\n`,
       })
     },
   ],

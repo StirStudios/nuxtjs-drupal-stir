@@ -13,6 +13,35 @@ jobs:
     steps:
       - name: Checkout client
         uses: actions/checkout@v7
+        with:
+          # A push to main needs history to compare main with dev.
+          fetch-depth: ${{ github.event_name == 'push' && '0' || '1' }}
+
+      # A step of this run rather than a job of its own, which would bill a
+      # private client at least a minute on every push. It cannot block the
+      # push, so it fails loudly instead: main must only gain work already on
+      # dev.
+      - name: Every new commit on main is already on dev
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          if ! git rev-parse --verify --quiet origin/dev >/dev/null; then
+            echo "No dev branch; nothing to compare."
+            exit 0
+          fi
+          range="$AFTER"
+          if [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            range="$BEFORE..$AFTER"
+          fi
+          stray="$(git rev-list --no-merges "$range" --not origin/dev)"
+          if [ -n "$stray" ]; then
+            echo "::error::main has commits that are not on dev. Merge main into dev now, and commit on dev from here on."
+            git log --oneline --no-walk $stray
+            exit 1
+          fi
+          echo "All new commits on main came from dev."
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6

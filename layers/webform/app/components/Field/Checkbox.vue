@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '#stir/types'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
-import { useEvaluateState } from '#stir-webform/composables/useEvaluateState'
+import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 
 const props = defineProps<{
   field: WebformFieldProps
@@ -19,10 +19,9 @@ const checkboxLabel = computed(() =>
 const descriptionContent = computed(() =>
   trustedDrupalHtml(String(props.field['#description'] ?? '')),
 )
-const { disabled, checked } = useEvaluateState(
-  props.field['#states'] ?? {},
-  props.state,
-)
+const fieldStates = computed(() => resolveWebformFieldStates(props.field, props.state))
+const disabled = computed(() => fieldStates.value.disabled)
+const checked = computed(() => fieldStates.value.checked)
 
 const checkboxValue = computed({
   get: () => props.state[props.fieldName] === true,
@@ -31,11 +30,9 @@ const checkboxValue = computed({
   },
 })
 
-if (props.field['#states']?.checked) {
-  watch(checked, (value) => {
-    checkboxValue.value = value
-  })
-}
+watch(checked, (value) => {
+  if (value !== undefined) checkboxValue.value = value
+})
 </script>
 
 <template>

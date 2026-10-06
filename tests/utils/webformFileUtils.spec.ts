@@ -30,6 +30,22 @@ describe('webformFileUtils', () => {
     expect(getFileMaxSize(field)).toBe(2 * 1024 * 1024)
   })
 
+  it('reads limits as Custom Elements sends them, in Webform units', () => {
+    // #file_extensions and #max_filesize arrive camel-cased; a bare
+    // #max_filesize is megabytes, as Webform reads it.
+    const field = {
+      '#type': 'webform_image_file',
+      '#name': 'poster',
+      '#fileExtensions': 'jpg png',
+      '#maxFilesize': 2,
+    } as unknown as WebformFieldProps
+
+    expect(getFileAccept(field)).toBe('.jpg,.png')
+    expect(getFileMaxSize(field)).toBe(2 * 1024 * 1024)
+    expect(getFileMaxSize({ ...field, '#maxFilesize': '5' })).toBe(5 * 1024 * 1024)
+    expect(getFileMaxSize({ ...field, '#maxFilesize': '500 KB' })).toBe(500 * 1024)
+  })
+
   it('detects and appends single and multiple files to FormData', () => {
     const headshot = new File(['image'], 'headshot.jpg', {
       type: 'image/jpeg',

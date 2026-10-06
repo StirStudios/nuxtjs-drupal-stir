@@ -64,12 +64,90 @@
         "#minSelected": { "type": "integer", "minimum": 0 },
         "#groupMaxSelected": { "type": "integer", "minimum": 0 },
         "#tabGroup": { "type": "string" },
+        "#optionKeys": { "$ref": "#/definitions/keyList" },
+        "#questionKeys": { "$ref": "#/definitions/keyList" },
+        "#answerKeys": { "$ref": "#/definitions/keyList" },
+        "#conditions": {
+          "description": "The element's #states with every element name as a value, since Custom Elements camel-cases the selector keys of #states. Container visibility is included.",
+          "type": "array",
+          "items": { "$ref": "#/definitions/conditionGroup" }
+        },
+        "#composite": {
+          "description": "Composite parts as Webform initializes them. Keys are camel-cased in transport; #name is the key Drupal stores.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/compositePart" }
+        },
         "children": {
           "type": "object",
           "additionalProperties": { "$ref": "#/definitions/field" }
         }
       },
       "additionalProperties": true
+    },
+    "keyList": {
+      "description": "The Drupal keys of a camel-cased map, in order.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "compositePart": {
+      "type": "object",
+      "required": ["#name"],
+      "properties": {
+        "#name": { "type": "string", "minLength": 1 },
+        "#type": { "type": "string", "minLength": 1 },
+        "#title": { "type": ["string", "null"] },
+        "#required": { "type": "boolean" },
+        "#optionKeys": { "$ref": "#/definitions/keyList" }
+      },
+      "additionalProperties": true
+    },
+    "conditionGroup": {
+      "type": "object",
+      "required": ["state", "logic", "rules"],
+      "properties": {
+        "state": { "type": "string", "minLength": 1 },
+        "logic": { "enum": ["and", "or", "xor"] },
+        "rules": { "type": "array", "items": { "$ref": "#/definitions/conditionRule" } }
+      },
+      "additionalProperties": false
+    },
+    "conditionRule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["logic", "rules"],
+          "properties": {
+            "logic": { "enum": ["and", "or", "xor"] },
+            "rules": { "type": "array", "items": { "$ref": "#/definitions/conditionRule" } }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["name", "selector", "triggers"],
+          "properties": {
+            "name": {
+              "description": "Submission path of the element the selector targets, dotted for nested values (address.city, extras.early_bird); null when the selector names no input.",
+              "type": ["string", "null"]
+            },
+            "selector": { "type": "string" },
+            "triggers": {
+              "description": "Webform triggers, any of which passes the rule.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["trigger", "value"],
+                "properties": {
+                  "trigger": { "type": "string", "minLength": 1 },
+                  "value": {}
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "action": {
       "type": "object",

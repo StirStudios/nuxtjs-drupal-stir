@@ -1,5 +1,5 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
-import { evaluateCondition } from '#stir-webform/utils/evaluateUtils'
+import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 
 export function evaluateContainerVisibility(
   containerName: string,
@@ -8,6 +8,8 @@ export function evaluateContainerVisibility(
   getGroupFields: (parentName: string) => string[],
 ): boolean {
   return getGroupFields(containerName).some((fieldName) => {
-    return evaluateCondition(fields[fieldName]?.['#states']?.visible, state, true)
+    const field = fields[fieldName]
+
+    return field ? resolveWebformFieldStates(field, state).visible : true
   })
 }

@@ -86,9 +86,10 @@ export default defineNuxtConfig({
       )
     },
     function registerStirAppConfigTypes() {
+      // Reference the file rather than copy it, so its relative imports resolve.
       addTypeTemplate({
         filename: 'types/stir-app-config.d.ts',
-        getContents: () => readFileSync(appConfigTypes, 'utf8'),
+        getContents: () => `/// <reference path="${appConfigTypes}" />\n`,
       })
     },
   ],

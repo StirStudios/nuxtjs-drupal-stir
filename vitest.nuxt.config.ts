@@ -16,6 +16,10 @@ export default defineVitestConfig({
     include: ['tests/nuxt/runtime/**/*.spec.ts'],
     setupFiles: ['tests/nuxt/runtime/setup.ts'],
     testTimeout: 10000,
+    // Each file boots a Nuxt app in a beforeAll hook. On a busy machine that
+    // can outlast Vitest's 10 s hook default although no test is slow; the
+    // tests themselves keep the 10 s limit.
+    hookTimeout: 60000,
     onConsoleLog(log, type) {
       if (
         type === 'stderr'

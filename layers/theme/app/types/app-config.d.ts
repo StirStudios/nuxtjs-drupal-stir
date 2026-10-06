@@ -7,6 +7,8 @@ export type { UiFieldVariantName } from '../../../foundation/app/types/ui'
 // project-specific keys without augmenting every branch up front.
 type LooseRecord = Record<string, unknown>
 type ClassValue = string
+// Values bound straight to Vue's `:class` or a Nuxt UI `ui` slot, which also accept a list.
+type ClassListValue = ClassValue | ClassValue[]
 type UiColorName = 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 type UiButtonVariantName = 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'material'
 type UiNavigationVariantName = 'link' | 'pill'
@@ -231,10 +233,10 @@ type StirThemeHeroConfig = {
 } & LooseRecord
 
 type StirThemeRouteHeroVariantConfig = {
-  base?: ClassValue
-  band?: ClassValue
-  container?: ClassValue
-  content?: ClassValue
+  base?: ClassListValue
+  band?: ClassListValue
+  container?: ClassListValue
+  content?: ClassListValue
 } & LooseRecord
 
 type StirThemeRouteHeroConfig = {
@@ -243,19 +245,20 @@ type StirThemeRouteHeroConfig = {
   imageSelection?: 'first' | 'random'
   parallax?: boolean
   routes?: RouteHeroDefinition[]
-  base?: ClassValue
-  band?: ClassValue
-  surface?: ClassValue
-  visual?: ClassValue
+  base?: ClassListValue
+  band?: ClassListValue
+  surface?: ClassListValue
+  visual?: ClassListValue
   image?: ClassValue
-  overlay?: ClassValue
-  container?: ClassValue
-  content?: ClassValue
-  eyebrow?: ClassValue
-  title?: ClassValue
-  description?: ClassValue
-  actions?: ClassValue
-  variants?: Partial<Record<RouteHeroVariant, StirThemeRouteHeroVariantConfig>>
+  overlay?: ClassListValue
+  container?: ClassListValue
+  content?: ClassListValue
+  eyebrow?: ClassListValue
+  title?: ClassListValue
+  description?: ClassListValue
+  actions?: ClassListValue
+  // A site may add its own variants; Section.vue looks the hero's variant up by key.
+  variants?: Partial<Record<RouteHeroVariant | (string & {}), StirThemeRouteHeroVariantConfig>>
 } & LooseRecord
 
 type StirThemeLinkHubConfig = {
@@ -341,7 +344,7 @@ type StirThemeMediaConfig = {
 type StirThemeCarouselConfig = {
   marqueeRepeat?: Partial<Record<'horizontal' | 'vertical', number>>
   padding?: ClassValue
-  root?: ClassValue
+  root?: ClassListValue
   arrows?: {
     prev?: StirThemeButtonLikeConfig
     next?: StirThemeButtonLikeConfig
@@ -617,7 +620,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   navigation: ResolvedStirThemeNavigationConfig
   hero: ResolvedStirThemeHeroConfig
   routeHero: StirThemeRouteHeroConfig & {
-    variants: Partial<Record<RouteHeroVariant, StirThemeRouteHeroVariantConfig>>
+    variants: Partial<Record<RouteHeroVariant | (string & {}), StirThemeRouteHeroVariantConfig>>
   }
   clientComponents: string[]
   linkHub: Required<StirThemeLinkHubConfig>
@@ -638,7 +641,9 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   auth: StirThemeAuthConfig
 }
 
-declare module 'nuxt/schema' {
+// Augment `@nuxt/schema`: from Nuxt 4.6, `nuxt/schema` only re-exports it, and
+// augmentations of a re-exported interface never reach `useAppConfig()`.
+declare module '@nuxt/schema' {
   interface AppConfigInput {
     protectedRoutes?: ProtectedRoutesConfig
     analytics?: AnalyticsConfig

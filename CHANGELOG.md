@@ -13,6 +13,92 @@ untouched do not need one.
 
 ## Unreleased
 
+### Rich text
+
+- **Document links embedded in rich text sit on their own line and follow the
+  embed's alignment.** Stir Tools now renders document media as
+  `<drupal-media data-media-type="document">` holding a download link. The
+  layer shows the wrapper as a block, and a centred embed centres its link
+  directly under the media above it. Needs no Stir Tools update to be safe:
+  without it, no document wrappers exist.
+
+### Nuxt 4.6
+
+The layer supports Nuxt 4.5.2 and 4.6, and its own lockfile now tests 4.6.0.
+The `nuxt` range stays `^4.5.2`, so a site is not forced to upgrade.
+
+- **Fixed: a site on Nuxt 4.6 failed `nuxi typecheck`.** Nuxt 4.6 stopped
+  bridging `nuxt/schema` and `@nuxt/schema` ([nuxt/nuxt#36186](https://github.com/nuxt/nuxt/pull/36186)),
+  so the layer's `AppConfig` augmentations no longer reached `useAppConfig()`.
+  Sites then saw only the types Nuxt infers from the `app.config` files:
+  `stirTheme`, `auth`, `popup` and the other layer keys lost their declared
+  types (`Property 'accountNav' does not exist on type '{}'`, implicit `any`
+  indexing). The layer now augments `@nuxt/schema`, which Nuxt 4.6 names as
+  the one surface to augment. A site that augments `AppConfig` or
+  `AppConfigInput` in `nuxt/schema` itself should move to `@nuxt/schema` too.
+- **Fixed:** the generated `stir-app-config.d.ts` type template now references
+  the layer's declaration file instead of copying it into `.nuxt/types`.
+  In the copy, relative imports such as `RouteHeroVariant` did not resolve.
+  The layer's `app.config` types now constrain a site's `app.config` for the
+  first time. A key the layer does not read can therefore fail typecheck.
+- **Changed:** route hero class keys (`stirTheme.routeHero.*` other than
+  `image`, and each variant's keys) accept a list of classes as well as a
+  string. `routeHero.variants` accepts a site's own variant names alongside
+  `cover`, `simple` and `overlap`. `stirTheme.carousel.root` also accepts a
+  list. The runtime already did all three; the types now match.
+- Upgrading a site to Nuxt 4.6 needs Node.js `^22.22.3 || ^24.15.0 || >=26`
+  on every build and deploy host. Nuxt 4.6 also auto-imports types from
+  `app/types`, so `nuxt prepare` warns that `ExposedFilter` and `ExposedSort`
+  are imported twice. The warning is harmless: both names refer to the same
+  type, and the composable still re-exports them for sites on 4.5.
+
+### Webform
+
+Requires nothing new from Drupal; with Stir Tools contract 1.32 (which sends
+`#conditions`, every composite's parts, resolved option sets and likert keys),
+every element family renders and submits correctly. Older payloads are adapted
+at the boundary.
+
+- **Fixed: conditions never matched snake_case fields.** Custom Elements sends
+  `#states` selectors camel-cased (`eventType`), which named no field, so a
+  field shown or required by another field's value never appeared. Conditions
+  are now read from `#conditions` (or rebuilt from `#states` against the form's
+  names) and evaluated as Webform evaluates them: all states (`invisible`,
+  `required`, `optional`, `enabled`…) and all triggers (`checked`, `filled`,
+  `!value`, `pattern`, `between`…), with `and`/`or`/`xor`. A conditionally
+  required field is now required in the browser too.
+- **Fixed: element types without a component rendered an empty label and
+  blocked the form when required.** Aliases now resolve to their family
+  (`webform_checkboxes_other`, `webform_toggles`, `webform_buttons`,
+  `webform_rating`, `webform_scale`, `webform_terms_of_service`,
+  `webform_email_confirm`, `webform_time`, `url`…); anything else is reported
+  with `console.error` and left to Drupal.
+- **Added:** every composite (name, contact, link, telephone, custom) renders
+  its parts through `FieldComposite`; likert (`FieldLikert`); several values
+  for a `#multiple` text input (`FieldMultiple`), up to its cardinality; a
+  multiple select; searchable selects for long lists.
+- **Fixed: composite and multiple values had the wrong shape.** A composite
+  that takes several values is submitted as a list of rows, and a multiple
+  text field as a list.
+- **Fixed: a required composite required every part.** Webform enforces only
+  each part's `#required`; the composite's own is display only.
+- **Fixed: upload limits were never applied in the browser.** `#fileExtensions`
+  and `#maxFilesize` arrive camel-cased; a bare `#maxFilesize` is megabytes,
+  as in Webform.
+- **Fixed:** a required select now announces `aria-required`.
+- **Changed: numbers are bounded only by Drupal's `#min` and `#max`.** The
+  browser no longer refuses values below 1 when the element sets no `#min`.
+  **Action (Piper):** `demo2`, `demo3` and `wotw` set `'#min': 1` on
+  `venue_guest_count` in Piper `dev` (3853044); deploy that, and set the same
+  minimum on production for `villa_vine` and `28vic`, which are in
+  `config_ignore`, before taking this release.
+- **Removed:** `useEvaluateState`, `evaluateCondition`, `getNestedStateValue`
+  and `matchesCondition`. Use `resolveWebformFieldStates` from
+  `#stir-webform/utils/webformConditions`. No site used them.
+- **Added:** `createWebformState` (`#stir-webform/utils/webformState`) builds
+  the form's values in Webform's stored shapes; `FieldRenderer` takes an
+  optional `formName` (validation path) for nested fields.
+
 ### Security
 
 - **Protected-page content is now refused without access at the server.**

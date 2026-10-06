@@ -1,7 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { nextTick, reactive } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { WebformFieldProps, WebformState } from '../../../layers/theme/app/types'
 import FieldRenderer from '../../../layers/webform/app/components/Field/Renderer.vue'
+import { normalizeWebformDefinition } from '../../../layers/webform/app/utils/webformFieldUtils'
+import { createWebformState } from '../../../layers/webform/app/utils/webformState'
+
+// Fields reach components through the payload boundary, as in WebformForm.
+function canonical(field: WebformFieldProps): WebformFieldProps {
+  return normalizeWebformDefinition({ webformId: 'test', fields: { [field['#name']]: field } })
+    .fields[field['#name']]!
+}
 
 describe('FieldRenderer (Nuxt runtime)', () => {
   it('renders hidden fields as native hidden input', async () => {
@@ -397,11 +406,12 @@ describe('FieldRenderer (Nuxt runtime)', () => {
         country: { label: 'Country', '#required': true, options: { GB: 'United Kingdom' } },
       },
     } as unknown as WebformFieldProps
+    const address = canonical(field)
     const wrapper = await mountSuspended(FieldRenderer, {
       props: {
-        field,
+        field: address,
         fieldName: 'address',
-        state: {},
+        state: createWebformState({ address }),
       },
     })
     const labels = wrapper.findAll('label')
@@ -430,7 +440,7 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     const wrapper = await mountSuspended(FieldRenderer, {
       props: {
-        field,
+        field: canonical(field),
         fieldName: 'region',
         state: { country: 'US' },
       },
@@ -464,5 +474,100 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(labels.filter(label => label === 'Appointment')).toHaveLength(1)
     expect(labels).toContain('Time')
+  })
+
+  it('reports an element type it cannot show instead of rendering an empty field', async () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field: canonical({ '#type': 'webform_signature' as never, '#name': 'signature', '#title': 'Sign here' }),
+        fieldName: 'signature',
+        state: {},
+      },
+    })
+
+    expect(wrapper.text()).not.toContain('Sign here')
+    expect(errors).toHaveBeenCalledWith(expect.stringContaining('webform_signature'))
+    errors.mockRestore()
+  })
+
+  it('renders composite parts under their Drupal names', async () => {
+    const organizer = canonical({
+      '#type': 'webform_name',
+      '#name': 'organizer',
+      '#composite': {
+        first: { '#type': 'textfield', '#name': 'first', '#title': 'First' },
+        last: { '#type': 'textfield', '#name': 'last', '#title': 'Last', '#required': true },
+      },
+    } as unknown as WebformFieldProps)
+    const state = createWebformState({ organizer })
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: organizer, fieldName: 'organizer', state },
+    })
+
+    await wrapper.get('input[name="organizer.last"]').setValue('Lovelace')
+
+    expect(state.organizer).toEqual({ first: '', last: 'Lovelace' })
+  })
+
+  it('answers each likert question under its key', async () => {
+    const survey = canonical({
+      '#type': 'webform_likert',
+      '#name': 'survey',
+      '#questions': { valueForMoney: 'Value for money' },
+      '#questionKeys': ['value-for-money'],
+      '#answers': { 1: 'Poor', 5: 'Great' },
+    } as unknown as WebformFieldProps)
+    const state = createWebformState({ survey })
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: survey, fieldName: 'survey', state },
+    })
+
+    expect(wrapper.text()).toContain('Value for money')
+    await wrapper.get('button[value="5"]').trigger('click')
+
+    expect(state.survey).toEqual({ 'value-for-money': '5' })
+  })
+
+  it('collects several values for a multiple field', async () => {
+    const attendees = canonical({ '#type': 'textfield', '#name': 'attendees', '#title': 'Attendees', '#multiple': 2 } as unknown as WebformFieldProps)
+    const state = reactive(createWebformState({ attendees }))
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: attendees, fieldName: 'attendees', state },
+    })
+
+    await wrapper.get('input').setValue('Ada')
+    await wrapper.findAll('button').find(button => button.text() === 'Add another attendees')!.trigger('click')
+    await wrapper.findAll('input')[1]!.setValue('Grace')
+
+    expect(state.attendees).toEqual(['Ada', 'Grace'])
+    // Drupal allows two, so no third.
+    expect(wrapper.findAll('button').filter(button => button.text().startsWith('Add another'))).toHaveLength(0)
+  })
+
+  it('shows a field once a camel-cased legacy condition holds', async () => {
+    const fee = canonical({
+      '#type': 'textfield',
+      '#name': 'ticket_fee',
+      '#title': 'Ticket fee',
+      '#states': { visible: { ':input[name="eventType"]': { value: 'paid_show' } } },
+    })
+    // The legacy selector resolves against the form's names.
+    const fields = normalizeWebformDefinition({
+      webformId: 'test',
+      fields: {
+        eventType: { '#type': 'radio', '#name': 'event_type', '#options': { paid_show: 'Paid' }, '#optionKeys': ['paid_show'] },
+        ticketFee: fee,
+      },
+    }).fields
+    const state = reactive<WebformState>({ event_type: '' })
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: fields.ticket_fee!, fieldName: 'ticket_fee', state },
+    })
+
+    expect(wrapper.text()).not.toContain('Ticket fee')
+    state.event_type = 'paid_show'
+    await nextTick()
+    expect(wrapper.text()).toContain('Ticket fee')
   })
 })

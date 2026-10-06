@@ -10,15 +10,15 @@ import {
   getWebformScrollConfig,
 } from '#stir-webform/utils/webformScrollToTop'
 import { resolveWebformRedirect } from '#stir-webform/utils/webformRedirect'
-import { evaluateCondition } from '#stir-webform/utils/evaluateUtils'
+import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
+import { createWebformState } from '#stir-webform/utils/webformState'
+import { isWebformContainer } from '#stir-webform/utils/webformFieldTypes'
 import {
   buildWebformFormData,
   hasFileValue,
-  isWebformFileField,
 } from '#stir-webform/utils/webformFileUtils'
 import type {
   WebformDefinition,
-  WebformFieldProps,
   WebformProps,
   WebformState,
 } from '#stir/types'
@@ -26,7 +26,6 @@ import type { WebformValidationSchema } from '#stir-webform/utils/buildValidatio
 import {
   normalizeWebformDefinition,
 } from '#stir-webform/utils/webformFieldUtils'
-import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
 
 type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
@@ -78,13 +77,18 @@ const schema = shallowRef<WebformValidationSchema>()
 const isSchemaReady = ref(false)
 let buildSchema: BuildValidationSchema | undefined
 let schemaLoadPromise: Promise<void> | undefined
+// Validation follows what conditions currently show and require.
 const visibilitySignature = computed(() =>
   orderedFieldNames.value
-    .map((fieldName) =>
-      evaluateCondition(fields[fieldName]?.['#states']?.visible, state, true)
-        ? '1'
-        : '0',
-    )
+    .map((fieldName) => {
+      const field = fields[fieldName]
+
+      if (!field) return '00'
+
+      const { visible, required } = resolveWebformFieldStates(field, state)
+
+      return `${visible ? 1 : 0}${required ? 1 : 0}`
+    })
     .join(''),
 )
 
@@ -140,65 +144,8 @@ const groupedFields = computed(() => {
 })
 
 const formResetKey = ref(0)
-const isRangeLikeField = (field: WebformFieldProps) => field['#type'] === 'range'
-
-const getFieldDefaultValue = (
-  field: WebformFieldProps,
-): WebformState[string] => {
-  const defaultValue = field['#defaultValue']
-
-  if (defaultValue !== undefined && defaultValue !== null) {
-    if (Array.isArray(defaultValue)) return [...defaultValue]
-    if (typeof defaultValue === 'object') {
-      return { ...(defaultValue as Record<string, unknown>) }
-    }
-    if (
-      typeof defaultValue === 'string' ||
-      typeof defaultValue === 'number' ||
-      typeof defaultValue === 'boolean'
-    ) {
-      return defaultValue
-    }
-    return ''
-  }
-
-  const type = field['#type']
-  const multiple = field['#multiple'] === true
-
-  if (isWebformFileField(field)) return multiple ? [] : undefined
-  if (type === 'checkboxes' || multiple) return []
-  if (type === 'checkbox') return false
-  if (isRangeLikeField(field)) {
-    const minValue = Number(field['#min'])
-
-    return Number.isFinite(minValue) ? Math.max(1, minValue) : 1
-  }
-
-  return ''
-}
-
 const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
-  for (const [key, field] of Object.entries(fields)) {
-    if (isWebformDisplayElement(field)) {
-      continue
-    }
-
-    const composite =
-      typeof field['#composite'] === 'object' && field['#composite'] !== null
-        ? field['#composite']
-        : undefined
-
-    if (composite) {
-      state[key] = {} as Record<string, unknown>
-      const compositeState = state[key] as Record<string, unknown>
-
-      for (const [subKey, subField] of Object.entries(composite)) {
-        compositeState[subKey] = subField['#value'] || ''
-      }
-    } else {
-      state[key] = getFieldDefaultValue(field)
-    }
-  }
+  Object.assign(state, createWebformState(fields))
 
   if (resetOptions.bumpKey !== false) {
     formResetKey.value += 1
@@ -207,12 +154,11 @@ const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
 
 resetFormState({ bumpKey: false })
 
-const containerTypes = ['section', 'fieldset', 'details', 'webform_section']
 const shouldRenderGroupContainer = (fieldName: string) =>
   !!(
     fields[fieldName]?.parent &&
     groupedFields.value[fields[fieldName]?.parent]?.[0] === fieldName &&
-    !containerTypes.includes(fields[fieldName]['#type'])
+    !isWebformContainer(fields[fieldName])
   )
 
 const getGroupFields = (parentName: string) =>
@@ -221,7 +167,7 @@ const getGroupFields = (parentName: string) =>
 const shouldRenderIndividualField = (fieldName: string) =>
   !fields[fieldName]?.parent &&
   (fields[fieldName]
-    ? !containerTypes.includes(fields[fieldName]['#type'])
+    ? !isWebformContainer(fields[fieldName])
     : false)
 
 const isContainerVisible = (containerName: string) =>

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/webform-submission-sample.schema.json",
+  "title": "Webform submission sample",
+  "description": "A submission Webform accepted and stored unchanged for the paired payload fixture. Keys are the Drupal element keys, and each value has the shape Webform stores, which is what a frontend must submit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "webformId",
+    "data"
+  ],
+  "properties": {
+    "webformId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data": {
+      "type": "object"
+    }
+  }
+}
