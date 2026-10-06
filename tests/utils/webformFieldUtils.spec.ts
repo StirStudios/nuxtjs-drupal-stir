@@ -72,6 +72,29 @@ describe('normalizeWebformDefinition', () => {
     ])
   })
 
+  it('keys composite parts by their Drupal #name', () => {
+    const webform = normalizeWebformDefinition({
+      schemaVersion: 1,
+      fields: {
+        eventLocation: {
+          '#type': 'address',
+          '#name': 'event_location',
+          '#composite': {
+            city: { '#name': 'city', '#required': true, label: 'City/Town' },
+            stateProvince: { '#name': 'state_province', label: 'State/Province' },
+            postalCode: { '#name': 'postal_code', label: 'ZIP/Postal Code' },
+          },
+        },
+      },
+    })
+
+    expect(Object.keys(webform.fields.event_location?.['#composite'] ?? {})).toEqual([
+      'city',
+      'state_province',
+      'postal_code',
+    ])
+  })
+
   it('restores Drupal option machine names changed by Custom Elements', () => {
     const webform = normalizeWebformDefinition({
       schemaVersion: 1,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.30.0",
+  "contractVersion": "1.31.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -164,7 +164,8 @@
       "schema": "schemas/webform.schema.json",
       "fixtures": [
         "fixtures/webform-contact.json",
-        "fixtures/webform-calculator.json"
+        "fixtures/webform-calculator.json",
+        "fixtures/webform-event.json"
       ]
     },
     "webform.submission.response": {

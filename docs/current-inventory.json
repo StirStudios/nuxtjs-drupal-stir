@@ -488,7 +488,8 @@
       "/api/sitemap",
       "/api/stir/presentation-catalogue",
       "/api/view/:paragraphId",
-      "/api/webform/submit"
+      "/api/webform/submit",
+      "/sites/default/files/**"
     ]
   },
   "publicApiSurface": {
@@ -827,10 +828,10 @@
     "utils": 75,
     "plugins": 10,
     "middleware": 5,
-    "serverRoutes": 29,
+    "serverRoutes": 30,
     "productionDependencies": 35,
     "developmentDependencies": 27,
-    "tests": 222,
+    "tests": 223,
     "testsByArea": {
       "composables": 13,
       "contracts": 1,
@@ -838,7 +839,7 @@
       "scripts": 5,
       "server": 31,
       "unit": 11,
-      "utils": 64
+      "utils": 65
     }
   },
   "tests": [
@@ -1010,6 +1011,7 @@
     "tests/utils/componentTreeDiagnostics.spec.ts",
     "tests/utils/dateUtils.spec.ts",
     "tests/utils/drupalLink.spec.ts",
+    "tests/utils/drupalPublicFiles.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
     "tests/utils/drupalViewPublicQuery.spec.ts",
     "tests/utils/drupalViewQueryNamespace.spec.ts",

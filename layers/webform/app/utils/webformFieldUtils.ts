@@ -190,6 +190,18 @@ function normalizeWebformField(
   source['#name'] = String(source['#name'] || fallbackName)
   source['#type'] = resolveWebformFieldType(source as WebformFieldProps)
 
+  // Custom Elements camel-cases composite part keys too (an address's
+  // `state_province` arrives as `stateProvince`); each part's `#name` is the
+  // key Drupal stores it under.
+  if (isRecord(source['#composite'])) {
+    source['#composite'] = Object.fromEntries(
+      Object.entries(source['#composite']).map(([key, part]) => [
+        isRecord(part) && typeof part['#name'] === 'string' && part['#name'] ? part['#name'] : key,
+        part,
+      ]),
+    )
+  }
+
   if (source['#type'] === 'checkbox') {
     source['#defaultValue'] = resolveBooleanProp(source['#defaultValue'])
   }

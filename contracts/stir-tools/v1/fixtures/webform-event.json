@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "webformId": "submit_event",
+  "webformTitle": "Submit an event",
+  "fields": {
+    "eventDetails": {
+      "#type": "fieldset",
+      "#name": "event_details",
+      "#title": "Event details",
+      "#states": {},
+      "children": {
+        "eventName": {
+          "#type": "textfield",
+          "#name": "event_name",
+          "#title": "Event name",
+          "#required": true,
+          "#maxlength": 60,
+          "#states": {}
+        },
+        "datesTimes": {
+          "#type": "textarea",
+          "#name": "dates_times",
+          "#title": "Dates/Times",
+          "#required": true,
+          "#states": {}
+        }
+      }
+    },
+    "eventLocation": {
+      "#type": "address",
+      "#name": "event_location",
+      "#title": "Event address",
+      "#states": {},
+      "#composite": {
+        "city": { "#name": "city", "#required": true, "value": "", "label": "City/Town" },
+        "stateProvince": { "#name": "state_province", "#required": false, "value": "", "label": "State/Province" },
+        "postalCode": { "#name": "postal_code", "#required": false, "value": "", "label": "ZIP/Postal Code" },
+        "country": { "#name": "country", "#required": true, "value": "", "label": "Country", "options": { "US": "United States" } }
+      }
+    },
+    "doubleCheck": {
+      "#type": "checkbox",
+      "#name": "double_check",
+      "#title": "Did you check all the information above is correct?",
+      "#required": true,
+      "#defaultValue": false,
+      "#states": {}
+    }
+  },
+  "actions": [
+    { "#type": "webform_actions", "#submitLabel": "Submit event" }
+  ],
+  "webformConfirmation": "<p>Thank you for submitting your event listing.</p>",
+  "webformConfirmationType": "message",
+  "webformRedirect": null,
+  "webformSubmissions": null
+}
