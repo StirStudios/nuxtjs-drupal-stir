@@ -22,7 +22,7 @@ export async function assertPresetComponents(consumerDir, preset) {
   ]) {
     if (components.includes(path) === minimal) throw new Error(`${preset} has incorrect optional component ownership: ${path}`)
   }
-  for (const name of ['useEvaluateState', 'useStirWebformTheme', 'buildValidationSchema']) {
+  for (const name of ['useContainerVisibility', 'useStirWebformTheme', 'buildValidationSchema']) {
     if (imports.includes(name) === minimal) throw new Error(`${preset} has incorrect optional import ownership: ${name}`)
   }
 }

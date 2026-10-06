@@ -1,4 +1,3 @@
-// Registered as a Nuxt type template by the auth layer, so keep it import-free.
 type StirAuthAccountNavItemConfig = {
   label: string
   to: string
@@ -20,7 +19,9 @@ type StirAuthAppConfig = {
   }
 }
 
-declare module 'nuxt/schema' {
+// Augment `@nuxt/schema`: from Nuxt 4.6, `nuxt/schema` only re-exports it, and
+// augmentations of a re-exported interface never reach `useAppConfig()`.
+declare module '@nuxt/schema' {
   interface AppConfigInput {
     auth?: StirAuthAppConfig
   }
