@@ -7,6 +7,11 @@ allowBuilds:
 
 overrides:
   fontless>esbuild: 0.28.2
+  # @nuxt/devtools default-imports simple-git, which v4 removed; 2.0.1 keeps the
+  # v3 vulnerabilityCheck(args, env) contract and fixes GHSA-v5rq-49vh-5v5c.
+  simple-git@3>@simple-git/argv-parser: 2.0.1
+  # release-it pins undici 7.28.0; 7.29.1 fixes the 7.x advisories.
+  release-it>undici: ^7.29.1
 
 # CE 2.9.0 imports H3 without declaring it; Nuxt 4 uses H3 1.
 packageExtensions:

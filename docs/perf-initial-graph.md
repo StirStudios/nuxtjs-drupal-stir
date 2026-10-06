@@ -14,6 +14,13 @@ across navigations, and costs 1.79 kB of entry JavaScript (auth chrome
 middleware and layout wiring) against the previous 236.94 kB build. CSS was
 unchanged.
 
+Nuxt 4.6 then brought the caps down to 233 / 197.5 kB. On the same layer code,
+Nuxt 4.5.2 built 237.98 kB initial (202.56 kB JavaScript) and Nuxt 4.6.0 builds
+231.65 kB (196.13 kB JavaScript). 4.6 no longer ships `unctx` to the browser
+and skips `defu` for a single `app.config`. CSS stayed at about 35.5 kB. The
+editor-only graph grew from 284.92 to 299.35 kB under 4.6's chunking, but it
+loads only for editors, and its largest chunk is well inside the deferred cap.
+
 Recovering those bytes is still worthwhile, and the caps should be ratcheted
 back down as it happens. This file records what the graph is actually made of
 so that work starts from measurement rather than guesswork.

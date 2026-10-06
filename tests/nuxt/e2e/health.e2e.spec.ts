@@ -155,6 +155,16 @@ const drupalFixtureServer = createServer((request, response) => {
         : path.endsWith('/pause-controls-fixture') ? pauseControlsFixture
           : path.endsWith('/carousel-interaction-fixture') ? carouselFixture : pageFixture
 
+  const errorStatus = path.endsWith('/missing-fixture')
+    ? 404
+    : path.endsWith('/maintenance-fixture') ? 503 : 0
+
+  if (errorStatus) {
+    response.writeHead(errorStatus, { 'content-type': 'application/json' })
+    response.end(JSON.stringify({ message: 'Fixture error' }))
+    return
+  }
+
   response.writeHead(200, { 'content-type': 'application/json' })
   response.end(JSON.stringify(payload))
 })
@@ -296,6 +306,24 @@ describe('Nuxt E2E smoke', async () => {
 
     expect(response.status).toBe(403)
     expect(response.headers.get('cache-control')).toBe('private, no-store, max-age=0')
+  })
+
+  it('renders a Drupal 404 as the not-found page without shared caching', async () => {
+    const response = await fetch(url('/missing-fixture'), { headers: { accept: 'text/html' } })
+    const html = await response.text()
+
+    expect(response.status).toBe(404)
+    expect(response.headers.get('content-type')).toContain('text/html')
+    expect(response.headers.get('cache-control')).toBe('no-cache')
+    expect(html).toContain('<meta name="robots" content="noindex, nofollow">')
+  })
+
+  it('renders Drupal maintenance as a 503 with Retry-After', async () => {
+    const response = await fetch(url('/maintenance-fixture'), { headers: { accept: 'text/html' } })
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('300')
+    expect(response.headers.get('cache-control')).toBe('no-cache')
   })
 
   it('prevents shared caching of authenticated protected HTML', async () => {

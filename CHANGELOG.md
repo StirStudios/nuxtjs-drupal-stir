@@ -13,6 +13,30 @@ untouched do not need one.
 
 ## Unreleased
 
+### Dependency security
+
+- **Refresh sharp to 0.35.5 in each site's lockfile.** sharp ships in the
+  production server through `@nuxt/image`'s IPX provider, and 0.35.4 bundles a
+  vulnerable librsvg (GHSA-wq5f-xc86-pv6w). The layer's lockfile now resolves
+  0.35.5, but a site resolves its own: run
+  `pnpm update sharp shell-quote @modelcontextprotocol/client`, which stays
+  inside the existing ranges and also clears GHSA-pqg4-j6r4-53mv and
+  GHSA-6qxp-vccf-f47h (dev-only).
+- **pnpm overrides in the layer do not reach sites.** To clear the dev-only
+  simple-git and undici alerts, add these to the site's `pnpm-workspace.yaml`:
+
+  ```yaml
+  overrides:
+    simple-git@3>@simple-git/argv-parser: 2.0.1
+    release-it>undici: ^7.29.1 # only if the site uses release-it
+  ```
+
+  Do not override `simple-git` itself to v4: `@nuxt/devtools` 3.4 default-imports
+  it, and v4 removed that export. The argv-parser override fixes
+  GHSA-v5rq-49vh-5v5c; the remaining simple-git 3 advisories need a devtools
+  release on simple-git 4. `braces` 3.0.3 and `node-forge` 1.4.0 have no patched
+  release yet; both are build and dev-server only and absent from `.output`.
+
 ### Rich text
 
 - **Document links embedded in rich text sit on their own line and follow the
@@ -35,6 +59,17 @@ untouched do not need one.
 
 ### Nuxt 4.6
 
+- **Changed: error pages render inside the failed request**
+  (`experimental.inlineErrorRendering`). Nuxt no longer re-enters the server
+  through `/__nuxt_error`, so an error page keeps the headers and cookies the
+  failed render had set. Middleware and route rules do not run a second time,
+  and `render:html` sees the original request: a 404 page now carries the
+  robots meta tag, as well as the `X-Robots-Tag` header it already had.
+  Status codes and the maintenance page's `Retry-After` are unchanged. Nitro's
+  error handler, which inline rendering bypasses, set `Cache-Control: no-cache`.
+  The layer now sets it on any HTML error response that has no cache
+  directive, and leaves a private page's `private, no-store` alone. A site
+  that sets `experimental.inlineErrorRendering: false` keeps the old path.
 - **Breaking: the layer now requires Nuxt 4.6 and Node.js
   `^22.22.3 || ^24.15.0 || >=26`.** `nuxt`, `@nuxt/kit` and `@nuxt/schema`
   move to `^4.6.0`, so the layer can adopt 4.6-only APIs such as
@@ -44,6 +79,12 @@ untouched do not need one.
   the lockfile. Nuxt 4.6 loads `nuxt.config` as an ES module, so a site config
   that uses `__dirname` fails `nuxt prepare`. Resolve paths with
   `fileURLToPath(new URL('./path', import.meta.url))` instead.
+- **Changed: the dev server refuses an unknown `Host`.** `@nuxt/cli` 4, which
+  ships with Nuxt 4.6, answers `Forbidden: this host is not allowed` on its
+  own pages (loading screen, error report) when the request's `Host` is not
+  one it listens on. In DDEV, nginx proxies `nuxt.<project>.ddev.site` to the
+  dev server, so start it with `nuxi dev --public`: in the project's
+  `ecosystem.config.js`, `args: 'dev --public'` (stir-decoupled a3ced4d6).
 - **Removed:** `useDrupalViewControls` no longer re-exports the
   `ExposedFilter` and `ExposedSort` types. Nuxt 4.6 auto-imports them from
   `app/types`, and the second export made `nuxt prepare` warn that each was
