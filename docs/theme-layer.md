@@ -76,9 +76,9 @@ output stays wrapper-free; editable fields own their control positioning.
 ### Nuxt Image delivery
 
 Nuxt Image with the local IPX provider is the default image delivery path.
-IPX trusts two sources: the Drupal origin (`DRUPAL_URL`) and the public file
-host (`DRUPAL_CDN`), and visitors receive IPX variants (through
-`NUXT_IMAGE_CDN` when set).
+IPX trusts the Drupal origin (`DRUPAL_URL`) and the public file host
+(`NUXT_IMAGE_CDN`, or `DRUPAL_CDN` when the file host is a different one), and
+visitors receive IPX variants (through `NUXT_IMAGE_CDN` when set).
 
 Every file address Drupal hands out must be on a public host, never the
 backend host, whose `robots.txt` is `Disallow: /`. Structured data, sitemap
@@ -87,8 +87,9 @@ that never pass through Nuxt Image, so a backend host there is blocked for
 search engines. Set the same public file host in both apps:
 
 - Drupal `DRUPAL_CDN` makes `stir_cdn` write it into every public file URL.
-- Nuxt `DRUPAL_CDN` lets IPX resize those URLs, and `NUXT_IMAGE_CDN` is
-  normally the same host.
+- Nuxt `NUXT_IMAGE_CDN`, the same host, serves IPX variants and lets IPX
+  resize those URLs. Nuxt needs `DRUPAL_CDN` only when the file host differs
+  from `NUXT_IMAGE_CDN`.
 
 That host is one pull CDN zone whose origin is the Nuxt site. The theme layer
 serves `/sites/default/files/**` from `DRUPAL_URL` (GET and HEAD only, no
