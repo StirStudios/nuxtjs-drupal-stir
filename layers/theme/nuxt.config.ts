@@ -36,14 +36,9 @@ const stirImageCdn = resolveImageCdnBase(
   process.env.NUXT_IMAGE_CDN,
   process.env.NODE_ENV === 'development',
 )
-// The website's originals come from Drupal itself; images reach visitors
-// through IPX (and NUXT_IMAGE_CDN). NUXT_IMAGE_SOURCE_CDN additionally trusts
-// the public file CDN as an IPX source, for images addressed from outside Nuxt
-// by their public URL, such as in emails. Opt-in; unset changes nothing.
-const drupalImageDomains = resolveDrupalImageDomains(
-  process.env.DRUPAL_URL,
-  process.env.NUXT_IMAGE_SOURCE_CDN,
-)
+// Originals come from Drupal itself. Images reach visitors through IPX (and
+// NUXT_IMAGE_CDN), so a separate Drupal file CDN would only add a hop.
+const drupalImageDomains = resolveDrupalImageDomains(process.env.DRUPAL_URL)
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
 const ipxRuntimeProvider = resolvePath(

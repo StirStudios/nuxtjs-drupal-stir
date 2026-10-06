@@ -67,9 +67,6 @@ The layer's documented names (`DRUPAL_API_KEY`, `TURNSTILE_SECRET`,
   hosts with a deploy.
 - `NUXT_IMAGE_CDN`, `NUXT_NAME` (runtime `NUXT_SITE_NAME` exists but is not
   used by Stir), `SERVER_DOMAIN_CLIENT` and `NODE_ENV`.
-- `NUXT_IMAGE_SOURCE_CDN` (optional): the public file CDN origin, such as
-  `https://cdn.example.com`, trusted as an extra IPX source. See
-  [theme-layer.md](theme-layer.md#nuxt-image-delivery).
 
 The keys generated `.env` files contain today (`NUXT_ENV`, `NUXT_NAME`,
 `NUXT_INDEXABLE`, `NUXT_URL`, `NUXT_IMAGE_CDN`) match no `runtimeConfig` path,
