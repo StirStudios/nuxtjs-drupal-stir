@@ -36,12 +36,15 @@ const stirImageCdn = resolveImageCdnBase(
   process.env.NUXT_IMAGE_CDN,
   process.env.NODE_ENV === 'development',
 )
-// IPX sources: the Drupal origin, and DRUPAL_CDN, the public file host Drupal
-// writes into every file URL it hands out (payloads, structured data, sitemap,
-// favicons, mail) so none of them names the backend host. Keep both.
+// IPX sources: the Drupal origin, and the public file host Drupal writes into
+// every file URL it hands out (payloads, structured data, sitemap, favicons,
+// mail) so none of them names the backend host. That host is normally the
+// NUXT_IMAGE_CDN zone, so a site sets only NUXT_IMAGE_CDN; DRUPAL_CDN is for a
+// file host that differs from it. Keep all three.
 const drupalImageDomains = resolveDrupalImageDomains(
   process.env.DRUPAL_URL,
   process.env.DRUPAL_CDN,
+  process.env.NUXT_IMAGE_CDN,
 )
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
