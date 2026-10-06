@@ -22,11 +22,33 @@ untouched do not need one.
   directly under the media above it. Needs no Stir Tools update to be safe:
   without it, no document wrappers exist.
 
+### Nuxt Image
+
+- **Fixed: IPX errors were cached for a year.** The `/_ipx/**` route rule sent
+  `public, max-age=31536000, immutable` on every response, and IPX sends no
+  `Cache-Control` of its own on errors, so a 404, 403 or 400 kept that header.
+  A pull CDN (Bunny, Cloudflare) or a browser could then keep a broken image
+  until a manual purge. The route rule now sends `public, max-age=60`, which
+  only errors keep: a resized image still gets IPX's own header, which repeats
+  the source file's max-age (ten years from Drupal's file host), unchanged.
+  Already cached errors still need one purge of `/_ipx/` on each zone.
+
 ### Nuxt 4.6
 
-The layer supports Nuxt 4.5.2 and 4.6, and its own lockfile now tests 4.6.0.
-The `nuxt` range stays `^4.5.2`, so a site is not forced to upgrade.
-
+- **Breaking: the layer now requires Nuxt 4.6 and Node.js
+  `^22.22.3 || ^24.15.0 || >=26`.** `nuxt`, `@nuxt/kit` and `@nuxt/schema`
+  move to `^4.6.0`, so the layer can adopt 4.6-only APIs such as
+  `nuxt/server`. Before updating `@stir/base`, put every build and deploy
+  host on a supported Node version. Then update the site's Nuxt with
+  `pnpm update nuxt --latest`, or `npx nuxt upgrade --dedupe`, and commit
+  the lockfile. Nuxt 4.6 loads `nuxt.config` as an ES module, so a site config
+  that uses `__dirname` fails `nuxt prepare`. Resolve paths with
+  `fileURLToPath(new URL('./path', import.meta.url))` instead.
+- **Removed:** `useDrupalViewControls` no longer re-exports the
+  `ExposedFilter` and `ExposedSort` types. Nuxt 4.6 auto-imports them from
+  `app/types`, and the second export made `nuxt prepare` warn that each was
+  imported twice. No audited site imported them from the composable. A site
+  that did should import them from `#stir/types/View`.
 - **Fixed: a site on Nuxt 4.6 failed `nuxi typecheck`.** Nuxt 4.6 stopped
   bridging `nuxt/schema` and `@nuxt/schema` ([nuxt/nuxt#36186](https://github.com/nuxt/nuxt/pull/36186)),
   so the layer's `AppConfig` augmentations no longer reached `useAppConfig()`.
@@ -46,11 +68,6 @@ The `nuxt` range stays `^4.5.2`, so a site is not forced to upgrade.
   string. `routeHero.variants` accepts a site's own variant names alongside
   `cover`, `simple` and `overlap`. `stirTheme.carousel.root` also accepts a
   list. The runtime already did all three; the types now match.
-- Upgrading a site to Nuxt 4.6 needs Node.js `^22.22.3 || ^24.15.0 || >=26`
-  on every build and deploy host. Nuxt 4.6 also auto-imports types from
-  `app/types`, so `nuxt prepare` warns that `ExposedFilter` and `ExposedSort`
-  are imported twice. The warning is harmless: both names refer to the same
-  type, and the composable still re-exports them for sites on 4.5.
 
 ### Webform
 
