@@ -82,12 +82,12 @@ fetches originals from there; visitors receive IPX variants (through
 
 Images addressed from outside Nuxt, such as in emails, use the public file URL,
 which on a site whose Drupal rewrites file URLs to a CDN is that CDN, not the
-Drupal origin. Set `DRUPAL_CDN` to that CDN's origin (the same value Drupal
-uses) to let IPX resize them, for example
+Drupal origin. Set `NUXT_IMAGE_SOURCE_CDN` to that CDN's origin to let IPX resize
+them, for example
 `https://www.example.com/_ipx/f_jpeg&w_1120/https://cdn.example.com/sites/default/files/...`.
 It only adds a trusted source; leave it unset unless something outside Nuxt
-needs it. (`aaf36ad9` removed this trust as unused by the website; emails need
-it, so it was restored.)
+needs it. (It replaces the `DRUPAL_CDN` trust removed in `aaf36ad9`, under a
+name that says what it is for.)
 
 Projects using IPX
 must also permit the package manager to build Sharp in their

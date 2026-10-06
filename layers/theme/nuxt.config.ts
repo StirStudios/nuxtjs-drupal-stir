@@ -37,13 +37,12 @@ const stirImageCdn = resolveImageCdnBase(
   process.env.NODE_ENV === 'development',
 )
 // The website's originals come from Drupal itself; images reach visitors
-// through IPX (and NUXT_IMAGE_CDN). DRUPAL_CDN, the CDN Drupal rewrites file
-// URLs to, is also trusted as an IPX source: the website does not need it, but
-// images addressed from outside Nuxt by their public URL, such as in emails,
-// do. Keep it. Unset changes nothing.
+// through IPX (and NUXT_IMAGE_CDN). NUXT_IMAGE_SOURCE_CDN additionally trusts
+// the public file CDN as an IPX source, for images addressed from outside Nuxt
+// by their public URL, such as in emails. Opt-in; unset changes nothing.
 const drupalImageDomains = resolveDrupalImageDomains(
   process.env.DRUPAL_URL,
-  process.env.DRUPAL_CDN,
+  process.env.NUXT_IMAGE_SOURCE_CDN,
 )
 const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
 const imageProviderComponent = resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
