@@ -21,6 +21,15 @@
     @apply sm:w-[calc(50%-0.625rem)] sm:max-w-none;
   }
 
+  :where(.prose, .admin-editor-prose) drupal-media[data-media-type='document'] {
+    @apply mb-5 block;
+  }
+
+  :where(.prose, .admin-editor-prose)
+    drupal-media[data-media-type='document'].align-center {
+    @apply mt-0 max-w-none text-center;
+  }
+
   .align-left {
     @apply mx-auto mb-5 max-w-sm sm:float-left sm:me-5;
   }

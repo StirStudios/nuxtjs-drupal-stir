@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Rich text
+
+- **Document links embedded in rich text sit on their own line and follow the
+  embed's alignment.** Stir Tools now renders document media as
+  `<drupal-media data-media-type="document">` holding a download link. The
+  layer shows the wrapper as a block, and a centred embed centres its link
+  directly under the media above it. Needs no Stir Tools update to be safe:
+  without it, no document wrappers exist.
+
 ### Nuxt 4.6
 
 The layer supports Nuxt 4.5.2 and 4.6, and its own lockfile now tests 4.6.0.
