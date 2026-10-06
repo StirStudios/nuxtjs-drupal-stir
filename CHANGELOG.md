@@ -79,6 +79,12 @@ untouched do not need one.
   the lockfile. Nuxt 4.6 loads `nuxt.config` as an ES module, so a site config
   that uses `__dirname` fails `nuxt prepare`. Resolve paths with
   `fileURLToPath(new URL('./path', import.meta.url))` instead.
+- **Changed: the dev server refuses an unknown `Host`.** `@nuxt/cli` 4, which
+  ships with Nuxt 4.6, answers `Forbidden: this host is not allowed` on its
+  own pages (loading screen, error report) when the request's `Host` is not
+  one it listens on. In DDEV, nginx proxies `nuxt.<project>.ddev.site` to the
+  dev server, so start it with `nuxi dev --public`: in the project's
+  `ecosystem.config.js`, `args: 'dev --public'` (stir-decoupled a3ced4d6).
 - **Removed:** `useDrupalViewControls` no longer re-exports the
   `ExposedFilter` and `ExposedSort` types. Nuxt 4.6 auto-imports them from
   `app/types`, and the second export made `nuxt prepare` warn that each was
