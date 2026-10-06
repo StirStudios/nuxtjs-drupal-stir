@@ -119,6 +119,12 @@ and `/sites/default/files/**`, and cache successful responses. This mode deliber
 provider and keeps Nuxt's local `/_ipx` transformer registered; it does not
 require Bunny Optimizer, a storage zone, or pre-uploaded derivatives.
 
+A resized image keeps IPX's own `Cache-Control`, which repeats the source
+file's max-age (ten years from Drupal's file host); revisioned `?v=` URLs make
+that safe. IPX errors (a missing file, an untrusted host, a bad modifier) get
+`public, max-age=60` from the `/_ipx/**` route rule, so a CDN or browser
+retries within a minute instead of keeping the error.
+
 `MediaImage` versions `originalSrc` (falling back to `src`) with
 `originalRevision` and passes the canonical source to Nuxt Image. Unknown or
 missing profiles use the `container` profile, so payload omissions remain safe

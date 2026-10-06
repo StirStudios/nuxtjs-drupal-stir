@@ -1,5 +1,11 @@
 import createIpxProvider from '@nuxt/image/runtime/providers/ipx'
 
+// The `/_ipx/**` route-rule header. IPX replaces it on every image it serves
+// with the source file's own max-age, and sends none on errors, so this short
+// value reaches only error responses: a CDN or browser then retries a missing
+// or rejected image within a minute instead of keeping the error for a year.
+export const ipxErrorCacheControl = 'public, max-age=60'
+
 function extractRevision(source: string): {
   revision?: string
   source: string

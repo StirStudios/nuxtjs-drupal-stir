@@ -837,7 +837,7 @@
     "serverRoutes": 30,
     "productionDependencies": 35,
     "developmentDependencies": 27,
-    "tests": 225,
+    "tests": 226,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
@@ -845,7 +845,7 @@
       "scripts": 5,
       "server": 31,
       "unit": 11,
-      "utils": 66
+      "utils": 67
     }
   },
   "tests": [
@@ -1038,6 +1038,7 @@
     "tests/utils/heroVideoSource.spec.ts",
     "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",
+    "tests/utils/ipxCacheControl.spec.ts",
     "tests/utils/layerContract.spec.ts",
     "tests/utils/layoutContract.spec.ts",
     "tests/utils/linkHubHeroImage.spec.ts",

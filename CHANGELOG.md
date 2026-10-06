@@ -22,6 +22,17 @@ untouched do not need one.
   directly under the media above it. Needs no Stir Tools update to be safe:
   without it, no document wrappers exist.
 
+### Nuxt Image
+
+- **Fixed: IPX errors were cached for a year.** The `/_ipx/**` route rule sent
+  `public, max-age=31536000, immutable` on every response, and IPX sends no
+  `Cache-Control` of its own on errors, so a 404, 403 or 400 kept that header.
+  A pull CDN (Bunny, Cloudflare) or a browser could then keep a broken image
+  until a manual purge. The route rule now sends `public, max-age=60`, which
+  only errors keep: a resized image still gets IPX's own header, which repeats
+  the source file's max-age (ten years from Drupal's file host), unchanged.
+  Already cached errors still need one purge of `/_ipx/` on each zone.
+
 ### Nuxt 4.6
 
 The layer supports Nuxt 4.5.2 and 4.6, and its own lockfile now tests 4.6.0.

@@ -17,6 +17,7 @@ import {
   type PresentationConfig,
 } from './build/presentationSource'
 import {
+  ipxErrorCacheControl,
   resolveDrupalImageDomains,
   resolveImageCdnBase,
 } from './build/imageCdn'
@@ -96,7 +97,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/_ipx/**': {
       headers: {
-        'cache-control': 'public, max-age=31536000, immutable',
+        'cache-control': ipxErrorCacheControl,
       },
     },
   },
