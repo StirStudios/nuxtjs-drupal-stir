@@ -75,10 +75,28 @@ output stays wrapper-free; editable fields own their control positioning.
 
 ### Nuxt Image delivery
 
-Nuxt Image with the local IPX provider is the default image delivery path. The
-Drupal origin hostname is allowed automatically from `DRUPAL_URL`, and IPX
-fetches originals from there; visitors receive IPX variants (through
-`NUXT_IMAGE_CDN` when set), so Drupal file URLs need no CDN of their own.
+Nuxt Image with the local IPX provider is the default image delivery path.
+IPX trusts two sources: the Drupal origin (`DRUPAL_URL`) and the public file
+host (`DRUPAL_CDN`), and visitors receive IPX variants (through
+`NUXT_IMAGE_CDN` when set).
+
+Every file address Drupal hands out must be on a public host, never the
+backend host, whose `robots.txt` is `Disallow: /`. Structured data, sitemap
+images, favicons, social images and mail are read by crawlers and mail clients
+that never pass through Nuxt Image, so a backend host there is blocked for
+search engines. Set the same public file host in both apps:
+
+- Drupal `DRUPAL_CDN` makes `stir_cdn` write it into every public file URL.
+- Nuxt `DRUPAL_CDN` lets IPX resize those URLs, and `NUXT_IMAGE_CDN` is
+  normally the same host.
+
+That host is one pull CDN zone whose origin is the Nuxt site. The Nuxt vhost
+serves `/sites/default/files/**` from Drupal (the shared `nuxt.tpl` in
+`stir-server-config`), so the one zone answers both `/_ipx/**` and original
+files. A zone whose origin is the Drupal host cannot serve `/_ipx` and answers
+404. `pnpm audit:seo` fails when an image or icon handed to search engines is
+blocked by its host's `robots.txt`.
+
 Projects using IPX
 must also permit the package manager to build Sharp in their
 trusted-dependency policy. Nuxt Image is the single frontend image-delivery
@@ -86,9 +104,9 @@ path; Drupal supplies the original asset, revision, intrinsic dimensions, and
 semantic delivery profile rather than generating frontend derivatives.
 
 Set `NUXT_IMAGE_CDN` to an absolute CDN origin such as
-`https://images.example.com` to render IPX derivative URLs through an ordinary
-pull CDN. The CDN origin must point to the Nuxt application, forward `/_ipx/**`,
-and cache successful responses. This mode deliberately reuses Nuxt Image's IPX
+`https://cdn.example.com` to render IPX derivative URLs through an ordinary
+pull CDN. The CDN origin must point to the Nuxt application, forward `/_ipx/**`
+and `/sites/default/files/**`, and cache successful responses. This mode deliberately reuses Nuxt Image's IPX
 provider and keeps Nuxt's local `/_ipx` transformer registered; it does not
 require Bunny Optimizer, a storage zone, or pre-uploaded derivatives.
 

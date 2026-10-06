@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { attributes, crawlableUrl, hasNoindex, readUrlArgument, resolveSiteUrl } from '../../scripts/seo/html.mjs'
+import { attributes, crawlableUrl, hasNoindex, readUrlArgument, resolveSiteUrl, robotsAllows } from '../../scripts/seo/html.mjs'
 
 describe('SEO HTML inspection', () => {
   it('reads quoted, unquoted, boolean, and encoded attributes', () => {
@@ -19,6 +19,20 @@ describe('SEO HTML inspection', () => {
   it('recognizes noindex as a complete robots token', () => {
     expect(hasNoindex('nofollow, noindex')).toBe(true)
     expect(hasNoindex('index, follow')).toBe(false)
+  })
+
+  it('reads robots.txt the way Google does', () => {
+    const backend = 'User-agent: *\nDisallow: /\n'
+    const filesAllowed = 'User-agent: *\nAllow: /sites/default/files/\nDisallow: /\n'
+
+    expect(robotsAllows(backend, '/sites/default/files/meta/favicon.ico')).toBe(false)
+    expect(robotsAllows(filesAllowed, '/sites/default/files/meta/favicon.ico')).toBe(true)
+    expect(robotsAllows(filesAllowed, '/node/1')).toBe(false)
+    expect(robotsAllows('User-agent: *\nDisallow:\n', '/anything')).toBe(true)
+    expect(robotsAllows('', '/anything')).toBe(true)
+    expect(robotsAllows('User-agent: Googlebot\nDisallow: /private\n\nUser-agent: *\nDisallow: /\n', '/public')).toBe(true)
+    expect(robotsAllows('User-agent: *\nDisallow: /*.pdf$\n', '/guide.pdf')).toBe(false)
+    expect(robotsAllows('User-agent: *\nDisallow: /*.pdf$\n', '/guide.pdf?download=1')).toBe(true)
   })
 
   it('reads the audit origin only from an explicit --url argument', () => {
