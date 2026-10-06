@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.30.0",
+  "contractVersion": "1.31.0",
   "files": {
     "fixtures/account-settings-update-error.json": "55b9059ee49f33b77876622afd3dabc30369dec71f6eff56b9698610ab5a678f",
     "fixtures/account-settings-update-success.json": "23fca3887518f9ddbc9f52abae9bf2aab021dc9e0a185cbc83cfe22cea7c5076",
@@ -28,9 +28,10 @@
     "fixtures/sitemap.json": "5167a7958d5018b979752582a0e52b8afcc97c11510b2384a60b904d41240a11",
     "fixtures/webform-calculator.json": "a52a397e845256d8b054411bf9aa630f0d975ee603a59e4c1155f959f6f4b6fa",
     "fixtures/webform-contact.json": "7074c24531e159b3cc479f538832b1087886cc400ac11f8a34be07581d673ee1",
+    "fixtures/webform-event.json": "25ff54116955712872cab9b7b012665530fc3ff41e7a595c336b0b6e4f63cfd4",
     "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
     "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
-    "manifest.json": "5a2dd3a74bf4740e09bc1e161951afd16b1bbbba3016a6f039830a7f48800798",
+    "manifest.json": "986ba98d1aa7ef8b3c15c0dc00179235221195319cc6e39b0ea8d1d57eba0ff7",
     "schemas/account-settings-update.schema.json": "6f3362b418e3b31afbd54e9f76be2d6bd052f8b4a59383ebdcab4666941ae252",
     "schemas/account-settings-values.schema.json": "189523229869b68ba03c8cbee22c83855d6f869b8a10ab06170463d241efb1ea",
     "schemas/account-snapshot.schema.json": "6a59eac1c80e3b34de5d455de93ac335f95b3df350f7e694c83dc53d05614ae4",
