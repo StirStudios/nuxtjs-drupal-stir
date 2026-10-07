@@ -50,9 +50,9 @@ const placeholder = computed(() => {
 
   if (props.floatingLabel && !isMaterial.value) return ' '
 
-  if (value) return value
-
-  return minValue.value !== undefined ? String(minValue.value) : ''
+  // Only Drupal's own placeholder: showing the minimum here looked like an
+  // entered value, so visitors believed they had answered.
+  return value
 })
 
 const defaultValue = computed(() => {
