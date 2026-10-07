@@ -41,6 +41,10 @@
       "pathEnvironment": "STIR_CONSUMER_DDRINK",
       "routes": ["/", "discover:first-inner"]
     },
+    "wotw": {
+      "pathEnvironment": "STIR_CONSUMER_WOTW",
+      "routes": ["/", "discover:first-inner"]
+    },
     "stir-base": {
       "pathEnvironment": "STIR_CONSUMER_STIR_BASE",
       "routes": ["/", "discover:first-inner"]

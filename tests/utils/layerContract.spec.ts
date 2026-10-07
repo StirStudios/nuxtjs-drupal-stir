@@ -328,6 +328,7 @@ describe('layer contract', () => {
       'tkflagg',
       'sbpublic',
       'ddrink',
+      'wotw',
       'stir-base',
     ])
     expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
