@@ -24,7 +24,7 @@ Keep the application on exactly `nuxtjs-drupal-ce` 2.9.0 while using this patch;
 install and commit the lockfile, then rebuild and test client navigation. This
 layer's patch does not automatically propagate into consumer applications.
 Remove the entry and patch after adopting an upstream release with the fix.
-Do not apply it to another version without review. Deployment to Stir or DancePlug
+Do not apply it to another version without review. Deployment to each site
 must be validated separately; availability in this layer is not site deployment.
 
 ## Drupal CE runtime dependency repair

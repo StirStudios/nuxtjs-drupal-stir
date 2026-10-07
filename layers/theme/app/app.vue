@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 const appConfig = useAppConfig()
 const nuxtApp = useNuxtApp()
-// Embedded in another site (for example Piper's calculator widget), the app
+// Embedded in another site (for example a calculator widget), the app
 // renders only its page: the host page owns the skip link, announcements,
 // loading bar and page-level extras.
 const embedded = computed(() => appConfig.stirTheme.embedded === true)

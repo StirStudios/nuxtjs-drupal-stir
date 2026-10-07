@@ -12,7 +12,7 @@ const appFooterContextData = ref({
   ],
   site_info: {
     name: 'Santa Barbara Public Market Dev',
-    mail: 'info@sbpublicmarket.com',
+    mail: 'info@example.com',
     slogan: 'Fine food and wine',
   },
 })
@@ -128,7 +128,7 @@ describe('Footer (Nuxt runtime)', () => {
     expect(centerSection.classes()).toContain('flex-col')
     expect(centerSection.classes()).not.toContain('grid')
     expect(wrapper.text()).toContain('Accessibility Statement')
-    expect(wrapper.text()).toContain('info@sbpublicmarket.com')
+    expect(wrapper.text()).toContain('info@example.com')
     expect(wrapper.find('[data-slot="left"]').classes()).toContain('order-1')
     expect(wrapper.find('[data-slot="center"]').classes()).toEqual(expect.arrayContaining(['order-3', 'lg:order-2']))
     expect(wrapper.find('[data-slot="right"]').classes()).toEqual(expect.arrayContaining(['order-2', 'lg:order-3']))
@@ -141,7 +141,7 @@ describe('Footer (Nuxt runtime)', () => {
     const wrapper = await mountFooter()
 
     expect(wrapper.text()).toContain('Santa Barbara Public Market Dev')
-    expect(wrapper.text()).toContain('info@sbpublicmarket.com')
+    expect(wrapper.text()).toContain('info@example.com')
     expect(appFooterContextExecuteCalls).toBe(1)
   })
 

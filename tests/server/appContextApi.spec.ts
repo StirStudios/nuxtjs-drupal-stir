@@ -111,12 +111,12 @@ describe('appContextApi', () => {
   it('passes Drupal Maintenance mode on as a 503 with its message', async () => {
     vi.mocked(stirDrupalApiRequest).mockRejectedValue(Object.assign(new Error('Service Unavailable'), {
       statusCode: 503,
-      data: 'DancePlug is currently under maintenance.',
+      data: 'Example is currently under maintenance.',
     }))
 
     await expect(fetchAppContext({} as Parameters<typeof fetchAppContext>[0], '/')).rejects.toMatchObject({
       statusCode: 503,
-      data: { maintenanceMessage: 'DancePlug is currently under maintenance.' },
+      data: { maintenanceMessage: 'Example is currently under maintenance.' },
     })
   })
 

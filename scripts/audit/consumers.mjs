@@ -6,10 +6,15 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const rootDir = resolve(fileURLToPath(new URL('../..', import.meta.url)))
-const targetConfig = JSON.parse(await readFile(
-  new URL('./consumer-targets.json', import.meta.url),
-  'utf8',
-))
+// This repository is public, so the consumer matrix, which names client
+// projects, lives in the private ops repository (ops/consumer-targets.json).
+const targetsPath = process.env.STIR_CONSUMER_TARGETS
+
+if (!targetsPath) {
+  throw new Error('Set STIR_CONSUMER_TARGETS to the consumer target list (ops/consumer-targets.json in the private ops repository).')
+}
+
+const targetConfig = JSON.parse(await readFile(resolve(targetsPath), 'utf8'))
 const requestedNames = process.argv.slice(2).filter(arg => !arg.startsWith('--'))
 const shouldVerify = process.argv.includes('--verify')
 const keepTemporary = process.argv.includes('--keep-temporary')

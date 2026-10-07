@@ -13,12 +13,26 @@ untouched do not need one.
 
 ## Unreleased
 
+### Privacy
+
+- **This repository is public, so it no longer names client sites.** The
+  consumer audit's target list moved to the private ops repository: run
+  `pnpm audit:consumers` with `STIR_CONSUMER_TARGETS` pointing at it. Tests,
+  docs and examples use neutral names, and a check fails on any client name.
+- **Changed: the calculator paragraph allows no script hosts by default.**
+  Its widget hosts were a layer default; a site that embeds the calculator
+  now lists them in `thirdPartyScripts.allowedOrigins.calculator` in its own
+  `app.config.ts`. **Action:** sites using the calculator paragraph add their
+  widget hosts before taking this release (the three current ones already
+  have).
+- The video player debug switch is `localStorage['stir:video-player-debug']`.
+
 ### Webform
 
 - **Fixed: an empty number field showed its minimum as if it were entered.**
   A number with `#min` and no `#placeholder` used the minimum as placeholder
-  text, so Piper's guest count looked like "1" while still empty, and visitors
-  thought they had answered. The field now shows only the placeholder Drupal
+  text, so a required guest count looked like "1" while still empty, and
+  visitors thought they had answered. The field now shows only the placeholder Drupal
   sets.
 
 ### Dependency security
@@ -154,10 +168,9 @@ at the boundary.
 - **Fixed:** a required select now announces `aria-required`.
 - **Changed: numbers are bounded only by Drupal's `#min` and `#max`.** The
   browser no longer refuses values below 1 when the element sets no `#min`.
-  **Action (Piper):** `demo2`, `demo3` and `wotw` set `'#min': 1` on
-  `venue_guest_count` in Piper `dev` (3853044); deploy that, and set the same
-  minimum on production for `villa_vine` and `28vic`, which are in
-  `config_ignore`, before taking this release.
+  **Action:** a site that relied on that floor sets `'#min': 1` on the element
+  in Drupal (and on production for any webform kept out of config sync)
+  before taking this release.
 - **Removed:** `useEvaluateState`, `evaluateCondition`, `getNestedStateValue`
   and `matchesCondition`. Use `resolveWebformFieldStates` from
   `#stir-webform/utils/webformConditions`. No site used them.
@@ -193,7 +206,7 @@ at the boundary.
   `page_layout` is not `default` (`clear`, `links`, a site's `clients`), the
   page mounted in `default`, was remounted in its own layout and fetched
   Drupal twice: one Drupal round trip slower, and the same mid-load remount
-  that left DancePlug on the loader. A late write could also land on whichever
+  that left a site on the loader. A late write could also land on whichever
   route was current by then. `plugins/drupalPageLayout.client.ts` now fetches
   the page (importing the Drupal CE client lazily, so the initial bundle does
   not grow) and sets `to.meta.layout`; the page's `fetchPage()` reuses that
@@ -210,7 +223,7 @@ at the boundary.
   the layout, which it never did on the server: use
   `definePageMeta({ layout })`. No consumer change is needed otherwise. Both
   layout plugins are named `stir:drupal-page-layout`: a site that maps the
-  layout per navigation (DancePlug's member app shell) registers its own route
+  layout per navigation (such as a member app shell) registers its own route
   middleware in a plugin with `dependsOn: ['stir:drupal-page-layout']`, so it
   runs after the Drupal page's layout is set.
 
@@ -312,7 +325,7 @@ at the boundary.
   media or accordion that shows a heading in a Layout paragraph and move the
   heading to the Layout's `field_header`; section spacing and heading styles
   follow the Layout too. Across the Stir sites this affected four paragraphs,
-  all on Tri-Link. Drupal still sends `field_header` until Stir Tools removes
+  all on one site. Drupal still sends `field_header` until Stir Tools removes
   it; the layer ignores it.
 
 - **Breaking.** The CMS presentation manifest and free-text classes are gone.
@@ -366,7 +379,7 @@ at the boundary.
   controls such as date pickers and scrollbars match dark pages and sections.
 
 - `stirTheme.embedded` (default `false`): an app embedded in another site,
-  such as Piper's calculator widget, renders only its layout and page. The
+  such as a calculator widget, renders only its layout and page. The
   skip link, route announcer, loading indicator, scroll-to-top button, popup,
   privacy notice and client components are left to the host page. Set it at
   runtime with `updateAppConfig({ stirTheme: { embedded: true } })`.
@@ -526,9 +539,9 @@ at the boundary.
   Center") now applies to its heading and content. Drupal sent it as
   `align.text`, but `Wrap/Grid.vue` only used `align.justify`, so it was
   dropped. Only Layouts with a text alignment set change; across the fleet,
-  only WOTW has any.
+  only one site has any.
 
-- The calculator paragraph initialises Piper's widget on a repeat client
+- The calculator paragraph initialises its widget on a repeat client
   navigation. With the loader already loaded, it called `initPiperWidget()`
   during setup, before `<ClientOnly>` rendered the widget element, so the
   widget never appeared. It now waits for both the loader and the element.
@@ -587,10 +600,9 @@ at the boundary.
   styles.
 
 - `thirdPartyScripts.allowedOrigins` accepts subdomain wildcards such as
-  `https://*.piperavenue.com`. The calculator allows `https://*.piperavenue.com`,
-  `https://*.stirstudiosdesign.com` and `https://piper.b-cdn.net` by default, so
-  it needs no project override. **Behaviour change:** the calculator no longer
-  derives `data-piper-origin` from the loader URL. Piper's loader works out its
+  `https://*.example.com`. The calculator allowed its widget's hosts by default
+  (now listed by each site that embeds it; see Unreleased). **Behaviour change:** the calculator no longer
+  derives `data-piper-origin` from the loader URL. The widget's loader works out its
   own API address, and an explicit `apiOrigin` still sets it. In dev, a refused
   third-party script URL logs a console warning instead of failing silently.
 
@@ -634,7 +646,7 @@ at the boundary.
 - **Security.** `/api/auth/session` no longer copies Drupal's `csrf_token` and
   `logout_token` into the client-side `user` object. Nothing on the client
   read them; the Nitro proxy fetches its own token. Other snapshot fields,
-  including project additions such as DancePlug's `has_class_access`, are
+  including project additions such as a site's own access flags, are
   unchanged.
 - Sign-in, registration and password-request forms no longer resend a spent
   Turnstile token. Drupal verifies the token on every attempt and Turnstile

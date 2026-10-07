@@ -316,7 +316,7 @@ revision, utility count, source bytes and generation duration, and
 ## Finding forks before they break a deploy
 
 A site component whose resolved Nuxt name matches a layer component replaces
-it silently, and then drifts from it. DancePlug's `AuthCard` fork drifted
+it silently, and then drifts from it. One site's `AuthCard` fork drifted
 until an upstream type change failed that site's deploy, which is the failure
 mode this check exists to prevent.
 
@@ -334,12 +334,12 @@ Read the line counts as a triage signal, not a verdict:
 
 - **Site file much smaller than the layer's** — usually a thin fork that
   exists for one or two differences. Add tokens upstream and delete it, as
-  `stirTheme.auth.showLogo`, `logoClass` and `formUi` replaced DancePlug's
+  `stirTheme.auth.showLogo`, `logoClass` and `formUi` replaced one site's
   `AuthCard`, and `stirTheme.node.pageContentClass` replaced its
   `node--page`.
 - **Site file much larger** — usually a genuine site implementation, like
-  Piper's `WebformContent` (302 lines against the layer's 171: widget runtime
-  mode, step model and tab groups). Keep it, and keep its props and emits in
+  one site's `WebformContent` (302 lines against the layer's 171: widget
+  runtime mode, step model and tab groups). Keep it, and keep its props and emits in
   step with the layer's.
 - **Either way, an override must match the layer component's emit types.**
   That is what broke the deploy: the fork still said `event: unknown` after

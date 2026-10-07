@@ -47,7 +47,7 @@ const appOrigin = computed(() =>
   ),
 )
 
-// Piper's loader works out its own API address. An explicit origin is only an
+// The widget's loader works out its own API address. An explicit origin is only an
 // override for a non-standard setup.
 const apiBase = computed(() => toOrigin(appOrigin.value))
 

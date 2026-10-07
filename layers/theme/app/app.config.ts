@@ -12,13 +12,9 @@ export default defineAppConfig({
 
   thirdPartyScripts: {
     allowedOrigins: {
-      // The loader URL comes from CMS content. Piper hosts it on its own
-      // subdomains, so a pattern needs no upkeep as hosts change.
-      calculator: [
-        'https://*.piperavenue.com',
-        'https://*.stirstudiosdesign.com',
-        'https://piper.b-cdn.net',
-      ],
+      // The calculator loader URL comes from CMS content; a site that embeds
+      // the calculator lists the hosts that may serve it.
+      calculator: [],
       enzuzo: ['https://app.enzuzo.com'],
     },
   },

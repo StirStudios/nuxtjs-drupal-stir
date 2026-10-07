@@ -12,22 +12,20 @@ async function piperOrigin(props: Record<string, string>) {
 }
 
 describe('ParagraphCalculator (Nuxt runtime)', () => {
-  it('allows Piper loader hosts by pattern by default', () => {
-    expect(useAppConfig().thirdPartyScripts?.allowedOrigins?.calculator).toEqual(
-      expect.arrayContaining(['https://*.piperavenue.com', 'https://*.stirstudiosdesign.com']),
-    )
+  it('allows no loader hosts by default; a site that embeds it lists them', () => {
+    expect(useAppConfig().thirdPartyScripts?.allowedOrigins?.calculator).toEqual([])
   })
 
-  it('leaves the API origin to the Piper loader', async () => {
+  it('leaves the API origin to the widget loader', async () => {
     expect(await piperOrigin({
-      embedUrl: 'https://assets.piperavenue.com/widgets/piper-loader.js',
+      embedUrl: 'https://assets.example.com/widgets/loader.js',
     })).toBeUndefined()
   })
 
   it('passes an explicit API origin through', async () => {
     expect(await piperOrigin({
-      embedUrl: 'https://assets.piperavenue.com/widgets/piper-loader.js',
-      apiOrigin: 'https://app.piperavenue.com/',
-    })).toBe('https://app.piperavenue.com')
+      embedUrl: 'https://assets.example.com/widgets/loader.js',
+      apiOrigin: 'https://app.example.com/',
+    })).toBe('https://app.example.com')
   })
 })

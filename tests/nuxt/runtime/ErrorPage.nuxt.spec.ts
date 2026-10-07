@@ -30,17 +30,17 @@ describe('error page', () => {
 
   it('shows the maintenance message Drupal sends, ahead of the project fallback', async () => {
     errorConfig.value = { maintenance: { message: 'Fallback wording.' } }
-    const text = await render(503, { maintenanceMessage: 'DancePlug is currently under maintenance.' })
+    const text = await render(503, { maintenanceMessage: 'Example is currently under maintenance.' })
 
-    expect(text).toContain('DancePlug is currently under maintenance.')
+    expect(text).toContain('Example is currently under maintenance.')
     expect(text).not.toContain('Fallback wording.')
   })
 
   it('uses the project wording for maintenance', async () => {
-    errorConfig.value = { maintenance: { title: 'Improving DancePlug', message: 'Classes are back in a few minutes.' } }
+    errorConfig.value = { maintenance: { title: 'Improving Example', message: 'Classes are back in a few minutes.' } }
     const text = await render(503)
 
-    expect(text).toContain('Improving DancePlug')
+    expect(text).toContain('Improving Example')
     expect(text).toContain('Classes are back in a few minutes.')
   })
 

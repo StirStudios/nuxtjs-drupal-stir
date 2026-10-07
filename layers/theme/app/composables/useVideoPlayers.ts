@@ -61,7 +61,7 @@ function videoPlayerDebug(): boolean {
   try {
     return searchParams.get('debugPlayers') === '1' ||
       searchParams.get('debugProgress') === '1' ||
-      window.localStorage.getItem('danceplug:video-player-debug') === '1'
+      window.localStorage.getItem('stir:video-player-debug') === '1'
   }
   catch {
     return searchParams.get('debugPlayers') === '1' ||
