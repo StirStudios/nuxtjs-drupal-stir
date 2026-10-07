@@ -85,6 +85,7 @@ const submitButtonProps = computed(() => ({
   <UForm
     v-if="!isFormSubmitted"
     :class="[props.themeWebform.formClass, props.themeWebform.spacing]"
+    novalidate
     :schema="schema"
     :state="state"
     :validate-on="validateOn"
