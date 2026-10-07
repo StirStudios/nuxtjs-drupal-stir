@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { useOptionalScriptConsent } from './useOptionalScriptConsent'
 
-export type ThirdPartyScriptKind = 'calculator' | 'enzuzo'
+export type ThirdPartyScriptKind = 'enzuzo'
 
 type ThirdPartyScriptOptions = {
   allowedOrigins?: MaybeRefOrGetter<readonly string[] | undefined>

@@ -13,18 +13,27 @@ untouched do not need one.
 
 ## Unreleased
 
+### Calculator
+
+- **Changed: the calculator loads its widget from site configuration, never
+  from content.** Editors choose only the venue; the paragraph's Embed URL is
+  ignored. A site that uses the calculator commits the production loader in
+  `nuxt.config.ts` (`runtimeConfig.public.calculator.loaderUrl`), and staging
+  and local environments override it with `NUXT_PUBLIC_CALCULATOR_LOADER_URL`.
+  A production build (`NUXT_ENV=production`) fails if that variable is set,
+  so a copied staging value cannot go live. The per-paragraph API origin
+  override and `thirdPartyScripts.allowedOrigins.calculator` are removed.
+  **Action:** a site using the calculator paragraph sets the loader in its
+  `nuxt.config.ts`, removes `allowedOrigins.calculator` from its
+  `app.config.ts`, and sets the variable on staging and local, in the same
+  change that takes this release.
+
 ### Privacy
 
 - **This repository is public, so it no longer names client sites.** The
   consumer audit's target list moved to the private ops repository: run
   `pnpm audit:consumers` with `STIR_CONSUMER_TARGETS` pointing at it. Tests,
   docs and examples use neutral names, and a check fails on any client name.
-- **Changed: the calculator paragraph allows no script hosts by default.**
-  Its widget hosts were a layer default; a site that embeds the calculator
-  now lists them in `thirdPartyScripts.allowedOrigins.calculator` in its own
-  `app.config.ts`. **Action:** sites using the calculator paragraph add their
-  widget hosts before taking this release (the three current ones already
-  have).
 - The video player debug switch is `localStorage['stir:video-player-debug']`.
 
 ### Webform

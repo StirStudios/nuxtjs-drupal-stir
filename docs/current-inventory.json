@@ -838,7 +838,7 @@
     "serverRoutes": 30,
     "productionDependencies": 35,
     "developmentDependencies": 27,
-    "tests": 227,
+    "tests": 228,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
@@ -846,7 +846,7 @@
       "scripts": 6,
       "server": 31,
       "unit": 11,
-      "utils": 67
+      "utils": 68
     }
   },
   "tests": [
@@ -1015,6 +1015,7 @@
     "tests/utils/authTheme.spec.ts",
     "tests/utils/authValidation.spec.ts",
     "tests/utils/buildValidationSchema.spec.ts",
+    "tests/utils/calculatorLoader.spec.ts",
     "tests/utils/calendlyWidget.spec.ts",
     "tests/utils/colorMode.spec.ts",
     "tests/utils/componentTreeDiagnostics.spec.ts",

@@ -276,6 +276,7 @@ attributes above; the harness does not depend on project-specific components.
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable
 - `NUXT_INDEXABLE`: Set to `'false'` to temporarily hide a website (a composition with the SEO capability) even when `NUXT_ENV=production`. Applications without the SEO capability are never indexable and do not need it
 - `DRUPAL_CDN`: Optional public file host, when it differs from `NUXT_IMAGE_CDN`. Its host is trusted as an IPX source alongside `DRUPAL_URL` and `NUXT_IMAGE_CDN`
+- `NUXT_PUBLIC_CALCULATOR_LOADER_URL`: Staging and local only. Points the calculator paragraph's widget at a non-production loader; production uses the address in the site's `nuxt.config.ts`, and a production build fails if this is set
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required. Its host is also trusted as an IPX source, so the Drupal file URLs `stir_cdn` writes to the same zone are resized
 - `SERVER_DOMAIN_CLIENT`: Development-only host allowed by the Vite dev server
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`

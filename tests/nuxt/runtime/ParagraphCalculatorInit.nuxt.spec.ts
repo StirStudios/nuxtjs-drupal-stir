@@ -22,7 +22,7 @@ describe('ParagraphCalculator initialisation', () => {
     }
 
     const wrapper = await mountSuspended(ParagraphCalculator, {
-      props: { venueId: '42', embedUrl: 'https://assets.example.com/widgets/loader.js' },
+      props: { venueId: '42' },
       attachTo: document.body,
     })
 

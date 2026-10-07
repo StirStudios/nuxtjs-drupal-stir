@@ -227,17 +227,31 @@ allowlist:
 ```ts
 thirdPartyScripts: {
   allowedOrigins: {
-    calculator: ['https://cdn.example.net'],
     enzuzo: ['https://app.enzuzo.com'],
   },
 }
 ```
 
-The calculator default matches the widget URL shipped by `stir-tools`.
-Downstream projects using another calculator host must add its exact origin;
-lookalike subdomains and HTTP URLs are rejected. Enzuzo remains available after
+Lookalike subdomains and HTTP URLs are rejected. Enzuzo remains available after
 a visitor declines optional tracking because it renders legal/compliance
 content, but its URL is still origin-validated.
+
+The calculator paragraph does not take its script from content. A site that
+uses it commits the production loader address in its own `nuxt.config.ts`:
+
+```ts
+runtimeConfig: {
+  public: {
+    calculator: {
+      loaderUrl: 'https://assets.example.com/widgets/loader.js',
+    },
+  },
+},
+```
+
+Staging and local environments point it elsewhere with
+`NUXT_PUBLIC_CALCULATOR_LOADER_URL`. A production build (`NUXT_ENV=production`)
+fails if that variable is set, so a copied staging value cannot go live.
 
 Calendly and Bunny PlayerJS use fixed vendor origins. PlayerJS is requested only
 when a visitor activates an embedded video and retains Bunny's official

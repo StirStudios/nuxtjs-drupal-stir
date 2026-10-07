@@ -12,9 +12,6 @@ export default defineAppConfig({
 
   thirdPartyScripts: {
     allowedOrigins: {
-      // The calculator loader URL comes from CMS content; a site that embeds
-      // the calculator lists the hosts that may serve it.
-      calculator: [],
       enzuzo: ['https://app.enzuzo.com'],
     },
   },

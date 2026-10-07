@@ -30,7 +30,6 @@ const appConfig = ref({
   },
   thirdPartyScripts: {
     allowedOrigins: {
-      calculator: ['https://cdn.example.net'],
       enzuzo: ['https://app.enzuzo.com'],
     },
   },
