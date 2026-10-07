@@ -12,11 +12,16 @@ const props = defineProps<{
 }>()
 
 const webform = useStirWebformTheme()
-const isMaterial = computed(() => webform.fieldVariant === 'material')
 const fieldVariant = computed(() => resolveUiFieldVariant(webform.fieldVariant))
 const injectedInputId = inject(inputIdInjectionKey, undefined)
 const fallbackId = useId()
 const id = computed(() => injectedInputId?.value ?? fallbackId)
+const isRequired = computed(() => props.field['#required'] === true)
+// Like a select, the steppers frame the control, so a floating label rests on
+// its border instead of inside it.
+const inputUi = computed(() => props.floatingLabel
+  ? { base: webform.compactControlClass }
+  : {})
 
 const minValue = computed(() => {
   const value = Number(props.field['#min'])
@@ -43,17 +48,11 @@ const stepValue = computed(() => {
 
   return Number.isFinite(value) && value > 0 ? value : 1
 })
-const placeholder = computed(() => {
-  const value = props.field['#placeholder']
-    ? String(props.field['#placeholder']).trim()
-    : ''
-
-  if (props.floatingLabel && !isMaterial.value) return ' '
-
-  // Only Drupal's own placeholder: showing the minimum here looked like an
-  // entered value, so visitors believed they had answered.
-  return value
-})
+// Only Drupal's own placeholder: showing the minimum here looked like an
+// entered value, so visitors believed they had answered.
+const placeholder = computed(() => props.field['#placeholder']
+  ? String(props.field['#placeholder']).trim()
+  : '')
 
 const defaultValue = computed(() => {
   const rawDefault =
@@ -98,17 +97,28 @@ const modelValue = computed<number | undefined>({
 </script>
 
 <template>
-  <UInputNumber
-    :id="id"
-    v-model="modelValue"
-    :class="[webform.fieldInput, webform.fieldText]"
-    :decrement="{ size: 'sm', color: 'neutral' }"
-    :increment="{ size: 'sm', color: 'neutral' }"
-    :max="maxValue"
-    :min="minValue"
-    name=""
-    :placeholder="placeholder"
-    :step="stepValue"
-    :variant="fieldVariant"
-  />
+  <div class="relative">
+    <UInputNumber
+      :id="id"
+      v-model="modelValue"
+      :aria-required="isRequired || undefined"
+      :class="[webform.fieldInput, webform.fieldText]"
+      :decrement="{ size: 'sm', color: 'neutral' }"
+      :increment="{ size: 'sm', color: 'neutral' }"
+      :max="maxValue"
+      :min="minValue"
+      name=""
+      :placeholder="placeholder"
+      :step="stepValue"
+      :ui="inputUi"
+      :variant="fieldVariant"
+    />
+    <label
+      v-if="floatingLabel"
+      :class="[webform.labels.staticFloatingClass, isRequired && webform.labels.requiredClass]"
+      :for="id"
+    >
+      {{ field['#title'] }}
+    </label>
+  </div>
 </template>
