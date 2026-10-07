@@ -20,6 +20,12 @@ untouched do not need one.
   value of a required multiple element. Required now means at least one value,
   and `#multiple` caps how many. (Webform's `multiple__min_items` only sets how
   many empty rows its own form shows, so it is not a minimum.)
+- **Fixed: an empty required select blocked submit with the browser's
+  tooltip.** A required select marks its hidden native select required, and
+  the browser checked that before the form's own validation ran, so no inline
+  errors showed. The webform now sets `novalidate`: controls stay marked
+  required for assistive technology, Nuxt UI validates every field, and each
+  shows its inline error with the `#required_error` set in Drupal.
 
 ### Calculator
 

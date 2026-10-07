@@ -229,6 +229,46 @@ describe('Webform (Nuxt runtime)', () => {
     expect(toasting.find('[role="alert"]').exists()).toBe(false)
   })
 
+  it('leaves validation to the form, with an inline error for each required field', async () => {
+    runtime.fetch.mockClear()
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            name: { ...webform.fields.name, '#requiredError': 'Enter your name' },
+            venue: {
+              '#type': 'select',
+              '#name': 'venue',
+              '#title': 'Venue',
+              '#required': true,
+              '#requiredError': 'Choose a venue',
+              '#options': { Hall: 'Hall', Barn: 'Barn' },
+              '#optionKeys': ['Hall', 'Barn'],
+            },
+          },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    const form = wrapper.get('form')
+
+    // Controls stay marked required for assistive technology, but the browser's
+    // own check would cancel the submit before the form's validation ran.
+    expect((form.element as HTMLFormElement).noValidate).toBe(true)
+    expect(wrapper.get('input[name="name"]').attributes('aria-required')).toBe('true')
+    expect(wrapper.get('button[role="combobox"]').attributes('aria-required')).toBe('true')
+
+    await form.trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Enter your name')
+    expect(wrapper.text()).toContain('Choose a venue')
+    expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
+  })
+
   it('does not submit display-only markup as an empty field', async () => {
     runtime.fetch.mockClear()
     runtime.fetch.mockResolvedValue(undefined)
