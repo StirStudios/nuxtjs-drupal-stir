@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Fixed: an empty number field showed its minimum as if it were entered.**
+  A number with `#min` and no `#placeholder` used the minimum as placeholder
+  text, so Piper's guest count looked like "1" while still empty, and visitors
+  thought they had answered. The field now shows only the placeholder Drupal
+  sets.
+
 ### Dependency security
 
 - **Refresh sharp to 0.35.5 in each site's lockfile.** sharp ships in the

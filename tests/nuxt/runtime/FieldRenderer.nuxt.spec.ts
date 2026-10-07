@@ -570,4 +570,39 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     await nextTick()
     expect(wrapper.text()).toContain('Ticket fee')
   })
+
+  it('leaves a number with a minimum empty, without showing the minimum', async () => {
+    // Piper's guest count: an empty box showing "1" looked answered.
+    const guests = canonical({
+      '#type': 'number',
+      '#name': 'venue_guest_count',
+      '#title': 'Guest Count',
+      '#required': true,
+      '#min': 1,
+      '#max': 130,
+    })
+    const state = reactive(createWebformState({ venue_guest_count: guests }))
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: guests, fieldName: 'venue_guest_count', state },
+    })
+    const input = wrapper.get('input')
+
+    expect(input.element.value).toBe('')
+    expect(input.attributes('placeholder') ?? '').toBe('')
+    expect(state.venue_guest_count).toBe('')
+  })
+
+  it('shows the placeholder Drupal sets on a number', async () => {
+    const guests = canonical({
+      '#type': 'number',
+      '#name': 'guests',
+      '#min': 1,
+      '#placeholder': 'How many guests?',
+    })
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: guests, fieldName: 'guests', state: reactive(createWebformState({ guests })) },
+    })
+
+    expect(wrapper.get('input').attributes('placeholder')).toBe('How many guests?')
+  })
 })
