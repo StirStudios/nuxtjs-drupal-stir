@@ -1,33 +1,44 @@
-import { useAppConfig } from '#imports'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { describe, expect, it } from 'vitest'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import ParagraphCalculator from '../../../layers/theme/app/components/global/Paragraph/Calculator.vue'
 
-async function piperOrigin(props: Record<string, string>) {
-  const wrapper = await mountSuspended(ParagraphCalculator, { props: { venueId: '42', ...props } })
-  const origin = wrapper.find('[data-piper-widget]').attributes('data-piper-origin')
+const loader = vi.hoisted(() => ({ src: '', options: undefined as Record<string, unknown> | undefined }))
 
-  wrapper.unmount()
-  return origin
-}
+mockNuxtImport('useThirdPartyScript', () => (src: string, options: Record<string, unknown>) => {
+  loader.src = src
+  loader.options = options
+
+  return { isLoaded: { value: false } }
+})
+
+const configured = 'https://assets.example.com/widgets/loader.js'
 
 describe('ParagraphCalculator (Nuxt runtime)', () => {
-  it('allows Piper loader hosts by pattern by default', () => {
-    expect(useAppConfig().thirdPartyScripts?.allowedOrigins?.calculator).toEqual(
-      expect.arrayContaining(['https://*.piperavenue.com', 'https://*.stirstudiosdesign.com']),
-    )
+  // As a site's nuxt.config.ts sets it.
+  beforeAll(() => {
+    useRuntimeConfig().public.calculator.loaderUrl = configured
+  })
+  afterAll(() => {
+    useRuntimeConfig().public.calculator.loaderUrl = ''
   })
 
-  it('leaves the API origin to the Piper loader', async () => {
-    expect(await piperOrigin({
-      embedUrl: 'https://assets.piperavenue.com/widgets/piper-loader.js',
-    })).toBeUndefined()
+  it('loads the widget from the site config, not from content', async () => {
+    const wrapper = await mountSuspended(ParagraphCalculator, {
+      props: { venueId: '42', embedUrl: 'https://editor-typed.example.com/other.js' },
+    })
+    const widget = wrapper.find('[data-piper-widget]')
+
+    expect(loader.src).toBe(configured)
+    expect(widget.attributes('data-piper-venue')).toBe('42')
+    // The deprecated content field is never rendered.
+    expect(wrapper.html()).not.toContain('editor-typed')
+    wrapper.unmount()
   })
 
-  it('passes an explicit API origin through', async () => {
-    expect(await piperOrigin({
-      embedUrl: 'https://assets.piperavenue.com/widgets/piper-loader.js',
-      apiOrigin: 'https://app.piperavenue.com/',
-    })).toBe('https://app.piperavenue.com')
+  it('allows only the configured loader host', async () => {
+    const wrapper = await mountSuspended(ParagraphCalculator, { props: { venueId: '42' } })
+
+    expect(loader.options?.allowedOrigins).toEqual(['https://assets.example.com'])
+    wrapper.unmount()
   })
 })

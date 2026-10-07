@@ -307,32 +307,16 @@ describe('layer contract', () => {
     }
   })
 
-  it('keeps the consumer audit matrix outside downstream repositories', () => {
-    const targets = JSON.parse(readFileSync(
-      resolve(rootDir, 'scripts/audit/consumer-targets.json'),
-      'utf8',
-    )) as { targets: Record<string, { routes: string[] }> }
+  it('keeps the consumer audit matrix outside this public repository', () => {
     const consumerScript = readFileSync(
       resolve(rootDir, 'scripts/audit/consumers.mjs'),
       'utf8',
     )
 
-    expect(Object.keys(targets.targets)).toEqual([
-      'laamada',
-      'piper',
-      'rsf',
-      'danceplug',
-      'stir',
-      'edsmart',
-      'trilink',
-      'tkflagg',
-      'sbpublic',
-      'ddrink',
-      'wotw',
-      'stir-base',
-    ])
-    expect(targets.targets.rsf?.routes).toContain('discover:first-inner')
-    expect(targets.targets.danceplug?.routes).toContain('/videos')
+    // The matrix names client projects, so it lives in the private ops
+    // repository and is passed in.
+    expect(existsSync(resolve(rootDir, 'scripts/audit/consumer-targets.json'))).toBe(false)
+    expect(consumerScript).toContain('process.env.STIR_CONSUMER_TARGETS')
     expect(consumerScript).toContain('\'archive\'')
     expect(consumerScript).toContain('mkdtemp(join(tmpdir(), \'stir-consumers-\'))')
     expect(consumerScript).toContain('packageJson.peerDependencies?.nuxt ?? packageJson.dependencies.nuxt')
@@ -680,7 +664,7 @@ describe('layer contract', () => {
     expect(clientLayout).toContain('await import(\'../composables/useStirDrupalCe\')')
     expect(clientLayout).not.toMatch(/^import .*useStirDrupalCe/m)
     expect(clientLayout).toContain('to.meta.layout =')
-    // Sites map the layout after these with dependsOn (DancePlug's app shell).
+    // Sites map the layout after these with dependsOn (a member app shell).
     for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {
       expect(read(`layers/theme/app/plugins/${plugin}`)).toContain('name: \'stir:drupal-page-layout\'')
     }

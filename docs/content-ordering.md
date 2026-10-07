@@ -8,4 +8,4 @@ Deploy this layer support before or alongside the Stir Tools change. Rebuild Dru
 
 Media needs no frontend token: Drupal supplies a stable selection for each interval. No wrappers, client-side randomization or additional startup request are introduced for ordinary unfiltered first-page visits.
 
-DancePlug's override uses the shared DrupalViewProps and useDrupalViewControls; it inherits token transport. Its separate daily listing services retain their existing policy.
+A site override that uses the shared DrupalViewProps and useDrupalViewControls inherits token transport. Its separate daily listing services retain their existing policy.

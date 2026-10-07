@@ -13,8 +13,6 @@
 
 Nuxt layer reviewed branch/commit: `dev` refreshed at `f5912d9fad118f8fc5d4439a73270c3010fed9d7` (original full-review baseline `a8bb7aab1c1849c3710df37191278855692c0e0e`)
 Stir Tools reviewed branch/commit: `dev` at `395686036c01ced16dec74d3febdae05e9e90985`
-RSF consumer snapshots: Drupal `dev` at `b5f66e2605c3d3f574a4f6c3905dfb2e01ed2a15`; Nuxt `dev` at `e9ba93af8bf2c745eb59b4ed5a883fa37f25902a`
-DancePlug consumer snapshots: Drupal `dev` at `a0120c29d8bd9d06cf97b562cff7d13bc83eb613`; Nuxt `dev` at `12f444025a9de8561453144496b61fc335353f34`
 Review date: 2026-07-14; Nuxt delta refreshed 2026-07-15 (America/Los_Angeles)
 
 ## Verdict
@@ -53,19 +51,19 @@ The reviewed local checkout was clean on `dev`. Its baseline is healthy:
 
 The architectural conclusion is to keep Stir Tools and the Nuxt platform as separate repositories and separately deployable products. They should share an explicit, versioned data contract—not PHP/TypeScript runtime source and not release lockstep for unrelated admin features.
 
-## Consumer evidence: RSF and DancePlug
+## Consumer evidence: two client sites
 
-RSF and DancePlug were reviewed as read-only consumers because they reveal the platform's actual extension points better than the base repositories alone. Both contained existing local changes, which were preserved; the commit identifiers above describe the reviewed baselines, not clean working-tree claims.
+Two client sites were reviewed as read-only consumers because they reveal the platform's actual extension points better than the base repositories alone. Both contained existing local changes, which were preserved; the commit identifiers above describe the reviewed baselines, not clean working-tree claims.
 
 The two projects use the platform differently:
 
-- RSF is comparatively close to the base and demonstrates which visual/content components appropriately remain project-owned.
-- DancePlug is an override-heavy product with classes, editorial content, progress, favorites, subscriptions, access rules, and several card/listing variants. It is the better stress test for where generic Drupal data stops being immediately usable.
-- Both still carry explicit Custom Elements display configuration. RSF has 19 entity CE display configurations, with 85 fields using `auto`; DancePlug has 36, with 163 `auto` fields plus repeated `stir_entity_reference`, `stir_text`, and `stir_media` formatter selection.
-- DancePlug's Nuxt app adds generic-looking adapters such as an entity-reference renderer, text-with-summary passthrough, Drupal markup extension, slot parsing, and node-card normalization. Some of this is valid product composition, but the repeated field/VNode normalization belongs lower in the platform.
-- DancePlug's backend card and response-alter services often traverse already-produced CE payloads, resolve entities again, and enrich them for the frontend. That is evidence that common summary/reference/media contracts should be produced correctly at the entity view-mode boundary instead of repaired after serialization.
+- The close-to-base site demonstrates which visual/content components appropriately remain project-owned.
+- The override-heavy site is a product with classes, editorial content, progress, favorites, subscriptions, access rules, and several card/listing variants. It is the better stress test for where generic Drupal data stops being immediately usable.
+- Both still carry explicit Custom Elements display configuration. The close-to-base site has 19 entity CE display configurations, with 85 fields using `auto`; the override-heavy site has 36, with 163 `auto` fields plus repeated `stir_entity_reference`, `stir_text`, and `stir_media` formatter selection.
+- The override-heavy site's Nuxt app adds generic-looking adapters such as an entity-reference renderer, text-with-summary passthrough, Drupal markup extension, slot parsing, and node-card normalization. Some of this is valid product composition, but the repeated field/VNode normalization belongs lower in the platform.
+- The override-heavy site's backend card and response-alter services often traverse already-produced CE payloads, resolve entities again, and enrich them for the frontend. That is evidence that common summary/reference/media contracts should be produced correctly at the entity view-mode boundary instead of repaired after serialization.
 
-This does not mean the platform should absorb all DancePlug behavior. Stripe, class access, progress, Bunny-specific policy, editorial product variants, and branded presentation remain consumer concerns. The vNext opportunity is to make standard Drupal fields, references, media, cards, and layout structure predictable enough that project code focuses on those real business differences.
+This does not mean the platform should absorb all of that site's behavior. Stripe, class access, progress, Bunny-specific policy, editorial product variants, and branded presentation remain consumer concerns. The vNext opportunity is to make standard Drupal fields, references, media, cards, and layout structure predictable enough that project code focuses on those real business differences.
 
 ## Main findings
 
@@ -133,9 +131,9 @@ This gives each project a substantially smaller CSS candidate set without making
 
 ### P1 — Common Drupal fields are configured twice and normalized too late
 
-The current stack has two competing field-output modes. Custom Elements can seed fields from an entity view display using its `auto` formatter when CE display configuration is empty. Stir's force-auto processing instead bypasses that CE field table and applies its processor registry. Some RSF configurations set `forceAutoProcessing: true` while still declaring individual formatter configuration, which makes the saved display look authoritative even though that table is not the active path.
+The current stack has two competing field-output modes. Custom Elements can seed fields from an entity view display using its `auto` formatter when CE display configuration is empty. Stir's force-auto processing instead bypasses that CE field table and applies its processor registry. Some of the close-to-base site's configurations set `forceAutoProcessing: true` while still declaring individual formatter configuration, which makes the saved display look authoritative even though that table is not the active path.
 
-DancePlug then compensates at both ends: backend payload managers turn entity references, categories, images, dates, and summaries into card shapes, while frontend components/composables parse VNode slots back into similarly normalized data. The result works, but a standard field can require Drupal display configuration, a Stir processor/formatter, TypeScript interpretation, and a Vue renderer before it feels native.
+The override-heavy site then compensates at both ends: backend payload managers turn entity references, categories, images, dates, and summaries into card shapes, while frontend components/composables parse VNode slots back into similarly normalized data. The result works, but a standard field can require Drupal display configuration, a Stir processor/formatter, TypeScript interpretation, and a Vue renderer before it feels native.
 
 Recommendation: make a dedicated decoupled entity view mode the exposure and presentation boundary, then generate/synchronize CE configuration from it through a versioned field-contract registry. Preserve explicit bundle/field overrides, but do not mix force-auto and display-driven behavior in one configuration.
 
@@ -157,7 +155,7 @@ Adding an ordinary field should then be: enable it in the bundle's decoupled vie
 
 ### P1 — Drupal Views is doing work that high-traffic listings should not require
 
-DancePlug provides especially useful performance evidence. Its current class and editorial listing APIs were added specifically as optimized alternatives to rendering the equivalent Drupal Views. They query only the ordered/paged entity IDs, run a separate count, bulk-load the current page, normalize a lean card representation, and return explicit filter/pager metadata. Anonymous listing responses are cacheable for an hour with list tags and query/path/access contexts; genuinely personalized class progress adds the `user` context and disables shared caching. Instructor profiles and dashboards were similarly changed toward bounded queries and bulk loading.
+The override-heavy site provides especially useful performance evidence. Its current class and editorial listing APIs were added specifically as optimized alternatives to rendering the equivalent Drupal Views. They query only the ordered/paged entity IDs, run a separate count, bulk-load the current page, normalize a lean card representation, and return explicit filter/pager metadata. Anonymous listing responses are cacheable for an hour with list tags and query/path/access contexts; genuinely personalized class progress adds the `user` context and disables shared caching. Instructor profiles and dashboards were similarly changed toward bounded queries and bulk loading.
 
 Stir Tools has already absorbed two good parts of that work: `LightweightListingHelper` standardizes request parsing and cacheable listing responses, while lightweight media mode avoids detail image sources and embeds for card rows. Its generic paragraph-View processor still executes the full Views render pipeline, extracts its render array, reconstructs CE rows, and derives filters/pager metadata. That is appropriate for flexible editor-selected embedded Views, but it is too expensive a default for a high-traffic, faceted public catalogue.
 
@@ -182,7 +180,7 @@ Create an optional `stir_listing` capability rather than growing a generic helpe
 
 Listing definitions should be exportable Drupal configuration containing a stable ID/label, provider, summary view mode, allowed filters/sorts, page-size limits, personalization policy, and cache policy. An admin inventory page should show every listing endpoint—including code providers—its source, contract version, filters, cache behavior, and last measured performance. It should not attempt to recreate the entire Views query builder.
 
-The current DancePlug `/api/editorial/*` and class APIs are code-backed listings, not Drupal Views, and should be named/documented that way. DancePlug currently has no exported `views.view.*` configuration in the reviewed config tree, which explains why those listings cannot be inspected in Views UI. VNext should make them discoverable through the listing inventory without pretending that their complex product query logic is a View. Stir Tools must not know DancePlug field table names or product rules; DancePlug continues to own its class/editorial definitions, access/progress semantics, event occurrence logic, and any direct SQL or Search API provider needed to implement them.
+The override-heavy site's current `/api/editorial/*` and class APIs are code-backed listings, not Drupal Views, and should be named/documented that way. The override-heavy site currently has no exported `views.view.*` configuration in the reviewed config tree, which explains why those listings cannot be inspected in Views UI. VNext should make them discoverable through the listing inventory without pretending that their complex product query logic is a View. Stir Tools must not know a site's field table names or product rules; the site continues to own its class/editorial definitions, access/progress semantics, event occurrence logic, and any direct SQL or Search API provider needed to implement them.
 
 Every listing route should have measured budgets for database query count/time, entity loads, render time, response bytes, cache metadata, and cold/warm latency. Use `EXPLAIN` against representative data before adding indexes; validate count-query cost independently; preserve the selected ID order after `loadMultiple()`; avoid N+1 reference/media loads; and do not compute every facet on every request when a cacheable/precomputed option set is sufficient. Exact total counts may become optional for very large datasets where they cost more than their UX value.
 
@@ -206,7 +204,7 @@ Use one-region layouts for repeated collections where regions have no distinct m
 
 Paragraphs is not obsolete. Its current 1.21 line is maintained and security-covered, and recent releases include Drupal 11.3 performance work. [Paragraphs releases](https://www.drupal.org/project/paragraphs/releases) confirm that it remains a viable Drupal 11 structured-content tool. It is particularly appropriate for repeatable, fieldable components that belong to one host entity and should share that entity's revision lifecycle.
 
-Layout Paragraphs is a separate decision. It supplies a useful visual arrangement UI over those owned components, but it also makes paragraph behavior metadata responsible for parentage, regions, and presentation. The current stable line is 2.1; 3.0 remains beta while modernizing its interaction model and removing older JavaScript dependencies. DancePlug currently uses 3.0.0-beta2 plus a local PHP 8.4 patch, which is workable but not the dependency posture to make mandatory across every vNext site. See [Layout Paragraphs releases](https://www.drupal.org/project/layout_paragraphs/releases).
+Layout Paragraphs is a separate decision. It supplies a useful visual arrangement UI over those owned components, but it also makes paragraph behavior metadata responsible for parentage, regions, and presentation. The current stable line is 2.1; 3.0 remains beta while modernizing its interaction model and removing older JavaScript dependencies. The override-heavy site currently uses 3.0.0-beta2 plus a local PHP 8.4 patch, which is workable but not the dependency posture to make mandatory across every vNext site. See [Layout Paragraphs releases](https://www.drupal.org/project/layout_paragraphs/releases).
 
 Drupal Canvas has now changed the options. Canvas is not a Drupal core module; it is a strategic, security-covered contributed project shipped as a central part of Drupal CMS 2.0. Canvas 1.8 supports Drupal 11.3, includes translation support, and explicitly supports coupled and headless composition. Drupal documents a Vue-compatible External JavaScript Components route with SSR and Lupus Decoupled integration. See [Drupal Canvas](https://www.drupal.org/project/canvas), [Drupal CMS 2.0](https://www.drupal.org/blog/drupal-cms-20-is-here-visual-building-ai-and-site-templates-transform-drupal), and [Decoupled Drupal Canvas](https://www.drupal.org/docs/develop/decoupled-drupal/decoupled-drupal-canvas).
 
@@ -563,7 +561,7 @@ Compatibility adapters may temporarily increase total repository code while both
 
 These are safeguards for the rebuild, not additional platform features:
 
-- **Keep explicit non-goals:** vNext does not replace Lupus, Custom Elements, Nuxt UI, VueUse, Layout Paragraphs, or Drupal Views where they already fit; it does not absorb DancePlug/RSF business rules; and it does not migrate existing content merely to make the implementation look newer.
+- **Keep explicit non-goals:** vNext does not replace Lupus, Custom Elements, Nuxt UI, VueUse, Layout Paragraphs, or Drupal Views where they already fit; it does not absorb client business rules; and it does not migrate existing content merely to make the implementation look newer.
 - **Maintain a golden reference consumer:** one deliberately small Drupal 11 + Nuxt 4 project must install the published packages from scratch and demonstrate direct fields, media, a nested Layout Paragraphs page, an embedded View, a lightweight listing, cache invalidation, and one optional capability. Its source, fixtures, screenshots, budgets, and setup instructions become executable documentation and a release gate.
 - **Require editor acceptance, not only technical tests:** a representative client editor must be able to create, revise, preview, publish, translate, reorder, and recover a realistic page in Gin without touching Tailwind classes, machine names, JSON, or developer configuration. Record task time, confusing steps, permission failures, and regressions against the current workflow.
 - **Rehearse migration and rollback:** the pilot consumer must have a documented cutover, content/config update path, cache/deployment sequence, compatibility window, monitoring checks, and tested rollback to the current production line. Do not migrate the next consumer until that rehearsal succeeds.
@@ -591,11 +589,11 @@ These are safeguards for the rebuild, not additional platform features:
 4. Make the Nuxt test harness fail on initialization errors and assert a deterministic homepage.
 5. Change Stir Tools vNext metadata and dependency constraints to Drupal 11+, remove Drupal 10 compatibility paths, run a module-by-module deprecation/internal-API audit, and define the Drupal 12 prerelease matrix.
 6. Generate the actual frontend public API/override inventory and the Drupal module/service/endpoint/payload inventory from real consumers.
-7. Capture RSF/DancePlug field, nested-layout, embedded-View, optimized-listing, and project-override fixtures as the behavioral baseline.
+7. Capture client-site field, nested-layout, embedded-View, optimized-listing, and project-override fixtures as the behavioral baseline.
 8. Write cross-repository architecture decisions for upstream/Stir/project ownership, capability boundaries, Drupal extension points, field contracts, listing paths, semantic presentation values, compatibility, and versioning.
 9. Add the producer-owned contract artifact and make both CI pipelines validate it.
 10. Build the decoupled field registry/default renderer and direct Layout Paragraphs CE bridge, with migration adapters for current force-auto and flat-layout responses.
-11. Extract the current lightweight-listing helper into an optional `stir_listing` contract/toolkit; implement and benchmark both a Views-query provider and one DancePlug code provider without moving DancePlug field/query policy into Stir Tools.
+11. Extract the current lightweight-listing helper into an optional `stir_listing` contract/toolkit; implement and benchmark both a Views-query provider and one client-site code provider without moving client field/query policy into Stir Tools.
 12. As a separate research task, build one small representative landing page with the same component manifest in Layout Paragraphs and Canvas/Lupus; test developer, client-editor, reviewer, and anonymous roles and record governance, authoring, workflow, translation, preview, performance, cacheability, payload, Nuxt, and migration results before considering any change from the Layout Paragraphs default.
 13. Implement the Drupal presentation-usage manifest and Nuxt Tailwind 4 source generator, with schema validation, deterministic hashes, strict failure behavior, and rebuild signalling.
 14. Extract a minimal Drupal layout/CE core and optional bridges behind the existing compatibility install path, measuring module count, queries, payloads, and cacheability before/after.

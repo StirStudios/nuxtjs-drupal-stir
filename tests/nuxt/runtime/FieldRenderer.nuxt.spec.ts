@@ -572,7 +572,7 @@ describe('FieldRenderer (Nuxt runtime)', () => {
   })
 
   it('leaves a number with a minimum empty, without showing the minimum', async () => {
-    // Piper's guest count: an empty box showing "1" looked answered.
+    // A required guest count: an empty box showing "1" looked answered.
     const guests = canonical({
       '#type': 'number',
       '#name': 'venue_guest_count',

@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { useOptionalScriptConsent } from './useOptionalScriptConsent'
 
-export type ThirdPartyScriptKind = 'calculator' | 'enzuzo'
+export type ThirdPartyScriptKind = 'enzuzo'
 
 type ThirdPartyScriptOptions = {
   allowedOrigins?: MaybeRefOrGetter<readonly string[] | undefined>
@@ -34,7 +34,7 @@ export function normalizeScriptOrigin(value: string): string {
 
 /**
  * An entry is an exact origin (`https://app.enzuzo.com`) or a subdomain
- * wildcard (`https://*.piperavenue.com`). A wildcard matches any subdomain on
+ * wildcard (`https://*.example.com`). A wildcard matches any subdomain on
  * the default HTTPS port, at a dot boundary, but not the bare domain.
  */
 function allowsScriptOrigin(entry: string, url: URL): boolean {

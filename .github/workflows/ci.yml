@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # The commit message check reads the pushed commits.
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -26,6 +29,16 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      # This repository is public; verify:core checks the files.
+      - name: Commit messages name no client project
+        env:
+          RANGE: ${{ github.event_name == 'pull_request' && format('{0}..{1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) || format('{0}..{1}', github.event.before, github.sha) }}
+        run: |
+          case "$RANGE" in
+            0000000000000000000000000000000000000000..*) RANGE="${RANGE#*..}~1..${RANGE#*..}" ;;
+          esac
+          node scripts/audit/private-names.mjs --commits "$RANGE"
 
       - name: Install
         run: pnpm install --frozen-lockfile

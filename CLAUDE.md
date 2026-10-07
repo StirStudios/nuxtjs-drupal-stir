@@ -196,6 +196,14 @@ PR readiness:
 
 ## Release and safety rules
 
+- **This repository is public. Never name a client project** (site, product,
+  domain or repository) in code, tests, docs, the changelog, commit messages
+  or pull requests. Say "a client site" or "one site", and use `example.com`
+  and neutral fixtures. `pnpm audit:private-names` (part of `verify:core`)
+  checks tracked files and CI checks each push's commit messages. Client
+  specifics such as the consumer audit targets live in the private ops
+  repository.
+
 - Do **not** run `pnpm release` unless explicitly requested.
 - Do not introduce breaking changes to shared layer contracts without approval.
 - Before removing or renaming an exported symbol, run `pnpm audit:consumers`

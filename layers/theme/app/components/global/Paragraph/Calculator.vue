@@ -1,63 +1,42 @@
 <script setup lang="ts">
+import { normalizeScriptOrigin } from '#stir/composables/useThirdPartyScript'
+
 const props = defineProps<{
   id?: number | string
   uuid?: string
   parentUuid?: string
   region?: string
 
-  embedUrl?: string
-  apiOrigin?: string
-  piperOrigin?: string
   venueId?: string
   direction?: string
+  /**
+   * @deprecated Ignored. The loader address is site configuration
+   * (runtimeConfig.public.calculator.loaderUrl), not content; declared only
+   * so Drupal sites that still send it do not render it as an attribute.
+   */
+  embedUrl?: string
 
   editLink?: string
 }>()
 
 const attrs = useAttrs()
 
-const toTrimmedString = (value: unknown) =>
-  typeof value === 'string' ? value.trim() : ''
+const venueId = computed(() =>
+  String(props.venueId || attrs.venue_id || '').trim(),
+)
 
-const toOrigin = (value: string) => {
-  try {
-    return value ? new URL(value).origin : ''
-  } catch {
-    return ''
-  }
+// Configuration, never content: editors choose the venue, and each
+// environment sets where the widget loads from.
+const loaderSrc = String(useRuntimeConfig().public.calculator?.loaderUrl || '').trim()
+
+if (!loaderSrc && import.meta.dev) {
+  console.warn('[stir] The calculator has no loader: set runtimeConfig.public.calculator.loaderUrl.')
 }
 
-const venueId = computed(() =>
-  toTrimmedString(props.venueId || attrs.venue_id),
-)
-
-const loaderSrc = computed(() =>
-  toTrimmedString(props.embedUrl || attrs.embed_url),
-)
-
-const appOrigin = computed(() =>
-  toTrimmedString(
-    props.apiOrigin ||
-      props.piperOrigin ||
-      attrs.api_origin ||
-      attrs.piper_origin ||
-      attrs.apiBase ||
-      attrs.api_base ||
-      attrs.origin,
-  ),
-)
-
-// Piper's loader works out its own API address. An explicit origin is only an
-// override for a non-standard setup.
-const apiBase = computed(() => toOrigin(appOrigin.value))
-
-const widgetAttrs = computed<Record<string, string>>(() => {
-  const elementAttrs: Record<string, string> = {
-    'data-piper-widget': '',
-  }
+const widgetAttrs = computed(() => {
+  const elementAttrs: Record<string, string> = { 'data-piper-widget': '' }
 
   if (venueId.value) elementAttrs['data-piper-venue'] = venueId.value
-  if (apiBase.value) elementAttrs['data-piper-origin'] = apiBase.value
 
   return elementAttrs
 })
@@ -66,7 +45,8 @@ const getInitPiperWidget = () =>
   (window as Window & { initPiperWidget?: () => void }).initPiperWidget
 
 const { isLoaded } = useThirdPartyScript(loaderSrc, {
-  kind: 'calculator',
+  // The address is trusted configuration; HTTPS is still required.
+  allowedOrigins: [normalizeScriptOrigin(loaderSrc)].filter(Boolean),
   isReady: () => typeof getInitPiperWidget() === 'function',
 })
 

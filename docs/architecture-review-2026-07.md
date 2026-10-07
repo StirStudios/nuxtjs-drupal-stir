@@ -26,8 +26,8 @@ The layer boundaries remain useful:
   169.73 kB to 167.29 kB gzip. It is not part of the anonymous initial bundle.
 - Reveal motion remains async and decreased from approximately 27.80 kB to
   26.89 kB gzip; static paragraph text now skips its renderer entirely.
-- La Amada, Piper, DancePlug, and Stir were inventoried read-only at pinned Git
-  revisions. All consume the GitHub layer contract.
+- Four client sites were inventoried read-only at pinned Git revisions. All
+  consume the GitHub layer contract.
 - A packed tarball now resolves through `package.json` and successfully
   typechecks and builds as `@stir/base` in an isolated temporary consumer.
 

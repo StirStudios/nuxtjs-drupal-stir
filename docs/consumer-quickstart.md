@@ -72,7 +72,7 @@ If owning `app/assets/css/main.css`, retain:
 @import '@stir/base/layers/theme/app/assets/css/main';
 ```
 
-Use `#stir/utils`, `#stir/composables`, `#stir/components` and `#stir/types` for explicit shared imports. Legacy aliases remain supported; see the [consumer inventory](consumer-compatibility-2026-09-06.md). Avoid copying entire shared components for a color or spacing change.
+Use `#stir/utils`, `#stir/composables`, `#stir/components` and `#stir/types` for explicit shared imports. Legacy aliases remain supported. Avoid copying entire shared components for a color or spacing change.
 
 `spaLoadingTemplate: false` now truly disables the loader. A custom template path and the existing themed default remain supported. The loader is an initial document fallback, not a replacement for route-specific pending UI.
 

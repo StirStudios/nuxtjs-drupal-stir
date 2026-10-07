@@ -136,7 +136,7 @@ a single-process deployment.
 Keys contain a SHA-256 hash of the resolved client identifier. The old separate
 check/record helpers and best-effort Nitro storage contract were internal to
 the protected-login route; consumers should use the atomic adapter seam above.
-The [read-only consumer scan](consumer-compatibility-2026-09-06.md) found no callers
+A read-only scan of the client sites (2026-09-06) found no callers
 of those old helpers.
 
 `PROTECTED_RATE_LIMIT_TRUST_PROXY` defaults to `false`. Enable it only behind a

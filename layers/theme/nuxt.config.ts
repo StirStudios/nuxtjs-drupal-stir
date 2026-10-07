@@ -21,6 +21,7 @@ import {
   resolveDrupalImageDomains,
   resolveImageCdnBase,
 } from './build/imageCdn'
+import { refuseProductionCalculatorOverride } from './build/calculatorLoader'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
 import { STIR_PRESENTATION_DEFAULTS } from './app/utils/presentationDefaults'
@@ -74,6 +75,7 @@ export default defineNuxtConfig({
     '#stir-image-provider': imageProviderComponent,
   },
   modules: [
+    () => refuseProductionCalculatorOverride(),
     '@nuxt/image',
     '@nuxt/scripts',
     function useInstalledPdfViewer() {
@@ -94,6 +96,13 @@ export default defineNuxtConfig({
       })
     },
   ],
+  runtimeConfig: {
+    public: {
+      calculator: {
+        loaderUrl: '',
+      },
+    },
+  },
   routeRules: {
     '/_ipx/**': {
       headers: {

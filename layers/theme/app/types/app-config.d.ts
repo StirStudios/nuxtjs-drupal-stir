@@ -80,7 +80,6 @@ type AnalyticsConfig = {
 
 type ThirdPartyScriptsConfig = {
   allowedOrigins?: {
-    calculator?: string[]
     enzuzo?: string[]
   }
 } & LooseRecord
