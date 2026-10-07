@@ -192,14 +192,15 @@ function fieldValidationMessage(
 
   if (type === 'checkboxes' || multiple) {
     const values = Array.isArray(value) ? value.filter(item => !isEmpty(item)) : []
-    const multipleCount = field['#cardinality'] ?? 1
-    const requiredCount = (type === 'date' || type === 'datetime')
-      && Number.isFinite(multipleCount)
-      && multipleCount > 1
-      ? multipleCount
-      : 1
+    // As Webform validates a multiple element: required means at least one
+    // value, and #multiple caps how many. Its multiple__min_items only sets how
+    // many empty rows its own form shows.
+    const maxValues = multiple ? Number(field['#cardinality'] ?? 1) : Number.NaN
 
-    if (required && values.length < requiredCount) return requiredError
+    if (required && values.length === 0) return requiredError
+    if (Number.isFinite(maxValues) && maxValues > 1 && values.length > maxValues) {
+      return `You can enter up to ${maxValues}`
+    }
     if (field['#minSelected'] && values.length < field['#minSelected']) {
       return `Please select at least ${field['#minSelected']} items`
     }

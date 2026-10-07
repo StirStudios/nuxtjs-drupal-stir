@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Fixed: a required multiple field demanded every slot.** A required date
+  with `#multiple: 3` needed all three dates, though Webform requires only one
+  value of a required multiple element. Required now means at least one value,
+  and `#multiple` caps how many. (Webform's `multiple__min_items` only sets how
+  many empty rows its own form shows, so it is not a minimum.)
+
 ### Calculator
 
 - **Changed: the calculator loads its widget from site configuration, never

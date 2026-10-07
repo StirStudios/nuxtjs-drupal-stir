@@ -43,7 +43,7 @@ describe('buildValidationSchema', () => {
     })).toEqual({ name: 'Alex' })
   })
 
-  it('enforces required multiple datetime count from API', async () => {
+  it('requires at least one value of a required multiple field, up to its #multiple', async () => {
     const fields: Record<string, WebformFieldProps> = {
       eventDate: createDateTimeField({
         '#required': true,
@@ -54,24 +54,22 @@ describe('buildValidationSchema', () => {
     const state: WebformState = {}
     const schema = buildValidationSchema(fields, state)
 
-    await expect(
-      parseAsync(schema, {
-        eventDate: [
-          '2026-02-19T10:30:00-0800',
-          '2026-02-20T10:30:00-0800',
-        ],
-      }),
-    ).rejects.toBeTruthy()
-
-    await expect(
-      parseAsync(schema, {
-        eventDate: [
-          '2026-02-19T10:30:00-0800',
-          '2026-02-20T10:30:00-0800',
-          '2026-02-21T10:30:00-0800',
-        ],
-      }),
-    ).resolves.toBeTruthy()
+    // Webform requires one value of a required multiple element, not every
+    // slot: one, two or three dates are all valid.
+    await expect(parseAsync(schema, { eventDate: [] })).rejects.toBeTruthy()
+    for (const count of [1, 2, 3]) {
+      await expect(parseAsync(schema, {
+        eventDate: ['2026-02-19T10:30:00-0800', '2026-02-20T10:30:00-0800', '2026-02-21T10:30:00-0800'].slice(0, count),
+      }), `${count} date(s)`).resolves.toBeTruthy()
+    }
+    await expect(parseAsync(schema, {
+      eventDate: [
+        '2026-02-19T10:30:00-0800',
+        '2026-02-20T10:30:00-0800',
+        '2026-02-21T10:30:00-0800',
+        '2026-02-22T10:30:00-0800',
+      ],
+    })).rejects.toThrow('You can enter up to 3')
   })
 
   it('returns cached schema when visibility signature is unchanged', () => {
