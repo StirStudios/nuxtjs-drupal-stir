@@ -605,4 +605,31 @@ describe('FieldRenderer (Nuxt runtime)', () => {
 
     expect(wrapper.get('input').attributes('placeholder')).toBe('How many guests?')
   })
+
+  it('rests a number\'s floating label on its border, as a select\'s does', async () => {
+    const guests = canonical({
+      '#type': 'number',
+      '#name': 'guests',
+      '#title': 'Estimated guest count',
+      '#required': true,
+      '#min': 1,
+      '#max': 130,
+      '#floatingLabel': true,
+    })
+    const state = reactive(createWebformState({ guests }))
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: { field: guests, fieldName: 'guests', state },
+    })
+    const labels = wrapper.findAll('label')
+    const input = wrapper.get('input')
+
+    expect(labels).toHaveLength(1)
+    expect(labels[0]!.text()).toBe('Estimated guest count')
+    expect(labels[0]!.attributes('for')).toBe(input.attributes('id'))
+    expect(labels[0]!.classes()).toEqual(expect.arrayContaining(useStirWebformTheme().labels.staticFloatingClass.join(' ').split(' ')))
+    expect(input.attributes('aria-required')).toBe('true')
+    expect(input.element.value).toBe('')
+    expect(input.attributes('placeholder') ?? '').toBe('')
+    expect(wrapper.findAll('button')).toHaveLength(2)
+  })
 })

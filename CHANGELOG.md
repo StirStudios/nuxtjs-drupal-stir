@@ -26,6 +26,10 @@ untouched do not need one.
   errors showed. The webform now sets `novalidate`: controls stay marked
   required for assistive technology, Nuxt UI validates every field, and each
   shows its inline error with the `#required_error` set in Drupal.
+- **Changed: a number field takes the form's floating labels.** With
+  floating labels on, its label rests on the control's border, as a select's
+  and a date's do, instead of standing above it; the steppers stay at the
+  control's ends. It also announces `aria-required` like other inputs.
 
 ### Calculator
 

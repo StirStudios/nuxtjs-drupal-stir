@@ -136,7 +136,6 @@ const shouldShowLabel = computed(
     resolvedFieldType.value !== 'hidden' &&
     !isDisplayElement.value &&
     (resolvedFieldType.value === 'checkboxes' ||
-      resolvedFieldType.value === 'number' ||
       resolvedFieldType.value === 'range' ||
       !useFloatingLabels.value),
 )
@@ -260,7 +259,6 @@ const fieldUi = computed(() => {
       :floating-label="
         resolvedFieldType === 'checkbox' ||
           resolvedFieldType === 'checkboxes' ||
-          resolvedFieldType === 'number' ||
           resolvedFieldType === 'range'
           ? undefined
           : useFloatingLabels
