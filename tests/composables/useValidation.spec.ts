@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { handleValidationError } from '../../layers/foundation/app/composables/useValidation'
 
 describe('handleValidationError', () => {
-  it('focuses and scrolls the first errored field and emits a toast', () => {
+  it('focuses without jumping and smoothly scrolls the first errored field, and emits a toast', () => {
     const focus = vi.fn()
     const scrollIntoView = vi.fn()
     const add = vi.fn()
@@ -28,7 +28,7 @@ describe('handleValidationError', () => {
       },
     )
 
-    expect(focus).toHaveBeenCalledTimes(1)
+    expect(focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true })
     expect(scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'center',

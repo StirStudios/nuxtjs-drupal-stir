@@ -27,6 +27,17 @@ describe('authUiConfigApi', () => {
     expect(parseAuthUiConfigResponse(fixture)).toEqual(fixture)
   })
 
+  it('accepts a protected page without a submit label, as Stir Tools before 1.33 sends', () => {
+    const fixture = producerFixture()
+
+    delete fixture.protectedPage.submitLabel
+
+    expect(parseAuthUiConfigResponse(fixture).protectedPage).toEqual({
+      title: fixture.protectedPage.title,
+      description: fixture.protectedPage.description,
+    })
+  })
+
   it('rejects identifier modes that disagree with their field contract', () => {
     const fixture = producerFixture()
 
