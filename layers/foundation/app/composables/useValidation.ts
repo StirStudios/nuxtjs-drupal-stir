@@ -21,7 +21,7 @@ type ValidationOptions = {
 }
 
 type ValidationField = {
-  focus?: () => void
+  focus?: (focusOptions?: FocusOptions) => void
   scrollIntoView?: (scrollOptions?: ScrollIntoViewOptions) => void
   compareDocumentPosition?: (other: Node) => number
   getBoundingClientRect?: () => { top: number, bottom: number }
@@ -63,7 +63,9 @@ export function handleValidationError(
     return field && (!first || comesBefore(field, first)) ? field : first
   }, null)
 
-  element?.focus?.()
+  // Focusing jumps the page to the field; prevent that so the smooth scroll
+  // below moves it instead.
+  element?.focus?.({ preventScroll: true })
   if (element && !isOnScreen(element)) {
     element.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
   }
