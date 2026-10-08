@@ -22,6 +22,9 @@ const description = computed(
     auth.value.protectedPage?.description ||
     'Enter the page password to continue.',
 )
+const submitLabel = computed(
+  () => auth.value.protectedPage?.submitLabel || 'Continue',
+)
 
 // The gate has no login to fall back to, so it shows a secondary action only
 // when the site configures one, e.g. an enquiry link.
@@ -46,7 +49,7 @@ useSeoMeta({
       :fields="fields"
       icon="i-lucide-shield-check"
       :loading="isLoading"
-      :submit="{ label: 'Continue' }"
+      :submit="{ label: submitLabel }"
       :title="title"
       :validate="validate"
       @submit="onSubmit"

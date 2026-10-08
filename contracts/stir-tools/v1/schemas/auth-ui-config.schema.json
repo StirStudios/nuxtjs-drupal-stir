@@ -116,10 +116,11 @@
     "protectedPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "description"],
+      "required": ["title", "description", "submitLabel"],
       "properties": {
         "title": { "type": "string" },
-        "description": { "type": "string" }
+        "description": { "type": "string" },
+        "submitLabel": { "type": "string" }
       }
     },
     "passwordPolicy": { "$ref": "#/definitions/passwordPolicy" }

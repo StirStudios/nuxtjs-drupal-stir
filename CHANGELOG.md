@@ -31,6 +31,14 @@ untouched do not need one.
   and a date's do, instead of standing above it; the steppers stay at the
   control's ends. It also announces `aria-required` like other inputs.
 
+### Auth
+
+- **Added: the protected page's button label comes from Drupal.** It was fixed
+  as "Continue". It now reads `protectedPage.submitLabel` from
+  `/api/auth/config`, as login and register read theirs, and falls back to
+  "Continue". Set it as **Protected page submit label** in the Stir Account
+  settings; needs Stir Tools contract 1.33 (synced here).
+
 ### Validation
 
 - **Fixed: an invalid form jumped to its first error instead of scrolling

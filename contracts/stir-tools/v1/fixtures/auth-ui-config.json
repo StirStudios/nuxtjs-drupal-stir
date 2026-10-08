@@ -98,7 +98,8 @@
   },
   "protectedPage": {
     "title": "Protected Access",
-    "description": "Enter the page password to continue."
+    "description": "Enter the page password to continue.",
+    "submitLabel": "Continue"
   },
   "passwordPolicy": {
     "minLength": 8,

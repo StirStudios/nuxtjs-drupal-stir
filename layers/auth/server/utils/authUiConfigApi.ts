@@ -114,7 +114,12 @@ const authUiConfigSchema = strictObject({
     successDescription: text(),
     failedDescription: text(),
   }),
-  protectedPage: message(),
+  protectedPage: strictObject({
+    title: text(),
+    description: text(),
+    // Stir Tools before contract 1.33 sends none; the page then says Continue.
+    submitLabel: optional(text()),
+  }),
   passwordPolicy: strictObject({
     minLength: pipe(number(), integer(), minValue(1)),
     maxLength: pipe(number(), integer(), minValue(1)),

@@ -175,6 +175,7 @@ export type AuthUiConfig = {
   protectedPage?: {
     title?: string
     description?: string
+    submitLabel?: string
   }
   passwordPolicy?: AuthPasswordPolicy
 }
