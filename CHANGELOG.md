@@ -31,6 +31,14 @@ untouched do not need one.
   and a date's do, instead of standing above it; the steppers stay at the
   control's ends. It also announces `aria-required` like other inputs.
 
+### Button
+
+- **Fixed: a document button ignored the editor's link text.** A Button
+  paragraph with a PDF showed the media's title, so the link text only showed
+  when the media had none. The link text now labels the button and the PDF
+  viewer's heading; the media's title fills in only when the link text is
+  empty, so editors can keep their file names for the media library.
+
 ### Calculator
 
 - **Changed: the calculator loads its widget from site configuration, never

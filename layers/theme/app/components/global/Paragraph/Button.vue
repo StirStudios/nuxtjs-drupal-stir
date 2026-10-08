@@ -38,7 +38,8 @@ const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
 const linkData = computed(() => resolveDrupalLink(props.link))
 const isExternal = computed(() => !!linkData.value.external)
-const btnLabel = computed(() => linkData.value.title || 'View link')
+const linkText = computed(() => String(linkData.value.title ?? '').trim())
+const btnLabel = computed(() => linkText.value || 'View link')
 const btnColor = computed(() => resolveUiColor(props.color))
 const btnVariant = computed(() => resolveUiButtonVariant(props.variant))
 const btnSize = computed(() => resolveUiSize(props.size, 'xl'))
@@ -73,7 +74,11 @@ const pdfProps = computed(() => {
 
 const hasPdf = computed(() => !!pdfProps.value)
 const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
-const pdfTitle = computed(() => String(pdfProps.value?.title || btnLabel.value))
+// The editor's link text labels the button; the document's own title, which
+// editors keep for the media library, only fills in when it is empty.
+const pdfTitle = computed(() =>
+  linkText.value || String(pdfProps.value?.title || btnLabel.value),
+)
 const pdfDescription = computed(() =>
   String(pdfProps.value?.alt || 'PDF document preview'),
 )
