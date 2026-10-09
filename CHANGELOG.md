@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Layout
+
+- **Fixed: a Layout's vertical Align did nothing.** Align top/center/bottom
+  (`align.items`) now adds `items-start|center|end` to the Layout's grid, so a
+  short column (or grid item) aligns against the tallest one. Text and
+  horizontal alignment are unchanged, and a Layout without a vertical Align
+  renders as before. Layouts already saved with a vertical Align will change
+  appearance on deploy.
+
 ### Webform
 
 - **Fixed: a required multiple field demanded every slot.** A required date

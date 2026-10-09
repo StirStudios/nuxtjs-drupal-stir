@@ -16,7 +16,11 @@ defineSlots<{ default(): unknown }>()
 
 const { container: themeContainer, card: themeCard } = useAppConfig().stirTheme
 const gridStyles = computed(() => {
-  return [resolveGridClasses(props.gridItems), props.card ? 'relative z-10' : null].filter(
+  const grid = resolveGridClasses(props.gridItems)
+  // The Align field's vertical value aligns the grid's columns (regions or items).
+  const items = grid && props.align?.items ? `items-${props.align.items}` : null
+
+  return [grid, items, props.card ? 'relative z-10' : null].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   )
 })
