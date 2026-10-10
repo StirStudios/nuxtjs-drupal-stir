@@ -191,7 +191,7 @@
     "lighthouse": "^13.5.0",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.7.4",
-    "release-it": "^20.2.1",
+    "release-it": "^21.1.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",
     "vue": "^3.5.43",
