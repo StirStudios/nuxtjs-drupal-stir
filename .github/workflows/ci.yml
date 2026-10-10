@@ -38,6 +38,8 @@ jobs:
           case "$RANGE" in
             0000000000000000000000000000000000000000..*) RANGE="${RANGE#*..}~1..${RANGE#*..}" ;;
           esac
+          # A force-push removes the old tip; check everything not yet on main.
+          git cat-file -e "${RANGE%%..*}^{commit}" 2>/dev/null || RANGE="origin/main..${RANGE#*..}"
           node scripts/audit/private-names.mjs --commits "$RANGE"
 
       - name: Install
