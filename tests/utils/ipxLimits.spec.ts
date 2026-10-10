@@ -1,11 +1,7 @@
 import { EventEmitter } from 'node:events'
 import type { H3Event } from 'h3'
 import { describe, expect, it } from 'vitest'
-import {
-  STIR_IPX_LIMITS,
-  createIpxLimiter,
-  resolveIpxLimits,
-} from '../../layers/theme/server/utils/ipxLimits'
+import { createIpxLimiter } from '../../layers/theme/server/utils/ipxLimits'
 
 function fakeEvent() {
   const res = Object.assign(new EventEmitter(), { closed: false })
@@ -16,19 +12,6 @@ function fakeEvent() {
 
   return { event: { node: { res } } as unknown as H3Event, close }
 }
-
-describe('resolveIpxLimits', () => {
-  it('uses the defaults for missing or invalid values', () => {
-    expect(resolveIpxLimits()).toEqual(STIR_IPX_LIMITS)
-    expect(resolveIpxLimits({ maxConcurrent: 0, sharpCacheMb: -1, sharpConcurrency: 'x' }))
-      .toEqual(STIR_IPX_LIMITS)
-  })
-
-  it('accepts env strings', () => {
-    expect(resolveIpxLimits({ maxConcurrent: '4', sharpCacheMb: '50', sharpConcurrency: '0' }))
-      .toEqual({ maxConcurrent: 4, sharpCacheMb: 50, sharpConcurrency: 0 })
-  })
-})
 
 describe('createIpxLimiter', () => {
   it('runs at most the limit at once and admits waiters in order as responses close', async () => {

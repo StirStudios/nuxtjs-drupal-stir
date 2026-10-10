@@ -1,21 +1,20 @@
 import { defineEventHandler } from 'h3'
-import { createIpxLimiter, resolveIpxLimits } from '../utils/ipxLimits'
+import { createIpxLimiter } from '../utils/ipxLimits'
 
-// IPX has no concurrency or libvips cache option, so bound both here before
-// @nuxt/image's /_ipx handler runs.
-let limit: ReturnType<typeof createIpxLimiter> | undefined
-let sharpReady: Promise<unknown> | undefined
+// A burst of uncached gallery sizes otherwise decodes dozens of large masters
+// at once and pushes the process past a 1GB pm2 limit. IPX has no option for
+// this, so run two transforms at a time, each on one libvips thread, with
+// libvips' cache off (Varnish/the CDN cache each derivative already).
+const limit = createIpxLimiter(2)
+let sharpReady: Promise<void> | undefined
 
 export default defineEventHandler(async (event) => {
   if (!event.path.startsWith('/_ipx/')) return
 
-  const limits = resolveIpxLimits(useRuntimeConfig(event).stirIpx)
-
   sharpReady ||= import('sharp').then(({ default: sharp }) => {
-    sharp.cache(limits.sharpCacheMb > 0 ? { memory: limits.sharpCacheMb } : false)
-    sharp.concurrency(limits.sharpConcurrency)
+    sharp.cache(false)
+    sharp.concurrency(1)
   })
-  limit ||= createIpxLimiter(limits.maxConcurrent)
 
   await sharpReady
   await limit(event)

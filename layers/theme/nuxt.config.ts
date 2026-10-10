@@ -22,7 +22,6 @@ import {
   resolveImageCdnBase,
 } from './build/imageCdn'
 import { refuseProductionCalculatorOverride } from './build/calculatorLoader'
-import { STIR_IPX_LIMITS } from './server/utils/ipxLimits'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
 import { STIR_PRESENTATION_DEFAULTS } from './app/utils/presentationDefaults'
@@ -107,8 +106,6 @@ export default defineNuxtConfig({
         limitInputPixels: 40_000_000,
       },
     },
-    // See layers/theme/server/utils/ipxLimits.ts.
-    stirIpx: { ...STIR_IPX_LIMITS },
     public: {
       calculator: {
         loaderUrl: '',
