@@ -254,6 +254,19 @@ watch(
 
 const links = computed(() => {
   const dashboard = adminDashboardUrl.value
+  // Outside production, editors see which environment they are editing next
+  // to Drupal CMS, or their name when there is no dashboard link. Only admins
+  // see this bar, so clients reviewing a development site never see it.
+  const environment = String(config.public.environment)
+  const badge = environment === 'production'
+    ? undefined
+    : {
+        label: `${environment.charAt(0).toUpperCase()}${environment.slice(1)} site`,
+        color: 'error' as const,
+        variant: 'solid' as const,
+        // The same red as stir_env's Drupal bar: 4.5:1 for the small text.
+        class: 'bg-red-700 text-white',
+      }
   // Drupal names the dashboard it allows; without one there is no item.
   const baseLinks = dashboard
     ? [
@@ -261,6 +274,7 @@ const links = computed(() => {
           {
             label: 'Drupal CMS',
             icon: 'i-lucide-layout-dashboard',
+            badge,
             to: normalizeAdminUrl(dashboard),
             tooltip: isCompactTabs.value,
             onSelect: getAdminLinkSelectHandler(normalizeAdminUrl(dashboard)),
@@ -277,12 +291,14 @@ const links = computed(() => {
     ? {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
+        badge: dashboard ? undefined : badge,
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
+        badge: dashboard ? undefined : badge,
         to: accountTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(accountTo),

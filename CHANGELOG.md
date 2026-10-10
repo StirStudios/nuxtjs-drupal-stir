@@ -15,13 +15,15 @@ untouched do not need one.
 
 ### Environment
 
-- **New: a badge on non-production builds.** Every page of a build whose
-  `NUXT_ENV` is not `production` shows a small red "Development site" (or
-  "Staging site", and so on) badge fixed to the bottom-left corner; it does not
-  take clicks. Production builds show nothing. `NUXT_ENV` unset counts as
-  development, the same rule that already keeps such builds out of search, so
-  check production builds set `NUXT_ENV=production`. The value is exposed as
-  `runtimeConfig.public.environment`.
+- **New: an environment badge in the editorial tabs.** On a build whose
+  `NUXT_ENV` is not `production`, the editorial tabs show a red "Development
+  site" (or "Local site", "Staging site") badge beside Drupal CMS (or the editor's name when there is no
+  dashboard link), like
+  `stir_env`'s Drupal admin bar. Only editors see the tabs, so clients
+  reviewing a development site never see it. Production builds show nothing.
+  `NUXT_ENV` unset counts as development, the same rule that already keeps such
+  builds out of search, so check production builds set `NUXT_ENV=production`.
+  The value is exposed as `runtimeConfig.public.environment`.
 
 ### Images
 
