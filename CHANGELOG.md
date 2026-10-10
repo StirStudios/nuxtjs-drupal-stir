@@ -18,11 +18,12 @@ untouched do not need one.
 - **Changed: `/_ipx` image processing is bounded.** A burst of uncached sizes
   ran every transform at once and could push a site over a 1GB pm2
   `max_memory_restart`. With no configuration needed, the theme layer now runs
-  at most 4 IPX transforms at a time (others queue), turns off the libvips
+  at most 2 IPX transforms at a time (others queue), turns off the libvips
   cache, uses one libvips thread per transform, clamps output to 3840px and
   refuses masters over 40MP. On a staging gallery of 136 photos, a cold burst
-  peaked at ~1,024MB before and ~600MB after with 2 transforms at a time; 4
-  restores most of the cold-burst speed. Cache headers on successful images are
+  peaked at ~1,024MB before and ~600MB after. 4 at a time halved the cold time
+  but peaked at ~850MB, too close to the 1GB limit with SSR traffic on top, so
+  the layer stays at 2. Cache headers on successful images are
   unchanged. `sharp` is now a direct dependency.
 
 ### Layout

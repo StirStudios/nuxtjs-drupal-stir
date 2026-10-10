@@ -3,9 +3,9 @@ import { createIpxLimiter } from '../utils/ipxLimits'
 
 // A burst of uncached gallery sizes otherwise decodes dozens of large masters
 // at once and pushes the process past a 1GB pm2 limit. IPX has no option for
-// this, so run four transforms at a time, each on one libvips thread, with
+// this, so run two transforms at a time, each on one libvips thread, with
 // libvips' cache off (Varnish/the CDN cache each derivative already).
-const limit = createIpxLimiter(4)
+const limit = createIpxLimiter(2)
 let sharpReady: Promise<void> | undefined
 
 export default defineEventHandler(async (event) => {
