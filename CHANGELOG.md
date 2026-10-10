@@ -25,6 +25,13 @@ untouched do not need one.
   builds out of search, so check production builds set `NUXT_ENV=production`.
   The value is exposed as `runtimeConfig.public.environment`.
 
+### Header
+
+- **New: `stirTheme.navigation.desktopBreakpoint`.** The header switches from
+  the menu button to the desktop menu at `'lg'` (1024px, the default, so
+  existing sites are unchanged). Set `'xl'` to keep the menu button until
+  1280px when a site's menu and actions do not fit on one line at 1024px.
+
 ### Images
 
 - **Changed: `/_ipx` image processing is bounded.** A burst of uncached sizes
@@ -134,8 +141,10 @@ untouched do not need one.
   ```yaml
   overrides:
     simple-git@3>@simple-git/argv-parser: 2.0.1
-    release-it>undici: ^7.29.1 # only if the site uses release-it
   ```
+
+  A site that uses release-it should move to release-it 21, which brings in the
+  patched undici, rather than overriding it.
 
   Do not override `simple-git` itself to v4: `@nuxt/devtools` 3.4 default-imports
   it, and v4 removed that export. The argv-parser override fixes
