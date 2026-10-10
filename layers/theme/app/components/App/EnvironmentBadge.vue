@@ -7,10 +7,11 @@ const label = `${environment.charAt(0).toUpperCase()}${environment.slice(1)} sit
 </script>
 
 <template>
-  <div
+  <aside
     v-if="environment !== 'production'"
+    aria-label="Site environment"
     class="bg-red-700 px-4 py-1 text-center text-sm leading-snug text-white"
   >
     <strong class="font-semibold">{{ label }}</strong>, not production.
-  </div>
+  </aside>
 </template>
