@@ -150,6 +150,8 @@ type StirThemeNavigationConfig = {
   variant?: UiNavigationVariantName
   contentOrientation?: 'horizontal' | 'vertical'
   desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | 'toggle' | string
+  /** Width from which the desktop menu replaces the menu toggle: lg (1024px, default) or xl (1280px), for a longer menu. */
+  desktopBreakpoint?: 'lg' | 'xl' | string
   logoMenuMarker?: string
   toggleDirection?: 'left' | 'right' | string
   toggleIcon?: ClassValue
