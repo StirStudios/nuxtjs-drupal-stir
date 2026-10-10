@@ -67,6 +67,7 @@ export default defineAppConfig({
       variant: 'link',
       contentOrientation: 'horizontal',
       desktopLayout: 'default',
+      desktopBreakpoint: 'lg',
       logoMenuMarker: '--logo--',
       toggleDirection: 'right',
       toggleIcon: 'size-7',

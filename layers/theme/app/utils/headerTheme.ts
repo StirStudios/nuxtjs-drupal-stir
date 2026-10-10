@@ -20,6 +20,33 @@ export const headerToggleDirection = (value: unknown): HeaderToggleDirection =>
 export const headerDesktopLayout = (value: unknown): HeaderDesktopLayout =>
   value === 'split-logo' || value === 'centered-toggle' || value === 'toggle' ? value : 'default'
 
+export type HeaderDesktopBreakpoint = 'lg' | 'xl'
+
+export const headerDesktopBreakpoint = (value: unknown): HeaderDesktopBreakpoint =>
+  value === 'xl' ? 'xl' : 'lg'
+
+// The classes that switch the header between the menu toggle and the desktop
+// menu. Written out in full per breakpoint so Tailwind generates them.
+const desktopBreakpointClasses = {
+  lg: {
+    flexOne: 'lg:flex-1',
+    showFlex: 'hidden lg:flex',
+    showInlineFlex: 'hidden lg:inline-flex',
+    hideFromDesktop: 'lg:hidden',
+    collapseFromDesktop: 'block lg:hidden lg:flex-0',
+  },
+  xl: {
+    flexOne: 'xl:flex-1',
+    showFlex: 'hidden xl:flex',
+    showInlineFlex: 'hidden xl:inline-flex',
+    hideFromDesktop: 'xl:hidden',
+    collapseFromDesktop: 'block xl:hidden xl:flex-0',
+  },
+} as const
+
+export const headerDesktopClasses = (breakpoint: HeaderDesktopBreakpoint) =>
+  desktopBreakpointClasses[breakpoint]
+
 export const headerLogoSurface = (value: unknown): HeaderLogoSurface =>
   value === 'light' || value === 'dark' ? value : 'auto'
 

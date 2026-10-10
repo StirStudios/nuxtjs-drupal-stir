@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   headerClassName,
   headerConfigString,
+  headerDesktopBreakpoint,
+  headerDesktopClasses,
   headerDesktopLayout,
   headerLogoSurface,
   headerMenuAngleStyle,
@@ -10,6 +12,20 @@ import {
 } from '../../layers/theme/app/utils/headerTheme'
 
 describe('header theme', () => {
+  it('switches to the desktop menu at lg unless a site asks for xl', () => {
+    expect(headerDesktopBreakpoint(undefined)).toBe('lg')
+    expect(headerDesktopBreakpoint('md')).toBe('lg')
+    expect(headerDesktopBreakpoint('xl')).toBe('xl')
+    expect(headerDesktopClasses('lg').showFlex).toBe('hidden lg:flex')
+    expect(headerDesktopClasses('xl')).toEqual({
+      flexOne: 'xl:flex-1',
+      showFlex: 'hidden xl:flex',
+      showInlineFlex: 'hidden xl:inline-flex',
+      hideFromDesktop: 'xl:hidden',
+      collapseFromDesktop: 'block xl:hidden xl:flex-0',
+    })
+  })
+
   it('falls back to the documented defaults for unknown values', () => {
     expect(headerToggleDirection('left')).toBe('left')
     expect(headerToggleDirection('diagonal')).toBe('right')

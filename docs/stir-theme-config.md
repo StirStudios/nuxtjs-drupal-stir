@@ -440,6 +440,7 @@ navigation: {
   variant: 'link',
   contentOrientation: 'horizontal', // 'vertical' stacks dropdown links under the open item
   desktopLayout: 'default', // 'default', 'split-logo', 'centered-toggle' or 'toggle'
+  desktopBreakpoint: 'lg', // 'lg' (1024px) or 'xl' (1280px): where the desktop menu replaces the toggle
   logoMenuMarker: '--logo--',
   toggleDirection: 'right', // 'left' or 'right'
   toggleIcon: 'size-7',
@@ -486,6 +487,11 @@ Use `navigation.modeRoutes` to override the default mode for specific routes.
 In the example above, the header defaults to `'fixed'`, while `/work` and nested
 work routes use `'sticky'`. Patterns ending in `*` match the route and its child
 paths.
+
+The desktop menu replaces the menu toggle from Tailwind's `lg` breakpoint
+(1024px). A site whose menu and header actions do not fit on one line at that
+width sets `navigation.desktopBreakpoint: 'xl'`, so the toggle stays until
+1280px instead of the menu wrapping onto a second line.
 
 For a centered-logo desktop header, set `navigation.desktopLayout` to
 `'split-logo'` and place a placeholder Drupal menu link whose title matches

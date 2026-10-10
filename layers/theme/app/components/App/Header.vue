@@ -14,6 +14,8 @@ import {
 import {
   headerClassName,
   headerConfigString,
+  headerDesktopBreakpoint,
+  headerDesktopClasses,
   headerDesktopLayout,
   headerLogoSurface,
   headerMenuAngleStyle,
@@ -45,11 +47,12 @@ const menuOpen = ref(false)
 const menuMounted = ref(theme.navigation.slideover?.unmountOnHide === false)
 const menuId = useId()
 const [DefineMenuToggle, ReuseMenuToggle] = createReusableTemplate()
+const desktop = headerDesktopClasses(headerDesktopBreakpoint(theme.navigation?.desktopBreakpoint))
 const headerUi = {
   container: 'flex items-center justify-between gap-3',
-  left: 'lg:flex-1 flex items-center gap-1.5',
-  center: 'hidden lg:flex',
-  right: 'flex items-center justify-end lg:flex-1 gap-1.5',
+  left: `${desktop.flexOne} flex items-center gap-1.5`,
+  center: desktop.showFlex,
+  right: `flex items-center justify-end ${desktop.flexOne} gap-1.5`,
   // The slideover's own close region; header-only responsive classes, such as
   // hiding the right region from lg up, must not hide its close button.
   overlayRight: 'flex items-center justify-end gap-1.5',
@@ -90,7 +93,7 @@ const isSplitLogoLayout = computed(() => desktopHeaderLayout.value === 'split-lo
 const isCenteredToggleLayout = computed(() => desktopHeaderLayout.value === 'centered-toggle')
 const isToggleLayout = computed(() => desktopHeaderLayout.value === 'toggle')
 // Toggle layouts make the menu toggle the only navigation at every breakpoint.
-const mobileOnlyClass = computed(() => isCenteredToggleLayout.value || isToggleLayout.value ? '' : 'lg:hidden')
+const mobileOnlyClass = computed(() => isCenteredToggleLayout.value || isToggleLayout.value ? '' : desktop.hideFromDesktop)
 const showBrand = computed(() => theme.navigation.brand !== false)
 // Shared by every desktop menu the header renders.
 const navProps = computed(() => {
@@ -219,8 +222,8 @@ const headerRightClasses = computed(() => {
   return joinHeaderClasses(
     headerUi.right,
     (appConfig.colorMode?.forced || appConfig.colorMode?.showToggle === false) && !hasDesktopActions.value
-      ? 'block lg:hidden lg:flex-0'
-      : 'lg:flex-1',
+      ? desktop.collapseFromDesktop
+      : desktop.flexOne,
     isSplitLogoLayout.value && theme.navigation.splitLogo?.right,
   )
 })
@@ -252,7 +255,7 @@ const toggleIconClass = computed(() =>
 const { data: mainMenu } = await useMenu('main')
 const splitLogoMarker = computed(() => headerConfigString(theme.navigation?.logoMenuMarker))
 const splitDesktopNavClasses = computed(() =>
-  headerClassName(theme.navigation.splitLogo?.desktopNav) || 'hidden lg:flex',
+  headerClassName(theme.navigation.splitLogo?.desktopNav) || desktop.showFlex,
 )
 const showSlideoverBrand = computed(() => theme.navigation.slideover?.logo !== false)
 
@@ -475,7 +478,7 @@ watch(menuOpen, (val) => {
         <UButton
           v-for="action in actionButtons"
           :key="action.item.label"
-          :class="['hidden shrink-0 whitespace-nowrap lg:inline-flex', action.button.class]"
+          :class="[desktop.showInlineFlex, 'shrink-0 whitespace-nowrap', action.button.class]"
           :color="action.button.color"
           data-slot="action"
           :icon="action.button.icon"
@@ -490,7 +493,7 @@ watch(menuOpen, (val) => {
           v-if="actionNavLinks.length"
           v-bind="navProps"
           aria-label="Secondary navigation"
-          class="app-nav app-nav-actions app-nav-desktop hidden lg:flex"
+          :class="['app-nav app-nav-actions app-nav-desktop', desktop.showFlex]"
           :items="actionNavLinks"
         />
 
