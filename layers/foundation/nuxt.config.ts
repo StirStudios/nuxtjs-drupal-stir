@@ -177,6 +177,9 @@ export default defineNuxtConfig({
     },
     public: {
       api: drupalUrl,
+      // Build-time label like indexability: anything but production shows the
+      // environment badge.
+      environment: process.env.NUXT_ENV || 'development',
     },
   },
 

@@ -273,7 +273,7 @@ attributes above; the harness does not depend on project-specific components.
 - `WEBFORM_MAX_FIELDS`: Maximum non-file multipart fields per submission (default: `100`)
 - `NUXT_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
 - `NUXT_NAME`: Site name used in SEO/meta defaults
-- `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable
+- `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable. Any other value shows a small red "<Environment> site" badge in the bottom-left corner of every page, so a local or development site is never mistaken for the live one; unset means `development`
 - `NUXT_INDEXABLE`: Set to `'false'` to temporarily hide a website (a composition with the SEO capability) even when `NUXT_ENV=production`. Applications without the SEO capability are never indexable and do not need it
 - `DRUPAL_CDN`: Optional public file host, when it differs from `NUXT_IMAGE_CDN`. Its host is trusted as an IPX source alongside `DRUPAL_URL` and `NUXT_IMAGE_CDN`
 - `NUXT_PUBLIC_CALCULATOR_LOADER_URL`: Staging and local only. Points the calculator paragraph's widget at a non-production loader; production uses the address in the site's `nuxt.config.ts`, and a production build fails if this is set

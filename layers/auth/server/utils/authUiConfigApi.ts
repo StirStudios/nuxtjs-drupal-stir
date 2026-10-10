@@ -8,11 +8,11 @@ import {
   minLength,
   minValue,
   number,
+  object,
   optional,
   parse,
   picklist,
   pipe,
-  strictObject,
   string,
 } from 'valibot'
 import type { InferOutput } from 'valibot'
@@ -22,43 +22,46 @@ import { layerAuthDrupalApiRequest } from './drupalApi'
 const text = () => string()
 const requiredText = () => pipe(string(), minLength(1))
 const identifierMode = () => picklist(['email', 'username', 'email_or_username'])
-const basicField = () => strictObject({
+const basicField = () => object({
   label: text(),
   placeholder: text(),
 })
-const requiredField = () => strictObject({
+const requiredField = () => object({
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
 })
-const validatedField = () => strictObject({
+const validatedField = () => object({
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
   invalidMessage: text(),
 })
-const identifierField = () => strictObject({
+const identifierField = () => object({
   mode: identifierMode(),
   label: text(),
   placeholder: text(),
   requiredMessage: text(),
   invalidMessage: text(),
 })
-const message = () => strictObject({
+const message = () => object({
   title: text(),
   description: text(),
 })
 
-const authUiConfigSchema = strictObject({
+// Unknown properties are dropped rather than rejected: Stir Tools often ships a
+// new field before a site updates this layer, and an extra label must not turn
+// the whole config into the fallback, which reads as accounts being disabled.
+const authUiConfigSchema = object({
   version: literal(2),
   accountsEnabled: optional(boolean()),
   loginRedirectPath: requiredText(),
   logoutRedirectPath: requiredText(),
-  identifierModes: strictObject({
+  identifierModes: object({
     login: identifierMode(),
     passwordRequest: identifierMode(),
   }),
-  login: strictObject({
+  login: object({
     title: text(),
     description: text(),
     submitLabel: text(),
@@ -66,13 +69,13 @@ const authUiConfigSchema = strictObject({
     password: requiredField(),
     successToast: message(),
   }),
-  register: strictObject({
+  register: object({
     title: text(),
     description: text(),
     submitLabel: text(),
     email: validatedField(),
     password: basicField(),
-    complete: strictObject({
+    complete: object({
       verificationTitle: text(),
       createdTitle: text(),
       verificationSentDescription: text(),
@@ -80,7 +83,7 @@ const authUiConfigSchema = strictObject({
       createdDescription: text(),
     }),
   }),
-  passwordRequest: strictObject({
+  passwordRequest: object({
     title: text(),
     description: text(),
     submitLabel: text(),
@@ -88,12 +91,12 @@ const authUiConfigSchema = strictObject({
     sentTitle: text(),
     sentDescription: text(),
   }),
-  passwordReset: strictObject({
+  passwordReset: object({
     title: text(),
     description: text(),
     submitLabel: text(),
     password: basicField(),
-    confirmPassword: strictObject({
+    confirmPassword: object({
       label: text(),
       placeholder: text(),
       requiredMessage: text(),
@@ -105,7 +108,7 @@ const authUiConfigSchema = strictObject({
     expiredLinkMessage: text(),
     successToast: message(),
   }),
-  verify: strictObject({
+  verify: object({
     loadingTitle: text(),
     successTitle: text(),
     failedTitle: text(),
@@ -114,13 +117,13 @@ const authUiConfigSchema = strictObject({
     successDescription: text(),
     failedDescription: text(),
   }),
-  protectedPage: strictObject({
+  protectedPage: object({
     title: text(),
     description: text(),
     // Stir Tools before contract 1.33 sends none; the page then says Continue.
     submitLabel: optional(text()),
   }),
-  passwordPolicy: strictObject({
+  passwordPolicy: object({
     minLength: pipe(number(), integer(), minValue(1)),
     maxLength: pipe(number(), integer(), minValue(1)),
     requiredMessage: text(),
@@ -130,12 +133,12 @@ const authUiConfigSchema = strictObject({
     uppercaseMessage: text(),
     numberMessage: text(),
     notSameAsCurrentMessage: text(),
-    requirements: pipe(array(strictObject({
+    requirements: pipe(array(object({
       key: requiredText(),
       pattern: requiredText(),
       label: text(),
     })), minLength(1)),
-    strengthLabels: strictObject({
+    strengthLabels: object({
       empty: text(),
       weak: text(),
       medium: text(),
@@ -197,12 +200,12 @@ export async function fetchAuthUiConfig(
     return parseAuthUiConfigResponse(response)
   }
   catch (error: unknown) {
-    if (import.meta.dev) {
-      console.warn(
-        '[auth/config] Falling back to local auth UI config because Drupal config could not be loaded.',
-        error,
-      )
-    }
+    // Logged in every environment: the fallback reads as accounts being
+    // disabled, so /auth pages redirect away with nothing else to show why.
+    console.error(
+      '[auth/config] Falling back to local auth UI config because Drupal config could not be loaded.',
+      error,
+    )
 
     return {}
   }

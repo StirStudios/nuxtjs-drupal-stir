@@ -56,13 +56,23 @@ describe('authUiConfigApi', () => {
       .toThrow('Invalid Drupal auth UI config contract at passwordPolicy.requirements.0.pattern')
   })
 
-  it('rejects undocumented nested properties', () => {
+  it('drops properties a newer Stir Tools sends, so the config still loads', () => {
+    const fixture = producerFixture()
+    const expected = producerFixture()
+
+    fixture.newSection = { title: 'New' }
+    fixture.login.newLabel = 'New'
+
+    expect(parseAuthUiConfigResponse(fixture)).toEqual(expected)
+  })
+
+  it('still rejects a missing required property', () => {
     const fixture = producerFixture()
 
-    fixture.login.legacyLabel = 'Legacy'
+    delete fixture.login.title
 
     expect(() => parseAuthUiConfigResponse(fixture))
-      .toThrow('Invalid Drupal auth UI config contract at login')
+      .toThrow('Invalid Drupal auth UI config contract at login.title')
   })
 
   it('fetches public UI config without forwarding visitor cookies', async () => {
@@ -83,6 +93,29 @@ describe('authUiConfigApi', () => {
     vi.mocked(layerAuthDrupalApiRequest).mockRejectedValue(new Error('Unavailable'))
     const event = {} as Parameters<typeof fetchAuthUiConfig>[0]
 
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
     await expect(fetchAuthUiConfig(event)).resolves.toEqual({})
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining('[auth/config] Falling back'),
+      expect.any(Error),
+    )
+    consoleError.mockRestore()
+  })
+
+  it('logs a contract violation instead of falling back silently', async () => {
+    const fixture = producerFixture()
+
+    delete fixture.version
+    vi.mocked(layerAuthDrupalApiRequest).mockResolvedValue(fixture)
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const event = {} as Parameters<typeof fetchAuthUiConfig>[0]
+
+    await expect(fetchAuthUiConfig(event)).resolves.toEqual({})
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining('[auth/config] Falling back'),
+      expect.objectContaining({ message: 'Invalid Drupal auth UI config contract at version' }),
+    )
+    consoleError.mockRestore()
   })
 })
