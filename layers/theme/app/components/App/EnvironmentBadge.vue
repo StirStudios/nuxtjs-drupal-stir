@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // Marks every page of a non-production build, so a local or development site
-// is never mistaken for the live one. Bottom left keeps clear of the
-// scroll-to-top button.
+// is never mistaken for the live one. Matches the Drupal admin bar from
+// stir_env: a thin red strip above the header that scrolls with the page.
 const environment = String(useRuntimeConfig().public.environment)
 const label = `${environment.charAt(0).toUpperCase()}${environment.slice(1)} site`
 </script>
@@ -9,8 +9,8 @@ const label = `${environment.charAt(0).toUpperCase()}${environment.slice(1)} sit
 <template>
   <div
     v-if="environment !== 'production'"
-    class="pointer-events-none fixed bottom-0 left-0 z-50 bg-red-700 px-2 py-0.5 text-xs font-semibold text-white"
+    class="bg-red-700 px-4 py-1 text-center text-sm leading-snug text-white"
   >
-    {{ label }}
+    <strong class="font-semibold">{{ label }}</strong>, not production.
   </div>
 </template>

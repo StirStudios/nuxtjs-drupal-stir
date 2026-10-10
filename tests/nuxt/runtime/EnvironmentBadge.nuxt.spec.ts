@@ -4,8 +4,8 @@ import EnvironmentBadge from '../../../layers/theme/app/components/App/Environme
 
 describe('environment badge', () => {
   it.each([
-    ['development', 'Development site'],
-    ['staging', 'Staging site'],
+    ['development', 'Development site, not production.'],
+    ['staging', 'Staging site, not production.'],
     ['production', ''],
   ])('for %s shows "%s"', async (environment, text) => {
     useRuntimeConfig().public.environment = environment
