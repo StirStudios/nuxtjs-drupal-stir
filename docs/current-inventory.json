@@ -56,6 +56,7 @@
       "nuxt-vitalizer",
       "nuxtjs-drupal-ce",
       "rate-limiter-flexible",
+      "sharp",
       "tailwindcss",
       "ultrahtml",
       "unhead",
@@ -836,9 +837,9 @@
     "plugins": 10,
     "middleware": 5,
     "serverRoutes": 30,
-    "productionDependencies": 35,
+    "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 230,
+    "tests": 231,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
@@ -846,7 +847,7 @@
       "scripts": 6,
       "server": 31,
       "unit": 11,
-      "utils": 68
+      "utils": 69
     }
   },
   "tests": [
@@ -1044,6 +1045,7 @@
     "tests/utils/imageCdn.spec.ts",
     "tests/utils/imageDelivery.spec.ts",
     "tests/utils/ipxCacheControl.spec.ts",
+    "tests/utils/ipxLimits.spec.ts",
     "tests/utils/layerContract.spec.ts",
     "tests/utils/layoutContract.spec.ts",
     "tests/utils/linkHubHeroImage.spec.ts",
