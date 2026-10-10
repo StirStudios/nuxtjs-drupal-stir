@@ -37,12 +37,12 @@ const clientComponents = computed(() =>
         Skip to main content
       </a>
     </nav>
-    <AppEnvironmentBadge v-if="!embedded" />
     <!-- One layout instance persists across pages that share it, so the
          header and footer aren't rebuilt on every navigation. -->
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <AppEnvironmentBadge v-if="!embedded" />
     <template v-if="!embedded">
       <LazyAppScrollToTop v-if="scrollButtonEnabled" />
       <LazyAppIntegrations />

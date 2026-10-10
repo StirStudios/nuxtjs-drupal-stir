@@ -17,8 +17,9 @@ untouched do not need one.
 
 - **New: a strip on non-production builds.** Every page of a build whose
   `NUXT_ENV` is not `production` opens with a thin red "Development site, not
-  production." strip (or "Local site", "Staging site") above the header,
-  matching the Drupal admin bar from `stir_env`; it scrolls away with the page.
+  production." strip (or "Local site", "Staging site") held at the bottom
+  of the screen, matching the Drupal admin bar from `stir_env` in look; the
+  top is left to the editorial tabs and sticky headers.
   Production builds show nothing. `NUXT_ENV` unset counts as development, the
   same rule that already keeps such builds out of search, so check production
   builds set `NUXT_ENV=production`. The value is exposed as
