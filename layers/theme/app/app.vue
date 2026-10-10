@@ -42,7 +42,6 @@ const clientComponents = computed(() =>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <AppEnvironmentBadge v-if="!embedded" />
     <template v-if="!embedded">
       <LazyAppScrollToTop v-if="scrollButtonEnabled" />
       <LazyAppIntegrations />

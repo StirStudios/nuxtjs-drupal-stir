@@ -273,16 +273,30 @@ const links = computed(() => {
     ? [editorialTaskLinks.value]
     : []
   const accountTo = normalizeAdminUrl('/user')
+  // Outside production, editors see which environment they are editing next
+  // to their name. Clients reviewing a development site never see this bar.
+  const environment = String(config.public.environment)
+  const badge = environment === 'production'
+    ? undefined
+    : {
+        label: `${environment.charAt(0).toUpperCase()}${environment.slice(1)} site`,
+        color: 'error' as const,
+        variant: 'solid' as const,
+        // The same red as stir_env's Drupal bar: 4.5:1 for the small text.
+        class: 'bg-red-700 text-white',
+      }
   const accountItem = accountMenu.value.length
     ? {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
+        badge,
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
+        badge,
         to: accountTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(accountTo),
