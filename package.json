@@ -149,6 +149,7 @@
     "nuxt-vitalizer": "^2.0.0",
     "nuxtjs-drupal-ce": "2.9.0",
     "rate-limiter-flexible": "^11.2.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "ultrahtml": "^1.7.0",
     "unhead": "^3.4.1",

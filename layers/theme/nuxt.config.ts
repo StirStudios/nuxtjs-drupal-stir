@@ -97,6 +97,15 @@ export default defineNuxtConfig({
     },
   ],
   runtimeConfig: {
+    // Read by @nuxt/image's /_ipx handler. Clamps requested sizes beyond the
+    // largest srcset width (2xl x2) and refuses masters over 40MP, which
+    // libvips would otherwise decode at ~120MB each.
+    ipx: {
+      maxOutputDimension: 3840,
+      sharpOptions: {
+        limitInputPixels: 40_000_000,
+      },
+    },
     public: {
       calculator: {
         loaderUrl: '',
