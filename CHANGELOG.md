@@ -13,6 +13,18 @@ untouched do not need one.
 
 ## Unreleased
 
+### Images
+
+- **Changed: `/_ipx` image processing is bounded.** A burst of uncached sizes
+  ran every transform at once and could push a site over a 1GB pm2
+  `max_memory_restart`. The theme layer now runs at most 2 IPX transforms at a
+  time (others queue), turns off the libvips cache, uses one libvips thread per
+  transform, clamps output to 3840px and refuses masters over 40MP. In a local
+  burst of 50 distinct sizes from 3200px JPEGs, peak added RSS fell from
+  ~245MB to ~95MB; the burst took ~5.4s instead of ~3s. Tune with
+  `NUXT_STIR_IPX_*` and `NUXT_IPX_*` (see the README). Cache headers on
+  successful images are unchanged. `sharp` is now a direct dependency.
+
 ### Layout
 
 - **Fixed: a Layout's vertical Align did nothing.** Align top/center/bottom
