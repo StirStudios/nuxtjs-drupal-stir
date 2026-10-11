@@ -70,14 +70,6 @@ watch(open, (isOpen) => {
   if (status.value === 'idle') void execute()
 })
 
-// Shift+Alt+D toggles the panel from anywhere except a text field; browsers
-// such as Zen take Alt+D.
-defineShortcuts({
-  shift_alt_d: () => {
-    open.value = !open.value
-  },
-})
-
 const content = {
   onCloseAutoFocus: (event: Event) => {
     event.preventDefault()
@@ -113,7 +105,7 @@ const items = computed<NavigationMenuItem[]>(() =>
   <USlideover
     v-model:open="open"
     :content="content"
-    description="Drupal's administration sections. Each link opens in Drupal. Shift+Alt+D opens and closes this panel."
+    description="Drupal's administration sections. Each link opens in Drupal."
     side="left"
     title="Drupal CMS"
     :ui="panelUi"
