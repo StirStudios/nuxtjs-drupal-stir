@@ -37,7 +37,12 @@ useHead({
 })
 
 const user = computed(() => page.value?.current_user || null)
-const { adminDashboardUrl, hasEditorialAccess, isAuthenticated } = usePageContext()
+const {
+  adminDashboardUrl,
+  hasAdminMenuAccess,
+  hasEditorialAccess,
+  isAuthenticated,
+} = usePageContext()
 
 type LocalTask = StirDrupalLocalTask
 type LocalTasks = StirDrupalLocalTasks
@@ -252,6 +257,14 @@ watch(
   },
 )
 
+// Drupal's administration sections, in a panel loaded the first time it opens.
+const adminMenuOpen = ref(false)
+const resolveAdminMenuLink = (url: string) => {
+  const to = normalizeAdminUrl(url)
+
+  return { to, onSelect: getAdminLinkSelectHandler(to) }
+}
+
 const links = computed(() => {
   const dashboard = adminDashboardUrl.value
   // Outside production, editors see which environment they are editing next
@@ -267,21 +280,28 @@ const links = computed(() => {
         // The same red as stir_env's Drupal bar: 4.5:1 for the small text.
         class: 'bg-red-700 text-white',
       }
-  // Drupal names the dashboard it allows; without one there is no item.
-  const baseLinks = dashboard
-    ? [
-        [
-          {
-            label: 'Drupal CMS',
-            icon: 'i-lucide-layout-dashboard',
-            badge,
-            to: normalizeAdminUrl(dashboard),
-            tooltip: isCompactTabs.value,
-            onSelect: getAdminLinkSelectHandler(normalizeAdminUrl(dashboard)),
-          },
-        ],
-      ]
-    : []
+  const drupalCms = {
+    label: 'Drupal CMS',
+    icon: 'i-lucide-layout-dashboard',
+    badge,
+    tooltip: isCompactTabs.value,
+  }
+  // Accounts Drupal serves its administration menu get the menu, which leads
+  // with the dashboard; others get the dashboard Drupal allows, or no item.
+  const baseLinks = hasAdminMenuAccess.value
+    ? [[{
+        ...drupalCms,
+        onSelect: () => {
+          adminMenuOpen.value = true
+        },
+      }]]
+    : dashboard
+      ? [[{
+          ...drupalCms,
+          to: normalizeAdminUrl(dashboard),
+          onSelect: getAdminLinkSelectHandler(normalizeAdminUrl(dashboard)),
+        }]]
+      : []
 
   const tasks = editorialTaskLinks.value.length
     ? [editorialTaskLinks.value]
@@ -291,14 +311,14 @@ const links = computed(() => {
     ? {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
-        badge: dashboard ? undefined : badge,
+        badge: baseLinks.length ? undefined : badge,
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: user.value?.name || 'Account',
         icon: 'i-lucide-circle-user',
-        badge: dashboard ? undefined : badge,
+        badge: baseLinks.length ? undefined : badge,
         to: accountTo,
         tooltip: isCompactTabs.value,
         onSelect: getAdminLinkSelectHandler(accountTo),
@@ -318,4 +338,11 @@ const links = computed(() => {
       variant="link"
     />
   </UTheme>
+  <!-- Outside the bar's theme, whose navigation styles are for a top bar. -->
+  <DrupalAdminMenu
+    v-if="hasAdminMenuAccess"
+    v-model:open="adminMenuOpen"
+    :resolve-link="resolveAdminMenuLink"
+    :user-key="currentUserId"
+  />
 </template>

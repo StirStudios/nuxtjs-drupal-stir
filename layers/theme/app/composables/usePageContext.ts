@@ -34,6 +34,7 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
   ))
   const isAuthenticated = computed(() => access.value.isAuthenticated)
   const hasEditorialAccess = computed(() => access.value.hasEditorialAccess)
+  const hasAdminMenuAccess = computed(() => access.value.hasAdminMenuAccess)
   // Drupal sends this only when the site has a dashboard route the account
   // may open, so the frontend never links to a page it cannot reach.
   const adminDashboardUrl = computed(() => access.value.adminDashboardUrl)
@@ -49,6 +50,7 @@ export function usePageContext(page = useStirDrupalCe().getPage()) {
     isFront,
     isAuthenticated,
     hasEditorialAccess,
+    hasAdminMenuAccess,
     adminDashboardUrl,
     canEditInline,
     pageLayout,

@@ -7,6 +7,15 @@ consumers that omit this layer do not ship those mutation endpoints. Drupal
 remains authoritative for authentication, access checks, and the links or
 tasks exposed to Nuxt.
 
+Accounts whose Drupal snapshot carries the `adminMenu` capability (core's
+`access administration pages`, Stir Tools contract 1.34.0) get **Drupal CMS**
+as a panel of Drupal's administration sections instead of a dashboard link.
+The panel loads the sections from the layer's `GET /api/admin-menu` route, which
+forwards the editor's session to Stir Tools' `/api/auth/admin-menu`, the first
+time it opens; each link opens the Drupal page with a return destination.
+Drupal decides which sections and pages appear. Other editors, and sites on an
+older Stir Tools, keep the dashboard link.
+
 `EditableRichText` accepts an `editTarget` containing `entityType`, `entityId`,
 `fieldName`, and an optional `editorMode`. The matching Drupal formatter emits
 this metadata beside single-value text fields, so node strings, node bodies,

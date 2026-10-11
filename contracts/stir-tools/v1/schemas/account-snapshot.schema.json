@@ -27,7 +27,11 @@
       "required": ["editorialUi"],
       "additionalProperties": { "type": "boolean" },
       "properties": {
-        "editorialUi": { "type": "boolean" }
+        "editorialUi": { "type": "boolean" },
+        "adminMenu": {
+          "description": "The account may open Drupal's administration menu (/api/auth/admin-menu). Absent from producers before 1.34.0; treat absence as false.",
+          "type": "boolean"
+        }
       }
     }
   },

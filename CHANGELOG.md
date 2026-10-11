@@ -13,6 +13,18 @@ untouched do not need one.
 
 ## Unreleased
 
+### Editorial
+
+- **New: Drupal's administration menu in the editorial tabs.** For accounts
+  Drupal gives the `adminMenu` capability (`access administration pages`),
+  **Drupal CMS** opens a left panel of Drupal's administration sections, one
+  open at a time, each with its pages; every link opens Drupal with a way
+  back. The sections load the first time the panel opens, through the new
+  server route `GET /api/admin-menu` (forwards the session to Stir Tools'
+  `/api/auth/admin-menu`). Needs Stir Tools with contract 1.34.0; other
+  editors and older Stir Tools keep the dashboard link. Syncs Stir Tools
+  contract 1.34.0. `usePageContext()` gains `hasAdminMenuAccess`.
+
 ### Theme
 
 - **Fix: links in rich text take the link colour again.** The prose link

@@ -8,6 +8,8 @@
  */
 export type StirDrupalCapabilities = {
   editorialUi: boolean
+  // Absent from Stir Tools before contract 1.34.0.
+  adminMenu?: boolean
 } & Record<string, boolean>
 
 export type StirDrupalCurrentUser = {

@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stirstudios.dev/contracts/v1/admin-menu.schema.json",
+  "title": "Stir administration menu",
+  "description": "Drupal's administration sections the account may open, with one level of children, from GET /api/auth/admin-menu. Only internal Drupal paths; links leaving Drupal are left out. Requires the adminMenu capability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sections"
+  ],
+  "properties": {
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/section"
+      }
+    }
+  },
+  "definitions": {
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url",
+        "description"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "description": "A Drupal path, never an absolute URL.",
+          "type": "string",
+          "pattern": "^/(?!/)"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url",
+        "description",
+        "children"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "description": "A Drupal path, never an absolute URL.",
+          "type": "string",
+          "pattern": "^/(?!/)"
+        },
+        "description": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/link"
+          }
+        }
+      }
+    }
+  }
+}
