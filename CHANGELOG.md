@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **Fix: links in rich text are underlined and coloured again.** The prose
+  link rule (`base.css`) used `:where(a)`, which has no specificity, so
+  Tailwind's preflight `a { color: inherit; text-decoration: inherit }` in the
+  same layer won: links in CMS text looked like body text, apart from a medium
+  weight. The rule now targets `a:any-link`, so rich-text links show in the
+  primary colour with an underline, darker on hover, on every site. Links with
+  their own utility classes (buttons in content) are unchanged. No consumer
+  action needed; check any site that styled prose links itself.
+
 ### Environment
 
 - **New: an environment badge in the editorial tabs.** On a build whose
