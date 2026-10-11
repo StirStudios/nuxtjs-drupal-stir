@@ -15,14 +15,15 @@ untouched do not need one.
 
 ### Theme
 
-- **Fix: links in rich text are underlined and coloured again.** The prose
-  link rule (`base.css`) used `:where(a)`, which has no specificity, so
-  Tailwind's preflight `a { color: inherit; text-decoration: inherit }` in the
-  same layer won: links in CMS text looked like body text, apart from a medium
-  weight. The rule now targets `a:any-link`, so rich-text links show in the
-  primary colour with an underline, darker on hover, on every site. Links with
-  their own utility classes (buttons in content) are unchanged. No consumer
-  action needed; check any site that styled prose links itself.
+- **Fix: links in rich text take the link colour again.** The prose link
+  rule (`base.css`) used `:where(a)`, which has no specificity, so Tailwind's
+  preflight `a { color: inherit; text-decoration: inherit }` in the same layer
+  won and links looked like body text. Rich-text links now show in the primary
+  colour with a darker hover colour, and no underline. Content marked
+  `.not-prose` (an address, a card) and links with their own utility classes
+  keep their own styling. A project whose link colour is close to its text
+  colour (under 3:1, so colour alone does not mark a link) turns the underline
+  on with `--stir-prose-link-decoration: underline` in its CSS.
 
 ### Environment
 
