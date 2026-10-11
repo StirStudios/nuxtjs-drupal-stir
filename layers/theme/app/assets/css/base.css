@@ -124,14 +124,18 @@
       @apply my-0;
     }
 
-    /* :any-link outranks Tailwind's preflight `a { color: inherit;
-       text-decoration: inherit }` in this layer, which a bare :where(a) lost
-       to, leaving links unstyled. Utility classes on a link still win. */
-    a:any-link {
-      @apply text-primary-800 dark:text-primary-300 font-medium underline underline-offset-4 transition-colors;
+    /* Links take the link colour and a hover colour. :any-link outranks
+       Tailwind's preflight `a { color: inherit; text-decoration: inherit }`,
+       which a bare :where(a) lost to; .not-prose content (an address, a card)
+       and links with their own utility classes keep their own styling. A
+       project whose link colour is close to its text colour turns the
+       underline on with `--stir-prose-link-decoration: underline`. */
+    a:any-link:not(:where(.not-prose, .not-prose *)) {
+      @apply text-primary-800 dark:text-primary-300 font-medium underline-offset-4 transition-colors;
+      text-decoration-line: var(--stir-prose-link-decoration, none);
     }
 
-    a:any-link:hover {
+    a:any-link:not(:where(.not-prose, .not-prose *)):hover {
       @apply text-primary-900 dark:text-primary-200;
     }
 
