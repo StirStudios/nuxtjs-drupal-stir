@@ -84,9 +84,10 @@ const items = computed<NavigationMenuItem[]>(() =>
   <USlideover
     v-model:open="open"
     :content="content"
-    description="Each link opens in Drupal CMS."
+    description="Drupal's administration sections. Each link opens in Drupal."
     side="left"
-    title="Drupal administration"
+    title="Drupal CMS"
+    :ui="{ content: 'max-w-72', description: 'sr-only' }"
   >
     <template #body>
       <p v-if="status === 'pending'" class="text-sm text-muted" role="status">

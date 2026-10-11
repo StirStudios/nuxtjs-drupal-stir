@@ -66,7 +66,8 @@ describe('Drupal/Tabs administration menu', () => {
     await vi.waitFor(() => {
       const panel = document.body.querySelector('[role="dialog"]')
 
-      expect(panel?.textContent).toContain('Drupal administration')
+      expect(panel?.getAttribute('aria-describedby')).toBeTruthy()
+      expect(panel?.querySelector('h2')?.textContent).toBe('Drupal CMS')
       expect(panel?.textContent).toContain('Dashboard')
       expect(panel?.textContent).toContain('Content')
     })
