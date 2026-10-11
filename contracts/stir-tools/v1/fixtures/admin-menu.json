@@ -1,0 +1,39 @@
+{
+  "sections": [
+    {
+      "title": "Dashboard",
+      "url": "/admin/dashboard",
+      "description": "User dashboard.",
+      "children": []
+    },
+    {
+      "title": "Content",
+      "url": "/admin/content",
+      "description": "Find and manage content.",
+      "children": [
+        {
+          "title": "Add content",
+          "url": "/node/add",
+          "description": ""
+        },
+        {
+          "title": "Media",
+          "url": "/admin/content/media",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "Configuration",
+      "url": "/admin/config",
+      "description": "Administer settings.",
+      "children": [
+        {
+          "title": "People",
+          "url": "/admin/config/people",
+          "description": "Configure user accounts."
+        }
+      ]
+    }
+  ]
+}

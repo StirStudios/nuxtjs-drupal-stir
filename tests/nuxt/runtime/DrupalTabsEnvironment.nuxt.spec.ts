@@ -6,8 +6,8 @@ import DrupalTabs from '../../../layers/editorial/app/components/Drupal/Tabs.vue
 
 describe('Drupal/Tabs environment badge', () => {
   it.each([
-    ['development', 'Development site'],
-    ['local', 'Local site'],
+    ['development', 'Development'],
+    ['local', 'Local'],
     ['production', null],
   ])('on %s shows %s', async (environment, label) => {
     registerEndpoint('/api/menu/api/menu_items/account', () => [])
@@ -21,8 +21,15 @@ describe('Drupal/Tabs environment badge', () => {
 
     const bar = await mountSuspended(DrupalTabs)
 
-    if (label) expect(bar.text()).toContain(label)
-    else expect(bar.text()).not.toMatch(/ site\b/)
+    if (label) {
+      expect(bar.text()).toContain(label)
+      expect(bar.text()).not.toMatch(/\bsite\b/i)
+      // The theme's error colour, at a shade that keeps 4.5:1 for white text.
+      expect(bar.find('.bg-error-700').text()).toBe(label)
+    }
+    else {
+      expect(bar.find('.bg-error-700').exists()).toBe(false)
+    }
     bar.unmount()
   })
 })

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.33.0",
+  "contractVersion": "1.34.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -17,6 +17,10 @@
       "optional": true
     },
     "account.session": {
+      "providerModules": ["stir_account"],
+      "optional": true
+    },
+    "account.admin": {
       "providerModules": ["stir_account"],
       "optional": true
     },
@@ -86,6 +90,11 @@
         "fixtures/page-current-user-anonymous.json",
         "fixtures/page-current-user-editor.json"
       ]
+    },
+    "account.admin.menu": {
+      "capability": "account.admin",
+      "schema": "schemas/admin-menu.schema.json",
+      "fixtures": ["fixtures/admin-menu.json"]
     },
     "auth.session": {
       "capability": "account.session",

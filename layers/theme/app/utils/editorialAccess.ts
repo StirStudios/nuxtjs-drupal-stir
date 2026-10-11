@@ -1,5 +1,6 @@
 type DrupalCapabilities = {
   editorialUi?: unknown
+  adminMenu?: unknown
 }
 
 type DrupalPageUser = {
@@ -42,6 +43,8 @@ export function resolveDrupalPageAccess(
   return {
     isAuthenticated,
     hasEditorialAccess: user?.capabilities?.editorialUi === true,
+    // Drupal's administration menu, offered only to accounts Drupal serves it.
+    hasAdminMenuAccess: user?.capabilities?.adminMenu === true,
     adminDashboardUrl: asUrl(user?.admin_dashboard_url),
   }
 }
@@ -86,6 +89,7 @@ export function mergeDrupalPageAccess(
   return {
     isAuthenticated: routeAccess.isAuthenticated || sessionAccess.isAuthenticated,
     hasEditorialAccess: routeAccess.hasEditorialAccess || sessionAccess.hasEditorialAccess,
+    hasAdminMenuAccess: routeAccess.hasAdminMenuAccess || sessionAccess.hasAdminMenuAccess,
     adminDashboardUrl: routeAccess.adminDashboardUrl ?? sessionAccess.adminDashboardUrl,
   }
 }

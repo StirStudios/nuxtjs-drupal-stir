@@ -12,6 +12,7 @@ describe('resolveDrupalPageAccess', () => {
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
@@ -37,6 +38,7 @@ describe('resolveDrupalPageAccess', () => {
     } as never)).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
@@ -88,6 +90,24 @@ describe('the dashboard link', () => {
   })
 })
 
+describe('the administration menu', () => {
+  it('follows the adminMenu capability Drupal sent, not editorial access', () => {
+    expect(resolveDrupalPageAccess({
+      current_user: { uid: 1, capabilities: { editorialUi: true, adminMenu: true } },
+    }).hasAdminMenuAccess).toBe(true)
+    expect(resolveDrupalPageAccess({
+      current_user: { uid: 2, capabilities: { editorialUi: true } },
+    }).hasAdminMenuAccess).toBe(false)
+  })
+
+  it('falls back to the session when the page payload has none', () => {
+    expect(mergeDrupalPageAccess(
+      resolveDrupalPageAccess(null),
+      resolveAuthSessionAccess({ loggedIn: true, user: { uid: 1, capabilities: { adminMenu: true } } }),
+    ).hasAdminMenuAccess).toBe(true)
+  })
+})
+
 describe('resolveAuthSessionAccess', () => {
   it('reads the editorial capability from the session user', () => {
     expect(resolveAuthSessionAccess({
@@ -96,6 +116,7 @@ describe('resolveAuthSessionAccess', () => {
     })).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
@@ -104,6 +125,7 @@ describe('resolveAuthSessionAccess', () => {
     expect(resolveAuthSessionAccess({ loggedIn: false, user: null })).toEqual({
       isAuthenticated: false,
       hasEditorialAccess: false,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
@@ -120,6 +142,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: true,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
@@ -134,6 +157,7 @@ describe('mergeDrupalPageAccess', () => {
     )).toEqual({
       isAuthenticated: true,
       hasEditorialAccess: false,
+      hasAdminMenuAccess: false,
       adminDashboardUrl: null,
     })
   })
