@@ -49,6 +49,13 @@ watch(open, (isOpen) => {
   if (status.value === 'idle') void execute()
 })
 
+// Alt+D toggles the panel from anywhere except a text field.
+defineShortcuts({
+  alt_d: () => {
+    open.value = !open.value
+  },
+})
+
 const content = {
   onCloseAutoFocus: (event: Event) => {
     event.preventDefault()
@@ -84,7 +91,7 @@ const items = computed<NavigationMenuItem[]>(() =>
   <USlideover
     v-model:open="open"
     :content="content"
-    description="Drupal's administration sections. Each link opens in Drupal."
+    description="Drupal's administration sections. Each link opens in Drupal. Alt+D opens and closes this panel."
     side="left"
     title="Drupal CMS"
     :ui="{ content: 'max-w-72', description: 'sr-only' }"
