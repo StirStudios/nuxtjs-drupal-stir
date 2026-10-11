@@ -80,4 +80,19 @@ describe('Drupal/Tabs administration menu', () => {
     expect(dashboard?.getAttribute('href')).toContain('/admin/dashboard')
     bar.unmount()
   })
+
+  it('toggles the panel with Alt+D', async () => {
+    registerEndpoint('/api/admin-menu', () => ({ sections }))
+
+    const bar = await mountBar('page-admin-menu-shortcut', { editorialUi: true, adminMenu: true })
+    const panelState = () => document.body.querySelector('[role="dialog"]')?.getAttribute('data-state') ?? 'closed'
+    const pressAltD = () => document.dispatchEvent(new KeyboardEvent('keydown', { key: '∂', code: 'KeyD', altKey: true, bubbles: true }))
+
+    pressAltD()
+    await vi.waitFor(() => expect(panelState()).toBe('open'))
+
+    pressAltD()
+    await vi.waitFor(() => expect(panelState()).toBe('closed'))
+    bar.unmount()
+  })
 })
