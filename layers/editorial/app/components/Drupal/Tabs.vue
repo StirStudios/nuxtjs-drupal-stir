@@ -274,11 +274,12 @@ const links = computed(() => {
   const badge = environment === 'production'
     ? undefined
     : {
-        label: `${environment.charAt(0).toUpperCase()}${environment.slice(1)} site`,
+        label: `${environment.charAt(0).toUpperCase()}${environment.slice(1)}`,
         color: 'error' as const,
         variant: 'solid' as const,
-        // The same red as stir_env's Drupal bar: 4.5:1 for the small text.
-        class: 'bg-red-700 text-white',
+        // The theme's error colour at the 700 shade keeps the small white text
+        // above 4.5:1; with the default red it matches stir_env's Drupal bar.
+        class: 'bg-error-700 text-white',
       }
   const drupalCms = {
     label: 'Drupal CMS',
