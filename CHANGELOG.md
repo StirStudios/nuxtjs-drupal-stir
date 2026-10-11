@@ -23,11 +23,9 @@ untouched do not need one.
   server route `GET /api/admin-menu` (forwards the session to Stir Tools'
   `/api/auth/admin-menu`). Needs Stir Tools with contract 1.34.0; other
   editors and older Stir Tools keep the dashboard link. Syncs Stir Tools
-  contract 1.34.0. `usePageContext()` gains `hasAdminMenuAccess`. **Shift+Alt+D**
-  opens and closes the panel (Shift+Option+D on macOS), except while typing in a field.
+  contract 1.34.0. `usePageContext()` gains `hasAdminMenuAccess`.
   The panel uses the editorial admin scope, so a site's theme does not restyle
-  it. **Shift+Alt+D**
-  opens and closes the panel (Shift+Option+D on macOS), except while typing in a field.
+  it.
 
 ### Theme
 

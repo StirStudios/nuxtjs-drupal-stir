@@ -12,10 +12,8 @@ Accounts whose Drupal snapshot carries the `adminMenu` capability (core's
 as a panel of Drupal's administration sections instead of a dashboard link.
 The panel loads the sections from the layer's `GET /api/admin-menu` route, which
 forwards the editor's session to Stir Tools' `/api/auth/admin-menu`, the first
-time it opens; each link opens the Drupal page with a return destination. **Shift+Alt+D**
-(Shift+Option+D on macOS) opens and closes the panel. Like the tabs, the panel uses the admin UI
-scope, so a site's theme and `app.config` do not restyle it. **Shift+Alt+D**
-(Shift+Option+D on macOS) opens and closes the panel.
+time it opens; each link opens the Drupal page with a return destination. Like the tabs, the panel uses the admin UI
+scope, so a site's theme and `app.config` do not restyle it.
 Drupal decides which sections and pages appear. Other editors, and sites on an
 older Stir Tools, keep the dashboard link.
 
