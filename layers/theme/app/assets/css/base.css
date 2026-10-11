@@ -124,11 +124,14 @@
       @apply my-0;
     }
 
-    :where(a) {
+    /* :any-link outranks Tailwind's preflight `a { color: inherit;
+       text-decoration: inherit }` in this layer, which a bare :where(a) lost
+       to, leaving links unstyled. Utility classes on a link still win. */
+    a:any-link {
       @apply text-primary-800 dark:text-primary-300 font-medium underline underline-offset-4 transition-colors;
     }
 
-    :where(a:hover) {
+    a:any-link:hover {
       @apply text-primary-900 dark:text-primary-200;
     }
 
