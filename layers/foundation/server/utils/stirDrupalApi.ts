@@ -8,6 +8,7 @@ import {
   setResponseHeader,
   type H3Event,
 } from 'h3'
+import { recordStirCacheTags } from './stirCacheTags'
 import { readStirDrupalMaintenanceMessage } from '../../shared/utils/drupalMaintenance'
 import { assertStirSameOrigin } from './stirRequestSecurity'
 
@@ -608,6 +609,7 @@ export async function stirDrupalApiRequest<T>(
   }
 
   assertStirDrupalResponseNotRedirect(response)
+  recordStirCacheTags(event, response.headers)
 
   if (options.forwardSetCookies) {
     appendStirDrupalSetCookies(event, response)

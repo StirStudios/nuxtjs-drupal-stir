@@ -22,6 +22,7 @@ import {
   getStirForwardedCookie,
   markStirPrivateResponse,
 } from '../../../../foundation/server/utils/stirDrupalApi'
+import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
 
 const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
 
@@ -55,6 +56,7 @@ export default defineEventHandler(async (event) => {
     )
 
     assertStirDrupalResponseNotRedirect(response)
+    recordStirCacheTags(event, response.headers)
     const payload = parseStirListingResponse(response._data)
     const setsSession = filterStirDrupalSetCookies(
       getStirDrupalSetCookies(response.headers),

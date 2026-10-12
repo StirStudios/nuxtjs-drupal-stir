@@ -102,9 +102,11 @@ export default defineNuxtPlugin(async () => {
   const config = resolveCmsGlobalSeoConfig((appConfig.cmsGlobalSeo || {}) as CmsGlobalSeoConfig)
   // Started before useHead and awaited at the end, so the head registers while
   // the plugin context is still active. Missing defaults fall back to empty.
+  // The request's own fetch, so the server records Drupal's cache tags.
+  const requestFetch = useRequestFetch()
   const globalSeo = useAsyncData(
     'cms-global-seo',
-    () => $fetch<GlobalSeoResponse>('/api/seo/global').catch((): GlobalSeoResponse => ({ meta: [], link: [] })),
+    () => requestFetch<GlobalSeoResponse>('/api/seo/global').catch((): GlobalSeoResponse => ({ meta: [], link: [] })),
     { default: () => null, immediate: config.enabled },
   )
   const defaults = globalSeo.data
