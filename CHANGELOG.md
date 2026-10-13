@@ -13,6 +13,21 @@ untouched do not need one.
 
 ## Unreleased
 
+### Foundation
+
+- **New: pages carry Drupal's cache tags for Varnish.** Server-rendered HTML
+  and the Drupal API responses this layer proxies or serves (`/api/drupal-ce`,
+  `/api/menu`, `/api/app-context`, `/api/view/*`, `/api/listings/*`,
+  `/api/seo/global`) now send `X-Cache-Tags`: the union of the cache tags of
+  every Drupal response the page was built from, space-separated, at most
+  3,000 bytes (over that, per-entity tags give way to `stir:oversize`). The
+  Nuxt Varnish stores them and Stir Tools purges by tag, so editing content
+  purges exactly the pages that showed it. Private responses send none. A new
+  Nitro plugin wraps each request's own `$fetch` to collect the tags of
+  internal requests, and `x-cache-tags` joins the Drupal CE pass-through
+  headers. Needs Stir Tools sending `X-Cache-Tags` (until then nothing is
+  sent) and the Nuxt VCL that strips it before browsers. No consumer change.
+
 ### Editorial
 
 - **New: Drupal's administration menu in the editorial tabs.** For accounts

@@ -105,16 +105,19 @@ export default defineNuxtConfig({
 
   hooks: {
     'modules:done'() {
-      if (!isDevelopment) return
-
       const nuxt = useNuxt()
       const drupalCe = nuxt.options.runtimeConfig.drupalCe as {
         passThroughHeaders?: string[]
       }
+      const headers = drupalCe.passThroughHeaders ?? []
 
-      drupalCe.passThroughHeaders = drupalCe.passThroughHeaders?.filter(
-        header => header.toLowerCase() !== 'cache-control',
-      )
+      // The page's Drupal cache tags reach the HTML response, where the
+      // foundation cache-tags plugin merges them with the other requests'.
+      if (!headers.includes('x-cache-tags')) headers.push('x-cache-tags')
+
+      drupalCe.passThroughHeaders = isDevelopment
+        ? headers.filter(header => header.toLowerCase() !== 'cache-control')
+        : headers
     },
   },
 })

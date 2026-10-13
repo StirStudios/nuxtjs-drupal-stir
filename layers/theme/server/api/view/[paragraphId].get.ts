@@ -11,6 +11,7 @@ import {
   getStirForwardedCookie,
   markStirPrivateResponse,
 } from '../../../../foundation/server/utils/stirDrupalApi'
+import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
 import { resolveDrupalCeApiConfig } from '../../../../core/server/utils/drupalCeApiConfig'
 import {
   buildParagraphViewPath,
@@ -47,6 +48,7 @@ export default defineEventHandler(async (event) => {
     )
 
     assertStirDrupalResponseNotRedirect(response)
+    recordStirCacheTags(event, response.headers)
 
     if (!cookie) {
       for (const header of FORWARDED_CACHE_HEADERS) {

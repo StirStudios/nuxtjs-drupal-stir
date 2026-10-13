@@ -1,3 +1,4 @@
+import { appendResponseHeader } from 'h3'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import {
   buildDrupalViewControlQuery,
@@ -66,6 +67,7 @@ export function useDrupalViewControls(
   inheritedQueryNamespace?: MaybeRefOrGetter<string | undefined>,
 ) {
   const { $ceApi } = useStirDrupalCe()
+  const requestEvent = import.meta.server ? useRequestEvent() : undefined
   const route = useRoute()
   const routeControls = useRouteListControls()
 
@@ -526,7 +528,16 @@ export function useDrupalViewControls(
     const requestPath = `${route.path}${queryString ? `?${queryString}` : ''}`
     const api = $ceApi()
 
-    return api(requestPath, { signal })
+    // Server-rendered pages carry the Drupal cache tags of the view they show;
+    // the internal /api/view request above is recorded by the server plugin.
+    return api(requestPath, {
+      signal,
+      onResponse: ({ response }) => {
+        const tags = response.headers.get('x-cache-tags')
+
+        if (requestEvent && tags) appendResponseHeader(requestEvent, 'x-cache-tags', tags)
+      },
+    })
   }
 
   function applyViewPageResponse(pageResponse: unknown, page: number): void {
