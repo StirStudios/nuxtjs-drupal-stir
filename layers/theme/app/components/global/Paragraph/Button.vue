@@ -133,7 +133,7 @@ const pdfUrl = computed(() =>
     }"
   >
     <template #body>
-      <LazyStirPdfViewer :src="pdfUrl" />
+      <LazyStirPdfViewer class="[--stir-pdf-toolbar-offset:0px]" :src="pdfUrl" :title="pdfTitle" />
     </template>
   </LazyUModal>
 </template>
