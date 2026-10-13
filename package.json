@@ -117,7 +117,7 @@
     "release": "release-it",
     "perf:imports": "node scripts/perf/import-inventory.mjs",
     "audit:overrides": "node scripts/audit/shadowed-components.mjs",
-    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    "setup:hooks": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.142",

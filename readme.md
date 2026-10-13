@@ -384,7 +384,7 @@ pnpm verify:ci
 This includes unit, Nuxt runtime, E2E, lint, typecheck, root build, and
 downstream consumer checks.
 
-`pnpm install` points git at `.githooks/`. Its pre-commit hook blocks a commit
+Run `pnpm setup:hooks` once per clone to point git at `.githooks/`. The pre-commit hook blocks a commit
 while `docs/current-inventory.json` is stale (the first check in
 `verify:core`), regenerates it, and asks you to stage it and commit again.
 
