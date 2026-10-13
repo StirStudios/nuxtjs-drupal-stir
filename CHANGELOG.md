@@ -23,19 +23,17 @@ untouched do not need one.
 
 ### Theme
 
-- **Fixed: PDF viewer toolbars covering the site header.** The
-  vue-pdf-viewer-core toolbar (sticky, `z-index: 60`) now stays inside its
-  viewer's stacking context and sticks below the pinned header instead of over
-  it. Its sticky offset defaults to `--ui-header-height` plus the editorial
-  tabs bar; sites with more fixed chrome set `--stir-pdf-toolbar-offset` (for
-  example `calc(var(--ui-header-height) + 3rem)`). The PDF modal on
-  `paragraph-button` sets it to `0px`. `StirPdfViewer` takes a new optional
-  `title` prop that prefixes the library's hardcoded names, so the viewer,
-  pages region and toolbar become "<title>, PDF document viewer", "<title>,
-  PDF pages" and "<title>, PDF viewer toolbar" and several viewers on one page
-  no longer share landmark names (axe `landmark-unique`). Without a title the
-  library names are kept. `media-document` and `paragraph-button` pass their
-  titles.
+- **Changed: `StirPdfViewer` requires vue-pdf-viewer-core 0.4.0.** Sites that
+  install the viewer must update it (`pnpm add vue-pdf-viewer-core@^0.4.0`).
+  The library now names the viewer, pages region and toolbar from the document
+  title ("<title>, PDF document viewer", "<title>, PDF pages", "<title>, PDF
+  viewer toolbar"), so pages with several viewers pass axe `landmark-unique`,
+  and it keeps its sticky toolbar inside the viewer's stacking context so it no
+  longer covers the site header. `StirPdfViewer` passes its `title` through and
+  maps `--stir-pdf-toolbar-offset` (default `--ui-header-height` plus the
+  editorial tabs bar) to the library's `--lpv-toolbar-offset`; the layer's DOM
+  label rewriting and stacking overrides are removed. On an older library the
+  titles are ignored and the toolbar can again cover the header.
 
 - **Changed: carousel accessible names and focus.** `paragraph-carousel` no
   longer exposes its paragraph ID in `aria-label`. It uses an optional new
