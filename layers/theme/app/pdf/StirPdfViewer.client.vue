@@ -14,13 +14,22 @@ const attrs = useAttrs()
 
 const viewer = ref<{ $el?: Element } | null>(null)
 
-// The library hardcodes the toolbar name, so pages with several viewers
-// expose identical toolbars unless the document title is added.
-watchEffect(() => {
-  const label = props.title?.trim()
-  const toolbar = viewer.value?.$el?.querySelector('.lpv-toolbar')
+// The library hardcodes its region and toolbar names, so pages with several
+// viewers expose duplicate landmarks unless the document title is added.
+const libraryLabels = ['PDF document viewer', 'PDF pages', 'PDF viewer toolbar']
 
-  if (label && toolbar) toolbar.setAttribute('aria-label', `${label} toolbar`)
+watchEffect(() => {
+  const title = props.title?.trim()
+  const root = viewer.value?.$el
+
+  if (!title || !(root instanceof Element)) return
+
+  for (const label of libraryLabels) {
+    const selector = `[aria-label="${label}"]`
+    const element = root.matches(selector) ? root : root.querySelector(selector)
+
+    element?.setAttribute('aria-label', `${title}, ${label}`)
+  }
 }, { flush: 'post' })
 </script>
 

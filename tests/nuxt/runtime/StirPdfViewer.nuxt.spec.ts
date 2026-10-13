@@ -3,12 +3,15 @@ import { defineComponent, h } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import StirPdfViewer from '../../../layers/theme/app/pdf/StirPdfViewer.client.vue'
 
-// Mirrors vue-pdf-viewer-core's markup: a root wrapping a toolbar whose
-// accessible name is hardcoded.
+// Mirrors vue-pdf-viewer-core's markup: a labelled viewer region wrapping a
+// toolbar and a pages region, all with hardcoded accessible names.
 const PdfViewer = defineComponent({
   props: { src: { type: String, default: '' } },
   setup: () => () => h('div', { class: 'lpv-root' }, [
-    h('div', { 'aria-label': 'PDF viewer toolbar', class: 'lpv-toolbar', role: 'toolbar' }),
+    h('div', { 'aria-label': 'PDF document viewer', class: 'lpv', role: 'region' }, [
+      h('div', { 'aria-label': 'PDF viewer toolbar', class: 'lpv-toolbar', role: 'toolbar' }),
+      h('div', { 'aria-label': 'PDF pages', class: 'lpv-scroll', role: 'region' }),
+    ]),
   ]),
 })
 
@@ -16,17 +19,22 @@ const mountViewer = (props: Record<string, unknown>) =>
   mountSuspended(StirPdfViewer, { props, global: { stubs: { PdfViewer } } })
 
 describe('StirPdfViewer (Nuxt runtime)', () => {
-  it('names the toolbar after the document so several viewers can be told apart', async () => {
+  it('names the viewer, pages and toolbar after the document so several viewers can be told apart', async () => {
     const first = await mountViewer({ src: '/a.pdf', title: 'Floor plan – 2nd Floor' })
     const second = await mountViewer({ src: '/b.pdf', title: 'Floor plan – 3rd Floor' })
 
-    expect(first.get('[role="toolbar"]').attributes('aria-label')).toBe('Floor plan – 2nd Floor toolbar')
-    expect(second.get('[role="toolbar"]').attributes('aria-label')).toBe('Floor plan – 3rd Floor toolbar')
+    expect(first.get('.lpv').attributes('aria-label')).toBe('Floor plan – 2nd Floor, PDF document viewer')
+    expect(first.get('.lpv-scroll').attributes('aria-label')).toBe('Floor plan – 2nd Floor, PDF pages')
+    expect(first.get('[role="toolbar"]').attributes('aria-label')).toBe('Floor plan – 2nd Floor, PDF viewer toolbar')
+    expect(second.get('.lpv').attributes('aria-label')).toBe('Floor plan – 3rd Floor, PDF document viewer')
+    expect(second.get('.lpv-scroll').attributes('aria-label')).toBe('Floor plan – 3rd Floor, PDF pages')
   })
 
   it('keeps the library name when the title is blank', async () => {
     const wrapper = await mountViewer({ src: '/a.pdf', title: '  ' })
 
+    expect(wrapper.get('.lpv').attributes('aria-label')).toBe('PDF document viewer')
+    expect(wrapper.get('.lpv-scroll').attributes('aria-label')).toBe('PDF pages')
     expect(wrapper.get('[role="toolbar"]').attributes('aria-label')).toBe('PDF viewer toolbar')
   })
 

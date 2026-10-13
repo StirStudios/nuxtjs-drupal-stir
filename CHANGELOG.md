@@ -30,8 +30,12 @@ untouched do not need one.
   tabs bar; sites with more fixed chrome set `--stir-pdf-toolbar-offset` (for
   example `calc(var(--ui-header-height) + 3rem)`). The PDF modal on
   `paragraph-button` sets it to `0px`. `StirPdfViewer` takes a new optional
-  `title` prop, and the toolbar is named "<title> toolbar" so several viewers
-  on one page can be told apart; `media-document` passes its title.
+  `title` prop that prefixes the library's hardcoded names, so the viewer,
+  pages region and toolbar become "<title>, PDF document viewer", "<title>,
+  PDF pages" and "<title>, PDF viewer toolbar" and several viewers on one page
+  no longer share landmark names (axe `landmark-unique`). Without a title the
+  library names are kept. `media-document` and `paragraph-button` pass their
+  titles.
 
 - **Changed: carousel accessible names and focus.** `paragraph-carousel` no
   longer exposes its paragraph ID in `aria-label`. It uses an optional new
