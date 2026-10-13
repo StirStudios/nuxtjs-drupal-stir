@@ -33,6 +33,7 @@ const props = withDefaults(defineProps<{
   spacing?: string
 
   direction?: string
+  header?: string
 
   carouselIndicators?: boolean
   carouselArrows?: boolean
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<{
   direction: undefined,
   editLink: undefined,
   gridItems: undefined,
+  header: undefined,
   id: undefined,
   items: undefined,
   marqueeDuration: undefined,
@@ -114,6 +116,14 @@ provideRevealMotionScope(() => undefined)
 
 onMounted(() => {
   mounted.value = true
+
+  const peers = [...document.querySelectorAll<HTMLElement>('[data-stir-carousel-label]')]
+    .filter(el => el.dataset.stirCarouselLabel === baseLabel.value)
+  const index = carouselRoot.value ? peers.indexOf(carouselRoot.value) : -1
+
+  if (peers.length > 1 && index >= 0) {
+    labelOrder.value = index + 1
+  }
 
   if (!intersectionObserverSupported.value) {
     carouselIsVisible.value = true
@@ -194,11 +204,15 @@ const prevButton = computed(() =>
 const nextButton = computed(() =>
   resolveCarouselArrowButton(theme.carousel.arrows?.next),
 )
-const carouselLabel = computed(() =>
-  `Content carousel ${props.id ?? props.uuid ?? ''}`.trim(),
+const baseLabel = computed(() => props.header?.trim()
+  || (props.carouselFade && !isMarquee.value ? 'Slideshow' : 'Carousel'))
+// Numbered after mount by page order so several unnamed carousels stay distinct.
+const labelOrder = ref<number>()
+const label = computed(() =>
+  labelOrder.value ? `${baseLabel.value} ${labelOrder.value}` : baseLabel.value,
 )
-const marqueeLabel = computed(() =>
-  `Content marquee ${props.id ?? props.uuid ?? ''}`.trim(),
+const motionName = computed(() =>
+  props.carouselFade && !isMarquee.value ? 'slideshow' : 'automatic scrolling',
 )
 
 function syncAutoplay() {
@@ -262,7 +276,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"
   >
-    <div ref="carouselRoot">
+    <div ref="carouselRoot" :data-stir-carousel-label="baseLabel">
       <UButton
         v-if="slides.length > 1 && preferredMotion !== 'reduce'"
         :aria-controls="mounted ? contentId : undefined"
@@ -270,7 +284,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
         color="neutral"
         :disabled="!mounted"
         :icon="userPaused ? 'i-lucide-play' : 'i-lucide-pause'"
-        :label="userPaused ? 'Start automatic scrolling' : 'Pause automatic scrolling'"
+        :label="`${userPaused ? 'Start' : 'Pause'} ${motionName}`"
         variant="outline"
         @click="userPaused = !userPaused"
       />
@@ -284,7 +298,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
       >
         <UMarquee
           v-if="isMarquee && slides.length"
-          :aria-label="marqueeLabel"
+          :aria-label="label"
           class="stir-marquee"
           :class="{ 'stir-marquee-paused': motionPaused }"
           :orientation="marqueeOrientation ?? 'horizontal'"
@@ -303,7 +317,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
           v-else-if="slides.length"
           ref="carousel"
           v-slot="{ item }"
-          :aria-label="carouselLabel"
+          :aria-label="label"
           :arrows="mounted ? carouselArrows : false"
           :auto-height="carouselAutoheight"
           :auto-scroll="autoScrollOptions"
@@ -317,7 +331,10 @@ function releasePointerArrowFocus(event: PointerEvent) {
           :prev="prevButton"
           :prev-icon="theme.carousel.arrows?.prevIcon"
           :ui="{
-            root: ['stir-carousel', theme.carousel.root],
+            root: [
+              'stir-carousel rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary',
+              theme.carousel.root,
+            ],
             container: 'items-center transition-[height]',
             item: carouselItemClasses,
           }"

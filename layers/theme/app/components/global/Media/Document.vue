@@ -8,5 +8,5 @@ defineProps<{
 </script>
 
 <template>
-  <StirPdfViewer v-if="url" :src="url" />
+  <StirPdfViewer v-if="url" :src="url" :title="title" />
 </template>

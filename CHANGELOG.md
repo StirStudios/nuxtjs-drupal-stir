@@ -13,6 +13,26 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **Fixed: PDF viewer toolbars covering the site header.** The
+  vue-pdf-viewer-core toolbar (sticky, `z-index: 60`) now stays inside its
+  viewer's stacking context and sticks below the pinned header instead of over
+  it. Its sticky offset defaults to `--ui-header-height` plus the editorial
+  tabs bar; sites with more fixed chrome set `--stir-pdf-toolbar-offset` (for
+  example `calc(var(--ui-header-height) + 3rem)`). The PDF modal on
+  `paragraph-button` sets it to `0px`. `StirPdfViewer` takes a new optional
+  `title` prop, and the toolbar is named "<title> toolbar" so several viewers
+  on one page can be told apart; `media-document` passes its title.
+
+- **Changed: carousel accessible names and focus.** `paragraph-carousel` no
+  longer exposes its paragraph ID in `aria-label`. It uses an optional new
+  `header` prop when Drupal sends one, otherwise "Carousel" (or "Slideshow"
+  for fade mode), numbered by page order when several share a name. The
+  carousel region now shows a primary `focus-visible` outline, and the pause
+  control on fade slideshows reads "Pause slideshow". Tests matching the old
+  "Content carousel <id>" label need updating.
+
 ### Foundation
 
 - **New: pages live in Varnish as long as their shortest Drupal response.**
