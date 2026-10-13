@@ -126,6 +126,7 @@
     "perf:lighthouse:local",
     "perf:presentation",
     "perf:report",
+    "prepare",
     "preview",
     "release",
     "test",

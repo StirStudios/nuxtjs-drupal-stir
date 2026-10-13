@@ -1,0 +1,8 @@
+#!/bin/sh
+# CI's Verify Core fails on a stale inventory; catch it before the commit.
+# Checks the working tree, so stage the regenerated file before committing.
+if ! node scripts/audit/inventory.mjs --check; then
+  node scripts/audit/inventory.mjs
+  echo 'pre-commit: docs/current-inventory.json was regenerated; review it, git add it, and commit again.' >&2
+  exit 1
+fi
