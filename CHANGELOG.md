@@ -15,6 +15,16 @@ untouched do not need one.
 
 ### Foundation
 
+- **New: pages live in Varnish as long as their shortest Drupal response.**
+  A public page built from several Drupal responses (page, menus, views, app
+  context, SEO) now sends `Cache-Control: public, max-age=60, s-maxage=<N>`,
+  N being the smallest `s-maxage` among them; Stir Tools sets each from the
+  content's own lifetime or the site's settings. Responses without one leave
+  the choice to the rest, or to Varnish's default. Private responses are left
+  alone. Needs Stir Tools sending `s-maxage`; until then nothing changes.
+
+### Foundation
+
 - **New: pages carry Drupal's cache tags for Varnish.** Server-rendered HTML
   and the Drupal API responses this layer proxies or serves (`/api/drupal-ce`,
   `/api/menu`, `/api/app-context`, `/api/view/*`, `/api/listings/*`,
