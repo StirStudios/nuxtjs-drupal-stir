@@ -842,13 +842,13 @@
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 234,
+    "tests": 235,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
       "nuxt": 101,
       "scripts": 6,
-      "server": 32,
+      "server": 33,
       "unit": 11,
       "utils": 69
     }
@@ -1004,6 +1004,7 @@
     "tests/server/registerPolicyApi.spec.ts",
     "tests/server/robotsIndexability.spec.ts",
     "tests/server/sitemapApi.spec.ts",
+    "tests/server/stirCacheTags.spec.ts",
     "tests/server/stirDrupalApi.spec.ts",
     "tests/server/stirRequestSecurity.spec.ts",
     "tests/server/webformLimits.spec.ts",
