@@ -1,7 +1,9 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import {
   applyStirCacheTagsHeader,
+  applyStirSharedMaxAge,
   formatStirCacheTags,
+  parseStirSharedMaxAge,
   parseStirCacheTags,
   recordStirCacheTags,
   STIR_OVERSIZE_CACHE_TAG,
@@ -108,5 +110,41 @@ describe('Drupal cache tags on responses', () => {
 
     expect(callerHook).toHaveBeenCalledOnce()
     expect(responseHeaders.get('x-cache-tags')).toBe('config:system.menu.main')
+  })
+
+  it('reads the smallest s-maxage from Cache-Control values', () => {
+    expect(parseStirSharedMaxAge(['max-age=60, public, s-maxage=86400', 'public, s-maxage=3600'])).toBe(3600)
+    expect(parseStirSharedMaxAge('max-age=3600, public')).toBeUndefined()
+  })
+
+  it('gives a public page the smallest lifetime of its Drupal responses', () => {
+    const { event, responseHeaders } = createEvent({ 'cache-control': 'max-age=60, public, s-maxage=86400' })
+
+    recordStirCacheTags(event, new Headers({ 'cache-control': 'max-age=60, public, s-maxage=900' }))
+    recordStirCacheTags(event, new Headers({ 'cache-control': 'max-age=3600, public' }))
+    applyStirSharedMaxAge(event)
+
+    expect(responseHeaders.get('cache-control')).toBe('public, max-age=60, s-maxage=900')
+  })
+
+  it('keeps the browser lifetime under a short Varnish lifetime', () => {
+    const { event, responseHeaders } = createEvent({ 'cache-control': 'public, max-age=30, s-maxage=30' })
+
+    applyStirSharedMaxAge(event)
+
+    expect(responseHeaders.get('cache-control')).toBe('public, max-age=30, s-maxage=30')
+  })
+
+  it('leaves private and lifetime-less responses alone', () => {
+    const { event, responseHeaders } = createEvent({ 'cache-control': 'private, no-store, max-age=0' })
+
+    recordStirCacheTags(event, new Headers({ 'cache-control': 'public, s-maxage=900' }))
+    applyStirSharedMaxAge(event)
+    expect(responseHeaders.get('cache-control')).toBe('private, no-store, max-age=0')
+
+    const plain = createEvent({ 'cache-control': 'max-age=3600, public' })
+
+    applyStirSharedMaxAge(plain.event)
+    expect(plain.responseHeaders.get('cache-control')).toBe('max-age=3600, public')
   })
 })

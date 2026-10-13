@@ -1,6 +1,7 @@
 import type { H3Event } from 'h3'
 import {
   applyStirCacheTagsHeader,
+  applyStirSharedMaxAge,
   recordStirCacheTags,
 } from '../utils/stirCacheTags'
 
@@ -10,8 +11,9 @@ type FetchOptions = { onResponse?: FetchHook | FetchHook[] } & Record<string, un
 type EventFetch = (request: unknown, options?: FetchOptions) => Promise<unknown>
 
 /**
- * Wraps a request's own `$fetch` so the cache tags of every internal request
- * a page renders from (menus, app context, views, listings) reach the page.
+ * Wraps a request's own `$fetch` so the cache tags and Varnish lifetime of
+ * every internal request a page renders from (menus, app context, views,
+ * listings) reach the page.
  */
 export const wrapStirEventFetch = (event: H3Event): void => {
   const holder = event as unknown as { $fetch?: EventFetch }
@@ -37,6 +39,7 @@ export default defineNitroPlugin((nitroApp) => {
   })
 
   nitroApp.hooks.hook('beforeResponse', (event) => {
+    applyStirSharedMaxAge(event)
     applyStirCacheTagsHeader(event)
   })
 })

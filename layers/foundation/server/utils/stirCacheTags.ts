@@ -75,19 +75,82 @@ const contextTags = (event: H3Event): Set<string> => {
 }
 
 /**
- * Records the cache tags of a Drupal (or internal) response on this request.
+ * Returns the smallest `s-maxage` in Cache-Control values, if any.
+ */
+export const parseStirSharedMaxAge = (value: HeaderValue): number | undefined => {
+  if (value === null || value === undefined) return undefined
+
+  const values = Array.isArray(value) ? value : [String(value)]
+  const ages = values
+    .flatMap(item => [...String(item).matchAll(/(?:^|[\s,])s-maxage=(\d+)/gi)])
+    .map(match => Number(match[1]))
+
+  return ages.length > 0 ? Math.min(...ages) : undefined
+}
+
+const recordSharedMaxAge = (event: H3Event, age: number | undefined): void => {
+  if (age === undefined) return
+
+  const context = event.context as { stirSharedMaxAge?: number }
+
+  context.stirSharedMaxAge = context.stirSharedMaxAge === undefined
+    ? age
+    : Math.min(context.stirSharedMaxAge, age)
+}
+
+/**
+ * Records the cache tags and Varnish lifetime of a Drupal (or internal)
+ * response on this request.
  */
 export const recordStirCacheTags = (
   event: H3Event,
   headers: { get?: (name: string) => string | null } | null | undefined,
 ): void => {
+  if (!event.context) return
+
+  recordSharedMaxAge(event, parseStirSharedMaxAge(headers?.get?.('cache-control')))
+
   const tags = parseStirCacheTags(headers?.get?.(STIR_CACHE_TAGS_HEADER))
 
-  if (tags.length === 0 || !event.context) return
+  if (tags.length === 0) return
 
   const recorded = contextTags(event)
 
   for (const tag of tags) recorded.add(tag)
+}
+
+/** Browsers keep a page at most this long; no purge reaches them. */
+export const STIR_BROWSER_MAX_AGE = 60
+
+const PRIVATE_DIRECTIVE = /(?:^|,)\s*(?:private|no-store|no-cache)\b/i
+
+/**
+ * Gives a public response the smallest Varnish lifetime of the Drupal
+ * responses it was built from.
+ *
+ * Drupal sends `public, max-age=60, s-maxage=<N>` (Stir Tools); a page made
+ * of several responses (page, menus, views, app context) may live only as
+ * long as the shortest of them. Responses without `s-maxage` leave the
+ * choice to the rest, or to Varnish's default when none has one. Private and
+ * uncacheable responses are left alone.
+ */
+export const applyStirSharedMaxAge = (event: H3Event): void => {
+  const current = getResponseHeader(event, 'Cache-Control') as HeaderValue
+  const currentValue = Array.isArray(current) ? current.join(', ') : String(current ?? '')
+
+  recordSharedMaxAge(event, parseStirSharedMaxAge(current))
+
+  const age = (event.context as { stirSharedMaxAge?: number }).stirSharedMaxAge
+
+  if (age === undefined || PRIVATE_DIRECTIVE.test(currentValue) || !/\bpublic\b/i.test(currentValue)) {
+    return
+  }
+
+  setResponseHeader(
+    event,
+    'Cache-Control',
+    `public, max-age=${Math.min(STIR_BROWSER_MAX_AGE, age)}, s-maxage=${age}`,
+  )
 }
 
 /**
