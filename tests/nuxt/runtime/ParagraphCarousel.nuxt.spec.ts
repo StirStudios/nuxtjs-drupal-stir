@@ -215,6 +215,49 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
+  it.each([
+    [{ id: 308 }, 'Carousel'],
+    [{ id: 308, carouselFade: true }, 'Slideshow'],
+    [{ id: 308, presentation: 'marquee' }, 'Carousel'],
+    [{ id: 308, header: '  Our partners ' }, 'Our partners'],
+    [{ id: 308, header: '   ' }, 'Carousel'],
+  ])('names the region without exposing paragraph ids (%o)', async (props, name) => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { ...props, items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')] },
+    })
+
+    expect(wrapper.get('[aria-label]:not(button)').attributes('aria-label')).toBe(name)
+    wrapper.unmount()
+  })
+
+  it('numbers same-named carousels by page order', async () => {
+    const items = [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')]
+    const first = await mountSuspended(ParagraphCarousel, { props: { items }, attachTo: document.body })
+    const second = await mountSuspended(ParagraphCarousel, { props: { items }, attachTo: document.body })
+
+    expect(second.get('[role="region"]').attributes('aria-label')).toBe('Carousel 2')
+    first.unmount()
+    second.unmount()
+  })
+
+  it('shows a focus indicator on the carousel region', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')] },
+    })
+
+    expect(wrapper.get('[role="region"]').classes()).toContain('focus-visible:outline-2')
+    wrapper.unmount()
+  })
+
+  it('labels the fade pause control as a slideshow control', async () => {
+    const wrapper = await mountSuspended(ParagraphCarousel, {
+      props: { carouselFade: true, items: [h('a', { href: '/one' }, 'One'), h('a', { href: '/two' }, 'Two')] },
+    })
+
+    expect(wrapper.get('button[aria-controls]').text()).toBe('Pause slideshow')
+    wrapper.unmount()
+  })
+
   it('uses efficient horizontal marquee defaults', async () => {
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {

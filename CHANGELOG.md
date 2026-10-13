@@ -13,6 +13,16 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **Changed: carousel accessible names and focus.** `paragraph-carousel` no
+  longer exposes its paragraph ID in `aria-label`. It uses an optional new
+  `header` prop when Drupal sends one, otherwise "Carousel" (or "Slideshow"
+  for fade mode), numbered by page order when several share a name. The
+  carousel region now shows a primary `focus-visible` outline, and the pause
+  control on fade slideshows reads "Pause slideshow". Tests matching the old
+  "Content carousel <id>" label need updating.
+
 ### Foundation
 
 - **New: pages live in Varnish as long as their shortest Drupal response.**
