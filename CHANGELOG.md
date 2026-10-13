@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Tooling
+
+- **Fixed: installing the layer from git no longer fails.** A `prepare`
+  script made pnpm refuse the git dependency with
+  `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`. It is replaced by
+  `pnpm setup:hooks`, which layer contributors run once per clone. Consumers
+  need no `onlyBuiltDependencies` entry.
+
 ### Theme
 
 - **Fixed: PDF viewer toolbars covering the site header.** The
