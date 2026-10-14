@@ -198,4 +198,24 @@ describe('protected content boundary', () => {
       protectedContentMiddleware(createEvent('/api/drupal-ce//private/report')),
     ).rejects.toMatchObject({ statusCode: 403 })
   })
+
+  it.each([
+    '/api/drupal-ce/Clients/vendors',
+    '/api/drupal-ce/CLIENTS/vendors',
+    '/api/drupal-ce/%43lients/vendors',
+    '/api/drupal-ce/clients%2Fvendors',
+    '/api/drupal-ce/clients./vendors',
+    '/api/drupal-ce/clients;p/vendors',
+    '/api/drupal-ce/clients//vendors',
+    '/api/drupal-ce/./clients/vendors',
+    '/api/drupal-ce/other/../clients/vendors',
+    '/api/drupal-ce/\uFF43lients/vendors',
+    '/api/drupal-ce/Clients',
+  ])('rejects the payload for the case/encoding variant %s', async (path) => {
+    stubRuntimeConfig(['/clients', '/clients/'])
+
+    await expect(
+      protectedContentMiddleware(createEvent(path)),
+    ).rejects.toMatchObject({ statusCode: 403 })
+  })
 })

@@ -627,7 +627,8 @@ footer: {
   },
   copyright: 'mb-0',
   email: '',
-  footerLinks: 'transition-colors text-primary hover:text-primary/90',
+  footerInlineLinks: 'underline underline-offset-4 text-primary-800 dark:text-primary-300', // email, copyright and credit links
+  footerLinks: '', // footer menu (NavigationMenu link slot)
   logo: '',
   menu: 'mb-3',
   menuItem: 'min-w-0 py-0',

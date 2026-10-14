@@ -843,14 +843,14 @@
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 236,
+    "tests": 237,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
       "nuxt": 102,
       "scripts": 6,
       "server": 33,
-      "unit": 11,
+      "unit": 12,
       "utils": 69
     }
   },
@@ -1021,6 +1021,7 @@
     "tests/unit/paragraphComponentStarter.spec.ts",
     "tests/unit/paragraphLayoutArrangement.spec.ts",
     "tests/unit/paragraphLayoutTransition.spec.ts",
+    "tests/unit/protectedPaths.spec.ts",
     "tests/unit/stirCtaEditor.spec.ts",
     "tests/utils/accountNav.spec.ts",
     "tests/utils/authRedirect.spec.ts",

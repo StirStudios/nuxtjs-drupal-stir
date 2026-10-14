@@ -13,6 +13,24 @@ untouched do not need one.
 
 ## Unreleased
 
+### Security
+
+- **Fixed: protected routes could be bypassed by changing the path's letter
+  case or encoding.** Drupal resolves path aliases case-insensitively, but the
+  layer matched `protectedRoutes.requireLoginPaths` case-sensitively, so with a
+  rule such as `/members/` a request for `/Members/page` (or
+  `/api/drupal-ce/Members/page`) skipped both the page middleware and the CE
+  payload guard and returned the protected content, without the private
+  `Cache-Control` marker. Matching now runs on one canonical form, built by
+  `canonicalizeStirProtectedPath()`, in the page middleware, the CE API guard and
+  the auth cache-control middleware: decoded once, lowercased with Unicode
+  folding, duplicate slashes collapsed, `.`/`..` segments resolved, and `;`
+  parameters and trailing dots dropped. Configured rules are now
+  case-insensitive, and an exact rule also matches its trailing-slash form.
+  **Every site that configures protected routes should update the layer and
+  redeploy promptly**, then purge any CDN or Varnish cache that may hold a
+  leaked page.
+
 ### Tooling
 
 - **Fixed: installing the layer from git no longer fails.** A `prepare`
@@ -23,6 +41,7 @@ untouched do not need one.
 
 ### Theme
 
+- **Changed: footer menu links are no longer underlined.** `stirTheme.footer.footerLinks` now styles only the footer menu (the NavigationMenu `link` slot) and defaults to empty, so Nuxt UI styles it. The underline was clipped by Nuxt UI's truncating label at some widths, and WCAG 1.4.1 does not require one in a navigation list. The new `footerInlineLinks` key styles links inside footer text (email, copyright, credit) and keeps the underline and darker shades. Sites that override `footerLinks` for those inline links should move the override to `footerInlineLinks`.
 - **Changed: `StirPdfViewer` requires vue-pdf-viewer-core 0.4.0.** Sites that
   install the viewer must update it (`pnpm add vue-pdf-viewer-core@^0.4.0`).
   The library now names the viewer, pages region and toolbar from the document

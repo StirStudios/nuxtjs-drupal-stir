@@ -317,6 +317,9 @@ type StirThemeFooterConfig = {
   showSubFooterRegion?: boolean
   copyright?: ClassValue
   email?: ClassValue
+  /** Links inside footer sentences (email, copyright, credit); keep an underline for WCAG 1.4.1. */
+  footerInlineLinks?: ClassValue
+  /** Footer menu links (NavigationMenu `link` slot); empty by default so Nuxt UI styles them. */
   footerLinks?: ClassValue
   poweredBy?: ClassValue
   slogan?: ClassValue

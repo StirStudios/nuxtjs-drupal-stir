@@ -15,6 +15,7 @@ import {
 } from '../utils/protectedAccess'
 import { layerAuthDrupalApiRequest } from '../utils/drupalApi'
 import {
+  canonicalizeStirProtectedPath,
   isStirProtectedPath,
   normalizeStirProtectedPaths,
 } from '../../shared/utils/protectedPaths'
@@ -29,15 +30,17 @@ type StirProtectedRoutesConfig = {
   allowAuthenticatedUserBypass?: unknown
 }
 
+// Canonicalized the same way as the configured rules (case, percent-encoding,
+// duplicate slashes, dot segments), so a variant such as
+// /api/drupal-ce//Clients/vendors cannot dodge the match while Drupal still
+// resolves it to the protected node.
 const protectedRoutePathFor = (requestPath: string): string | undefined => {
-  if (requestPath === CE_PROXY_PREFIX) return '/'
-  if (!requestPath.startsWith(`${CE_PROXY_PREFIX}/`)) return undefined
+  const path = canonicalizeStirProtectedPath(requestPath)
 
-  // Mirrors normalizeProxyPath()'s leading-slash collapse in drupalCeProxy.ts:
-  // the two must agree on the canonical path, or a request such as
-  // /api/drupal-ce//private/report evades this prefix match while still
-  // reaching the protected Drupal path once the proxy normalizes it.
-  return requestPath.slice(CE_PROXY_PREFIX.length).replace(/^\/+/, '/')
+  if (path === CE_PROXY_PREFIX || path === `${CE_PROXY_PREFIX}/`) return '/'
+  if (!path.startsWith(`${CE_PROXY_PREFIX}/`)) return undefined
+
+  return path.slice(CE_PROXY_PREFIX.length)
 }
 
 type DrupalSessionResponse = { authenticated?: boolean }

@@ -31,6 +31,10 @@ describe('auth API cache control', () => {
       // The prefixes themselves, which a trailing-slash-only match missed.
       '/api/auth',
       '/api/account',
+      // Case and encoding variants must not slip past the private marker.
+      '/api/Auth/session',
+      '/api/%61ccount/settings',
+      '/api//auth/login',
     ]) {
       const { event, headers } = createEvent(path)
 
