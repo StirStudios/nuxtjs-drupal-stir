@@ -214,6 +214,9 @@ afterAll(async () => {
 
 describe('Nuxt E2E smoke', async () => {
   await setup({
+    // setup() builds the fixture site: about 70s alone, and the specs build
+    // side by side, so the 120s default fails on a busy machine.
+    setupTimeout: 300_000,
     browser: browserEnabled,
     env: {
       DRUPAL_API_KEY: 'fixture-api-key',
