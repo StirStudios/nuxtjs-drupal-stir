@@ -32,6 +32,7 @@ export type FooterThemeConfig = {
   leftSlot: string
   right: string
   rightSlot: string
+  footerInlineLinks: string
   footerLinks: string
   logo: string
   menu: string
@@ -79,7 +80,8 @@ export const DEFAULT_FOOTER_THEME: Omit<FooterThemeConfig, 'sections'> = {
   leftSlot: 'order-1',
   right: 'flex flex-col items-center gap-3 text-center lg:items-end lg:text-right',
   rightSlot: 'order-2 lg:order-3',
-  footerLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
+  footerInlineLinks: 'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
+  footerLinks: '',
   logo: 'h-16 w-auto',
   menu: '',
   menuItem: 'min-w-0 py-0',
@@ -160,6 +162,7 @@ export function resolveFooterConfig(
     leftSlot: toString(next.leftSlot, DEFAULT_FOOTER_THEME.leftSlot),
     right: toString(next.right, DEFAULT_FOOTER_THEME.right),
     rightSlot: toString(next.rightSlot, DEFAULT_FOOTER_THEME.rightSlot),
+    footerInlineLinks: toString(next.footerInlineLinks, DEFAULT_FOOTER_THEME.footerInlineLinks),
     footerLinks: toString(next.footerLinks, DEFAULT_FOOTER_THEME.footerLinks),
     logo: toString(next.logo, DEFAULT_FOOTER_THEME.logo),
     menu: toString(next.menu, DEFAULT_FOOTER_THEME.menu),

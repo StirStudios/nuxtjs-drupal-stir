@@ -254,8 +254,11 @@ const drupal = createServer((request, response) => {
   const payload = path === '/api/app-context'
     ? {
         blocks: {},
-        footer_menu: [],
-        site_info: { name: 'Accessibility fixture', mail: '', slogan: '' },
+        footer_menu: [
+          { title: 'Privacy Policy', url: '/privacy-policy' },
+          { title: 'Terms of Service', url: '/terms-of-service' },
+        ],
+        site_info: { name: 'Accessibility fixture', mail: 'hello@example.com', slogan: '' },
       }
     : path === '/api/auth/config'
       ? authUiConfig

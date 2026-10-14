@@ -66,7 +66,7 @@ defineProps<{
     <ULink
       v-else-if="atom === 'email' && toMail"
       :class="config.email"
-      :inactive-class="config.footerLinks"
+      :inactive-class="config.footerInlineLinks"
       raw
       target="_blank"
       :to="toMail"
@@ -91,7 +91,7 @@ defineProps<{
       <template v-if="showPoweredBy">
         Website created &amp; powered by
         <ULink
-            :inactive-class="config.footerLinks"
+            :inactive-class="config.footerInlineLinks"
             raw
             target="_blank"
             :to="STIR_STUDIOS_WEBSITE"
@@ -118,7 +118,7 @@ defineProps<{
     >
       Website created &amp; powered by
       <ULink
-        :inactive-class="config.footerLinks"
+        :inactive-class="config.footerInlineLinks"
         raw
         target="_blank"
         :to="STIR_STUDIOS_WEBSITE"
