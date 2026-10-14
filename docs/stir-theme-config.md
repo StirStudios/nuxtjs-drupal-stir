@@ -627,7 +627,7 @@ footer: {
   },
   copyright: 'mb-0',
   email: '',
-  footerInlineLinks: 'underline underline-offset-4 text-primary-800 dark:text-primary-300', // email, copyright and credit links
+  footerInlineLinks: 'underline underline-offset-4 text-primary-800 dark:text-primary-300', // email, copyright and credit links; unset, a footerLinks override is reused with an underline
   footerLinks: '', // footer menu (NavigationMenu link slot)
   logo: '',
   menu: 'mb-3',

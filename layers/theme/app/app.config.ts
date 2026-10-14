@@ -223,8 +223,6 @@ export default defineAppConfig({
       rightSlot: 'order-2 lg:order-3',
       copyright: 'mb-0',
       email: 'break-all',
-      footerInlineLinks:
-        'text-primary-800 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200 underline underline-offset-4 transition-colors',
       footerLinks: '',
       logo: 'h-16 w-auto',
       menu: '',
