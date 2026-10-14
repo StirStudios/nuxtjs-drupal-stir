@@ -49,6 +49,9 @@ afterAll(async () => {
 
 describe('Indexable production website', async () => {
   await setup({
+    // setup() builds the fixture site: about 70s alone, and the specs build
+    // side by side, so the 120s default fails on a busy machine.
+    setupTimeout: 300_000,
     rootDir: fileURLToPath(
       new URL('../../fixtures/full-consumer', import.meta.url),
     ),

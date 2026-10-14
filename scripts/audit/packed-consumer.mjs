@@ -145,6 +145,13 @@ async function main() {
       }, null, 2)}\n`,
     )
 
+    // pnpm 11 refuses an install whose packages' build scripts are neither
+    // allowed nor denied; the consumer takes the layer's own allowBuilds.
+    const rootWorkspace = await readFile(resolve('pnpm-workspace.yaml'), 'utf8')
+    const allowBuilds = rootWorkspace.match(/^allowBuilds:\n(?: {2}.*\n)+/m)?.[0]
+    if (!allowBuilds) throw new Error('pnpm-workspace.yaml has no allowBuilds block.')
+    await writeFile(join(consumerDir, 'pnpm-workspace.yaml'), `packages:\n  - .\n\n${allowBuilds}`)
+
     await run('pnpm', ['install', '--no-frozen-lockfile'], consumerDir)
     const installedConsumerPackage = JSON.parse(
       await readFile(join(consumerDir, 'package.json'), 'utf8'),

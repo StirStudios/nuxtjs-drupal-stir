@@ -45,7 +45,8 @@ const playwrightConfig = defineConfig({
         cwd: projectRoot,
         url: localBaseUrl,
         reuseExistingServer: !process.env.CI,
-        timeout: 12e4,
+        // Builds the site first; 120s fails on a busy machine.
+        timeout: 3e5,
       },
   projects: [
     {
