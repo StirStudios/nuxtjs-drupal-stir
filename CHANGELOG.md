@@ -13,6 +13,24 @@ untouched do not need one.
 
 ## Unreleased
 
+### Security
+
+- **Fixed: protected routes could be bypassed by changing the path's letter
+  case or encoding.** Drupal resolves path aliases case-insensitively, but the
+  layer matched `protectedRoutes.requireLoginPaths` case-sensitively, so with a
+  rule such as `/members/` a request for `/Members/page` (or
+  `/api/drupal-ce/Members/page`) skipped both the page middleware and the CE
+  payload guard and returned the protected content, without the private
+  `Cache-Control` marker. Matching now runs on one canonical form, built by
+  `canonicalizeStirProtectedPath()`, in the page middleware, the CE API guard and
+  the auth cache-control middleware: decoded once, lowercased with Unicode
+  folding, duplicate slashes collapsed, `.`/`..` segments resolved, and `;`
+  parameters and trailing dots dropped. Configured rules are now
+  case-insensitive, and an exact rule also matches its trailing-slash form.
+  **Every site that configures protected routes should update the layer and
+  redeploy promptly**, then purge any CDN or Varnish cache that may hold a
+  leaked page.
+
 ### Tooling
 
 - **Fixed: installing the layer from git no longer fails.** A `prepare`
