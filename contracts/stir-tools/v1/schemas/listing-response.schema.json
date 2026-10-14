@@ -41,7 +41,17 @@
           "type": "object",
           "additionalProperties": {
             "type": "array",
-            "items": { "type": "object", "additionalProperties": true }
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Results with this value under the other active filters."
+                }
+              }
+            }
           }
         }
       }
