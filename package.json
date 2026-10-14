@@ -40,7 +40,7 @@
     "./layers/theme/app/assets/css/main": "./layers/theme/app/assets/css/main.css",
     "./*": "./*"
   },
-  "packageManager": "pnpm@10.33.1",
+  "packageManager": "pnpm@11.13.1",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },
