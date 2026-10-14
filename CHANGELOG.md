@@ -51,7 +51,7 @@ untouched do not need one.
   Pass `totalItems` from the listing pager once the backend sends counts
   (Stir Tools `LightweightListingHelper::addCountsToOptions()`).
 
-- **Changed: footer menu links are no longer underlined.** `stirTheme.footer.footerLinks` now styles only the footer menu (the NavigationMenu `link` slot) and defaults to empty, so Nuxt UI styles it. The underline was clipped by Nuxt UI's truncating label at some widths, and WCAG 1.4.1 does not require one in a navigation list. The new `footerInlineLinks` key styles links inside footer text (email, copyright, credit) and keeps the underline and darker shades. Sites that override `footerLinks` for those inline links should move the override to `footerInlineLinks`.
+- **Changed: footer menu links are no longer underlined.** `stirTheme.footer.footerLinks` now styles only the footer menu (the NavigationMenu `link` slot) and defaults to empty, so Nuxt UI styles it. The underline was clipped by Nuxt UI's truncating label at some widths, and WCAG 1.4.1 does not require one in a navigation list. The new `footerInlineLinks` key styles links inside footer text (email, copyright, credit) and keeps the underline and darker shades. A site that overrides `footerLinks` but not `footerInlineLinks` keeps its colours on the inline links, with an underline added; before this fallback, such sites (styled for a dark footer) got the layer's dark `text-primary-800` inline links and failed contrast. Set `footerInlineLinks` to style inline links separately.
 - **Changed: `StirPdfViewer` requires vue-pdf-viewer-core 0.4.0.** Sites that
   install the viewer must update it (`pnpm add vue-pdf-viewer-core@^0.4.0`).
   The library now names the viewer, pages region and toolbar from the document

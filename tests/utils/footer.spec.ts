@@ -55,4 +55,13 @@ describe('resolveFooterConfig', () => {
 
     expect(config.sections).toEqual({ left: [], center: [], right: [] })
   })
+
+  it('styles inline links from a site footerLinks override unless footerInlineLinks is set', () => {
+    expect(resolveFooterConfig({ footerLinks: 'text-inverted' }, {}).footerInlineLinks)
+      .toBe('text-inverted underline underline-offset-4')
+    expect(resolveFooterConfig({ footerLinks: 'text-inverted', footerInlineLinks: 'text-primary-300' }, {}).footerInlineLinks)
+      .toBe('text-primary-300')
+    expect(resolveFooterConfig({ footerLinks: '' }, {}).footerInlineLinks)
+      .toBe(DEFAULT_FOOTER_THEME.footerInlineLinks)
+  })
 })

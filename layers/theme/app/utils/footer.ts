@@ -132,6 +132,17 @@ function toAtomList(value: unknown, fallback: FooterAtom[]): FooterAtom[] {
     .filter((entry, index, list) => list.indexOf(entry) === index)
 }
 
+// Sites that styled footer links before footerInlineLinks existed keep their colours on inline links.
+function resolveInlineLinks(footer: ThemeRecord): string {
+  const inline = toString(footer.footerInlineLinks)
+  const links = toString(footer.footerLinks)
+
+  if (inline) return inline
+  if (links) return `${links} underline underline-offset-4`
+
+  return DEFAULT_FOOTER_THEME.footerInlineLinks
+}
+
 export function resolveFooterConfig(
   footer: unknown,
   navigation: unknown,
@@ -162,7 +173,7 @@ export function resolveFooterConfig(
     leftSlot: toString(next.leftSlot, DEFAULT_FOOTER_THEME.leftSlot),
     right: toString(next.right, DEFAULT_FOOTER_THEME.right),
     rightSlot: toString(next.rightSlot, DEFAULT_FOOTER_THEME.rightSlot),
-    footerInlineLinks: toString(next.footerInlineLinks, DEFAULT_FOOTER_THEME.footerInlineLinks),
+    footerInlineLinks: resolveInlineLinks(footerRecord),
     footerLinks: toString(next.footerLinks, DEFAULT_FOOTER_THEME.footerLinks),
     logo: toString(next.logo, DEFAULT_FOOTER_THEME.logo),
     menu: toString(next.menu, DEFAULT_FOOTER_THEME.menu),
