@@ -5,6 +5,8 @@ type DynamicListingFilterOption = {
   label: string
   filterLabel?: string
   type?: string
+  /** Results with this value under the other active filters. */
+  count?: number
 }
 
 type DynamicListingFilters = Record<string, DynamicListingFilterOption[] | undefined>
@@ -34,6 +36,8 @@ type DynamicListingControlsOptions = {
   sortOptions?: DynamicListingSortOption[]
   sortQueryKey?: string
   defaultSort?: string
+  /** Results under the current filters; with option counts, decides whether a lone facet option still narrows them. */
+  totalItems?: MaybeRefOrGetter<number | null | undefined>
 }
 
 function routeArrayValue(value: unknown): string[] {
@@ -174,7 +178,19 @@ export function useDynamicListingControls(options: DynamicListingControlsOptions
   }
 
   function isFacetDisabled(key: string): boolean {
-    return activeFilterValues(key).length === 0 && facetOptions(key).length <= 1
+    if (activeFilterValues(key).length) return false
+
+    const rows = filterOptions(key)
+
+    if (rows.length !== 1) return rows.length === 0
+
+    const count = rows[0]?.count
+    const totalItems = toValue(options.totalItems)
+
+    // Without counts a lone option is assumed not to narrow the results.
+    if (typeof count !== 'number' || typeof totalItems !== 'number') return true
+
+    return count >= totalItems
   }
 
   function applyFixedQueryDefaults() {
