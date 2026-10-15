@@ -262,6 +262,10 @@ type StirThemeRouteHeroConfig = {
   variants?: Partial<Record<RouteHeroVariant | (string & {}), StirThemeRouteHeroVariantConfig>>
 } & LooseRecord
 
+type StirThemeClearLayoutConfig = {
+  title?: ClassListValue
+} & LooseRecord
+
 type StirThemeLinkHubConfig = {
   root?: ClassValue
   backgroundImage?: ClassValue
@@ -551,6 +555,7 @@ type StirThemeConfig = {
   hero?: StirThemeHeroConfig
   routeHero?: StirThemeRouteHeroConfig
   clientComponents?: string[]
+  clearLayout?: StirThemeClearLayoutConfig
   linkHub?: StirThemeLinkHubConfig
   socials?: StirThemeSocialConfig[]
   footer?: StirThemeFooterConfig
@@ -627,6 +632,7 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
     variants: Partial<Record<RouteHeroVariant | (string & {}), StirThemeRouteHeroVariantConfig>>
   }
   clientComponents: string[]
+  clearLayout: Required<StirThemeClearLayoutConfig>
   linkHub: Required<StirThemeLinkHubConfig>
   socials: StirThemeSocialConfig[]
   footer: StirThemeFooterConfig
