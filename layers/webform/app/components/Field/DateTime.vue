@@ -3,7 +3,7 @@ import type { DateTimeBlock, DateTimeDate, WebformFieldProps, WebformState } fro
 import { CalendarDate as DateValue } from '@internationalized/date'
 import DateTimeCalendar from './DateTime/Calendar.vue'
 import DateTimeSelect from './DateTime/Select.vue'
-import { formatWebformDateTime, generateTimeOptions } from '#stir/utils/dateUtils'
+import { formatWebformDateTime, generateTimeOptions, parseWebformDateLimit } from '#stir/utils/dateUtils'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
@@ -29,6 +29,8 @@ const siteTimezone =
     ? props.field['#timezone']
     : 'America/Los_Angeles'
 const timeOptions = generateTimeOptions(minTime, maxTime, step)
+const minDate = parseWebformDateLimit(props.field['#dateMin'])
+const maxDate = parseWebformDateLimit(props.field['#dateMax'])
 
 const blocks = ref<DateTimeBlock[]>(
   Array.from({ length: multiple }, (_, i) => {
@@ -108,6 +110,8 @@ watch(
           v-model="block.date"
           :invalid="fieldInvalid"
           :label="dateFieldLabel(i)"
+          :max-value="maxDate"
+          :min-value="minDate"
           :timezone="siteTimezone"
           :variant="fieldVariant"
         />

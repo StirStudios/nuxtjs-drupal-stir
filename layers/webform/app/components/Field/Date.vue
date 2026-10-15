@@ -5,6 +5,7 @@ import {
   DateFormatter,
   getLocalTimeZone,
 } from '@internationalized/date'
+import { parseWebformDateLimit } from '#stir/utils/dateUtils'
 import { resolveUiButtonVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
@@ -31,6 +32,8 @@ const compactControlClass = computed(() =>
 )
 const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const max = props.field['#cardinality'] ?? 1
+const minValue = parseWebformDateLimit(props.field['#dateMin'])
+const maxValue = parseWebformDateLimit(props.field['#dateMax'])
 
 const models = ref<CalendarDate[]>([])
 const popoverOpen = ref(false)
@@ -128,7 +131,13 @@ const calendarModel = computed({
         {{ selectedDatesLabel }}
       </UButton>
       <template #content>
-        <UCalendar v-model="calendarModel" class="p-2" multiple />
+        <UCalendar
+          v-model="calendarModel"
+          class="p-2"
+          :max-value="maxValue"
+          :min-value="minValue"
+          multiple
+        />
       </template>
     </UPopover>
     <label

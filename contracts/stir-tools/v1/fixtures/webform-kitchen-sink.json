@@ -200,7 +200,9 @@
                     "#name": "starts_on",
                     "#conditions": [],
                     "#states": [],
-                    "#timezone": "Australia/Sydney"
+                    "#timezone": "Australia/Sydney",
+                    "#dateMin": "2026-01-01",
+                    "#dateMax": "2027-12-31"
                 },
                 "startTime": {
                     "#type": "webform_time",

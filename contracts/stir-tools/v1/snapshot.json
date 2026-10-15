@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.35.0",
+  "contractVersion": "1.36.0",
   "files": {
     "fixtures/account-settings-update-error.json": "55b9059ee49f33b77876622afd3dabc30369dec71f6eff56b9698610ab5a678f",
     "fixtures/account-settings-update-success.json": "23fca3887518f9ddbc9f52abae9bf2aab021dc9e0a185cbc83cfe22cea7c5076",
@@ -31,10 +31,10 @@
     "fixtures/webform-contact.json": "7074c24531e159b3cc479f538832b1087886cc400ac11f8a34be07581d673ee1",
     "fixtures/webform-event.json": "25ff54116955712872cab9b7b012665530fc3ff41e7a595c336b0b6e4f63cfd4",
     "fixtures/webform-kitchen-sink-submission.json": "cffbb704e7070cbedbd8ca2913283731aca0de156b58e615e159af03198c3f58",
-    "fixtures/webform-kitchen-sink.json": "21ce1ad2f04f49e214350231a900a95bd549231110303078c02b431a1dfb86c2",
+    "fixtures/webform-kitchen-sink.json": "97dbb5718438afedab3aad93128bbec7fc0a81a6a89a5d1faad64d4446610957",
     "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
     "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
-    "manifest.json": "8a1e89ec20947b7ed235bf69ff88fcee9836b2020531d93aef0bc56e613bedb4",
+    "manifest.json": "d991539cf3098d3e1f3761136bf1da44e4b920d839a8491adae487a857083b52",
     "schemas/account-settings-update.schema.json": "6f3362b418e3b31afbd54e9f76be2d6bd052f8b4a59383ebdcab4666941ae252",
     "schemas/account-settings-values.schema.json": "189523229869b68ba03c8cbee22c83855d6f869b8a10ab06170463d241efb1ea",
     "schemas/account-snapshot.schema.json": "e2968ed767a19e6d206f0829eeab7ef01693bbcd66b2557d9aff0ae000e86786",
@@ -55,6 +55,6 @@
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform-submission-sample.schema.json": "0b27ece2f8fcf44ceba7963567cad17bf6d8e1ce1bcce44c87c6afb0b811ad98",
-    "schemas/webform.schema.json": "2ab745745d124d83987d57410b6bf0b577f82fb87245faa9ba8aee52e08786be"
+    "schemas/webform.schema.json": "b357549db100ff535bd740beedc740b482c253a886252a310d01774f72404c91"
   }
 }

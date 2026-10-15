@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatWebformDateTime } from '../../layers/theme/app/utils/dateUtils'
+import { formatWebformDateTime, parseWebformDateLimit } from '../../layers/theme/app/utils/dateUtils'
 
 describe('formatWebformDateTime', () => {
   it('uses the Drupal timezone for standard time', () => {
@@ -20,5 +20,13 @@ describe('formatWebformDateTime', () => {
         'America/Los_Angeles',
       ),
     ).toBe('2026-07-15T10:30:00-0700')
+  })
+})
+
+describe('parseWebformDateLimit', () => {
+  it('reads Y-m-d dates and ignores anything else', () => {
+    expect(parseWebformDateLimit('2026-10-14')?.toString()).toBe('2026-10-14')
+    expect(parseWebformDateLimit('today')).toBeUndefined()
+    expect(parseWebformDateLimit(undefined)).toBeUndefined()
   })
 })
