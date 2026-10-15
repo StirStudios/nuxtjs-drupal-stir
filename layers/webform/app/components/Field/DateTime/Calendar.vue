@@ -2,6 +2,7 @@
 import {
   CalendarDate,
   DateFormatter,
+  type DateValue,
   getLocalTimeZone,
 } from '@internationalized/date'
 import {
@@ -13,6 +14,8 @@ import type { DateTimeDate } from '#stir/types'
 const props = defineProps<{
   invalid?: boolean
   label: string
+  maxValue?: DateValue
+  minValue?: DateValue
   modelValue: DateTimeDate | null
   timezone: string
   variant?: UiFieldVariant
@@ -85,7 +88,12 @@ const selectedDateLabel = computed(() =>
     </UButton>
 
     <template #content>
-      <LazyUCalendar v-model="model" class="p-2" />
+      <LazyUCalendar
+        v-model="model"
+        class="p-2"
+        :max-value="maxValue"
+        :min-value="minValue"
+      />
     </template>
   </UPopover>
 </template>

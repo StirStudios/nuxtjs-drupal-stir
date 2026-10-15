@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormErrorEvent } from '@nuxt/ui'
+import type { FormError, FormErrorEvent } from '@nuxt/ui'
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
@@ -47,6 +47,8 @@ const emit = defineEmits<{
   (e: 'update:turnstileToken', value: string): void
 }>()
 
+const form = useTemplateRef('form')
+
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const trustedHtml = (value?: string) => trustedDrupalHtml(value)
 const buttonSize = computed<UiSize>(() =>
@@ -79,11 +81,17 @@ const submitButtonProps = computed(() => ({
   size: buttonSize.value,
   type: 'submit' as const,
 }))
+
+defineExpose({
+  // Drupal's refusals, shown on the fields they concern.
+  setErrors: (errors: FormError[]) => form.value?.setErrors(errors),
+})
 </script>
 
 <template>
   <UForm
     v-if="!isFormSubmitted"
+    ref="form"
     :class="[props.themeWebform.formClass, props.themeWebform.spacing]"
     novalidate
     :schema="schema"

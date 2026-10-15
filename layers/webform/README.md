@@ -69,6 +69,21 @@ field: it is reported with `console.error`, left out of the form, its state
 and its validation, and left to Drupal to judge. Add a component and its type
 to `WEBFORM_FIELD_TYPES` when a project needs one.
 
+### Dates
+
+Date and datetime pickers disable the days outside the field's `#dateMin`
+and `#dateMax` (Stir Tools contract 1.36.0), which Drupal resolves from
+Webform's `#date_date_min`/`#date_min` and `#date_date_max`/`#date_max`,
+relative strings such as `today` included, to `Y-m-d` dates in the field's
+`#timezone`. Webform validates the same limits on submit.
+
+### Refusals
+
+When Drupal refuses a submission, the form shows Webform's own messages
+(stir_webform_rest's `error.flat`) instead of a generic failure, in the toast
+or inline. A message Drupal keys to an element (`error.details`) is also set
+on that field, until the visitor changes it.
+
 ### Contract
 
 The versioned producer schema and fixtures are mirrored under

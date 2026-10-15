@@ -146,6 +146,9 @@ export interface WebformFieldProps {
   '#defaultValue'?: unknown
   '#multiple'?: boolean
   '#cardinality'?: number
+  '#timezone'?: string
+  '#dateMin'?: string
+  '#dateMax'?: string
   '#disabled'?: boolean
   '#readonly'?: boolean
   '#floatingLabel'?: boolean

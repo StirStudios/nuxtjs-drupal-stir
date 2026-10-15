@@ -10,6 +10,7 @@ import {
   getWebformScrollConfig,
 } from '#stir-webform/utils/webformScrollToTop'
 import { resolveWebformRedirect } from '#stir-webform/utils/webformRedirect'
+import { resolveWebformSubmissionIssues } from '#stir-webform/utils/webformSubmissionErrors'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 import { createWebformState } from '#stir-webform/utils/webformState'
 import { isWebformContainer } from '#stir-webform/utils/webformFieldTypes'
@@ -71,6 +72,7 @@ const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
+const content = useTemplateRef('content')
 // The last refusal, for forms that show it inline instead of as a toast.
 const submissionError = ref('')
 const schema = shallowRef<WebformValidationSchema>()
@@ -244,21 +246,13 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     // Drupal spent the token; clearing it asks FieldTurnstile for a fresh one.
     // The form stays mounted, so the visitor keeps their place.
     turnstileToken.value = ''
-    const errorData = (
-      error as { response?: { _data?: Record<string, unknown> } }
-    )?.response?._data as
-      | {
-          error?: { message?: string }
-          message?: string
-        }
-      | undefined
+    const issues = resolveWebformSubmissionIssues(
+      (error as { response?: { _data?: unknown } })?.response?._data,
+      orderedFieldNames.value,
+    )
 
-    const errorMessage =
-      errorData?.error?.message ||
-      errorData?.message ||
-      'Form submission failed. Please try again.'
-
-    submissionError.value = `Error submitting form: ${errorMessage}`
+    content.value?.setErrors(issues.fieldErrors)
+    submissionError.value = `Error submitting form: ${issues.message}`
 
     if (shouldShowToasts.value) {
       toast.add({
@@ -277,6 +271,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
   <WrapDiv :align="alignClasses" :styles="wrapStyles">
     <WebformContent
       :key="formResetKey"
+      ref="content"
       v-model:turnstile-token="turnstileToken"
       :edit-link="webformSubmissions || undefined"
       :fields="fields"

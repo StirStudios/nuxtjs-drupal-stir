@@ -64,6 +64,17 @@
         "#minSelected": { "type": "integer", "minimum": 0 },
         "#groupMaxSelected": { "type": "integer", "minimum": 0 },
         "#tabGroup": { "type": "string" },
+        "#timezone": { "type": "string", "minLength": 1 },
+        "#dateMin": {
+          "description": "A date or datetime element's earliest date, resolved from #date_date_min or #date_min in #timezone.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "#dateMax": {
+          "description": "A date or datetime element's latest date, resolved from #date_date_max or #date_max in #timezone.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
         "#optionKeys": { "$ref": "#/definitions/keyList" },
         "#questionKeys": { "$ref": "#/definitions/keyList" },
         "#answerKeys": { "$ref": "#/definitions/keyList" },

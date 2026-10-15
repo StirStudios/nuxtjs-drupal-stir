@@ -445,7 +445,8 @@
       "layers/webform/app/utils/webformFileUtils.ts",
       "layers/webform/app/utils/webformRedirect.ts",
       "layers/webform/app/utils/webformScrollToTop.ts",
-      "layers/webform/app/utils/webformState.ts"
+      "layers/webform/app/utils/webformState.ts",
+      "layers/webform/app/utils/webformSubmissionErrors.ts"
     ],
     "plugins": [
       "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
@@ -825,7 +826,8 @@
         "layers/webform/app/utils/webformFileUtils.ts",
         "layers/webform/app/utils/webformRedirect.ts",
         "layers/webform/app/utils/webformScrollToTop.ts",
-        "layers/webform/app/utils/webformState.ts"
+        "layers/webform/app/utils/webformState.ts",
+        "layers/webform/app/utils/webformSubmissionErrors.ts"
       ]
     },
     "candidateDeprecations": [
@@ -837,21 +839,21 @@
   "counts": {
     "components": 139,
     "composables": 71,
-    "utils": 76,
+    "utils": 77,
     "plugins": 10,
     "middleware": 5,
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 238,
+    "tests": 240,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
-      "nuxt": 103,
+      "nuxt": 104,
       "scripts": 6,
       "server": 33,
       "unit": 12,
-      "utils": 69
+      "utils": 70
     }
   },
   "tests": [
@@ -901,6 +903,7 @@
     "tests/nuxt/runtime/EditorialFallback.nuxt.spec.ts",
     "tests/nuxt/runtime/EntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/ErrorPage.nuxt.spec.ts",
+    "tests/nuxt/runtime/FieldDateLimits.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldEntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldLink.nuxt.spec.ts",
     "tests/nuxt/runtime/FieldRenderer.nuxt.spec.ts",
@@ -1092,6 +1095,7 @@
     "tests/utils/webformFileUtils.spec.ts",
     "tests/utils/webformRedirect.spec.ts",
     "tests/utils/webformScrollToTop.spec.ts",
+    "tests/utils/webformSubmissionErrors.spec.ts",
     "tests/utils/writeFileIfChanged.spec.ts"
   ],
   "documentedPublicContract": {

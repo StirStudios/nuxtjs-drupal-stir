@@ -13,6 +13,22 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Fixed: date pickers offered dates Drupal then refused.** The date and
+  datetime pickers now disable days outside the field's `#dateMin` and
+  `#dateMax`, which Stir Tools contract 1.36.0 resolves from Webform's
+  `#date_date_min`/`#date_min` and `#date_date_max`/`#date_max` (`today`
+  included). Needs a Stir Tools release with that contract; with an older
+  one the pickers stay unlimited, as before. `WebformFieldProps` gains
+  `#dateMin`, `#dateMax` and `#timezone`, and `parseWebformDateLimit()` is
+  exported from `#stir/utils/dateUtils`.
+- **Changed: a refused submission shows Webform's messages.** The toast or
+  inline error now lists stir_webform_rest's `error.flat` messages, such as
+  "… must be on or after 2026-10-14.", instead of "Submitted data contains
+  validation errors.", and a message keyed to an element is set on that field.
+  `WebformContent` exposes `setErrors()`.
+
 ### Security
 
 - **Fixed: protected routes could be bypassed by changing the path's letter

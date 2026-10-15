@@ -1,4 +1,4 @@
-import { CalendarDateTime, toZoned } from '@internationalized/date'
+import { CalendarDate, CalendarDateTime, toZoned } from '@internationalized/date'
 
 type DateParts = {
   year: number
@@ -66,4 +66,11 @@ export function generateTimeOptions(min: string, max: string, step: number) {
   }
 
   return times
+}
+
+/** Reads a Drupal `Y-m-d` date limit, such as a Webform field's `#dateMin`. */
+export function parseWebformDateLimit(value: unknown): CalendarDate | undefined {
+  const match = typeof value === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(value) : null
+
+  return match ? new CalendarDate(Number(match[1]), Number(match[2]), Number(match[3])) : undefined
 }
