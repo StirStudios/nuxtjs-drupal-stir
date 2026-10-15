@@ -13,6 +13,16 @@ untouched do not need one.
 
 ## Unreleased
 
+### Layouts
+
+- **Fixed: Clear-layout pages without a hero had no h1.** The Clear layout now
+  renders the page title (from `useRouteHero`) as an h1 when the page has no
+  Hero paragraph. It is `sr-only` by default, so Clear stays visually blank;
+  set the new `stirTheme.clearLayout.title` classes to show it. The page's
+  `hideTitle` still forces `sr-only`. A page with a Hero paragraph gets no
+  extra h1, and with `routeHero.enabled` its hero now renders on Clear instead
+  of being dropped. The Link hub layout is unchanged.
+
 ### Webform
 
 - **Fixed: date pickers offered dates Drupal then refused.** The date and

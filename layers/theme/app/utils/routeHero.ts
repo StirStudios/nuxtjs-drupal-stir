@@ -130,6 +130,11 @@ export function normalizeRouteHero(input: RouteHeroInput | null | undefined): Ro
   }
 }
 
+/** Whether the page payload carries an authored Hero paragraph, which supplies its own h1. */
+export function hasPageHeroParagraph(page: RouteHeroPage): boolean {
+  return slotNodes(page?.content, 'hero').length > 0
+}
+
 /** Every image in the page hero slot, in payload order (video media yields its poster). */
 export function resolvePageRouteHeroImages(page: RouteHeroPage): RouteHeroImage[] {
   return slotNodes(page?.content, 'hero')

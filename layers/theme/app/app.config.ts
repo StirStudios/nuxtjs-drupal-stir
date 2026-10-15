@@ -190,6 +190,11 @@ export default defineAppConfig({
       },
     },
 
+    clearLayout: {
+      // Keeps Clear visually blank; set title classes to show the page title.
+      title: 'sr-only',
+    },
+
     linkHub: {
       root: 'bg-default text-default relative flex min-h-dvh flex-col overflow-hidden',
       backgroundImage: 'absolute inset-0 z-0 size-full object-cover',
