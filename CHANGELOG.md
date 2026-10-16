@@ -67,6 +67,13 @@ untouched do not need one.
 
 ### Theme
 
+- **Fixed: Back after a listing pager click returns to the previous page.**
+  `useDynamicListingControls().setPage()` replaced the current history entry,
+  so going from page 1 to page 2 and pressing Back skipped page 1. Page
+  changes now push a history entry; search, sort and filter changes still
+  replace it. Listings must re-sync from the route (`syncFromRoute()` on route
+  change) to follow Back.
+
 - **Changed: a facet with one option stays enabled when that option would
   narrow the results.** `useDynamicListingControls().isFacetDisabled()` used to
   disable any unselected facet with one option or none. Filter option rows may
