@@ -140,6 +140,8 @@ type StirThemeNavigationConfig = {
   brand?: boolean
   logoClass?: ClassValue
   logoScrolledClass?: ClassValue
+  /** CSS length for the unscrolled header, emitted in the server HTML as `--ui-header-height` so hydration measures without a layout shift. */
+  height?: string
   hidden?: boolean
   transparentAtTop?: boolean
   transparentSurface?: 'auto' | 'light' | 'dark'

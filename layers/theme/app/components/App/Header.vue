@@ -46,6 +46,7 @@ const menuOpen = ref(false)
 // the server HTML.
 const menuMounted = ref(theme.navigation.slideover?.unmountOnHide === false)
 const menuId = useId()
+const headerEl = ref<HTMLElement | null>(null)
 const [DefineMenuToggle, ReuseMenuToggle] = createReusableTemplate()
 const desktop = headerDesktopClasses(headerDesktopBreakpoint(theme.navigation?.desktopBreakpoint))
 const headerUi = {
@@ -335,6 +336,8 @@ onMounted(() => {
   hydrated.value = true
 })
 
+useHeaderHeight(headerEl, finalIsScrolled, theme.navigation.height)
+
 watch(
   () => route.hash,
   (hash) => {
@@ -392,6 +395,7 @@ watch(menuOpen, (val) => {
   <LazyDrupalTabs v-if="hasEditorialAccess" />
 
   <header
+    ref="headerEl"
     v-bind="attrs"
     aria-label="Site header"
     :class="headerClasses"

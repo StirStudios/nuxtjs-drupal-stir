@@ -56,6 +56,7 @@ export default defineAppConfig({
       brand: true,
       logoClass: 'h-[5rem]',
       // logoScrolledClass: 'h-[4rem]',
+      // height: '4rem',
       hidden: false,
       transparentAtTop: false,
       transparentSurface: 'auto',
@@ -115,10 +116,10 @@ export default defineAppConfig({
       base: 'hero flex items-center justify-center overflow-hidden',
       mediaAppearance: 'dark text-default',
       mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
-      // Clears the fixed header (Nuxt UI's --ui-header-height) plus a gap; at
-      // the default 4rem this is exactly pt-20 lg:pt-54.
+      // Clears the fixed header (--ui-header-height, published by the header)
+      // plus a gap; lg keeps the former 13.5rem floor.
       noMediaSpacing:
-        'pt-[calc(var(--ui-header-height)_+_1rem)] lg:pt-[calc(var(--ui-header-height)_+_9.5rem)]',
+        'pt-[calc(var(--ui-header-height)_+_1rem)] lg:pt-[max(calc(var(--ui-header-height)_+_1rem),13.5rem)]',
       noMediaFallback:
         'dark text-default bg-linear-to-b from-gray-900 via-gray-800 to-black/70',
       overlay:
@@ -134,9 +135,9 @@ export default defineAppConfig({
         base: 'relative z-10 w-full items-center p-5 text-center [&>*]:max-w-4xl',
         isFront: 'absolute bottom-0 left-0 p-10 lg:p-24',
       },
-      // Header clearance for a hidden title with no hero content; at the
-      // default 4rem header this is exactly pt-15 lg:pt-30.
-      hide: 'pt-[calc(var(--ui-header-height)_-_0.25rem)] lg:pt-[calc(var(--ui-header-height)_+_3.5rem)]',
+      // Header clearance for a hidden title with no hero content; lg keeps the
+      // former 7.5rem floor.
+      hide: 'pt-[calc(var(--ui-header-height)_-_0.25rem)] lg:pt-[max(calc(var(--ui-header-height)_-_0.25rem),7.5rem)]',
       backdrop: '',
       inline: {
         base: 'mx-auto w-full max-w-(--ui-container) px-4 sm:px-6 lg:px-8',
