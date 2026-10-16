@@ -224,13 +224,23 @@ export function useDynamicListingControls(options: DynamicListingControlsOptions
     })
   }
 
+  // Pages add a history entry so Back returns to the previous page; filter and search edits replace.
+  async function pushRoute() {
+    if (syncingFromRoute.value) return
+
+    await router.push({
+      path: route.path,
+      query: routeQuery(),
+    })
+  }
+
   function resetPage() {
     page.value = 0
   }
 
   function setPage(value: number) {
     page.value = Math.max(0, value)
-    void replaceRoute()
+    void pushRoute()
   }
 
   function resetFilters() {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h } from 'vue'
 import { useDynamicListingControls } from '../../../layers/theme/app/composables/useDynamicListingControls'
@@ -65,5 +65,26 @@ describe('useDynamicListingControls isFacetDisabled', () => {
     updateFilterValues('single', ['a'])
 
     expect(isFacetDisabled('single')).toBe(false)
+  })
+})
+
+describe('useDynamicListingControls history', () => {
+  it('pushes page changes so Back returns to the previous page and replaces filter changes', async () => {
+    const { setPage, updateFilterValues } = await controls({
+      filters: { category: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] },
+    })
+    const router = useRouter()
+    const push = vi.spyOn(router, 'push')
+    const replace = vi.spyOn(router, 'replace')
+
+    setPage(1)
+
+    expect(push).toHaveBeenCalledWith(expect.objectContaining({ query: { page: '1' } }))
+    expect(replace).not.toHaveBeenCalled()
+
+    updateFilterValues('category', ['a'])
+
+    expect(replace).toHaveBeenCalledWith(expect.objectContaining({ query: { category: 'a' } }))
+    expect(push).toHaveBeenCalledTimes(1)
   })
 })
