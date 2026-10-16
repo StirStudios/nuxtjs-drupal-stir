@@ -9,6 +9,7 @@ import {
 } from '#stir/utils/nuxtUiProps'
 import {
   carouselImageDeliverySizesKey,
+  leadImageKey,
   viewportImageLoadingKey,
   resolveCarouselImageDeliverySizes,
 } from '#stir/utils/imageDelivery'
@@ -17,6 +18,7 @@ import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
+import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { resolveGridClasses, resolveWidthClasses, type GridConfig } from '#stir/utils/gridClasses'
 
 const props = withDefaults(defineProps<{
@@ -111,6 +113,15 @@ const carouselMotionProps = useRevealMotionProps(
 provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
 // Source hero hints do not describe a slide's current viewport position.
 provide(viewportImageLoadingKey, true)
+// The first slide of the page's first media paragraph is the likely LCP.
+const isLead = useLeadMedia(props.uuid ?? props.id)
+let leadClaimed = false
+
+provide(leadImageKey, () => {
+  if (!isLead || leadClaimed) return false
+  leadClaimed = true
+  return true
+})
 // The carousel enters as one unit; its media slides should not double animate.
 provideRevealMotionScope(() => undefined)
 

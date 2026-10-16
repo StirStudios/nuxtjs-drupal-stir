@@ -18,6 +18,7 @@ const variantTheme = computed(() => theme.variants[variant.value] ?? {})
 const image = computed(() =>
   variant.value === 'simple' || props.hero.mediaFirst ? undefined : props.hero.image,
 )
+
 const parallaxStyle = useParallaxStyle({
   enabled: () => Boolean(theme.parallax && image.value),
 })

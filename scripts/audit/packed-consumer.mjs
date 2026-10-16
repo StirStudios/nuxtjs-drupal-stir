@@ -86,7 +86,9 @@ async function main() {
       entry.startsWith('package/scripts/')
       && !entry.startsWith('package/scripts/a11y/')
       && !entry.startsWith('package/scripts/compliance/')
-      && !entry.startsWith('package/scripts/seo/'),
+      && !entry.startsWith('package/scripts/seo/')
+      // The stir-perf bin; the other perf scripts are repository-only.
+      && entry !== 'package/scripts/perf/audit.mjs',
     )
     if (unexpectedScripts.length > 0) {
       throw new Error(

@@ -79,6 +79,25 @@ Automation validates technical consistency, not search rankings or editorial
 quality. Confirm that page titles, descriptions, link text, image alternatives,
 and structured data accurately describe the visible content.
 
+## Required performance review
+
+<!-- stir-compliance-performance:v1 -->
+
+Maintain `performance.auditRoutes` in `compliance/site.json`: the home page plus
+the heaviest template (for example a photo gallery, a long listing, or a page
+with video). Run `pnpm audit:perf` against the public origin. It runs Lighthouse
+for mobile and desktop with real (devtools) throttling and reports the score,
+LCP and its element, FCP, TBT, CLS, page weight, and the top opportunities.
+Pass `--throttling=simulate` to compare with PageSpeed Insights, which uses
+simulated throttling and can overstate text LCP. Set `PAGESPEED_API_KEY` to run
+through the PageSpeed Insights API instead of local Chromium.
+
+Budgets default to Lighthouse's good thresholds (for example mobile LCP warns
+above 2.5 s and fails above 4 s; CLS above 0.1 fails). Override a value per
+site in `performance.budgets.<mobile|desktop>.<metric>` as `{ "warn", "error" }`
+(metrics: `score`, `lcpMs`, `fcpMs`, `tbtMs`, `cls`, `totalBytes`). Record the
+date, results, and any budget a page knowingly exceeds, with the reason.
+
 ## Tracked legal copy
 
 <!-- stir-compliance-legal-source:v1 -->

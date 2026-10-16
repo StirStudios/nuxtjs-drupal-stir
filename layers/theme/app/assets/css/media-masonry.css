@@ -1,0 +1,75 @@
+/* Masonry galleries: Paragraph/Media.vue sets lanes, gaps, and each item's
+ * lane and row span inline (utils/masonryLayout.ts). A row is 1/100 of a
+ * lane's width, so spans follow the images' aspect ratios. */
+.media-masonry {
+  --masonry-lanes: var(--masonry-lanes-default, 1);
+  --masonry-gap: var(--masonry-gap-default, 16px);
+
+  display: grid;
+  grid-auto-flow: dense;
+  grid-template-columns: repeat(var(--masonry-lanes), minmax(0, 1fr));
+  grid-auto-rows: calc((100cqi - (var(--masonry-lanes) - 1) * var(--masonry-gap)) / var(--masonry-lanes) / 100);
+  column-gap: var(--masonry-gap);
+  margin-bottom: calc(-1 * var(--masonry-gap));
+
+  /* The gap comes out of the item's rows, trimming that much of the image. */
+  > * {
+    margin-bottom: var(--masonry-gap);
+    overflow: clip;
+    grid-column-start: var(--masonry-lane-default, 1);
+  }
+
+  @media (width >= 30rem) {
+    --masonry-lanes: var(--masonry-lanes-xs, var(--masonry-lanes-default, 1));
+    --masonry-gap: var(--masonry-gap-xs, var(--masonry-gap-default, 16px));
+
+    > * {
+      grid-column-start: var(--masonry-lane-xs, var(--masonry-lane-default, 1));
+    }
+  }
+
+  @media (width >= 40rem) {
+    --masonry-lanes: var(--masonry-lanes-sm, var(--masonry-lanes-xs, var(--masonry-lanes-default, 1)));
+    --masonry-gap: var(--masonry-gap-sm, var(--masonry-gap-xs, var(--masonry-gap-default, 16px)));
+
+    > * {
+      grid-column-start: var(--masonry-lane-sm, var(--masonry-lane-xs, var(--masonry-lane-default, 1)));
+    }
+  }
+
+  @media (width >= 48rem) {
+    --masonry-lanes: var(--masonry-lanes-md, var(--masonry-lanes-sm, var(--masonry-lanes-xs, var(--masonry-lanes-default, 1))));
+    --masonry-gap: var(--masonry-gap-md, var(--masonry-gap-sm, var(--masonry-gap-xs, var(--masonry-gap-default, 16px))));
+
+    > * {
+      grid-column-start: var(--masonry-lane-md, var(--masonry-lane-sm, var(--masonry-lane-xs, var(--masonry-lane-default, 1))));
+    }
+  }
+
+  @media (width >= 64rem) {
+    --masonry-lanes: var(--masonry-lanes-lg, var(--masonry-lanes-md, var(--masonry-lanes-sm, var(--masonry-lanes-xs, var(--masonry-lanes-default, 1)))));
+    --masonry-gap: var(--masonry-gap-lg, var(--masonry-gap-md, var(--masonry-gap-sm, var(--masonry-gap-xs, var(--masonry-gap-default, 16px)))));
+
+    > * {
+      grid-column-start: var(--masonry-lane-lg, var(--masonry-lane-md, var(--masonry-lane-sm, var(--masonry-lane-xs, var(--masonry-lane-default, 1)))));
+    }
+  }
+
+  @media (width >= 80rem) {
+    --masonry-lanes: var(--masonry-lanes-xl, var(--masonry-lanes-lg, var(--masonry-lanes-md, var(--masonry-lanes-sm, var(--masonry-lanes-xs, var(--masonry-lanes-default, 1))))));
+    --masonry-gap: var(--masonry-gap-xl, var(--masonry-gap-lg, var(--masonry-gap-md, var(--masonry-gap-sm, var(--masonry-gap-xs, var(--masonry-gap-default, 16px))))));
+
+    > * {
+      grid-column-start: var(--masonry-lane-xl, var(--masonry-lane-lg, var(--masonry-lane-md, var(--masonry-lane-sm, var(--masonry-lane-xs, var(--masonry-lane-default, 1))))));
+    }
+  }
+
+  @media (width >= 96rem) {
+    --masonry-lanes: var(--masonry-lanes-2xl, var(--masonry-lanes-xl, var(--masonry-lanes-lg, var(--masonry-lanes-md, var(--masonry-lanes-sm, var(--masonry-lanes-xs, var(--masonry-lanes-default, 1)))))));
+    --masonry-gap: var(--masonry-gap-2xl, var(--masonry-gap-xl, var(--masonry-gap-lg, var(--masonry-gap-md, var(--masonry-gap-sm, var(--masonry-gap-xs, var(--masonry-gap-default, 16px)))))));
+
+    > * {
+      grid-column-start: var(--masonry-lane-2xl, var(--masonry-lane-xl, var(--masonry-lane-lg, var(--masonry-lane-md, var(--masonry-lane-sm, var(--masonry-lane-xs, var(--masonry-lane-default, 1)))))));
+    }
+  }
+}

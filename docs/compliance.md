@@ -19,8 +19,9 @@ agent-generated edits.
    creates generic `compliance/site.json` and `compliance/REVIEW.md` starters
    without overwriting existing files. Replace every `REPLACE_*` value with a
    verified project fact.
-5. The initializer adds separate `audit:compliance` and `audit:seo` scripts plus
-   a combined `audit:site` command without replacing existing scripts. Run the
+5. The initializer adds separate `audit:compliance`, `audit:seo` and
+   `audit:perf` scripts plus a combined `audit:site` command without replacing
+   customised scripts (an unmodified earlier `audit:site` default is upgraded). Run the
    focused command while iterating, and `audit:site` at launch, on each
    `nextReview` date and after adding a form, vendor, tracker or embed. Keep
    both out of `verify:core`: they check the live site, so they must not gate
@@ -60,6 +61,7 @@ the flag and reports live page problems as errors.
 ```sh
 pnpm audit:compliance
 pnpm audit:seo
+pnpm audit:perf
 pnpm audit:site
 ```
 

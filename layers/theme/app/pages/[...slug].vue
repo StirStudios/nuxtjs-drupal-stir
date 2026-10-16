@@ -5,6 +5,8 @@ definePageMeta({
   // plugins/drupalPageLayout.{server,client}.ts.
   drupalPage: true,
 })
+
+provideLeadMediaTracker()
 </script>
 
 <template>

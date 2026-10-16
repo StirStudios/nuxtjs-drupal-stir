@@ -31,6 +31,34 @@ describe('MediaItem (Nuxt runtime)', () => {
   })
 
   it.each([
+    [0, true, 'eager', 'high'],
+    [1, true, 'eager', 'auto'],
+    [0, false, 'lazy', undefined],
+  ])('loads item %i with lead=%s as %s', async (index, lead, loading, priority) => {
+    const wrapper = await mountSuspended(MediaItem, {
+      props: {
+        index,
+        lead,
+        deferLoad: true,
+        node: h('div'),
+        overlay: true,
+        tk: { propsOf: () => ({ type: 'image', src: '/photo.webp', alt: 'Photo', width: 800, height: 1200 }) } as Pick<SlotsToolkit, 'propsOf'>,
+      },
+    })
+
+    // A lead image is never deferred, hidden for a reveal, or lazy.
+    expect(wrapper.find('img').exists()).toBe(lead)
+    if (lead) {
+      const img = wrapper.get('img')
+
+      expect(img.attributes('loading')).toBe(loading)
+      expect(img.attributes('fetchpriority')).toBe(priority)
+      expect(wrapper.html()).not.toContain('motion-safe:opacity-0')
+    }
+    wrapper.unmount()
+  })
+
+  it.each([
     ['video', false, 'Video title', false, true],
     ['video', true, 'Video title', true, true],
     ['image', false, '   ', false, false],

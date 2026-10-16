@@ -11,6 +11,7 @@ import {
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { sectionHeroMediaKey } from '#stir/utils/imageDelivery'
@@ -102,6 +103,10 @@ const heroMediaNode = computed(() => {
   return cloneVNode(node, { isHero: !isInline.value }, true)
 })
 const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
+
+// A hero's media is above the fold and loads eagerly itself, so later media
+// paragraphs must not also claim the lead. A text-only hero leaves it.
+useLeadMedia(hasMediaSlot.value ? `hero-${props.id ?? ''}` : undefined)
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
   slotMedia.value

@@ -3,10 +3,10 @@ import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { useMediaModal } from '#stir/composables/useMediaModal'
 import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
-import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
-import { useWindowSize } from '@vueuse/core'
 import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
-import { resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
+import { maxGridColumns, resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
+import { useLeadMedia } from '#stir/composables/useLeadMedia'
+import { masonryGridStyle, masonryItemStyles } from '../../../utils/masonryLayout'
 
 const props = defineProps<{
   id?: number | string
@@ -77,12 +77,6 @@ const {
   onSelect: onSelectModal,
 } = useMediaModal(slotMedia, tk)
 
-const { width: viewportWidth } = useWindowSize()
-const gap = computed(() => resolveResponsiveGridValue(
-  props.masonry?.gap,
-  viewportWidth.value,
-  16,
-))
 const isImageGallery = computed(
   () =>
     slotMedia.value.length > 1 &&
@@ -100,22 +94,36 @@ const isVisualGallery = computed(
     }),
 )
 
-const hydrated = ref(false)
 const revealMode = computed<'default' | 'gallery'>(() =>
   isVisualGallery.value ? 'gallery' : 'default',
 )
-const lanes = computed(() => resolveResponsiveGridValue(
-  props.masonry?.lanes,
-  viewportWidth.value,
-  1,
-))
-const deliveryProfile = computed(() =>
-  resolveStableMediaDeliveryProfile(props.gridItems, Boolean(props.masonry)),
-)
+// Masonry lanes size images like grid columns.
+const layoutGrid = computed<GridConfig | undefined>(() => {
+  if (!props.masonry) return props.gridItems
 
-onMounted(() => {
-  hydrated.value = true
+  // Masonry gaps are pixels; grid gaps are Tailwind spacing steps (4px).
+  const gap = Object.fromEntries(Object.entries(props.masonry.gap ?? { default: 16 })
+    .map(([breakpoint, pixels]) => [breakpoint, Math.round(pixels / 4)]))
+
+  return { columns: props.masonry.lanes ?? { default: 1 }, gap } as GridConfig
 })
+const deliveryProfile = computed(() =>
+  resolveStableMediaDeliveryProfile(layoutGrid.value, false),
+)
+// The first row of the page's first media paragraph is the likely LCP: those
+// images load eagerly without a reveal, and everything after stays lazy.
+const isLead = useLeadMedia(props.uuid ?? props.id)
+const leadCount = computed(() =>
+  isLead ? Math.min(Math.max(maxGridColumns(layoutGrid.value), 1), 4) : 0,
+)
+// Masonry needs natural-height images and media without captions below, as
+// each item's rows come from its aspect ratio; anything else is a plain grid.
+const masonryStyles = computed(() =>
+  props.masonry && isVisualGallery.value && props.titleDisplay !== 'below'
+  && (props.mediaHeight || 'natural') === 'natural'
+    ? masonryItemStyles(slotMedia.value.map(node => tk.propsOf<DrupalMediaNodeProps>(node)), props.masonry)
+    : undefined,
+)
 </script>
 
 <template>
@@ -127,41 +135,39 @@ onMounted(() => {
     :parent-uuid="parentUuid"
   >
     <WrapDiv :align="alignClasses">
-      <LazyUScrollArea
-        v-if="props.masonry && hydrated"
-        v-slot="{ item: node, index: i }"
-        class="w-full overflow-hidden"
-        :items="slotMedia"
-        :virtualize="{
-          lanes,
-          gap,
-          estimateSize: isImageGallery ? 260 : 480,
-          overscan: isImageGallery ? 24 : 8,
-        }"
-      >
-        <MediaItem
-          :key="getMediaItemKey(node, i)"
-          :delivery-profile="deliveryProfile"
-          :direction="direction"
-          :edit-actions="
-            i === 0 ? actions : undefined
-          "
-          :index="i"
-          :node="node"
-          :overlay="overlayEnabled"
-          :reveal-mode="revealMode"
-          :rounded-class="roundedClass"
-          :title-display="titleDisplay"
-          :tk="tk"
-          :wrapper-class="mediaHeightClass"
-          @edit-action-select="selectAction"
-          @open="openModal"
-        />
-      </LazyUScrollArea>
+      <div v-if="masonryStyles" class="@container w-full">
+        <div class="media-masonry" :style="masonryGridStyle(props.masonry ?? {})">
+          <div
+            v-for="(node, i) in slotMedia"
+            :key="getMediaItemKey(node, i)"
+            :class="roundedClass || theme.media.rounded"
+            :style="masonryStyles[i]"
+          >
+            <LazyMediaItem
+              :defer-load="isImageGallery && i >= 4"
+              :delivery-profile="deliveryProfile"
+              :direction="direction"
+              :edit-actions="i === 0 ? actions : undefined"
+              :hydrate-on-visible="{ rootMargin: '200px' }"
+              :index="i"
+              :lead="i < leadCount"
+              :node="node"
+              :overlay="overlayEnabled"
+              :reveal-mode="revealMode"
+              :rounded-class="roundedClass"
+              :title-display="titleDisplay"
+              :tk="tk"
+              :wrapper-class="mediaHeightClass"
+              @edit-action-select="selectAction"
+              @open="openModal"
+            />
+          </div>
+        </div>
+      </div>
 
       <WrapGrid
         v-else
-        :grid-items="gridItems"
+        :grid-items="layoutGrid"
         :spacing="spacing"
         :width="resolvedWidth"
       >
@@ -175,6 +181,7 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
+          :lead="i < leadCount"
           :node="node"
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"

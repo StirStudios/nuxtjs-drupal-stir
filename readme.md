@@ -168,6 +168,7 @@ parameters so campaign attribution and query-driven state are not lost.
 - Real consumer pilots: `STIR_CONSUMER_TARGETS=/path/to/consumer-targets.json STIR_CONSUMER_EXAMPLE=/path/to/site-nuxt pnpm audit:consumers example --verify`; the target list names client sites, so it lives in the private ops repository (archives committed source into a disposable directory, installs the packed layer and its Nuxt version, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - SEO auditing: `pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
+- Performance auditing: `pnpm audit:perf` (Lighthouse mobile and desktop on representative routes, against budgets)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 - Bundle/perf visibility: `pnpm perf:report`; after an analyzed build use `pnpm perf:report --no-build --warn-budget` to reuse it. CI blocks initial editor leakage and reports historical size overruns without hiding them by raising the limits.
 - Coverage: explicit config/server/shared/utility TypeScript (including unimported files); Vue/composable behavior has a separate Nuxt runtime suite. The percentage is not whole-layer coverage.
@@ -183,7 +184,17 @@ review sections and package scripts. The generated commands remain independent:
   legal-page contract, consent rationale, and review schedule.
 - `pnpm audit:seo` crawls the public sitemap using `owner.domain` from the inventory
   and representative routes for broken links or images and rendered SEO defects.
-- `pnpm audit:site` runs compliance, SEO,
+- `pnpm audit:perf` runs Lighthouse (performance only) for mobile and desktop on
+  `performance.auditRoutes` against `owner.domain` or `--url`, reporting score,
+  LCP and its element, FCP, TBT, CLS, page weight and the top opportunities,
+  and fails or warns against budgets (`performance.budgets` overrides them per
+  site). It uses the Playwright Chromium from `pnpm test:a11y:install` (or
+  `CHROME_PATH`) with real devtools throttling; `--throttling=simulate` matches
+  PageSpeed Insights, and `PAGESPEED_API_KEY` runs through that API instead.
+  Local runs need `pnpm add -D lighthouse chrome-launcher`. Narrow a run with
+  `PERF_ROUTES=/,/gallery`, `--form-factor=mobile`, or save each report with
+  `--output=<dir>`.
+- `pnpm audit:site` runs compliance, SEO, performance
   and accessibility together for a periodic or release review.
 
 ### Accessibility audits in downstream projects

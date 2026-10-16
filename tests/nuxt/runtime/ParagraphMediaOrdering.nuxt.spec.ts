@@ -65,4 +65,25 @@ describe('Drupal media ordering', () => {
     expect(wrapper.get('output').attributes('data-open')).toBe('true')
     wrapper.unmount()
   })
+
+  it('server-renders every masonry item in its lane with a row span', async () => {
+    const wrapper = await mountSuspended(ParagraphMedia, {
+      props: { masonry: { lanes: { default: 2 }, gap: { default: 8 } } },
+      slots: {
+        media: () => [[100, 150], [100, 50], [100, 100]].map(([width, height], index) =>
+          h('div', { mid: `m${index}`, type: 'image', width, height })),
+      },
+      global: { stubs: { MediaItem: Item, ParagraphMediaModal: Modal } },
+    })
+
+    const grid = wrapper.get('.media-masonry')
+
+    expect(grid.attributes('style')).toContain('--masonry-lanes-default: 2')
+    expect(grid.findAll(':scope > div').map(item => item.attributes('style'))).toEqual([
+      'grid-row-end: span 150; --masonry-lane-default: 1;',
+      'grid-row-end: span 50; --masonry-lane-default: 2;',
+      'grid-row-end: span 100; --masonry-lane-default: 2;',
+    ])
+    wrapper.unmount()
+  })
 })
