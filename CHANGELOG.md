@@ -13,6 +13,22 @@ untouched do not need one.
 
 ## Unreleased
 
+### Header
+
+- **Changed: the header publishes its real height as `--ui-header-height`.**
+  The fixed header measures its top-of-page (unscrolled) height with a
+  `ResizeObserver` and sets it on `<html>`, replacing Nuxt UI's `4rem`
+  default, so the no-media hero padding and every
+  `calc(var(--ui-header-height)...)` follow header customisation (taller
+  padding, larger logo). The scrolled state is ignored, so content does not
+  move when the header shrinks. Below `lg`, hero clearance is now the real
+  header height plus the old gap. From `lg`, the hero keeps its former fixed
+  floor (`7.5rem` hidden hero, `13.5rem` no-media hero) but grows past it when
+  the header is taller; sites with a 4rem header look unchanged. Sites that
+  hard-coded their own offsets for a tall header can drop them. Optional
+  `stirTheme.navigation.height` (a CSS length) is emitted in the server HTML to
+  avoid a shift when hydration measures.
+
 ### Performance
 
 - **New: `stir-perf` performance audit.** Sites get `pnpm audit:perf`
