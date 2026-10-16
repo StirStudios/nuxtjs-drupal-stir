@@ -118,7 +118,7 @@ const isLead = useLeadMedia(props.uuid ?? props.id)
 let leadClaimed = false
 
 provide(leadImageKey, () => {
-  if (!isLead.value || leadClaimed) return false
+  if (!isLead || leadClaimed) return false
   leadClaimed = true
   return true
 })

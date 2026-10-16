@@ -18,6 +18,8 @@ defineOptions({
   inheritAttrs: false,
 })
 
+provideLeadMediaSection()
+
 const props = defineProps<{
   id?: number | string
   uuid?: string

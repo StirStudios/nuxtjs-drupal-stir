@@ -128,7 +128,7 @@ const deliveryProfile = computed(() =>
 // images load eagerly without a reveal, and everything after stays lazy.
 const isLead = useLeadMedia(props.uuid ?? props.id)
 const leadCount = computed(() =>
-  isLead.value ? Math.min(Math.max(maxGridColumns(layoutGrid.value), 1), 4) : 0,
+  isLead ? Math.min(Math.max(maxGridColumns(layoutGrid.value), 1), 4) : 0,
 )
 // The virtualized masonry replaces the server grid once hydrated, so the
 // server renders only its first rows instead of hydrating every item twice.

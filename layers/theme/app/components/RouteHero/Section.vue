@@ -19,8 +19,6 @@ const image = computed(() =>
   variant.value === 'simple' || props.hero.mediaFirst ? undefined : props.hero.image,
 )
 
-// The route hero's image is the lead; later media paragraphs stay lazy.
-useLeadMedia(image.value ? 'route-hero' : undefined)
 const parallaxStyle = useParallaxStyle({
   enabled: () => Boolean(theme.parallax && image.value),
 })

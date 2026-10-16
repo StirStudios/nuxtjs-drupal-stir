@@ -26,8 +26,10 @@ untouched do not need one.
 - **Fixed: the first gallery images were lazy and hidden.** The first row of
   the page's first Media paragraph (and the first slide image of a lead
   Carousel) now loads eagerly, without the reveal animation, with
-  `fetchpriority="high"` on the first image. Later media stays lazy. A Hero
-  paragraph with media, or a route hero image, claims the lead instead.
+  `fetchpriority="high"` on the first image, but only when that paragraph
+  renders before or inside the page's first Layout section and no route hero
+  image or Hero paragraph with media comes first. A gallery lower on the page,
+  and every later media paragraph, stays lazy.
 - **Changed: masonry galleries render their lanes before hydration.** The
   server grid now uses the masonry lane counts and gap (so the first row no
   longer shifts when the virtualized masonry takes over) and renders only the
