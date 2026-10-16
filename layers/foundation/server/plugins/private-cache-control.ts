@@ -7,6 +7,9 @@ const PRIVATE_NO_STORE = 'private, no-store, max-age=0'
 
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('beforeResponse', (event) => {
+    // Headers already sent (a streamed response): nothing can change them.
+    if (event.node.res.headersSent) return
+
     const cacheControl = String(
       getResponseHeader(event, 'Cache-Control') ?? '',
     )

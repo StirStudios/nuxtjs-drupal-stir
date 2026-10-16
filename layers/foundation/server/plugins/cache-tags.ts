@@ -39,6 +39,10 @@ export default defineNitroPlugin((nitroApp) => {
   })
 
   nitroApp.hooks.hook('beforeResponse', (event) => {
+    // A streamed response (/_ipx images, proxied files, the Plausible proxy)
+    // has sent its headers already; changing them only throws
+    // ERR_HTTP_HEADERS_SENT into the error log.
+    if (event.node.res.headersSent) return
     applyStirSharedMaxAge(event)
     applyStirCacheTagsHeader(event)
   })
