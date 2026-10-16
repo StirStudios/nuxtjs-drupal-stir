@@ -54,5 +54,12 @@
       "/",
       "REPLACE_REPRESENTATIVE_NOINDEX_OR_PROTECTED_ROUTE"
     ]
+  },
+  "performance": {
+    "auditRoutes": [
+      "/",
+      "REPLACE_HEAVIEST_TEMPLATE_ROUTE"
+    ],
+    "budgets": {}
   }
 }

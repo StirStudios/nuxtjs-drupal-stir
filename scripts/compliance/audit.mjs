@@ -214,6 +214,9 @@ if (config) {
       }
     }
   }
+  if (!Array.isArray(config.performance?.auditRoutes) || config.performance.auditRoutes.length < 2) {
+    warn('performance.auditRoutes should list the home page and the heaviest template for pnpm audit:perf.')
+  }
 
   const sourceFiles = [
     ...await collectSourceFiles(resolve(projectRoot, 'app')),

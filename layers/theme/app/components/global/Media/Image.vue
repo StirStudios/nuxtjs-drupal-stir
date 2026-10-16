@@ -5,6 +5,7 @@ import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
   carouselImageDeliverySizesKey,
+  leadImageKey,
   sectionHeroMediaKey,
   viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
@@ -73,13 +74,15 @@ const forwardedAttrs = computed(() => {
 })
 const { isFront } = usePageContext()
 const viewportLoading = inject(viewportImageLoadingKey, false)
+const isLeadImage = inject(leadImageKey, undefined)?.() === true
 const normalizedLoading = computed<'lazy' | 'eager'>(() => {
-  if (!viewportLoading && props.loading === 'eager') return 'eager'
+  if (isLeadImage || (!viewportLoading && props.loading === 'eager')) return 'eager'
   return 'lazy'
 })
-const normalizedFetchPriority = computed(() =>
-  viewportLoading ? 'auto' : props.fetchpriority || undefined,
-)
+const normalizedFetchPriority = computed(() => {
+  if (isLeadImage) return 'high'
+  return viewportLoading ? 'auto' : props.fetchpriority || undefined
+})
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
 const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)

@@ -13,6 +13,29 @@ untouched do not need one.
 
 ## Unreleased
 
+### Performance
+
+- **New: `stir-perf` performance audit.** Sites get `pnpm audit:perf`
+  (Lighthouse mobile and desktop on `performance.auditRoutes`, against
+  per-site budgets), and `audit:site` now includes it. Run
+  `pnpm exec stir-compliance-init`: it adds the script, upgrades an unmodified
+  `audit:site`, and adds the new "Required performance review" section to
+  `compliance/REVIEW.md`, which `pnpm audit:compliance` now requires. Local runs
+  need `pnpm add -D lighthouse chrome-launcher` (optional peers) and the
+  Playwright Chromium; `PAGESPEED_API_KEY` uses PageSpeed Insights instead.
+- **Fixed: the first gallery images were lazy and hidden.** The first row of
+  the page's first Media paragraph (and the first slide image of a lead
+  Carousel) now loads eagerly, without the reveal animation, with
+  `fetchpriority="high"` on the first image. Later media stays lazy. A Hero
+  paragraph with media, or a route hero image, claims the lead instead.
+- **Changed: masonry galleries render their lanes before hydration.** The
+  server grid now uses the masonry lane counts and gap (so the first row no
+  longer shifts when the virtualized masonry takes over) and renders only the
+  first 12 items; images are sized for the lane width instead of the container.
+- **Fixed: `public/` files had no Cache-Control.** Fonts and images served from
+  a site's `public/` directory now get `public, max-age=2592000,
+  stale-while-revalidate=86400`; a missing file gets `no-cache`.
+
 ### Layouts
 
 - **Fixed: Clear-layout pages without a hero had no h1.** The Clear layout now

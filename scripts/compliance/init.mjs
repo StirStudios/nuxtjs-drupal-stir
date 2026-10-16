@@ -14,7 +14,12 @@ const updated = []
 const requiredScripts = {
   'audit:compliance': 'stir-compliance',
   'audit:seo': 'stir-seo',
-  'audit:site': 'pnpm audit:compliance && pnpm audit:seo && pnpm test:a11y',
+  'audit:perf': 'stir-perf',
+  'audit:site': 'pnpm audit:compliance && pnpm audit:seo && pnpm audit:perf && pnpm test:a11y',
+}
+// Earlier defaults, upgraded in place; a customised command is left alone.
+const previousScripts = {
+  'audit:site': ['pnpm audit:compliance && pnpm audit:seo && pnpm test:a11y'],
 }
 
 // --check reports missing or outdated compliance files without writing, so CI
@@ -116,7 +121,7 @@ try {
   const addedScripts = []
 
   for (const [name, command] of Object.entries(requiredScripts)) {
-    if (packageJson.scripts[name]) continue
+    if (packageJson.scripts[name] && !previousScripts[name]?.includes(packageJson.scripts[name])) continue
     packageJson.scripts[name] = command
     addedScripts.push(name)
   }

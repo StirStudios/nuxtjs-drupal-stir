@@ -18,6 +18,11 @@ export const REVIEW_SECTIONS = [
   {
     heading: '## Required SEO review',
     marker: '<!-- stir-compliance-seo:v1 -->',
+    nextHeading: '## Required performance review',
+  },
+  {
+    heading: '## Required performance review',
+    marker: '<!-- stir-compliance-performance:v1 -->',
     nextHeading: '## Tracked legal copy',
   },
   {

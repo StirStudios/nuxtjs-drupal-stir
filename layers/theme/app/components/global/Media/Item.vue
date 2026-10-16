@@ -17,6 +17,8 @@ const props = defineProps<{
   node: VNode
   index: number
   deferLoad?: boolean
+  // A likely LCP image: eager, no reveal, and high priority for the first.
+  lead?: boolean
   direction?: string
   revealMode?: RevealMode
   deliveryProfile?: string
@@ -52,16 +54,19 @@ const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
       : props.deliveryProfile || explicitDeliveryProfile,
   }
 })
+const loadingProps = computed(() => {
+  if (props.lead) {
+    return { loading: 'eager' as const, fetchpriority: props.index === 0 ? 'high' as const : 'auto' as const }
+  }
+
+  return props.deferLoad === true ? { deferSource: true } : {}
+})
 const overlayImageProps = computed(() => {
   const { imageClass, ...rest } = mediaProps.value
 
-  return props.deferLoad === true ? { ...rest, deferSource: true } : rest
+  return { ...rest, ...loadingProps.value }
 })
-const renderedMediaProps = computed(() =>
-  props.deferLoad === true
-    ? { ...mediaProps.value, deferSource: true }
-    : mediaProps.value,
-)
+const renderedMediaProps = computed(() => ({ ...mediaProps.value, ...loadingProps.value }))
 const visibleTitle = computed(() =>
   ['below', 'over'].includes(props.titleDisplay || '')
   && ['image', 'video'].includes(mediaProps.value.type)
@@ -121,7 +126,7 @@ const visualRoundedClass = computed(() =>
 )
 
 const shouldAnimate = computed(() =>
-  Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
+  !props.lead && Boolean((revealMotionProps.value as Record<string, unknown>)?.whileInView),
 )
 </script>
 
@@ -157,7 +162,7 @@ const shouldAnimate = computed(() =>
     v-else
     :key="`media-overlay-${props.index}-${revealMotionKey}`"
     as-child
-    v-bind="revealMotionProps"
+    v-bind="shouldAnimate ? revealMotionProps : undefined"
   >
     <MediaImage
       v-bind="{ ...overlayImageProps, link: undefined, hideCredit: isVideo }"

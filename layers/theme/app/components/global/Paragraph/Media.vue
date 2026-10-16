@@ -6,7 +6,8 @@ import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveResponsiveGridValue } from '../../../utils/responsiveGrid'
 import { useWindowSize } from '@vueuse/core'
 import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
-import { resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
+import { maxGridColumns, resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
+import { useLeadMedia } from '#stir/composables/useLeadMedia'
 
 const props = defineProps<{
   id?: number | string
@@ -109,8 +110,30 @@ const lanes = computed(() => resolveResponsiveGridValue(
   viewportWidth.value,
   1,
 ))
+// Masonry lanes size images like grid columns; before hydration the grid
+// renders those lanes, so the first row sits where the masonry puts it.
+const layoutGrid = computed<GridConfig | undefined>(() => {
+  if (!props.masonry) return props.gridItems
+
+  // Masonry gaps are pixels; grid gaps are Tailwind spacing steps (4px).
+  const gap = Object.fromEntries(Object.entries(props.masonry.gap ?? { default: 16 })
+    .map(([breakpoint, pixels]) => [breakpoint, Math.round(pixels / 4)]))
+
+  return { columns: props.masonry.lanes ?? { default: 1 }, gap } as GridConfig
+})
 const deliveryProfile = computed(() =>
-  resolveStableMediaDeliveryProfile(props.gridItems, Boolean(props.masonry)),
+  resolveStableMediaDeliveryProfile(layoutGrid.value, false),
+)
+// The first row of the page's first media paragraph is the likely LCP: those
+// images load eagerly without a reveal, and everything after stays lazy.
+const isLead = useLeadMedia(props.uuid ?? props.id)
+const leadCount = computed(() =>
+  isLead.value ? Math.min(Math.max(maxGridColumns(layoutGrid.value), 1), 4) : 0,
+)
+// The virtualized masonry replaces the server grid once hydrated, so the
+// server renders only its first rows instead of hydrating every item twice.
+const serverMedia = computed(() =>
+  props.masonry ? slotMedia.value.slice(0, 12) : slotMedia.value,
 )
 
 onMounted(() => {
@@ -147,6 +170,7 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
+          :lead="i < leadCount"
           :node="node"
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
@@ -161,12 +185,12 @@ onMounted(() => {
 
       <WrapGrid
         v-else
-        :grid-items="gridItems"
+        :grid-items="layoutGrid"
         :spacing="spacing"
         :width="resolvedWidth"
       >
         <MediaItem
-          v-for="(node, i) in slotMedia"
+          v-for="(node, i) in serverMedia"
           :key="getMediaItemKey(node, i)"
           :defer-load="isImageGallery && i >= 4"
           :delivery-profile="deliveryProfile"
@@ -175,6 +199,7 @@ onMounted(() => {
             i === 0 ? actions : undefined
           "
           :index="i"
+          :lead="i < leadCount"
           :node="node"
           :overlay="overlayEnabled"
           :reveal-mode="revealMode"
