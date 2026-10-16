@@ -417,6 +417,7 @@
       "layers/theme/app/utils/imageLoadState.ts",
       "layers/theme/app/utils/layoutEditLinks.ts",
       "layers/theme/app/utils/linkHubHeroImage.ts",
+      "layers/theme/app/utils/masonryLayout.ts",
       "layers/theme/app/utils/mediaPreviewClasses.ts",
       "layers/theme/app/utils/motion.ts",
       "layers/theme/app/utils/navigation.ts",
@@ -799,6 +800,7 @@
         "layers/theme/app/utils/imageLoadState.ts",
         "layers/theme/app/utils/layoutEditLinks.ts",
         "layers/theme/app/utils/linkHubHeroImage.ts",
+        "layers/theme/app/utils/masonryLayout.ts",
         "layers/theme/app/utils/mediaPreviewClasses.ts",
         "layers/theme/app/utils/motion.ts",
         "layers/theme/app/utils/navigation.ts",
@@ -842,13 +844,13 @@
   "counts": {
     "components": 139,
     "composables": 72,
-    "utils": 77,
+    "utils": 78,
     "plugins": 10,
     "middleware": 5,
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 242,
+    "tests": 243,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
@@ -856,7 +858,7 @@
       "scripts": 6,
       "server": 33,
       "unit": 12,
-      "utils": 70
+      "utils": 71
     }
   },
   "tests": [
@@ -1069,6 +1071,7 @@
     "tests/utils/layoutContract.spec.ts",
     "tests/utils/linkHubHeroImage.spec.ts",
     "tests/utils/linkHubLayout.spec.ts",
+    "tests/utils/masonryLayout.spec.ts",
     "tests/utils/navigation.spec.ts",
     "tests/utils/nodeOverrideContract.spec.ts",
     "tests/utils/nuxtDevtoolsUnheadCompat.spec.ts",

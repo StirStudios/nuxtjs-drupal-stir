@@ -30,10 +30,18 @@ untouched do not need one.
   renders before or inside the page's first Layout section and no route hero
   image or Hero paragraph with media comes first. A gallery lower on the page,
   and every later media paragraph, stays lazy.
-- **Changed: masonry galleries render their lanes before hydration.** The
-  server grid now uses the masonry lane counts and gap (so the first row no
-  longer shifts when the virtualized masonry takes over) and renders only the
-  first 12 items; images are sized for the lane width instead of the container.
+- **Changed: masonry galleries are a server-rendered CSS grid.** The
+  virtualized `UScrollArea` is gone. Each item's lane (shortest lane first, per
+  breakpoint in `masonry.lanes`) and row span (from the image's `width` and
+  `height`) are computed on the server, so the layout needs no measuring and
+  does not shift after hydration. On a 136-image gallery this removed a 4.4 s
+  layout task on mobile and the 0.08–0.14 CLS. Every item is server-rendered;
+  items off screen hydrate only as they scroll near (`hydrate-on-visible`).
+  The `masonry.gap` applies between lanes and between items in a lane; the
+  vertical gap is taken from the bottom of each image, so up to that many pixels
+  are trimmed. Media without a size is laid out as 16:9. Galleries with captions
+  below, a fixed media height, or non-image/video items use the plain grid.
+  Images are sized for the lane width.
 - **Fixed: `public/` files had no Cache-Control.** Fonts and images served from
   a site's `public/` directory now get `public, max-age=2592000,
   stale-while-revalidate=86400`; a missing file gets `no-cache`.
