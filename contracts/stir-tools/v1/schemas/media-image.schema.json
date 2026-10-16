@@ -12,7 +12,7 @@
     "alt",
     "width",
     "height",
-    "delivery_profile",
+    "deliveryProfile",
     "loading",
     "fetchpriority"
   ],
@@ -26,12 +26,12 @@
     },
     "title": { "type": "string" },
     "src": { "type": "string", "minLength": 1 },
-    "original_src": { "type": "string", "minLength": 1 },
-    "original_revision": { "type": "string", "pattern": "^[0-9]+-[0-9]+-[0-9]+$" },
+    "originalSrc": { "type": "string", "minLength": 1 },
+    "originalRevision": { "type": "string", "pattern": "^[0-9]+-[0-9]+-[0-9]+$" },
     "alt": { "type": "string" },
     "width": { "type": ["integer", "null"], "minimum": 0 },
     "height": { "type": ["integer", "null"], "minimum": 0 },
-    "delivery_profile": {
+    "deliveryProfile": {
       "enum": ["auto", "card", "split", "container", "full", "hero"]
     },
     "loading": { "enum": ["lazy", "eager"] },

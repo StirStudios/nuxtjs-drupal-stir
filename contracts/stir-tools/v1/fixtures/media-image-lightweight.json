@@ -3,12 +3,12 @@
   "mid": 42,
   "title": "Example card image",
   "src": "https://www.example.com/sites/default/files/example.jpg",
-  "original_src": "https://www.example.com/sites/default/files/example.jpg",
-  "original_revision": "42-1710000000-293400",
+  "originalSrc": "https://www.example.com/sites/default/files/example.jpg",
+  "originalRevision": "42-1710000000-293400",
   "alt": "Two people reviewing a design together",
   "width": 1600,
   "height": 900,
-  "delivery_profile": "card",
+  "deliveryProfile": "card",
   "loading": "lazy",
   "fetchpriority": "auto"
 }
