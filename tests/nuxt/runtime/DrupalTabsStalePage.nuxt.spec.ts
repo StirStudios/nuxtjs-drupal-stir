@@ -38,7 +38,7 @@ describe('Drupal/Tabs page tasks', () => {
 
   it('leaves them off a page the site builds in Nuxt', async () => {
     lastNode()
-    // A page the site builds in Nuxt, like DancePlug's /instructors.
+    // A page the site builds in Nuxt, like /instructors.
     useRouter().addRoute({ path: '/instructors', name: 'instructors', component: { render: () => null } })
     const bar = await mountSuspended(DrupalTabs, { route: '/instructors' })
 

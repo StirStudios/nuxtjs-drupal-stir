@@ -17,7 +17,7 @@ untouched do not need one.
 
 - **Fixed: the editorial bar no longer shows the last node's tasks on a Nuxt
   page.** Drupal's page data stays in state after a client navigation to a
-  page the site builds in Nuxt (DancePlug's `/instructors`), so the bar kept
+  page the site builds in Nuxt (for example `/instructors`), so the bar kept
   the previous node's Edit, Delete, Revisions and Unpublished. Page tasks and
   the published state now show only where `route.meta.drupalPage` is true;
   the account menu, Drupal CMS menu and environment badge are unchanged.

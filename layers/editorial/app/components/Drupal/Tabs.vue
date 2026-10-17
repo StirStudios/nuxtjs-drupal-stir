@@ -93,7 +93,7 @@ const getAdminLinkSelectHandler = (destination: string) => {
 }
 
 // Drupal's page data stays in state after a client navigation to a page the
-// site builds in Nuxt (DancePlug's /instructors): its tasks and published
+// site builds in Nuxt (for example /instructors): its tasks and published
 // state belong to the last Drupal page, so they show only on a Drupal page.
 const onDrupalPage = computed(() => route.meta.drupalPage === true)
 
