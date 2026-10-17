@@ -92,8 +92,13 @@ const getAdminLinkSelectHandler = (destination: string) => {
     : undefined
 }
 
+// Drupal's page data stays in state after a client navigation to a page the
+// site builds in Nuxt (DancePlug's /instructors): its tasks and published
+// state belong to the last Drupal page, so they show only on a Drupal page.
+const onDrupalPage = computed(() => route.meta.drupalPage === true)
+
 const tabs = computed<LocalTasks>(() => {
-  const localTasks = page.value?.local_tasks
+  const localTasks = onDrupalPage.value ? page.value?.local_tasks : null
 
   return {
     primary: Array.isArray(localTasks?.primary) ? localTasks.primary : [],
@@ -124,7 +129,7 @@ const localTaskLinks = computed(() =>
 )
 
 const editorialTaskLinks = computed(() =>
-  withUnpublishedTask(localTaskLinks.value, page.value?.published),
+  withUnpublishedTask(localTaskLinks.value, onDrupalPage.value ? page.value?.published : undefined),
 )
 
 const currentUserId = computed(() =>
