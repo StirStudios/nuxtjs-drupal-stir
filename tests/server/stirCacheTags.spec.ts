@@ -3,6 +3,7 @@ import {
   applyStirCacheTagsHeader,
   applyStirSharedMaxAge,
   formatStirCacheTags,
+  parseStirCacheUntil,
   parseStirSharedMaxAge,
   parseStirCacheTags,
   recordStirCacheTags,
@@ -110,6 +111,29 @@ describe('Drupal cache tags on responses', () => {
 
     expect(callerHook).toHaveBeenCalledOnce()
     expect(responseHeaders.get('x-cache-tags')).toBe('config:system.menu.main')
+  })
+
+  it('counts down to x-stir-cache-until', () => {
+    const now = 1_760_000_000_000
+
+    expect(parseStirCacheUntil(String(1_760_000_000 + 600), now)).toBe(600)
+    expect(parseStirCacheUntil(String(1_760_000_000 - 5), now)).toBe(0)
+    expect(parseStirCacheUntil('soon', now)).toBeUndefined()
+    expect(parseStirCacheUntil(undefined, now)).toBeUndefined()
+  })
+
+  it('takes the clock time over a repeated, overshooting s-maxage', () => {
+    // A page-cache response from hours ago: s-maxage still counts from then.
+    const until = Math.floor(Date.now() / 1000) + 600
+    const { event, responseHeaders } = createEvent({ 'cache-control': 'max-age=60, public, s-maxage=86400' })
+
+    recordStirCacheTags(event, new Headers({ 'cache-control': 'public, s-maxage=84928', 'x-stir-cache-until': String(until) }))
+    applyStirSharedMaxAge(event)
+
+    const age = Number(/s-maxage=(\d+)/.exec(String(responseHeaders.get('cache-control')))?.[1])
+
+    expect(age).toBeGreaterThanOrEqual(599)
+    expect(age).toBeLessThanOrEqual(600)
   })
 
   it('reads the smallest s-maxage from Cache-Control values', () => {
