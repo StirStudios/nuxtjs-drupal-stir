@@ -47,9 +47,9 @@ describe('markStirPublicResponse', () => {
   it('caches an anonymous response and varies on what the decision reads', () => {
     const { event, headers } = createEvent()
 
-    markStirPublicResponse(event, { maxAge: 3600 })
+    markStirPublicResponse(event)
 
-    expect(headers.get('cache-control')).toBe('public, max-age=3600')
+    expect(headers.get('cache-control')).toBe('public')
     expect(headers.get('vary')).toBe('Cookie, Authorization')
   })
 
@@ -57,7 +57,7 @@ describe('markStirPublicResponse', () => {
   it('falls back to private for a session cookie or Authorization header', () => {
     const withSession = createEvent(`${SESSION_NAME}=value`)
 
-    markStirPublicResponse(withSession.event, { maxAge: 3600 })
+    markStirPublicResponse(withSession.event, )
     expect(withSession.headers.get('cache-control')).toBe('private, no-store, max-age=0')
 
     const withAuth = createEvent()
@@ -66,17 +66,16 @@ describe('markStirPublicResponse', () => {
     }).node.req.headers
 
     authHeaders.authorization = 'Bearer token'
-    markStirPublicResponse(withAuth.event, { maxAge: 3600 })
+    markStirPublicResponse(withAuth.event, )
     expect(withAuth.headers.get('cache-control')).toBe('private, no-store, max-age=0')
   })
 
-  it('accepts a narrower vary list and refuses a negative max-age', () => {
+  it('accepts a narrower vary list', () => {
     const { event, headers } = createEvent()
 
-    markStirPublicResponse(event, { maxAge: -5, vary: ['Accept-Language'] })
+    markStirPublicResponse(event, { vary: ['Accept-Language'] })
 
     expect(headers.get('vary')).toBe('Accept-Language')
-    expect(headers.get('cache-control')).toBe('public, max-age=0')
   })
 })
 
