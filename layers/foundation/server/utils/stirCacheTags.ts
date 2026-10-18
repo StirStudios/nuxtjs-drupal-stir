@@ -161,6 +161,8 @@ export const applyStirSharedMaxAge = (event: H3Event): void => {
   const currentValue = Array.isArray(current) ? current.join(', ') : String(current ?? '')
 
   recordSharedMaxAge(event, parseStirSharedMaxAge(current))
+  // The page's own end time, passed through from the Drupal CE fetch.
+  recordSharedMaxAge(event, parseStirCacheUntil(getResponseHeader(event, STIR_CACHE_UNTIL_HEADER) as HeaderValue))
 
   const age = (event.context as { stirSharedMaxAge?: number }).stirSharedMaxAge
 

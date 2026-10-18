@@ -122,6 +122,22 @@ describe('Drupal cache tags on responses', () => {
     expect(parseStirCacheUntil(undefined, now)).toBeUndefined()
   })
 
+  it('counts down to the page response\'s own x-stir-cache-until', () => {
+    // The Drupal CE page fetch passes both headers through to the page.
+    const until = Math.floor(Date.now() / 1000) + 300
+    const { event, responseHeaders } = createEvent({
+      'cache-control': 'max-age=60, public, s-maxage=85809',
+      'x-stir-cache-until': String(until),
+    })
+
+    applyStirSharedMaxAge(event)
+
+    const age = Number(/s-maxage=(\d+)/.exec(String(responseHeaders.get('cache-control')))?.[1])
+
+    expect(age).toBeGreaterThanOrEqual(299)
+    expect(age).toBeLessThanOrEqual(300)
+  })
+
   it('takes the clock time over a repeated, overshooting s-maxage', () => {
     // A page-cache response from hours ago: s-maxage still counts from then.
     const until = Math.floor(Date.now() / 1000) + 600
