@@ -114,6 +114,9 @@ export default defineNuxtConfig({
       // The page's Drupal cache tags reach the HTML response, where the
       // foundation cache-tags plugin merges them with the other requests'.
       if (!headers.includes('x-cache-tags')) headers.push('x-cache-tags')
+      // And the clock time it ends (Stir Tools): the page's own s-maxage may
+      // be a countdown Drupal's page cache repeated from hours ago.
+      if (!headers.includes('x-stir-cache-until')) headers.push('x-stir-cache-until')
 
       drupalCe.passThroughHeaders = isDevelopment
         ? headers.filter(header => header.toLowerCase() !== 'cache-control')
