@@ -98,6 +98,27 @@ const recordSharedMaxAge = (event: H3Event, age: number | undefined): void => {
     : Math.min(context.stirSharedMaxAge, age)
 }
 
+/** When a response expires, as a Unix time (Stir Tools). */
+export const STIR_CACHE_UNTIL_HEADER = 'x-stir-cache-until'
+
+/**
+ * Returns the seconds left until `x-stir-cache-until`, if the header is set.
+ *
+ * Drupal's page cache repeats a stored response with its headers unchanged,
+ * so `s-maxage` may be a countdown that started hours ago (seconds until
+ * midnight, worked out at 00:24 and repeated at 08:30). The clock time it
+ * also sends stays right: counting down to it, a page never outlives it.
+ */
+export const parseStirCacheUntil = (value: HeaderValue, now = Date.now()): number | undefined => {
+  if (value === null || value === undefined) return undefined
+
+  const until = Number(Array.isArray(value) ? value[0] : value)
+
+  if (!Number.isFinite(until) || until <= 0) return undefined
+
+  return Math.max(0, Math.floor(until - now / 1000))
+}
+
 /**
  * Records the cache tags and Varnish lifetime of a Drupal (or internal)
  * response on this request.
@@ -109,6 +130,7 @@ export const recordStirCacheTags = (
   if (!event.context) return
 
   recordSharedMaxAge(event, parseStirSharedMaxAge(headers?.get?.('cache-control')))
+  recordSharedMaxAge(event, parseStirCacheUntil(headers?.get?.(STIR_CACHE_UNTIL_HEADER)))
 
   const tags = parseStirCacheTags(headers?.get?.(STIR_CACHE_TAGS_HEADER))
 
