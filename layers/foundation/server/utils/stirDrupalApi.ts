@@ -279,10 +279,14 @@ export const markStirPrivateResponse = (event: H3Event): void => {
  * carrying a Drupal session cookie or an Authorization header falls back to
  * private no-store. `vary` names the request headers the cache key depends
  * on, and defaults to the two this decision reads.
+ *
+ * The lifetime is Drupal's alone: the cache-tags plugin gives a public
+ * response the shortest `s-maxage` of the Drupal responses it was built from
+ * (docs/caching-contract.md). Nuxt never chooses one.
  */
 export const markStirPublicResponse = (
   event: H3Event,
-  options: { maxAge: number, vary?: string[] },
+  options: { vary?: string[] } = {},
 ): void => {
   const vary = options.vary ?? ['Cookie', 'Authorization']
 
@@ -295,7 +299,7 @@ export const markStirPublicResponse = (
     return
   }
 
-  setResponseHeader(event, 'Cache-Control', `public, max-age=${Math.max(0, Math.trunc(options.maxAge))}`)
+  setResponseHeader(event, 'Cache-Control', 'public')
 }
 
 export const captureStirDrupalApiError = (
