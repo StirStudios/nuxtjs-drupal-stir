@@ -1092,10 +1092,11 @@ describe('layer contract', () => {
     // Ratchet: these track the enforced baseline in docs/perf-budget.json and
     // only ever move down. Raising them is a deliberate re-baseline, not a way
     // to absorb a regression -- see docs/perf-initial-graph.md.
-    // 233 / 197.5: Nuxt 4.6's smaller client runtime (docs/perf-budget.json rationale).
-    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(233)
-    expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(197.5)
-    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(36.5)
+    // 231 / 194 / 38: Nuxt UI 4.12 moved about 1.1 kB from JavaScript to theme
+    // CSS while cutting the total (docs/perf-budget.json rationale).
+    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(231)
+    expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(194)
+    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(38)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
   })
 
