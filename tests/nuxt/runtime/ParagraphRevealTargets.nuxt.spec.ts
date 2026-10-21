@@ -88,6 +88,24 @@ describe('paragraph reveal targets (Nuxt runtime)', () => {
     expect(wrapper.findAll('[style*="opacity"]')).toHaveLength(1)
   })
 
+  it('renders the active tab panel straight into the Nuxt UI content slot', async () => {
+    const wrapper = await mountSuspended(ParagraphTabs, {
+      props: { id: 1 },
+      slots: {
+        tab: () => [
+          h('div', { title: 'First' }, [h('p', { class: 'panel-content' }, 'First panel')]),
+          h('div', { title: 'Second' }, 'Second panel'),
+        ],
+      },
+    })
+    const content = wrapper.get('[data-slot="content"]')
+
+    expect(content.classes()).toEqual(expect.arrayContaining(['[&_ul]:pt-0', '[&_p]:pb-0']))
+    expect(content.find(':scope > div > .panel-content').exists()).toBe(true)
+    expect(wrapper.get('[data-slot="root"]').classes())
+      .toContain('data-[orientation=horizontal]:overflow-y-clip')
+  })
+
   it('keeps explicitly disabled paragraph motion visible', async () => {
     const wrapper = await mountSuspended(ParagraphInstagramFeed, {
       props: {
