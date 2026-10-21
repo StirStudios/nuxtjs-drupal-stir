@@ -88,10 +88,13 @@ spoofing through the proxy.
 
 **Other tight-coupling points:**
 
-- **CE machine-name ↔ Vue filename mapping:** every Drupal paragraph-bundle CE
-  display config must have a matching kebab-case Vue component filename (per
-  `CLAUDE.md`'s 1:1 mapping rule). Renaming a bundle on Drupal breaks rendering
-  unless the Nuxt component is renamed in lockstep.
+- **CE machine-name ↔ Vue component mapping:** `nuxtjs-drupal-ce` resolves a
+  custom element by PascalCasing its name to a global component name, so every
+  Drupal paragraph bundle needs a matching
+  `layers/*/app/components/global/Paragraph/<Bundle>.vue` (`paragraph-hero` →
+  `Paragraph/Hero.vue` → `ParagraphHero`; see `CLAUDE.md`). Without one it
+  falls back to `ParagraphDefault`. Renaming a bundle on Drupal breaks its
+  rendering unless the Nuxt component is renamed in lockstep.
 - **Menu endpoint path:** the public-menu carve-out
   (`/ce-api/api/menu_items/*`) is hardcoded identically on both sides
   (`ApiAuthSubscriber.php` and Nuxt's `layers/core/server/api/menu/[...].ts` /
@@ -331,7 +334,7 @@ consumer presets.
 These are the points where a change on one side requires a coordinated change on
 the other, ranked roughly by blast radius:
 
-1. **CE machine-name ↔ Vue component filename** (1:1 kebab-case mapping) — a
+1. **CE machine-name ↔ Vue component name** (`paragraph-hero` → `ParagraphHero`) — a
    Drupal paragraph bundle rename breaks rendering unless mirrored in Nuxt.
 2. **`customElementJsonFormat`** — Nuxt relies on Drupal's `explicit` default with
    no explicit override; a Drupal-side change would break every CE response

@@ -26,13 +26,23 @@ Use these rules for all changes.
 
 ## Repository structure (high level)
 
-- `app/` - Nuxt app code (pages, components, composables, plugins)
-- `server/` - Nitro server routes/middleware/utilities
-- `assets/` - global CSS and static assets
-- `docs/` - integration and project docs
-- `types/` - shared TS types/interfaces
-- `nuxt.config.ts` - runtime/build/module configuration
-- `app.config.ts` - Nuxt UI/theme-level app configuration
+- `nuxt.config.ts` - the full layer: only an `extends` list of `layers/*`
+  (platform, seo, listing, editorial, integrations, analytics, scripts,
+  webform, auth; diagnostics only for `STIR_PERF_ANALYZE` in this workspace).
+- `layers/<name>/` - Nuxt layers, each with its own `nuxt.config.ts` and, as
+  needed, `app/` (components, composables, pages, plugins, `app.config.ts`,
+  `types`), `server/` (Nitro routes, middleware, utils) and `shared/`
+  (app/server types and utils). `platform` extends `foundation`, `core` and
+  `theme`; `theme/app` holds the base UI (`app.config.ts`, `assets/css`,
+  global components). See `docs/layers.md`.
+- `presets/` - `minimal` and `full` entry points (`exports` in `package.json`).
+- `config/` - shared build-time config helpers (runtime, sitemap, component
+  overrides).
+- `server/` - only the root `tsconfig.json`; server code lives in
+  `layers/*/server`.
+- `contracts/`, `scripts/`, `tests/` - stir-tools contracts, audit/perf/docs
+  scripts, and unit, Nuxt runtime, e2e and consumer-fixture tests.
+- `docs/` - integration and project docs.
 
 ## Environment and configuration rules
 
@@ -61,7 +71,7 @@ Use these rules for all changes.
 - Prefer nested CSS for readability when using Tailwind v4 CSS features.
 - In scoped styles, use `:global(...)` with `:deep(...)` when targeting global theme/state classes.
 - Prefer stable class hooks (for example `app-nav`) over ARIA/attribute selectors for reusable styling targets.
-- Treat `app/assets/css/custom.css` as an import/index file; place new styles in focused partials under `app/assets/css/custom/`.
+- Treat `layers/theme/app/assets/css/main.css` as an import/index file; place new styles in focused partials beside it.
 - If custom styles in one file grow beyond roughly 80-120 lines or mix unrelated concerns, split them in the same PR.
 - Keep comments minimal and only for non-obvious logic or external constraints.
 - Do not wrap imports in `try/catch` (project-wide rule).
@@ -72,7 +82,7 @@ Use these rules for all changes.
 - Use single-quoted strings in JS/TS/Vue config and code unless escaping would reduce readability; keep style aligned with ESLint/Prettier.
 - In `<script setup>`, group related declarations with a single blank line between logical blocks (imports, props/emits, composables/context, local types, refs/state, computed values, methods/watch/lifecycle). Avoid extra blank lines within a single block.
 - Naming:
-  - Vue components: PascalCase unless Drupal custom-element mapping requires kebab-case.
+  - Vue components: PascalCase. Custom-element components follow the mapping below.
   - Composables: camelCase with `use*` naming.
   - Server utilities/routes: clear, purpose-driven names that match Nitro conventions.
 
@@ -87,7 +97,7 @@ Use these rules for all changes.
 ## UI architecture and reuse
 
 - Use Nuxt UI components, composables, and generated themes before building local equivalents.
-- Configure shared Nuxt UI behavior in `app.config.ts`; downstream projects should inherit these defaults and override only genuine project requirements.
+- Configure shared Nuxt UI behavior in `layers/theme/app/app.config.ts`; downstream projects should inherit these defaults and override only genuine project requirements.
 - Prefer semantic colors such as `primary`, `neutral`, `success`, and `error` in application UI. Reserve direct brand utilities for intentional artwork, gradients, and brand-specific treatments.
 - Use Tailwind utilities directly in templates for one-off layout and presentation. Do not create custom CSS classes or TypeScript string constants that only rename a utility recipe.
 - Extract a local component when a repeated composition has semantic meaning, behavior, slots, or variants. Keep wrappers thin and delegate primitives such as containers, buttons, forms, and overlays to Nuxt UI.
@@ -103,9 +113,15 @@ Use these rules for all changes.
   - Drupal/edge: enforces access policy for CE/data endpoints.
 - Do not narrow API-key middleware scope without verifying homepage, CE page fetch, and menu endpoint behavior.
 - Keep schema and mapping assumptions explicit with types or concise inline notes.
-- For custom elements, prefer 1:1 filename mapping in kebab-case
-  (example: `node-article-teaser.vue`); fallback components may use `--default` suffix.
-- Place globally reused custom-element components in `components/global` when appropriate.
+- Custom elements resolve by Nuxt component name: `nuxtjs-drupal-ce`
+  (`resolveCustomElement`) PascalCases the element name and looks up a global
+  component, so `paragraph-hero` renders `ParagraphHero`. Paragraph bundles
+  live at `layers/*/app/components/global/Paragraph/<Bundle>.vue` in
+  PascalCase (`Hero.vue`, `CarouselItem.vue` for `paragraph-carousel-item`);
+  Nuxt prefixes the `Paragraph/` directory. Without an exact match it tries
+  `<Prefix>Default` while dropping trailing segments (`Paragraph/Default.vue`
+  → `ParagraphDefault`, `node--default.vue` → `NodeDefault`).
+- Custom-element components must be global (`components/global`) to resolve.
 - Default Custom Elements JSON format is `explicit`; use `legacy` only for old backends and document why.
 - If changed, document these module options and expected behavior:
   - `drupalBaseUrl`
@@ -155,22 +171,26 @@ Use these rules for all changes.
 
 ## Validation checklist
 
-Run relevant checks after changes:
+Gates (`package.json`):
 
-- `pnpm lint`
-- `pnpm build`
-- `pnpm generate` (when static output behavior is affected)
-- `pnpm dev` (for local/manual verification when needed)
+- `pnpm verify:core` - prepare, `audit:inventory:check`, `audit:private-names`,
+  `audit:single-versions`, `test:all` (coverage, Nuxt runtime, e2e, a11y),
+  `lint`, `typecheck`, `build`.
+- `pnpm verify:ci` - `verify:core` plus `test:consumer` (consumer fixture
+  typecheck, build and packed install) and `test:presets`.
 
 Validation policy:
 
-- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts, then run `pnpm verify:ci`.
+- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts (`pnpm audit:inventory`, `pnpm contracts:sync`), then run `pnpm verify:ci`.
 - If debugging failures, run the individual commands:
   - `pnpm lint`
   - `pnpm typecheck`
   - `pnpm test`
   - `pnpm test:nuxt`
+  - `pnpm test:e2e`
+  - `pnpm test:a11y`
   - `pnpm build`
+- `pnpm generate` only when static output behavior is affected; `pnpm dev` for manual checks.
 - For docs-only or clearly isolated non-runtime edits, targeted validation is acceptable, but state what was intentionally skipped.
 - Any change touching auth, headers, route middleware, CE fetch/proxy behavior, or runtime config must run the full validation set above.
 

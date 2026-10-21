@@ -4,22 +4,48 @@ Which settings change when a deployed app restarts, and which need a rebuild.
 
 ## How the environment reaches the app
 
-On Stir servers, pm2 starts each app from `shared/ecosystem.config.js`. Since
-2026-09-25 the generated file reads `shared/.env` and passes every key to the
-Nitro process (stir-server-config, `create_project.sh`). Before that, pm2 7
-ignored the old `env_file` key, so no `.env` key reached a running app and an
-`.env` edit only took effect at the next build. Sites provisioned earlier keep
-the old file until they are updated by hand.
+On Stir servers each site's Nuxt app runs as a systemd unit,
+`stir-nuxt@<instance>` (instance `<user>`, or `<user>-a` / `<user>-b` for a
+two-instance site), set up by stir-server-config `setup_nuxt_unit.sh`. The
+unit starts Nitro through `nuxt/start.mjs`, which reads the site's
+`htdocs/shared/.env` (the unit's `STIR_ENV_FILE`) with `nuxt/app-env.cjs`
+before the app loads. That parser handles `export`, single and double quotes,
+trailing comments and `${VAR}` expansion from earlier keys, so chained values
+such as `DRUPAL_URL="https://${SERVER_DOMAIN_CLIENT}"` work. systemd's
+`EnvironmentFile=` is not used because it does not expand `${VAR}`.
 
-To apply an `.env` edit, run as the site user from `htdocs/current`:
+The same `shared/.env` is linked into each release, so `nuxi build` reads it
+too: `nuxt.config.ts` sees it at build, the running process sees it at start.
+
+Precedence in the running process:
+
+1. Values the unit sets (`Environment=`): `NITRO_HOST`, `NITRO_PORT`, `PORT`,
+   `STIR_ENV_FILE`, the watchdog settings and `NODE_ENV=production`. A key
+   already in the environment is never replaced by `.env`, and `start.mjs`
+   forces `NODE_ENV=production`.
+2. `shared/.env`, for every other key.
+3. Values frozen into the build from `nuxt.config.ts`, which a `NUXT_*`
+   variable matching a `runtimeConfig` path overrides at runtime (below).
+
+Nuxt reads the environment only when the process starts. To apply an `.env`
+edit, restart the site's units:
 
 ```bash
-pm2 startOrReload ecosystem.config.js --update-env && pm2 save
+sudo stir nuxt restart <user>
 ```
 
-`pm2 restart <name>` reuses the saved environment and does not reread `.env`.
+A deploy restarts them too (capistrano-stir `app:restart_nuxt`, which runs
+after `deploy:published` and on its own as `cap <stage> app:restart_nuxt`).
 Varnish keeps serving cached pages, so purge the site when the change affects
 rendered HTML or public runtime config.
+
+Locally, DDEV runs the Nuxt dev server as the `nuxt` daemon
+(`web_extra_daemons`), and `nuxi dev` reads the Nuxt project's own `.env`.
+Restart it after an `.env` edit:
+
+```bash
+ddev exec supervisorctl restart webextradaemons:nuxt
+```
 
 ## What a restart can change
 
@@ -35,15 +61,18 @@ Nuxt fixes `nuxt.config.ts` at build. At runtime a value changes only through:
    runtime for `site.url`, `site.name` and `site.indexable`.
 3. Server code that reads `process.env` directly.
 
-The layer's documented names (`DRUPAL_API_KEY`, `TURNSTILE_SECRET`,
-`PROTECTED_PASSWORD`, …) are none of these. They set build-time defaults only.
+Of the layer's documented names, only `DRUPAL_API_KEY` and
+`PROTECTED_PASSWORD` are the third kind: server code reads them from
+`process.env` (`stirServerEnv`) and falls back to the build value. The others
+(`TURNSTILE_SECRET`, `DRUPAL_REQUEST_TIMEOUT_MS`, …) set build-time defaults
+only.
 
 ### Settings apps expect to change on restart
 
 | Documented name | runtimeConfig path | Name that overrides it at runtime today |
 | --- | --- | --- |
-| `DRUPAL_API_KEY` | `apiKey` | `NUXT_API_KEY` |
-| `PROTECTED_PASSWORD` | `protectedPassword` | `NUXT_PROTECTED_PASSWORD` |
+| `DRUPAL_API_KEY` | `apiKey` | Same name (read at runtime), or `NUXT_API_KEY` |
+| `PROTECTED_PASSWORD` | `protectedPassword` | Same name (read at runtime), or `NUXT_PROTECTED_PASSWORD` |
 | `TURNSTILE_SECRET` | `turnstile.secretKey` | `NUXT_TURNSTILE_SECRET_KEY`, only if set at build |
 | `TURNSTILE_KEY` | `public.turnstile.siteKey` | `NUXT_PUBLIC_TURNSTILE_SITE_KEY`, only if set at build |
 | `NUXT_URL` | `siteUrl`, `site.url` | `NUXT_SITE_URL` (covers both) |
@@ -75,7 +104,7 @@ The layer's documented names (`DRUPAL_API_KEY`, `TURNSTILE_SECRET`,
 The keys generated `.env` files contain today (`NUXT_ENV`, `NUXT_NAME`,
 `NUXT_INDEXABLE`, `NUXT_URL`, `NUXT_IMAGE_CDN`) match no `runtimeConfig` path,
 so passing them to the process changes nothing in the layer. Downstream server
-code that reads `process.env` directly does see them now.
+code that reads `process.env` directly does see them.
 
 ## Proposal
 
@@ -99,5 +128,6 @@ needs its own release and consumer notes.
 
 Until then a server `.env` can make a setting restart-changeable without a
 layer change by adding the runtime name next to the documented one, for
-example `NUXT_API_KEY="${DRUPAL_API_KEY}"`. The ecosystem file expands
-`${VAR}`, so editing `DRUPAL_API_KEY` and reloading updates both.
+example `NUXT_TURNSTILE_SECRET_KEY="${TURNSTILE_SECRET}"`. `app-env.cjs`
+expands `${VAR}`, so editing `TURNSTILE_SECRET` and restarting updates both
+(the Turnstile names still need a value at build, as noted above).
