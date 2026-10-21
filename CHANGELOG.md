@@ -135,6 +135,13 @@ untouched do not need one.
   unchanged. Site CSS that targeted `.tab-content` inside tabs should target
   `.app-tabs [data-slot="content"]`.
 
+- **Changed: Tailwind 3 class names replaced with their Tailwind 4 forms.**
+  Leading `!` important modifiers move to the end (`h-full!`), including the
+  default `stirTheme.routeHero.image`; the video "processing" placeholder uses
+  `bg-linear-to-br`; the skip link uses `focus-visible:outline-hidden`, which
+  keeps an outline in forced-colours mode where `outline-none` removed it.
+  Rendering is otherwise unchanged.
+
 - **Fixed: Back after a listing pager click returns to the previous page.**
   `useDynamicListingControls().setPage()` replaced the current history entry,
   so going from page 1 to page 2 and pressing Back skipped page 1. Page

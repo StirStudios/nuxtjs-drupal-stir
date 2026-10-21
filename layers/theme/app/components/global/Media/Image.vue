@@ -252,7 +252,7 @@ onMounted(() => {
         : [
           theme.media.base,
           resolvedRoundedClass,
-          'm-auto !object-contain',
+          'm-auto object-contain!',
           !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
           imageClass,
         ]

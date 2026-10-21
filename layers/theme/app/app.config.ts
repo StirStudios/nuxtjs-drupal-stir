@@ -161,7 +161,7 @@ export default defineAppConfig({
       band: 'route-hero-band isolate overflow-hidden',
       surface: 'bg-linear-to-b from-gray-900 via-gray-800 to-black',
       visual: 'absolute inset-x-0 top-0 -z-10 h-[calc(100%+7rem)]',
-      image: 'inset-0 !h-full !w-full !object-cover',
+      image: 'inset-0 h-full! w-full! object-cover!',
       overlay:
         'pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/80 via-black/50 to-black/20',
       container:
