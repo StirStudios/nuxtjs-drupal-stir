@@ -13,6 +13,16 @@ untouched do not need one.
 
 ## Unreleased
 
+### Environment
+
+- **Added: canonical environment names, old names still accepted.** The build
+  reads `NUXT_SITE_URL` (old `NUXT_URL`), `NUXT_SITE_NAME` (old `NUXT_NAME`)
+  and takes the development Vite host from the `NUXT_SITE_URL` host (old
+  `SERVER_DOMAIN_CLIENT`). The canonical name wins when both are set. Existing
+  `.env` files behave exactly as before; runtime overrides are unchanged
+  (`NUXT_SITE_URL`/`NUXT_SITE_NAME` were already the runtime names). See
+  `docs/runtime-environment.md`.
+
 ### Editorial
 
 - **Fixed: the editorial bar no longer shows the last node's tasks on a Nuxt
