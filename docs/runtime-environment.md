@@ -110,9 +110,8 @@ code that reads `process.env` directly does see them.
 ### Canonical names and accepted old names
 
 The build reads each renamed setting through one helper in
-`config/runtime.ts`: the canonical name first, then the old name. When both
-are set with different values the canonical name wins and the build warns
-(naming the variables, never the values).
+`config/runtime.ts`: the canonical name first, then the old name; when both
+are set, the canonical name wins.
 
 | Canonical | Accepted old name | Read at |
 | --- | --- | --- |

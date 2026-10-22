@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   canonicalEnvironment,
   commaSeparatedEnvironment,
@@ -77,8 +77,7 @@ describe('canonical environment names', () => {
     expect(developmentHostEnvironment(env)).toBe('new.example')
   })
 
-  it('prefers the canonical name and warns without printing values', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  it('prefers the canonical name', () => {
     const env = {
       NUXT_SITE_URL: 'https://new.example',
       NUXT_URL: 'https://old.example',
@@ -90,9 +89,6 @@ describe('canonical environment names', () => {
     expect(siteUrlEnvironment(env)).toBe('https://new.example')
     expect(siteNameEnvironment(env)).toBe('Same')
     expect(developmentHostEnvironment(env)).toBe('new.example')
-    expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0]?.[0]).toBe('[stir] NUXT_SITE_URL overrides NUXT_URL, which has a different value.')
-    warn.mockRestore()
   })
 
   it('falls back when nothing is set', () => {

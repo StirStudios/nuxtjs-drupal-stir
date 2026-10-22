@@ -22,23 +22,15 @@ type Environment = Record<string, string | undefined>
 
 /**
  * Reads the first set name: the canonical one first, then the old names it
- * replaces. When the canonical and an old name disagree the canonical wins
- * and a warning names (never prints) the variables.
+ * replaces.
  */
 export function canonicalEnvironment(
   names: readonly [string, ...string[]],
   env: Environment = process.env,
 ): string | undefined {
-  const set = names.filter(name => env[name]?.trim())
-  const [first] = set
-  const value = first ? env[first]?.trim() : undefined
-  const conflicting = set.filter(name => env[name]?.trim() !== value)
+  const first = names.find(name => env[name]?.trim())
 
-  if (conflicting.length) {
-    console.warn(`[stir] ${first} overrides ${conflicting.join(', ')}, which has a different value.`)
-  }
-
-  return value
+  return first ? env[first]?.trim() : undefined
 }
 
 /** Public site origin: NUXT_SITE_URL, else the old NUXT_URL. */
