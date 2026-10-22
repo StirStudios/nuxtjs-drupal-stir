@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **Changed: hero fallback colours.** The no-media hero and route hero
+  surfaces use the site's `neutral` palette (`from-neutral-900 via-neutral-800`)
+  instead of fixed grey, so they follow each site's neutral colour.
+
 ### Environment
 
 - **Removed: old environment names.** The build reads only `NUXT_SITE_URL`
