@@ -1,5 +1,4 @@
 import { sitemapCanonicalKey } from './sitemapCanonicalKey'
-import { siteUrlEnvironment } from './runtime'
 
 const sitemapExcludedRoutes = [
   '/account/**',
@@ -53,7 +52,7 @@ function sitemapMetadataScore(entry: SitemapEntry): number {
 
 export function dedupeResolvedSitemapUrls<T extends SitemapEntry>(
   urls: T[],
-  siteUrl = siteUrlEnvironment(),
+  siteUrl = process.env.NUXT_SITE_URL || '',
 ): T[] {
   const deduped: T[] = []
   const indexes = new Map<string, number>()

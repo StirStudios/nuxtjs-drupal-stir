@@ -1192,11 +1192,10 @@
     "runtimeConfigEnvironment": [
       "DRUPAL_URL",
       "DRUPAL_API_KEY",
-      "NUXT_URL",
-      "NUXT_NAME",
+      "NUXT_SITE_URL",
+      "NUXT_SITE_NAME",
       "NUXT_ENV",
       "NUXT_INDEXABLE",
-      "SERVER_DOMAIN_CLIENT",
       "TURNSTILE_KEY",
       "TURNSTILE_SECRET"
     ],

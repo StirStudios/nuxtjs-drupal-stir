@@ -1,7 +1,7 @@
 /**
  * Resolves the site's public origin for absolute URLs such as canonicals.
  *
- * On the server the configured NUXT_URL (runtimeConfig.siteUrl) wins, so a
+ * On the server the configured NUXT_SITE_URL (runtimeConfig.siteUrl) wins, so a
  * proxied request host cannot leak into links; otherwise the request origin
  * is used. nuxt-site-config is server-only here to keep it off the client.
  */

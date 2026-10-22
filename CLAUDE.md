@@ -51,11 +51,10 @@ Use these rules for all changes.
 - When changed, explicitly document purpose and expected values for:
   - `DRUPAL_URL`
   - `DRUPAL_API_KEY`
-  - `NUXT_URL`
-  - `NUXT_NAME`
+  - `NUXT_SITE_URL`
+  - `NUXT_SITE_NAME`
   - `NUXT_ENV`
   - `NUXT_INDEXABLE`
-  - `SERVER_DOMAIN_CLIENT`
   - `TURNSTILE_KEY`
   - `TURNSTILE_SECRET`
 - Call out runtime overrides via `NUXT_PUBLIC_DRUPAL_CE_*` variables whenever used.

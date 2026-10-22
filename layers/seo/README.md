@@ -19,7 +19,7 @@ export default defineNuxtConfig({
 })
 ```
 
-`DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_URL`, `NUXT_NAME`,
+`DRUPAL_URL` supplies the Drupal sitemap source. `NUXT_SITE_URL`, `NUXT_SITE_NAME`,
 `NUXT_ENV` and `NUXT_INDEXABLE` remain shared site/robots configuration.
 
 This layer is what makes a composition an indexable website. The Robots module

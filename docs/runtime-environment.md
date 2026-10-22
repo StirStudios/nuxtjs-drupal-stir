@@ -11,7 +11,7 @@ unit starts Nitro through `nuxt/start.mjs`, which reads the site's
 `htdocs/shared/.env` (the unit's `STIR_ENV_FILE`) with `nuxt/app-env.cjs`
 before the app loads. That parser handles `export`, single and double quotes,
 trailing comments and `${VAR}` expansion from earlier keys, so chained values
-such as `DRUPAL_URL="https://${SERVER_DOMAIN_CLIENT}"` work. systemd's
+such as `DRUPAL_URL="https://${SITE_DOMAIN}"` work. systemd's
 `EnvironmentFile=` is not used because it does not expand `${VAR}`.
 
 The same `shared/.env` is linked into each release, so `nuxi build` reads it
@@ -75,7 +75,7 @@ only.
 | `PROTECTED_PASSWORD` | `protectedPassword` | Same name (read at runtime), or `NUXT_PROTECTED_PASSWORD` |
 | `TURNSTILE_SECRET` | `turnstile.secretKey` | `NUXT_TURNSTILE_SECRET_KEY`, only if set at build |
 | `TURNSTILE_KEY` | `public.turnstile.siteKey` | `NUXT_PUBLIC_TURNSTILE_SITE_KEY`, only if set at build |
-| `NUXT_SITE_URL` (old: `NUXT_URL`) | `siteUrl`, `site.url` | `NUXT_SITE_URL` (covers both) |
+| `NUXT_SITE_URL` | `siteUrl`, `site.url` | `NUXT_SITE_URL` (covers both) |
 | `DRUPAL_REQUEST_TIMEOUT_MS` | `drupalRequestTimeoutMs` | `NUXT_DRUPAL_REQUEST_TIMEOUT_MS` |
 | `DRUPAL_SESSION_COOKIE_NAMES` | `drupalSessionCookieNames` | `NUXT_DRUPAL_SESSION_COOKIE_NAMES` (JSON array) |
 | `DRUPAL_FORWARD_CLIENT_IP` | `drupalClientIpForwarding.enabled` | `NUXT_DRUPAL_CLIENT_IP_FORWARDING_ENABLED` |
@@ -94,36 +94,18 @@ only.
   SEO proxying at build. Overriding only `NUXT_API` or the Drupal CE base URLs
   at runtime would leave those pointing at the old host, so change Drupal
   hosts with a deploy.
-- `NUXT_IMAGE_CDN`, `NUXT_SITE_NAME` (old: `NUXT_NAME`; nuxt-site-config
+- `NUXT_IMAGE_CDN`, `NUXT_SITE_NAME` (nuxt-site-config
   also reads `NUXT_SITE_NAME` at runtime for `site.name`), the Vite dev host
-  (the `NUXT_SITE_URL` host, old: `SERVER_DOMAIN_CLIENT`) and `NODE_ENV`.
+  (the `NUXT_SITE_URL` host, else `localhost`) and `NODE_ENV`.
 - `DRUPAL_CDN` (optional): a public file host that differs from
   `NUXT_IMAGE_CDN`, trusted as an IPX source. `NUXT_IMAGE_CDN`'s host is
   trusted already, so most sites leave it unset; see
   [theme-layer.md](theme-layer.md#nuxt-image-delivery).
 
-The keys generated `.env` files contain today (`NUXT_ENV`, `NUXT_NAME`,
-`NUXT_INDEXABLE`, `NUXT_URL`, `NUXT_IMAGE_CDN`) match no `runtimeConfig` path,
+The keys generated `.env` files contain today (`NUXT_ENV`,
+`NUXT_INDEXABLE`, `NUXT_IMAGE_CDN`) match no `runtimeConfig` path,
 so passing them to the process changes nothing in the layer. Downstream server
 code that reads `process.env` directly does see them.
-
-### Canonical names and accepted old names
-
-The build reads each renamed setting through one helper in
-`config/runtime.ts`: the canonical name first, then the old name; when both
-are set, the canonical name wins.
-
-| Canonical | Accepted old name | Read at |
-| --- | --- | --- |
-| `NUXT_SITE_URL` | `NUXT_URL` | Build; runtime through `NUXT_SITE_URL` only |
-| `NUXT_SITE_NAME` | `NUXT_NAME` | Build; runtime through `NUXT_SITE_NAME` (nuxt-site-config) only |
-| `NUXT_SITE_URL` host | `SERVER_DOMAIN_CLIENT` | Build (development Vite `allowedHosts`) |
-
-`NUXT_SITE_URL` and `NUXT_SITE_NAME` were already the runtime override names
-for `runtimeConfig.siteUrl` and nuxt-site-config's `site.url`/`site.name`, so
-a file that sets them now gets the same value at build and at runtime. A file
-with only the old names behaves exactly as before. `DRUPAL_URL` is already
-canonical; `DRUPAL_CDN` is unchanged.
 
 ## Proposal
 

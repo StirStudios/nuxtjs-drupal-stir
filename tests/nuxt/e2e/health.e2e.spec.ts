@@ -190,14 +190,14 @@ const normalizeNuxtPayload = (html: string) => html.replace(
 const originalEnvironment = {
   DRUPAL_API_KEY: process.env.DRUPAL_API_KEY,
   DRUPAL_URL: process.env.DRUPAL_URL,
-  NUXT_URL: process.env.NUXT_URL,
+  NUXT_SITE_URL: process.env.NUXT_SITE_URL,
   NUXT_INDEXABLE: process.env.NUXT_INDEXABLE,
   PROTECTED_PASSWORD: process.env.PROTECTED_PASSWORD,
 }
 
 process.env.DRUPAL_API_KEY = 'fixture-api-key'
 process.env.DRUPAL_URL = drupalFixtureUrl
-process.env.NUXT_URL = 'http://127.0.0.1'
+process.env.NUXT_SITE_URL = 'http://127.0.0.1'
 process.env.NUXT_INDEXABLE = 'false'
 process.env.PROTECTED_PASSWORD = 'fixture-protected-password'
 
@@ -221,7 +221,7 @@ describe('Nuxt E2E smoke', async () => {
     env: {
       DRUPAL_API_KEY: 'fixture-api-key',
       DRUPAL_URL: drupalFixtureUrl,
-      NUXT_URL: 'http://127.0.0.1',
+      NUXT_SITE_URL: 'http://127.0.0.1',
       NUXT_INDEXABLE: 'false',
       PROTECTED_PASSWORD: 'fixture-protected-password',
     },

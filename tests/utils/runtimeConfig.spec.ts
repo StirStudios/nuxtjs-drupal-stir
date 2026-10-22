@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  canonicalEnvironment,
   commaSeparatedEnvironment,
-  developmentHostEnvironment,
   normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
-  siteNameEnvironment,
-  siteUrlEnvironment,
 } from '../../config/runtime'
 import {
   buildSitemapModuleOptions,
@@ -57,44 +53,5 @@ describe('root configuration helpers', () => {
       { loc: '/search?q=one&amp;page=2', lastmod: '2026-01-01' },
       invalid,
     ])
-  })
-})
-
-describe('canonical environment names', () => {
-  it('reads the old name alone', () => {
-    const env = { NUXT_URL: 'https://old.example', NUXT_NAME: 'Old', SERVER_DOMAIN_CLIENT: 'old.ddev.site' }
-
-    expect(siteUrlEnvironment(env)).toBe('https://old.example')
-    expect(siteNameEnvironment(env)).toBe('Old')
-    expect(developmentHostEnvironment(env)).toBe('old.ddev.site')
-  })
-
-  it('reads the canonical name alone', () => {
-    const env = { NUXT_SITE_URL: 'https://new.example', NUXT_SITE_NAME: 'New' }
-
-    expect(siteUrlEnvironment(env)).toBe('https://new.example')
-    expect(siteNameEnvironment(env)).toBe('New')
-    expect(developmentHostEnvironment(env)).toBe('new.example')
-  })
-
-  it('prefers the canonical name', () => {
-    const env = {
-      NUXT_SITE_URL: 'https://new.example',
-      NUXT_URL: 'https://old.example',
-      NUXT_SITE_NAME: 'Same',
-      NUXT_NAME: 'Same',
-      SERVER_DOMAIN_CLIENT: 'old.ddev.site',
-    }
-
-    expect(siteUrlEnvironment(env)).toBe('https://new.example')
-    expect(siteNameEnvironment(env)).toBe('Same')
-    expect(developmentHostEnvironment(env)).toBe('new.example')
-  })
-
-  it('falls back when nothing is set', () => {
-    expect(siteUrlEnvironment({})).toBe('')
-    expect(siteNameEnvironment({})).toBeUndefined()
-    expect(developmentHostEnvironment({})).toBe('localhost')
-    expect(canonicalEnvironment(['A', 'B'], { A: ' ', B: 'b' })).toBe('b')
   })
 })

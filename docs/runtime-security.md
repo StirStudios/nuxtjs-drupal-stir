@@ -45,7 +45,7 @@ configured CE/menu endpoints, forwarding headers are removed, and upstream
 redirects are returned without following them with server credentials.
 
 Cookie-authenticated account mutations and paragraph updates enforce the
-`NUXT_URL` origin at the Nuxt boundary. Browser requests must provide a matching
+`NUXT_SITE_URL` origin at the Nuxt boundary. Browser requests must provide a matching
 `Origin`/`Referer` or a browser-generated `Sec-Fetch-Site: same-origin` signal.
 Public login, registration, password-request, and Webform routes keep their
 existing Turnstile/token contracts.

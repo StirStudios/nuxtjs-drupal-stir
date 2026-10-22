@@ -38,7 +38,7 @@ if (!address || typeof address === 'string') {
 // Indexability is resolved at build time from these variables.
 process.env.DRUPAL_URL = `http://127.0.0.1:${address.port}`
 process.env.NUXT_ENV = 'production'
-process.env.NUXT_URL = 'https://www.example.com'
+process.env.NUXT_SITE_URL = 'https://www.example.com'
 Reflect.deleteProperty(process.env, 'NUXT_INDEXABLE')
 
 afterAll(async () => {
@@ -58,7 +58,7 @@ describe('Indexable production website', async () => {
     browser: false,
     env: {
       DRUPAL_URL: `http://127.0.0.1:${address.port}`,
-      NUXT_URL: 'https://www.example.com',
+      NUXT_SITE_URL: 'https://www.example.com',
     },
     nuxtConfig: {
       sourcemap: { client: false, server: false },

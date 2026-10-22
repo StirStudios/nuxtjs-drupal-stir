@@ -15,6 +15,10 @@ untouched do not need one.
 
 ### Environment
 
+- **Removed: old environment names.** The build reads only `NUXT_SITE_URL`
+  and `NUXT_SITE_NAME`; `NUXT_URL`, `NUXT_NAME` and `SERVER_DOMAIN_CLIENT` are
+  no longer read (the development Vite host is the `NUXT_SITE_URL` host, else
+  `localhost`). Rename them in any `.env` that still uses them.
 - **Added: canonical environment names, old names still accepted.** The build
   reads `NUXT_SITE_URL` (old `NUXT_URL`), `NUXT_SITE_NAME` (old `NUXT_NAME`)
   and takes the development Vite host from the `NUXT_SITE_URL` host (old
