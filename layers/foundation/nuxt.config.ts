@@ -5,8 +5,11 @@ import { fileURLToPath } from 'node:url'
 import { addServerHandler, defineNuxtModule, hasNuxtModule } from '@nuxt/kit'
 import {
   commaSeparatedEnvironment,
+  developmentHostEnvironment,
   normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
+  siteNameEnvironment,
+  siteUrlEnvironment,
 } from '../../config/runtime'
 
 const resolveLayerPath = (path: string) =>
@@ -18,6 +21,7 @@ const foundationCss = fileURLToPath(
 )
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 const isDevelopment = process.env.NODE_ENV === 'development'
+const siteUrl = siteUrlEnvironment()
 const developmentNoStore = 'private, no-store, max-age=0'
 const isIndexable =
   process.env.NUXT_ENV === 'production' && process.env.NUXT_INDEXABLE !== 'false'
@@ -26,8 +30,8 @@ const isIndexable =
 // applications that omit the SEO capability as well as for full websites.
 const siteConfig = {
   site: {
-    name: process.env.NUXT_NAME,
-    url: process.env.NUXT_URL,
+    name: siteNameEnvironment(),
+    url: siteUrl || undefined,
     indexable: isIndexable,
   },
 }
@@ -110,7 +114,7 @@ export default defineNuxtConfig({
     server: {
       allowedHosts:
         isDevelopment
-          ? [process.env.SERVER_DOMAIN_CLIENT || 'localhost']
+          ? [developmentHostEnvironment()]
           : [],
       headers: isDevelopment
         ? {
@@ -161,7 +165,7 @@ export default defineNuxtConfig({
   >,
 
   runtimeConfig: {
-    siteUrl: process.env.NUXT_URL || '',
+    siteUrl,
     api: drupalUrl,
     apiKey: process.env.DRUPAL_API_KEY || '',
     drupalRequestTimeoutMs: positiveIntegerEnvironment(
