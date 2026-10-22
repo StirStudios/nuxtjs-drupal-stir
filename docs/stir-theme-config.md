@@ -801,7 +801,7 @@ hero: {
   base: 'hero flex items-center justify-center overflow-hidden',
   mediaSpacing: 'min-h-[22rem] lg:min-h-[35rem] mb-20',
   noMediaSpacing: 'pt-30 lg:pt-54',
-  overlay: 'relative min-h-[22rem] lg:min-h-[35rem] after:to-bg-black-10 after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-gradient-to-b after:from-black/80 after:via-black/50',
+  overlay: 'relative min-h-[22rem] lg:min-h-[35rem] after:to-bg-black-10 after:absolute after:inset-0 after:z-auto after:h-full after:w-full after:bg-linear-to-b after:from-black/80 after:via-black/50',
   isFront: 'h-screen',
   image: {
 	base: 'absolute min-h-full w-auto max-w-none min-w-full',
@@ -874,10 +874,10 @@ routeHero: {
   routes: [], // RouteHeroDefinition[]: { path, title, eyebrow, description, actions, image, variant, ... }
   base: 'route-hero relative isolate',
   band: 'route-hero-band isolate overflow-hidden',
-  surface: 'bg-gradient-to-b from-gray-900 via-gray-800 to-black', // replaced by a hero's surfaceClass
+  surface: 'bg-linear-to-b from-gray-900 via-gray-800 to-black', // replaced by a hero's surfaceClass
   visual: 'absolute inset-x-0 top-0 -z-10 h-[calc(100%+7rem)]',
-  image: 'inset-0 !h-full !w-full !object-cover',
-  overlay: 'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/80 via-black/50 to-black/20',
+  image: 'inset-0 h-full! w-full! object-cover!',
+  overlay: 'pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/80 via-black/50 to-black/20',
   container: 'relative z-10 mx-auto w-full max-w-(--ui-container) px-4 md:px-5 lg:px-8',
   content: 'flex flex-col gap-[var(--stir-content-action-gap,1.5rem)]',
   eyebrow: 'mb-0 text-sm font-semibold tracking-[0.1em] uppercase',
@@ -974,9 +974,9 @@ card: {
   effect: 'absolute top-0 left-1/2 -z-10 -translate-x-1/2 blur-3xl xl:-top-6',
 },
 gradients: {
-  1: 'bg-gradient-to-tr from-[#f35b0f] to-[#6b4ef2]',
-  2: 'bg-gradient-to-r from-[#ff7f50] to-[#1e90ff]',
-  3: 'bg-gradient-to-b from-[#7b2ff7] to-[#e53e3e]',
+  1: 'bg-linear-to-tr from-[#f35b0f] to-[#6b4ef2]',
+  2: 'bg-linear-to-r from-[#ff7f50] to-[#1e90ff]',
+  3: 'bg-linear-to-b from-[#7b2ff7] to-[#e53e3e]',
 },
 ```
 

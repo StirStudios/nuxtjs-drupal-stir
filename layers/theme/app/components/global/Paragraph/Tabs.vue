@@ -53,38 +53,18 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
         :items="items"
         :orientation="orientation"
         :ui="{
-          root: 'app-tabs items-start gap-2 m-auto w-full',
+          root: 'app-tabs items-start gap-2 m-auto w-full data-[orientation=horizontal]:overflow-y-clip',
           list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
-          content: 'flex-1 min-w-0',
+          content: 'flex-1 min-w-0 [&_ul]:pt-0 [&_p]:pb-0',
           trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
           indicator: 'bg-primary',
         }"
         variant="link"
       >
         <template #content>
-          <div class="tab-content">
-            <component :is="activeTabNode" v-if="activeTabNode" />
-          </div>
+          <component :is="activeTabNode" v-if="activeTabNode" />
         </template>
       </UTabs>
     </PageRevealScope>
   </ParagraphReveal>
 </template>
-
-<style scoped>
-@reference "~/assets/css/main.css";
-
-.tab-content {
-  :deep(ul) {
-    @apply pt-0;
-  }
-
-  :deep(p) {
-    @apply pb-0;
-  }
-}
-
-:deep(.app-tabs[data-orientation='horizontal']) {
-  @apply overflow-y-clip;
-}
-</style>

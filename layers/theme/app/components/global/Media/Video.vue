@@ -322,7 +322,7 @@ watch(
   >
     <div
       v-if="isProcessing"
-      class="relative flex aspect-[16/9] w-full flex-col items-center justify-center rounded-lg bg-gradient-to-br from-slate-700 to-zinc-800"
+      class="relative flex aspect-[16/9] w-full flex-col items-center justify-center rounded-lg bg-linear-to-br from-slate-700 to-zinc-800"
     >
       <UIcon class="mb-2 size-16 text-white" name="i-lucide-clock" />
       <span class="text-lg font-semibold text-white">

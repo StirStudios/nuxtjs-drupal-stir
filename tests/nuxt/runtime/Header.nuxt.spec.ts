@@ -174,7 +174,7 @@ describe('App header', () => {
     expect(contentClasses).toContain('project-panel')
     expect(contentClasses).toContain('stir-menu-panel')
     expect(slideover.props('ui').overlay).toContain('stir-menu-overlay')
-    expect(contentClasses).not.toContain('!bg-default')
+    expect(contentClasses).not.toContain('bg-default!')
     expect(contentClasses).not.toContain('lg:hidden')
     expect(wrapper.get('[data-test="toggle-icon"]').attributes('data-open')).toBe('false')
     await toggle.trigger('click')
