@@ -121,7 +121,7 @@ export default defineAppConfig({
       noMediaSpacing:
         'pt-[calc(var(--ui-header-height)_+_1rem)] lg:pt-[max(calc(var(--ui-header-height)_+_1rem),13.5rem)]',
       noMediaFallback:
-        'dark text-default bg-linear-to-b from-gray-900 via-gray-800 to-black/70',
+        'dark text-default bg-linear-to-b from-neutral-900 via-neutral-800 to-black/70',
       overlay:
         'after:absolute after:inset-0 after:z-auto after:bg-linear-to-b after:from-black/80 after:via-black/50 after:to-black/10',
       isFront: 'h-screen',
@@ -159,7 +159,7 @@ export default defineAppConfig({
       routes: [],
       base: 'route-hero relative isolate',
       band: 'route-hero-band isolate overflow-hidden',
-      surface: 'bg-linear-to-b from-gray-900 via-gray-800 to-black',
+      surface: 'bg-linear-to-b from-neutral-900 via-neutral-800 to-black',
       visual: 'absolute inset-x-0 top-0 -z-10 h-[calc(100%+7rem)]',
       image: 'inset-0 h-full! w-full! object-cover!',
       overlay:
