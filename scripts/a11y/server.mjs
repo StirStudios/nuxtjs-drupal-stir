@@ -290,7 +290,7 @@ const nuxtEnvironment = {
   ...process.env,
   DRUPAL_URL: `http://${host}:${address.port}`,
   NUXT_INDEXABLE: 'false',
-  NUXT_URL: `http://${host}:${nuxtPort}`,
+  NUXT_SITE_URL: `http://${host}:${nuxtPort}`,
 }
 const build = spawn(
   packageManager.command,

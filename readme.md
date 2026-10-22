@@ -282,14 +282,13 @@ attributes above; the harness does not depend on project-specific components.
 - `WEBFORM_MAX_FILE_BYTES`: Maximum size of one webform upload (default: `5242880`, 5 MB)
 - `WEBFORM_MAX_FILES`: Maximum files per webform submission (default: `5`)
 - `WEBFORM_MAX_FIELDS`: Maximum non-file multipart fields per submission (default: `100`)
-- `NUXT_SITE_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com` (old name `NUXT_URL` still accepted; the canonical name wins)
-- `NUXT_SITE_NAME`: Site name used in SEO/meta defaults (old name `NUXT_NAME` still accepted)
+- `NUXT_SITE_URL`: Public site URL used by SEO modules, e.g. `https://www.example.com`
+- `NUXT_SITE_NAME`: Site name used in SEO/meta defaults
 - `NUXT_ENV`: Environment label (for example `development`, `staging`, `production`); only a `production` build that includes the SEO capability can be indexable. Any other value shows a red "<Environment> site" badge beside Drupal CMS in the editorial tabs, so editors never mistake a local or development site for the live one; visitors, including clients reviewing a development site, never see it; unset means `development`
 - `NUXT_INDEXABLE`: Set to `'false'` to temporarily hide a website (a composition with the SEO capability) even when `NUXT_ENV=production`. Applications without the SEO capability are never indexable and do not need it
 - `DRUPAL_CDN`: Optional public file host, when it differs from `NUXT_IMAGE_CDN`. Its host is trusted as an IPX source alongside `DRUPAL_URL` and `NUXT_IMAGE_CDN`
 - `NUXT_PUBLIC_CALCULATOR_LOADER_URL`: Staging and local only. Points the calculator paragraph's widget at a non-production loader; production uses the address in the site's `nuxt.config.ts`, and a production build fails if this is set
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required. Its host is also trusted as an IPX source, so the Drupal file URLs `stir_cdn` writes to the same zone are resized
-- `SERVER_DOMAIN_CLIENT`: Old name for the development-only host allowed by the Vite dev server; the layer now uses the `NUXT_SITE_URL` host when that is set
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
@@ -310,7 +309,7 @@ Notes:
 - Every composition (root, presets, and individual capability layers) registers `@nuxtjs/robots` through the foundation layer. A composition without the SEO capability, including `presets/minimal`, is in application mode and never indexable. When `site.indexable` is false, responses carry `X-Robots-Tag: noindex, nofollow`, `/robots.txt` disallows every crawler, and documents, including `ssr: false` ones, get a noindex robots meta tag.
 - When the SEO capability is selected, sitemap routes remain registered in non-indexable environments so `/sitemap.xml` can be checked during development and staging; non-indexing is controlled separately through `site.indexable`/robots behavior. Without the SEO capability, `/sitemap.xml`, `/sitemap_index.xml` and `/__sitemap__/**` return a plain 404.
 - Auth/session source of truth is server endpoint `/api/auth/session`.
-- Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_URL`.
+- Cookie-authenticated account changes and paragraph updates require same-origin browser evidence based on `NUXT_SITE_URL`.
 
 ## Auth + Account Integration (stir_account)
 

@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 })
 ```
 
-Set `DRUPAL_URL` to the Drupal origin, `DRUPAL_API_KEY` to the private CE/API credential and `NUXT_URL` to the public frontend origin. Configure `NUXT_NAME`, `NUXT_ENV`, `NUXT_INDEXABLE`, `SERVER_DOMAIN_CLIENT` and, when forms/auth require CAPTCHA, `TURNSTILE_KEY` and private `TURNSTILE_SECRET` as documented in the [environment reference](../readme.md#-environment-variables). Never put the API key or Turnstile secret in `runtimeConfig.public`.
+Set `DRUPAL_URL` to the Drupal origin, `DRUPAL_API_KEY` to the private CE/API credential and `NUXT_SITE_URL` to the public frontend origin. Configure `NUXT_SITE_NAME`, `NUXT_ENV`, `NUXT_INDEXABLE` and, when forms/auth require CAPTCHA, `TURNSTILE_KEY` and private `TURNSTILE_SECRET` as documented in the [environment reference](../readme.md#-environment-variables). Never put the API key or Turnstile secret in `runtimeConfig.public`.
 
 `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL` and `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL` can override Drupal origins at runtime. Match them deliberately to the deployment; don't ship localhost/DDEV values to production. The CE format remains `explicit`, and the existing CE/menu endpoints remain unchanged.
 
