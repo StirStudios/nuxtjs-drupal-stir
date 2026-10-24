@@ -291,6 +291,7 @@ attributes above; the harness does not depend on project-specific components.
 - `NUXT_IMAGE_CDN`: Optional absolute CDN origin for Nuxt/IPX derivatives, e.g. `https://images.example.com`; its pull origin must be the Nuxt application and Bunny Optimizer is not required. Its host is also trusted as an IPX source, so the Drupal file URLs `stir_cdn` writes to the same zone are resized
 - `NUXT_PUBLIC_PLAUSIBLE_DOMAIN`: Public Plausible site domain override, e.g. `example.com`
 - `NUXT_PUBLIC_PLAUSIBLE_API_HOST`: Public Plausible API host override, e.g. `https://analytics.example.com`
+- `NUXT_PUBLIC_ERRORS_DSN`: The site's GlitchTip address, e.g. `https://<key>@errors.example.com/<project id>`. Empty (the default) turns error reporting off. The key is public by design. Browser reports also need consent for non-essential scripts. Optional `NUXT_PUBLIC_ERRORS_ENVIRONMENT` (defaults to `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision)
 - `TURNSTILE_KEY`: Cloudflare Turnstile site key (public widget key)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key (server-side verification)
 
