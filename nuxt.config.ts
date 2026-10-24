@@ -18,5 +18,6 @@ export default defineNuxtConfig({
     './layers/scripts',
     './layers/webform',
     './layers/auth',
+    './layers/errors',
   ],
 })

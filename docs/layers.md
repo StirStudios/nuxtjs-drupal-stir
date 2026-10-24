@@ -10,6 +10,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 - `layers/editorial`: authenticated Drupal editing controls and local tasks.
 - `layers/integrations`: optional popup/privacy UI and the shared consent policy used by analytics and trusted scripts.
 - `layers/analytics`: optional Plausible integration.
+- `layers/errors`: optional error reporting to GlitchTip (a Sentry-compatible tracker), switched on per site by `NUXT_PUBLIC_ERRORS_DSN`.
 - `layers/scripts`: optional third-party script integrations.
 - `layers/diagnostics`: repository-only performance analysis selected explicitly by maintainers; never registered by installed consumers.
 - `server/utils`: shared Nitro utilities used by multiple layers when behavior must stay identical across boundaries.

@@ -13,6 +13,18 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Added: `layers/errors`, error reporting to GlitchTip (Sentry-compatible).**
+  Part of the full preset; off until the site sets `NUXT_PUBLIC_ERRORS_DSN`
+  (`https://<key>@errors.example.com/<project id>`; optional
+  `NUXT_PUBLIC_ERRORS_ENVIRONMENT` and `NUXT_PUBLIC_ERRORS_RELEASE`). Server
+  errors with status 500 and up are sent by a Nitro plugin, and uncaught
+  browser errors once consent allows non-essential scripts, both with a plain
+  `fetch` to GlitchTip's envelope endpoint (path only, throttled; no SDK and
+  no new dependency). Name the GlitchTip project after the site's system user
+  so the Stir dashboard can match it.
+
 ### Theme
 
 - **Added: `useCurrentYear()`.** Returns the copyright year, corrected in the
