@@ -20,6 +20,12 @@ every site before any is switched on.
   `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision, so an
   error maps to a deploy).
 
+Turning it on for a live site: set the DSN in the site's runtime `.env`
+(`shared/.env`; no rebuild), restart the site (`stir nuxt restart <site>`),
+then clear that site's Nuxt Varnish cache, or cached pages keep the empty
+setting until they expire (`varnishadm -n /var/lib/varnish-nuxt ban
+'obj.http.X-Host ~ "example.com$"'`).
+
 Name the GlitchTip project after the site's system user (for example
 `examplesite`): the Stir dashboard matches a site's open errors to its project by
 that name. Drupal sites report PHP errors with the Raven module instead.
