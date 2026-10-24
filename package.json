@@ -190,7 +190,7 @@
     "@tiptap/extension-paragraph": "^3.32.0",
     "@tiptap/extension-text": "^3.32.0",
     "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "@vue/test-utils": "^2.5.1",
     "ajv": "6.15.0",
     "chrome-launcher": "^1.2.2",
