@@ -1,6 +1,7 @@
 import {
   buildEvent,
   createThrottle,
+  isAutomatedVisitor,
   isIgnoredBrowserError,
   parseDsn,
   sendEvent,
@@ -17,7 +18,7 @@ export default defineNuxtPlugin({
     const config = useRuntimeConfig().public.errors as { dsn?: string, environment?: string, release?: string } | undefined
     const dsn = parseDsn(config?.dsn)
 
-    if (!dsn) return
+    if (!dsn || isAutomatedVisitor(navigator.userAgent, navigator.webdriver)) return
 
     const { allowsNonEssential } = usePrivacyConsent()
     const allow = createThrottle()
