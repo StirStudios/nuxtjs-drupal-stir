@@ -10,7 +10,7 @@ import {
 
 const { iconsSocialConfig } = useSocialIcons()
 const { siteInfo, footerMenuItems } = useFooterData()
-const currentYear = new Date().getFullYear()
+const currentYear = useCurrentYear()
 
 const theme = computed(() => toThemeRecord(useAppConfig().stirTheme))
 const themeNavigation = computed(() => toThemeRecord(theme.value.navigation))
@@ -60,7 +60,7 @@ const footerAtomProps = computed(() => ({
   showPoweredBy: footerConfig.value.showPoweredBy,
   showLogo: showLogo.value,
   toMail: toMailto.value,
-  year: currentYear,
+  year: currentYear.value,
 }))
 
 // Stacked keeps only the centre slot, and Nuxt UI's lg:justify-between would
