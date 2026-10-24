@@ -15,6 +15,11 @@ untouched do not need one.
 
 ### Theme
 
+- **Changed: media modal image sizes.** Gallery modal images use a new
+  `modal` delivery profile (`sm:100vw lg:1152px`, the modal frame's width)
+  instead of `full`, and only the active slide and its neighbours mount
+  their media, so opening a large gallery no longer requests every image at
+  2560px.
 - **Changed: hero fallback colours.** The no-media hero and route hero
   surfaces use the site's `neutral` palette (`from-neutral-900 via-neutral-800`)
   instead of fixed grey, so they follow each site's neutral colour.

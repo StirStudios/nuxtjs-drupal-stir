@@ -36,7 +36,7 @@ describe('useMediaModal', () => {
         src: '/small.jpg',
         originalSrc: '/original.jpg',
         originalRevision: '1-2-3',
-        deliveryProfile: 'full',
+        deliveryProfile: 'modal',
       },
       {
         key: '2',

@@ -267,6 +267,8 @@ export default defineAppConfig({
           split: 'sm:100vw md:50vw xl:600px',
           splitFull: 'sm:100vw md:50vw',
           card: 'sm:100vw md:50vw lg:33vw xl:400px',
+          // The media modal frame is at most 72rem wide.
+          modal: 'sm:100vw lg:1152px',
         },
       },
       rounded: 'rounded-xl',
