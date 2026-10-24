@@ -14,11 +14,22 @@ every site before any is switched on.
   non-essential scripts (the same policy as analytics). Only the path leaves
   the server or the page (never the query string, headers, cookies or request
   bodies), the same error counts once a minute, a runaway loop is capped, and
-  scripts from other sites and browser extensions are ignored. Stack traces
+  scripts from other sites and browser extensions are ignored. Crawlers, page
+  checkers and automated browsers (by user agent or `navigator.webdriver`) send
+  nothing from the browser; the server only reports status 500 and up, so
+  their 404s never count. A failed chunk import from a normal browser is still
+  reported once (a stale tab after a deploy), however many Nuxt, Vue and window
+  handlers raise it. Stack traces
   from the browser are minified; there are no source maps.
 - **Environment and release:** `NUXT_PUBLIC_ERRORS_ENVIRONMENT` (defaults to
   `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision, so an
   error maps to a deploy).
+
+Turning it on for a live site: set the DSN in the site's runtime `.env`
+(`shared/.env`; no rebuild), restart the site (`stir nuxt restart <site>`),
+then clear that site's Nuxt Varnish cache, or cached pages keep the empty
+setting until they expire (`varnishadm -n /var/lib/varnish-nuxt ban
+'obj.http.X-Host ~ "example.com$"'`).
 
 Name the GlitchTip project after the site's system user (for example
 `examplesite`): the Stir dashboard matches a site's open errors to its project by

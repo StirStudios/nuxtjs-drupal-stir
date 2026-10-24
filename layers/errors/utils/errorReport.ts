@@ -173,3 +173,11 @@ export function isIgnoredBrowserError(error: Error, source?: string, origin?: st
   // A script from another site or an extension, not from this one.
   return Boolean(source && origin && !source.startsWith(origin))
 }
+
+// Crawlers, page checkers and automation: a script they give up loading is
+// not a visitor's problem, and every connected site would collect them.
+const AUTOMATED_USER_AGENT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headlesschrome|phantomjs|prerender|facebookexternalhit|preview/i
+
+export function isAutomatedVisitor(userAgent?: string, webdriver?: boolean): boolean {
+  return webdriver === true || AUTOMATED_USER_AGENT.test(userAgent || '')
+}

@@ -15,6 +15,11 @@ untouched do not need one.
 
 ### Errors
 
+- **Changed: the browser reporter skips automated visitors.** Crawlers,
+  page checkers (Lighthouse, PageSpeed, headless browsers) and
+  `navigator.webdriver` visitors report nothing, so their failed script loads
+  don't create issues. Normal browsers still report, including a failed
+  dynamic import, counted once a minute.
 - **Added: `layers/errors`, error reporting to GlitchTip (Sentry-compatible).**
   Part of the full preset; off until the site sets `NUXT_PUBLIC_ERRORS_DSN`
   (`https://<key>@errors.example.com/<project id>`; optional
