@@ -15,6 +15,10 @@ untouched do not need one.
 
 ### Theme
 
+- **Added: `useCurrentYear()`.** Returns the copyright year, corrected in the
+  browser on mount so a cached page doesn't show last year after 1 January.
+  The layer footer uses it; site footers that compute
+  `new Date().getFullYear()` themselves should switch to it.
 - **Changed: media modal image sizes.** Gallery modal images use a new
   `modal` delivery profile (`sm:100vw lg:1152px`, the modal frame's width)
   instead of `full`, and only the active slide and its neighbours mount
