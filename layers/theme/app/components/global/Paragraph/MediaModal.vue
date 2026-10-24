@@ -70,6 +70,15 @@ const { handleCarouselSelect } = useModalMediaPlayback({
   },
 })
 
+// Only the active slide and its neighbours mount media, so opening a large
+// gallery doesn't request every image at once.
+function isNearActive(index: number): boolean {
+  const count = props.items.length
+  const distance = Math.abs(index - props.activeIndex)
+
+  return Math.min(distance, count - distance) <= 1
+}
+
 function mediaComponentFor(type: unknown) {
   return drupalMediaComponentName(type)
 }
@@ -146,13 +155,14 @@ function closeModal(): void {
         }"
         @select="handleCarouselSelect"
       >
-        <template #default="{ item }">
+        <template #default="{ item, index }">
           <div
             :class="['mx-auto overflow-hidden', theme.media.rounded]"
             :style="mediaFrameStyle(item)"
           >
             <component
               :is="mediaComponentFor(item.type)"
+              v-if="isNearActive(index)"
               :key="item.key"
               class="shadow-2xl"
               v-bind="{

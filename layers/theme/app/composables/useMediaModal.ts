@@ -26,7 +26,7 @@ export function useMediaModal(
       const src = typeof props.src === 'string' ? props.src : undefined
       const item: ModalMediaItem = {
         ...props,
-        deliveryProfile: type === 'image' ? 'full' : props.deliveryProfile,
+        deliveryProfile: type === 'image' ? 'modal' : props.deliveryProfile,
         key: mid ?? src ?? `${type}-${i}`,
         type,
       }
