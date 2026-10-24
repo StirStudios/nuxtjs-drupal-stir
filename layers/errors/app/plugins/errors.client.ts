@@ -5,7 +5,7 @@ import {
   parseDsn,
   sendEvent,
   toError,
-} from '../../shared/utils/errorReport'
+} from '../../utils/errorReport'
 
 // Reports browser errors (uncaught errors, unhandled rejections and Vue
 // errors) to the site's GlitchTip, with the same small reporter the server

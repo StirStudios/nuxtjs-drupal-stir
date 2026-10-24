@@ -5,7 +5,8 @@ error tracker). It does nothing until the site sets `NUXT_PUBLIC_ERRORS_DSN`
 (`https://<key>@errors.example.com/<project id>`), so extending it is safe on
 every site before any is switched on.
 
-- **Server and browser:** one small reporter (`shared/utils/errorReport.ts`)
+- **Server and browser:** one small reporter (`utils/errorReport.ts`, outside
+  the auto-imported folders so its names stay out of sites' auto-imports)
   sends errors with a plain `fetch` to GlitchTip's envelope endpoint: no SDK, no
   extra dependency, nothing downloaded. The server reports errors with status
   500 and up (render and API failures); the browser reports uncaught errors,

@@ -9,7 +9,7 @@ import {
   sendEvent,
   shouldReport,
   toError,
-} from '../../layers/errors/shared/utils/errorReport'
+} from '../../layers/errors/utils/errorReport'
 
 describe('error report DSN', () => {
   it('reads GlitchTip addresses', () => {

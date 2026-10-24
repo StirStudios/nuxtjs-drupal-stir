@@ -1,4 +1,4 @@
-import { buildEvent, createThrottle, parseDsn, sendEvent, shouldReport } from '../../shared/utils/errorReport'
+import { buildEvent, createThrottle, parseDsn, sendEvent, shouldReport } from '../../utils/errorReport'
 
 // Server errors (render and API failures, status 500 and up) go to the site's
 // GlitchTip. No DSN, no plugin work.
