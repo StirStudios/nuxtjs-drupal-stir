@@ -21,7 +21,7 @@ every site before any is switched on.
   error maps to a deploy).
 
 Name the GlitchTip project after the site's system user (for example
-`danceplug`): the Stir dashboard matches a site's open errors to its project by
+`examplesite`): the Stir dashboard matches a site's open errors to its project by
 that name. Drupal sites report PHP errors with the Raven module instead.
 
 It is included by the full compatibility preset and excluded from the minimal
