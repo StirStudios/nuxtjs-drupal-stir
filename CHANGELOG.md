@@ -15,6 +15,13 @@ untouched do not need one.
 
 ### Theme
 
+- **Fixed: a View keeps its Drupal spacing when the site renders its own
+  grid.** Spacing was applied only through the layer's default grid, so a
+  View component using the `#grid` slot lost it. The View's section now takes
+  the spacing in that case; Views on the default grid are unchanged.
+
+### Theme
+
 - **Fixed: buttons in an action group line up.** Only the button right after
   a Layout's text got the gap below it, so in a row of buttons the first sat
   lower than the rest. Every button after the text in an action group now

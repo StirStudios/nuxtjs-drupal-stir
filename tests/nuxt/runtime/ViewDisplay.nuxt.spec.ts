@@ -3,6 +3,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
 import { h, nextTick } from 'vue'
 import type { DrupalViewControlsSlotProps } from '../../../layers/theme/app/types/View'
+import DrupalViewDisplay from '../../../layers/theme/app/components/Drupal/ViewDisplay.vue'
 import DrupalViewDefault from '../../../layers/theme/app/components/global/drupal-view--default.vue'
 
 const state = vi.hoisted(() => ({
@@ -88,6 +89,22 @@ describe('DrupalViewDisplay controls slot (Nuxt runtime)', () => {
     state.api.mockReset()
     sessionStorage.clear()
     await useRouter().replace({ path: '/' })
+  })
+
+  it('keeps Drupal spacing on a View whose site renders its own grid', async () => {
+    const withGrid = await mountSuspended(DrupalViewDisplay, {
+      route: '/work',
+      props: { ...viewProps, spacing: 'pt-5 pb-5' },
+      slots: { grid: () => h('div', { class: 'site-grid' }) },
+    })
+    const withoutGrid = await mountSuspended(DrupalViewDisplay, {
+      route: '/work',
+      props: { ...viewProps, spacing: 'pt-5 pb-5' },
+    })
+
+    expect(withGrid.get('section').classes()).toEqual(expect.arrayContaining(['pt-5', 'pb-5']))
+    // The default grid applies it itself, so the View stays as it was.
+    expect(withoutGrid.get('section').classes()).not.toContain('pt-5')
   })
 
   it('keeps the default controls when no slot is provided', async () => {
