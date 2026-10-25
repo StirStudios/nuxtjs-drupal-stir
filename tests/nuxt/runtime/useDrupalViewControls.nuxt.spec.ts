@@ -76,6 +76,27 @@ const InitialViewControlsHarness = defineComponent({
   template: '<div :data-page="currentPage">{{ dynamicRows?.[0]?.props?.id }}</div>',
 })
 
+const DateRangeViewControlsHarness = defineComponent({
+  async setup() {
+    const controls = useDrupalViewControls({
+      ...viewProps,
+      exposedFilters: [{
+        label: 'Week',
+        queryParamName: 'date',
+        type: 'date_range',
+        options: {},
+        submittedValues: [],
+      }],
+      exposedSorts: [],
+    })
+
+    await controls.resolveInitialView()
+
+    return controls
+  },
+  template: '<div>{{ dynamicRows?.[0]?.props?.id }}</div>',
+})
+
 const LegacyViewControlsHarness = defineComponent({
   setup() {
     const { paragraphId: _paragraphId, ...legacyProps } = viewProps
@@ -364,6 +385,22 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
       }),
     )
     expect(state.api).toHaveBeenCalledTimes(1)
+  })
+
+  it('resolves both dates of a date range from the URL during the initial render', async () => {
+    state.api.mockResolvedValue(viewResponse(0, 'next-week'))
+
+    const wrapper = await mountSuspended(DateRangeViewControlsHarness, {
+      route: '/work?testimonials_p42_date[]=2026-10-26&testimonials_p42_date[]=2026-11-02',
+    })
+
+    expect(wrapper.text()).toBe('next-week')
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/42',
+      expect.objectContaining({
+        query: expect.objectContaining({ 'date[]': ['2026-10-26', '2026-11-02'] }),
+      }),
+    )
   })
 
   it('keeps the server render when the URL has no View controls', async () => {

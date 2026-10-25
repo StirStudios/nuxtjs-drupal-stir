@@ -58,6 +58,13 @@ const wizardPages = computed(() =>
   resolveWizardPages(props.fields, props.orderedFieldNames, props.state),
 )
 const isWizard = computed(() => wizardPages.value.length > 0)
+const stepperItems = computed(() =>
+  wizardPages.value.map((page, index) => ({
+    value: index,
+    title: page.title ?? `Step ${index + 1}`,
+    disabled: index > pageIndex.value,
+  })),
+)
 const pageIndex = ref(0)
 const currentPage = computed(() =>
   wizardPages.value[Math.min(pageIndex.value, wizardPages.value.length - 1)],
@@ -144,8 +151,15 @@ defineExpose({
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
-    <div v-if="isWizard && currentPage" class="flex flex-col gap-1">
-      <p aria-live="polite" class="text-sm text-muted">
+    <div v-if="isWizard && currentPage" class="flex flex-col gap-4">
+      <!-- Steps already passed can be revisited; later ones open with Next. -->
+      <UStepper
+        :items="stepperItems"
+        :model-value="pageIndex"
+        size="sm"
+        @update:model-value="(index) => typeof index === 'number' && index < pageIndex && goToPage(index)"
+      />
+      <p aria-live="polite" class="sr-only">
         Step {{ pageIndex + 1 }} of {{ wizardPages.length }}
       </p>
       <h2
