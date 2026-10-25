@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { flattenWebformFields } from '../../layers/webform/app/utils/flattenWebformFields'
-import { resolveWizardPages, wizardPageFieldNames } from '../../layers/webform/app/utils/webformWizard'
+import { hasLaterWizardPage, resolveWizardPages, wizardPageFieldNames } from '../../layers/webform/app/utils/webformWizard'
 import type { WebformFieldProps } from '../../layers/theme/app/types/Form'
 
 // A booking-style wizard: a chooser page, then pages shown only for one path.
@@ -61,6 +61,12 @@ describe('wizard pages', () => {
     expect(resolveWizardPages(fields, names, { path: 'book' }).map((page) => page.key)).toEqual(['start', 'when'])
     expect(resolveWizardPages(fields, names, { path: 'info' }).map((page) => page.key)).toEqual(['start', 'inquiry'])
     expect(resolveWizardPages(fields, names, { path: '' }).map((page) => page.key)).toEqual(['start'])
+  })
+
+  it('knows a hidden page still comes after the chooser', () => {
+    expect(hasLaterWizardPage(fields, names, 'start')).toBe(true)
+    expect(hasLaterWizardPage(fields, names, 'inquiry')).toBe(false)
+    expect(hasLaterWizardPage(fields, names, undefined)).toBe(false)
   })
 
   it('lists the fields on one page', () => {

@@ -35,3 +35,19 @@ export function wizardPageFieldNames(
 ): string[] {
   return orderedFieldNames.filter((fieldName) => fields[fieldName]?.page?.key === pageKey)
 }
+
+/**
+ * Whether the form declares a wizard page after this one, visible or not. A
+ * page hidden until an earlier answer (a path chooser) still comes later, so
+ * the current page offers Next, not Submit.
+ */
+export function hasLaterWizardPage(
+  fields: Record<string, PagedField>,
+  orderedFieldNames: string[],
+  pageKey: string | undefined,
+): boolean {
+  const keys = [...new Set(orderedFieldNames.map((fieldName) => fields[fieldName]?.page?.key).filter(Boolean))]
+  const index = pageKey ? keys.indexOf(pageKey) : -1
+
+  return index >= 0 && index < keys.length - 1
+}

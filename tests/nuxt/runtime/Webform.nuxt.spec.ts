@@ -327,6 +327,46 @@ describe('Webform (Nuxt runtime)', () => {
     expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
   })
 
+  it('offers Next, not Submit, on a chooser whose answer reveals the later pages', async () => {
+    const onlyFor = (value: string) => ({
+      '#states': { visible: { ':input[name="path"]': { value } } },
+      '#conditions': [{ state: 'visible', logic: 'and', rules: [{ name: 'path', selector: ':input[name="path"]', triggers: [{ trigger: 'value', value }] }] }],
+    })
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            start: {
+              '#type': 'webform_wizard_page',
+              '#name': 'start',
+              '#title': 'Get started',
+              children: {
+                path: { '#type': 'radio', '#name': 'path', '#title': 'Path', '#required': true, '#options': { book: 'Book', info: 'Info' }, '#optionKeys': ['book', 'info'] },
+              },
+            },
+            book: {
+              '#type': 'webform_wizard_page',
+              '#name': 'book',
+              '#title': 'Book',
+              children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes', ...onlyFor('book') } },
+            },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(false)
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Next')).toBe(true)
+
+    wrapper.findComponent(WebformContent).props('state').path = 'book'
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Step 1 of 2')
+  })
+
   it('does not submit display-only markup as an empty field', async () => {
     runtime.fetch.mockClear()
     runtime.fetch.mockResolvedValue(undefined)
