@@ -24,6 +24,7 @@ export default defineAppConfig({
       help: 'text-muted my-3 text-sm',
       submitAlign: '',
       submitComponent: '',
+      fieldComponents: {},
       buttonClass: '',
       submitButtonSize: '2xl',
     },

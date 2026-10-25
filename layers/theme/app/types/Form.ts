@@ -28,6 +28,7 @@ export type InputType =
   | 'address'
   | 'datetime'
   | 'section'
+  | 'webform_wizard_page'
   | 'file'
   | 'managed_file'
   | 'webform_document_file'

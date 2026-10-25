@@ -15,6 +15,19 @@ untouched do not need one.
 
 ### Webform
 
+- **Added: Webform wizard pages.** A form built from Drupal wizard pages
+  (`webform_wizard_page`) now shows one page at a time with a step counter, the
+  page title (focused on each step) and Back and Next buttons using the labels
+  set in Drupal. Next validates the current page; the last page submits every
+  value once. Pages whose fields are hidden by conditions are skipped. Forms
+  without wizard pages render exactly as before. Flattened fields carry their
+  wizard page as `page`; new exports `resolveWizardPages()` and
+  `wizardPageFieldNames()` in `utils/webformWizard`. Requires the Stir Tools
+  contract 1.37.0 labels (`#prevButtonLabel`, `#nextButtonLabel`).
+- **Added: `stirTheme.webform.fieldComponents`.** Maps a Webform element name
+  to a globally registered component that renders that one field inside the
+  layer's form field (label, conditions and validation unchanged), for a
+  site-specific widget. Unset or unresolved names keep the layer's field.
 - **Changed: a URL confirmation follows the URL Drupal resolved for the
   submission.** After a successful submit, `WebformForm` redirects to the
   `confirmation_url` in the submit response when there is one, falling back to

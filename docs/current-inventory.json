@@ -452,7 +452,8 @@
       "layers/webform/app/utils/webformRedirect.ts",
       "layers/webform/app/utils/webformScrollToTop.ts",
       "layers/webform/app/utils/webformState.ts",
-      "layers/webform/app/utils/webformSubmissionErrors.ts"
+      "layers/webform/app/utils/webformSubmissionErrors.ts",
+      "layers/webform/app/utils/webformWizard.ts"
     ],
     "plugins": [
       "layers/analytics/app/plugins/plausible-config-bridge.client.ts",
@@ -838,7 +839,8 @@
         "layers/webform/app/utils/webformRedirect.ts",
         "layers/webform/app/utils/webformScrollToTop.ts",
         "layers/webform/app/utils/webformState.ts",
-        "layers/webform/app/utils/webformSubmissionErrors.ts"
+        "layers/webform/app/utils/webformSubmissionErrors.ts",
+        "layers/webform/app/utils/webformWizard.ts"
       ]
     },
     "candidateDeprecations": [
@@ -850,13 +852,13 @@
   "counts": {
     "components": 139,
     "composables": 74,
-    "utils": 78,
+    "utils": 79,
     "plugins": 11,
     "middleware": 5,
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 247,
+    "tests": 248,
     "testsByArea": {
       "composables": 13,
       "contracts": 2,
@@ -864,7 +866,7 @@
       "scripts": 6,
       "server": 34,
       "unit": 12,
-      "utils": 71
+      "utils": 72
     }
   },
   "tests": [
@@ -1114,6 +1116,7 @@
     "tests/utils/webformRedirect.spec.ts",
     "tests/utils/webformScrollToTop.spec.ts",
     "tests/utils/webformSubmissionErrors.spec.ts",
+    "tests/utils/webformWizard.spec.ts",
     "tests/utils/writeFileIfChanged.spec.ts"
   ],
   "documentedPublicContract": {
