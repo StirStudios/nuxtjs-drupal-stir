@@ -15,6 +15,12 @@ untouched do not need one.
 
 ### Webform
 
+- **Fixed: Back reaches a wizard's chooser page.** A page that moves on when
+  its one radio question is answered moved on again as soon as Back showed it
+  with its earlier answer; it now moves on only for an answer given there.
+
+### Webform
+
 - **New: `prefill` on the webform paragraph and `WebformForm`.** Values for
   fields Drupal lets the URL fill (`#prepopulate`), applied the same way and
   over the URL's, for a form opened somewhere other than its own page (a
