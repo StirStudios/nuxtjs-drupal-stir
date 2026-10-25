@@ -22,6 +22,8 @@ const { renderCustomElements } = useStirDrupalCe()
 defineSlots<{
   rows?(): unknown
   controls?(props: DrupalViewControlsSlotProps): unknown
+  // Placeholders while results load, shaped like the site's own cards.
+  skeleton?(): unknown
   grid?(props: {
     rows: RenderedDrupalViewRow[]
     renderCustomElements: typeof renderCustomElements
@@ -218,6 +220,8 @@ const getRowMotionProps = (index: number) =>
       :spacing="spacing"
       :width="width"
     />
+
+    <slot v-else-if="isLoading && vueSlots.skeleton" name="skeleton" />
 
     <WrapGrid
     v-else-if="isLoading"

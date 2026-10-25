@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- `DrupalViewDisplay` has a `skeleton` slot, so a site's own grid can show loading placeholders shaped like its cards. Without it, the default skeleton is unchanged.
+
 ### Webform
 
 - **New: `webform.wizardPageTitle`.** Classes for a wizard page's heading,
