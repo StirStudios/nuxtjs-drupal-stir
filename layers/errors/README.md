@@ -17,10 +17,12 @@ every site before any is switched on.
   scripts from other sites and browser extensions are ignored. Crawlers, page
   checkers and automated browsers (by user agent or `navigator.webdriver`) send
   nothing from the browser; the server only reports status 500 and up, so
-  their 404s never count. A failed chunk import from a normal browser is still
-  reported once (a stale tab after a deploy), however many Nuxt, Vue and window
-  handlers raise it. Stack traces
-  from the browser are minified; there are no source maps.
+  their 404s never count. The browser sends an error only when at least one
+  stack frame is in the site's own built scripts (`/_nuxt/`, following the base
+  path and CDN settings); code injected by an in-app browser or an extension
+  (its source is the page address or another origin) and errors with no frames,
+  such as a failed script load, are dropped. Stack traces from the browser are
+  minified; there are no source maps.
 - **Environment and release:** `NUXT_PUBLIC_ERRORS_ENVIRONMENT` (defaults to
   `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision, so an
   error maps to a deploy).
