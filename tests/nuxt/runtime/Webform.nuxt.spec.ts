@@ -1,13 +1,17 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useAppConfig } from '#imports'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
 import WebformContent from '../../../layers/webform/app/components/WebformContent.vue'
 import Webform from '../../../layers/webform/app/components/WebformForm.vue'
 import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
 import kitchenSink from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink.json'
 import kitchenSinkSubmission from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink-submission.json'
+
+// A submitted form schedules a scroll to the top; unmounting clears it before
+// the environment goes.
+enableAutoUnmount(afterEach)
 
 // The kitchen sink without anything required, so an untouched form submits.
 function optional(value: unknown): unknown {
