@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Fixed: an inline confirmation shows the message Drupal resolved for the
+  submission.** The submit response's `confirmation_message` (tokens replaced,
+  or set by a handler) now replaces the form's static message, which still
+  shows when the response has none. New `resolveSubmissionMessage` util.
+
 ### Theme
 
 - **Fixed: the hero no longer warns `Slot "media" invoked outside of the render
@@ -85,11 +92,17 @@ untouched do not need one.
 
 ### Errors
 
+- **Changed: the browser reporter sends only errors from the site's own
+  scripts.** An error is reported when at least one stack frame is in the
+  site's built scripts (`/_nuxt/`, following the base path and CDN settings).
+  Code that other software injects into the page (an in-app browser, an
+  extension) and errors with no frames, such as a failed script load or a
+  thrown string, are dropped. A failed dynamic import therefore no longer
+  reports.
 - **Changed: the browser reporter skips automated visitors.** Crawlers,
   page checkers (Lighthouse, PageSpeed, headless browsers) and
   `navigator.webdriver` visitors report nothing, so their failed script loads
-  don't create issues. Normal browsers still report, including a failed
-  dynamic import, counted once a minute.
+  don't create issues.
 - **Added: `layers/errors`, error reporting to GlitchTip (Sentry-compatible).**
   Part of the full preset; off until the site sets `NUXT_PUBLIC_ERRORS_DSN`
   (`https://<key>@errors.example.com/<project id>`; optional

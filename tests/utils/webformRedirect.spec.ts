@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   normalizeWebformConfirmationType,
+  resolveSubmissionMessage,
   resolveSubmissionRedirect,
   resolveWebformRedirect,
 } from '../../layers/webform/app/utils/webformRedirect'
@@ -77,5 +78,17 @@ describe('resolveSubmissionRedirect', () => {
 
   it('rejects a resolved URL that is not HTTP or root-relative', () => {
     expect(resolveSubmissionRedirect({ confirmation_type: 'url', confirmation_url: 'javascript:alert(1)' }, 'url', '/thanks')).toBeNull()
+  })
+})
+
+describe('resolveSubmissionMessage', () => {
+  it('prefers the message Drupal resolved for the submission', () => {
+    expect(resolveSubmissionMessage({ confirmation_message: '<p>Thanks, Ada.</p>' }, '<p>Thanks, [name].</p>')).toBe('<p>Thanks, Ada.</p>')
+  })
+
+  it('falls back to the form message without one', () => {
+    expect(resolveSubmissionMessage({ sid: '1' }, 'Sent.')).toBe('Sent.')
+    expect(resolveSubmissionMessage({ confirmation_message: '  ' }, 'Sent.')).toBe('Sent.')
+    expect(resolveSubmissionMessage(null, 'Sent.')).toBe('Sent.')
   })
 })

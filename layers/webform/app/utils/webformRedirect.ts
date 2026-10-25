@@ -63,3 +63,16 @@ export function resolveSubmissionRedirect(
 
   return resolveWebformRedirect(confirmationType, redirect)
 }
+
+/**
+ * Inline confirmation message after a submission: the message Drupal resolved
+ * for that submission (tokens replaced, or set by a handler) when the response
+ * carries one, otherwise the form's own message.
+ */
+export function resolveSubmissionMessage(response: unknown, fallback: string): string {
+  const message = response && typeof response === 'object'
+    ? (response as { confirmation_message?: unknown }).confirmation_message
+    : undefined
+
+  return typeof message === 'string' && message.trim() ? message : fallback
+}
