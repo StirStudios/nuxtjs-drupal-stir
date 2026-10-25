@@ -15,6 +15,17 @@ untouched do not need one.
 
 ### Theme
 
+- `DrupalViewDisplay` has a `skeleton` slot, so a site's own grid can show loading placeholders shaped like its cards. Without it, the default skeleton is unchanged.
+
+### Webform
+
+- **New: `webform.wizardPageTitle`.** Classes for a wizard page's heading,
+  which otherwise uses `fieldGroupHeader` as before. A site whose stepper
+  already names each page can set `sr-only`: the heading stays for screen
+  readers, and focus still moves to it on each step.
+
+### Theme
+
 - **Fixed: a View keeps its Drupal spacing when the site renders its own
   grid.** Spacing was applied only through the layer's default grid, so a
   View component using the `#grid` slot lost it. The View's section now takes

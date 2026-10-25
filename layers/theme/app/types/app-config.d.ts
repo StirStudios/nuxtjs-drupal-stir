@@ -385,6 +385,8 @@ type StirThemeWebformConfig = {
     base?: string | string[]
   } & LooseRecord
   fieldGroupHeader?: ClassValue
+  /** Classes for a wizard page's heading; falls back to `fieldGroupHeader`. `sr-only` keeps it for screen readers (focus moves to it on each step) where the stepper already shows it. */
+  wizardPageTitle?: ClassValue
   fieldGroup?: ClassValue
   fieldInput?: ClassValue
   fieldText?: ClassValue

@@ -107,6 +107,31 @@ describe('DrupalViewDisplay controls slot (Nuxt runtime)', () => {
     expect(withoutGrid.get('section').classes()).not.toContain('pt-5')
   })
 
+  it('shows the site skeleton while results load', async () => {
+    state.api.mockReturnValue(new Promise(() => {}))
+    const received: { current?: DrupalViewControlsSlotProps } = {}
+    const wrapper = await mountSuspended(DrupalViewDisplay, {
+      route: '/work',
+      props: viewProps,
+      slots: {
+        controls: (controls: DrupalViewControlsSlotProps) => {
+          received.current = controls
+
+          return h('div')
+        },
+        skeleton: () => h('div', { class: 'site-skeleton' }),
+      },
+    })
+
+    vi.useFakeTimers()
+    received.current!.setFilter({ key: 'category', value: 'news' })
+    await vi.advanceTimersByTimeAsync(200)
+    await nextTick()
+
+    expect(wrapper.find('.site-skeleton').exists()).toBe(true)
+    expect(wrapper.find('.item [data-slot="base"]').exists()).toBe(false)
+  })
+
   it('keeps the default controls when no slot is provided', async () => {
     const wrapper = await mountSuspended(DrupalViewDefault, {
       route: '/work',
