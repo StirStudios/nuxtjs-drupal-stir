@@ -15,6 +15,13 @@ untouched do not need one.
 
 ### Views
 
+- **Fixed: filters in the URL apply on load.** A View's namespaced filter or
+  sort values in the URL (a reload, a shared link, back and forward, or the page
+  re-rendering after a filter change) were ignored on the first render, because
+  Drupal renders the page with the View's defaults. The View now fetches its
+  filtered results on load whenever the URL carries its controls, as it already
+  did for a later page. URLs without View controls render as before, with no
+  extra request.
 - **Fixed: date range filters keep both dates.** A View's `date_range` filter
   was treated as single-valued, so restoring it from the URL or refreshing the
   View sent only the start date and Drupal refused the request. Date range
