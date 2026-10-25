@@ -15,6 +15,13 @@ untouched do not need one.
 
 ### Webform
 
+- **New: `prefill` on the webform paragraph and `WebformForm`.** Values for
+  fields Drupal lets the URL fill (`#prepopulate`), applied the same way and
+  over the URL's, for a form opened somewhere other than its own page (a
+  modal, say).
+
+### Webform
+
 - **New: fields Webform lets the URL fill are filled from it.** An element
   with "Allow the element to be populated using query string parameters"
   (`#prepopulate`) starts with the matching query value, so `?space=12` picks

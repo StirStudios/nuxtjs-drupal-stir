@@ -55,6 +55,9 @@ export interface WebformProps {
   spacing?: string
   editLink?: string
   onClose?: () => void
+  // Values for fields Drupal lets the URL fill (#prepopulate), as when the
+  // form opens somewhere other than its own page; they win over the URL.
+  prefill?: Record<string, string | string[]>
 }
 
 export interface WebformDefinition {

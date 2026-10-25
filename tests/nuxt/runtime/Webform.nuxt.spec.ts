@@ -104,6 +104,27 @@ describe('Webform (Nuxt runtime)', () => {
     )
   })
 
+  it('fills prepopulated fields from the prefill prop', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        prefill: { name: 'Ada', topic: 'nope' },
+        webform: {
+          ...webform,
+          fields: {
+            name: { '#name': 'name', '#prepopulate': true, '#title': 'Name', '#type': 'textfield' },
+            topic: { '#name': 'topic', '#options': { a: 'A' }, '#prepopulate': true, '#title': 'Topic', '#type': 'select' },
+            notes: { '#name': 'notes', '#title': 'Notes', '#type': 'textfield' },
+          },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    expect((wrapper.get('input[name="name"]').element as HTMLInputElement).value).toBe('Ada')
+    wrapper.unmount()
+  })
+
   it('starts a textarea at the height Drupal configured', async () => {
     const wrapper = await mountSuspended(Webform, {
       props: {
