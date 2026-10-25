@@ -161,7 +161,8 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
           v-if="!hasGridItems || slotName !== 'items'"
           :class="[
             'region [&>:where(.prose,:has(.prose))+:where(.paragraph-button,.action-group)]:mt-[var(--stir-content-action-gap,1.5rem)]',
-            isActionGroup ? 'flex flex-row flex-wrap items-center gap-x-6 gap-y-3 [&>div]:w-auto [&>div]:max-w-full' : 'flex-col',
+            // Buttons sharing a row all keep the gap below the text, so they line up.
+            isActionGroup ? 'flex flex-row flex-wrap items-center gap-x-6 gap-y-3 [&>div]:w-auto [&>div]:max-w-full [&>:where(.prose,:has(.prose))~:where(.paragraph-button)]:mt-[var(--stir-content-action-gap,1.5rem)]' : 'flex-col',
             isActionGroup && classNames.includes('action-group--center') && 'justify-center',
             isActionGroup && classNames.includes('action-group--right') && 'justify-end',
             slotName,
