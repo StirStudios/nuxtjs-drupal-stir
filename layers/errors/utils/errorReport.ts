@@ -24,6 +24,7 @@ export interface ReportContext {
   method?: string
   environment?: string
   release?: string
+  extra?: Record<string, unknown>
 }
 
 const MAX_MESSAGE = 500
@@ -105,6 +106,7 @@ export function buildEvent(error: Error, context: ReportContext, eventId = crypt
     request: context.url
       ? { url: context.url.split('?')[0], method: context.method }
       : undefined,
+    extra: context.extra,
   }
 }
 
@@ -211,4 +213,64 @@ export function ownScriptsPrefix(
 // nothing about our code either.
 export function hasOwnFrame(error: Error, prefix: string): boolean {
   return parseStack(error.stack).some(frame => frame.filename.startsWith(prefix))
+}
+
+// A script or stylesheet that failed to load, as WebKit, Chrome and Firefox
+// each word it, is the one error whose cause is not in our code.
+const MODULE_LOAD_FAILURE = /dynamically imported module|importing a module script failed|loading chunk|unable to preload css/i
+
+export function isModuleLoadFailure(error: Error): boolean {
+  return MODULE_LOAD_FAILURE.test(error.message || '')
+}
+
+export interface ResourceEntry {
+  name: string
+  duration: number
+  transferSize?: number
+  decodedBodySize?: number
+  responseStatus?: number
+  nextHopProtocol?: string
+}
+
+const MAX_FAILED_FILES = 5
+
+// Names the file behind a failed module load and how it travelled: the site's
+// own scripts and stylesheets that came back with no body or an error status,
+// the protocols (h2, h3) the site's files used, and the connection type where
+// the browser reports one (Safari does not). File names only, no query
+// string; nothing about the visitor.
+export function describeModuleLoad(
+  entries: ResourceEntry[],
+  prefix: string,
+  connection?: { effectiveType?: string, type?: string, saveData?: boolean },
+): Record<string, unknown> {
+  const own = entries.filter(entry => entry.name.startsWith(prefix))
+  const failed = own.filter((entry) => {
+    const status = entry.responseStatus
+
+    return (typeof status === 'number' && status >= 400)
+      || (!entry.decodedBodySize && !entry.transferSize && (status === 0 || status === undefined))
+  })
+  const protocols: Record<string, number> = {}
+
+  for (const entry of own) {
+    const protocol = entry.nextHopProtocol || 'unknown'
+
+    protocols[protocol] = (protocols[protocol] || 0) + 1
+  }
+
+  return {
+    ownFiles: own.length,
+    failedFiles: failed.length,
+    failed: failed.slice(0, MAX_FAILED_FILES).map(entry => ({
+      file: entry.name.slice(prefix.length).split(/[?#]/)[0],
+      status: entry.responseStatus,
+      protocol: entry.nextHopProtocol || undefined,
+      ms: Math.round(entry.duration),
+    })),
+    protocols,
+    connection: connection
+      ? { effectiveType: connection.effectiveType, type: connection.type, saveData: connection.saveData }
+      : undefined,
+  }
 }

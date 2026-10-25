@@ -92,6 +92,13 @@ untouched do not need one.
 
 ### Errors
 
+- **Added: a failed module load names the failing file.** A browser report
+  of "Importing a module script failed" or "Failed to fetch dynamically
+  imported module" now carries extra data: the site's own `/_nuxt` files that
+  came back with an error or no body (file name, status, protocol, time; no
+  query string), how many of the site's files used each protocol (h2, h3), and
+  the connection type where the browser reports one. Other errors and the
+  server reporter are unchanged.
 - **Fixed: the browser reports one failure once.** The window, Vue and Nuxt
   each raise the same failure and may wrap it differently (a TypeError, an
   Error, a Nuxt error), which counted as separate errors. The browser now

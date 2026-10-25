@@ -21,8 +21,14 @@ every site before any is switched on.
   stack frame is in the site's own built scripts (`/_nuxt/`, following the base
   path and CDN settings); code injected by an in-app browser or an extension
   (its source is the page address or another origin) and errors with no frames,
-  such as a failed script load, are dropped. Stack traces from the browser are
-  minified; there are no source maps.
+  such as a failed script load, are dropped. A failed script or module load
+  ("Importing a module script failed", "Failed to fetch dynamically imported
+  module") carries extra data naming the site's own files that came back with
+  an error or no body (file name only, no query string), the protocols (h2,
+  h3) the site's files used and the connection type where the browser reports
+  one (Safari does not), so an event shows which file failed and how it
+  travelled. Stack traces from the browser are minified; there are no source
+  maps.
 - **Environment and release:** `NUXT_PUBLIC_ERRORS_ENVIRONMENT` (defaults to
   `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision, so an
   error maps to a deploy).
