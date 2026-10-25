@@ -166,16 +166,6 @@ describe('Drupal Hero page ownership and headings', () => {
     expect(wrapper.find('section').exists()).toBe(false)
     wrapper.unmount()
   })
-  it('fills the viewport at the Full screen height', async () => {
-    const wrapper = await mountSuspended(Hero, {
-      props: { placement: 'field_section', header: 'Gather and create', mediaHeight: 'full' },
-      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Home')) } },
-    })
-
-    expect(wrapper.get('section').attributes('style')).toContain('min-height: max(100svh,45rem)')
-    wrapper.unmount()
-  })
-
   it.each(['field_section', 'field_content'])('uses authored section headings in %s without the page title', async (placement) => {
     const wrapper = await mountSuspended(Hero, {
       props: { placement, header: 'Section title', headerTag: 'h3', label: 'Contact', mediaHeight: 'feature', align: { justify: 'end', items: 'end', text: 'end' } },

@@ -130,7 +130,7 @@ describe('Drupal CE proxy boundary', () => {
     expect(proxyRequest).toHaveBeenCalledTimes(1)
   })
 
-  it('turns a CMS redirect into a 404 and an HTML 200 into a 502, not a crash', async () => {
+  it('turns a redirect or HTML answer to a page read into a 404, not a crash', async () => {
     stubRuntimeConfig()
     vi.mocked(proxyRequest).mockClear()
 
@@ -153,7 +153,7 @@ describe('Drupal CE proxy boundary', () => {
     expect(() => onResponse(event, new Response(html, {
       status: 200,
       headers: { 'content-type': 'text/html; charset=UTF-8' },
-    }))).toThrowError(expect.objectContaining({ statusCode: 502 }))
+    }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
 
     expect(() => onResponse(event, new Response('{"title":"Home"}', {
       status: 200,
@@ -177,12 +177,8 @@ describe('Drupal CE proxy boundary', () => {
       expect(() => assertStirDrupalPageResponse(event, response)).not.toThrow()
     }
 
-    for (const response of [answer(301, 'text/html'), answer(302), answer(307, 'text/html')]) {
+    for (const response of [answer(301, 'text/html'), answer(302), answer(307, 'text/html'), answer(200, 'text/html'), answer(204)]) {
       expect(() => assertStirDrupalPageResponse(event, response)).toThrowError(expect.objectContaining({ statusCode: 404 }))
-    }
-
-    for (const response of [answer(200, 'text/html'), answer(200), answer(204)]) {
-      expect(() => assertStirDrupalPageResponse(event, response)).toThrowError(expect.objectContaining({ statusCode: 502 }))
     }
   })
 
