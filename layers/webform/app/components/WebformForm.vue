@@ -9,7 +9,7 @@ import {
   createScrollToTopRunner,
   getWebformScrollConfig,
 } from '#stir-webform/utils/webformScrollToTop'
-import { resolveSubmissionRedirect } from '#stir-webform/utils/webformRedirect'
+import { resolveSubmissionMessage, resolveSubmissionRedirect } from '#stir-webform/utils/webformRedirect'
 import { resolveWebformSubmissionIssues } from '#stir-webform/utils/webformSubmissionErrors'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 import { createWebformState } from '#stir-webform/utils/webformState'
@@ -70,6 +70,7 @@ const orderedFieldNames = computed(() => Object.keys(fields))
 
 const turnstileToken = ref('')
 const isFormSubmitted = ref(false)
+const submittedConfirmation = ref('')
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
 const content = useTemplateRef('content')
@@ -241,6 +242,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     resetFormState({ bumpKey: false })
     errors.value = {}
     turnstileToken.value = ''
+    submittedConfirmation.value = resolveSubmissionMessage(response, webformConfirmation)
     isFormSubmitted.value = true
   } catch (error) {
     console.error('Submission Error:', error)
@@ -291,7 +293,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       :submission-error="submissionError"
       :submit-button-label="submitButtonLabel"
       :theme-webform="themeWebform"
-      :webform-confirmation="webformConfirmation"
+      :webform-confirmation="isFormSubmitted ? submittedConfirmation : webformConfirmation"
       @error="onError"
       @reset-submission="handleResetSubmission"
       @submit="onSubmit"

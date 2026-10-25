@@ -1,8 +1,10 @@
 import {
   buildEvent,
   createThrottle,
+  hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  ownScriptsPrefix,
   parseDsn,
   sendEvent,
   toError,
@@ -11,7 +13,8 @@ import {
 // Reports browser errors (uncaught errors, unhandled rejections and Vue
 // errors) to the site's GlitchTip, with the same small reporter the server
 // uses: nothing is downloaded, and nothing is sent without a DSN or without
-// consent for non-essential scripts (the policy analytics follows).
+// consent for non-essential scripts (the policy analytics follows), and only
+// for errors with a frame in the site's own built scripts.
 export default defineNuxtPlugin({
   name: 'errors',
   setup(nuxtApp) {
@@ -21,12 +24,13 @@ export default defineNuxtPlugin({
     if (!dsn || isAutomatedVisitor(navigator.userAgent, navigator.webdriver)) return
 
     const { allowsNonEssential } = usePrivacyConsent()
+    const ownScripts = ownScriptsPrefix(useRuntimeConfig().app, window.location.origin)
     const allow = createThrottle()
 
     function report(value: unknown, source?: string) {
       const error = toError(value)
 
-      if (!allowsNonEssential.value || !error || isIgnoredBrowserError(error, source, window.location.origin) || !allow(error)) return
+      if (!allowsNonEssential.value || !error || isIgnoredBrowserError(error, source, window.location.origin) || !hasOwnFrame(error, ownScripts) || !allow(error)) return
 
       void sendEvent(dsn!, buildEvent(error, {
         platform: 'javascript',

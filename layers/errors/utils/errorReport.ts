@@ -181,3 +181,23 @@ const AUTOMATED_USER_AGENT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headle
 export function isAutomatedVisitor(userAgent?: string, webdriver?: boolean): boolean {
   return webdriver === true || AUTOMATED_USER_AGENT.test(userAgent || '')
 }
+
+// Where this site's own built scripts live: the CDN when one is set, else the
+// page's origin plus the base path, then the assets folder (/_nuxt/).
+export function ownScriptsPrefix(
+  app: { baseURL?: string, buildAssetsDir?: string, cdnURL?: string } | undefined,
+  origin: string,
+): string {
+  const root = (app?.cdnURL || `${origin}${app?.baseURL || '/'}`).replace(/\/+$/, '')
+
+  return `${root}/${(app?.buildAssetsDir || '/_nuxt/').replace(/^\/+/, '')}`
+}
+
+// Only an error with a frame in the site's own built scripts is the site's
+// fault. Code that other pages inject (an in-app browser, an extension, a
+// translator) shows the page address or another origin as its source, and an
+// error with no frames at all (a failed script load, a thrown string) says
+// nothing about our code either.
+export function hasOwnFrame(error: Error, prefix: string): boolean {
+  return parseStack(error.stack).some(frame => frame.filename.startsWith(prefix))
+}

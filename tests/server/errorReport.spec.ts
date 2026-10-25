@@ -3,8 +3,10 @@ import {
   buildEnvelope,
   buildEvent,
   createThrottle,
+  hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  ownScriptsPrefix,
   parseDsn,
   parseStack,
   sendEvent,
@@ -155,7 +157,7 @@ describe('automated visitors', () => {
     expect(isAutomatedVisitor(chrome, true)).toBe(true)
   })
 
-  it('still reports normal browsers, including a failed chunk import', () => {
+  it('still treats normal browsers as visitors, and a chunk failure is not noise by message', () => {
     for (const userAgent of [
       chrome,
       'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
@@ -177,5 +179,59 @@ describe('automated visitors', () => {
     const chunkError = new Error('Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js')
 
     expect([allow(chunkError), allow(chunkError), allow(chunkError)]).toEqual([true, false, false])
+  })
+})
+
+describe('own scripts only', () => {
+  const origin = 'https://www.example.com'
+  const prefix = ownScriptsPrefix({ baseURL: '/', buildAssetsDir: '/_nuxt/' }, origin)
+  const errorWith = (stack: string, message = 'boom') => Object.assign(new Error(message), { stack })
+
+  it('finds the built scripts on the page origin, a base path or a CDN', () => {
+    expect(prefix).toBe('https://www.example.com/_nuxt/')
+    expect(ownScriptsPrefix(undefined, origin)).toBe('https://www.example.com/_nuxt/')
+    expect(ownScriptsPrefix({ baseURL: '/shop/', buildAssetsDir: '/_nuxt/' }, origin)).toBe('https://www.example.com/shop/_nuxt/')
+    expect(ownScriptsPrefix({ cdnURL: 'https://cdn.example.com/', buildAssetsDir: '_assets/' }, origin)).toBe('https://cdn.example.com/_assets/')
+  })
+
+  it('reports an exception thrown from the site\'s own script', () => {
+    expect(hasOwnFrame(errorWith('TypeError: x is undefined\n    at render (https://www.example.com/_nuxt/Cx4f2a.js:10:5)\n    at https://www.example.com/_nuxt/entry.js:3:9'), prefix)).toBe(true)
+    expect(hasOwnFrame(errorWith('render@https://www.example.com/_nuxt/Cx4f2a.js:10:5'), prefix)).toBe(true)
+    // One frame of ours among others is enough.
+    expect(hasOwnFrame(errorWith('Error: x\n    at Hk (https://www.example.com/:229:3)\n    at run (https://www.example.com/_nuxt/entry.js:3:9)'), prefix)).toBe(true)
+  })
+
+  it('drops errors from injected scripts, extensions and other origins', () => {
+    // An in-app browser's script: its source is the page address itself.
+    expect(hasOwnFrame(errorWith('RangeError: Maximum call stack size exceeded\n    at Hk (https://www.example.com/class/yoga:229:12)\n    at Fk (https://www.example.com/class/yoga:229:40)'), prefix)).toBe(false)
+    expect(hasOwnFrame(errorWith('Error: x\n    at a (chrome-extension://abc/inject.js:1:1)'), prefix)).toBe(false)
+    expect(hasOwnFrame(errorWith('Error: x\n    at a (https://cdn.other.com/_nuxt/app.js:1:1)'), prefix)).toBe(false)
+    // A look-alike path on our own origin is not a built script.
+    expect(hasOwnFrame(errorWith('Error: x\n    at a (https://www.example.com/not_nuxt/app.js:1:1)'), prefix)).toBe(false)
+  })
+
+  it('keeps a failed module import whose stack has frames in the site\'s scripts', () => {
+    // The two frames of a real iPhone in-app browser report, with the message
+    // WebKit gives a failed import(). The drop below is by frames, never by message.
+    const message = 'Importing a module script failed.'
+    const webkit = errorWith(
+      'a@https://www.example.com/_nuxt/BmIMsDnx.js:2:67390\nb@https://www.example.com/_nuxt/CRzLMJPS.js:1:1505',
+      message,
+    )
+
+    expect(hasOwnFrame(webkit, prefix)).toBe(true)
+    expect(hasOwnFrame(errorWith('at a (https://www.example.com/_nuxt/BmIMsDnx.js:2:67390)\n    at b (https://www.example.com/_nuxt/CRzLMJPS.js:1:1505)', message), prefix)).toBe(true)
+    expect(isIgnoredBrowserError(webkit, 'https://www.example.com/_nuxt/BmIMsDnx.js', origin)).toBe(false)
+    expect(buildEvent(webkit, { platform: 'javascript' }).exception.values[0]!.stacktrace.frames.map(frame => frame.filename)).toEqual([
+      'https://www.example.com/_nuxt/CRzLMJPS.js',
+      'https://www.example.com/_nuxt/BmIMsDnx.js',
+    ])
+  })
+
+  it('drops errors with no frames, including failed script loads', () => {
+    expect(hasOwnFrame(errorWith(''), prefix)).toBe(false)
+    expect(hasOwnFrame(new Error('rejected string'), prefix)).toBe(false)
+    expect(hasOwnFrame(errorWith('TypeError: Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js'), prefix)).toBe(false)
+    expect(hasOwnFrame(errorWith('TypeError: Importing a module script failed.'), prefix)).toBe(false)
   })
 })
