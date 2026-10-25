@@ -48,7 +48,8 @@ const isSection = computed(() => Boolean(props.placement && props.placement !== 
 provide(sectionHeroMediaKey, isSection)
 
 const sectionHeadingTag = computed(() => resolveHeadingTag(props.headerTag))
-const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
+// Full screen fills the viewport (a homepage), never shorter than 45rem.
+const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)', full: 'max(100svh,45rem)' })[props.mediaHeight as 'small' | 'break' | 'feature' | 'full'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const alignment = computed(() => {
   const align = props.align
