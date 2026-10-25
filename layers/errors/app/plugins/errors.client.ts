@@ -1,9 +1,12 @@
 import {
   buildEvent,
   createThrottle,
+  describeModuleLoad,
   hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  isModuleLoadFailure,
+  messageKey,
   ownScriptsPrefix,
   parseDsn,
   sendEvent,
@@ -25,7 +28,7 @@ export default defineNuxtPlugin({
 
     const { allowsNonEssential } = usePrivacyConsent()
     const ownScripts = ownScriptsPrefix(useRuntimeConfig().app, window.location.origin)
-    const allow = createThrottle()
+    const allow = createThrottle(Date.now, 60_000, 20, messageKey)
 
     function report(value: unknown, source?: string) {
       const error = toError(value)
@@ -37,6 +40,14 @@ export default defineNuxtPlugin({
         url: `${window.location.origin}${window.location.pathname}`,
         environment: config?.environment,
         release: config?.release,
+        // A failed module load says nothing about which file or how it travelled.
+        extra: isModuleLoadFailure(error)
+          ? describeModuleLoad(
+              performance.getEntriesByType('resource') as PerformanceResourceTiming[],
+              ownScripts,
+              (navigator as Navigator & { connection?: { effectiveType?: string, type?: string, saveData?: boolean } }).connection,
+            )
+          : undefined,
       }))
     }
 

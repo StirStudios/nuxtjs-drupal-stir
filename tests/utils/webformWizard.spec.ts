@@ -38,6 +38,18 @@ const fields = flattenWebformFields({
     '#title': 'Your project',
     children: {
       notes: { '#type': 'textarea', '#name': 'notes', ...onlyFor('info') },
+      useType: { '#type': 'select', '#name': 'use_type', ...onlyFor('info') },
+      // As Custom Elements sends it: camel-cased `#states`, machine names in
+      // `#conditions`.
+      insurance: {
+        '#type': 'select',
+        '#name': 'insurance',
+        '#states': { visible: { ':input[name="useType"]': { value: 'event' }, ':input[name="path"]': { value: 'info' } } },
+        '#conditions': [
+          { state: 'visible', logic: 'and', rules: [{ name: 'use_type', selector: ':input[name="use_type"]', triggers: [{ trigger: 'value', value: 'event' }] }] },
+          { state: 'visible', logic: 'and', rules: [{ name: 'path', selector: ':input[name="path"]', triggers: [{ trigger: 'value', value: 'info' }] }] },
+        ],
+      },
     },
   },
 } as unknown as Record<string, WebformFieldProps>)
@@ -45,7 +57,7 @@ const names = Object.keys(fields)
 
 describe('wizard pages', () => {
   it('flattens page fields without making the page a visual group', () => {
-    expect(names).toEqual(['path', 'space', 'day', 'notes'])
+    expect(names).toEqual(['path', 'space', 'day', 'notes', 'useType', 'insurance'])
     expect(fields.space?.parent).toBeNull()
     expect(fields.space?.page).toEqual({ key: 'when', title: 'Space and time', prevLabel: null, nextLabel: 'Choose a time' })
   })
@@ -64,9 +76,18 @@ describe('wizard pages', () => {
   })
 
   it('knows a hidden page still comes after the chooser', () => {
-    expect(hasLaterWizardPage(fields, names, 'start')).toBe(true)
-    expect(hasLaterWizardPage(fields, names, 'inquiry')).toBe(false)
-    expect(hasLaterWizardPage(fields, names, undefined)).toBe(false)
+    expect(hasLaterWizardPage(fields, names, 'start', {})).toBe(true)
+    expect(hasLaterWizardPage(fields, names, 'inquiry', { path: 'info' })).toBe(false)
+    expect(hasLaterWizardPage(fields, names, undefined, {})).toBe(false)
+  })
+
+  it('drops a later page the chosen path hides, so the last page submits', () => {
+    expect(hasLaterWizardPage(fields, names, 'start', { path: 'book' })).toBe(true)
+    expect(hasLaterWizardPage(fields, names, 'when', { path: 'book' })).toBe(false)
+    expect(hasLaterWizardPage(fields, names, 'when', { path: '' })).toBe(true)
+    // A later field that also waits on an unanswered question stays hidden
+    // once the path is chosen.
+    expect(hasLaterWizardPage(fields, names, 'when', { path: 'book', use_type: '' })).toBe(false)
   })
 
   it('finds the single radio question a page asks', () => {
@@ -77,5 +98,22 @@ describe('wizard pages', () => {
   it('lists the fields on one page', () => {
     expect(wizardPageFieldNames(fields, names, 'when')).toEqual(['space', 'day'])
     expect(wizardPageFieldNames(fields, names, undefined)).toEqual([])
+  })
+
+  it('keeps the flexbox row of fields that render side by side', () => {
+    const row = flattenWebformFields({
+      contact: {
+        '#type': 'webform_flexbox',
+        '#name': 'contact',
+        children: {
+          name: { '#type': 'textfield', '#name': 'name' },
+          email: { '#type': 'email', '#name': 'email' },
+        },
+      },
+      notes: { '#type': 'textarea', '#name': 'notes' },
+    } as unknown as Record<string, WebformFieldProps>)
+
+    expect(Object.keys(row)).toEqual(['name', 'email', 'notes'])
+    expect([row.name?.row, row.email?.row, row.notes?.row]).toEqual(['contact', 'contact', undefined])
   })
 })

@@ -3,9 +3,12 @@ import {
   buildEnvelope,
   buildEvent,
   createThrottle,
+  describeModuleLoad,
   hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  isModuleLoadFailure,
+  messageKey,
   ownScriptsPrefix,
   parseDsn,
   parseStack,
@@ -233,5 +236,108 @@ describe('own scripts only', () => {
     expect(hasOwnFrame(new Error('rejected string'), prefix)).toBe(false)
     expect(hasOwnFrame(errorWith('TypeError: Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js'), prefix)).toBe(false)
     expect(hasOwnFrame(errorWith('TypeError: Importing a module script failed.'), prefix)).toBe(false)
+  })
+})
+
+describe('one failure, several handlers', () => {
+  it('counts the browser\'s window, Vue and Nuxt reports of one failure once, whatever they wrap it as', () => {
+    let now = 1_000
+    const allow = createThrottle(() => now, 60_000, 20, messageKey)
+    const message = 'Importing a module script failed.'
+
+    // A rejected promise gives a TypeError; Nuxt hands over its own wrapped error.
+    expect(allow(new TypeError(message))).toBe(true)
+    expect(allow(Object.assign(new Error(message), { name: 'NuxtError' }))).toBe(false)
+    expect(allow(new Error(`${message} `))).toBe(false)
+    expect(allow(new Error('Importing a module script failed'))).toBe(false)
+
+    // A different failure still counts, and the same one counts again after the window.
+    expect(allow(new Error('x is not a function'))).toBe(true)
+    now += 61_000
+    expect(allow(new TypeError(message))).toBe(true)
+  })
+
+  it('keeps the server\'s count by name and message', () => {
+    const allow = createThrottle(() => 1_000)
+
+    expect(allow(new TypeError('boom'))).toBe(true)
+    expect(allow(new Error('boom'))).toBe(true)
+    expect(allow(new TypeError('boom'))).toBe(false)
+  })
+})
+
+describe('failed module load diagnostics', () => {
+  const prefix = 'https://www.example.com/_nuxt/'
+  const entry = (file: string, extra: Record<string, unknown> = {}) => ({
+    name: `${prefix}${file}`,
+    duration: 120.4,
+    transferSize: 1500,
+    decodedBodySize: 4000,
+    responseStatus: 200,
+    nextHopProtocol: 'h2',
+    ...extra,
+  })
+
+  it('recognizes the module load failures of the three engines, and nothing else', () => {
+    for (const message of [
+      'Importing a module script failed.',
+      'Failed to fetch dynamically imported module: https://www.example.com/_nuxt/a.js',
+      'error loading dynamically imported module: https://www.example.com/_nuxt/a.js',
+      'Loading chunk 12 failed.',
+      'Unable to preload CSS for /_nuxt/entry.css',
+    ]) {
+      expect(isModuleLoadFailure(new Error(message)), message).toBe(true)
+    }
+
+    expect(isModuleLoadFailure(new Error('x is not a function'))).toBe(false)
+    expect(isModuleLoadFailure(new Error(''))).toBe(false)
+  })
+
+  it('names the files that failed, with no query string', () => {
+    const result = describeModuleLoad([
+      entry('ok.js'),
+      entry('missing.js?v=abc#frag', { responseStatus: 404, transferSize: 300, decodedBodySize: 0, nextHopProtocol: 'h3' }),
+      entry('dropped.js', { responseStatus: 0, transferSize: 0, decodedBodySize: 0 }),
+      entry('no-status.js', { responseStatus: undefined, transferSize: 0, decodedBodySize: 0 }),
+    ], prefix)
+
+    expect(result.failedFiles).toBe(3)
+    expect(result.failed).toEqual([
+      { file: 'missing.js', status: 404, protocol: 'h3', ms: 120 },
+      { file: 'dropped.js', status: 0, protocol: 'h2', ms: 120 },
+      { file: 'no-status.js', status: undefined, protocol: 'h2', ms: 120 },
+    ])
+  })
+
+  it('does not count a cached file, other origins or other folders as failed', () => {
+    const result = describeModuleLoad([
+      entry('cached.js', { transferSize: 0, decodedBodySize: 9000 }),
+      { ...entry('x.js'), name: 'https://cdn.other.com/_nuxt/x.js', responseStatus: 500 },
+      { ...entry('y.js'), name: 'https://www.example.com/api/y.js', responseStatus: 500 },
+    ], prefix)
+
+    expect(result).toMatchObject({ ownFiles: 1, failedFiles: 0, failed: [] })
+  })
+
+  it('reports how the site\'s files travelled, at most five failed names, and the connection when there is one', () => {
+    const entries = [
+      ...Array.from({ length: 8 }, (_, index) => entry(`f${index}.js`, { responseStatus: 0, transferSize: 0, decodedBodySize: 0, nextHopProtocol: index % 2 ? 'h3' : 'h2' })),
+      entry('fine.js', { nextHopProtocol: '' }),
+    ]
+    const result = describeModuleLoad(entries, prefix, { effectiveType: '4g', type: 'cellular', saveData: false })
+
+    expect(result.ownFiles).toBe(9)
+    expect(result.failedFiles).toBe(8)
+    expect(result.failed).toHaveLength(5)
+    expect(result.protocols).toEqual({ h2: 4, h3: 4, unknown: 1 })
+    expect(result.connection).toEqual({ effectiveType: '4g', type: 'cellular', saveData: false })
+    expect(describeModuleLoad([], prefix).connection).toBeUndefined()
+  })
+
+  it('goes on the event as extra data only when given', () => {
+    const error = new Error('Importing a module script failed.')
+
+    expect(buildEvent(error, { platform: 'javascript', extra: { failedFiles: 1 } }).extra).toEqual({ failedFiles: 1 })
+    expect(JSON.parse(JSON.stringify(buildEvent(error, { platform: 'javascript' }))).extra).toBeUndefined()
   })
 })

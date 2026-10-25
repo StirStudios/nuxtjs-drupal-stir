@@ -15,6 +15,17 @@ untouched do not need one.
 
 ### Webform
 
+- **New: Webform flexbox rows render side by side.** Fields in a
+  `webform_flexbox` share a responsive grid row (stacked on phones); before,
+  the flexbox was flattened away and every field took a full row. Flattened
+  fields gain `row`, and `InputType` gains `webform_flexbox`.
+- **Changed: `hasLaterWizardPage` takes the form state.** A hidden later page
+  counts only while none of the answers its `#states` depend on is given, so once
+  a path chooser hides the other path, the last page offers Submit, not Next.
+  Callers pass the state as a fourth argument.
+
+### Webform
+
 - **Fixed: an inline confirmation shows the message Drupal resolved for the
   submission.** The submit response's `confirmation_message` (tokens replaced,
   or set by a handler) now replaces the form's static message, which still
@@ -92,6 +103,18 @@ untouched do not need one.
 
 ### Errors
 
+- **Added: a failed module load names the failing file.** A browser report
+  of "Importing a module script failed" or "Failed to fetch dynamically
+  imported module" now carries extra data: the site's own `/_nuxt` files that
+  came back with an error or no body (file name, status, protocol, time; no
+  query string), how many of the site's files used each protocol (h2, h3), and
+  the connection type where the browser reports one. Other errors and the
+  server reporter are unchanged.
+- **Fixed: the browser reports one failure once.** The window, Vue and Nuxt
+  each raise the same failure and may wrap it differently (a TypeError, an
+  Error, a Nuxt error), which counted as separate errors. The browser now
+  counts by message alone, once a minute; the server still counts by name and
+  message.
 - **Changed: the browser reporter sends only errors from the site's own
   scripts.** An error is reported when at least one stack frame is in the
   site's built scripts (`/_nuxt/`, following the base path and CDN settings).

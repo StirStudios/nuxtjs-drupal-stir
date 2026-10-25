@@ -1,4 +1,4 @@
-import type { WebformFieldProps, WebformState } from '#stir/types'
+import type { WebformConditionGroup, WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformWizardPage } from '#stir-webform/utils/flattenWebformFields'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
@@ -38,19 +38,46 @@ export function wizardPageFieldNames(
 }
 
 /**
- * Whether the form declares a wizard page after this one, visible or not. A
- * page hidden until an earlier answer (a path chooser) still comes later, so
- * the current page offers Next, not Submit.
+ * Whether a wizard page comes after this one. A later page counts while it is
+ * visible, or while none of the answers its `#states` depend on is given: a
+ * page hidden until a path is chosen still comes later, so the chooser offers
+ * Next, but once the other path is chosen the last page offers Submit.
  */
 export function hasLaterWizardPage(
   fields: Record<string, PagedField>,
   orderedFieldNames: string[],
   pageKey: string | undefined,
+  state: WebformState,
 ): boolean {
   const keys = [...new Set(orderedFieldNames.map((fieldName) => fields[fieldName]?.page?.key).filter(Boolean))]
   const index = pageKey ? keys.indexOf(pageKey) : -1
 
-  return index >= 0 && index < keys.length - 1
+  if (index < 0) return false
+
+  return keys.slice(index + 1).some((key) =>
+    wizardPageFieldNames(fields, orderedFieldNames, key).some((fieldName) => {
+      const field = fields[fieldName]!
+
+      const inputs = statesInputNames(field)
+
+      return resolveWebformFieldStates(field, state).visible || (inputs.length > 0 && inputs.every((name) => isEmptyAnswer(state[name])))
+    }),
+  )
+}
+
+/**
+ * The inputs a field's conditions depend on, by Drupal machine name. Read from
+ * `#conditions`: Custom Elements camel-cases the `#states` selectors.
+ */
+function statesInputNames(field: PagedField): string[] {
+  const names = (group: WebformConditionGroup): string[] =>
+    group.rules.flatMap((rule) => 'rules' in rule ? names(rule) : rule.name ? [rule.name] : [])
+
+  return [...new Set((field['#conditions'] ?? []).flatMap(names))]
+}
+
+function isEmptyAnswer(value: unknown): boolean {
+  return value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)
 }
 
 /**
