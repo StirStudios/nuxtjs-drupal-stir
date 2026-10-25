@@ -4,7 +4,7 @@ import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
-import { resolveWizardPages, wizardPageFieldNames } from '#stir-webform/utils/webformWizard'
+import { hasLaterWizardPage, resolveWizardPages, wizardPageFieldNames } from '#stir-webform/utils/webformWizard'
 
 type WebformThemeConfig = {
   buttonClass?: string
@@ -58,12 +58,22 @@ const wizardPages = computed(() =>
   resolveWizardPages(props.fields, props.orderedFieldNames, props.state),
 )
 const isWizard = computed(() => wizardPages.value.length > 0)
+const stepperItems = computed(() =>
+  wizardPages.value.map((page, index) => ({
+    value: index,
+    title: page.title ?? `Step ${index + 1}`,
+    disabled: index > pageIndex.value,
+  })),
+)
 const pageIndex = ref(0)
 const currentPage = computed(() =>
   wizardPages.value[Math.min(pageIndex.value, wizardPages.value.length - 1)],
 )
 const isLastPage = computed(
-  () => !isWizard.value || pageIndex.value >= wizardPages.value.length - 1,
+  () => !isWizard.value || (
+    pageIndex.value >= wizardPages.value.length - 1
+    && !hasLaterWizardPage(props.fields, props.orderedFieldNames, currentPage.value?.key)
+  ),
 )
 const isOnCurrentPage = (fieldName: string) => {
   if (!isWizard.value) return true
@@ -88,7 +98,13 @@ async function nextPage() {
     return
   }
 
-  await goToPage(pageIndex.value + 1)
+  // Answers on this page may reveal the next one; with none left, submit.
+  await nextTick()
+  if (pageIndex.value + 1 < wizardPages.value.length) {
+    await goToPage(pageIndex.value + 1)
+  } else {
+    form.value?.submit()
+  }
 }
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
@@ -144,8 +160,15 @@ defineExpose({
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
-    <div v-if="isWizard && currentPage" class="flex flex-col gap-1">
-      <p aria-live="polite" class="text-sm text-muted">
+    <div v-if="isWizard && currentPage" class="flex flex-col gap-4">
+      <!-- Steps already passed can be revisited; later ones open with Next. -->
+      <UStepper
+        :items="stepperItems"
+        :model-value="pageIndex"
+        size="sm"
+        @update:model-value="(index) => typeof index === 'number' && index < pageIndex && goToPage(index)"
+      />
+      <p aria-live="polite" class="sr-only">
         Step {{ pageIndex + 1 }} of {{ wizardPages.length }}
       </p>
       <h2

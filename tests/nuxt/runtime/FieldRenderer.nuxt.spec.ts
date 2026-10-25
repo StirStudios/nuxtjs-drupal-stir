@@ -193,6 +193,29 @@ describe('FieldRenderer (Nuxt runtime)', () => {
       .not.toContain('mt-2')
   })
 
+  it('shows radios whose options have descriptions as cards', async () => {
+    const wrapper = await mountSuspended(FieldRenderer, {
+      props: {
+        field: canonical({
+          '#type': 'radio',
+          '#name': 'path',
+          '#title': 'What would you like to do?',
+          '#options': {
+            book: { label: 'Book a space', description: 'Fastest. Pick an open time.' },
+            info: 'I need more info',
+          },
+          '#optionKeys': ['book', 'info'],
+        }),
+        fieldName: 'path',
+        state: {},
+      },
+    })
+
+    expect(wrapper.text()).toContain('Book a space')
+    expect(wrapper.text()).toContain('Fastest. Pick an open time.')
+    expect(wrapper.findComponent({ name: 'URadioGroup' }).props('variant')).toBe('card')
+  })
+
   it('renders a field with the site component named for it', async () => {
     const appConfig = useAppConfig()
     const webform = appConfig.stirTheme.webform as { fieldComponents?: Record<string, string> }

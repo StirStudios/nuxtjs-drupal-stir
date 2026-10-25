@@ -134,7 +134,8 @@ export interface WebformFieldProps {
   '#widget'?: string
   '#required'?: boolean
   '#requiredError'?: string
-  '#options'?: Record<string, string>
+  // A radio or checkbox option may carry a description (Webform's "label -- description").
+  '#options'?: Record<string, string | { label: string, description?: string }>
   '#optionProperties'?: Record<string, WebformOptionProperties>
   '#text'?: string
   '#markup'?: string

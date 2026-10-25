@@ -11,6 +11,8 @@ const props = defineProps<{
 const transformedOptions = computed(() =>
   transformOptions(props.field['#options'] || {}),
 )
+// Options with descriptions (Webform's "label -- description") read as cards.
+const hasDescriptions = computed(() => transformedOptions.value.some((option) => option.description))
 
 </script>
 
@@ -19,7 +21,9 @@ const transformedOptions = computed(() =>
     v-model="state[fieldName]"
     class="form-input w-full"
     :items="transformedOptions"
-    :orientation="field['#orientation'] === 'horizontal' ? 'horizontal' : 'vertical'"
+    :orientation="hasDescriptions || field['#orientation'] === 'horizontal' ? 'horizontal' : 'vertical'"
+    :ui="hasDescriptions ? { fieldset: 'grid gap-3 sm:grid-cols-2', item: 'items-start p-5' } : undefined"
+    :variant="hasDescriptions ? 'card' : 'list'"
   >
     <template #description="{ item }">
       <span class="mt-2 block whitespace-pre-line">{{ item.description }}</span>

@@ -13,6 +13,20 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Changed: wizard steps use Nuxt UI's stepper.** A Drupal wizard form shows
+  its pages as a `UStepper` with the page titles; steps already passed can be
+  revisited, later ones open with Next. The step count is still announced to
+  screen readers and the page heading still takes focus. A page offers Next,
+  not Submit, while the form declares a later page, even one hidden until an
+  answer on this page (a path chooser). New export: `hasLaterWizardPage()`.
+- **Added: card radios for options with descriptions.** Radios whose options
+  carry a description (Webform's `label -- description`, sent as
+  `{label, description}` by Stir Tools) render as Nuxt UI card radios.
+  Other radios are unchanged. `WebformFieldProps['#options']` now allows
+  `{ label, description? }` values.
+
 ### Views
 
 - **Fixed: filters in the URL apply on load.** A View's namespaced filter or
