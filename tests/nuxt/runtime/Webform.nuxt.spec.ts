@@ -370,6 +370,7 @@ describe('Webform (Nuxt runtime)', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Step 2 of 2')
+    expect(wrapper.findAll('[data-slot="trigger"]')).toHaveLength(2)
     expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
     expect(wrapper.find('input[name="name"]').exists()).toBe(false)
     expect(buttons()).toContain('Change your name')
@@ -410,6 +411,9 @@ describe('Webform (Nuxt runtime)', () => {
 
     expect(wrapper.find('button[type="submit"]').exists()).toBe(false)
     expect(wrapper.findAll('button').some((button) => button.text() === 'Next')).toBe(true)
+    // Before the answer only the chooser shows, so there is no stepper yet.
+    expect(wrapper.find('[data-slot="header"] [data-slot="trigger"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Step 1 of 1')
 
     wrapper.findComponent(WebformContent).props('state').path = 'book'
     await flushPromises()

@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- A wizard shows its stepper only once there are two or more steps to show. A chooser page whose answer reveals the later pages no longer shows a lone "1".
+
 ### Theme
 
 - `DrupalViewDisplay` has a `skeleton` slot, so a site's own grid can show loading placeholders shaped like its cards. Without it, the default skeleton is unchanged.
