@@ -243,6 +243,42 @@ const stirDrupalProxyOptions = (event: H3Event) => ({
   onResponse: handleStirDrupalProxyResponse,
 })
 
+// Only JSON describes a page, and anything else would reach fetchPage() as a
+// string it cannot read and end as a 500. A redirect from the CMS (its vhost
+// redirecting a stray /index.php/ path, say) means no such page: 404. A 2xx
+// that is not JSON (HTML served with a 200) means the CMS or its vhost is
+// misbehaving: 502, so it is reported rather than passing for a missing page.
+// A 304 is a cache revalidation, and 4xx and 5xx already take the error path
+// with their own status.
+export const assertStirDrupalPageResponse = (
+  event: H3Event,
+  response: Response,
+): void => {
+  if (event.method !== 'GET' && event.method !== 'HEAD') return
+
+  const { status } = response
+
+  if (status === 304 || status >= 400) return
+
+  if (status >= 300) {
+    event.node?.res?.removeHeader('location')
+
+    throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+  }
+
+  if (/json/i.test(response.headers.get('content-type') ?? '')) return
+
+  throw createError({ statusCode: 502, statusMessage: 'Unexpected response from the CMS' })
+}
+
+const stirDrupalCeProxyOptions = (event: H3Event) => ({
+  ...stirDrupalProxyOptions(event),
+  onResponse: (responseEvent: H3Event, response: Response) => {
+    assertStirDrupalPageResponse(responseEvent, response)
+    handleStirDrupalProxyResponse(responseEvent, response)
+  },
+})
+
 export const proxyStirDrupalCeRequest = async (
   event: H3Event,
   path = '',
@@ -261,7 +297,7 @@ export const proxyStirDrupalCeRequest = async (
     getRequestURL(event).search,
   )
 
-  return await proxyRequest(event, target, stirDrupalProxyOptions(event))
+  return await proxyRequest(event, target, stirDrupalCeProxyOptions(event))
 }
 
 export const proxyStirDrupalMenuRequest = async (
