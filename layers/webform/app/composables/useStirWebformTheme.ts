@@ -13,6 +13,7 @@ type StirWebformTheme = {
     base?: string | string[]
   }
   fieldGroupHeader?: string
+  wizardPageTitle?: string
   fieldGroup?: string
   fieldInput?: string
   fieldText?: string

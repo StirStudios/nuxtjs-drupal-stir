@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { useAppConfig } from '#imports'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import WebformContent from '../../../layers/webform/app/components/WebformContent.vue'
@@ -102,6 +103,34 @@ describe('Webform (Nuxt runtime)', () => {
     expect([...wrapper.get('form').element.parentElement!.classList]).toEqual(
       expect.arrayContaining(['w-full', 'mx-auto', 'lg:max-w-3xl']),
     )
+  })
+
+  it('styles a wizard page heading with wizardPageTitle, keeping it for focus', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+    const mountWizard = () => mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            first: { '#type': 'webform_wizard_page', '#name': 'first', '#title': 'Pick your time', children: { name: { '#type': 'textfield', '#name': 'name', '#title': 'Name' } } },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    theme.wizardPageTitle = 'sr-only'
+    const hidden = await mountWizard()
+
+    await flushPromises()
+    expect(hidden.get('h2[tabindex="-1"]').classes()).toContain('sr-only')
+    hidden.unmount()
+
+    delete theme.wizardPageTitle
+    const shown = await mountWizard()
+
+    await flushPromises()
+    expect(shown.get('h2[tabindex="-1"]').classes()).not.toContain('sr-only')
+    shown.unmount()
   })
 
   it('fills prepopulated fields from the prefill prop', async () => {

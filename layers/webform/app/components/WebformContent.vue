@@ -13,6 +13,7 @@ type WebformThemeConfig = {
   formClass?: string
   fieldGroup?: string
   fieldGroupHeader?: string
+  wizardPageTitle?: string
   response?: string
   spacing?: string
   submitAlign?: string
@@ -197,7 +198,7 @@ defineExpose({
       <h2
         v-if="currentPage.title"
         ref="pageHeading"
-        :class="props.themeWebform.fieldGroupHeader"
+        :class="props.themeWebform.wizardPageTitle ?? props.themeWebform.fieldGroupHeader"
         tabindex="-1"
       >
         {{ currentPage.title }}
