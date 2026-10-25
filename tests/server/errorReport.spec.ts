@@ -210,6 +210,24 @@ describe('own scripts only', () => {
     expect(hasOwnFrame(errorWith('Error: x\n    at a (https://www.example.com/not_nuxt/app.js:1:1)'), prefix)).toBe(false)
   })
 
+  it('keeps a failed module import whose stack has frames in the site\'s scripts', () => {
+    // The two frames of a real iPhone in-app browser report, with the message
+    // WebKit gives a failed import(). The drop below is by frames, never by message.
+    const message = 'Importing a module script failed.'
+    const webkit = errorWith(
+      'a@https://www.example.com/_nuxt/BmIMsDnx.js:2:67390\nb@https://www.example.com/_nuxt/CRzLMJPS.js:1:1505',
+      message,
+    )
+
+    expect(hasOwnFrame(webkit, prefix)).toBe(true)
+    expect(hasOwnFrame(errorWith('at a (https://www.example.com/_nuxt/BmIMsDnx.js:2:67390)\n    at b (https://www.example.com/_nuxt/CRzLMJPS.js:1:1505)', message), prefix)).toBe(true)
+    expect(isIgnoredBrowserError(webkit, 'https://www.example.com/_nuxt/BmIMsDnx.js', origin)).toBe(false)
+    expect(buildEvent(webkit, { platform: 'javascript' }).exception.values[0]!.stacktrace.frames.map(frame => frame.filename)).toEqual([
+      'https://www.example.com/_nuxt/CRzLMJPS.js',
+      'https://www.example.com/_nuxt/BmIMsDnx.js',
+    ])
+  })
+
   it('drops errors with no frames, including failed script loads', () => {
     expect(hasOwnFrame(errorWith(''), prefix)).toBe(false)
     expect(hasOwnFrame(new Error('rejected string'), prefix)).toBe(false)
