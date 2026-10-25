@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Changed: a URL confirmation follows the URL Drupal resolved for the
+  submission.** After a successful submit, `WebformForm` redirects to the
+  `confirmation_url` in the submit response when there is one, falling back to
+  the form's own redirect as before. Drupal (`stir_webform_rest`) resolves
+  tokens in that URL for the saved submission when the site includes
+  confirmation settings, so a redirect built from submitted values works. The
+  same safety rules apply: only root-relative or HTTP(S) URLs are followed.
+  New export: `resolveSubmissionRedirect()` in `utils/webformRedirect`.
+
 ### Errors
 
 - **Changed: the browser reporter skips automated visitors.** Crawlers,
