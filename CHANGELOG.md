@@ -15,6 +15,13 @@ untouched do not need one.
 
 ### Theme
 
+- **Fixed: buttons in an action group line up.** Only the button right after
+  a Layout's text got the gap below it, so in a row of buttons the first sat
+  lower than the rest. Every button after the text in an action group now
+  keeps the gap.
+
+### Theme
+
 - **New: `stirTheme.navigation.ui`.** Nuxt UI NavigationMenu slot classes
   for the header menu only (`{ link: 'uppercase text-lg' }`). Setting
   `ui.navigationMenu` in a site's app config also restyles every other menu,

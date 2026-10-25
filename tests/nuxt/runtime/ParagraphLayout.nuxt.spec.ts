@@ -67,6 +67,18 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     wrapper.unmount()
   })
 
+  it('keeps every button in an action group on one line below the text', async () => {
+    const wrapper = await mountSuspended(ParagraphLayout, {
+      props: { id: 'actions', gridClass: {}, presentationVariant: 'action-group-center' },
+      slots: { first: '<p>First</p>' },
+    })
+    const region = wrapper.get('.region').classes().join(' ')
+
+    // A sibling rule (~), not the adjacent one (+) alone, so later buttons match.
+    expect(region).toContain('[&>:where(.prose,:has(.prose))~:where(.paragraph-button)]:mt-[var(--stir-content-action-gap,1.5rem)]')
+    wrapper.unmount()
+  })
+
   it('applies no presentation classes without a known choice, even from a payload classes value', async () => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: { id: 'unknown', gridClass: {}, surface: 'unknown' },
