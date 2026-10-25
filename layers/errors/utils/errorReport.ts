@@ -110,13 +110,18 @@ export function buildEvent(error: Error, context: ReportContext, eventId = crypt
 
 // The same error again within a minute counts once, and a runaway loop sends
 // no more than a handful a minute.
-export function createThrottle(now: () => number = Date.now, windowMs = 60_000, max = 20) {
+export function createThrottle(
+  now: () => number = Date.now,
+  windowMs = 60_000,
+  max = 20,
+  keyOf: (error: Error) => string = error => `${error.name}:${(error.message || '').slice(0, 200)}`,
+) {
   const seen = new Map<string, number>()
   let sent: number[] = []
 
   return (error: Error): boolean => {
     const at = now()
-    const key = `${error.name}:${(error.message || '').slice(0, 200)}`
+    const key = keyOf(error)
 
     sent = sent.filter(time => at - time < windowMs)
     for (const [known, time] of seen) {
@@ -130,6 +135,12 @@ export function createThrottle(now: () => number = Date.now, windowMs = 60_000, 
     return true
   }
 }
+
+// One failure reaches the page by several routes (the window, Vue and Nuxt
+// each raise it) and each may wrap it differently: a TypeError, an Error, a
+// Nuxt error. The message is what they share, so the browser counts by that.
+export const messageKey = (error: Error): string =>
+  (error.message || '').trim().replace(/[.\s]+$/, '').slice(0, 200)
 
 // One event as a Sentry envelope: a header line, an item header, the event.
 export function buildEnvelope(event: { event_id: string }): string {

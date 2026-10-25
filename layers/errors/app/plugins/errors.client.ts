@@ -4,6 +4,7 @@ import {
   hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  messageKey,
   ownScriptsPrefix,
   parseDsn,
   sendEvent,
@@ -25,7 +26,7 @@ export default defineNuxtPlugin({
 
     const { allowsNonEssential } = usePrivacyConsent()
     const ownScripts = ownScriptsPrefix(useRuntimeConfig().app, window.location.origin)
-    const allow = createThrottle()
+    const allow = createThrottle(Date.now, 60_000, 20, messageKey)
 
     function report(value: unknown, source?: string) {
       const error = toError(value)

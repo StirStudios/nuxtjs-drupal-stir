@@ -6,6 +6,7 @@ import {
   hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  messageKey,
   ownScriptsPrefix,
   parseDsn,
   parseStack,
@@ -233,5 +234,32 @@ describe('own scripts only', () => {
     expect(hasOwnFrame(new Error('rejected string'), prefix)).toBe(false)
     expect(hasOwnFrame(errorWith('TypeError: Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js'), prefix)).toBe(false)
     expect(hasOwnFrame(errorWith('TypeError: Importing a module script failed.'), prefix)).toBe(false)
+  })
+})
+
+describe('one failure, several handlers', () => {
+  it('counts the browser\'s window, Vue and Nuxt reports of one failure once, whatever they wrap it as', () => {
+    let now = 1_000
+    const allow = createThrottle(() => now, 60_000, 20, messageKey)
+    const message = 'Importing a module script failed.'
+
+    // A rejected promise gives a TypeError; Nuxt hands over its own wrapped error.
+    expect(allow(new TypeError(message))).toBe(true)
+    expect(allow(Object.assign(new Error(message), { name: 'NuxtError' }))).toBe(false)
+    expect(allow(new Error(`${message} `))).toBe(false)
+    expect(allow(new Error('Importing a module script failed'))).toBe(false)
+
+    // A different failure still counts, and the same one counts again after the window.
+    expect(allow(new Error('x is not a function'))).toBe(true)
+    now += 61_000
+    expect(allow(new TypeError(message))).toBe(true)
+  })
+
+  it('keeps the server\'s count by name and message', () => {
+    const allow = createThrottle(() => 1_000)
+
+    expect(allow(new TypeError('boom'))).toBe(true)
+    expect(allow(new Error('boom'))).toBe(true)
+    expect(allow(new TypeError('boom'))).toBe(false)
   })
 })

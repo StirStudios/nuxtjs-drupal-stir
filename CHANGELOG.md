@@ -92,6 +92,11 @@ untouched do not need one.
 
 ### Errors
 
+- **Fixed: the browser reports one failure once.** The window, Vue and Nuxt
+  each raise the same failure and may wrap it differently (a TypeError, an
+  Error, a Nuxt error), which counted as separate errors. The browser now
+  counts by message alone, once a minute; the server still counts by name and
+  message.
 - **Changed: the browser reporter sends only errors from the site's own
   scripts.** An error is reported when at least one stack frame is in the
   site's built scripts (`/_nuxt/`, following the base path and CDN settings).
