@@ -156,7 +156,7 @@ const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
 }
 
 resetFormState({ bumpKey: false })
-applyWebformPrepopulate(state, fields, useRoute().query)
+applyWebformPrepopulate(state, fields, { ...useRoute().query, ...props.prefill })
 
 const shouldRenderGroupContainer = (fieldName: string) =>
   !!(
