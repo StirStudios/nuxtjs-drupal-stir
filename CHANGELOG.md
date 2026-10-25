@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Core
+
+- **Fixed: a CMS redirect or HTML answer to a page read is a 404, not a 500.**
+  A path such as `/anything/index.php/test` made the CMS vhost answer with an
+  HTML 307, which the page fetch could not read and the site returned 500
+  (and, with the errors layer on, reported an error). The Drupal CE proxy now
+  turns a GET/HEAD answer that is a redirect or not JSON into a 404; 304
+  revalidations, 4xx and 5xx, mutations and menu reads are unchanged.
+
 ### Webform
 
 - **Changed: wizard steps use Nuxt UI's stepper.** A Drupal wizard form shows

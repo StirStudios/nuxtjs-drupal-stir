@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { proxyRequest } from 'h3'
 import {
+  assertStirDrupalPageResponse,
   createStirDrupalProxyFetch,
   getStirDrupalCeProxyTargets,
   handleStirDrupalProxyResponse,
@@ -127,6 +128,75 @@ describe('Drupal CE proxy boundary', () => {
     await proxyStirDrupalCeRequest(event, 'ce-api/node/1')
 
     expect(proxyRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it('turns a redirect or HTML answer to a page read into a 404, not a crash', async () => {
+    stubRuntimeConfig()
+    vi.mocked(proxyRequest).mockClear()
+
+    const { event, responseHeaders } = createEvent()
+
+    await proxyStirDrupalCeRequest(event, 'ce-api/webroot/index.php/_environment')
+
+    const { onResponse } = vi.mocked(proxyRequest).mock.calls[0]![2] as unknown as {
+      onResponse: (event: never, response: Response) => void
+    }
+    const html = '<html><head><title>307 Temporary Redirect</title></head></html>'
+
+    responseHeaders.set('location', '/webroot/_environment')
+    expect(() => onResponse(event, new Response(html, {
+      status: 307,
+      headers: { 'content-type': 'text/html', location: '/webroot/_environment' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
+    expect(responseHeaders.has('location')).toBe(false)
+
+    expect(() => onResponse(event, new Response(html, {
+      status: 200,
+      headers: { 'content-type': 'text/html; charset=UTF-8' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
+
+    expect(() => onResponse(event, new Response('{"title":"Home"}', {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }))).not.toThrow()
+  })
+
+  it('lets JSON pages, errors and revalidations through the page guard', () => {
+    const { event } = createEvent()
+    const answer = (status: number, type?: string) =>
+      new Response([204, 304].includes(status) ? null : '{}', { status, headers: type ? { 'content-type': type } : {} })
+
+    for (const response of [
+      answer(200, 'application/json'),
+      answer(200, 'application/json; charset=utf-8'),
+      answer(304),
+      answer(404, 'application/json'),
+      answer(403, 'text/html'),
+      answer(503, 'text/html'),
+    ]) {
+      expect(() => assertStirDrupalPageResponse(event, response)).not.toThrow()
+    }
+
+    for (const response of [answer(301, 'text/html'), answer(302), answer(307, 'text/html'), answer(200, 'text/html'), answer(204)]) {
+      expect(() => assertStirDrupalPageResponse(event, response)).toThrowError(expect.objectContaining({ statusCode: 404 }))
+    }
+  })
+
+  it('leaves mutations and menu reads to their own handling', async () => {
+    const { event } = createEvent('', '/', { method: 'POST' })
+
+    expect(() => assertStirDrupalPageResponse(event, new Response('<html>', { status: 307 }))).not.toThrow()
+
+    stubRuntimeConfig()
+    vi.mocked(proxyRequest).mockClear()
+
+    await proxyStirDrupalMenuRequest(createEvent().event, 'api/menu_items/main')
+
+    const { onResponse } = vi.mocked(proxyRequest).mock.calls[0]![2] as unknown as {
+      onResponse: (event: never, response: Response) => void
+    }
+
+    expect(onResponse).toBe(handleStirDrupalProxyResponse)
   })
 
   it('resolves the configured CE and menu targets', () => {

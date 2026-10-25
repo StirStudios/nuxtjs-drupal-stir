@@ -243,6 +243,35 @@ const stirDrupalProxyOptions = (event: H3Event) => ({
   onResponse: handleStirDrupalProxyResponse,
 })
 
+// Only JSON describes a page. A redirect or an HTML page from the CMS (its
+// vhost redirecting a stray /index.php/ path, say) reaches fetchPage() as a
+// string it cannot read and ends as a 500, so a read that did not come back as
+// JSON is a page that was not found. A 304 is a cache revalidation and 4xx and
+// 5xx already take the error path with their own status.
+export const assertStirDrupalPageResponse = (
+  event: H3Event,
+  response: Response,
+): void => {
+  if (event.method !== 'GET' && event.method !== 'HEAD') return
+
+  const { status } = response
+
+  if (status === 304 || status >= 400) return
+  if (status < 300 && /json/i.test(response.headers.get('content-type') ?? '')) return
+
+  event.node?.res?.removeHeader('location')
+
+  throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+}
+
+const stirDrupalCeProxyOptions = (event: H3Event) => ({
+  ...stirDrupalProxyOptions(event),
+  onResponse: (responseEvent: H3Event, response: Response) => {
+    assertStirDrupalPageResponse(responseEvent, response)
+    handleStirDrupalProxyResponse(responseEvent, response)
+  },
+})
+
 export const proxyStirDrupalCeRequest = async (
   event: H3Event,
   path = '',
@@ -261,7 +290,7 @@ export const proxyStirDrupalCeRequest = async (
     getRequestURL(event).search,
   )
 
-  return await proxyRequest(event, target, stirDrupalProxyOptions(event))
+  return await proxyRequest(event, target, stirDrupalCeProxyOptions(event))
 }
 
 export const proxyStirDrupalMenuRequest = async (
