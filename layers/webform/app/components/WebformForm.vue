@@ -12,7 +12,7 @@ import {
 import { resolveSubmissionMessage, resolveSubmissionRedirect } from '#stir-webform/utils/webformRedirect'
 import { resolveWebformSubmissionIssues } from '#stir-webform/utils/webformSubmissionErrors'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
-import { createWebformState } from '#stir-webform/utils/webformState'
+import { applyWebformPrepopulate, createWebformState } from '#stir-webform/utils/webformState'
 import { isWebformContainer } from '#stir-webform/utils/webformFieldTypes'
 import {
   buildWebformFormData,
@@ -156,6 +156,7 @@ const resetFormState = (resetOptions: { bumpKey?: boolean } = {}) => {
 }
 
 resetFormState({ bumpKey: false })
+applyWebformPrepopulate(state, fields, useRoute().query)
 
 const shouldRenderGroupContainer = (fieldName: string) =>
   !!(

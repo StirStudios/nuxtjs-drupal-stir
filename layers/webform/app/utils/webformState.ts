@@ -76,3 +76,28 @@ export function createWebformState(
 
   return state
 }
+
+/**
+ * Fills fields that allow it from the page URL, as Webform's "Allow the
+ * element to be populated using query string parameters" does: `?space=12`
+ * sets the `space` field. A field with options takes only one of them.
+ */
+export function applyWebformPrepopulate(
+  state: WebformState,
+  fields: Record<string, WebformFieldProps>,
+  query: Record<string, unknown>,
+): void {
+  for (const [key, field] of Object.entries(fields)) {
+    const raw = query[key]
+    const value = Array.isArray(raw) ? raw.filter((item) => typeof item === 'string') : raw
+
+    if (field['#prepopulate'] !== true || !(key in state) || (typeof value !== 'string' && !Array.isArray(value))) continue
+
+    const values = Array.isArray(value) ? value : [value]
+    const options = field['#options'] && typeof field['#options'] === 'object' ? Object.keys(field['#options']) : null
+    const allowed = options ? values.filter((item) => options.includes(item)) : values
+
+    if (!allowed.length) continue
+    state[key] = Array.isArray(state[key]) ? allowed : allowed[0]!
+  }
+}

@@ -15,6 +15,14 @@ untouched do not need one.
 
 ### Webform
 
+- **New: fields Webform lets the URL fill are filled from it.** An element
+  with "Allow the element to be populated using query string parameters"
+  (`#prepopulate`) starts with the matching query value, so `?space=12` picks
+  a space; a field with options takes only one of them. New
+  `applyWebformPrepopulate` util.
+
+### Webform
+
 - **New: Webform flexbox rows render side by side.** Fields in a
   `webform_flexbox` share a responsive grid row (stacked on phones); before,
   the flexbox was flattened away and every field took a full row. Flattened

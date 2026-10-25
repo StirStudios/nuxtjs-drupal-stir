@@ -147,6 +147,7 @@ export interface WebformFieldProps {
   '#file_extensions'?: string
   '#upload_validators'?: Record<string, unknown>
   '#defaultValue'?: unknown
+  '#prepopulate'?: boolean
   '#multiple'?: boolean
   '#cardinality'?: number
   '#timezone'?: string
