@@ -21,6 +21,12 @@ and skips `defu` for a single `app.config`. CSS stayed at about 35.5 kB. The
 editor-only graph grew from 284.92 to 299.35 kB under 4.6's chunking, but it
 loads only for editors, and its largest chunk is well inside the deferred cap.
 
+The caps then moved to 232 / 195 kB for the errors reporter's browser half: the
+frame allowlist, counting one failure once and the failed-module diagnostics
+added 0.48 kB gzip (1.18 kB raw) to the app entry, in first-party code only.
+It cannot be tree-shaken per site, because a site's DSN is runtime
+configuration, so the cost is the same on every site.
+
 Recovering those bytes is still worthwhile, and the caps should be ratcheted
 back down as it happens. This file records what the graph is actually made of
 so that work starts from measurement rather than guesswork.
