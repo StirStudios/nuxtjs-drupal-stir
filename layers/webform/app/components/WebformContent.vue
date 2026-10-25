@@ -185,7 +185,10 @@ defineExpose({
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
     <div v-if="isWizard && currentPage" class="flex flex-col gap-4">
-      <!-- Steps already passed can be revisited; later ones open with Next. -->
+      <!-- Steps already passed can be revisited; later ones open with Next.
+           A lone step, such as a chooser before its answer reveals the rest,
+           shows no progress, so the stepper waits for a second step. -->
+      <template v-if="stepperItems.length > 1">
       <UStepper
         :items="stepperItems"
         :model-value="pageIndex"
@@ -195,6 +198,7 @@ defineExpose({
       <p aria-live="polite" class="sr-only">
         Step {{ pageIndex + 1 }} of {{ wizardPages.length }}
       </p>
+      </template>
       <h2
         v-if="currentPage.title"
         ref="pageHeading"
