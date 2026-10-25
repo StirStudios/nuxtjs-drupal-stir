@@ -21,6 +21,8 @@ type StirWebformTheme = {
   help?: string
   submitAlign?: string
   submitComponent?: string
+  /** Global component names keyed by Webform element name (`#name`), for site-specific fields. */
+  fieldComponents?: Record<string, string>
   buttonClass?: string
   submitButtonSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   fieldVariant?: 'outline' | 'soft' | 'subtle' | 'ghost' | 'none' | 'material'

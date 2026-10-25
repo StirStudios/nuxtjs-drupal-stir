@@ -54,7 +54,9 @@ export function normalizeDrupalViewFilters(
       label: filter.label,
       queryParamName: filter.queryParamName,
       type: filter.type,
-      multiple: filter.multiple,
+      // A date range holds its start and end, so it keeps both values through
+      // state, the URL and the refresh request.
+      multiple: filter.type === 'date_range' ? true : filter.multiple,
       disabled: filter.disabled,
       options: mapDrupalViewFilterOptions(filter.options),
     }))

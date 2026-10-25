@@ -1093,6 +1093,7 @@ webform: {
   help: 'my-3 text-sm text-muted',
   submitAlign: '',
   submitComponent: '',
+  fieldComponents: {},
   submitButtonSize: '2xl',
   fieldVariant: 'outline',
 },
@@ -1101,6 +1102,7 @@ webform: {
 - `formClass` applies classes to the root `UForm`, useful for downstream project scoping.
 - `showToasts: false` drops the success and error toasts. A refused submission is then shown under the Submit button instead (`role="alert"`), so the visitor still learns why. Forms that override `WebformContent` receive it as the `submissionError` prop.
 - `submitComponent` optionally names a globally registered custom submit action component. When empty or unresolved, the default `UButton` submit action is used.
+- `fieldComponents` maps a Webform element name (its Drupal `#name`) to a globally registered component that renders that one field instead of the layer's, for a site-specific widget such as options loaded from an endpoint. The component receives `field`, `fieldName` and `state` and sits inside the layer's `UFormField`, so the label, description, required marker, conditions and validation stay the layer's. Drupal still validates the value. An unresolved name falls back to the layer's field.
 - Most projects do not need a `webform` override. Override only values that genuinely differ from these defaults.
 - `spacing` controls the root form rhythm, while `fieldGroup` controls fields inside each Drupal group and the space after that group. There is no separate `spacingLarge` setting.
 

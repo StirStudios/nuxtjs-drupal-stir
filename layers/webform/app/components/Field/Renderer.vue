@@ -115,7 +115,18 @@ const useFloatingLabels = computed(
 const resolvedFieldType = computed(() => props.field['#type'])
 const isDisplayElement = computed(() => isWebformDisplayElement(props.field))
 
+const nuxtApp = useNuxtApp()
+// A site may render one element with its own global component, named in
+// stirTheme.webform.fieldComponents by the element's Drupal name.
+const siteComponent = computed(() => {
+  const name = webform.fieldComponents?.[String(props.field['#name'] ?? '')]?.trim()
+
+  return name ? nuxtApp.vueApp.component(name) ?? null : null
+})
+
 const resolvedComponent = computed(() => {
+  if (siteComponent.value) return siteComponent.value
+
   if (isCompositeField(props.field) && resolvedFieldType.value !== 'address') {
     return LazyFieldComposite
   }

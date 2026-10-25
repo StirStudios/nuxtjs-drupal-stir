@@ -64,6 +64,8 @@
         "#minSelected": { "type": "integer", "minimum": 0 },
         "#groupMaxSelected": { "type": "integer", "minimum": 0 },
         "#tabGroup": { "type": "string" },
+        "#prevButtonLabel": { "type": "string" },
+        "#nextButtonLabel": { "type": "string" },
         "#timezone": { "type": "string", "minLength": 1 },
         "#dateMin": {
           "description": "A date or datetime element's earliest date, resolved from #date_date_min or #date_min in #timezone.",

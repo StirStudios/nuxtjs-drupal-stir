@@ -349,6 +349,32 @@ describe('useDrupalViewControls (Nuxt runtime)', () => {
     expect(state.api).toHaveBeenCalledTimes(1)
   })
 
+  it('resolves namespaced filters from the URL during the initial render', async () => {
+    state.api.mockResolvedValue(viewResponse(0, 'filtered-news'))
+
+    const wrapper = await mountSuspended(InitialViewControlsHarness, {
+      route: '/work?testimonials_p42_category=news',
+    })
+
+    expect(wrapper.text()).toBe('filtered-news')
+    expect(state.api).toHaveBeenCalledWith(
+      '/api/view/42',
+      expect.objectContaining({
+        query: expect.objectContaining({ category: 'news' }),
+      }),
+    )
+    expect(state.api).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps the server render when the URL has no View controls', async () => {
+    const wrapper = await mountSuspended(InitialViewControlsHarness, {
+      route: '/work?campaign=portfolio',
+    })
+
+    expect(wrapper.text()).toBe('')
+    expect(state.api).not.toHaveBeenCalled()
+  })
+
   it('applies safe route query values after route changes', async () => {
     state.api.mockResolvedValue(viewResponse(2, 'route-row'))
     const wrapper = await mountSuspended(ViewControlsHarness)

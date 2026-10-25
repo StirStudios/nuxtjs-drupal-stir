@@ -579,9 +579,18 @@ export function useDrupalViewControls(
   }
 
   async function resolveInitialView(): Promise<void> {
-    const page = routePageValue()
+    const routePage = routePageValue()
+    // Drupal renders the page with the View's defaults: it does not read the
+    // namespaced control keys. A URL that carries this View's filters or sort
+    // (a reload, a shared link, history) is resolved here, as a later page is.
+    const pageKeys = new Set([publicQueryKey('page'), publicQueryKey('page', legacyQueryNamespace.value)])
+    const hasRouteControls = managedQueryKeys().some(
+      key => !pageKeys.has(key) && routeControls.routeQueryValue(key) !== undefined,
+    )
 
-    if (page === null || page < 1) return
+    if (!hasRouteControls && (routePage === null || routePage < 1)) return
+
+    const page = routePage !== null && routePage > 0 ? routePage : 0
 
     const queryString = buildDrupalViewSearchParams(buildQueryParams(page)).toString()
     const key = `drupal-view:${resolvedQueryNamespace.value}:${route.path}:${queryString}`

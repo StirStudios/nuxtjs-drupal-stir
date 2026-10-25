@@ -269,6 +269,64 @@ describe('Webform (Nuxt runtime)', () => {
     expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
   })
 
+  it('steps through Drupal wizard pages, validating each before the next', async () => {
+    runtime.fetch.mockClear()
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            about: {
+              '#type': 'webform_wizard_page',
+              '#name': 'about',
+              '#title': 'About you',
+              '#nextButtonLabel': 'Continue',
+              children: {
+                name: { ...webform.fields.name, '#type': 'textfield', '#requiredError': 'Enter your name' },
+              },
+            },
+            details: {
+              '#type': 'webform_wizard_page',
+              '#name': 'details',
+              '#title': 'Details',
+              '#prevButtonLabel': 'Change your name',
+              children: {
+                notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' },
+              },
+            },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    const buttons = () => wrapper.findAll('button').map((button) => button.text())
+
+    expect(wrapper.text()).toContain('Step 1 of 2')
+    expect(wrapper.find('input[name="name"]').exists()).toBe(true)
+    expect(wrapper.find('textarea[name="notes"]').exists()).toBe(false)
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(false)
+
+    const next = () => wrapper.findAll('button').find((button) => button.text() === 'Continue')!
+
+    await next().trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Enter your name')
+    expect(wrapper.text()).toContain('Step 1 of 2')
+
+    wrapper.findComponent(WebformContent).props('state').name = 'Ada'
+    await next().trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Step 2 of 2')
+    expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
+    expect(wrapper.find('input[name="name"]').exists()).toBe(false)
+    expect(buttons()).toContain('Change your name')
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(true)
+    expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
+  })
+
   it('does not submit display-only markup as an empty field', async () => {
     runtime.fetch.mockClear()
     runtime.fetch.mockResolvedValue(undefined)

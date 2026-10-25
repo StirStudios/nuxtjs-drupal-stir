@@ -4,6 +4,7 @@ import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
+import { resolveWizardPages, wizardPageFieldNames } from '#stir-webform/utils/webformWizard'
 
 type WebformThemeConfig = {
   buttonClass?: string
@@ -48,6 +49,47 @@ const emit = defineEmits<{
 }>()
 
 const form = useTemplateRef('form')
+const pageHeading = useTemplateRef<HTMLElement>('pageHeading')
+
+// Drupal Webform wizard pages: one page at a time, each validated before the
+// next; the last page submits every value once. Pages hidden by conditions
+// are skipped. Forms without wizard pages render all fields as before.
+const wizardPages = computed(() =>
+  resolveWizardPages(props.fields, props.orderedFieldNames, props.state),
+)
+const isWizard = computed(() => wizardPages.value.length > 0)
+const pageIndex = ref(0)
+const currentPage = computed(() =>
+  wizardPages.value[Math.min(pageIndex.value, wizardPages.value.length - 1)],
+)
+const isLastPage = computed(
+  () => !isWizard.value || pageIndex.value >= wizardPages.value.length - 1,
+)
+const isOnCurrentPage = (fieldName: string) => {
+  if (!isWizard.value) return true
+  const page = (props.fields[fieldName] as { page?: { key: string } | null } | undefined)?.page
+
+  return !page || page.key === currentPage.value?.key
+}
+
+async function goToPage(index: number) {
+  pageIndex.value = index
+  await nextTick()
+  pageHeading.value?.focus()
+}
+
+async function nextPage() {
+  const names = wizardPageFieldNames(props.fields, props.orderedFieldNames, currentPage.value?.key)
+
+  try {
+    await form.value?.validate({ name: names, silent: false })
+  } catch {
+    // UForm shows the errors on the fields of this page.
+    return
+  }
+
+  await goToPage(pageIndex.value + 1)
+}
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const trustedHtml = (value?: string) => trustedDrupalHtml(value)
@@ -102,9 +144,24 @@ defineExpose({
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
+    <div v-if="isWizard && currentPage" class="flex flex-col gap-1">
+      <p aria-live="polite" class="text-sm text-muted">
+        Step {{ pageIndex + 1 }} of {{ wizardPages.length }}
+      </p>
+      <h2
+        v-if="currentPage.title"
+        ref="pageHeading"
+        :class="props.themeWebform.fieldGroupHeader"
+        tabindex="-1"
+      >
+        {{ currentPage.title }}
+      </h2>
+    </div>
+
     <template v-for="fieldName in orderedFieldNames" :key="fieldName">
       <template
         v-if="
+          isOnCurrentPage(fieldName) &&
           shouldRenderGroupContainer(fieldName) &&
           isContainerVisible(String(fields[fieldName]?.parent ?? ''))
         "
@@ -143,7 +200,7 @@ defineExpose({
         </div>
       </template>
 
-      <template v-else-if="shouldRenderIndividualField(fieldName)">
+      <template v-else-if="isOnCurrentPage(fieldName) && shouldRenderIndividualField(fieldName)">
         <FieldRenderer
           v-if="!fields[fieldName]?.['#tabGroup']"
           :field="fields[fieldName]!"
@@ -156,19 +213,37 @@ defineExpose({
     </template>
 
     <FieldTurnstile
+      v-if="isLastPage"
       collapse-when-inactive
       :model-value="turnstileToken"
       @update:model-value="emit('update:turnstileToken', String($event ?? ''))"
     />
 
     <WrapDiv :align="props.themeWebform.submitAlign">
+      <div v-if="isWizard" class="flex flex-wrap gap-3">
+        <UButton
+          v-if="pageIndex > 0"
+          color="neutral"
+          :label="currentPage?.prevLabel || 'Back'"
+          :size="buttonSize"
+          variant="outline"
+          @click="goToPage(pageIndex - 1)"
+        />
+        <UButton
+          v-if="!isLastPage"
+          :class="props.themeWebform.buttonClass"
+          :label="currentPage?.nextLabel || 'Next'"
+          :size="buttonSize"
+          @click="nextPage"
+        />
+      </div>
       <component
         :is="submitComponent"
-        v-if="submitComponent"
+        v-if="isLastPage && submitComponent"
         v-bind="submitComponentProps"
       />
       <UButton
-        v-else
+        v-else-if="isLastPage"
         v-bind="submitButtonProps"
       />
     </WrapDiv>

@@ -55,6 +55,6 @@
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform-submission-sample.schema.json": "0b27ece2f8fcf44ceba7963567cad17bf6d8e1ce1bcce44c87c6afb0b811ad98",
-    "schemas/webform.schema.json": "b357549db100ff535bd740beedc740b482c253a886252a310d01774f72404c91"
+    "schemas/webform.schema.json": "ef1f2d707620662999b4260ffdfe7e3abee2af4d419738189ed4c50cd67b2082"
   }
 }

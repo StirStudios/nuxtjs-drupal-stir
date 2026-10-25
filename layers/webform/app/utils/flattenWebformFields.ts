@@ -1,17 +1,30 @@
 import type { WebformFieldProps, GroupField } from '#stir/types'
 
+/** A Drupal Webform wizard page (`webform_wizard_page`) a field sits on. */
+export interface WebformWizardPage {
+  key: string
+  title: string | null
+  prevLabel: string | null
+  nextLabel: string | null
+}
+
 interface FlattenedField extends WebformFieldProps {
   parent: string | null
   group?: string | null
   parentTitle?: string | null
   parentDescription?: string | null
+  page?: WebformWizardPage | null
 }
+
+const label = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() ? value : null
 
 export function flattenWebformFields(
   fields: Record<string, WebformFieldProps>,
   parentKey: string | null = null,
   parentTitle: string | null = null,
   parentDescription: string | null = null,
+  page: WebformWizardPage | null = null,
 ): Record<string, FlattenedField> {
   const flat: Record<string, FlattenedField> = {}
 
@@ -41,6 +54,7 @@ export function flattenWebformFields(
           ...field,
           parent: parentKey,
           group: null,
+          page,
         }
       }
 
@@ -57,11 +71,24 @@ export function flattenWebformFields(
               ),
             ) as Record<string, WebformFieldProps>)
 
+      // A wizard page is not a visual group: its fields keep their parent and
+      // only learn which page they are on, so forms render as before until a
+      // consumer pages through them.
+      const childPage = type === 'webform_wizard_page'
+        ? {
+            key,
+            title: label(field['#title']),
+            prevLabel: label(field['#prevButtonLabel']),
+            nextLabel: label(field['#nextButtonLabel']),
+          }
+        : page
+
       const nested = flattenWebformFields(
         children,
         type === 'section' ? key : parentKey,
         type === 'section' ? field['#title'] || null : parentTitle,
         type === 'section' ? field['#description'] || null : parentDescription,
+        childPage,
       )
 
       Object.assign(flat, nested)
@@ -72,6 +99,7 @@ export function flattenWebformFields(
         group: field['#group'] || null,
         parentTitle,
         parentDescription,
+        page,
       }
     }
   }

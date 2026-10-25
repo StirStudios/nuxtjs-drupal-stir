@@ -13,6 +13,46 @@ untouched do not need one.
 
 ## Unreleased
 
+### Views
+
+- **Fixed: filters in the URL apply on load.** A View's namespaced filter or
+  sort values in the URL (a reload, a shared link, back and forward, or the page
+  re-rendering after a filter change) were ignored on the first render, because
+  Drupal renders the page with the View's defaults. The View now fetches its
+  filtered results on load whenever the URL carries its controls, as it already
+  did for a later page. URLs without View controls render as before, with no
+  extra request.
+- **Fixed: date range filters keep both dates.** A View's `date_range` filter
+  was treated as single-valued, so restoring it from the URL or refreshing the
+  View sent only the start date and Drupal refused the request. Date range
+  filters are now normalised as two-valued (`multiple: true`), so the start
+  and end travel together through state, the URL and the refresh request.
+  Needs the Stir Tools fix that maps the two values to Views' min and max.
+
+### Webform
+
+- **Added: Webform wizard pages.** A form built from Drupal wizard pages
+  (`webform_wizard_page`) now shows one page at a time with a step counter, the
+  page title (focused on each step) and Back and Next buttons using the labels
+  set in Drupal. Next validates the current page; the last page submits every
+  value once. Pages whose fields are hidden by conditions are skipped. Forms
+  without wizard pages render exactly as before. Flattened fields carry their
+  wizard page as `page`; new exports `resolveWizardPages()` and
+  `wizardPageFieldNames()` in `utils/webformWizard`. Requires the Stir Tools
+  contract 1.37.0 labels (`#prevButtonLabel`, `#nextButtonLabel`).
+- **Added: `stirTheme.webform.fieldComponents`.** Maps a Webform element name
+  to a globally registered component that renders that one field inside the
+  layer's form field (label, conditions and validation unchanged), for a
+  site-specific widget. Unset or unresolved names keep the layer's field.
+- **Changed: a URL confirmation follows the URL Drupal resolved for the
+  submission.** After a successful submit, `WebformForm` redirects to the
+  `confirmation_url` in the submit response when there is one, falling back to
+  the form's own redirect as before. Drupal (`stir_webform_rest`) resolves
+  tokens in that URL for the saved submission when the site includes
+  confirmation settings, so a redirect built from submitted values works. The
+  same safety rules apply: only root-relative or HTTP(S) URLs are followed.
+  New export: `resolveSubmissionRedirect()` in `utils/webformRedirect`.
+
 ### Errors
 
 - **Changed: the browser reporter skips automated visitors.** Crawlers,

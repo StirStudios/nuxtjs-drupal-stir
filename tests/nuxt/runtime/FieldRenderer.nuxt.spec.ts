@@ -193,6 +193,42 @@ describe('FieldRenderer (Nuxt runtime)', () => {
       .not.toContain('mt-2')
   })
 
+  it('renders a field with the site component named for it', async () => {
+    const appConfig = useAppConfig()
+    const webform = appConfig.stirTheme.webform as { fieldComponents?: Record<string, string> }
+    const previous = webform.fieldComponents
+    const nuxtApp = useNuxtApp()
+
+    nuxtApp.vueApp.component('TestSiteTimeField', {
+      props: ['field', 'fieldName', 'state'],
+      template: '<select :name="fieldName" data-site-field><option>10:00</option></select>',
+    })
+    webform.fieldComponents = { start_time: 'TestSiteTimeField', other: 'NotRegistered' }
+
+    try {
+      const site = await mountSuspended(FieldRenderer, {
+        props: {
+          field: { '#type': 'textfield', '#name': 'start_time', '#title': 'Start time', '#required': true },
+          fieldName: 'start_time',
+          state: {},
+        },
+      })
+      const fallback = await mountSuspended(FieldRenderer, {
+        props: {
+          field: { '#type': 'textfield', '#name': 'other', '#title': 'Other' },
+          fieldName: 'other',
+          state: {},
+        },
+      })
+
+      expect(site.find('[data-site-field]').exists()).toBe(true)
+      expect(site.text()).toContain('Start time')
+      expect(fallback.find('input[name="other"]').exists()).toBe(true)
+    } finally {
+      webform.fieldComponents = previous
+    }
+  })
+
   it('tightens static material text labels without affecting floating labels', async () => {
     const appConfig = useAppConfig()
     const webform = appConfig.stirTheme.webform

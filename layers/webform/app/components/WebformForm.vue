@@ -9,7 +9,7 @@ import {
   createScrollToTopRunner,
   getWebformScrollConfig,
 } from '#stir-webform/utils/webformScrollToTop'
-import { resolveWebformRedirect } from '#stir-webform/utils/webformRedirect'
+import { resolveSubmissionRedirect } from '#stir-webform/utils/webformRedirect'
 import { resolveWebformSubmissionIssues } from '#stir-webform/utils/webformSubmissionErrors'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 import { createWebformState } from '#stir-webform/utils/webformState'
@@ -210,7 +210,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       ? buildWebformFormData(payload)
       : JSON.stringify(payload)
 
-    await $fetch('/api/webform/submit', {
+    const response = await $fetch<unknown>('/api/webform/submit', {
       method: 'POST',
       body,
     })
@@ -227,7 +227,8 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     }
     props.onClose?.()
 
-    const redirectTarget = resolveWebformRedirect(
+    const redirectTarget = resolveSubmissionRedirect(
+      response,
       webformConfirmationType,
       webformRedirect,
     )

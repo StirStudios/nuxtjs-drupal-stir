@@ -42,3 +42,24 @@ export function resolveWebformRedirect(
 
   return null
 }
+
+/**
+ * Redirect after a submission. Drupal's submit response carries the
+ * confirmation URL resolved for that submission (tokens replaced) when the
+ * site includes confirmation settings; otherwise the form's own redirect is used.
+ */
+export function resolveSubmissionRedirect(
+  response: unknown,
+  confirmationType: unknown,
+  redirect: unknown,
+): WebformRedirectTarget | null {
+  const submitted = response && typeof response === 'object'
+    ? response as { confirmation_type?: unknown, confirmation_url?: unknown }
+    : {}
+
+  if (typeof submitted.confirmation_url === 'string' && submitted.confirmation_url.trim()) {
+    return resolveWebformRedirect(submitted.confirmation_type ?? confirmationType, submitted.confirmation_url)
+  }
+
+  return resolveWebformRedirect(confirmationType, redirect)
+}

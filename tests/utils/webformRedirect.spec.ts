@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   normalizeWebformConfirmationType,
+  resolveSubmissionRedirect,
   resolveWebformRedirect,
 } from '../../layers/webform/app/utils/webformRedirect'
 
@@ -53,5 +54,28 @@ describe('resolveWebformRedirect', () => {
     ['url', null],
   ])('rejects an unsupported redirect %#', (type, redirect) => {
     expect(resolveWebformRedirect(type, redirect)).toBeNull()
+  })
+})
+
+describe('resolveSubmissionRedirect', () => {
+  it('prefers the confirmation URL Drupal resolved for the submission', () => {
+    expect(resolveSubmissionRedirect(
+      { sid: 'a', confirmation_type: 'url', confirmation_url: 'https://example.com/book?at=10' },
+      'url',
+      '[webform_submission:values:link]',
+    )).toEqual({ to: 'https://example.com/book?at=10', external: true })
+  })
+
+  it('falls back to the form redirect when the response has no confirmation URL', () => {
+    expect(resolveSubmissionRedirect({ sid: 'a' }, 'url', '/thanks')).toEqual({ to: '/thanks', external: false })
+    expect(resolveSubmissionRedirect(undefined, 'url', '/thanks')).toEqual({ to: '/thanks', external: false })
+  })
+
+  it('stays inline for an inline confirmation', () => {
+    expect(resolveSubmissionRedirect({ confirmation_type: 'message', confirmation_url: '' }, 'inline', '/thanks')).toBeNull()
+  })
+
+  it('rejects a resolved URL that is not HTTP or root-relative', () => {
+    expect(resolveSubmissionRedirect({ confirmation_type: 'url', confirmation_url: 'javascript:alert(1)' }, 'url', '/thanks')).toBeNull()
   })
 })
