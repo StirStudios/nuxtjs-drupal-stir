@@ -102,10 +102,12 @@ const choiceField = computed(() => isWizard.value
   ? wizardChoiceField(props.fields, props.orderedFieldNames, currentPage.value?.key)
   : undefined)
 
+// Only an answer given on this page counts: going Back to it shows the
+// earlier answer, which must not move on again.
 watch(
-  () => (choiceField.value ? props.state[choiceField.value] : undefined),
-  (value, previous) => {
-    if (value && value !== previous && !isLastPage.value) void nextPage()
+  () => [currentPage.value?.key, choiceField.value ? props.state[choiceField.value] : undefined] as const,
+  ([page, value], [previousPage, previous]) => {
+    if (page === previousPage && value && value !== previous && !isLastPage.value) void nextPage()
   },
 )
 

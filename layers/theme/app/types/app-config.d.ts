@@ -150,6 +150,8 @@ type StirThemeNavigationConfig = {
   container?: ClassValue
   color?: UiColorName
   variant?: UiNavigationVariantName
+  /** Nuxt UI NavigationMenu slot classes for the header menu only, such as `{ link: 'uppercase' }`; `ui.navigationMenu` styles every menu, the editorial one too. */
+  ui?: Partial<Record<string, ClassValue>>
   contentOrientation?: 'horizontal' | 'vertical'
   desktopLayout?: 'default' | 'split-logo' | 'centered-toggle' | 'toggle' | string
   /** Width from which the desktop menu replaces the menu toggle: lg (1024px, default) or xl (1280px), for a longer menu. */

@@ -388,6 +388,13 @@ describe('Webform (Nuxt runtime)', () => {
     // A page that asks one radio question moves on as soon as it is answered.
     expect(wrapper.text()).toContain('Step 2 of 2')
     expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
+
+    // Back shows the chooser with its answer, and stays there.
+    await wrapper.findAll('button').find((button) => button.text() === 'Back')!.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Step 1 of 2')
+    expect(wrapper.find('textarea[name="notes"]').exists()).toBe(false)
   })
 
   it('does not submit display-only markup as an empty field', async () => {

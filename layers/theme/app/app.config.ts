@@ -66,6 +66,7 @@ export default defineAppConfig({
       container: 'flex-wrap',
       color: 'primary',
       variant: 'link',
+      ui: {},
       contentOrientation: 'horizontal',
       desktopLayout: 'default',
       desktopBreakpoint: 'lg',
