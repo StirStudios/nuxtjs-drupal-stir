@@ -364,7 +364,9 @@ describe('Webform (Nuxt runtime)', () => {
     wrapper.findComponent(WebformContent).props('state').path = 'book'
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Step 1 of 2')
+    // A page that asks one radio question moves on as soon as it is answered.
+    expect(wrapper.text()).toContain('Step 2 of 2')
+    expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
   })
 
   it('does not submit display-only markup as an empty field', async () => {

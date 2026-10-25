@@ -1,6 +1,7 @@
 import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformWizardPage } from '#stir-webform/utils/flattenWebformFields'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
+import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
 
 type PagedField = WebformFieldProps & { page?: WebformWizardPage | null }
 
@@ -50,4 +51,20 @@ export function hasLaterWizardPage(
   const index = pageKey ? keys.indexOf(pageKey) : -1
 
   return index >= 0 && index < keys.length - 1
+}
+
+/**
+ * The field a page's answer is chosen with, when the page asks only one
+ * radio question (a path chooser). Picking an option then moves on, saving a
+ * click. Display-only elements on the page (text, links) do not count.
+ */
+export function wizardChoiceField(
+  fields: Record<string, PagedField>,
+  orderedFieldNames: string[],
+  pageKey: string | undefined,
+): string | undefined {
+  const inputs = wizardPageFieldNames(fields, orderedFieldNames, pageKey)
+    .filter((fieldName) => fields[fieldName] && !isWebformDisplayElement(fields[fieldName]!))
+
+  return inputs.length === 1 && fields[inputs[0]!]?.['#type'] === 'radio' ? inputs[0] : undefined
 }
