@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **New: `stirTheme.navigation.ui`.** Nuxt UI NavigationMenu slot classes
+  for the header menu only (`{ link: 'uppercase text-lg' }`). Setting
+  `ui.navigationMenu` in a site's app config also restyles every other menu,
+  the editorial admin menu included.
+
 ### Webform
 
 - **Fixed: Back reaches a wizard's chooser page.** A page that moves on when

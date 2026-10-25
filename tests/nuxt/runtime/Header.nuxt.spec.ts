@@ -63,6 +63,17 @@ describe('App header', () => {
     wrapper.unmount()
   })
 
+  it('styles the header menu alone with navigation.ui', async () => {
+    setNavigation({ ui: { link: 'uppercase' } })
+
+    const wrapper = await mountSuspended(Header, { attachTo: document.body })
+    const menus = wrapper.findAllComponents({ name: 'UNavigationMenu' })
+
+    expect(menus.length).toBeGreaterThan(0)
+    for (const navMenu of menus) expect(navMenu.props('ui')).toMatchObject({ link: 'uppercase' })
+    wrapper.unmount()
+  })
+
   it('keeps the default mobile toggle and returns focus after the visitor closes the menu', async () => {
     const wrapper = await mountSuspended(Header, { attachTo: document.body })
     const toggle = wrapper.get('[data-slot="right"] [data-slot="toggle"]')

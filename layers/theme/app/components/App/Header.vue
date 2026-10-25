@@ -107,6 +107,7 @@ const navProps = computed(() => {
     highlight,
     highlightColor: highlight ? headerConfigString<NavigationMenuColor>(navigation.highlight?.color) : undefined,
     variant: headerConfigString<NavigationMenuVariant>(navigation.variant),
+    ui: navigation.ui,
   }
 })
 const menuAngled = computed(() => Boolean(theme.navigation.slideover?.angle))
