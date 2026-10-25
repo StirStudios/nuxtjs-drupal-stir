@@ -142,8 +142,8 @@ describe('Webform (Nuxt runtime)', () => {
         webform: {
           ...webform,
           fields: {
-            path: { '#type': 'radios', '#name': 'path', '#title': 'Path', '#options': { book: 'Book -- Fastest.', info: 'Info -- We follow up.' } },
-            size: { '#type': 'radios', '#name': 'size', '#title': 'Size', '#options': { s: 'Small', l: 'Large' } },
+            path: { '#type': 'radios', '#name': 'path', '#title': 'Path', '#options': { book: { label: 'Book', description: 'Fastest.' }, info: { label: 'Info', description: 'We follow up.' } }, '#optionKeys': ['book', 'info'] },
+            size: { '#type': 'radios', '#name': 'size', '#title': 'Size', '#options': { s: 'Small', l: 'Large' }, '#optionKeys': ['s', 'l'] },
           },
         } as unknown as WebformDefinition,
       },
