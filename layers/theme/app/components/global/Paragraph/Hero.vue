@@ -106,7 +106,8 @@ const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 
 // A hero's media is above the fold and loads eagerly itself, so later media
 // paragraphs must not also claim the lead. A text-only hero leaves it.
-useLeadMedia(hasMediaSlot.value ? `hero-${props.id ?? ''}` : undefined)
+// Setup runs outside render, so check the slot is given without calling it.
+useLeadMedia(vueSlots.media ? `hero-${props.id ?? ''}` : undefined)
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
   slotMedia.value

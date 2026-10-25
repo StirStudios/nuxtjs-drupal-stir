@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- **Fixed: the hero no longer warns `Slot "media" invoked outside of the render
+  function`.** It checked for media during setup by calling the slot; it now
+  checks only that the slot is given. Lead-media loading is unchanged.
+
 ### Core
 
 - **Fixed: a CMS redirect or HTML answer to a page read no longer crashes the
