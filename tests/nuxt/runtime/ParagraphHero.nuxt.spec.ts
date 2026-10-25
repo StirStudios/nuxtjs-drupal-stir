@@ -123,6 +123,19 @@ describe('Drupal Hero page ownership and headings', () => {
     wrapper.unmount()
   })
 
+  it('renders media without invoking its slot outside render', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = await mountSuspended(Hero, {
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('With media')) } },
+      slots: { media: () => h('img', { alt: 'Hero photo', src: '/hero.jpg' }) },
+    })
+
+    expect(wrapper.find('img').exists()).toBe(true)
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('invoked outside of the render function')
+    warn.mockRestore()
+    wrapper.unmount()
+  })
+
   it('lets the title slot replace the default H1', async () => {
     const wrapper = await mountSuspended(Hero, {
       global: { provide: { [drupalPageKey as symbol]: ref(makePage('Default title')) } },

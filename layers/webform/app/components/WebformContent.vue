@@ -4,7 +4,7 @@ import type { WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformValidationSchema } from '#stir-webform/utils/buildValidationSchema'
 import { trustedDrupalHtml } from '#stir/utils/trustedDrupalHtml'
 import { resolveUiSize, type UiSize } from '#stir/utils/nuxtUiProps'
-import { hasLaterWizardPage, resolveWizardPages, wizardPageFieldNames } from '#stir-webform/utils/webformWizard'
+import { hasLaterWizardPage, resolveWizardPages, wizardChoiceField, wizardPageFieldNames } from '#stir-webform/utils/webformWizard'
 
 type WebformThemeConfig = {
   buttonClass?: string
@@ -87,6 +87,18 @@ async function goToPage(index: number) {
   await nextTick()
   pageHeading.value?.focus()
 }
+
+// A page that asks a single radio question moves on as soon as it is answered.
+const choiceField = computed(() => isWizard.value
+  ? wizardChoiceField(props.fields, props.orderedFieldNames, currentPage.value?.key)
+  : undefined)
+
+watch(
+  () => (choiceField.value ? props.state[choiceField.value] : undefined),
+  (value, previous) => {
+    if (value && value !== previous && !isLastPage.value) void nextPage()
+  },
+)
 
 async function nextPage() {
   const names = wizardPageFieldNames(props.fields, props.orderedFieldNames, currentPage.value?.key)

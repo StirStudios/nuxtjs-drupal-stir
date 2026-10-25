@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { flattenWebformFields } from '../../layers/webform/app/utils/flattenWebformFields'
-import { hasLaterWizardPage, resolveWizardPages, wizardPageFieldNames } from '../../layers/webform/app/utils/webformWizard'
+import { hasLaterWizardPage, resolveWizardPages, wizardChoiceField, wizardPageFieldNames } from '../../layers/webform/app/utils/webformWizard'
 import type { WebformFieldProps } from '../../layers/theme/app/types/Form'
 
 // A booking-style wizard: a chooser page, then pages shown only for one path.
@@ -19,7 +19,7 @@ const fields = flattenWebformFields({
     '#name': 'start',
     '#title': 'Start',
     children: {
-      path: { '#type': 'radios', '#name': 'path', '#required': true },
+      path: { '#type': 'radio', '#name': 'path', '#required': true },
     },
   },
   when: {
@@ -67,6 +67,11 @@ describe('wizard pages', () => {
     expect(hasLaterWizardPage(fields, names, 'start')).toBe(true)
     expect(hasLaterWizardPage(fields, names, 'inquiry')).toBe(false)
     expect(hasLaterWizardPage(fields, names, undefined)).toBe(false)
+  })
+
+  it('finds the single radio question a page asks', () => {
+    expect(wizardChoiceField(fields, names, 'start')).toBe('path')
+    expect(wizardChoiceField(fields, names, 'when')).toBeUndefined()
   })
 
   it('lists the fields on one page', () => {
