@@ -858,9 +858,9 @@
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 248,
+    "tests": 249,
     "testsByArea": {
-      "composables": 13,
+      "composables": 14,
       "contracts": 2,
       "nuxt": 109,
       "scripts": 6,
@@ -870,6 +870,7 @@
     }
   },
   "tests": [
+    "tests/composables/drupalViewDateRange.spec.ts",
     "tests/composables/useDrupalPageNodes.spec.ts",
     "tests/composables/useDrupalTeaserLink.spec.ts",
     "tests/composables/useDrupalViewControls.spec.ts",

@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Views
+
+- **Fixed: date range filters keep both dates.** A View's `date_range` filter
+  was treated as single-valued, so restoring it from the URL or refreshing the
+  View sent only the start date and Drupal refused the request. Date range
+  filters are now normalised as two-valued (`multiple: true`), so the start
+  and end travel together through state, the URL and the refresh request.
+  Needs the Stir Tools fix that maps the two values to Views' min and max.
+
 ### Webform
 
 - **Added: Webform wizard pages.** A form built from Drupal wizard pages

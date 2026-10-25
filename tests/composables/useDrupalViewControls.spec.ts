@@ -65,7 +65,7 @@ describe('useDrupalViewControls helpers', () => {
       label: 'Date range',
       queryParamName: 'date_range',
       type: 'date_range',
-      multiple: undefined,
+      multiple: true,
       disabled: undefined,
       options: [],
     }])
