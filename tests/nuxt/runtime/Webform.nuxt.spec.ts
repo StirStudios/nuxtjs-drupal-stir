@@ -415,10 +415,19 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="header"] [data-slot="trigger"]').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('Step 1 of 1')
 
+    // An arrow key selects as it moves through the options, so a keyboard
+    // answer waits for Next.
+    await wrapper.get('form').trigger('keydown', { key: 'ArrowDown' })
+    wrapper.findComponent(WebformContent).props('state').path = 'info'
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('Step 2 of 2')
+
+    await wrapper.get('form').trigger('pointerdown')
     wrapper.findComponent(WebformContent).props('state').path = 'book'
     await flushPromises()
 
-    // A page that asks one radio question moves on as soon as it is answered.
+    // A click or tap on the one radio question moves on.
     expect(wrapper.text()).toContain('Step 2 of 2')
     expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
 

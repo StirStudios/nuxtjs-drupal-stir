@@ -103,12 +103,16 @@ const choiceField = computed(() => isWizard.value
   ? wizardChoiceField(props.fields, props.orderedFieldNames, currentPage.value?.key)
   : undefined)
 
+// Only a click or tap moves on. Arrow keys select a radio as they move
+// through the options, so a keyboard answer waits for Next (WCAG 3.2.2).
+const answeredByPointer = ref(false)
+
 // Only an answer given on this page counts: going Back to it shows the
 // earlier answer, which must not move on again.
 watch(
   () => [currentPage.value?.key, choiceField.value ? props.state[choiceField.value] : undefined] as const,
   ([page, value], [previousPage, previous]) => {
-    if (page === previousPage && value && value !== previous && !isLastPage.value) void nextPage()
+    if (page === previousPage && value && value !== previous && answeredByPointer.value && !isLastPage.value) void nextPage()
   },
 )
 
@@ -180,6 +184,8 @@ defineExpose({
     :state="state"
     :validate-on="validateOn"
     @error="emit('error', $event)"
+    @keydown.capture="answeredByPointer = false"
+    @pointerdown.capture="answeredByPointer = true"
     @submit="emit('submit', $event)"
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
@@ -288,16 +294,17 @@ defineExpose({
       @update:model-value="emit('update:turnstileToken', String($event ?? ''))"
     />
 
-    <WrapDiv :align="props.themeWebform.submitAlign">
-      <div v-if="isWizard" class="flex flex-wrap gap-3">
-        <UButton
-          v-if="pageIndex > 0"
-          color="neutral"
-          :label="currentPage?.prevLabel || 'Back'"
-          :size="buttonSize"
-          variant="outline"
-          @click="goToPage(pageIndex - 1)"
-        />
+    <!-- A wizard keeps Back on the left and moves forward from the right. -->
+    <div v-if="isWizard" class="flex flex-wrap items-center gap-3">
+      <UButton
+        v-if="pageIndex > 0"
+        color="neutral"
+        :label="currentPage?.prevLabel || 'Back'"
+        :size="buttonSize"
+        variant="outline"
+        @click="goToPage(pageIndex - 1)"
+      />
+      <div class="ms-auto">
         <UButton
           v-if="!isLastPage"
           :class="props.themeWebform.buttonClass"
@@ -305,14 +312,25 @@ defineExpose({
           :size="buttonSize"
           @click="nextPage"
         />
+        <component
+          :is="submitComponent"
+          v-else-if="submitComponent"
+          v-bind="submitComponentProps"
+        />
+        <UButton
+          v-else
+          v-bind="submitButtonProps"
+        />
       </div>
+    </div>
+    <WrapDiv v-else :align="props.themeWebform.submitAlign">
       <component
         :is="submitComponent"
-        v-if="isLastPage && submitComponent"
+        v-if="submitComponent"
         v-bind="submitComponentProps"
       />
       <UButton
-        v-else-if="isLastPage"
+        v-else
         v-bind="submitButtonProps"
       />
     </WrapDiv>
