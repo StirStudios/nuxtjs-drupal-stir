@@ -162,7 +162,8 @@ const getRowMotionProps = (index: number) =>
 </script>
 
 <template>
-  <section ref="viewRoot" class="scroll-mt-24">
+  <!-- A site's own grid slot skips WrapGrid, so Drupal's spacing goes on the View itself. -->
+  <section ref="viewRoot" :class="['scroll-mt-24', vueSlots.grid && spacing]">
     <template v-if="hasControls && !carousel && vueSlots.controls">
       <slot name="controls" v-bind="controlsSlotProps" />
       <p class="sr-only" role="status">{{ controlsStatus }}</p>
