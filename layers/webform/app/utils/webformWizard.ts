@@ -1,4 +1,4 @@
-import type { WebformFieldProps, WebformState } from '#stir/types'
+import type { WebformConditionGroup, WebformFieldProps, WebformState } from '#stir/types'
 import type { WebformWizardPage } from '#stir-webform/utils/flattenWebformFields'
 import { resolveWebformFieldStates } from '#stir-webform/utils/webformConditions'
 import { isWebformDisplayElement } from '#stir-webform/utils/webformDisplayUtils'
@@ -39,8 +39,8 @@ export function wizardPageFieldNames(
 
 /**
  * Whether a wizard page comes after this one. A later page counts while it is
- * visible, or while an answer its `#states` depend on is still empty: a page
- * hidden until a path is chosen still comes later, so the chooser offers
+ * visible, or while none of the answers its `#states` depend on is given: a
+ * page hidden until a path is chosen still comes later, so the chooser offers
  * Next, but once the other path is chosen the last page offers Submit.
  */
 export function hasLaterWizardPage(
@@ -58,16 +58,22 @@ export function hasLaterWizardPage(
     wizardPageFieldNames(fields, orderedFieldNames, key).some((fieldName) => {
       const field = fields[fieldName]!
 
-      return resolveWebformFieldStates(field, state).visible || statesInputNames(field).some((name) => isEmptyAnswer(state[name]))
+      const inputs = statesInputNames(field)
+
+      return resolveWebformFieldStates(field, state).visible || (inputs.length > 0 && inputs.every((name) => isEmptyAnswer(state[name])))
     }),
   )
 }
 
-/** The inputs a field's `#states` selectors name, such as `path`. */
+/**
+ * The inputs a field's conditions depend on, by Drupal machine name. Read from
+ * `#conditions`: Custom Elements camel-cases the `#states` selectors.
+ */
 function statesInputNames(field: PagedField): string[] {
-  const selectors = Object.values(field['#states'] ?? {}).flatMap((conditions) => Object.keys(conditions ?? {}))
+  const names = (group: WebformConditionGroup): string[] =>
+    group.rules.flatMap((rule) => 'rules' in rule ? names(rule) : rule.name ? [rule.name] : [])
 
-  return [...new Set(selectors.flatMap((selector) => [...selector.matchAll(/name="([^"[]+)/g)].map((match) => match[1]!)))]
+  return [...new Set((field['#conditions'] ?? []).flatMap(names))]
 }
 
 function isEmptyAnswer(value: unknown): boolean {

@@ -20,7 +20,7 @@ untouched do not need one.
   the flexbox was flattened away and every field took a full row. Flattened
   fields gain `row`, and `InputType` gains `webform_flexbox`.
 - **Changed: `hasLaterWizardPage` takes the form state.** A hidden later page
-  counts only while an answer its `#states` depend on is still empty, so once
+  counts only while none of the answers its `#states` depend on is given, so once
   a path chooser hides the other path, the last page offers Submit, not Next.
   Callers pass the state as a fourth argument.
 
