@@ -133,6 +133,31 @@ describe('Webform (Nuxt runtime)', () => {
     shown.unmount()
   })
 
+  it('styles card radios with cardRadio, keeping list radios as they are', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+
+    theme.cardRadio = { indicator: 'hidden', ui: { item: 'p-8' } }
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            path: { '#type': 'radios', '#name': 'path', '#title': 'Path', '#options': { book: 'Book -- Fastest.', info: 'Info -- We follow up.' } },
+            size: { '#type': 'radios', '#name': 'size', '#title': 'Size', '#options': { s: 'Small', l: 'Large' } },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    const [cards, list] = wrapper.findAll('[role="radiogroup"]')
+
+    expect(cards!.find('[data-slot="indicator"]').exists()).toBe(false)
+    expect(cards!.get('[data-slot="item"]').classes()).toContain('p-8')
+    expect(list!.find('[data-slot="base"]').exists()).toBe(true)
+    delete theme.cardRadio
+  })
+
   it('fills prepopulated fields from the prefill prop', async () => {
     const wrapper = await mountSuspended(Webform, {
       props: {

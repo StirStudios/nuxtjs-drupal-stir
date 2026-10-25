@@ -15,6 +15,7 @@ untouched do not need one.
 
 ### Webform
 
+- **New: `webform.cardRadio`.** Styles radios whose options have descriptions (the card radios): `indicator: 'hidden'` drops the dot so the whole card is the choice, `size` sets the Nuxt UI size and `ui` adds classes to RadioGroup slots. Without it, cards are unchanged.
 - A wizard keeps Back on the left and puts Next or Submit on the right.
 - A one-question wizard page moves on only when answered by click or tap. Arrow keys select a radio as they move through the options, so a keyboard answer now waits for Next (WCAG 3.2.2).
 - A wizard shows its stepper only once there are two or more steps to show. A chooser page whose answer reveals the later pages no longer shows a lone "1".

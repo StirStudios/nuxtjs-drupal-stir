@@ -1,5 +1,13 @@
 import formFieldTheme from '#build/ui/form-field'
 
+export type CardRadioTheme = {
+  /** `hidden` drops the radio dot, so the whole card is the choice. */
+  indicator?: 'start' | 'end' | 'hidden'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Classes added to Nuxt UI RadioGroup slots. */
+  ui?: Partial<Record<'fieldset' | 'item' | 'base' | 'label' | 'description' | 'wrapper', string>>
+}
+
 type StirWebformTheme = {
   showToasts?: boolean
   scrollToTopOnSuccess?: boolean
@@ -14,6 +22,8 @@ type StirWebformTheme = {
   }
   fieldGroupHeader?: string
   wizardPageTitle?: string
+  /** Radios whose options have descriptions, shown as cards. */
+  cardRadio?: CardRadioTheme
   fieldGroup?: string
   fieldInput?: string
   fieldText?: string

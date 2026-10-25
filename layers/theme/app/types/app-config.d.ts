@@ -387,6 +387,12 @@ type StirThemeWebformConfig = {
   fieldGroupHeader?: ClassValue
   /** Classes for a wizard page's heading; falls back to `fieldGroupHeader`. `sr-only` keeps it for screen readers (focus moves to it on each step) where the stepper already shows it. */
   wizardPageTitle?: ClassValue
+  /** Radios whose options have descriptions, shown as cards. `indicator: 'hidden'` drops the dot; `ui` adds classes to RadioGroup slots. */
+  cardRadio?: {
+    indicator?: 'start' | 'end' | 'hidden'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+    ui?: Partial<Record<'fieldset' | 'item' | 'base' | 'label' | 'description' | 'wrapper', string>>
+  }
   fieldGroup?: ClassValue
   fieldInput?: ClassValue
   fieldText?: ClassValue
