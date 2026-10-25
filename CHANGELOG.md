@@ -15,6 +15,17 @@ untouched do not need one.
 
 ### Webform
 
+- **New: Webform flexbox rows render side by side.** Fields in a
+  `webform_flexbox` share a responsive grid row (stacked on phones); before,
+  the flexbox was flattened away and every field took a full row. Flattened
+  fields gain `row`, and `InputType` gains `webform_flexbox`.
+- **Changed: `hasLaterWizardPage` takes the form state.** A hidden later page
+  counts only while an answer its `#states` depend on is still empty, so once
+  a path chooser hides the other path, the last page offers Submit, not Next.
+  Callers pass the state as a fourth argument.
+
+### Webform
+
 - **Fixed: an inline confirmation shows the message Drupal resolved for the
   submission.** The submit response's `confirmation_message` (tokens replaced,
   or set by a handler) now replaces the form's static message, which still

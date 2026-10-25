@@ -14,6 +14,8 @@ interface FlattenedField extends WebformFieldProps {
   parentTitle?: string | null
   parentDescription?: string | null
   page?: WebformWizardPage | null
+  // The Webform flexbox the field sits in; its fields render side by side.
+  row?: string | null
 }
 
 const label = (value: unknown): string | null =>
@@ -90,6 +92,10 @@ export function flattenWebformFields(
         type === 'section' ? field['#description'] || null : parentDescription,
         childPage,
       )
+
+      if (type === 'webform_flexbox') {
+        for (const child of Object.values(nested)) child.row ??= key
+      }
 
       Object.assign(flat, nested)
     } else {

@@ -64,9 +64,15 @@ describe('wizard pages', () => {
   })
 
   it('knows a hidden page still comes after the chooser', () => {
-    expect(hasLaterWizardPage(fields, names, 'start')).toBe(true)
-    expect(hasLaterWizardPage(fields, names, 'inquiry')).toBe(false)
-    expect(hasLaterWizardPage(fields, names, undefined)).toBe(false)
+    expect(hasLaterWizardPage(fields, names, 'start', {})).toBe(true)
+    expect(hasLaterWizardPage(fields, names, 'inquiry', { path: 'info' })).toBe(false)
+    expect(hasLaterWizardPage(fields, names, undefined, {})).toBe(false)
+  })
+
+  it('drops a later page the chosen path hides, so the last page submits', () => {
+    expect(hasLaterWizardPage(fields, names, 'start', { path: 'book' })).toBe(true)
+    expect(hasLaterWizardPage(fields, names, 'when', { path: 'book' })).toBe(false)
+    expect(hasLaterWizardPage(fields, names, 'when', { path: '' })).toBe(true)
   })
 
   it('finds the single radio question a page asks', () => {
@@ -77,5 +83,22 @@ describe('wizard pages', () => {
   it('lists the fields on one page', () => {
     expect(wizardPageFieldNames(fields, names, 'when')).toEqual(['space', 'day'])
     expect(wizardPageFieldNames(fields, names, undefined)).toEqual([])
+  })
+
+  it('keeps the flexbox row of fields that render side by side', () => {
+    const row = flattenWebformFields({
+      contact: {
+        '#type': 'webform_flexbox',
+        '#name': 'contact',
+        children: {
+          name: { '#type': 'textfield', '#name': 'name' },
+          email: { '#type': 'email', '#name': 'email' },
+        },
+      },
+      notes: { '#type': 'textarea', '#name': 'notes' },
+    } as unknown as Record<string, WebformFieldProps>)
+
+    expect(Object.keys(row)).toEqual(['name', 'email', 'notes'])
+    expect([row.name?.row, row.email?.row, row.notes?.row]).toEqual(['contact', 'contact', undefined])
   })
 })

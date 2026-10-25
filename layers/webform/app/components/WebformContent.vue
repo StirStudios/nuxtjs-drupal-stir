@@ -58,6 +58,15 @@ const wizardPages = computed(() =>
   resolveWizardPages(props.fields, props.orderedFieldNames, props.state),
 )
 const isWizard = computed(() => wizardPages.value.length > 0)
+const rowOf = (fieldName: string): string | undefined => {
+  const row = props.fields[fieldName]?.row
+
+  return typeof row === 'string' ? row : undefined
+}
+const rowFields = (row: string) => props.orderedFieldNames.filter(name => rowOf(name) === row)
+// Written out in full so Tailwind finds them; a phone stacks the row.
+const rowColumns = (row: string) =>
+  ['', '', 'sm:grid-cols-2', 'sm:grid-cols-3', 'sm:grid-cols-4'][rowFields(row).length] ?? 'sm:grid-cols-4'
 const stepperItems = computed(() =>
   wizardPages.value.map((page, index) => ({
     value: index,
@@ -72,7 +81,7 @@ const currentPage = computed(() =>
 const isLastPage = computed(
   () => !isWizard.value || (
     pageIndex.value >= wizardPages.value.length - 1
-    && !hasLaterWizardPage(props.fields, props.orderedFieldNames, currentPage.value?.key)
+    && !hasLaterWizardPage(props.fields, props.orderedFieldNames, currentPage.value?.key, props.state)
   ),
 )
 const isOnCurrentPage = (fieldName: string) => {
@@ -232,6 +241,24 @@ defineExpose({
               :state="state"
             />
           </template>
+        </div>
+      </template>
+
+      <!-- A Webform flexbox renders as one row, from its first field. -->
+      <template v-else-if="isOnCurrentPage(fieldName) && shouldRenderIndividualField(fieldName) && rowOf(fieldName)">
+        <div
+          v-if="rowFields(rowOf(fieldName)!)[0] === fieldName"
+          :class="['grid gap-x-4 gap-y-8', rowColumns(rowOf(fieldName)!)]"
+        >
+          <FieldRenderer
+            v-for="rowFieldName in rowFields(rowOf(fieldName)!)"
+            :key="rowFieldName"
+            :field="fields[rowFieldName]!"
+            :field-name="rowFieldName"
+            :fields="fields"
+            :ordered-field-names="orderedFieldNames"
+            :state="state"
+          />
         </div>
       </template>
 

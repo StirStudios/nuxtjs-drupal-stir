@@ -29,6 +29,7 @@ export type InputType =
   | 'datetime'
   | 'section'
   | 'webform_wizard_page'
+  | 'webform_flexbox'
   | 'file'
   | 'managed_file'
   | 'webform_document_file'

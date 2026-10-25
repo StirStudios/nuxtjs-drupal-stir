@@ -38,19 +38,40 @@ export function wizardPageFieldNames(
 }
 
 /**
- * Whether the form declares a wizard page after this one, visible or not. A
- * page hidden until an earlier answer (a path chooser) still comes later, so
- * the current page offers Next, not Submit.
+ * Whether a wizard page comes after this one. A later page counts while it is
+ * visible, or while an answer its `#states` depend on is still empty: a page
+ * hidden until a path is chosen still comes later, so the chooser offers
+ * Next, but once the other path is chosen the last page offers Submit.
  */
 export function hasLaterWizardPage(
   fields: Record<string, PagedField>,
   orderedFieldNames: string[],
   pageKey: string | undefined,
+  state: WebformState,
 ): boolean {
   const keys = [...new Set(orderedFieldNames.map((fieldName) => fields[fieldName]?.page?.key).filter(Boolean))]
   const index = pageKey ? keys.indexOf(pageKey) : -1
 
-  return index >= 0 && index < keys.length - 1
+  if (index < 0) return false
+
+  return keys.slice(index + 1).some((key) =>
+    wizardPageFieldNames(fields, orderedFieldNames, key).some((fieldName) => {
+      const field = fields[fieldName]!
+
+      return resolveWebformFieldStates(field, state).visible || statesInputNames(field).some((name) => isEmptyAnswer(state[name]))
+    }),
+  )
+}
+
+/** The inputs a field's `#states` selectors name, such as `path`. */
+function statesInputNames(field: PagedField): string[] {
+  const selectors = Object.values(field['#states'] ?? {}).flatMap((conditions) => Object.keys(conditions ?? {}))
+
+  return [...new Set(selectors.flatMap((selector) => [...selector.matchAll(/name="([^"[]+)/g)].map((match) => match[1]!)))]
+}
+
+function isEmptyAnswer(value: unknown): boolean {
+  return value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)
 }
 
 /**
