@@ -28,6 +28,14 @@ export default defineNuxtPlugin({
       pageUrl: () => `${window.location.origin}${window.location.pathname}`,
       resources: () => performance.getEntriesByType('resource') as PerformanceResourceTiming[],
       connection: () => (navigator as Navigator & { connection?: NetworkInformation }).connection,
+      userAgent: () => navigator.userAgent,
+      requestedModules: () => [...document.querySelectorAll<HTMLLinkElement>('link[rel="modulepreload"]')].map(link => link.href),
+      pageState: () => ({
+        visibility: document.visibilityState,
+        online: navigator.onLine,
+        msSinceStart: Math.round(performance.now()),
+        navigationType: (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined)?.type,
+      }),
       environment: config?.environment,
       release: config?.release,
     })

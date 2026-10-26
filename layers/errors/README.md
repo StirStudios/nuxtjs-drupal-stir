@@ -12,8 +12,9 @@ every site before any is switched on.
   500 and up (render and API failures); the browser reports uncaught errors,
   unhandled rejections and Vue errors, and only once consent allows
   non-essential scripts (the same policy as analytics). Only the path leaves
-  the server or the page (never the query string, headers, cookies or request
-  bodies), the same error counts once a minute, a runaway loop is capped, and
+  the server or the page (never the query string, cookies or request bodies,
+  and no headers except the user agent on a failed module load, below), the
+  same error counts once a minute, a runaway loop is capped, and
   scripts from other sites and browser extensions are ignored. Crawlers, page
   checkers and automated browsers (by user agent or `navigator.webdriver`) send
   nothing from the browser; the server only reports status 500 and up, so
@@ -22,14 +23,25 @@ every site before any is switched on.
   path and CDN settings); code injected by an in-app browser or an extension
   (its source is the page address or another origin) and errors with no frames,
   such as a failed script load, are dropped. A thrown string is judged by the
-  location the browser reported for it, never by the reporter's own stack. A failed script or module load
-  ("Importing a module script failed", "Failed to fetch dynamically imported
-  module") carries extra data naming the site's own files that came back with
-  an error or no body (file name only, no query string), the protocols (h2,
-  h3) the site's files used and the connection type where the browser reports
-  one (Safari does not), so an event shows which file failed and how it
-  travelled. Stack traces from the browser are minified; there are no source
-  maps.
+  location the browser reported for it, never by the reporter's own stack.
+- **Failed module loads:** an error such as "Importing a module script
+  failed" or "Failed to fetch dynamically imported module", and only such an
+  error, also carries:
+  - the browser's user agent (as the event's `User-Agent`, which GlitchTip
+    reads as browser and OS) and whether it is an in-app browser, such as an
+    app's iPhone web view or the Facebook, Instagram or Google app;
+  - the site's own files that came back with an error or no body, and those
+    the page asked for (its `modulepreload` links) that never arrived, which
+    is how a cancelled load shows on iPhones, where Safari keeps no record of
+    it (file names only, no query string);
+  - the protocols (h2, h3) the site's files used, and the connection type
+    where the browser reports one (Safari does not);
+  - the page's state: whether it was visible, whether the device was online,
+    how long after the page started it happened, and how the page was opened
+    (`navigate`, `reload`, `back_forward`).
+
+  Nothing else about the visitor is sent. Stack traces from the browser are
+  minified; there are no source maps.
 - **Environment and release:** `NUXT_PUBLIC_ERRORS_ENVIRONMENT` (defaults to
   `NUXT_ENV`) and `NUXT_PUBLIC_ERRORS_RELEASE` (the deployed revision, so an
   error maps to a deploy).

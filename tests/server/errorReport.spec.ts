@@ -8,6 +8,7 @@ import {
   hasOwnFrame,
   isAutomatedVisitor,
   isIgnoredBrowserError,
+  isInAppBrowser,
   isModuleLoadFailure,
   messageKey,
   ownScriptsPrefix,
@@ -373,6 +374,9 @@ describe('browser report pipeline', () => {
       pageUrl: () => `${page}/class/yoga`,
       resources: () => overrides.resources ?? [],
       connection: () => ({ effectiveType: '4g' }),
+      userAgent: () => iphoneApp,
+      requestedModules: () => [`${ownScripts}ok.js`, `${ownScripts}gone.js?v=1`, `${ownScripts}never.js`, 'https://cdn.other.com/x.js'],
+      pageState: () => ({ visibility: 'hidden', online: true, msSinceStart: 1200, navigationType: 'reload' }),
       now: () => now,
       send: send as unknown as typeof fetch,
     })
@@ -383,6 +387,8 @@ describe('browser report pipeline', () => {
   }
 
   type ResourceEntryLike = Parameters<typeof describeModuleLoad>[0][number]
+
+  const iphoneApp = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
 
   it('sends an error thrown from the site\'s own scripts, without the query string', () => {
     const { report, sent } = setup()
@@ -457,9 +463,50 @@ describe('browser report pipeline', () => {
     expect(sent()[0].extra).toEqual({
       ownFiles: 2,
       failedFiles: 1,
+      // Asked for by the page, never recorded: WebKit keeps no entry for it.
+      missingFiles: 1,
+      missing: ['never.js'],
       failed: [{ file: 'gone.js', status: 0, protocol: 'h3', ms: 40 }],
       protocols: { h3: 2 },
       connection: { effectiveType: '4g' },
+      inAppBrowser: true,
+      page: { visibility: 'hidden', online: true, msSinceStart: 1200, navigationType: 'reload' },
     })
+    expect(sent()[0].request.headers).toEqual({ 'User-Agent': iphoneApp })
+  })
+
+  it('sends the browser and page state only for a failed module load', () => {
+    const { report, sent } = setup()
+
+    report(thrownAt('x is undefined', `${ownScripts}entry.js`))
+
+    expect(sent()[0].request.headers).toBeUndefined()
+    expect(sent()[0].extra).toBeUndefined()
+  })
+})
+
+describe('in-app browsers', () => {
+  it('tells an app\'s web view from a browser', () => {
+    for (const userAgent of [
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+      'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBAV/480.0]',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 350.0',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/443.5 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0 Mobile Safari/537.36',
+    ]) {
+      expect(isInAppBrowser(userAgent), userAgent).toBe(true)
+    }
+
+    for (const userAgent of [
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0 Mobile/15E148 Safari/604.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36',
+      '',
+    ]) {
+      expect(isInAppBrowser(userAgent), userAgent).toBe(false)
+    }
+    expect(isInAppBrowser()).toBe(false)
   })
 })
