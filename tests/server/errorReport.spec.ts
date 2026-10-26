@@ -7,6 +7,7 @@ import {
   describeModuleLoad,
   hasOwnFrame,
   isAutomatedVisitor,
+  isDrupalMaintenance,
   isIgnoredBrowserError,
   isInAppBrowser,
   isModuleLoadFailure,
@@ -508,5 +509,53 @@ describe('in-app browsers', () => {
       expect(isInAppBrowser(userAgent), userAgent).toBe(false)
     }
     expect(isInAppBrowser()).toBe(false)
+  })
+})
+
+describe('CMS maintenance', () => {
+  const maintenance = 'The site is being updated. Back in a minute.'
+
+  it('recognises the CMS\'s Maintenance mode by the message the layer passes on', () => {
+    // A server route's own error.
+    expect(isDrupalMaintenance(Object.assign(new Error('Service Unavailable'), { statusCode: 503, data: { maintenanceMessage: maintenance } }))).toBe(true)
+    // A fetch of that route: its JSON error body is the FetchError's data.
+    expect(isDrupalMaintenance(Object.assign(new Error('[GET] "/api/app-context": 503'), { statusCode: 503, data: { statusCode: 503, data: { maintenanceMessage: maintenance } } }))).toBe(true)
+    // Wrapped once, as a render error around the fetch.
+    expect(isDrupalMaintenance(Object.assign(new Error('render'), { cause: { data: { maintenanceMessage: maintenance } } }))).toBe(true)
+  })
+
+  it('keeps reporting a 503 that is not Maintenance mode', () => {
+    // A CMS that is down: a proxy's HTML page, so no message is passed on.
+    const outage = Object.assign(new Error('Service Unavailable'), { statusCode: 503 })
+
+    expect(isDrupalMaintenance(outage)).toBe(false)
+    expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: { maintenanceMessage: '  ' } }))).toBe(false)
+    expect(shouldReport(outage)).toBe(true)
+    expect(shouldReport(Object.assign(new Error('x'), { statusCode: 503, data: { maintenanceMessage: maintenance } }))).toBe(false)
+    expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }))).toBe(true)
+  })
+
+  it('sends no browser report for Maintenance mode, and still one for an outage', () => {
+    const send = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
+    const ownScripts = 'https://www.example.com/_nuxt/'
+    const report = createBrowserReporter({
+      dsn: parseDsn('https://key@errors.example.com/7')!,
+      ownScripts,
+      allowed: () => true,
+      pageUrl: () => 'https://www.example.com/',
+      resources: () => [],
+      send: send as unknown as typeof fetch,
+    })
+    const fetchError = (data: unknown) => Object.assign(new Error('[GET] "/api/app-context": 503 Service Unavailable'), {
+      statusCode: 503,
+      data,
+      stack: `FetchError: 503\n    at load (${ownScripts}entry.js:1:2)`,
+    })
+
+    report(fetchError({ statusCode: 503, data: { maintenanceMessage: maintenance } }))
+    expect(send).not.toHaveBeenCalled()
+
+    report(fetchError({ statusCode: 503 }))
+    expect(send).toHaveBeenCalledTimes(1)
   })
 })
