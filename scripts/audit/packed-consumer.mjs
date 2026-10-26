@@ -19,7 +19,9 @@ const keepTemporary = process.argv.includes('--keep-temporary')
 // This download-archive limit is separate from the browser JavaScript budgets.
 // It exists to catch an accidentally published directory rather than to police
 // kilobytes of feature code, so it keeps headroom above the current archive.
-const maxArchiveBytes = 420_000
+// Raised from 420,000 when feature work reached it (420,055 bytes in October
+// 2026), keeping about 7% headroom.
+const maxArchiveBytes = 450_000
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
