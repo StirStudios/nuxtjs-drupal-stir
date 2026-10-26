@@ -15,7 +15,13 @@ const transformedOptions = computed(() =>
 const hasDescriptions = computed(() => transformedOptions.value.some((option) => option.description))
 const card = useStirWebformTheme().cardRadio
 const cardUi = computed(() => {
-  const base: Record<string, string> = { fieldset: 'grid gap-3 sm:grid-cols-2', item: 'items-start p-5' }
+  // A selected card gets a solid ring, a change of weight and not only of
+  // colour, which also shows the choice when a site hides the radio dot
+  // (WCAG 1.4.1, 1.4.11).
+  const base: Record<string, string> = {
+    fieldset: 'grid gap-3 sm:grid-cols-2',
+    item: 'items-start p-5 has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-primary',
+  }
 
   for (const [slot, classes] of Object.entries(card?.ui ?? {})) base[slot] = [base[slot], classes].filter(Boolean).join(' ')
 

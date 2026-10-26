@@ -385,6 +385,8 @@ type StirThemeWebformConfig = {
     base?: string | string[]
   } & LooseRecord
   fieldGroupHeader?: ClassValue
+  /** Shown above a wizard page that asks one radio question, which moves on as soon as it is answered by click or tap. Empty turns that off: changing step on an answer needs advance notice (WCAG 3.2.2). */
+  autoAdvanceNotice?: string
   /** Classes for a wizard page's heading; falls back to `fieldGroupHeader`. `sr-only` keeps it for screen readers (focus moves to it on each step) where the stepper already shows it. */
   wizardPageTitle?: ClassValue
   /** Radios whose options have descriptions, shown as cards. `indicator: 'hidden'` drops the dot; `ui` adds classes to RadioGroup slots. */

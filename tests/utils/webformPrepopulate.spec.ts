@@ -23,4 +23,22 @@ describe('applyWebformPrepopulate', () => {
     applyWebformPrepopulate(state, fields, { space: '99', topics: ['a', 'z'] })
     expect(state).toMatchObject({ space: '', topics: ['a'] })
   })
+
+  it('gives a URL value the shape its field stores, or leaves it out', () => {
+    const typed = {
+      agree: { '#type': 'checkbox', '#name': 'agree', '#prepopulate': true },
+      guests: { '#type': 'range', '#name': 'guests', '#prepopulate': true, '#min': 1 },
+      address: { '#type': 'webform_address', '#name': 'address', '#prepopulate': true, '#composite': { city: { '#type': 'textfield' } } },
+    } as unknown as Record<string, WebformFieldProps>
+    const state = createWebformState(typed)
+
+    applyWebformPrepopulate(state, typed, { agree: 'true', guests: '4', address: 'Paris' })
+    expect(state).toMatchObject({ agree: true, guests: 4, address: { city: '' } })
+
+    applyWebformPrepopulate(state, typed, { agree: '0', guests: 'many' })
+    expect(state).toMatchObject({ agree: false, guests: 4 })
+
+    applyWebformPrepopulate(state, typed, { agree: 'maybe', guests: ' ' })
+    expect(state).toMatchObject({ agree: false, guests: 4 })
+  })
 })

@@ -158,6 +158,11 @@ describe('Webform (Nuxt runtime)', () => {
 
     expect(cards!.find('[data-slot="indicator"]').exists()).toBe(false)
     expect(cards!.get('[data-slot="item"]').classes()).toContain('p-8')
+    // With the dot hidden, a selected card still shows by a solid ring, not by
+    // a tint alone (WCAG 1.4.1, 1.4.11).
+    expect(cards!.get('[data-slot="item"]').classes()).toEqual(
+      expect.arrayContaining(['has-data-[state=checked]:ring-2', 'has-data-[state=checked]:ring-primary']),
+    )
     expect(list!.find('[data-slot="base"]').exists()).toBe(true)
     delete theme.cardRadio
   })
@@ -405,6 +410,90 @@ describe('Webform (Nuxt runtime)', () => {
     expect(buttons()).toContain('Change your name')
     expect(wrapper.find('button[type="submit"]').exists()).toBe(true)
     expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
+  })
+
+  it('says a one-question page moves on when answered, and stays put without that notice', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+    const notice = theme.autoAdvanceNotice
+    const chooser = {
+      ...webform,
+      fields: {
+        start: { '#type': 'webform_wizard_page', '#name': 'start', '#title': 'Get started', children: { path: { '#type': 'radio', '#name': 'path', '#title': 'Path', '#options': { book: 'Book', info: 'Info' }, '#optionKeys': ['book', 'info'] } } },
+        details: { '#type': 'webform_wizard_page', '#name': 'details', '#title': 'Details', children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' } } },
+      },
+    } as unknown as WebformDefinition
+
+    const announced = await mountSuspended(Webform, { props: { webform: chooser } })
+
+    await flushPromises()
+    expect(announced.text()).toContain('Choosing an answer takes you to the next step.')
+    announced.unmount()
+
+    theme.autoAdvanceNotice = ''
+    const quiet = await mountSuspended(Webform, { props: { webform: chooser } })
+
+    await flushPromises()
+    expect(quiet.text()).not.toContain('takes you to the next step')
+    await quiet.get('form').trigger('pointerdown')
+    quiet.findComponent(WebformContent).props('state').path = 'book'
+    await flushPromises()
+    // Without the notice an answer does not change the step.
+    expect(quiet.text()).toContain('Step 1 of 2')
+    quiet.unmount()
+    theme.autoAdvanceNotice = notice
+  })
+
+  it('focuses the first field of a page that has no title', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      attachTo: document.body,
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            one: { '#type': 'webform_wizard_page', '#name': 'one', '#title': 'One', children: { name: { '#type': 'textfield', '#name': 'name', '#title': 'Name' } } },
+            two: { '#type': 'webform_wizard_page', '#name': 'two', children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' } } },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    await wrapper.findAll('button').find((button) => button.text() === 'Next')!.trigger('click')
+    await flushPromises()
+
+    expect(document.activeElement).toBe(wrapper.get('textarea[name="notes"]').element)
+    wrapper.unmount()
+  })
+
+  it('moves focus to the confirmation once the form is sent', async () => {
+    const wrapper = await mountSuspended(WebformContent, {
+      attachTo: document.body,
+      props: {
+        fields: {},
+        state: {},
+        isFormSubmitted: false,
+        isLoading: false,
+        isSchemaReady: true,
+        orderedFieldNames: [],
+        themeWebform: {},
+        groupedFields: {},
+        shouldRenderGroupContainer: () => false,
+        shouldRenderIndividualField: () => false,
+        getGroupFields: () => [],
+        isContainerVisible: () => true,
+        submitButtonLabel: 'Submit',
+        webformConfirmation: '<p>Thanks, we will be in touch.</p>',
+        turnstileToken: 'token',
+      },
+    })
+
+    await flushPromises()
+    await wrapper.setProps({ isFormSubmitted: true })
+    await flushPromises()
+
+    expect(document.activeElement?.textContent).toContain('Thanks, we will be in touch.')
+    expect(document.activeElement?.getAttribute('tabindex')).toBe('-1')
+    wrapper.unmount()
   })
 
   it('offers Next, not Submit, on a chooser whose answer reveals the later pages', async () => {

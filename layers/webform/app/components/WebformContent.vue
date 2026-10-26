@@ -13,6 +13,8 @@ type WebformThemeConfig = {
   formClass?: string
   fieldGroup?: string
   fieldGroupHeader?: string
+  autoAdvanceNotice?: string
+  description?: string
   wizardPageTitle?: string
   response?: string
   spacing?: string
@@ -51,6 +53,7 @@ const emit = defineEmits<{
 
 const form = useTemplateRef('form')
 const pageHeading = useTemplateRef<HTMLElement>('pageHeading')
+const confirmation = useTemplateRef<HTMLElement>('confirmation')
 
 // Drupal Webform wizard pages: one page at a time, each validated before the
 // next; the last page submits every value once. Pages hidden by conditions
@@ -92,14 +95,26 @@ const isOnCurrentPage = (fieldName: string) => {
   return !page || page.key === currentPage.value?.key
 }
 
+const FIRST_FIELD = 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [role="radio"], [role="checkbox"]'
+
 async function goToPage(index: number) {
   pageIndex.value = index
   await nextTick()
-  pageHeading.value?.focus()
+
+  // A page without a title has no heading to land on, so its first field
+  // takes focus; otherwise focus would fall to the page when Next turns into
+  // Submit.
+  const formElement = (form.value as { $el?: Element } | null)?.$el
+  const target = pageHeading.value ?? formElement?.querySelector<HTMLElement>(FIRST_FIELD)
+
+  target?.focus()
 }
 
-// A page that asks a single radio question moves on as soon as it is answered.
-const choiceField = computed(() => isWizard.value
+// A page that asks a single radio question moves on as soon as it is
+// answered, but only where the notice above it says so (WCAG 3.2.2): a
+// change of step on input needs advance notice, whatever the input.
+const autoAdvanceNotice = computed(() => props.themeWebform.autoAdvanceNotice?.trim() ?? '')
+const choiceField = computed(() => isWizard.value && autoAdvanceNotice.value
   ? wizardChoiceField(props.fields, props.orderedFieldNames, currentPage.value?.key)
   : undefined)
 
@@ -134,6 +149,15 @@ async function nextPage() {
     form.value?.submit()
   }
 }
+
+// The form is replaced by its confirmation, so focus would fall to the page;
+// moving it there has screen readers read the confirmation. The site's own
+// scroll-to-top setting decides the scroll.
+watch(() => props.isFormSubmitted, async (submitted) => {
+  if (!submitted) return
+  await nextTick()
+  confirmation.value?.focus({ preventScroll: true })
+})
 
 const validateOn: Array<'blur' | 'change' | 'input'> = ['blur', 'change', 'input']
 const trustedHtml = (value?: string) => trustedDrupalHtml(value)
@@ -213,6 +237,9 @@ defineExpose({
       >
         {{ currentPage.title }}
       </h2>
+      <p v-if="choiceField && !isLastPage" :class="props.themeWebform.description">
+        {{ autoAdvanceNotice }}
+      </p>
     </div>
 
     <template v-for="fieldName in orderedFieldNames" :key="fieldName">
@@ -344,7 +371,7 @@ defineExpose({
     </p>
   </UForm>
 
-  <div v-else :class="themeWebform.response">
+  <div v-else ref="confirmation" :class="themeWebform.response" tabindex="-1">
     <div class="prose" v-html="trustedHtml(webformConfirmation)" />
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
   </div>

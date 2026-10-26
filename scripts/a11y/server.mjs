@@ -177,17 +177,24 @@ const pageFixture = {
               webformId: 'contact',
               webformTitle: 'Contact',
               fields: {
-                name: {
-                  '#type': 'textfield',
-                  '#title': 'Your name',
-                  '#name': 'name',
-                  '#required': true,
-                },
-                email: {
-                  '#type': 'email',
-                  '#title': 'Email',
-                  '#name': 'email',
-                  '#required': true,
+                // A Webform flexbox: its fields render side by side.
+                contact_row: {
+                  '#type': 'webform_flexbox',
+                  '#name': 'contact_row',
+                  children: {
+                    name: {
+                      '#type': 'textfield',
+                      '#title': 'Your name',
+                      '#name': 'name',
+                      '#required': true,
+                    },
+                    email: {
+                      '#type': 'email',
+                      '#title': 'Email',
+                      '#name': 'email',
+                      '#required': true,
+                    },
+                  },
                 },
                 message: {
                   '#type': 'textarea',
@@ -205,6 +212,59 @@ const pageFixture = {
               webformConfirmation: 'Thanks',
               webformConfirmationType: 'url_message',
               webformRedirect: '<front>',
+              webformSubmissions: null,
+            },
+          },
+          slots: {},
+        },
+        {
+          // A wizard: the stepper, a one-question page that moves on when
+          // answered (with its notice), and radios shown as cards.
+          element: 'paragraph-webform',
+          props: {
+            uuid: '00000000-0000-4000-8000-0000000000f2',
+            webform: {
+              schemaVersion: 1,
+              webformId: 'booking',
+              webformTitle: 'Booking',
+              fields: {
+                start: {
+                  '#type': 'webform_wizard_page',
+                  '#name': 'start',
+                  '#title': 'How can we help?',
+                  children: {
+                    path: {
+                      '#type': 'radio',
+                      '#name': 'path',
+                      '#title': 'Choose one',
+                      '#required': true,
+                      '#options': {
+                        book: { label: 'Book a visit', description: 'Pick a day and time.' },
+                        ask: { label: 'Ask a question', description: 'We reply within a day.' },
+                      },
+                      '#optionKeys': ['book', 'ask'],
+                    },
+                  },
+                },
+                details: {
+                  '#type': 'webform_wizard_page',
+                  '#name': 'details',
+                  '#title': 'Your details',
+                  children: {
+                    phone: { '#type': 'tel', '#title': 'Phone', '#name': 'phone' },
+                  },
+                },
+              },
+              actions: [
+                {
+                  '#type': 'webform_actions',
+                  '#title': 'Submit',
+                  '#submitLabel': 'Send',
+                },
+              ],
+              webformConfirmation: 'Thanks',
+              webformConfirmationType: 'message',
+              webformRedirect: null,
               webformSubmissions: null,
             },
           },

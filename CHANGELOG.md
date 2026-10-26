@@ -13,6 +13,26 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform accessibility and safety
+
+- **Changed: a one-question wizard page says it moves on when answered.** New
+  theme setting `stirTheme.webform.autoAdvanceNotice` (default "Choosing an
+  answer takes you to the next step.") is shown above such a page; an empty
+  value turns auto-advance off, since a change of step on input needs advance
+  notice (WCAG 3.2.2).
+- **Changed: a selected card radio shows a solid 2px ring,** so the choice is
+  clear without relying on colour, including with `cardRadio.indicator:
+  'hidden'` (WCAG 1.4.1, 1.4.11).
+- **Changed: focus.** A wizard page without a title focuses its first field,
+  and after a successful submission focus moves to the confirmation (without
+  scrolling, so `scrollToTopOnSuccess` still decides), so screen readers read
+  it (WCAG 2.4.3, 4.1.3).
+- **Fixed: prepopulated values take their field's shape.** A URL value for a
+  checkbox becomes true/false (`1`, `true`, `on`, `yes` / `0`, `false`, `off`,
+  `no`), a number field takes a number, and a composite field is left alone.
+- **Fixed: a confirmation redirect starting `/\` is refused,** as browsers read
+  it as another site.
+
 ### Theme
 
 - A hero's text (`.lead`) now sits a step above body text: `text-lg`, `md:text-xl`. It was body size. Sites that sized it themselves keep their own rule.
