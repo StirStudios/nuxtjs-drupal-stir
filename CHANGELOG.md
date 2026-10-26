@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- A hero's text (`.lead`) now sits a step above body text: `text-lg`, `md:text-xl`. It was body size. Sites that sized it themselves keep their own rule.
+
 ### Errors
 
 - **Fixed: a thrown string no longer passes the own-scripts check by default.**
