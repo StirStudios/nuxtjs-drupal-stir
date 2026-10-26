@@ -98,6 +98,25 @@ export function applyWebformPrepopulate(
     const allowed = options ? values.filter((item) => options.includes(item)) : values
 
     if (!allowed.length) continue
-    state[key] = Array.isArray(state[key]) ? allowed : allowed[0]!
+
+    const current = state[key]
+
+    // A URL value is text: it takes the shape the field stores, or is left out.
+    if (Array.isArray(current)) state[key] = allowed
+    else if (typeof current === 'boolean') {
+      const flag = allowed[0]!.toLowerCase()
+
+      if (TRUE_VALUES.has(flag)) state[key] = true
+      else if (FALSE_VALUES.has(flag)) state[key] = false
+    }
+    else if (typeof current === 'number') {
+      const number = Number(allowed[0])
+
+      if (allowed[0]!.trim() && Number.isFinite(number)) state[key] = number
+    }
+    else if (current === null || typeof current !== 'object') state[key] = allowed[0]!
   }
 }
+
+const TRUE_VALUES = new Set(['1', 'true', 'on', 'yes'])
+const FALSE_VALUES = new Set(['0', 'false', 'off', 'no'])

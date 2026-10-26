@@ -32,6 +32,12 @@
     @apply text-[clamp(1.5rem,3vw,2.25rem)] leading-tight;
   }
 
+  /* A hero's text introduces the page, a step above body text. Sized on the
+     children: prose sets the wrapper's own font size. */
+  .lead > * {
+    @apply text-lg md:text-xl;
+  }
+
   a,
   button {
     @apply cursor-pointer;

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  MODAL_FRAME,
+  mediaAspectRatio,
+  resolveModalImageSizes,
   resolveLayoutImageDeliveryProfile,
   resolveGridImageDeliveryProfile,
   resolveCarouselImageDeliverySizes,
@@ -216,5 +219,31 @@ describe('Stir IPX provider', () => {
       'https://cdn.example/_ipx/f_webp&s_640x360/https://drupal.example/sites/default/files/photo.jpg?v=42-1710000000-293400',
     )
     expect(image.url).not.toContain('photo.jpg%3Fv')
+  })
+})
+
+describe('media modal image sizes', () => {
+  it('reads an aspect ratio from Drupal dimensions, falling back to 16:9', () => {
+    expect(mediaAspectRatio(2560, 3840)).toBeCloseTo(2 / 3)
+    expect(mediaAspectRatio('1200', '800')).toBe(1.5)
+    expect(mediaAspectRatio(undefined, 800)).toBeCloseTo(16 / 9)
+    expect(mediaAspectRatio(0, 0)).toBeCloseTo(16 / 9)
+  })
+
+  it('asks a portrait photo on a wide screen for a small file, held back by the height', () => {
+    // 1440 x 900 desktop: a 2:3 photo shows about 480px wide (80% of 900, times 2/3).
+    expect(resolveModalImageSizes(2 / 3, 1440, 900)).toBe('640px')
+  })
+
+  it('keeps landscape photos at the frame\'s full width', () => {
+    expect(resolveModalImageSizes(1.5, 1440, 900)).toBe('1152px')
+    expect(resolveModalImageSizes(1.5, 1280, 720)).toBe('1152px')
+    expect(resolveModalImageSizes(4, 1920, 1080)).toBe('1152px')
+  })
+
+  it('follows the gutter on a phone and snaps to widths the CDN has cached', () => {
+    expect(resolveModalImageSizes(2 / 3, 390, 844)).toBe('640px')
+    expect(resolveModalImageSizes(1.5, 800, 1000)).toBe('768px')
+    expect(MODAL_FRAME.maxWidthPx).toBe(1152)
   })
 })

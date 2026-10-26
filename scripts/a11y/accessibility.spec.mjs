@@ -293,6 +293,18 @@ test.describe('automated accessibility', () => {
           page.getByLabel('Your name'),
           'Expected the fixture webform fields to render',
         ).toBeVisible()
+        await expect(
+          page.getByLabel('Email'),
+          'Expected the fixture webform flexbox row to render',
+        ).toBeVisible()
+        await expect(
+          page.getByText('Choosing an answer takes you to the next step.'),
+          'Expected the fixture wizard notice to render',
+        ).toBeVisible()
+        await expect(
+          page.getByRole('radio', { name: /Book a visit/ }),
+          'Expected the fixture card radios to render',
+        ).toBeVisible()
       }
       // Measure stable rendered colors rather than a midpoint from a theme,
       // hover, carousel, or hydration transition.

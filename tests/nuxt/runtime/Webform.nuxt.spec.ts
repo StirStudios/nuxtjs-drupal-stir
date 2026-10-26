@@ -1,13 +1,17 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useAppConfig } from '#imports'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
 import WebformContent from '../../../layers/webform/app/components/WebformContent.vue'
 import Webform from '../../../layers/webform/app/components/WebformForm.vue'
 import ParagraphWebform from '../../../layers/webform/app/components/global/Paragraph/Webform.vue'
 import type { WebformDefinition } from '../../../layers/theme/app/types'
 import kitchenSink from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink.json'
 import kitchenSinkSubmission from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink-submission.json'
+
+// A submitted form schedules a scroll to the top; unmounting clears it before
+// the environment goes.
+enableAutoUnmount(afterEach)
 
 // The kitchen sink without anything required, so an untouched form submits.
 function optional(value: unknown): unknown {
@@ -131,6 +135,36 @@ describe('Webform (Nuxt runtime)', () => {
     await flushPromises()
     expect(shown.get('h2[tabindex="-1"]').classes()).not.toContain('sr-only')
     shown.unmount()
+  })
+
+  it('styles card radios with cardRadio, keeping list radios as they are', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+
+    theme.cardRadio = { indicator: 'hidden', ui: { item: 'p-8' } }
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            path: { '#type': 'radios', '#name': 'path', '#title': 'Path', '#options': { book: { label: 'Book', description: 'Fastest.' }, info: { label: 'Info', description: 'We follow up.' } }, '#optionKeys': ['book', 'info'] },
+            size: { '#type': 'radios', '#name': 'size', '#title': 'Size', '#options': { s: 'Small', l: 'Large' }, '#optionKeys': ['s', 'l'] },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    const [cards, list] = wrapper.findAll('[role="radiogroup"]')
+
+    expect(cards!.find('[data-slot="indicator"]').exists()).toBe(false)
+    expect(cards!.get('[data-slot="item"]').classes()).toContain('p-8')
+    // With the dot hidden, a selected card still shows by a solid ring, not by
+    // a tint alone (WCAG 1.4.1, 1.4.11).
+    expect(cards!.get('[data-slot="item"]').classes()).toEqual(
+      expect.arrayContaining(['has-data-[state=checked]:ring-2', 'has-data-[state=checked]:ring-primary']),
+    )
+    expect(list!.find('[data-slot="base"]').exists()).toBe(true)
+    delete theme.cardRadio
   })
 
   it('fills prepopulated fields from the prefill prop', async () => {
@@ -378,6 +412,90 @@ describe('Webform (Nuxt runtime)', () => {
     expect(runtime.fetch.mock.calls.filter(([url]) => url === '/api/webform/submit')).toHaveLength(0)
   })
 
+  it('says a one-question page moves on when answered, and stays put without that notice', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+    const notice = theme.autoAdvanceNotice
+    const chooser = {
+      ...webform,
+      fields: {
+        start: { '#type': 'webform_wizard_page', '#name': 'start', '#title': 'Get started', children: { path: { '#type': 'radio', '#name': 'path', '#title': 'Path', '#options': { book: 'Book', info: 'Info' }, '#optionKeys': ['book', 'info'] } } },
+        details: { '#type': 'webform_wizard_page', '#name': 'details', '#title': 'Details', children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' } } },
+      },
+    } as unknown as WebformDefinition
+
+    const announced = await mountSuspended(Webform, { props: { webform: chooser } })
+
+    await flushPromises()
+    expect(announced.text()).toContain('Choosing an answer takes you to the next step.')
+    announced.unmount()
+
+    theme.autoAdvanceNotice = ''
+    const quiet = await mountSuspended(Webform, { props: { webform: chooser } })
+
+    await flushPromises()
+    expect(quiet.text()).not.toContain('takes you to the next step')
+    await quiet.get('form').trigger('pointerdown')
+    quiet.findComponent(WebformContent).props('state').path = 'book'
+    await flushPromises()
+    // Without the notice an answer does not change the step.
+    expect(quiet.text()).toContain('Step 1 of 2')
+    quiet.unmount()
+    theme.autoAdvanceNotice = notice
+  })
+
+  it('focuses the first field of a page that has no title', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      attachTo: document.body,
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            one: { '#type': 'webform_wizard_page', '#name': 'one', '#title': 'One', children: { name: { '#type': 'textfield', '#name': 'name', '#title': 'Name' } } },
+            two: { '#type': 'webform_wizard_page', '#name': 'two', children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' } } },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    await wrapper.findAll('button').find((button) => button.text() === 'Next')!.trigger('click')
+    await flushPromises()
+
+    expect(document.activeElement).toBe(wrapper.get('textarea[name="notes"]').element)
+    wrapper.unmount()
+  })
+
+  it('moves focus to the confirmation once the form is sent', async () => {
+    const wrapper = await mountSuspended(WebformContent, {
+      attachTo: document.body,
+      props: {
+        fields: {},
+        state: {},
+        isFormSubmitted: false,
+        isLoading: false,
+        isSchemaReady: true,
+        orderedFieldNames: [],
+        themeWebform: {},
+        groupedFields: {},
+        shouldRenderGroupContainer: () => false,
+        shouldRenderIndividualField: () => false,
+        getGroupFields: () => [],
+        isContainerVisible: () => true,
+        submitButtonLabel: 'Submit',
+        webformConfirmation: '<p>Thanks, we will be in touch.</p>',
+        turnstileToken: 'token',
+      },
+    })
+
+    await flushPromises()
+    await wrapper.setProps({ isFormSubmitted: true })
+    await flushPromises()
+
+    expect(document.activeElement?.textContent).toContain('Thanks, we will be in touch.')
+    expect(document.activeElement?.getAttribute('tabindex')).toBe('-1')
+    wrapper.unmount()
+  })
+
   it('offers Next, not Submit, on a chooser whose answer reveals the later pages', async () => {
     const onlyFor = (value: string) => ({
       '#states': { visible: { ':input[name="path"]': { value } } },
@@ -415,10 +533,19 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.find('[data-slot="header"] [data-slot="trigger"]').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('Step 1 of 1')
 
+    // An arrow key selects as it moves through the options, so a keyboard
+    // answer waits for Next.
+    await wrapper.get('form').trigger('keydown', { key: 'ArrowDown' })
+    wrapper.findComponent(WebformContent).props('state').path = 'info'
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('Step 2 of 2')
+
+    await wrapper.get('form').trigger('pointerdown')
     wrapper.findComponent(WebformContent).props('state').path = 'book'
     await flushPromises()
 
-    // A page that asks one radio question moves on as soon as it is answered.
+    // A click or tap on the one radio question moves on.
     expect(wrapper.text()).toContain('Step 2 of 2')
     expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
 

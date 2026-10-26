@@ -21,7 +21,8 @@ every site before any is switched on.
   stack frame is in the site's own built scripts (`/_nuxt/`, following the base
   path and CDN settings); code injected by an in-app browser or an extension
   (its source is the page address or another origin) and errors with no frames,
-  such as a failed script load, are dropped. A failed script or module load
+  such as a failed script load, are dropped. A thrown string is judged by the
+  location the browser reported for it, never by the reporter's own stack. A failed script or module load
   ("Importing a module script failed", "Failed to fetch dynamically imported
   module") carries extra data naming the site's own files that came back with
   an error or no body (file name only, no query string), the protocols (h2,

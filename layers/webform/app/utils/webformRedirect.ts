@@ -26,7 +26,8 @@ export function resolveWebformRedirect(
 
   if (value === '<front>') return { to: '/', external: false }
 
-  if (value.startsWith('/') && !value.startsWith('//')) {
+  // A browser reads `/\` as `//`, another site.
+  if (value.startsWith('/') && !/^\/[\\/]/.test(value)) {
     return { to: value, external: false }
   }
 

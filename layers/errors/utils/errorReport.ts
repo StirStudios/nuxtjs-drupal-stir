@@ -25,6 +25,8 @@ export interface ReportContext {
   environment?: string
   release?: string
   extra?: Record<string, unknown>
+  // Already parsed by the caller, so the stack is read once.
+  frames?: StackFrame[]
 }
 
 const MAX_MESSAGE = 500
@@ -100,7 +102,7 @@ export function buildEvent(error: Error, context: ReportContext, eventId = crypt
       values: [{
         type: error.name || 'Error',
         value: (error.message || String(error)).slice(0, MAX_MESSAGE),
-        stacktrace: { frames: parseStack(error.stack) },
+        stacktrace: { frames: context.frames ?? parseStack(error.stack) },
       }],
     },
     request: context.url
@@ -167,24 +169,37 @@ export async function sendEvent(dsn: ErrorDsn, event: { event_id: string }, send
   }
 }
 
-// What is thrown is not always an Error (a rejected string, an event).
-export function toError(value: unknown): Error | null {
+export interface SourceLocation {
+  filename?: string
+  lineno?: number
+  colno?: number
+}
+
+// What is thrown is not always an Error (a rejected string, an event). An
+// Error made here would carry this reporter's own stack, which sits in the
+// site's scripts, so a string gets only the location the browser reported for
+// it (a window error event names the script), or no frames at all.
+export function toError(value: unknown, location?: SourceLocation): Error | null {
   if (value instanceof Error) return value
 
-  if (typeof value === 'string' && value.trim()) return new Error(value)
+  if (typeof value !== 'string' || !value.trim()) return null
 
-  return null
+  const error = new Error(value)
+
+  error.stack = location?.filename
+    ? `Error: ${value}\n    at ${location.filename}:${location.lineno ?? 0}:${location.colno ?? 0}`
+    : ''
+
+  return error
 }
 
 // Browser noise that is not the site's fault: cross-origin scripts that hide
-// their message, and a harmless layout notification.
+// their message, and a harmless layout notification. Where an error came from
+// is judged by its frames (hasOwnFrame), which also follows a CDN.
 const IGNORED_MESSAGES = /^(Script error\.?|ResizeObserver loop)/
 
-export function isIgnoredBrowserError(error: Error, source?: string, origin?: string): boolean {
-  if (IGNORED_MESSAGES.test(error.message)) return true
-
-  // A script from another site or an extension, not from this one.
-  return Boolean(source && origin && !source.startsWith(origin))
+export function isIgnoredBrowserError(error: Error): boolean {
+  return IGNORED_MESSAGES.test(error.message)
 }
 
 // Crawlers, page checkers and automation: a script they give up loading is
@@ -211,8 +226,8 @@ export function ownScriptsPrefix(
 // translator) shows the page address or another origin as its source, and an
 // error with no frames at all (a failed script load, a thrown string) says
 // nothing about our code either.
-export function hasOwnFrame(error: Error, prefix: string): boolean {
-  return parseStack(error.stack).some(frame => frame.filename.startsWith(prefix))
+export function hasOwnFrame(frames: StackFrame[], prefix: string): boolean {
+  return frames.some(frame => frame.filename.startsWith(prefix))
 }
 
 // A script or stylesheet that failed to load, as WebKit, Chrome and Firefox
@@ -272,5 +287,48 @@ export function describeModuleLoad(
     connection: connection
       ? { effectiveType: connection.effectiveType, type: connection.type, saveData: connection.saveData }
       : undefined,
+  }
+}
+
+export interface BrowserReporterOptions {
+  dsn: ErrorDsn
+  ownScripts: string
+  allowed: () => boolean
+  pageUrl: () => string
+  resources: () => ResourceEntry[]
+  connection?: () => { effectiveType?: string, type?: string, saveData?: boolean } | undefined
+  environment?: string
+  release?: string
+  now?: () => number
+  send?: typeof fetch
+}
+
+// The browser's whole decision, from a raw thrown value to a sent event:
+// consent, noise, the site's own frames, one failure counted once, and the
+// file names behind a failed module load. The plugin only wires up the events.
+export function createBrowserReporter(options: BrowserReporterOptions) {
+  const allow = createThrottle(options.now, 60_000, 20, messageKey)
+
+  return (value: unknown, location?: SourceLocation): void => {
+    if (!options.allowed()) return
+
+    const error = toError(value, location)
+
+    if (!error || isIgnoredBrowserError(error)) return
+
+    const frames = parseStack(error.stack)
+
+    if (!hasOwnFrame(frames, options.ownScripts) || !allow(error)) return
+
+    void sendEvent(options.dsn, buildEvent(error, {
+      platform: 'javascript',
+      frames,
+      url: options.pageUrl(),
+      environment: options.environment,
+      release: options.release,
+      extra: isModuleLoadFailure(error)
+        ? describeModuleLoad(options.resources(), options.ownScripts, options.connection?.())
+        : undefined,
+    }), options.send)
   }
 }

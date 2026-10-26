@@ -268,6 +268,10 @@ export const assertStirDrupalPageResponse = (
 
   if (/json/i.test(response.headers.get('content-type') ?? '')) return
 
+  // The CMS's own cache headers are already on the response; a cache must not
+  // keep a misbehaving CMS's answer once it recovers.
+  event.node?.res?.setHeader('Cache-Control', 'no-store')
+
   throw createError({ statusCode: 502, statusMessage: 'Unexpected response from the CMS' })
 }
 

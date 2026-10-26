@@ -13,8 +13,74 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- A hero with media clears the fixed header below `lg` (`hero.mediaSpacing`), so a long intro on a phone no longer runs up under the logo. Desktop is unchanged.
+
+### Webform accessibility and safety
+
+- **Changed: a one-question wizard page says it moves on when answered.** New
+  theme setting `stirTheme.webform.autoAdvanceNotice` (default "Choosing an
+  answer takes you to the next step.") is shown above such a page; an empty
+  value turns auto-advance off, since a change of step on input needs advance
+  notice (WCAG 3.2.2).
+- **Changed: a selected card radio shows a solid 2px ring,** so the choice is
+  clear without relying on colour, including with `cardRadio.indicator:
+  'hidden'` (WCAG 1.4.1, 1.4.11).
+- **Changed: focus.** A wizard page without a title focuses its first field,
+  and after a successful submission focus moves to the confirmation (without
+  scrolling, so `scrollToTopOnSuccess` still decides), so screen readers read
+  it (WCAG 2.4.3, 4.1.3).
+- **Fixed: prepopulated values take their field's shape.** A URL value for a
+  checkbox becomes true/false (`1`, `true`, `on`, `yes` / `0`, `false`, `off`,
+  `no`), a number field takes a number, and a composite field is left alone.
+- **Fixed: a confirmation redirect starting `/\` is refused,** as browsers read
+  it as another site.
+
+### Theme
+
+- A hero's text (`.lead`) now sits a step above body text: `text-lg`, `md:text-xl`. It was body size. Sites that sized it themselves keep their own rule.
+
+### Errors
+
+- **Fixed: a thrown string no longer passes the own-scripts check by default.**
+  A string error (a rejected string, or a window error with no error object)
+  was wrapped in an `Error` made inside the reporter, whose stack sits in the
+  site's own scripts, so it was always sent. It now carries only the location
+  the browser reported for it, or no frames, and is judged like any other.
+- **Changed: reporter helpers.** New export `createBrowserReporter()` holds the
+  browser's whole decision (consent, noise, own frames, one failure counted
+  once, module-load diagnostics); the plugin only wires up the events.
+  `hasOwnFrame()` now takes parsed frames, `toError()` takes an optional source
+  location, and `isIgnoredBrowserError()` takes only the error (where an error
+  came from is judged by its frames, which also follows a CDN). The stack is
+  parsed once per report.
+
+### Core
+
+- **Changed: the proxy's 502 for a non-JSON CMS answer sends
+  `Cache-Control: no-store`,** so no cache keeps a misbehaving CMS's answer
+  after it recovers.
+
+### Theme
+
+- **Changed: media modal images ask for the width they are shown at.** A
+  portrait photo on a wide screen is held back by the frame's height, so it
+  now requests a 640 or 768px file (twice that on high-density screens)
+  instead of 1152px, snapped to the widths the modal profile already produces
+  so the CDN keeps few variants. New exports in `utils/imageDelivery`:
+  `MODAL_FRAME`, `mediaAspectRatio()`, `resolveModalImageSizes()`.
+
+### Tooling
+
+- `@vitest/coverage-v8` now follows vitest's range (`^4.1.12`) instead of an
+  exact pin, so the two move together.
+
 ### Webform
 
+- **New: `webform.cardRadio`.** Styles radios whose options have descriptions (the card radios): `indicator: 'hidden'` drops the dot so the whole card is the choice, `size` sets the Nuxt UI size and `ui` adds classes to RadioGroup slots. Without it, cards are unchanged.
+- A wizard keeps Back on the left and puts Next or Submit on the right.
+- A one-question wizard page moves on only when answered by click or tap. Arrow keys select a radio as they move through the options, so a keyboard answer now waits for Next (WCAG 3.2.2).
 - A wizard shows its stepper only once there are two or more steps to show. A chooser page whose answer reveals the later pages no longer shows a lone "1".
 
 ### Theme

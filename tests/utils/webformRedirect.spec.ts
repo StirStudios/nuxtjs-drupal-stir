@@ -35,6 +35,12 @@ describe('resolveWebformRedirect', () => {
     })
   })
 
+  it('rejects a path a browser would read as another site', () => {
+    expect(resolveWebformRedirect('url', '/\\evil.example')).toBeNull()
+    expect(resolveWebformRedirect('url', '//evil.example')).toBeNull()
+    expect(resolveWebformRedirect('url', '/thanks\\more')).toEqual({ to: '/thanks\\more', external: false })
+  })
+
   it('accepts an explicit HTTP or HTTPS confirmation URL', () => {
     expect(resolveWebformRedirect('url', 'https://example.com/thanks')).toEqual({
       to: 'https://example.com/thanks',

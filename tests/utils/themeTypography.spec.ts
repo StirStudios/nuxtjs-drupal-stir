@@ -11,6 +11,11 @@ describe('shared theme typography and containment', () => {
     expect(source('assets/css/media.css')).not.toContain('!mb-4')
   })
 
+  it('sets a hero lead a step above body text', () => {
+    expect(source('assets/css/base.css')).toMatch(/\.lead > \* \{\s*@apply text-lg md:text-xl;/)
+    expect(source('components/global/Paragraph/Hero.vue')).toContain('classes="lead"')
+  })
+
   it('contains page motion without clipping every section', () => {
     expect(source('assets/css/base.css')).not.toContain('overflow-x-clip')
     expect(source('layouts/default.vue')).toContain('flex-col overflow-x-clip')

@@ -16,6 +16,7 @@ export default defineAppConfig({
       spacing: 'space-y-8',
       formClass: '',
       fieldGroupHeader: 'mb-6 text-xl font-semibold',
+      autoAdvanceNotice: 'Choosing an answer takes you to the next step.',
       fieldGroup: 'mb-14 space-y-8',
       fieldInput: 'w-full',
       fieldText: '',
