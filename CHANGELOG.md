@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Core
+
+- **Changed: a CMS that misses the request timeout is a 504.** When the
+  Drupal CE or menu proxy gives up on the CMS after `drupalRequestTimeoutMs`
+  (10 s by default, unchanged), the error is now `504 Gateway Timeout`, "CMS
+  did not answer within 10 s", instead of `502 Bad Gateway`, so error reports
+  tell a slow CMS apart from a refused or dropped connection, which stays 502.
+  It is still reported, and a page fetch still retries it once as before.
+
 ### Webform
 
 - A wizard opens past its first page when that page's single question is already answered by the link (prepopulate), as with a "Contact us" link that picks the inquiry path. Back still returns to the question.
