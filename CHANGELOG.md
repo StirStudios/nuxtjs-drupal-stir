@@ -15,6 +15,10 @@ untouched do not need one.
 
 ### Webform
 
+- A wizard opens past its first page when that page's single question is already answered by the link (prepopulate), as with a "Contact us" link that picks the inquiry path. Back still returns to the question.
+
+### Webform
+
 - A wizard page without a stepper adds no gap above its first field: the stepper's wrapper drops out of the layout and keeps only the hidden page heading.
 
 ### Theme

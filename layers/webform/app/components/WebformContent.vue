@@ -131,6 +131,13 @@ watch(
   },
 )
 
+// A link that already answers the first page's question (Webform's
+// prepopulate) opens on the page after it. Back still returns to the
+// question; focus stays put, as on any page load.
+onMounted(() => {
+  if (pageIndex.value === 0 && choiceField.value && props.state[choiceField.value] && !isLastPage.value) pageIndex.value = 1
+})
+
 async function nextPage() {
   const names = wizardPageFieldNames(props.fields, props.orderedFieldNames, currentPage.value?.key)
 
