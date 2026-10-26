@@ -532,7 +532,7 @@ describe('Webform (Nuxt runtime)', () => {
     // Before the answer only the chooser shows, so there is no stepper yet.
     expect(wrapper.find('[data-slot="header"] [data-slot="trigger"]').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('Step 1 of 1')
-    expect(wrapper.get('form > div.contents').exists()).toBe(true)
+    expect(wrapper.find('form > div.contents').exists()).toBe(true)
 
     // An arrow key selects as it moves through the options, so a keyboard
     // answer waits for Next.
