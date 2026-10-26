@@ -27,6 +27,8 @@ export interface ReportContext {
   extra?: Record<string, unknown>
   // Already parsed by the caller, so the stack is read once.
   frames?: StackFrame[]
+  // Sent only for a failed module load, where the browser is the question.
+  userAgent?: string
 }
 
 const MAX_MESSAGE = 500
@@ -106,7 +108,11 @@ export function buildEvent(error: Error, context: ReportContext, eventId = crypt
       }],
     },
     request: context.url
-      ? { url: context.url.split('?')[0], method: context.method }
+      ? {
+          url: context.url.split('?')[0],
+          method: context.method,
+          headers: context.userAgent ? { 'User-Agent': context.userAgent } : undefined,
+        }
       : undefined,
     extra: context.extra,
   }
@@ -258,8 +264,16 @@ export function describeModuleLoad(
   entries: ResourceEntry[],
   prefix: string,
   connection?: { effectiveType?: string, type?: string, saveData?: boolean },
+  requested: string[] = [],
 ): Record<string, unknown> {
   const own = entries.filter(entry => entry.name.startsWith(prefix))
+  const fileOf = (url: string) => url.slice(prefix.length).split(/[?#]/)[0]!
+  // WebKit records no entry for a module fetch that failed or was cancelled,
+  // so a file the page asked for (a modulepreload link) without an entry is
+  // the one that never arrived.
+  const completed = new Set(own.map(entry => fileOf(entry.name)))
+  const missing = [...new Set(requested.filter(url => url.startsWith(prefix)).map(fileOf))]
+    .filter(file => !completed.has(file))
   const failed = own.filter((entry) => {
     const status = entry.responseStatus
 
@@ -277,8 +291,10 @@ export function describeModuleLoad(
   return {
     ownFiles: own.length,
     failedFiles: failed.length,
+    missingFiles: missing.length,
+    missing: missing.slice(0, MAX_FAILED_FILES),
     failed: failed.slice(0, MAX_FAILED_FILES).map(entry => ({
-      file: entry.name.slice(prefix.length).split(/[?#]/)[0],
+      file: fileOf(entry.name),
       status: entry.responseStatus,
       protocol: entry.nextHopProtocol || undefined,
       ms: Math.round(entry.duration),
@@ -290,6 +306,21 @@ export function describeModuleLoad(
   }
 }
 
+// An app's own web view rather than a browser: an iPhone or iPad web view
+// without Safari's token, or an app that names itself.
+const IN_APP_BROWSER = /FBAN|FBAV|Instagram|GSA\/|\bLine\/|LinkedInApp|Snapchat|Pinterest|; wv\)/i
+
+export function isInAppBrowser(userAgent = ''): boolean {
+  return IN_APP_BROWSER.test(userAgent) || (/iPhone|iPad|iPod/.test(userAgent) && !/Safari\//.test(userAgent))
+}
+
+export interface PageState {
+  visibility?: string
+  online?: boolean
+  msSinceStart?: number
+  navigationType?: string
+}
+
 export interface BrowserReporterOptions {
   dsn: ErrorDsn
   ownScripts: string
@@ -297,6 +328,10 @@ export interface BrowserReporterOptions {
   pageUrl: () => string
   resources: () => ResourceEntry[]
   connection?: () => { effectiveType?: string, type?: string, saveData?: boolean } | undefined
+  userAgent?: () => string
+  // The module files the page asked for (modulepreload links).
+  requestedModules?: () => string[]
+  pageState?: () => PageState
   environment?: string
   release?: string
   now?: () => number
@@ -320,14 +355,24 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
 
     if (!hasOwnFrame(frames, options.ownScripts) || !allow(error)) return
 
+    // A failed module load also says which browser, what never arrived and
+    // what the page was doing; other errors carry none of this.
+    const moduleLoad = isModuleLoadFailure(error)
+    const userAgent = moduleLoad ? options.userAgent?.() : undefined
+
     void sendEvent(options.dsn, buildEvent(error, {
       platform: 'javascript',
       frames,
       url: options.pageUrl(),
       environment: options.environment,
       release: options.release,
-      extra: isModuleLoadFailure(error)
-        ? describeModuleLoad(options.resources(), options.ownScripts, options.connection?.())
+      userAgent,
+      extra: moduleLoad
+        ? {
+            ...describeModuleLoad(options.resources(), options.ownScripts, options.connection?.(), options.requestedModules?.()),
+            inAppBrowser: isInAppBrowser(userAgent),
+            page: options.pageState?.(),
+          }
         : undefined,
     }), options.send)
   }

@@ -27,6 +27,10 @@ added 0.48 kB gzip (1.18 kB raw) to the app entry, in first-party code only.
 It cannot be tree-shaken per site, because a site's DSN is runtime
 configuration, so the cost is the same on every site.
 
+They then moved to 233 / 196 kB for the module-load diagnostics (user agent
+and in-app flag, files that never arrived, page state), which added 0.35 kB
+gzip to the app entry.
+
 Recovering those bytes is still worthwhile, and the caps should be ratcheted
 back down as it happens. This file records what the graph is actually made of
 so that work starts from measurement rather than guesswork.

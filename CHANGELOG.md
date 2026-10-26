@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Changed: a failed module load says more.** For "Importing a module
+  script failed" and the other module-load failures only, the browser
+  reporter now also sends the user agent (as the event's `User-Agent`) and an
+  `inAppBrowser` flag, the page's `modulepreload` files that never arrived
+  (`missingFiles`, `missing`; Safari keeps no record of a cancelled load), and
+  the page's state (`visibility`, `online`, `msSinceStart`, `navigationType`).
+  Other errors send no headers, as before. Sites whose privacy notice lists
+  what error reports contain may want to mention the user agent.
+
 ### Core
 
 - **Changed: a CMS that misses the request timeout is a 504.** When the
