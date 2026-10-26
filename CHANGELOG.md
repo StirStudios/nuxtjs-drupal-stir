@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+### Theme
+
+- A hero with media clears the fixed header below `lg` (`hero.mediaSpacing`), so a long intro on a phone no longer runs up under the logo. Desktop is unchanged.
+
 ### Webform accessibility and safety
 
 - **Changed: a one-question wizard page says it moves on when answered.** New

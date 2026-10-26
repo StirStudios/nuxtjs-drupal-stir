@@ -116,7 +116,9 @@ export default defineAppConfig({
       actions: 'flex flex-wrap gap-x-6 gap-y-3 [&>div]:w-auto',
       base: 'hero flex items-center justify-center overflow-hidden',
       mediaAppearance: 'dark text-default',
-      mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
+      // Below lg a long intro can outgrow the hero, so it clears the fixed
+      // header (--ui-header-height) as a hero without media does.
+      mediaSpacing: 'mb-12 min-h-[22rem] pt-[calc(var(--ui-header-height)_+_1rem)] pb-10 lg:mb-20 lg:min-h-[35rem] lg:py-0',
       // Clears the fixed header (--ui-header-height, published by the header)
       // plus a gap; lg keeps the former 13.5rem floor.
       noMediaSpacing:
