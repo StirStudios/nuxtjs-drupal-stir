@@ -85,11 +85,31 @@ export function parseStack(stack: string | undefined): StackFrame[] {
   return frames.slice(0, MAX_FRAMES).reverse()
 }
 
-// A page not found or refused is not a fault of the site.
+// A page not found or refused is not a fault of the site, and neither is the
+// CMS's Maintenance mode during a deploy.
 export function shouldReport(error: unknown): boolean {
   const status = (error as { statusCode?: number } | null)?.statusCode
 
-  return typeof status !== 'number' || status >= 500
+  return (typeof status !== 'number' || status >= 500) && !isDrupalMaintenance(error)
+}
+
+type MaybeMaintenance = {
+  data?: { maintenanceMessage?: unknown, data?: { maintenanceMessage?: unknown } }
+  cause?: unknown
+} | null
+
+// Drupal in Maintenance mode answers with its message as plain text, which
+// the layer passes on as data.maintenanceMessage: on a route's own error, or
+// in the JSON error body a fetch of that route received. A CMS that is down
+// answers with a proxy's HTML page and carries no message, so it is still
+// reported.
+export function isDrupalMaintenance(error: unknown, depth = 0): boolean {
+  const data = (error as MaybeMaintenance)?.data
+  const message = data?.maintenanceMessage ?? data?.data?.maintenanceMessage
+
+  if (typeof message === 'string' && message.trim()) return true
+
+  return depth < 2 && Boolean((error as MaybeMaintenance)?.cause) && isDrupalMaintenance((error as MaybeMaintenance)!.cause, depth + 1)
 }
 
 export function buildEvent(error: Error, context: ReportContext, eventId = crypto.randomUUID().replaceAll('-', '')) {
@@ -349,7 +369,7 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
 
     const error = toError(value, location)
 
-    if (!error || isIgnoredBrowserError(error)) return
+    if (!error || isIgnoredBrowserError(error) || isDrupalMaintenance(value)) return
 
     const frames = parseStack(error.stack)
 

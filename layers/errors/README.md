@@ -18,7 +18,11 @@ every site before any is switched on.
   scripts from other sites and browser extensions are ignored. Crawlers, page
   checkers and automated browsers (by user agent or `navigator.webdriver`) send
   nothing from the browser; the server only reports status 500 and up, so
-  their 404s never count. The browser sends an error only when at least one
+  their 404s never count. Nor does the CMS's Maintenance mode during a deploy:
+  a 503 that carries Drupal's maintenance message (plain text, passed on as
+  `data.maintenanceMessage`) is not reported, from the server or the browser,
+  while a 503 without it (a CMS that is down, answering with a proxy's HTML
+  page) still is. The browser sends an error only when at least one
   stack frame is in the site's own built scripts (`/_nuxt/`, following the base
   path and CDN settings); code injected by an in-app browser or an extension
   (its source is the page address or another origin) and errors with no frames,

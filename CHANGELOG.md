@@ -15,6 +15,12 @@ untouched do not need one.
 
 ### Errors
 
+- **Changed: the CMS's Maintenance mode is not reported.** A 503 that
+  carries Drupal's maintenance message (`data.maintenanceMessage`, set only
+  when Drupal answers with its plain-text message) is no longer sent to the
+  error tracker, from the server or the browser; the maintenance page is
+  unchanged. A 503 without that message, such as a CMS that is down behind a
+  proxy, is still reported. New export: `isDrupalMaintenance()`.
 - **Changed: a failed module load says more.** For "Importing a module
   script failed" and the other module-load failures only, the browser
   reporter now also sends the user agent (as the event's `User-Agent`) and an
