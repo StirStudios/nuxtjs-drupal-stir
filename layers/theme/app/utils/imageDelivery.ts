@@ -175,3 +175,35 @@ export function resolveImageDeliveryProfile(
 
   return profile || undefined
 }
+
+// The media modal's frame: at most 72rem wide, a 1rem gutter each side, and
+// no taller than 80% of the viewport. MediaModal builds its CSS from this.
+export const MODAL_FRAME = { maxWidthPx: 1152, gutterPx: 32, maxHeightShare: 0.8 }
+
+// The widths the modal profile (sm:100vw lg:1152px) already produces, so a
+// modal asks for images the CDN has cached; each also comes at twice the width
+// for high-density screens.
+const MODAL_IMAGE_WIDTHS = [640, 768, 1152]
+
+export function mediaAspectRatio(width: unknown, height: unknown): number {
+  const w = Number(width)
+  const h = Number(height)
+
+  return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 ? w / h : 16 / 9
+}
+
+// A modal image's width as shown, snapped up to a cached width: a portrait
+// photo on a wide screen is held back by the height, not the width.
+export function resolveModalImageSizes(
+  aspectRatio: number,
+  viewportWidth: number,
+  viewportHeight: number,
+): string {
+  const shown = Math.min(
+    MODAL_FRAME.maxWidthPx,
+    viewportWidth - MODAL_FRAME.gutterPx,
+    viewportHeight * MODAL_FRAME.maxHeightShare * aspectRatio,
+  )
+
+  return `${MODAL_IMAGE_WIDTHS.find(width => width >= shown) ?? MODAL_FRAME.maxWidthPx}px`
+}

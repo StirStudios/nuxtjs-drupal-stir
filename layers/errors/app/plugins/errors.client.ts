@@ -1,17 +1,11 @@
 import {
-  buildEvent,
-  createThrottle,
-  describeModuleLoad,
-  hasOwnFrame,
+  createBrowserReporter,
   isAutomatedVisitor,
-  isIgnoredBrowserError,
-  isModuleLoadFailure,
-  messageKey,
   ownScriptsPrefix,
   parseDsn,
-  sendEvent,
-  toError,
 } from '../../utils/errorReport'
+
+type NetworkInformation = { effectiveType?: string, type?: string, saveData?: boolean }
 
 // Reports browser errors (uncaught errors, unhandled rejections and Vue
 // errors) to the site's GlitchTip, with the same small reporter the server
@@ -27,31 +21,18 @@ export default defineNuxtPlugin({
     if (!dsn || isAutomatedVisitor(navigator.userAgent, navigator.webdriver)) return
 
     const { allowsNonEssential } = usePrivacyConsent()
-    const ownScripts = ownScriptsPrefix(useRuntimeConfig().app, window.location.origin)
-    const allow = createThrottle(Date.now, 60_000, 20, messageKey)
+    const report = createBrowserReporter({
+      dsn,
+      ownScripts: ownScriptsPrefix(useRuntimeConfig().app, window.location.origin),
+      allowed: () => allowsNonEssential.value,
+      pageUrl: () => `${window.location.origin}${window.location.pathname}`,
+      resources: () => performance.getEntriesByType('resource') as PerformanceResourceTiming[],
+      connection: () => (navigator as Navigator & { connection?: NetworkInformation }).connection,
+      environment: config?.environment,
+      release: config?.release,
+    })
 
-    function report(value: unknown, source?: string) {
-      const error = toError(value)
-
-      if (!allowsNonEssential.value || !error || isIgnoredBrowserError(error, source, window.location.origin) || !hasOwnFrame(error, ownScripts) || !allow(error)) return
-
-      void sendEvent(dsn!, buildEvent(error, {
-        platform: 'javascript',
-        url: `${window.location.origin}${window.location.pathname}`,
-        environment: config?.environment,
-        release: config?.release,
-        // A failed module load says nothing about which file or how it travelled.
-        extra: isModuleLoadFailure(error)
-          ? describeModuleLoad(
-              performance.getEntriesByType('resource') as PerformanceResourceTiming[],
-              ownScripts,
-              (navigator as Navigator & { connection?: { effectiveType?: string, type?: string, saveData?: boolean } }).connection,
-            )
-          : undefined,
-      }))
-    }
-
-    window.addEventListener('error', event => report(event.error ?? event.message, event.filename))
+    window.addEventListener('error', event => report(event.error ?? event.message, event))
     window.addEventListener('unhandledrejection', event => report(event.reason))
     nuxtApp.hook('vue:error', error => report(error))
     nuxtApp.hook('app:error', error => report(error))

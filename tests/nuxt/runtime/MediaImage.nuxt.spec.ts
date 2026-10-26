@@ -283,6 +283,24 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('srcset')).toContain('3072')
   })
 
+  it('turns a modal image\'s single width into that width and its double', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Portrait photo',
+        deliverySizes: '640px',
+        noWrapper: true,
+        originalSrc: 'https://drupal.example/files/portrait.jpg',
+        src: '/styles/card/portrait.webp',
+      },
+    })
+    const srcset = wrapper.get('img').attributes('srcset') ?? ''
+
+    expect(wrapper.get('img').attributes('sizes')).toBe('640px')
+    expect(srcset).toContain('640w')
+    expect(srcset).toContain('1280w')
+    expect(srcset).not.toContain('2304w')
+  })
+
   it('avoids native auto-sizing for responsive wrapped images', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   buildEnvelope,
   buildEvent,
+  createBrowserReporter,
   createThrottle,
   describeModuleLoad,
   hasOwnFrame,
@@ -119,14 +120,26 @@ describe('browser errors', () => {
     expect(toError('  ')).toBeNull()
   })
 
-  it('ignores cross-origin noise and scripts that are not the site\'s', () => {
-    const origin = 'https://www.example.com'
+  it('gives a thrown string the location the browser reported, never this reporter\'s own stack', () => {
+    // Made here, a plain new Error() would carry the reporter's frames, which
+    // sit in the site's own scripts and would pass the own-script check.
+    expect(toError('rejected')?.stack).toBe('')
+    expect(parseStack(toError('rejected')?.stack)).toEqual([])
+    expect(parseStack(toError('Uncaught boom', {
+      filename: 'https://www.example.com/class/yoga',
+      lineno: 229,
+      colno: 12,
+    })?.stack)).toEqual([
+      { function: undefined, filename: 'https://www.example.com/class/yoga', lineno: 229, colno: 12 },
+    ])
+    expect(parseStack(toError('Uncaught boom', { filename: 'https://www.example.com/_nuxt/a.js', lineno: 1, colno: 2 })?.stack)[0]?.filename)
+      .toBe('https://www.example.com/_nuxt/a.js')
+  })
 
-    expect(isIgnoredBrowserError(new Error('Script error.'), '', origin)).toBe(true)
-    expect(isIgnoredBrowserError(new Error('ResizeObserver loop completed'), origin, origin)).toBe(true)
-    expect(isIgnoredBrowserError(new Error('x'), 'chrome-extension://abc/inject.js', origin)).toBe(true)
-    expect(isIgnoredBrowserError(new Error('x'), `${origin}/_nuxt/app.js`, origin)).toBe(false)
-    expect(isIgnoredBrowserError(new Error('x'), undefined, origin)).toBe(false)
+  it('ignores cross-origin noise and a harmless layout notification by message', () => {
+    expect(isIgnoredBrowserError(new Error('Script error.'))).toBe(true)
+    expect(isIgnoredBrowserError(new Error('ResizeObserver loop completed'))).toBe(true)
+    expect(isIgnoredBrowserError(new Error('x'))).toBe(false)
   })
 
   it('parses Firefox and Safari stacks', () => {
@@ -174,7 +187,7 @@ describe('automated visitors', () => {
 
     const chunkError = new Error('Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js')
 
-    expect(isIgnoredBrowserError(chunkError, 'https://www.example.com/_nuxt/entry.js', 'https://www.example.com')).toBe(false)
+    expect(isIgnoredBrowserError(chunkError)).toBe(false)
   })
 
   it('counts a chunk failure once when Nuxt, the window and Vue all raise it', () => {
@@ -188,6 +201,7 @@ describe('automated visitors', () => {
 describe('own scripts only', () => {
   const origin = 'https://www.example.com'
   const prefix = ownScriptsPrefix({ baseURL: '/', buildAssetsDir: '/_nuxt/' }, origin)
+  const ownFrame = (error: Error) => hasOwnFrame(parseStack(error.stack), prefix)
   const errorWith = (stack: string, message = 'boom') => Object.assign(new Error(message), { stack })
 
   it('finds the built scripts on the page origin, a base path or a CDN', () => {
@@ -198,19 +212,19 @@ describe('own scripts only', () => {
   })
 
   it('reports an exception thrown from the site\'s own script', () => {
-    expect(hasOwnFrame(errorWith('TypeError: x is undefined\n    at render (https://www.example.com/_nuxt/Cx4f2a.js:10:5)\n    at https://www.example.com/_nuxt/entry.js:3:9'), prefix)).toBe(true)
-    expect(hasOwnFrame(errorWith('render@https://www.example.com/_nuxt/Cx4f2a.js:10:5'), prefix)).toBe(true)
+    expect(ownFrame(errorWith('TypeError: x is undefined\n    at render (https://www.example.com/_nuxt/Cx4f2a.js:10:5)\n    at https://www.example.com/_nuxt/entry.js:3:9'))).toBe(true)
+    expect(ownFrame(errorWith('render@https://www.example.com/_nuxt/Cx4f2a.js:10:5'))).toBe(true)
     // One frame of ours among others is enough.
-    expect(hasOwnFrame(errorWith('Error: x\n    at Hk (https://www.example.com/:229:3)\n    at run (https://www.example.com/_nuxt/entry.js:3:9)'), prefix)).toBe(true)
+    expect(ownFrame(errorWith('Error: x\n    at Hk (https://www.example.com/:229:3)\n    at run (https://www.example.com/_nuxt/entry.js:3:9)'))).toBe(true)
   })
 
   it('drops errors from injected scripts, extensions and other origins', () => {
     // An in-app browser's script: its source is the page address itself.
-    expect(hasOwnFrame(errorWith('RangeError: Maximum call stack size exceeded\n    at Hk (https://www.example.com/class/yoga:229:12)\n    at Fk (https://www.example.com/class/yoga:229:40)'), prefix)).toBe(false)
-    expect(hasOwnFrame(errorWith('Error: x\n    at a (chrome-extension://abc/inject.js:1:1)'), prefix)).toBe(false)
-    expect(hasOwnFrame(errorWith('Error: x\n    at a (https://cdn.other.com/_nuxt/app.js:1:1)'), prefix)).toBe(false)
+    expect(ownFrame(errorWith('RangeError: Maximum call stack size exceeded\n    at Hk (https://www.example.com/class/yoga:229:12)\n    at Fk (https://www.example.com/class/yoga:229:40)'))).toBe(false)
+    expect(ownFrame(errorWith('Error: x\n    at a (chrome-extension://abc/inject.js:1:1)'))).toBe(false)
+    expect(ownFrame(errorWith('Error: x\n    at a (https://cdn.other.com/_nuxt/app.js:1:1)'))).toBe(false)
     // A look-alike path on our own origin is not a built script.
-    expect(hasOwnFrame(errorWith('Error: x\n    at a (https://www.example.com/not_nuxt/app.js:1:1)'), prefix)).toBe(false)
+    expect(ownFrame(errorWith('Error: x\n    at a (https://www.example.com/not_nuxt/app.js:1:1)'))).toBe(false)
   })
 
   it('keeps a failed module import whose stack has frames in the site\'s scripts', () => {
@@ -222,9 +236,9 @@ describe('own scripts only', () => {
       message,
     )
 
-    expect(hasOwnFrame(webkit, prefix)).toBe(true)
-    expect(hasOwnFrame(errorWith('at a (https://www.example.com/_nuxt/BmIMsDnx.js:2:67390)\n    at b (https://www.example.com/_nuxt/CRzLMJPS.js:1:1505)', message), prefix)).toBe(true)
-    expect(isIgnoredBrowserError(webkit, 'https://www.example.com/_nuxt/BmIMsDnx.js', origin)).toBe(false)
+    expect(ownFrame(webkit)).toBe(true)
+    expect(ownFrame(errorWith('at a (https://www.example.com/_nuxt/BmIMsDnx.js:2:67390)\n    at b (https://www.example.com/_nuxt/CRzLMJPS.js:1:1505)', message))).toBe(true)
+    expect(isIgnoredBrowserError(webkit)).toBe(false)
     expect(buildEvent(webkit, { platform: 'javascript' }).exception.values[0]!.stacktrace.frames.map(frame => frame.filename)).toEqual([
       'https://www.example.com/_nuxt/CRzLMJPS.js',
       'https://www.example.com/_nuxt/BmIMsDnx.js',
@@ -232,10 +246,10 @@ describe('own scripts only', () => {
   })
 
   it('drops errors with no frames, including failed script loads', () => {
-    expect(hasOwnFrame(errorWith(''), prefix)).toBe(false)
-    expect(hasOwnFrame(new Error('rejected string'), prefix)).toBe(false)
-    expect(hasOwnFrame(errorWith('TypeError: Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js'), prefix)).toBe(false)
-    expect(hasOwnFrame(errorWith('TypeError: Importing a module script failed.'), prefix)).toBe(false)
+    expect(ownFrame(errorWith(''))).toBe(false)
+    expect(ownFrame(new Error('rejected string'))).toBe(false)
+    expect(ownFrame(errorWith('TypeError: Failed to fetch dynamically imported module: https://www.example.com/_nuxt/abc.js'))).toBe(false)
+    expect(ownFrame(errorWith('TypeError: Importing a module script failed.'))).toBe(false)
   })
 })
 
@@ -339,5 +353,113 @@ describe('failed module load diagnostics', () => {
 
     expect(buildEvent(error, { platform: 'javascript', extra: { failedFiles: 1 } }).extra).toEqual({ failedFiles: 1 })
     expect(JSON.parse(JSON.stringify(buildEvent(error, { platform: 'javascript' }))).extra).toBeUndefined()
+  })
+})
+
+describe('browser report pipeline', () => {
+  const page = 'https://www.example.com'
+  const ownScripts = `${page}/_nuxt/`
+  const dsn = parseDsn('https://key@errors.example.com/7')!
+  const thrownAt = (message: string, file: string, name = 'Error') =>
+    Object.assign(new Error(message), { name, stack: `${name}: ${message}\n    at run (${file}:1:2)` })
+
+  function setup(overrides: { allowed?: boolean, resources?: ResourceEntryLike[] } = {}) {
+    const send = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
+    let now = 1_000
+    const report = createBrowserReporter({
+      dsn,
+      ownScripts,
+      allowed: () => overrides.allowed ?? true,
+      pageUrl: () => `${page}/class/yoga`,
+      resources: () => overrides.resources ?? [],
+      connection: () => ({ effectiveType: '4g' }),
+      now: () => now,
+      send: send as unknown as typeof fetch,
+    })
+    const sent = () => send.mock.calls.map(([, init]) =>
+      JSON.parse((init as RequestInit).body!.toString().split('\n')[2]!))
+
+    return { report, sent, later: (ms: number) => { now += ms } }
+  }
+
+  type ResourceEntryLike = Parameters<typeof describeModuleLoad>[0][number]
+
+  it('sends an error thrown from the site\'s own scripts, without the query string', () => {
+    const { report, sent } = setup()
+
+    report(thrownAt('x is undefined', `${ownScripts}entry.js`))
+
+    expect(sent()).toHaveLength(1)
+    expect(sent()[0]).toMatchObject({
+      platform: 'javascript',
+      request: { url: `${page}/class/yoga` },
+      exception: { values: [{ type: 'Error', value: 'x is undefined' }] },
+    })
+    expect(sent()[0].exception.values[0].stacktrace.frames[0].filename).toBe(`${ownScripts}entry.js`)
+    expect(sent()[0].extra).toBeUndefined()
+  })
+
+  it('sends nothing without consent', () => {
+    const { report, sent } = setup({ allowed: false })
+
+    report(thrownAt('x is undefined', `${ownScripts}entry.js`))
+
+    expect(sent()).toHaveLength(0)
+  })
+
+  it('drops thrown strings unless the browser placed them in the site\'s own scripts', () => {
+    const { report, sent } = setup()
+
+    report('rejected by an injected script')
+    report('Uncaught boom', { filename: `${page}/class/yoga`, lineno: 229, colno: 12 })
+    report('Uncaught boom', { filename: 'chrome-extension://abc/inject.js', lineno: 1, colno: 1 })
+    expect(sent()).toHaveLength(0)
+
+    report('Uncaught ours', { filename: `${ownScripts}entry.js`, lineno: 3, colno: 9 })
+    expect(sent()).toHaveLength(1)
+    expect(sent()[0].exception.values[0].value).toBe('Uncaught ours')
+  })
+
+  it('drops injected code, extensions and noise', () => {
+    const { report, sent } = setup()
+
+    report(thrownAt('Maximum call stack size exceeded', `${page}/class/yoga`, 'RangeError'))
+    report(thrownAt('x', 'chrome-extension://abc/inject.js'))
+    report(new Error('Script error.'))
+    report({ type: 'error' })
+
+    expect(sent()).toHaveLength(0)
+  })
+
+  it('counts one failure once across handlers, and again after the window', () => {
+    const { report, sent, later } = setup()
+    const message = 'Importing a module script failed.'
+
+    report(thrownAt(message, `${ownScripts}BmIMsDnx.js`, 'TypeError'))
+    report(thrownAt(message, `${ownScripts}CRzLMJPS.js`, 'Error'))
+    expect(sent()).toHaveLength(1)
+
+    later(61_000)
+    report(thrownAt(message, `${ownScripts}BmIMsDnx.js`, 'TypeError'))
+    expect(sent()).toHaveLength(2)
+  })
+
+  it('names the failed file on a module load failure', () => {
+    const { report, sent } = setup({
+      resources: [
+        { name: `${ownScripts}ok.js`, duration: 10, transferSize: 900, decodedBodySize: 2000, responseStatus: 200, nextHopProtocol: 'h3' },
+        { name: `${ownScripts}gone.js?v=1`, duration: 40, transferSize: 0, decodedBodySize: 0, responseStatus: 0, nextHopProtocol: 'h3' },
+      ],
+    })
+
+    report(thrownAt('Importing a module script failed.', `${ownScripts}BmIMsDnx.js`, 'TypeError'))
+
+    expect(sent()[0].extra).toEqual({
+      ownFiles: 2,
+      failedFiles: 1,
+      failed: [{ file: 'gone.js', status: 0, protocol: 'h3', ms: 40 }],
+      protocols: { h3: 2 },
+      connection: { effectiveType: '4g' },
+    })
   })
 })

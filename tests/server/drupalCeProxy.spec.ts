@@ -150,10 +150,13 @@ describe('Drupal CE proxy boundary', () => {
     }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
     expect(responseHeaders.has('location')).toBe(false)
 
+    // The CMS's cache header is already copied over; the 502 must not be cached.
+    responseHeaders.set('cache-control', 'public, max-age=3600')
     expect(() => onResponse(event, new Response(html, {
       status: 200,
       headers: { 'content-type': 'text/html; charset=UTF-8' },
     }))).toThrowError(expect.objectContaining({ statusCode: 502 }))
+    expect(responseHeaders.get('cache-control')).toBe('no-store')
 
     expect(() => onResponse(event, new Response('{"title":"Home"}', {
       status: 200,

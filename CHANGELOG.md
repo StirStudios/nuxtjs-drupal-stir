@@ -13,6 +13,41 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Fixed: a thrown string no longer passes the own-scripts check by default.**
+  A string error (a rejected string, or a window error with no error object)
+  was wrapped in an `Error` made inside the reporter, whose stack sits in the
+  site's own scripts, so it was always sent. It now carries only the location
+  the browser reported for it, or no frames, and is judged like any other.
+- **Changed: reporter helpers.** New export `createBrowserReporter()` holds the
+  browser's whole decision (consent, noise, own frames, one failure counted
+  once, module-load diagnostics); the plugin only wires up the events.
+  `hasOwnFrame()` now takes parsed frames, `toError()` takes an optional source
+  location, and `isIgnoredBrowserError()` takes only the error (where an error
+  came from is judged by its frames, which also follows a CDN). The stack is
+  parsed once per report.
+
+### Core
+
+- **Changed: the proxy's 502 for a non-JSON CMS answer sends
+  `Cache-Control: no-store`,** so no cache keeps a misbehaving CMS's answer
+  after it recovers.
+
+### Theme
+
+- **Changed: media modal images ask for the width they are shown at.** A
+  portrait photo on a wide screen is held back by the frame's height, so it
+  now requests a 640 or 768px file (twice that on high-density screens)
+  instead of 1152px, snapped to the widths the modal profile already produces
+  so the CDN keeps few variants. New exports in `utils/imageDelivery`:
+  `MODAL_FRAME`, `mediaAspectRatio()`, `resolveModalImageSizes()`.
+
+### Tooling
+
+- `@vitest/coverage-v8` now follows vitest's range (`^4.1.12`) instead of an
+  exact pin, so the two move together.
+
 ### Webform
 
 - **New: `webform.cardRadio`.** Styles radios whose options have descriptions (the card radios): `indicator: 'hidden'` drops the dot so the whole card is the choice, `size` sets the Nuxt UI size and `ui` adds classes to RadioGroup slots. Without it, cards are unchanged.

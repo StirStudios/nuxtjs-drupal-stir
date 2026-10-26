@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
 import { useModalMediaPlayback } from '#stir/composables/useModalMediaPlayback'
 import type { ModalMediaItem } from '#stir/composables/useMediaModal'
 import { resolveCarouselArrowButton } from '#stir/utils/nuxtUiProps'
 import { drupalMediaComponentName } from '../../../utils/drupalMediaTypes'
+import { MODAL_FRAME, mediaAspectRatio, resolveModalImageSizes } from '../../../utils/imageDelivery'
 
 const props = defineProps<{
   activeIndex: number
@@ -17,6 +19,7 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { required: true })
 const theme = useAppConfig().stirTheme
 const portal = useOverlayPortal()
+const viewport = shallowRef({ width: 0, height: 0 })
 const activeItem = computed(() => props.items[props.activeIndex] ?? null)
 const firstItem = computed(() => props.items[0] ?? null)
 const modalTitle = computed(() => activeItem.value?.title || '')
@@ -46,19 +49,41 @@ const nextCarouselButton = computed(() =>
 )
 
 function mediaFrameStyle(item: ModalMediaItem) {
-  const width = Number(item.width)
-  const height = Number(item.height)
-  const hasDimensions =
-    Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0
-
-  const aspectRatio =
-    hasDimensions
-      ? width / height
-      : 16 / 9
+  const aspectRatio = mediaAspectRatio(item.width, item.height)
 
   return {
     aspectRatio: `${aspectRatio}`,
-    width: `min(72rem, calc(100vw - 2rem), calc(80vh * ${aspectRatio}))`,
+    width: `min(${MODAL_FRAME.maxWidthPx / 16}rem, calc(100vw - ${MODAL_FRAME.gutterPx / 16}rem), calc(${MODAL_FRAME.maxHeightShare * 100}vh * ${aspectRatio}))`,
+  }
+}
+
+// Read when the modal opens and on resize. useEventListener, not
+// useWindowSize, because the header already ships it with every page.
+function readViewport(): void {
+  viewport.value = { width: window.innerWidth, height: window.innerHeight }
+}
+
+useEventListener(import.meta.client ? window : undefined, 'resize', readViewport, { passive: true })
+watch(open, (isOpen) => {
+  if (isOpen && import.meta.client) readViewport()
+}, { immediate: true })
+
+// Images ask for the width the frame shows them at, so a portrait photo on a
+// wide screen does not load a landscape-sized file. The slide sets its own key.
+function mediaProps({ key: _key, ...item }: ModalMediaItem) {
+  return {
+    ...item,
+    ...(item.type === 'video' ? { deferEmbed: false } : {}),
+    ...(item.type === 'image'
+      ? {
+          noWrapper: true,
+          deliverySizes: resolveModalImageSizes(
+            mediaAspectRatio(item.width, item.height),
+            viewport.value.width,
+            viewport.value.height,
+          ),
+        }
+      : {}),
   }
 }
 
@@ -126,11 +151,7 @@ function closeModal(): void {
         >
           <component
             :is="mediaComponentFor(firstItem.type)"
-            v-bind="{
-              ...firstItem,
-              ...(firstItem.type === 'video' ? { deferEmbed: false } : {}),
-              ...(firstItem.type === 'image' ? { noWrapper: true } : {}),
-            }"
+            v-bind="mediaProps(firstItem)"
           />
         </div>
       </div>
@@ -165,11 +186,7 @@ function closeModal(): void {
               v-if="isNearActive(index)"
               :key="item.key"
               class="shadow-2xl"
-              v-bind="{
-                ...item,
-                ...(item.type === 'video' ? { deferEmbed: false } : {}),
-                ...(item.type === 'image' ? { noWrapper: true } : {}),
-              }"
+              v-bind="mediaProps(item)"
             />
           </div>
         </template>
