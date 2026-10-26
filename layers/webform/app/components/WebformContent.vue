@@ -131,6 +131,13 @@ watch(
   },
 )
 
+// A link that already answers the first page's question (Webform's
+// prepopulate) opens on the page after it. Back still returns to the
+// question; focus stays put, as on any page load.
+onMounted(() => {
+  if (pageIndex.value === 0 && choiceField.value && props.state[choiceField.value] && !isLastPage.value) pageIndex.value = 1
+})
+
 async function nextPage() {
   const names = wizardPageFieldNames(props.fields, props.orderedFieldNames, currentPage.value?.key)
 
@@ -214,7 +221,9 @@ defineExpose({
   >
     <EditLink :link="editLink" :parent-uuid="parentUuid" />
 
-    <div v-if="isWizard && currentPage" class="flex flex-col gap-4">
+    <!-- Without a stepper only the visually hidden heading is left, so the
+         wrapper drops out of the layout and adds no gap above the first field. -->
+    <div v-if="isWizard && currentPage" :class="stepperItems.length > 1 ? 'flex flex-col gap-4' : 'contents'">
       <!-- Steps already passed can be revisited; later ones open with Next.
            A lone step, such as a chooser before its answer reveals the rest,
            shows no progress, so the stepper waits for a second step. -->

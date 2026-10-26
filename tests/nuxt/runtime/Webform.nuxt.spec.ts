@@ -532,6 +532,7 @@ describe('Webform (Nuxt runtime)', () => {
     // Before the answer only the chooser shows, so there is no stepper yet.
     expect(wrapper.find('[data-slot="header"] [data-slot="trigger"]').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('Step 1 of 1')
+    expect(wrapper.find('form > div.contents').exists()).toBe(true)
 
     // An arrow key selects as it moves through the options, so a keyboard
     // answer waits for Next.
@@ -555,6 +556,39 @@ describe('Webform (Nuxt runtime)', () => {
 
     expect(wrapper.text()).toContain('Step 1 of 2')
     expect(wrapper.find('textarea[name="notes"]').exists()).toBe(false)
+  })
+
+  it('opens past a chooser the link already answers', async () => {
+    const theme = useAppConfig().stirTheme.webform as Record<string, unknown>
+
+    theme.autoAdvanceNotice = 'Pick one to continue.'
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        prefill: { path: 'book' },
+        webform: {
+          ...webform,
+          fields: {
+            start: {
+              '#type': 'webform_wizard_page',
+              '#name': 'start',
+              '#title': 'Get started',
+              children: { path: { '#type': 'radio', '#name': 'path', '#title': 'Path', '#required': true, '#options': { book: 'Book', info: 'Info' }, '#optionKeys': ['book', 'info'], '#prepopulate': true } },
+            },
+            book: {
+              '#type': 'webform_wizard_page',
+              '#name': 'book',
+              '#title': 'Book',
+              children: { notes: { '#type': 'textarea', '#name': 'notes', '#title': 'Notes' } },
+            },
+          },
+        } as unknown as WebformDefinition,
+      },
+    })
+
+    await flushPromises()
+    expect(wrapper.text()).toContain('Step 2 of 2')
+    expect(wrapper.find('textarea[name="notes"]').exists()).toBe(true)
+    delete theme.autoAdvanceNotice
   })
 
   it('does not submit display-only markup as an empty field', async () => {

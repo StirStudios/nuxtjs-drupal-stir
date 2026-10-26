@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { proxyRequest } from 'h3'
+import { createError, proxyRequest } from 'h3'
 import {
   assertStirDrupalPageResponse,
   createStirDrupalProxyFetch,
@@ -204,6 +204,26 @@ describe('Drupal CE proxy boundary', () => {
     }
 
     expect(onResponse).toBe(handleStirDrupalProxyResponse)
+  })
+
+  it('reports a CMS that misses the request timeout as a 504, other failures as 502', async () => {
+    stubRuntimeConfig()
+    const badGateway = (cause: unknown) =>
+      createError({ statusCode: 502, statusMessage: 'Bad Gateway', cause })
+    const timedOut = () => badGateway(new DOMException('The operation was aborted due to timeout', 'TimeoutError'))
+
+    vi.mocked(proxyRequest).mockRejectedValueOnce(timedOut())
+    await expect(proxyStirDrupalCeRequest(createEvent().event, 'ce-api/resource/form-3461'))
+      .rejects.toMatchObject({ statusCode: 504, statusMessage: 'Gateway Timeout', message: 'CMS did not answer within 10 s' })
+
+    vi.mocked(proxyRequest).mockRejectedValueOnce(timedOut())
+    await expect(proxyStirDrupalMenuRequest(createEvent().event, 'api/menu_items/main'))
+      .rejects.toMatchObject({ statusCode: 504, message: 'CMS did not answer within 10 s' })
+
+    // A refused or dropped connection is still a bad gateway.
+    vi.mocked(proxyRequest).mockRejectedValueOnce(badGateway(new TypeError('fetch failed')))
+    await expect(proxyStirDrupalCeRequest(createEvent().event, 'ce-api/node/1'))
+      .rejects.toMatchObject({ statusCode: 502, statusMessage: 'Bad Gateway' })
   })
 
   it('resolves the configured CE and menu targets', () => {

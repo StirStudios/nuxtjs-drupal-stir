@@ -283,6 +283,26 @@ const stirDrupalCeProxyOptions = (event: H3Event) => ({
   },
 })
 
+// A CMS that does not answer within the request timeout reaches us from h3 as
+// a 502 whose cause is the fetch's TimeoutError. Reported as a 504 instead, so
+// a slow CMS is told apart from one that refused or dropped the connection.
+const withGatewayTimeout = async <T>(proxy: Promise<T>): Promise<T> => {
+  try {
+    return await proxy
+  } catch (error) {
+    if ((error as { cause?: { name?: unknown } } | null)?.cause?.name !== 'TimeoutError') throw error
+
+    const seconds = Math.round(getStirDrupalApiConfig().requestTimeoutMs / 1000)
+
+    throw createError({
+      statusCode: 504,
+      statusMessage: 'Gateway Timeout',
+      message: `CMS did not answer within ${seconds} s`,
+      cause: error,
+    })
+  }
+}
+
 export const proxyStirDrupalCeRequest = async (
   event: H3Event,
   path = '',
@@ -301,7 +321,7 @@ export const proxyStirDrupalCeRequest = async (
     getRequestURL(event).search,
   )
 
-  return await proxyRequest(event, target, stirDrupalCeProxyOptions(event))
+  return await withGatewayTimeout(proxyRequest(event, target, stirDrupalCeProxyOptions(event)))
 }
 
 export const proxyStirDrupalMenuRequest = async (
@@ -346,5 +366,5 @@ export const proxyStirDrupalMenuRequest = async (
 
   // Drupal's response cache headers pass through; menus are access-filtered,
   // so caching them is Drupal's decision, not the proxy's.
-  return await proxyRequest(event, target, stirDrupalProxyOptions(event))
+  return await withGatewayTimeout(proxyRequest(event, target, stirDrupalProxyOptions(event)))
 }
