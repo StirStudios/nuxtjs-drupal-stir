@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- A wizard page without a stepper adds no gap above its first field: the stepper's wrapper drops out of the layout and keeps only the hidden page heading.
+
 ### Theme
 
 - A hero with media clears the fixed header below `lg` (`hero.mediaSpacing`), so a long intro on a phone no longer runs up under the logo. Desktop is unchanged.
