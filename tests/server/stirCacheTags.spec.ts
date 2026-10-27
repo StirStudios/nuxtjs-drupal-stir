@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import {
   applyStirCacheTagsHeader,
+  stirSiteCacheTag,
   applyStirSharedMaxAge,
   formatStirCacheTags,
   parseStirCacheUntil,
@@ -82,6 +83,32 @@ describe('Drupal cache tags on responses', () => {
     applyStirCacheTagsHeader(event)
 
     expect(responseHeaders.get('x-cache-tags')).toBe('config:system.menu.main node:9 node_list')
+  })
+
+  it('adds the site tag to a response with Drupal tags', () => {
+    const { event, responseHeaders } = createEvent({ 'x-cache-tags': 'node:9' })
+
+    applyStirCacheTagsHeader(event, stirSiteCacheTag('https://lgrey.drupal.sgla.ddev.site/'))
+
+    expect(responseHeaders.get('x-cache-tags')).toBe('node:9 stir:site:lgrey.drupal.sgla.ddev.site')
+  })
+
+  it('adds no site tag to a response without Drupal tags', () => {
+    const { event, responseHeaders } = createEvent()
+
+    applyStirCacheTagsHeader(event, 'stir:site:a.example.com')
+
+    expect(responseHeaders.has('x-cache-tags')).toBe(false)
+  })
+
+  it('keeps the site tag when only the oversize tag fits', () => {
+    expect(formatStirCacheTags(['config:a', 'config:b', 'stir:site:a.example.com'], 10))
+      .toBe(`${STIR_OVERSIZE_CACHE_TAG} stir:site:a.example.com`)
+  })
+
+  it('has no site tag without a Drupal URL', () => {
+    expect(stirSiteCacheTag('')).toBeUndefined()
+    expect(stirSiteCacheTag('https://CMS.Example.com:8443/api')).toBe('stir:site:cms.example.com:8443')
   })
 
   it('sends no tags on a private response', () => {

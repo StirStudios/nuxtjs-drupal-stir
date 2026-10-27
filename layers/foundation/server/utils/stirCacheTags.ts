@@ -24,6 +24,21 @@ export const STIR_CACHE_TAGS_MAX_BYTES = 3000
  */
 export const STIR_OVERSIZE_CACHE_TAG = 'stir:oversize'
 
+/**
+ * Prefix of the tag naming the site a response belongs to. Several frontends
+ * share one Drupal (Domain module) and may share one Varnish; the tag lets a
+ * purge reach one site's pages only. Its value is the host of the configured
+ * Drupal API URL, the host Domain tells the sites apart by.
+ */
+export const STIR_SITE_CACHE_TAG_PREFIX = 'stir:site:'
+
+/** The site tag for a Drupal API base URL, if it has a host. */
+export const stirSiteCacheTag = (baseUrl: string): string | undefined => {
+  const host = URL.canParse(baseUrl) ? new URL(baseUrl).host.toLowerCase() : ''
+
+  return host ? `${STIR_SITE_CACHE_TAG_PREFIX}${host}` : undefined
+}
+
 const VALID_TAG = /^[a-z0-9_:.-]+$/
 const ENTITY_TAG = /^[a-z0-9_]+:\d+$/
 
@@ -46,8 +61,9 @@ export const parseStirCacheTags = (value: HeaderValue): string[] => {
  * Joins tags into one header value within the byte budget.
  *
  * Over budget, per-entity tags (`node:5`) give way to the oversize tag and the
- * list and config tags stay; if those still do not fit, the oversize tag alone
- * remains. Either way the page is still purged when its content changes.
+ * list and config tags stay; if those still do not fit, the oversize tag and
+ * the site tag remain. Either way the page is still purged when its content
+ * changes.
  */
 export const formatStirCacheTags = (
   tags: Iterable<string>,
@@ -63,7 +79,12 @@ export const formatStirCacheTags = (
     ...unique.filter(tag => !ENTITY_TAG.test(tag) && tag !== STIR_OVERSIZE_CACHE_TAG),
   ].join(' ')
 
-  return reduced.length <= maxBytes ? reduced : STIR_OVERSIZE_CACHE_TAG
+  return reduced.length <= maxBytes
+    ? reduced
+    : [
+        STIR_OVERSIZE_CACHE_TAG,
+        ...unique.filter(tag => tag.startsWith(STIR_SITE_CACHE_TAG_PREFIX)),
+      ].join(' ')
 }
 
 const contextTags = (event: H3Event): Set<string> => {
@@ -181,9 +202,10 @@ export const applyStirSharedMaxAge = (event: H3Event): void => {
  * Writes the request's tags as one header, or none on a private response.
  *
  * Tags appended by the Drupal CE page fetch and those recorded from other
- * requests are merged, so the header holds the union exactly once.
+ * requests are merged, so the header holds the union exactly once, with the
+ * site tag added to any response that carries Drupal tags.
  */
-export const applyStirCacheTagsHeader = (event: H3Event): void => {
+export const applyStirCacheTagsHeader = (event: H3Event, siteTag?: string): void => {
   const tags = contextTags(event)
 
   for (const tag of parseStirCacheTags(
@@ -198,6 +220,8 @@ export const applyStirCacheTagsHeader = (event: H3Event): void => {
     removeResponseHeader(event, STIR_CACHE_TAGS_HEADER)
     return
   }
+
+  if (siteTag) tags.add(siteTag)
 
   setResponseHeader(event, STIR_CACHE_TAGS_HEADER, formatStirCacheTags(tags))
 }

@@ -38,6 +38,13 @@ describe('root configuration helpers', () => {
     expect(result[1]).toEqual({ loc: 'not a valid url' })
   })
 
+  it('keeps the same path on two sites apart', () => {
+    expect(dedupeResolvedSitemapUrls([
+      { loc: 'https://a.example.com/about' },
+      { loc: 'https://b.example.com/about' },
+    ], 'https://a.example.com')).toHaveLength(2)
+  })
+
   it('preserves invalid entries and the first equally rich canonical entry', () => {
     const invalid = { loc: 'http://[' }
     const result = dedupeResolvedSitemapUrls([

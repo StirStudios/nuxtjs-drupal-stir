@@ -161,17 +161,22 @@ export async function resolveSitemapExtensions(
   })
 }
 
-/** Adds extension images and videos to matching Drupal URLs; unmatched entries are ignored. */
+/**
+ * Adds extension images and videos to matching Drupal URLs; unmatched entries
+ * are ignored. Relative URLs resolve against `siteUrl`, so an extension entry
+ * for another site's host never matches.
+ */
 export function mergeSitemapExtensions(
   entries: SitemapProducerPayload,
   extensions: SitemapExtensionEntry[],
+  siteUrl = '',
 ): SitemapEntry[] {
   if (extensions.length === 0) return entries
 
   const byKey = new Map<string, Required<Pick<SitemapEntry, 'images' | 'videos'>>>()
 
   for (const extension of extensions) {
-    const key = sitemapCanonicalKey(extension.loc)
+    const key = sitemapCanonicalKey(extension.loc, siteUrl)
 
     if (key === null) continue
 
@@ -183,7 +188,7 @@ export function mergeSitemapExtensions(
   }
 
   return entries.map((entry) => {
-    const key = sitemapCanonicalKey(entry.loc)
+    const key = sitemapCanonicalKey(entry.loc, siteUrl)
     const fields = key === null ? undefined : byKey.get(key)
 
     if (!fields) return entry

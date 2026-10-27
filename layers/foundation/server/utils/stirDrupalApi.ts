@@ -136,10 +136,13 @@ export function getStirDrupalApiConfig() {
       ? (config.public.drupalCe as Record<string, unknown>)
       : {}
 
+  // One order for every server request to Drupal, the CE proxy included: a
+  // deployment-time drupalCe URL beats the build-time `api`. With several
+  // sites on one Drupal, this URL's host is what tells them apart.
   const baseUrl = String(
     drupalCeConfig.serverDrupalBaseUrl
-    || config.api
     || drupalCeConfig.drupalBaseUrl
+    || config.api
     || config.public.api
     || '',
   ).replace(/\/+$/, '')
