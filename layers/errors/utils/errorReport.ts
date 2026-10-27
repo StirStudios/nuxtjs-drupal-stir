@@ -112,6 +112,32 @@ export function isDrupalMaintenance(error: unknown, depth = 0): boolean {
   return depth < 2 && Boolean((error as MaybeMaintenance)?.cause) && isDrupalMaintenance((error as MaybeMaintenance)!.cause, depth + 1)
 }
 
+export interface ErrorCause {
+  name: string
+  code?: string
+  message: string
+}
+
+// A proxy's "Bad Gateway" says only that the fetch threw; the reason (a reset
+// socket, a connect timeout) is in its cause, and undici nests one more.
+export function describeCauses(error: unknown, depth = 3): ErrorCause[] {
+  const causes: ErrorCause[] = []
+  let cause = (error as { cause?: unknown } | null)?.cause
+
+  while (cause && causes.length < depth) {
+    const { name, code, message } = cause as { name?: unknown, code?: unknown, message?: unknown }
+
+    causes.push({
+      name: typeof name === 'string' && name ? name : 'Error',
+      code: typeof code === 'string' ? code : undefined,
+      message: String(typeof message === 'string' ? message : cause).slice(0, MAX_MESSAGE),
+    })
+    cause = (cause as { cause?: unknown }).cause
+  }
+
+  return causes
+}
+
 export function buildEvent(error: Error, context: ReportContext, eventId = crypto.randomUUID().replaceAll('-', '')) {
   return {
     event_id: eventId,

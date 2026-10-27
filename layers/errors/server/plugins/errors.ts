@@ -1,4 +1,4 @@
-import { buildEvent, createThrottle, parseDsn, sendEvent, shouldReport } from '../../utils/errorReport'
+import { buildEvent, describeCauses, createThrottle, parseDsn, sendEvent, shouldReport } from '../../utils/errorReport'
 
 // Server errors (render and API failures, status 500 and up) go to the site's
 // GlitchTip. No DSN, no plugin work.
@@ -14,12 +14,14 @@ export default defineNitroPlugin((nitroApp) => {
     if (!shouldReport(error) || !allow(error)) return
 
     const event = context?.event
+    const causes = describeCauses(error)
 
     void sendEvent(dsn, buildEvent(error, {
       url: event?.path,
       method: event?.method,
       environment: config?.environment,
       release: config?.release,
+      extra: causes.length ? { causes } : undefined,
     }))
   })
 })
