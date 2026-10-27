@@ -56,6 +56,13 @@ untouched do not need one.
   Other errors send no headers, as before. Sites whose privacy notice lists
   what error reports contain may want to mention the user agent.
 
+### Webform
+
+- **Fixed: a phone field no longer throws when the browser autofills it.**
+  Autofill can send a keydown with no key, which the phone character filter
+  read as a string. `shouldPreventTelKeydown()` now accepts an undefined key
+  and lets it through.
+
 ### Core
 
 - **Changed: a CMS that misses the request timeout is a 504.** When the
