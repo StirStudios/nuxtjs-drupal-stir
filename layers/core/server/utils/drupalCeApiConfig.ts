@@ -19,10 +19,7 @@ function normalizeBaseUrl(value: unknown): string {
 export function resolveDrupalCeApiConfig(
   config: ReturnType<typeof useRuntimeConfig>,
 ) {
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
+  const drupalCeConfig = (config.public.drupalCe ?? {}) as { ceApiEndpoint?: string }
   const drupalApi = getStirDrupalApiConfig()
 
   return {

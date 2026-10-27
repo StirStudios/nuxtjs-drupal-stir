@@ -7,6 +7,14 @@ allowBuilds:
   unrs-resolver: false
   vue-demi: false
 
+minimumReleaseAgeExclude:
+  - '@nuxt/kit@4.6.3'
+  - '@nuxt/nitro-server@4.6.3'
+  - '@nuxt/schema@4.6.3'
+  - '@nuxt/vite-builder@4.6.3'
+  - '@nuxt/vite-server@4.6.3'
+  - nuxt@4.6.3
+
 overrides:
   fontless>esbuild: 0.28.2
   # @nuxt/devtools default-imports simple-git, which v4 removed; 2.0.1 keeps the

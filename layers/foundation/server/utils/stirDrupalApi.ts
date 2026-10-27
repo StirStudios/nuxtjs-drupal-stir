@@ -131,10 +131,12 @@ export function buildStirDrupalHeaders(
 
 export function getStirDrupalApiConfig() {
   const config = useRuntimeConfig()
-  const drupalCeConfig =
-    config.public.drupalCe && typeof config.public.drupalCe === 'object'
-      ? (config.public.drupalCe as Record<string, unknown>)
-      : {}
+  // The CE module copies serverDrupalBaseUrl into public config at runtime, but
+  // its generated type omits it, and consumers without the module see unknown.
+  const drupalCeConfig = (config.public.drupalCe ?? {}) as {
+    drupalBaseUrl?: string
+    serverDrupalBaseUrl?: string
+  }
 
   // One order for every server request to Drupal, the CE proxy included: a
   // deployment-time drupalCe URL beats the build-time `api`. With several
