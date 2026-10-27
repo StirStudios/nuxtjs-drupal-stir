@@ -42,6 +42,11 @@ untouched do not need one.
   error tracker, from the server or the browser; the maintenance page is
   unchanged. A 503 without that message, such as a CMS that is down behind a
   proxy, is still reported. New export: `isDrupalMaintenance()`.
+- **Changed: a module load that fails on a hidden page is not reported.**
+  When the page is left or put in the background mid-load, the browser
+  cancels the files still loading; that failure is now dropped
+  (`document.visibilityState` is `hidden`). A failure on a visible page is
+  still reported, in any browser.
 - **Changed: a failed module load says more.** For "Importing a module
   script failed" and the other module-load failures only, the browser
   reporter now also sends the user agent (as the event's `User-Agent`) and an
