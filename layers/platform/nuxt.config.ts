@@ -10,7 +10,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 
 export default defineNuxtConfig({
-  extends: ['../foundation', '../core', '../theme'],
+  extends: ['../foundation', '../core', '../theme', '../errors'],
 
   vite: {
     optimizeDeps: {

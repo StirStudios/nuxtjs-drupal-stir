@@ -10,7 +10,10 @@ currently composes this platform until its shared field renderer is extracted.
 
 Authentication, Webform, SEO, configured listings, editorial tools, analytics,
 scripts, and provider integrations are composed by explicit capability layers.
-None are part of this shared platform boundary.
+None are part of this shared platform boundary. Error reporting
+(`layers/errors`) is: it stays off until the site sets
+`NUXT_PUBLIC_ERRORS_DSN`, and a site cannot miss it by picking capability
+layers.
 
 Consumers should normally extend a preset instead of this layer directly:
 

@@ -1,7 +1,4 @@
 export default defineNuxtConfig({
-  // Consent for browser reports comes from the integrations layer.
-  extends: ['../integrations'],
-
   runtimeConfig: {
     public: {
       errors: {

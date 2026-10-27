@@ -1,9 +1,14 @@
 # Stir errors capability
 
-This optional layer reports errors to the site's GlitchTip (a Sentry-compatible
-error tracker). It does nothing until the site sets `NUXT_PUBLIC_ERRORS_DSN`
-(`https://<key>@errors.example.com/<project id>`), so extending it is safe on
-every site before any is switched on.
+This layer reports errors to the site's GlitchTip (a Sentry-compatible error
+tracker). The platform layer includes it, so every site that renders Drupal
+pages has it, whichever capability layers it picks. It does nothing until the
+site sets `NUXT_PUBLIC_ERRORS_DSN`
+(`https://<key>@errors.example.com/<project id>`). Browser reports follow the
+same consent as analytics and trusted scripts (`$stirScriptConsent`, provided
+by the integrations layer): with its privacy notice in consent mode they wait
+for acceptance, and a site without the integrations layer reports straight
+away.
 
 - **Server and browser:** one small reporter (`utils/errorReport.ts`, outside
   the auto-imported folders so its names stay out of sites' auto-imports)

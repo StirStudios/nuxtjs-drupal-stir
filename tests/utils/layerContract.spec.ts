@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { loadNuxtConfig } from '@nuxt/kit'
 import { STIR_EDITORIAL_OFFSET_VAR } from '../../layers/theme/app/utils/editorialOffset'
 
 const rootDir = resolve(__dirname, '../..')
@@ -53,7 +54,7 @@ describe('layer contract', () => {
       expect(nuxtConfig).toContain(`'./layers/${layer}'`)
     }
     expect(platformConfig).toContain(
-      'extends: [\'../foundation\', \'../core\', \'../theme\']',
+      'extends: [\'../foundation\', \'../core\', \'../theme\', \'../errors\']',
     )
     expect(platformConfig).not.toContain('../editorial')
     expect(platformConfig).not.toContain('@nuxtjs/sitemap')
@@ -403,6 +404,17 @@ describe('layer contract', () => {
       rootDir,
       'tests/fixtures/full-consumer/nuxt.config.ts',
     ))).toBe(true)
+  })
+
+  it('reports errors from a site that composes platform without integrations', async () => {
+    const config = await loadNuxtConfig({
+      cwd: resolve(rootDir, 'tests/fixtures/editorial-consumer'),
+    })
+    const layers = config._layers.map(layer => layer.cwd)
+
+    expect(config.runtimeConfig.public.errors).toEqual({ dsn: '', environment: '', release: '' })
+    expect(layers).toContain(resolve(rootDir, 'layers/errors'))
+    expect(layers).not.toContain(resolve(rootDir, 'layers/integrations'))
   })
 
   it('shares Turnstile without coupling auth to Webforms', () => {
