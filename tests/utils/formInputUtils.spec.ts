@@ -75,6 +75,10 @@ describe('formInputUtils', () => {
       expect(shouldPreventTelKeydown('Backspace')).toBe(false)
     })
 
+    it('lets through a keydown with no key, as autofill sends', () => {
+      expect(shouldPreventTelKeydown(undefined)).toBe(false)
+    })
+
     it('allows modified key combos for shortcuts', () => {
       expect(shouldPreventTelKeydown('a', { metaKey: true })).toBe(false)
       expect(shouldPreventTelKeydown('a', { ctrlKey: true })).toBe(false)

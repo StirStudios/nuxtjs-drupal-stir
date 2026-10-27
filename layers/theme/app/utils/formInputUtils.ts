@@ -15,12 +15,13 @@ export function shouldPreventTelBeforeInput(data?: string | null): boolean {
   return !isTelCharacterAllowed(data)
 }
 
+// Autofill in Chrome fires a keydown that has no key.
 export function shouldPreventTelKeydown(
-  key: string,
+  key: string | undefined,
   keyModifiers: { metaKey?: boolean, ctrlKey?: boolean, altKey?: boolean } = {},
 ): boolean {
   if (keyModifiers.metaKey || keyModifiers.ctrlKey || keyModifiers.altKey) return false
-  if (key.length !== 1) return false
+  if (key?.length !== 1) return false
 
   return !isTelCharacterAllowed(key)
 }
