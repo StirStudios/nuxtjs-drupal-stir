@@ -56,6 +56,17 @@ untouched do not need one.
   Other errors send no headers, as before. Sites whose privacy notice lists
   what error reports contain may want to mention the user agent.
 
+### Tooling
+
+- **Changed: Nuxt 4.6.3** (from 4.6.2; Nitro 2.13.5). Brings Nuxt's fixes for
+  dot segments in request paths (GHSA-9v7c-q64q-vv33), redirect route rules on
+  page islands (GHSA-2fxj-c3j7-rr69) and three dev-server advisories. Sites
+  should move their own `nuxt` to `^4.6.3`. 4.6.3 types the CE module's
+  public config, so the layer's Drupal URL helpers read it through their own
+  narrow types. `pnpm-workspace.yaml` exempts the six 4.6.3 packages from
+  pnpm's one-day minimum release age; remove that list once it has passed.
+- **Changed: happy-dom 21.0.4** (tests only), for GHSA-834v-8h66-3h79.
+
 ### Webform
 
 - **Fixed: a phone field no longer throws when the browser autofills it.**
