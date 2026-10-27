@@ -4,6 +4,7 @@ import {
   buildEvent,
   createBrowserReporter,
   createThrottle,
+  describeCauses,
   describeModuleLoad,
   hasOwnFrame,
   isAutomatedVisitor,
@@ -567,5 +568,26 @@ describe('CMS maintenance', () => {
 
     report(fetchError({ statusCode: 503 }))
     expect(send).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('error causes', () => {
+  it('lists the cause chain with name, code and message', () => {
+    const socket = Object.assign(new Error('other side closed'), { name: 'SocketError', code: 'UND_ERR_SOCKET' })
+    const fetchFailed = new TypeError('fetch failed', { cause: socket })
+    const badGateway = Object.assign(new Error('Bad Gateway'), { cause: fetchFailed })
+
+    expect(describeCauses(badGateway)).toEqual([
+      { name: 'TypeError', code: undefined, message: 'fetch failed' },
+      { name: 'SocketError', code: 'UND_ERR_SOCKET', message: 'other side closed' },
+    ])
+  })
+
+  it('is empty without a cause and stops at three', () => {
+    expect(describeCauses(new Error('plain'))).toEqual([])
+    const loop: { cause?: unknown, name: string, message: string } = { name: 'Error', message: 'loop' }
+
+    loop.cause = loop
+    expect(describeCauses({ cause: loop })).toHaveLength(3)
   })
 })

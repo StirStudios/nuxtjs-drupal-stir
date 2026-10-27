@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Error reporting
+
+- **Changed: server error reports carry the error's cause chain.** Each
+  report's `extra.causes` lists up to three causes by name, code and message,
+  so a proxy's "Bad Gateway" or "Gateway Timeout" shows why the fetch to the
+  CMS failed (for example `UND_ERR_SOCKET` or `UND_ERR_CONNECT_TIMEOUT`).
+
 ### Several sites on one Drupal
 
 - **Changed: one Drupal URL for every server request.** The Drupal CE proxy
