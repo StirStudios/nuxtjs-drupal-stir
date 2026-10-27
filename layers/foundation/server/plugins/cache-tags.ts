@@ -3,7 +3,9 @@ import {
   applyStirCacheTagsHeader,
   applyStirSharedMaxAge,
   recordStirCacheTags,
+  stirSiteCacheTag,
 } from '../utils/stirCacheTags'
+import { getStirDrupalApiConfig } from '../utils/stirDrupalApi'
 
 type FetchContext = { response?: { headers?: Headers } }
 type FetchHook = (context: FetchContext) => unknown
@@ -33,7 +35,18 @@ export const wrapStirEventFetch = (event: H3Event): void => {
   }
 }
 
+const resolveSiteCacheTag = (): string | undefined => {
+  try {
+    return stirSiteCacheTag(getStirDrupalApiConfig().baseUrl)
+  } catch {
+    // No Drupal configured: nothing to tell sites apart by.
+    return undefined
+  }
+}
+
 export default defineNitroPlugin((nitroApp) => {
+  const siteTag = resolveSiteCacheTag()
+
   nitroApp.hooks.hook('request', (event) => {
     wrapStirEventFetch(event)
   })
@@ -44,6 +57,6 @@ export default defineNitroPlugin((nitroApp) => {
     // ERR_HTTP_HEADERS_SENT into the error log.
     if (event.node.res.headersSent) return
     applyStirSharedMaxAge(event)
-    applyStirCacheTagsHeader(event)
+    applyStirCacheTagsHeader(event, siteTag)
   })
 })

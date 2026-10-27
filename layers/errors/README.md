@@ -29,8 +29,10 @@ every site before any is switched on.
   such as a failed script load, are dropped. A thrown string is judged by the
   location the browser reported for it, never by the reporter's own stack.
 - **Failed module loads:** an error such as "Importing a module script
-  failed" or "Failed to fetch dynamically imported module", and only such an
-  error, also carries:
+  failed" or "Failed to fetch dynamically imported module" is dropped when the
+  page is hidden at the time, since leaving or backgrounding a page cancels
+  its remaining loads. On a visible page it is sent, and only such an error
+  also carries:
   - the browser's user agent (as the event's `User-Agent`, which GlitchTip
     reads as browser and OS) and whether it is an in-app browser, such as an
     app's iPhone web view or the Facebook, Instagram or Google app;

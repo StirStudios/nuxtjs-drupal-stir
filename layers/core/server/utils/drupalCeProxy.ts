@@ -144,24 +144,12 @@ const assertContainedProxyTarget = (
 
 export const getStirDrupalCeProxyTargets = (): StirDrupalCeProxyTargets => {
   const config = useRuntimeConfig()
-  const privateConfig = config as Record<string, unknown>
   const publicConfig = config.public as Record<string, unknown>
   const drupalCeConfig = publicConfig.drupalCe
     && typeof publicConfig.drupalCe === 'object'
     ? publicConfig.drupalCe as Record<string, unknown>
     : {}
-  const apiBaseUrl = normalizeBaseUrl(drupalCeConfig.serverDrupalBaseUrl)
-    || normalizeBaseUrl(drupalCeConfig.drupalBaseUrl)
-    || normalizeBaseUrl(privateConfig.api)
-    || normalizeBaseUrl(publicConfig.api)
-
-  if (!apiBaseUrl) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Drupal API base URL is not configured',
-    })
-  }
-
+  const apiBaseUrl = getStirDrupalApiConfig().baseUrl
   const ceBaseUrl = `${apiBaseUrl}${normalizeEndpoint(
     drupalCeConfig.ceApiEndpoint,
   )}`

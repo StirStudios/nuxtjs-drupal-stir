@@ -58,5 +58,9 @@ export async function fetchSitemap(
     resolveSitemapExtensions(event, requestTimeoutMs),
   ])
 
-  return mergeSitemapExtensions(parseSitemapResponse(response), extensions)
+  return mergeSitemapExtensions(
+    parseSitemapResponse(response),
+    extensions,
+    String(useRuntimeConfig().siteUrl || ''),
+  )
 }

@@ -365,7 +365,7 @@ describe('browser report pipeline', () => {
   const thrownAt = (message: string, file: string, name = 'Error') =>
     Object.assign(new Error(message), { name, stack: `${name}: ${message}\n    at run (${file}:1:2)` })
 
-  function setup(overrides: { allowed?: boolean, resources?: ResourceEntryLike[] } = {}) {
+  function setup(overrides: { allowed?: boolean, resources?: ResourceEntryLike[], visibility?: string } = {}) {
     const send = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
     let now = 1_000
     const report = createBrowserReporter({
@@ -377,7 +377,7 @@ describe('browser report pipeline', () => {
       connection: () => ({ effectiveType: '4g' }),
       userAgent: () => iphoneApp,
       requestedModules: () => [`${ownScripts}ok.js`, `${ownScripts}gone.js?v=1`, `${ownScripts}never.js`, 'https://cdn.other.com/x.js'],
-      pageState: () => ({ visibility: 'hidden', online: true, msSinceStart: 1200, navigationType: 'reload' }),
+      pageState: () => ({ visibility: overrides.visibility ?? 'visible', online: true, msSinceStart: 1200, navigationType: 'reload' }),
       now: () => now,
       send: send as unknown as typeof fetch,
     })
@@ -471,9 +471,19 @@ describe('browser report pipeline', () => {
       protocols: { h3: 2 },
       connection: { effectiveType: '4g' },
       inAppBrowser: true,
-      page: { visibility: 'hidden', online: true, msSinceStart: 1200, navigationType: 'reload' },
+      page: { visibility: 'visible', online: true, msSinceStart: 1200, navigationType: 'reload' },
     })
     expect(sent()[0].request.headers).toEqual({ 'User-Agent': iphoneApp })
+  })
+
+  it('drops a module load failure on a hidden page, but not other errors', () => {
+    const { report, sent } = setup({ visibility: 'hidden' })
+
+    report(thrownAt('Importing a module script failed.', `${ownScripts}BmIMsDnx.js`, 'TypeError'))
+    expect(sent()).toHaveLength(0)
+
+    report(thrownAt('x is undefined', `${ownScripts}entry.js`))
+    expect(sent()).toHaveLength(1)
   })
 
   it('sends the browser and page state only for a failed module load', () => {

@@ -64,6 +64,7 @@ describe('sitemapApi', () => {
     })
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     registerHandlers([])
+    vi.stubGlobal('useRuntimeConfig', () => ({ siteUrl: 'https://www.example.com' }))
   })
 
   afterEach(() => {
@@ -123,6 +124,15 @@ describe('sitemapApi', () => {
       baseEntry('/about'),
     ])
     expect(handler).toHaveBeenCalledWith(expect.objectContaining({ event }))
+  })
+
+  it('never merges an extension entry for another site sharing the CMS', async () => {
+    vi.mocked(stirDrupalApiRequest).mockResolvedValue([baseEntry('/about')])
+    registerHandlers([(context) => {
+      context.entries.push({ loc: 'https://lgrey.example.com/about', images: [image] })
+    }])
+
+    await expect(fetchSitemap(event)).resolves.toEqual([baseEntry('/about')])
   })
 
   it('drops invalid extension entries with a warning', () => {

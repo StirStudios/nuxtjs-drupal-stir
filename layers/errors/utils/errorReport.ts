@@ -372,12 +372,16 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
     if (!error || isIgnoredBrowserError(error) || isDrupalMaintenance(value)) return
 
     const frames = parseStack(error.stack)
+    const moduleLoad = isModuleLoadFailure(error)
+    const page = moduleLoad ? options.pageState?.() : undefined
 
+    // A page left or backgrounded mid-load has its remaining fetches cancelled
+    // by the browser; only a load that fails in view can be a real fault.
+    if (page?.visibility === 'hidden') return
     if (!hasOwnFrame(frames, options.ownScripts) || !allow(error)) return
 
     // A failed module load also says which browser, what never arrived and
     // what the page was doing; other errors carry none of this.
-    const moduleLoad = isModuleLoadFailure(error)
     const userAgent = moduleLoad ? options.userAgent?.() : undefined
 
     void sendEvent(options.dsn, buildEvent(error, {
@@ -391,7 +395,7 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
         ? {
             ...describeModuleLoad(options.resources(), options.ownScripts, options.connection?.(), options.requestedModules?.()),
             inAppBrowser: isInAppBrowser(userAgent),
-            page: options.pageState?.(),
+            page,
           }
         : undefined,
     }), options.send)

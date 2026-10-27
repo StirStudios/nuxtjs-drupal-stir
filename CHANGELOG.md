@@ -13,6 +13,27 @@ untouched do not need one.
 
 ## Unreleased
 
+### Several sites on one Drupal
+
+- **Changed: one Drupal URL for every server request.** The Drupal CE proxy
+  and the Drupal API helpers now take the same URL, in the same order:
+  `drupalCe.serverDrupalBaseUrl`, `drupalCe.drupalBaseUrl`, `api`, then
+  `public.api`. Before, the helpers (app context, sitemap, editorial routes)
+  put the build-time `api` ahead of `drupalCe.drupalBaseUrl`. A site whose two
+  settings differ now calls the `drupalCe` one from those helpers too. Its
+  host is what the Domain module tells the sites apart by, and the layer never
+  sends a Host header of its own or forwards the visitor's.
+- **Changed: sitemap URLs are matched by host and path.**
+  `sitemapCanonicalKey()` now returns `host` + path (+ query), so the same path
+  on two sites stays two URLs. Relative URLs resolve against `NUXT_SITE_URL`,
+  which the sitemap extension merge now uses too: an extension entry whose
+  absolute URL names another host no longer attaches to this site's page.
+- **New: a site cache tag.** A response that carries Drupal cache tags also
+  carries `stir:site:<host of the Drupal API URL>` in `X-Cache-Tags`, kept
+  even when only `stir:oversize` fits. A shared Varnish can purge one site's
+  pages by it. New exports: `STIR_SITE_CACHE_TAG_PREFIX`, `stirSiteCacheTag()`;
+  `applyStirCacheTagsHeader()` takes the site tag as a second argument.
+
 ### Errors
 
 - **Changed: the CMS's Maintenance mode is not reported.** A 503 that
@@ -21,6 +42,11 @@ untouched do not need one.
   error tracker, from the server or the browser; the maintenance page is
   unchanged. A 503 without that message, such as a CMS that is down behind a
   proxy, is still reported. New export: `isDrupalMaintenance()`.
+- **Changed: a module load that fails on a hidden page is not reported.**
+  When the page is left or put in the background mid-load, the browser
+  cancels the files still loading; that failure is now dropped
+  (`document.visibilityState` is `hidden`). A failure on a visible page is
+  still reported, in any browser.
 - **Changed: a failed module load says more.** For "Importing a module
   script failed" and the other module-load failures only, the browser
   reporter now also sends the user agent (as the event's `User-Agent`) and an
