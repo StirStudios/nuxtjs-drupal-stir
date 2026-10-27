@@ -36,6 +36,15 @@ untouched do not need one.
 
 ### Errors
 
+- **Changed: error reporting is part of the platform layer.** `layers/platform`
+  now extends `layers/errors`, so a site that picks capability layers (webform,
+  editorial, auth) instead of the full `@stir/base` reports to GlitchTip once
+  it sets `NUXT_PUBLIC_ERRORS_DSN`; before, such a site had no
+  `runtimeConfig.public.errors` and reported nothing. `layers/errors` no
+  longer extends `layers/integrations`: browser reports read the consent the
+  integrations layer provides (`$stirScriptConsent`, as analytics and trusted
+  scripts do), so the full `@stir/base` is unchanged and a site without
+  integrations, which shows no consent notice, reports straight away.
 - **Changed: the CMS's Maintenance mode is not reported.** A 503 that
   carries Drupal's maintenance message (`data.maintenanceMessage`, set only
   when Drupal answers with its plain-text message) is no longer sent to the

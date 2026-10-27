@@ -20,11 +20,13 @@ export default defineNuxtPlugin({
 
     if (!dsn || isAutomatedVisitor(navigator.userAgent, navigator.webdriver)) return
 
-    const { allowsNonEssential } = usePrivacyConsent()
+    // Read on each report: the integrations layer's consent plugin may run
+    // after this one, and a site without it shows no consent notice.
+    const allowed = () => nuxtApp.$stirScriptConsent?.allowsNonEssential.value ?? true
     const report = createBrowserReporter({
       dsn,
       ownScripts: ownScriptsPrefix(useRuntimeConfig().app, window.location.origin),
-      allowed: () => allowsNonEssential.value,
+      allowed,
       pageUrl: () => `${window.location.origin}${window.location.pathname}`,
       resources: () => performance.getEntriesByType('resource') as PerformanceResourceTiming[],
       connection: () => (navigator as Navigator & { connection?: NetworkInformation }).connection,
