@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
-import type { VNode } from 'vue'
+import { useBreakpoints, breakpointsTailwind, useScroll } from '@vueuse/core'
+import type { ComponentPublicInstance, VNode } from 'vue'
 
 defineProps<{
   id?: number | string
@@ -38,6 +38,35 @@ const activeTabNode = computed(() => {
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const isMobile = breakpoints.smaller('lg')
 const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
+
+// Smaller screens: the tabs scroll sideways in one row, fading the edge on
+// whichever side has more, with the active tab kept in view.
+const tabs = useTemplateRef<ComponentPublicInstance>('tabs')
+const tabList = computed(
+  () =>
+    (tabs.value?.$el as HTMLElement | undefined)?.querySelector<HTMLElement>(
+      '[role="tablist"]',
+    ) ?? null,
+)
+const { arrivedState, measure } = useScroll(tabList)
+const listFade = computed(() =>
+  isMobile.value
+    ? [
+        !arrivedState.left && 'mask-l-from-[calc(100%-3rem)]',
+        !arrivedState.right && 'mask-r-from-[calc(100%-3rem)]',
+      ]
+    : [],
+)
+
+watch([tabList, isMobile], () => nextTick(measure))
+
+watch(active, async () => {
+  if (!isMobile.value) return
+  await nextTick()
+  tabList.value
+    ?.querySelector<HTMLElement>('[data-state="active"]')
+    ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+})
 </script>
 
 <template>
@@ -49,14 +78,19 @@ const orientation = computed(() => (isMobile.value ? 'horizontal' : 'vertical'))
 
       <UTabs
         v-else
+        ref="tabs"
         v-model="active"
         :items="items"
         :orientation="orientation"
         :ui="{
           root: 'app-tabs items-start gap-2 m-auto w-full data-[orientation=horizontal]:overflow-y-clip',
-          list: 'flex-wrap lg:flex-col overflow-x-auto lg:overflow-visible mb-10 pb-10 lg:mb-0 lg:pb-0 border-inverted/30',
+          list: [
+            'overflow-x-auto [scrollbar-width:none] lg:flex-col lg:overflow-visible mb-8 lg:mb-0 border-inverted/30',
+            listFade,
+          ],
           content: 'flex-1 min-w-0 [&_ul]:pt-0 [&_p]:pb-0',
-          trigger: 'w-full lg:px-10 py-2 tabs font-bold uppercase',
+          trigger:
+            'shrink-0 whitespace-nowrap lg:w-full lg:whitespace-normal lg:px-10 py-2 tabs font-bold uppercase',
           indicator: 'bg-primary',
         }"
         variant="link"
