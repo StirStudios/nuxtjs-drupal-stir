@@ -33,6 +33,16 @@ untouched do not need one.
 
 ### Error reporting
 
+- **Fixed: a CMS deploy's Maintenance mode is no longer reported.** A route
+  that passed ofetch's error on (such as `/api/sitemap`) carried Drupal's
+  plain-text maintenance message as the error's data, which the check did not
+  read. A 503 with an HTML page or an empty body (Varnish, nginx, a CMS that
+  is down) is still reported.
+- **Changed: a failed CMS fetch's report includes `extra.upstream`**: the
+  status, the `server`, `cf-ray` and `cf-cache-status` headers and the first
+  200 characters of the body, so a report shows whether Cloudflare or the
+  origin answered. No other header is sent.
+
 - **Changed: server error reports carry the error's cause chain.** Each
   report's `extra.causes` lists up to three causes by name, code and message,
   so a proxy's "Bad Gateway" or "Gateway Timeout" shows why the fetch to the

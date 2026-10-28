@@ -9,6 +9,7 @@ import {
   hasOwnFrame,
   isAutomatedVisitor,
   isDrupalMaintenance,
+  describeUpstreamResponse,
   isIgnoredBrowserError,
   isInAppBrowser,
   isModuleLoadFailure,
@@ -531,6 +532,8 @@ describe('CMS maintenance', () => {
     expect(isDrupalMaintenance(Object.assign(new Error('Service Unavailable'), { statusCode: 503, data: { maintenanceMessage: maintenance } }))).toBe(true)
     // A fetch of that route: its JSON error body is the FetchError's data.
     expect(isDrupalMaintenance(Object.assign(new Error('[GET] "/api/app-context": 503'), { statusCode: 503, data: { statusCode: 503, data: { maintenanceMessage: maintenance } } }))).toBe(true)
+    // A fetch of Drupal itself, its plain-text message as data.
+    expect(isDrupalMaintenance(Object.assign(new Error('[GET] "https://cms.example.com/api/sitemap": 503'), { statusCode: 503, data: maintenance }))).toBe(true)
     // Wrapped once, as a render error around the fetch.
     expect(isDrupalMaintenance(Object.assign(new Error('render'), { cause: { data: { maintenanceMessage: maintenance } } }))).toBe(true)
   })
@@ -541,6 +544,10 @@ describe('CMS maintenance', () => {
 
     expect(isDrupalMaintenance(outage)).toBe(false)
     expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: { maintenanceMessage: '  ' } }))).toBe(false)
+    // Varnish or nginx: an HTML page, or nothing at all.
+    expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: '<!DOCTYPE html><title>503</title>' }))).toBe(false)
+    expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: '' }))).toBe(false)
+    expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 500, data: maintenance }))).toBe(false)
     expect(shouldReport(outage)).toBe(true)
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 503, data: { maintenanceMessage: maintenance } }))).toBe(false)
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }))).toBe(true)
@@ -589,5 +596,32 @@ describe('error causes', () => {
 
     loop.cause = loop
     expect(describeCauses({ cause: loop })).toHaveLength(3)
+  })
+})
+
+describe('upstream response', () => {
+  it('keeps who answered and the start of the body, and no other header', () => {
+    const response = new Response(null, {
+      status: 502,
+      headers: { 'server': 'cloudflare', 'cf-ray': 'abc-SEA', 'set-cookie': 'SESSx=secret', 'x-api-key': 'key' },
+    })
+    const fetchError = Object.assign(new Error('[GET] "https://cms.example.com/api/sitemap": 502'), {
+      response,
+      data: `<html>${'x'.repeat(300)}`,
+    })
+    const upstream = describeUpstreamResponse(Object.assign(new Error('render'), { cause: fetchError }))
+
+    expect(upstream).toEqual({
+      status: 502,
+      server: 'cloudflare',
+      cfRay: 'abc-SEA',
+      cfCacheStatus: undefined,
+      body: `<html>${'x'.repeat(194)}`,
+    })
+    expect(JSON.stringify(upstream)).not.toMatch(/secret|key/)
+  })
+
+  it('is undefined when no response arrived', () => {
+    expect(describeUpstreamResponse(new TypeError('fetch failed'))).toBeUndefined()
   })
 })
