@@ -11,9 +11,10 @@ export default defineNitroPlugin((nitroApp) => {
   const allow = createThrottle()
 
   nitroApp.hooks.hook('error', (error, context) => {
-    if (!shouldReport(error) || !allow(error)) return
-
     const event = context?.event
+
+    if (!shouldReport(error, event?.path) || !allow(error)) return
+
     const causes = describeCauses(error)
     const upstream = describeUpstreamResponse(error)
 

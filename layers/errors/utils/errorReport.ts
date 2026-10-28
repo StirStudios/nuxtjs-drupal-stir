@@ -88,9 +88,13 @@ export function parseStack(stack: string | undefined): StackFrame[] {
 }
 
 // A page not found or refused is not a fault of the site, and neither is the
-// CMS's Maintenance mode during a deploy.
-export function shouldReport(error: unknown): boolean {
+// CMS's Maintenance mode during a deploy, or an analytics event the Plausible
+// forwarder could not deliver (a 502 there means no answer came back; an
+// answer, a 5xx included, passes through and is not an error).
+export function shouldReport(error: unknown, path?: string): boolean {
   const status = (error as { statusCode?: number } | null)?.statusCode
+
+  if (status === 502 && path?.startsWith('/_plausible/')) return false
 
   return (typeof status !== 'number' || status >= 500) && !isDrupalMaintenance(error)
 }

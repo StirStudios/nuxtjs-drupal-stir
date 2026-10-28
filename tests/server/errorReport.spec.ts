@@ -553,6 +553,14 @@ describe('CMS maintenance', () => {
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }))).toBe(true)
   })
 
+  it('skips a Plausible event the forwarder could not deliver, and nothing else', () => {
+    const badGateway = Object.assign(new Error('Bad Gateway'), { statusCode: 502 })
+
+    expect(shouldReport(badGateway, '/_plausible/api/event')).toBe(false)
+    expect(shouldReport(badGateway, '/api/drupal-ce/page')).toBe(true)
+    expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }), '/_plausible/api/event')).toBe(true)
+  })
+
   it('sends no browser report for Maintenance mode, and still one for an outage', () => {
     const send = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
     const ownScripts = 'https://www.example.com/_nuxt/'

@@ -60,6 +60,7 @@
       "sharp",
       "tailwindcss",
       "ultrahtml",
+      "undici",
       "unhead",
       "valibot",
       "vue-draggable-plus"
@@ -858,15 +859,15 @@
     "plugins": 11,
     "middleware": 5,
     "serverRoutes": 31,
-    "productionDependencies": 36,
+    "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 251,
+    "tests": 252,
     "testsByArea": {
       "composables": 14,
       "contracts": 2,
       "nuxt": 109,
       "scripts": 6,
-      "server": 34,
+      "server": 35,
       "unit": 12,
       "utils": 74
     }
@@ -1020,6 +1021,7 @@
     "tests/server/formattedTextApi.spec.ts",
     "tests/server/globalSeoApi.spec.ts",
     "tests/server/listingApi.spec.ts",
+    "tests/server/outboundRetry.spec.ts",
     "tests/server/paragraphPresentationApi.spec.ts",
     "tests/server/paragraphTextApi.spec.ts",
     "tests/server/paragraphViewApi.spec.ts",
