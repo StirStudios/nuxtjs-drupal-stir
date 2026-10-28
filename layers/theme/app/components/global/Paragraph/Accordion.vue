@@ -19,7 +19,6 @@ const props = defineProps<{
   align?: AlignConfig
   classes?: string
   width?: string
-  spacing?: string
   direction?: string
 
   editLink?: string
@@ -62,7 +61,6 @@ const sectionClasses = computed(() =>
     props.align ? 'w-full' : '',
     resolveAlignClasses(props.align),
     resolveWidthClasses(props.width, props.align),
-    props.spacing,
     props.classes,
   ].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
