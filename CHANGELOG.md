@@ -20,6 +20,19 @@ untouched do not need one.
   site clears the alert by refreshing its own lockfile (`pnpm update node-forge`).
   No override is needed.
 
+### Server requests
+
+- **Changed: server-side GETs retry once after a connection error.** A
+  foundation Nitro plugin sets undici's retry as the global dispatcher, so the
+  CE proxy, `$fetch` routes and image fetches resend a GET, HEAD or OPTIONS
+  request on a fresh connection, 250 ms later, after `ECONNRESET`,
+  `ECONNREFUSED`, `EPIPE` or a closed socket. Answers (a 503 included) and
+  requests with a body are never retried. Each retry logs
+  `[stir] retrying <method> <url> after <code>`. New dependency: `undici` 7.
+- **Changed: a Plausible event the forwarder could not deliver is not
+  reported.** A 502 on `/_plausible/` means no answer came back; an answer
+  from Plausible passes through as before.
+
 ### CMS requests
 
 - **Fixed: CMS GETs now retry after a timeout.** ofetch's single retry kept
