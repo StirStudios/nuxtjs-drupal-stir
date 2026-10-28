@@ -10,6 +10,7 @@ import {
   createStirDrupalUpstreamError,
   getStirForwardedCookie,
   markStirPrivateResponse,
+  stirDrupalTimeoutOptions,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
 import { resolveDrupalCeApiConfig } from '../../../../core/server/utils/drupalCeApiConfig'
@@ -43,7 +44,7 @@ export default defineEventHandler(async (event) => {
         query,
         headers: buildStirDrupalHeaders({ cookie, apiKey }),
         redirect: 'manual',
-        timeout: requestTimeoutMs,
+        ...stirDrupalTimeoutOptions(requestTimeoutMs),
       },
     )
 

@@ -20,6 +20,17 @@ untouched do not need one.
   site clears the alert by refreshing its own lockfile (`pnpm update node-forge`).
   No override is needed.
 
+### CMS requests
+
+- **Fixed: CMS GETs now retry after a timeout.** ofetch's single retry kept
+  the first attempt's expired timeout and failed without being sent, so one
+  stalled connection failed the request after the full timeout (for example
+  `/api/view/<paragraphId>`). Each attempt now gets its own timeout, and the
+  first attempt of a retried GET waits at most 3 s, so the retry gets the full
+  `drupalRequestTimeoutMs`. This covers `/api/view`, `/api/listings`, the CSRF
+  token fetch and `stirDrupalApiRequest` GETs. New export:
+  `stirDrupalTimeoutOptions(requestTimeoutMs)`.
+
 ### Error reporting
 
 - **Changed: server error reports carry the error's cause chain.** Each
