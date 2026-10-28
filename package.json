@@ -201,7 +201,7 @@
     "globals": "^17.13.0",
     "h3": "^1.15.11",
     "happy-dom": "^21.0.4",
-    "lighthouse": "^13.5.0",
+    "lighthouse": "^13.6.0",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "release-it": "^21.1.1",
