@@ -60,12 +60,18 @@ const listFade = computed(() =>
 
 watch([tabList, isMobile], () => nextTick(measure))
 
+// Scrolls only the tab row sideways, never the page.
 watch(active, async () => {
   if (!isMobile.value) return
   await nextTick()
-  tabList.value
-    ?.querySelector<HTMLElement>('[data-state="active"]')
-    ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  const list = tabList.value
+  const tab = list?.querySelector<HTMLElement>('[data-state="active"]')
+
+  if (!list || !tab) return
+  list.scrollTo({
+    left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+    behavior: 'smooth',
+  })
 })
 </script>
 
