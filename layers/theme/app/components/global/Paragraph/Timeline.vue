@@ -32,7 +32,6 @@ const props = defineProps<{
   direction?: string
   classes?: string
   width?: string
-  spacing?: string
   color?: string
 
   editLink?: string
@@ -63,7 +62,7 @@ const timelineItems = computed<UITimelineItem[]>(() =>
 
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapperClasses = computed(() =>
-  ['w-full', props.classes, resolveWidthClasses(props.width, props.align), props.spacing].filter(Boolean).join(' '),
+  ['w-full', props.classes, resolveWidthClasses(props.width, props.align)].filter(Boolean).join(' '),
 )
 const timelineColor = computed(() => resolveUiColor(props.color))
 </script>

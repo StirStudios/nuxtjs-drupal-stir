@@ -32,7 +32,6 @@ const props = withDefaults(defineProps<{
 
   gridItems?: GridConfig
   width?: string
-  spacing?: string
 
   direction?: string
   header?: string
@@ -65,7 +64,6 @@ const props = withDefaults(defineProps<{
   parentUuid: undefined,
   presentation: undefined,
   region: undefined,
-  spacing: undefined,
   uuid: undefined,
   width: undefined,
 })
@@ -282,7 +280,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
   <RevealMotionElement
     :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
     class="relative z-10"
-    :class="[indicatorPadding, widthClasses, spacing]"
+    :class="[indicatorPadding, widthClasses]"
     :motion-props="carouselMotionProps"
     @focusin.capture="restoreFadeViewportPosition"
     @pointerup.capture="releasePointerArrowFocus"
