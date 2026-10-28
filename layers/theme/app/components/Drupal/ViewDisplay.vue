@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 import type { DrupalViewControlsSlotProps, DrupalViewProps } from '#stir/types'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
@@ -16,6 +17,7 @@ import {
 } from '#stir/utils/imageDelivery'
 
 const props = defineProps<DrupalViewProps>()
+const spacing = computed(() => resolveSpacingClasses(useAppConfig().stirTheme?.presentation?.spacing, props.spacingTop, props.spacingBottom))
 
 const { renderCustomElements } = useStirDrupalCe()
 

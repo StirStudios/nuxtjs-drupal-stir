@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { GRID_BREAKPOINTS, WIDTH_MAX_WIDTH_CLASSES } from '../app/utils/gridClasses'
+import { DEFAULT_SPACING_SCALE, type SpacingScale } from '../app/utils/spacingClasses'
 
 export type PresentationWarningHandler = (message: string) => void
 
@@ -26,18 +27,15 @@ const ALIGNMENT_RECIPES: Record<string, string> = {
   text_left: 'text-start', text_center: 'text-center', text_right: 'text-end',
 }
 
-// Mirrors the allowed values of stir_layout_builder's field_spacing.
-const SPACING_OPTIONS = ['p', 'pt', 'pr', 'pb', 'pl', 'px', 'py']
-  .flatMap(side => [2, 5, 10, 20].map(size => `${side}-${size}`))
-
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => from + index)
 
 /**
  * Every utility the layout fields can produce, compiled whether or not
  * content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint
- * the grid field offers, plus every spacing, width and alignment option, so a
- * value an editor picks for the first time already has CSS.
+ * the grid field offers, plus the layer's spacing steps and every width and
+ * alignment option, so a value an editor picks for the first time already has
+ * CSS.
  */
 export function layoutVocabulary(): string[] {
   const classes = new Set<string>([
@@ -56,14 +54,8 @@ export function layoutVocabulary(): string[] {
     }
     for (const value of range(0, 20)) classes.add(`${variant}gap-${value}`)
   }
-  // The largest spacing steps down on small screens.
-  for (const utility of SPACING_OPTIONS) {
-    if (utility.endsWith('-20')) {
-      classes.add(utility.replace(/-20$/u, '-10'))
-      classes.add(`lg:${utility}`)
-      continue
-    }
-    classes.add(utility)
+  for (const step of Object.values(DEFAULT_SPACING_SCALE)) {
+    for (const utility of `${step.top} ${step.bottom}`.split(' ')) classes.add(utility)
   }
   for (const maxWidthClass of Object.values(WIDTH_MAX_WIDTH_CLASSES)) {
     classes.add('mx-auto')
@@ -80,6 +72,7 @@ export type PresentationConfig = {
   surfaces?: Record<string, { label: string, class: string, colorMode?: 'dark', card?: true | 'outline' | 'solid' | 'soft' | 'subtle' }>
   variants?: Record<string, { label: string, class: string, colorMode?: 'dark' }>
   richText?: string[]
+  spacing?: SpacingScale
 }
 
 /**
@@ -94,6 +87,7 @@ export function mergePresentationConfigs(configs: PresentationConfig[]): Require
     surfaces: Object.assign({}, ...farthestFirst.map(config => config.surfaces || {})),
     variants: Object.assign({}, ...farthestFirst.map(config => config.variants || {})),
     richText: [...new Set(configs.flatMap(config => config.richText || []))],
+    spacing: Object.assign({}, ...farthestFirst.map(config => config.spacing || {})),
   }
 }
 
@@ -111,6 +105,7 @@ export function catalogueUtilities(
     ...Object.values(presentation.surfaces || {}).map(option => option.class),
     ...Object.values(presentation.variants || {}).map(option => option.class),
     ...(presentation.richText || []),
+    ...Object.values(presentation.spacing || {}).flatMap(step => [step.top, step.bottom]),
   ]
 
   for (const value of declared) {

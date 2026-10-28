@@ -94,12 +94,12 @@ describe('DrupalViewDisplay controls slot (Nuxt runtime)', () => {
   it('keeps Drupal spacing on a View whose site renders its own grid', async () => {
     const withGrid = await mountSuspended(DrupalViewDisplay, {
       route: '/work',
-      props: { ...viewProps, spacing: 'pt-5 pb-5' },
+      props: { ...viewProps, spacingTop: 'small', spacingBottom: 'small' },
       slots: { grid: () => h('div', { class: 'site-grid' }) },
     })
     const withoutGrid = await mountSuspended(DrupalViewDisplay, {
       route: '/work',
-      props: { ...viewProps, spacing: 'pt-5 pb-5' },
+      props: { ...viewProps, spacingTop: 'small', spacingBottom: 'small' },
     })
 
     expect(withGrid.get('section').classes()).toEqual(expect.arrayContaining(['pt-5', 'pb-5']))

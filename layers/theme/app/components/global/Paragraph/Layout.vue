@@ -13,6 +13,7 @@ import {
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveAlignClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
 import { resolvePresentationCard, resolvePresentationClasses } from '#stir/utils/presentationClasses'
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -37,7 +38,8 @@ const props = defineProps<{
   headerTag?: string
 
   width?: string
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   gridClass?: GridConfig
   surface?: string
   presentationVariant?: string
@@ -55,6 +57,7 @@ const layoutTag = computed(() => props.layoutTag === 'div' ? 'div' : 'section')
 const headingTag = computed(() => resolveHeadingTag(props.headerTag))
 
 const presentation = useAppConfig().stirTheme?.presentation
+const spacing = computed(() => resolveSpacingClasses(presentation?.spacing, props.spacingTop, props.spacingBottom))
 const presentationClasses = computed(() => resolvePresentationClasses(
   presentation,
   { surface: props.surface, variant: props.presentationVariant },

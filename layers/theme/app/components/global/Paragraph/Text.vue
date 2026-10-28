@@ -4,6 +4,7 @@ import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { toEditableRichTextProps } from '#stir/utils/editableRichText'
 import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
 import { resolvePresentationCard, resolvePresentationClasses } from '#stir/utils/presentationClasses'
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 
 defineOptions({
   inheritAttrs: false,
@@ -16,7 +17,8 @@ const props = defineProps<
     card?: boolean
     cardVariant?: string
     width?: string
-    spacing?: string
+    spacingTop?: string
+    spacingBottom?: string
     region?: string
     surface?: string
     presentationVariant?: string
@@ -25,13 +27,14 @@ const props = defineProps<
 >()
 
 const presentation = useAppConfig().stirTheme?.presentation
+const spacing = computed(() => resolveSpacingClasses(presentation?.spacing, props.spacingTop, props.spacingBottom))
 const richTextProps = computed(() => toEditableRichTextProps(props, resolvePresentationClasses(
   presentation,
   { surface: props.surface, variant: props.presentationVariant },
 )))
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapStyles = computed(() =>
-  [resolveWidthClasses(props.width, props.align), props.spacing].filter(
+  [resolveWidthClasses(props.width, props.align), spacing.value].filter(
     (value): value is string => typeof value === 'string' && value.length > 0,
   ),
 )

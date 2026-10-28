@@ -34,7 +34,8 @@ export interface DrupalViewProps {
   gridItems?: GridConfig
   rowsWrapper?: string
   width?: string
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   container?: boolean
   viewId?: string
   displayId?: string

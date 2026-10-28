@@ -12,7 +12,8 @@ const props = defineProps<{
   header?: string
   gridItems?: GridConfig
   width?: string
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   editLink?: string
   direction?: string
 
