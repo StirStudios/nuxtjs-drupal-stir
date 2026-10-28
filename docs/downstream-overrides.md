@@ -297,12 +297,23 @@ stirTheme: {
   attributes. A paragraph without a known choice gets no presentation classes.
 - Tailwind utilities used inside rich text go in `richText`, so they are
   compiled too.
+- Every paragraph's Space above/below arrives as a step (`spacingTop`,
+  `spacingBottom`: `xsmall`, `small`, `medium` or `large`), and
+  `resolveSpacingClasses()` renders it. The layer's sizes are `pt-2`, `pt-5`,
+  `pt-10` and `pt-10 lg:pt-20` (`pb-*` below). A project changes any step, and
+  the build compiles its classes:
+
+  ```ts
+  presentation: {
+    spacing: { large: { top: 'pt-12 lg:pt-24', bottom: 'pb-12 lg:pb-24' } },
+  },
+  ```
 
 ## Presentation CSS
 
 Every build compiles every option the layout fields offer, whether or not
-content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint, and
-each spacing, width and alignment option. A value an editor picks for the first
+content uses it yet: grid columns 1-12 and gaps 0-20 at every breakpoint, the
+spacing steps, and each width and alignment option. A value an editor picks for the first
 time therefore has CSS without a rebuild. `layoutVocabulary()` generates this
 set, and a test checks it covers every class the grid, alignment and width
 resolvers can produce. The build adds every class the presentation catalogue

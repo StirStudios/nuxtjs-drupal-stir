@@ -52,7 +52,8 @@ export interface WebformProps {
   webform?: WebformDefinition
   align?: AlignConfig
   width?: string
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   editLink?: string
   onClose?: () => void
   // Values for fields Drupal lets the URL fill (#prepopulate), as when the

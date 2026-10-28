@@ -435,6 +435,7 @@
       "layers/theme/app/utils/responsiveGrid.ts",
       "layers/theme/app/utils/routeHero.ts",
       "layers/theme/app/utils/schedule.ts",
+      "layers/theme/app/utils/spacingClasses.ts",
       "layers/theme/app/utils/stringUtils.ts",
       "layers/theme/app/utils/timeUtils.ts",
       "layers/theme/app/utils/trustedDrupalHtml.ts",
@@ -822,6 +823,7 @@
         "layers/theme/app/utils/responsiveGrid.ts",
         "layers/theme/app/utils/routeHero.ts",
         "layers/theme/app/utils/schedule.ts",
+        "layers/theme/app/utils/spacingClasses.ts",
         "layers/theme/app/utils/stringUtils.ts",
         "layers/theme/app/utils/timeUtils.ts",
         "layers/theme/app/utils/trustedDrupalHtml.ts",
@@ -852,13 +854,13 @@
   "counts": {
     "components": 139,
     "composables": 74,
-    "utils": 79,
+    "utils": 80,
     "plugins": 11,
     "middleware": 5,
     "serverRoutes": 31,
     "productionDependencies": 36,
     "developmentDependencies": 27,
-    "tests": 250,
+    "tests": 251,
     "testsByArea": {
       "composables": 14,
       "contracts": 2,
@@ -866,7 +868,7 @@
       "scripts": 6,
       "server": 34,
       "unit": 12,
-      "utils": 73
+      "utils": 74
     }
   },
   "tests": [
@@ -1103,6 +1105,7 @@
     "tests/utils/selectionUtils.spec.ts",
     "tests/utils/spaLoaderTheme.spec.ts",
     "tests/utils/spaLoadingTemplate.spec.ts",
+    "tests/utils/spacingClasses.spec.ts",
     "tests/utils/stirDrupalHeaders.spec.ts",
     "tests/utils/stirFormTheme.spec.ts",
     "tests/utils/themeTypography.spec.ts",

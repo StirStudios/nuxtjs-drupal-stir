@@ -8,6 +8,7 @@ import {
   resolveUiSize,
 } from '#stir/utils/nuxtUiProps'
 import { resolveAlignClasses, resolveWidthClasses, type AlignConfig } from '#stir/utils/gridClasses'
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 
 const props = defineProps<{
   id?: number | string
@@ -16,7 +17,8 @@ const props = defineProps<{
   region?: string
 
   align?: AlignConfig
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   width?: string
   direction?: string
 
@@ -36,6 +38,7 @@ const tk = useSlotsToolkit(vueSlots)
 const open = ref(false)
 const portal = useOverlayPortal()
 const theme = useAppConfig().stirTheme
+const spacing = computed(() => resolveSpacingClasses(theme?.presentation?.spacing, props.spacingTop, props.spacingBottom))
 const linkData = computed(() => resolveDrupalLink(props.link))
 const isExternal = computed(() => !!linkData.value.external)
 const linkText = computed(() => String(linkData.value.title ?? '').trim())

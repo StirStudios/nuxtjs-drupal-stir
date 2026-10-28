@@ -555,6 +555,8 @@ type StirThemePresentationConfig = {
   surfaces?: Record<string, StirThemePresentationOption>
   variants?: Record<string, StirThemePresentationOption>
   richText?: string[]
+  /** Classes for the Space above/below steps, over the layer's sizes. */
+  spacing?: Partial<Record<'xsmall' | 'small' | 'medium' | 'large', { top: string, bottom: string }>>
 }
 
 type StirThemeConfig = {

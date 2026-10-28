@@ -41,7 +41,8 @@ describe('componentTree', () => {
           direction: 'up',
           align: 'center',
           width: 'w-lg',
-          spacing: 'py-8',
+          spacingTop: 'medium',
+          spacingBottom: 'medium',
         },
       },
       {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 import { flattenWebformFields } from '#stir-webform/utils/flattenWebformFields'
 import { evaluateContainerVisibility } from '#stir-webform/composables/useContainerVisibility'
 import { serializeWebformSubmission } from '#stir-webform/utils/transformUtils'
@@ -31,6 +32,7 @@ import {
 type BuildValidationSchema = typeof import('#stir-webform/utils/buildValidationSchema')['buildValidationSchema']
 
 const props = defineProps<WebformProps>()
+const spacing = computed(() => resolveSpacingClasses(useAppConfig().stirTheme?.presentation?.spacing, props.spacingTop, props.spacingBottom))
 const webform = computed<WebformDefinition>(() =>
   normalizeWebformDefinition(props.webform),
 )
@@ -179,7 +181,7 @@ const isContainerVisible = (containerName: string) =>
 
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const wrapStyles = computed(() =>
-  ['w-full', resolveWidthClasses(props.width, props.align), props.spacing].filter(
+  ['w-full', resolveWidthClasses(props.width, props.align), spacing.value].filter(
     (value): value is string =>
       typeof value === 'string' && value.length > 0,
   ),

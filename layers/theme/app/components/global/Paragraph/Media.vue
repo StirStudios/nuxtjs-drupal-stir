@@ -7,6 +7,7 @@ import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
 import { maxGridColumns, resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
 import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { masonryGridStyle, masonryItemStyles } from '../../../utils/masonryLayout'
+import { resolveSpacingClasses } from '#stir/utils/spacingClasses'
 
 const props = defineProps<{
   id?: number | string
@@ -15,7 +16,8 @@ const props = defineProps<{
   region?: string
 
   gridItems?: GridConfig
-  spacing?: string
+  spacingTop?: string
+  spacingBottom?: string
   width?: string
   widthClass?: string
   cornerStyle?: 'default' | 'square' | string
@@ -38,6 +40,7 @@ const props = defineProps<{
 const resolvedWidth = computed(() => props.widthClass || props.width || '')
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const theme = useAppConfig().stirTheme
+const spacing = computed(() => resolveSpacingClasses(theme?.presentation?.spacing, props.spacingTop, props.spacingBottom))
 const mediaHeightClass = computed(() =>
   theme.media.heights?.[props.mediaHeight || 'natural']
   || theme.media.heights?.natural
