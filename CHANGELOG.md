@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Dependencies
+
+- **Changed: `node-forge` 1.4.2.** 1.4.1 fixes GHSA-86w9-cpqp-85rv (CVE-2026-85393,
+  RSA PKCS#1 v1.5 signature forgery); the layer lockfile now resolves it, and a
+  site clears the alert by refreshing its own lockfile (`pnpm update node-forge`).
+  No override is needed.
+
 ### Error reporting
 
 - **Changed: server error reports carry the error's cause chain.** Each
