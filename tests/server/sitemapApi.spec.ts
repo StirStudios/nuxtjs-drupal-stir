@@ -129,7 +129,7 @@ describe('sitemapApi', () => {
   it('never merges an extension entry for another site sharing the CMS', async () => {
     vi.mocked(stirDrupalApiRequest).mockResolvedValue([baseEntry('/about')])
     registerHandlers([(context) => {
-      context.entries.push({ loc: 'https://lgrey.example.com/about', images: [image] })
+      context.entries.push({ loc: 'https://site-b.example.com/about', images: [image] })
     }])
 
     await expect(fetchSitemap(event)).resolves.toEqual([baseEntry('/about')])

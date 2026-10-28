@@ -88,9 +88,9 @@ describe('Drupal cache tags on responses', () => {
   it('adds the site tag to a response with Drupal tags', () => {
     const { event, responseHeaders } = createEvent({ 'x-cache-tags': 'node:9' })
 
-    applyStirCacheTagsHeader(event, stirSiteCacheTag('https://lgrey.drupal.sgla.ddev.site/'))
+    applyStirCacheTagsHeader(event, stirSiteCacheTag('https://site-b.cms.example.com/'))
 
-    expect(responseHeaders.get('x-cache-tags')).toBe('node:9 stir:site:lgrey.drupal.sgla.ddev.site')
+    expect(responseHeaders.get('x-cache-tags')).toBe('node:9 stir:site:site-b.cms.example.com')
   })
 
   it('adds no site tag to a response without Drupal tags', () => {

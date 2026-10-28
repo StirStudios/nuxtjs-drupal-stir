@@ -107,6 +107,31 @@ describe('Stir Drupal API boundary', () => {
     })
   })
 
+  it('falls back through the Drupal URLs in the CE proxy\'s order', () => {
+    const resolve = (config: Record<string, unknown>) => {
+      vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue(config))
+
+      return getStirDrupalApiConfig().baseUrl
+    }
+
+    // A deployment-time drupalCe URL beats the build-time `api`, so every
+    // server request reaches the same Drupal host as the CE proxy.
+    expect(resolve({
+      api: 'https://build-time.example.test',
+      public: {
+        api: 'https://public.example.test',
+        drupalCe: { drupalBaseUrl: 'https://site-b.cms.example.test/' },
+      },
+    })).toBe('https://site-b.cms.example.test')
+    expect(resolve({
+      api: 'https://build-time.example.test',
+      public: { api: 'https://public.example.test' },
+    })).toBe('https://build-time.example.test')
+    expect(resolve({
+      public: { api: 'https://public.example.test' },
+    })).toBe('https://public.example.test')
+  })
+
   it('forwards only strictly named Drupal session cookies', () => {
     expect(filterStirDrupalSessionCookies([
       'analytics=private',
