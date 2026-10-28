@@ -23,6 +23,11 @@ lifetime and the union of their tags (`server/plugins/cache-tags.ts`,
 fetch (`useRequestFetch`, the layer's Drupal helpers) so its tags and lifetime
 reach the page.
 
+A response with Drupal tags also carries `stir:site:<host>`, the host of the
+Drupal API URL. Several frontends can share one Drupal (Domain module, told
+apart by that host) and one Varnish; Drupal purges one site's pages by this
+tag. It survives the header budget alongside `stir:oversize`.
+
 ## Nuxt may only make things more private
 
 `markStirPublicResponse` marks a response public without a lifetime, and falls
