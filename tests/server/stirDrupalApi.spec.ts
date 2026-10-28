@@ -6,6 +6,7 @@ import {
   markStirPublicResponse,
   splitStirSetCookieHeader,
   stirDrupalApiRequest,
+  stirDrupalTimeoutOptions,
   throwStirDrupalApiError,
   createStirDrupalUpstreamError,
 } from '../../layers/foundation/server/utils/stirDrupalApi'
@@ -524,5 +525,41 @@ describe('Stir Drupal API boundary', () => {
       event,
       tags: ['stir-drupal-api'],
     })
+  })
+})
+
+describe('stirDrupalTimeoutOptions', () => {
+  const timedOut = () => AbortSignal.abort(Object.assign(new Error('timeout'), { name: 'TimeoutError' }))
+
+  it('cuts a retried GET\'s first attempt short and gives the retry the full timeout', () => {
+    const { onRequest } = stirDrupalTimeoutOptions(10_000)
+    const first = { method: 'GET' } as Parameters<typeof onRequest>[0]['options']
+    const retry = { method: 'GET', retry: 0, signal: timedOut(), timeout: 3_000 }
+
+    onRequest({ options: first })
+    onRequest({ options: retry })
+
+    expect(first.timeout).toBe(3_000)
+    expect(retry).toEqual({ method: 'GET', retry: 0, signal: undefined, timeout: 10_000 })
+  })
+
+  it('keeps the full timeout for mutations and short configured timeouts', () => {
+    const post = { method: 'POST' }
+    const short = { method: 'GET' }
+
+    stirDrupalTimeoutOptions(10_000).onRequest({ options: post })
+    stirDrupalTimeoutOptions(2_000).onRequest({ options: short })
+
+    expect(post).toEqual({ method: 'POST', timeout: 10_000 })
+    expect(short).toEqual({ method: 'GET', timeout: 2_000 })
+  })
+
+  it('keeps a caller signal that has not timed out', () => {
+    const signal = AbortSignal.abort()
+    const options = { method: 'GET', retry: 0, signal }
+
+    stirDrupalTimeoutOptions(10_000).onRequest({ options })
+
+    expect(options.signal).toBe(signal)
   })
 })

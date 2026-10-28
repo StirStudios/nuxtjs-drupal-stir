@@ -129,6 +129,34 @@ export function buildStirDrupalHeaders(
   return headers
 }
 
+const FIRST_ATTEMPT_TIMEOUT_MS = 3_000
+
+interface StirDrupalFetchRequestOptions {
+  method?: string
+  retry?: number | false
+  signal?: AbortSignal | null
+  timeout?: number
+}
+
+// ofetch retries a GET once when no response arrives, but it keeps the first
+// attempt's expired timeout signal, so the retry aborts before it is sent.
+// Each attempt gets its own signal here. A first attempt that hangs (a stalled
+// connection, which the CMS never sees) is cut short, so the retry, on another
+// connection, gets the full timeout.
+export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
+  timeout: requestTimeoutMs,
+  onRequest({ options }: { options: StirDrupalFetchRequestOptions }) {
+    if (options.signal?.reason?.name === 'TimeoutError') options.signal = undefined
+
+    const isFirstOfRetries = options.retry === undefined
+      && (!options.method || options.method === 'GET' || options.method === 'HEAD')
+
+    options.timeout = isFirstOfRetries
+      ? Math.min(FIRST_ATTEMPT_TIMEOUT_MS, requestTimeoutMs)
+      : requestTimeoutMs
+  },
+})
+
 export function getStirDrupalApiConfig() {
   const config = useRuntimeConfig()
   // The CE module copies serverDrupalBaseUrl into public config at runtime, but
@@ -558,7 +586,7 @@ export async function fetchStirDrupalCsrfToken(
         cookie,
       }),
       redirect: 'manual',
-      timeout: requestTimeoutMs,
+      ...stirDrupalTimeoutOptions(requestTimeoutMs),
     })
 
     assertStirDrupalResponseNotRedirect(response)
@@ -610,7 +638,7 @@ export async function stirDrupalApiRequest<T>(
         csrfToken,
       }),
       redirect: 'manual',
-      timeout: requestTimeoutMs,
+      ...stirDrupalTimeoutOptions(requestTimeoutMs),
     })
   } catch (error) {
     captureStirDrupalApiError(event, error)

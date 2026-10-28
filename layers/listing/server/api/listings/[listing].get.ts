@@ -21,6 +21,7 @@ import {
   getStirDrupalSetCookies,
   getStirForwardedCookie,
   markStirPrivateResponse,
+  stirDrupalTimeoutOptions,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
 
@@ -51,7 +52,7 @@ export default defineEventHandler(async (event) => {
         query: toDrupalListingQuery(getQuery(event)),
         headers: buildStirDrupalHeaders({ apiKey, cookie }),
         redirect: 'manual',
-        timeout: requestTimeoutMs,
+        ...stirDrupalTimeoutOptions(requestTimeoutMs),
       },
     )
 

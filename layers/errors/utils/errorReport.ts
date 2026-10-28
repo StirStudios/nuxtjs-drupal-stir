@@ -6,6 +6,8 @@
 // request bodies), and the key travels in the query string, as the SDKs send
 // it, so a browser makes no CORS preflight request.
 
+import { readStirDrupalMaintenanceMessage } from '../../foundation/shared/utils/drupalMaintenance'
+
 export interface ErrorDsn {
   key: string
   envelopeUrl: string
@@ -100,14 +102,19 @@ type MaybeMaintenance = {
 
 // Drupal in Maintenance mode answers with its message as plain text, which
 // the layer passes on as data.maintenanceMessage: on a route's own error, or
-// in the JSON error body a fetch of that route received. A CMS that is down
-// answers with a proxy's HTML page and carries no message, so it is still
-// reported.
+// in the JSON error body a fetch of that route received. A fetch of Drupal
+// itself that the route lets through carries the plain text as its data. A
+// CMS that is down answers with a proxy's HTML page or an empty body, so it is
+// still reported.
 export function isDrupalMaintenance(error: unknown, depth = 0): boolean {
   const data = (error as MaybeMaintenance)?.data
   const message = data?.maintenanceMessage ?? data?.data?.maintenanceMessage
 
   if (typeof message === 'string' && message.trim()) return true
+  if (
+    (error as { statusCode?: unknown } | null)?.statusCode === 503
+    && readStirDrupalMaintenanceMessage(data)
+  ) return true
 
   return depth < 2 && Boolean((error as MaybeMaintenance)?.cause) && isDrupalMaintenance((error as MaybeMaintenance)!.cause, depth + 1)
 }
@@ -136,6 +143,45 @@ export function describeCauses(error: unknown, depth = 3): ErrorCause[] {
   }
 
   return causes
+}
+
+export interface UpstreamResponse {
+  status: number
+  server?: string
+  cfRay?: string
+  cfCacheStatus?: string
+  body?: string
+}
+
+const MAX_UPSTREAM_BODY = 200
+
+// Who answered a failed CMS fetch, Cloudflare or the origin behind it: its
+// server and Cloudflare headers and the start of its body. No other header
+// is kept, so cookies and credentials never leave.
+export function describeUpstreamResponse(error: unknown, depth = 3): UpstreamResponse | undefined {
+  let current = error
+
+  for (let level = 0; current && level <= depth; level++) {
+    const { response, data } = current as { response?: { status?: unknown, headers?: { get?: unknown } }, data?: unknown }
+    const get = response?.headers?.get
+
+    if (typeof response?.status === 'number' && typeof get === 'function') {
+      const header = (name: string) => (get.call(response!.headers, name) as string | null) || undefined
+      const body = typeof data === 'string' ? data : data === undefined ? '' : JSON.stringify(data)
+
+      return {
+        status: response.status,
+        server: header('server'),
+        cfRay: header('cf-ray'),
+        cfCacheStatus: header('cf-cache-status'),
+        body: body ? body.slice(0, MAX_UPSTREAM_BODY) : undefined,
+      }
+    }
+
+    current = (current as { cause?: unknown }).cause
+  }
+
+  return undefined
 }
 
 export function buildEvent(error: Error, context: ReportContext, eventId = crypto.randomUUID().replaceAll('-', '')) {
