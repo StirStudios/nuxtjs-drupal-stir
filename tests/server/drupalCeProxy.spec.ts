@@ -314,6 +314,50 @@ describe('Drupal CE proxy boundary', () => {
       .rejects.toMatchObject({ name: 'TimeoutError' })
   })
 
+  // Real AbortSignal timers, a thousand times faster.
+  const scaleTimeouts = () => {
+    const timeout = AbortSignal.timeout.bind(AbortSignal)
+
+    vi.spyOn(AbortSignal, 'timeout').mockImplementation(ms => timeout(Math.ceil(ms / 1000)))
+  }
+  const stall = () => vi.fn((_input, init) => new Promise((_resolve, reject) => {
+    init.signal.addEventListener('abort', () => reject(init.signal.reason), { once: true })
+  }))
+
+  it('sends a GET that stalls past the first attempt once more', async () => {
+    stubRuntimeConfig({ drupalRequestTimeoutMs: 10_000 })
+    scaleTimeouts()
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const fetchMock = vi.fn(stall()).mockImplementationOnce(stall()).mockResolvedValueOnce(new Response('{}'))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const response = await createStirDrupalProxyFetch(createEvent().event)('https://cms.example.test/ce-api/about?x=1')
+
+    expect(response.status).toBe(200)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(AbortSignal.timeout).toHaveBeenNthCalledWith(1, 3_000)
+    expect(console.warn).toHaveBeenCalledWith('[stir] retrying GET https://cms.example.test/ce-api/about after 3000 ms without an answer')
+  })
+
+  it('does not resend a stalled POST or an answered GET', async () => {
+    stubRuntimeConfig({ drupalRequestTimeoutMs: 10_000 })
+    scaleTimeouts()
+    const answered = vi.fn().mockResolvedValue(new Response('The site is being updated.', { status: 503 }))
+
+    vi.stubGlobal('fetch', answered)
+    expect((await createStirDrupalProxyFetch(createEvent().event)('https://cms.example.test/ce-api')).status).toBe(503)
+    expect(answered).toHaveBeenCalledTimes(1)
+
+    const stalled = stall()
+
+    vi.stubGlobal('fetch', stalled)
+    await expect(createStirDrupalProxyFetch(createEvent().event)('https://cms.example.test/ce-api', { method: 'POST', body: '{}' }))
+      .rejects.toMatchObject({ name: 'TimeoutError' })
+    expect(stalled).toHaveBeenCalledTimes(1)
+    expect(AbortSignal.timeout).toHaveBeenLastCalledWith(10_000)
+  })
+
   it('preserves caller cancellation', async () => {
     stubRuntimeConfig()
     const controller = new AbortController()
