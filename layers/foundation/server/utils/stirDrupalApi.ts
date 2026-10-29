@@ -129,7 +129,7 @@ export function buildStirDrupalHeaders(
   return headers
 }
 
-const FIRST_ATTEMPT_TIMEOUT_MS = 3_000
+export const FIRST_ATTEMPT_TIMEOUT_MS = 3_000
 
 interface StirDrupalFetchRequestOptions {
   method?: string

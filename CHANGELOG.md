@@ -22,6 +22,14 @@ untouched do not need one.
 
 ### Server requests
 
+- **Changed: CE page and menu proxy GETs retry once after 3 s without an
+  answer.** The first attempt waits at most 3 s (or the configured
+  `drupalRequestTimeoutMs`, if shorter); a GET or HEAD that gets no answer by
+  then is sent once more on a fresh connection within the same overall
+  deadline, so a call that stalls before reaching the CMS costs about 3 s
+  instead of the full timeout. Answers (a maintenance 503 included) and
+  requests with a body are never resent. Each retry logs
+  `[stir] retrying GET <origin><path> after 3000 ms without an answer`.
 - **Changed: server-side GETs retry once after a connection error.** A
   foundation Nitro plugin sets undici's retry as the global dispatcher, so the
   CE proxy, `$fetch` routes and image fetches resend a GET, HEAD or OPTIONS

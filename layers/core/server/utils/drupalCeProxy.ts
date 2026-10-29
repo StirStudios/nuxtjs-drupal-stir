@@ -8,6 +8,7 @@ import {
 } from 'h3'
 import { assertStirSameOrigin } from '../../../foundation/server/utils/stirRequestSecurity'
 import {
+  FIRST_ATTEMPT_TIMEOUT_MS,
   filterStirDrupalSetCookies,
   getStirDrupalSetCookies,
   getStirDrupalApiConfig,
@@ -174,15 +175,37 @@ export const createStirDrupalProxyFetch = (
     if (apiKey) headers.set('x-api-key', apiKey)
 
     const callerSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined)
-
-    return await globalThis.fetch(input, {
+    const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase()
+    const send = (timeoutMs: number) => globalThis.fetch(input, {
       ...init,
       headers,
       redirect: 'manual',
       signal: callerSignal
-        ? AbortSignal.any([callerSignal, AbortSignal.timeout(requestTimeoutMs)])
-        : AbortSignal.timeout(requestTimeoutMs),
+        ? AbortSignal.any([callerSignal, AbortSignal.timeout(timeoutMs)])
+        : AbortSignal.timeout(timeoutMs),
     })
+    const firstTimeoutMs = Math.min(FIRST_ATTEMPT_TIMEOUT_MS, requestTimeoutMs)
+
+    if ((method !== 'GET' && method !== 'HEAD') || firstTimeoutMs >= requestTimeoutMs) {
+      return await send(requestTimeoutMs)
+    }
+
+    // A CMS call that stalls before reaching the CMS is sent once more on a
+    // fresh connection, within the same overall deadline. Any answer, a
+    // maintenance 503 included, is returned as it is.
+    const startedAt = Date.now()
+
+    try {
+      return await send(firstTimeoutMs)
+    } catch (error) {
+      if ((error as { name?: unknown } | null)?.name !== 'TimeoutError' || callerSignal?.aborted) throw error
+
+      const url = new URL(input instanceof Request ? input.url : String(input))
+
+      console.warn(`[stir] retrying ${method} ${url.origin}${url.pathname} after ${firstTimeoutMs} ms without an answer`)
+
+      return await send(requestTimeoutMs - (Date.now() - startedAt))
+    }
   }
 }
 
