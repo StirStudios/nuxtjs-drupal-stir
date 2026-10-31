@@ -8,7 +8,7 @@ const errorConfig = ref<Record<string, unknown>>({})
 
 mockNuxtImport('useAppConfig', () => () => ({
   stirTheme: { error: errorConfig.value },
-  icon: { provider: 'none', collections: [] },
+  icon: { provider: 'none', collections: [], cssSelectorPrefix: 'i-' },
   ui: {},
 }))
 
