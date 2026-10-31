@@ -113,7 +113,7 @@
     "test:watch": "vitest",
     "verify:core": "pnpm dev:prepare && pnpm audit:inventory:check && pnpm audit:private-names && pnpm audit:single-versions && pnpm test:all && pnpm lint && pnpm typecheck && pnpm build",
     "verify:ci": "pnpm verify:core && pnpm test:consumer && pnpm test:presets",
-    "deps:update": "pnpm update",
+    "deps:update": "pnpm update && node scripts/audit/single-versions.mjs --fix pnpm-lock.yaml && pnpm install",
     "deps:verify": "pnpm verify:ci",
     "deps:update:safe": "pnpm deps:update && pnpm docs:sync-tech-stack && pnpm deps:verify",
     "typecheck": "nuxi typecheck",
