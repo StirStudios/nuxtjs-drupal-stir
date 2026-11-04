@@ -46,7 +46,7 @@ if (!existsSync(manifestSchemaPath)) {
 
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
 const manifestSchema = JSON.parse(readFileSync(manifestSchemaPath, 'utf8'))
-const ajv = new Ajv({ allErrors: true, schemaId: 'auto' })
+const ajv = new Ajv({ allErrors: true })
 const validateManifest = ajv.compile(manifestSchema)
 
 if (!validateManifest(manifest)) {

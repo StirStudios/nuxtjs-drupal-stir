@@ -15,6 +15,15 @@ untouched do not need one.
 
 ### Dependencies
 
+- **Changed: major upgrades.** `@nuxtjs/robots` 7, `@nuxtjs/sitemap` 9 (both load
+  Nuxt Site Config 5), `@nuxtjs/plausible` 4, `@vueuse/core` 15, `nuxt-vitalizer` 3
+  and `undici` 8; for tooling `vitest` 5, `vue-tsc` 3, `typescript` 6 and `ajv` 8.
+  A site using `#internal/nuxt-robots`, `event.node` in a sitemap hook,
+  `disableStylesheets` with a non-boolean, or `templateRef` must update it.
+  `NUXT_SITE_TRAILING_SLASH=false` now disables trailing slashes, and
+  `useThrottleFn` fires on the trailing edge by default.
+- **Held: `h3` 1** (Nitro 2 depends on it) **and `typescript` 7** (`vue-tsc` needs
+  the JavaScript compiler v7 no longer ships).
 - **Changed: `node-forge` 1.4.2.** 1.4.1 fixes GHSA-86w9-cpqp-85rv (CVE-2026-85393,
   RSA PKCS#1 v1.5 signature forgery); the layer lockfile now resolves it, and a
   site clears the alert by refreshing its own lockfile (`pnpm update node-forge`).

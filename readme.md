@@ -148,13 +148,11 @@ parameters so campaign attribution and query-driven state are not lost.
 ## 🧱 Tech Stack
 
 <!-- tech-stack:start -->
-
-- **[Nuxt 4](https://nuxt.com/)**: `^4.6.0`
-- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.11.0`
-- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.3`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `^2.9.0`
+- **[Nuxt 4](https://nuxt.com/)**: `^4.6.4`
+- **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.12.0`
+- **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.4`
+- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `2.9.0`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
-
 <!-- tech-stack:end -->
 
 ## ✅ Quality Baseline

@@ -1,14 +1,17 @@
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
+import { getGlobalDispatcher, setGlobalDispatcher } from 'undici'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createOutboundDispatcher,
   shouldRetryOutbound,
 } from '../../layers/foundation/server/utils/outboundRetry'
 
+const originalDispatcher = getGlobalDispatcher()
 let server: Server | undefined
 
 afterEach(() => {
+  setGlobalDispatcher(originalDispatcher)
   server?.close()
   server = undefined
 })
@@ -48,7 +51,9 @@ describe('outbound retry dispatcher', () => {
   it('sends a reset GET again on a fresh connection and logs it', async () => {
     const { origin, requests } = await resetOnce()
     const log = vi.fn()
-    const response = await fetch(`${origin}/ce-api/page?x=1`, { dispatcher: createOutboundDispatcher(log) } as RequestInit)
+
+    setGlobalDispatcher(createOutboundDispatcher(log))
+    const response = await fetch(`${origin}/ce-api/page?x=1`)
 
     expect(await response.text()).toBe('ok')
     expect(requests()).toBe(2)
@@ -58,11 +63,11 @@ describe('outbound retry dispatcher', () => {
   it('does not send a reset POST again', async () => {
     const { origin, requests } = await resetOnce()
 
+    setGlobalDispatcher(createOutboundDispatcher(vi.fn()))
     await expect(fetch(`${origin}/api/stir_webform_rest/submit`, {
       method: 'POST',
       body: '{}',
-      dispatcher: createOutboundDispatcher(vi.fn()),
-    } as RequestInit)).rejects.toThrow('fetch failed')
+    })).rejects.toThrow('fetch failed')
     expect(requests()).toBe(1)
   })
 
@@ -76,7 +81,9 @@ describe('outbound retry dispatcher', () => {
     })
     await new Promise<void>(resolve => server!.listen(0, '127.0.0.1', resolve))
     const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
-    const response = await fetch(`${origin}/api/sitemap`, { dispatcher: createOutboundDispatcher(vi.fn()) } as RequestInit)
+
+    setGlobalDispatcher(createOutboundDispatcher(vi.fn()))
+    const response = await fetch(`${origin}/api/sitemap`)
 
     expect(response.status).toBe(503)
     expect(requests).toBe(1)
