@@ -53,7 +53,7 @@ describe('Stir Tools contract snapshot', () => {
   })
 
   it('declares independently releasable platform capabilities', () => {
-    const ajv = new Ajv({ allErrors: true, schemaId: 'auto' })
+    const ajv = new Ajv({ allErrors: true })
     const schema = JSON.parse(readFileSync(
       resolve(root, 'schemas/contract-manifest.schema.json'),
       'utf8',
@@ -90,7 +90,7 @@ describe('Stir Tools contract snapshot', () => {
   })
 
   it('validates every producer fixture against its declared schema', () => {
-    const ajv = new Ajv({ allErrors: true, schemaId: 'auto' })
+    const ajv = new Ajv({ allErrors: true })
 
     for (const [id, contract] of Object.entries(manifest.contracts)) {
       const schema = JSON.parse(
