@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Changed: a 503 is not reported.** The server and the browser now skip
+  every 503, not only one carrying Drupal's maintenance message: a CMS deploy
+  rebuilds page errors without that message, so each deploy still raised
+  issues. A CMS that is down is left to the uptime checks.
+
 ### Integrations
 
 - **Added: privacy notice page exclusions and a phone bar.** `privacyNotice` gains three optional keys. `ignoredPaths` and
