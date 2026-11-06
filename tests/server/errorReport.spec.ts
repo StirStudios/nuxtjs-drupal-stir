@@ -63,6 +63,14 @@ describe('error report policy', () => {
     expect(shouldReport({ statusCode: 403 })).toBe(false)
   })
 
+  it('reads the status Nuxt 4.6 errors, fetch errors and their wrappers carry', () => {
+    expect(shouldReport(Object.assign(new Error('Page not found'), { status: 404 }))).toBe(false)
+    expect(shouldReport({ response: { status: 401 } })).toBe(false)
+    expect(shouldReport(Object.assign(new Error('wrapped'), { cause: { status: 404 } }))).toBe(false)
+    expect(shouldReport({ status: 500, cause: { status: 404 } })).toBe(true)
+    expect(shouldReport({ status: 502 })).toBe(true)
+  })
+
   it('drops the query string and sends no headers or cookies', () => {
     const event = buildEvent(new RangeError('too deep'), {
       url: '/search?q=secret&token=abc',
@@ -406,6 +414,27 @@ describe('browser report pipeline', () => {
     })
     expect(sent()[0].exception.values[0].stacktrace.frames[0].filename).toBe(`${ownScripts}entry.js`)
     expect(sent()[0].extra).toBeUndefined()
+  })
+
+  it('drops refused and missing answers, and keeps faults and failed requests', () => {
+    const { report, sent } = setup()
+    const fetchError = (status: number | undefined, path: string) => Object.assign(
+      thrownAt(`[GET] "${path}": ${status ?? '<no response> Failed to fetch'}`, `${ownScripts}entry.js`, 'FetchError'),
+      { status, statusCode: status, response: status ? { status } : undefined },
+    )
+
+    report(fetchError(401, '/api/stripe/access'))
+    report(fetchError(403, '/api/account/settings/values'))
+    report(fetchError(404, '/api/account/profile/schema'))
+    report(Object.assign(thrownAt('Page not found', `${ownScripts}entry.js`), { status: 404 }))
+    expect(sent()).toHaveLength(0)
+
+    report(fetchError(500, '/api/account/profile/values'))
+    report(fetchError(undefined, '/api/stripe/access'))
+    expect(sent().map(event => event.exception.values[0].value)).toEqual([
+      '[GET] "/api/account/profile/values": 500',
+      '[GET] "/api/stripe/access": <no response> Failed to fetch',
+    ])
   })
 
   it('sends nothing without consent', () => {

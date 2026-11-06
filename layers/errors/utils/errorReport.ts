@@ -92,12 +92,34 @@ export function parseStack(stack: string | undefined): StackFrame[] {
 // forwarder could not deliver (a 502 there means no answer came back; an
 // answer, a 5xx included, passes through and is not an error).
 export function shouldReport(error: unknown, path?: string): boolean {
-  const status = (error as { statusCode?: number } | null)?.statusCode
+  const status = httpStatus(error)
 
   if (status === 502 && path?.startsWith('/_plausible/')) return false
 
   return (typeof status !== 'number' || status >= 500) && !isDrupalMaintenance(error)
 }
+
+type MaybeHttpError = {
+  status?: unknown
+  statusCode?: unknown
+  response?: { status?: unknown }
+  cause?: unknown
+} | null
+
+// Nuxt 4.6 errors carry `status`, older ones and H3 `statusCode`, and a fetch
+// error its response's. A wrapper without its own status takes its cause's.
+export function httpStatus(error: unknown, depth = 0): number | undefined {
+  const { status, statusCode, response, cause } = (error ?? {}) as NonNullable<MaybeHttpError>
+  const own = [status, statusCode, response?.status].find(value => typeof value === 'number')
+
+  if (typeof own === 'number') return own
+
+  return depth < 2 && cause ? httpStatus(cause, depth + 1) : undefined
+}
+
+// Signed-out visitors refused an account API, and pages or resources that do
+// not exist, are the site working as intended.
+const EXPECTED_BROWSER_STATUSES = new Set([401, 403, 404])
 
 type MaybeMaintenance = {
   data?: { maintenanceMessage?: unknown, data?: { maintenanceMessage?: unknown } }
@@ -446,6 +468,7 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
     const error = toError(value, location)
 
     if (!error || isIgnoredBrowserError(error) || isDrupalMaintenance(value)) return
+    if (EXPECTED_BROWSER_STATUSES.has(httpStatus(value) ?? 0)) return
 
     const frames = parseStack(error.stack)
     const moduleLoad = isModuleLoadFailure(error)
