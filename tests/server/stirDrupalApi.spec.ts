@@ -556,6 +556,13 @@ describe('Stir Drupal API boundary', () => {
 describe('stirDrupalTimeoutOptions', () => {
   const timedOut = () => AbortSignal.abort(Object.assign(new Error('timeout'), { name: 'TimeoutError' }))
 
+  it('does not retry Drupal\'s Maintenance-mode 503, only other transient answers', () => {
+    const { retryStatusCodes } = stirDrupalTimeoutOptions(10_000)
+
+    expect(retryStatusCodes).not.toContain(503)
+    expect(retryStatusCodes).toEqual(expect.arrayContaining([500, 502, 504]))
+  })
+
   it('cuts a retried GET\'s first attempt short and gives the retry the full timeout', () => {
     const { onRequest } = stirDrupalTimeoutOptions(10_000)
     const first = { method: 'GET' } as Parameters<typeof onRequest>[0]['options']

@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { useNuxt } from '@nuxt/kit'
 import { normalizeEnvironmentUrl } from '../../config/runtime'
+import { STIR_RETRY_STATUS_CODES } from '../foundation/shared/utils/retryStatusCodes'
 
 const resolveLayerPath = (path: string) =>
   fileURLToPath(new URL(`../../${path}`, import.meta.url))
@@ -99,6 +100,7 @@ export default defineNuxtConfig({
         disableFormHandler: true,
         enableComponentPreview: false,
         customErrorPages: true,
+        fetchOptions: { credentials: 'include', retryStatusCodes: STIR_RETRY_STATUS_CODES },
       },
     ],
   ] as Array<string | [string, Record<string, unknown>]>,

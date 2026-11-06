@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### CMS requests
+
+- **Changed: a Maintenance-mode 503 is no longer retried.** CE page fetches,
+  `/api/app-context` and the server's Drupal requests retried every 503 once
+  (ofetch's default), so a page view during a CMS deploy asked Drupal twice
+  for each request. They now use `STIR_RETRY_STATUS_CODES`, ofetch's list
+  without 503; 408, 409, 425, 429, 500, 502 and 504 are still retried once.
+
 ### Integrations
 
 - **Added: privacy notice page exclusions and a phone bar.** `privacyNotice` gains three optional keys. `ignoredPaths` and
