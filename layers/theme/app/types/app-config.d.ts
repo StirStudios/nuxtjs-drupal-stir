@@ -39,6 +39,12 @@ type PrivacyNoticeConfig = {
   cookiePolicyUrl?: string
   links?: PrivacyNoticeLink[]
   legalLinks?: PrivacyNoticeLink[]
+  /** Pages that never show the notice; skipping records no decision. */
+  ignoredPaths?: string[]
+  /** Path prefixes that never show the notice (`/checkout` also covers `/checkout/...`). */
+  ignoredPathPrefixes?: string[]
+  /** Below `md`: floating `card` (default) or a compact full-width `bar`. */
+  mobilePresentation?: 'card' | 'bar'
 } & LooseRecord
 
 type PopupConfig = {

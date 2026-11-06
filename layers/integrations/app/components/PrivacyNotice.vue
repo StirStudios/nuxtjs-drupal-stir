@@ -91,16 +91,28 @@ const ignorePaths = computed(() =>
     ),
   ]
     .filter((url): url is string => typeof url === 'string' && url.length > 0)
-    .map((url) => toRoutePath(url)),
+    .map((url) => toRoutePath(url))
+    .concat(config.value?.ignoredPaths || []),
 )
 
+const isMobileBar = computed(() => config.value?.mobilePresentation === 'bar')
 const positionClass = computed(() => {
   const position = config.value?.position ?? 'center'
 
+  if (isMobileBar.value) {
+    if (position === 'left') return 'max-md:inset-x-0 md:left-4'
+    if (position === 'right') return 'max-md:inset-x-0 md:right-4'
+    return 'max-md:inset-x-0 md:left-1/2 md:-translate-x-1/2'
+  }
   if (position === 'left') return 'left-3 sm:left-4'
   if (position === 'right') return 'right-3 sm:right-4'
   return 'left-1/2 -translate-x-1/2'
 })
+const wrapperClass = computed(() =>
+  isMobileBar.value
+    ? 'bottom-0 md:bottom-4 md:w-[26rem]'
+    : 'bottom-3 w-[min(26rem,calc(100vw-1.5rem))] sm:bottom-4',
+)
 
 const noticeTitle = computed(() =>
   isSetupNotice.value ? 'Privacy notice config required' : config.value?.title,
@@ -110,11 +122,23 @@ const noticeMessage = computed(() =>
     ? 'Set `privacyNotice.title` and `privacyNotice.message` in `app.config.ts` to enable this notice.'
     : config.value?.message,
 )
-const noticeCardRootClass = computed(() =>
-  isSetupNotice.value
-    ? 'shadow-xl ring-warning/40'
-    : 'shadow-xl',
-)
+const noticeCardRootClass = computed(() => [
+  isSetupNotice.value ? 'shadow-xl ring-warning/40' : 'shadow-xl',
+  isMobileBar.value && 'max-md:flex max-md:max-h-[20vh] max-md:flex-col max-md:rounded-none',
+])
+const noticeCardUi = computed(() => {
+  const bar = isMobileBar.value
+
+  return {
+    root: noticeCardRootClass.value,
+    body: [
+      'space-y-3 text-sm leading-relaxed text-default',
+      bar && 'max-md:min-h-0 max-md:overflow-y-auto max-md:space-y-1 max-md:px-3 max-md:py-1 max-md:text-xs max-md:leading-snug',
+    ],
+    footer: ['flex justify-end gap-2 pt-2', bar && 'max-md:px-3 max-md:py-2'],
+    header: ['flex items-start justify-between gap-3', bar && 'max-md:px-3 max-md:py-2'],
+  }
+})
 
 watch(
   () => route.path,
@@ -129,7 +153,7 @@ watch(
       !hasDecision.value &&
       (isConfigured.value || isSetupNotice.value) &&
       !isBot &&
-      !ignorePaths.value.includes(route.path)
+      !isPathIgnored(route.path, ignorePaths.value, config.value?.ignoredPathPrefixes)
     ) {
       open.value = true
     }
@@ -153,19 +177,11 @@ watchEffect(() => {
     v-if="isHydrated && open && (isConfigured || isSetupNotice)"
     :aria-label="noticeTitle"
     aria-live="polite"
-    :class="[
-      'fixed bottom-3 z-50 w-[min(26rem,calc(100vw-1.5rem))] sm:bottom-4',
-      positionClass,
-    ]"
+    :class="['fixed z-50', wrapperClass, positionClass]"
     role="dialog"
   >
     <UCard
-      :ui="{
-        root: noticeCardRootClass,
-        body: 'space-y-3 text-sm leading-relaxed text-default',
-        footer: 'flex justify-end gap-2 pt-2',
-        header: 'flex items-start justify-between gap-3',
-      }"
+      :ui="noticeCardUi"
       variant="outline"
     >
       <template #header>
