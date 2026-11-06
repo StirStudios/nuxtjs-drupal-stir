@@ -10,7 +10,6 @@ import {
 } from 'h3'
 import { recordStirCacheTags } from './stirCacheTags'
 import { readStirDrupalMaintenanceMessage } from '../../shared/utils/drupalMaintenance'
-import { STIR_RETRY_STATUS_CODES } from '../../shared/utils/retryStatusCodes'
 import { assertStirSameOrigin } from './stirRequestSecurity'
 
 // Shared by focused server capabilities and the full Drupal CE platform.
@@ -146,7 +145,6 @@ interface StirDrupalFetchRequestOptions {
 // connection, gets the full timeout.
 export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
   timeout: requestTimeoutMs,
-  retryStatusCodes: STIR_RETRY_STATUS_CODES,
   onRequest({ options }: { options: StirDrupalFetchRequestOptions }) {
     if (options.signal?.reason?.name === 'TimeoutError') options.signal = undefined
 

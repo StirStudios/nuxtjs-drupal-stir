@@ -30,7 +30,6 @@ export function useAppContext(options: AppContextOptions = {}) {
     immediate: options.immediate ?? true,
     key: computed(() => `app-context:${path.value}`),
     query: computed(() => ({ path: path.value })),
-    retryStatusCodes: STIR_RETRY_STATUS_CODES,
   })
 
   // Every page asks for app context, so it is how a page Nuxt builds itself
