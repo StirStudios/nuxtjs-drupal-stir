@@ -87,8 +87,9 @@ export function parseStack(stack: string | undefined): StackFrame[] {
   return frames.slice(0, MAX_FRAMES).reverse()
 }
 
-// A page not found or refused is not a fault of the site, and neither is the
-// CMS's Maintenance mode during a deploy, or an analytics event the Plausible
+// A page not found or refused is not a fault of the site, and neither is a
+// 503: the CMS's Maintenance mode during a deploy, or an outage the uptime
+// checks already watch. Nor is an analytics event the Plausible
 // forwarder could not deliver (a 502 there means no answer came back; an
 // answer, a 5xx included, passes through and is not an error).
 export function shouldReport(error: unknown, path?: string): boolean {
@@ -96,7 +97,7 @@ export function shouldReport(error: unknown, path?: string): boolean {
 
   if (status === 502 && path?.startsWith('/_plausible/')) return false
 
-  return (typeof status !== 'number' || status >= 500) && !isDrupalMaintenance(error)
+  return (typeof status !== 'number' || (status >= 500 && status !== 503)) && !isDrupalMaintenance(error)
 }
 
 type MaybeHttpError = {
@@ -119,7 +120,7 @@ export function httpStatus(error: unknown, depth = 0): number | undefined {
 
 // Signed-out visitors refused an account API, and pages or resources that do
 // not exist, are the site working as intended.
-const EXPECTED_BROWSER_STATUSES = new Set([401, 403, 404])
+const EXPECTED_BROWSER_STATUSES = new Set([401, 403, 404, 503])
 
 type MaybeMaintenance = {
   data?: { maintenanceMessage?: unknown, data?: { maintenanceMessage?: unknown } }

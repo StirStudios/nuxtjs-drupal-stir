@@ -567,7 +567,7 @@ describe('CMS maintenance', () => {
     expect(isDrupalMaintenance(Object.assign(new Error('render'), { cause: { data: { maintenanceMessage: maintenance } } }))).toBe(true)
   })
 
-  it('keeps reporting a 503 that is not Maintenance mode', () => {
+  it('tells Maintenance mode from other 503s, and reports neither', () => {
     // A CMS that is down: a proxy's HTML page, so no message is passed on.
     const outage = Object.assign(new Error('Service Unavailable'), { statusCode: 503 })
 
@@ -577,7 +577,8 @@ describe('CMS maintenance', () => {
     expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: '<!DOCTYPE html><title>503</title>' }))).toBe(false)
     expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 503, data: '' }))).toBe(false)
     expect(isDrupalMaintenance(Object.assign(new Error('x'), { statusCode: 500, data: maintenance }))).toBe(false)
-    expect(shouldReport(outage)).toBe(true)
+    // Uptime checks watch for a CMS that is down.
+    expect(shouldReport(outage)).toBe(false)
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 503, data: { maintenanceMessage: maintenance } }))).toBe(false)
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }))).toBe(true)
   })
@@ -590,7 +591,7 @@ describe('CMS maintenance', () => {
     expect(shouldReport(Object.assign(new Error('x'), { statusCode: 500 }), '/_plausible/api/event')).toBe(true)
   })
 
-  it('sends no browser report for Maintenance mode, and still one for an outage', () => {
+  it('sends no browser report for a 503, Maintenance mode or not', () => {
     const send = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
     const ownScripts = 'https://www.example.com/_nuxt/'
     const report = createBrowserReporter({
@@ -611,7 +612,7 @@ describe('CMS maintenance', () => {
     expect(send).not.toHaveBeenCalled()
 
     report(fetchError({ statusCode: 503 }))
-    expect(send).toHaveBeenCalledTimes(1)
+    expect(send).not.toHaveBeenCalled()
   })
 })
 
