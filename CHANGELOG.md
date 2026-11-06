@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Compliance
+
+- **Changed: a layer update installs new review checklists itself.** On
+  `nuxt prepare` (the `postinstall` step) and in development, a site with a
+  `compliance/REVIEW.md` gets any missing checklist sections added, keeping its
+  answers, so the change is committed with the lockfile instead of failing
+  `stir-compliance-init --check` in CI. Nothing is written in CI or a build.
+
 ### Errors
 
 - **Fixed: expected answers are no longer reported to GlitchTip.** The browser

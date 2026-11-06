@@ -174,7 +174,10 @@ parameters so campaign attribution and query-driven state are not lost.
 
 ### Compliance and SEO audits in downstream projects
 
-Run `pnpm exec stir-compliance-init` after installing or updating this layer.
+Run `pnpm exec stir-compliance-init` after installing this layer. After an
+update, `nuxt prepare` (the `postinstall` step) adds any new review checklists
+to an existing `compliance/REVIEW.md` itself (never in CI or a build); commit
+the file with the lockfile.
 It preserves the downstream inventory and review notes while adding any missing
 review sections and package scripts. The generated commands remain independent:
 
