@@ -13,6 +13,16 @@ untouched do not need one.
 
 ## Unreleased
 
+### Integrations
+
+- **Added: privacy notice page exclusions and a phone bar.** `privacyNotice` gains three optional keys. `ignoredPaths` and
+  `ignoredPathPrefixes` keep the notice off chosen pages (matched like
+  `cmsGlobalSeo`); skipping records no decision, so in `consent` mode
+  non-essential scripts stay off there. `mobilePresentation: 'bar'` shows a
+  compact full-width strip below `md` instead of the floating card. Defaults
+  are unchanged. New auto-imported app utils `isPathIgnored` and
+  `normalizePath` (foundation layer).
+
 ### Compliance
 
 - **Changed: a layer update installs new review checklists itself.** On

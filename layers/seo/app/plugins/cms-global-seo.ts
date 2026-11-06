@@ -47,29 +47,8 @@ function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<Cm
   }
 }
 
-function normalizePath(path: string) {
-  if (path.length > 1 && path.endsWith('/')) {
-    return path.replace(/\/+$/, '')
-  }
-
-  return path || '/'
-}
-
 function isIgnoredPath(path: string, config: Required<CmsGlobalSeoConfig>) {
-  const normalizedPath = normalizePath(path)
-
-  if (config.ignoredPaths.some(ignored => normalizePath(ignored) === normalizedPath)) {
-    return true
-  }
-
-  return config.ignoredPathPrefixes.some((prefix) => {
-    const normalizedPrefix = normalizePath(prefix)
-
-    return (
-      normalizedPrefix !== '/' &&
-      (normalizedPath === normalizedPrefix || normalizedPath.startsWith(`${normalizedPrefix}/`))
-    )
-  })
+  return isPathIgnored(path, config.ignoredPaths, config.ignoredPathPrefixes)
 }
 
 function isDrupalRoute(route: ReturnType<typeof useRoute>, config: Required<CmsGlobalSeoConfig>) {

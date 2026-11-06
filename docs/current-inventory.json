@@ -393,6 +393,7 @@
       "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
       "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
       "layers/foundation/app/utils/nuxtUiProps.ts",
+      "layers/foundation/app/utils/pathMatch.ts",
       "layers/foundation/app/utils/publicOrigin.ts",
       "layers/seo/app/utils/globalSeoAssets.ts",
       "layers/theme/app/utils/colorMode.ts",
@@ -781,6 +782,7 @@
         "layers/editorial/app/utils/normalizeEditorHtmlForSave.ts",
         "layers/foundation/app/utils/nuxtDevtoolsUnheadCompat.ts",
         "layers/foundation/app/utils/nuxtUiProps.ts",
+        "layers/foundation/app/utils/pathMatch.ts",
         "layers/foundation/app/utils/publicOrigin.ts",
         "layers/seo/app/utils/globalSeoAssets.ts",
         "layers/theme/app/utils/colorMode.ts",
@@ -855,21 +857,21 @@
   "counts": {
     "components": 139,
     "composables": 74,
-    "utils": 80,
+    "utils": 81,
     "plugins": 11,
     "middleware": 5,
     "serverRoutes": 31,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 252,
+    "tests": 254,
     "testsByArea": {
       "composables": 14,
       "contracts": 2,
-      "nuxt": 109,
+      "nuxt": 110,
       "scripts": 6,
       "server": 35,
       "unit": 12,
-      "utils": 74
+      "utils": 75
     }
   },
   "tests": [
@@ -959,6 +961,7 @@
     "tests/nuxt/runtime/ParagraphView.nuxt.spec.ts",
     "tests/nuxt/runtime/PlausibleBridge.nuxt.spec.ts",
     "tests/nuxt/runtime/Popup.nuxt.spec.ts",
+    "tests/nuxt/runtime/PrivacyNotice.nuxt.spec.ts",
     "tests/nuxt/runtime/RegionAreaAppContext.nuxt.spec.ts",
     "tests/nuxt/runtime/Relocated.nuxt.spec.ts",
     "tests/nuxt/runtime/RevealMotion.nuxt.spec.ts",
@@ -1096,6 +1099,7 @@
     "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
     "tests/utils/paragraphRevealOwnership.spec.ts",
+    "tests/utils/pathMatch.spec.ts",
     "tests/utils/presentationClasses.spec.ts",
     "tests/utils/presentationSource.spec.ts",
     "tests/utils/privacyConsent.spec.ts",
