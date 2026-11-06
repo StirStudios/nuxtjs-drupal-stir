@@ -6,3 +6,10 @@ if ! node scripts/audit/inventory.mjs --check; then
   echo 'pre-commit: docs/current-inventory.json was regenerated; review it, git add it, and commit again.' >&2
   exit 1
 fi
+
+# A dependency update can leave two versions of a package that must have one
+# (tiptap); Verify Core fails on that too.
+if ! git diff --cached --quiet -- pnpm-lock.yaml && ! node scripts/audit/single-versions.mjs; then
+  echo 'pre-commit: run pnpm deps:update (or the --fix command above, then pnpm install), git add pnpm-lock.yaml, and commit again.' >&2
+  exit 1
+fi
