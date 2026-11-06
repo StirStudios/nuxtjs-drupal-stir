@@ -16,7 +16,10 @@ away.
   extra dependency, nothing downloaded. The server reports errors with status
   500 and up (render and API failures); the browser reports uncaught errors,
   unhandled rejections and Vue errors, and only once consent allows
-  non-essential scripts (the same policy as analytics). Only the path leaves
+  non-essential scripts (the same policy as analytics), but not a request
+  answered 401, 403 or 404, such as a signed-out visitor refused an account
+  API. A status is read from `status` (Nuxt 4.6), `statusCode` or the fetch
+  response, and from the cause of a wrapper without its own. Only the path leaves
   the server or the page (never the query string, cookies or request bodies,
   and no headers except the user agent on a failed module load, below), the
   same error counts once a minute, a runaway loop is capped, and

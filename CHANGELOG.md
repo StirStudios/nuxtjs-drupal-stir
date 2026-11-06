@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Fixed: expected answers are no longer reported to GlitchTip.** The browser
+  no longer reports a request answered 401, 403 or 404 (a signed-out visitor
+  refused an account API, for example), and the server no longer reports a
+  missing page: Nuxt 4.6 errors carry `status`, which the server filter did not
+  read. Server errors, 5xx answers, requests with no answer and failed module
+  loads are still reported.
+
 ### Dependencies
 
 - **Changed: major upgrades.** `@nuxtjs/robots` 7, `@nuxtjs/sitemap` 9 (both load
