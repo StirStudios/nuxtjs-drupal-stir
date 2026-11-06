@@ -3,7 +3,7 @@
 import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { REVIEW_SECTIONS as reviewSections, missingReviewMarkers } from './review.mjs'
+import { addMissingReviewSections, missingReviewMarkers } from './review.mjs'
 
 const projectRoot = resolve(process.cwd())
 const templateRoot = fileURLToPath(new URL('./templates/', import.meta.url))
@@ -61,42 +61,8 @@ for (const file of files) {
     await access(destination)
 
     if (file === 'REVIEW.md') {
-      let review = await readFile(destination, 'utf8')
       const template = await readFile(resolve(templateRoot, file), 'utf8')
-      let changed = false
-
-      for (const section of reviewSections) {
-        if (review.includes(section.marker)) continue
-
-        const templateStart = template.indexOf(section.heading)
-        const templateEnd = template.indexOf(section.nextHeading, templateStart)
-        if (templateStart < 0 || templateEnd <= templateStart) continue
-
-        const currentStart = review.indexOf(section.heading)
-
-        if (currentStart >= 0) {
-          // The heading already exists without its marker, so a downstream
-          // site wrote its own content under it. Add only the marker
-          // (right after the heading line) rather than replacing the
-          // section body, which would silently discard recorded answers.
-          const headingLineEnd = review.indexOf('\n', currentStart)
-          const insertAt = headingLineEnd >= 0 ? headingLineEnd + 1 : review.length
-          review = `${review.slice(0, insertAt)}${section.marker}\n\n${review.slice(insertAt)}`
-          changed = true
-          continue
-        }
-
-        const preferredInsertionPoint = review.indexOf(section.nextHeading)
-        const humanConfirmations = review.indexOf('## Human confirmations')
-        const insertionPoint = preferredInsertionPoint >= 0
-          ? preferredInsertionPoint
-          : humanConfirmations
-        const replacement = template.slice(templateStart, templateEnd)
-        review = insertionPoint >= 0
-          ? `${review.slice(0, insertionPoint)}${replacement}${review.slice(insertionPoint)}`
-          : `${review.trimEnd()}\n\n${replacement}`
-        changed = true
-      }
+      const { review, changed } = addMissingReviewSections(await readFile(destination, 'utf8'), template)
 
       if (changed) {
         await writeFile(destination, review)

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { missingReviewMarkers, REVIEW_SECTIONS } from '../../scripts/compliance/review.mjs'
+import { addMissingReviewSections, missingReviewMarkers, REVIEW_SECTIONS } from '../../scripts/compliance/review.mjs'
 
 const template = readFileSync(new URL('../../scripts/compliance/templates/REVIEW.md', import.meta.url), 'utf8')
 const init = fileURLToPath(new URL('../../scripts/compliance/init.mjs', import.meta.url))
@@ -16,6 +16,21 @@ describe('compliance review checklists', () => {
     for (const section of REVIEW_SECTIONS) {
       expect(template).toContain(section.heading)
     }
+  })
+
+  it('adds a missing checklist without touching recorded answers, and leaves a current one alone', () => {
+    const perfStart = template.indexOf('## Required performance review')
+    const legalStart = template.indexOf('## Tracked legal copy')
+    const outdated = `${template.slice(0, perfStart)}${template.slice(legalStart)}`
+      .replace('## Human confirmations', '## Human confirmations\n\n- Answer kept.')
+
+    const { review, changed } = addMissingReviewSections(outdated, template)
+
+    expect(changed).toBe(true)
+    expect(missingReviewMarkers(review)).toEqual([])
+    expect(review).toContain('- Answer kept.')
+    expect(review.indexOf('## Required performance review')).toBeLessThan(review.indexOf('## Tracked legal copy'))
+    expect(addMissingReviewSections(review, template)).toEqual({ review, changed: false })
   })
 
   it('reports the markers an outdated REVIEW.md is missing, in checklist order', () => {

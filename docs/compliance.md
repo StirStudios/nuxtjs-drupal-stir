@@ -154,8 +154,10 @@ cannot establish, such as the legal entity, customer locations, mailbox
 provider, marketing use, manual accessibility testing, and captions. Ask it at
 every review and record the answers in the dated audit report.
 
-Existing consumers should rerun `pnpm exec stir-compliance-init` after upgrading.
-The command preserves project-specific content while installing versioned review
+An existing consumer gets new checklists on its next install: `nuxt prepare`
+adds missing sections to `compliance/REVIEW.md` outside CI and builds, so the
+change is committed with the lockfile. `pnpm exec stir-compliance-init` does the
+same on demand and also adds missing package scripts. Both preserve project-specific content while installing versioned review
 checklist additions. `pnpm audit:compliance` reports an error when that checklist
 is outdated.
 

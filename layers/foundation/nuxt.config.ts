@@ -1,8 +1,9 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { addServerHandler, defineNuxtModule, hasNuxtModule } from '@nuxt/kit'
+import { addServerHandler, defineNuxtModule, hasNuxtModule, useLogger } from '@nuxt/kit'
+import { addMissingReviewSections } from '../../scripts/compliance/review.mjs'
 import {
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
@@ -66,6 +67,31 @@ const applicationMode = defineNuxtModule({
         }
       }
     })
+  },
+})
+
+// A layer update that adds review checklists refreshes the site's
+// compliance/REVIEW.md on install (`nuxt prepare`) and in development, so the
+// change is committed with the lockfile instead of failing CI later. Never in
+// CI or a build, and never for a site without a REVIEW.md.
+const complianceChecklists = defineNuxtModule({
+  meta: {
+    name: 'stir-compliance-checklists',
+  },
+  setup(_options, nuxt) {
+    if (isLayerWorkspace || process.env.CI || !(nuxt.options._prepare || nuxt.options.dev)) return
+
+    const reviewPath = resolve(nuxt.options.rootDir, 'compliance/REVIEW.md')
+
+    if (!existsSync(reviewPath)) return
+
+    const template = readFileSync(resolveLayerPath('scripts/compliance/templates/REVIEW.md'), 'utf8')
+    const { review, changed } = addMissingReviewSections(readFileSync(reviewPath, 'utf8'), template)
+
+    if (!changed) return
+
+    writeFileSync(reviewPath, review)
+    useLogger('stir').info('Added the current review checklists to compliance/REVIEW.md; commit it with this update.')
   },
 })
 
@@ -146,6 +172,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     applicationMode,
+    complianceChecklists,
     '@nuxtjs/robots',
     ...(isLayerWorkspace ? ['@nuxt/eslint'] : []),
     [
@@ -158,6 +185,7 @@ export default defineNuxtConfig({
   ] as Array<
     | string
     | typeof applicationMode
+    | typeof complianceChecklists
     | [string, Record<string, unknown>]
   >,
 
