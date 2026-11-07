@@ -24,11 +24,13 @@ const delay = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds))
 
 function packageManagerCommand(script) {
-  if (process.env.npm_execpath) {
-    return {
-      command: process.execPath,
-      args: [process.env.npm_execpath, script],
-    }
+  const execPath = process.env.npm_execpath
+
+  // pnpm 12 runs as a native binary; older pnpm is a script for Node.
+  if (execPath) {
+    return /\.[cm]?js$/.test(execPath)
+      ? { command: process.execPath, args: [execPath, script] }
+      : { command: execPath, args: [script] }
   }
 
   return {

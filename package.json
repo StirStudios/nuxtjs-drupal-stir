@@ -41,7 +41,7 @@
     "./layers/theme/app/assets/css/main": "./layers/theme/app/assets/css/main.css",
     "./*": "./*"
   },
-  "packageManager": "pnpm@11.13.1",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },
@@ -196,8 +196,6 @@
     "ajv": "8.20.0",
     "chrome-launcher": "^1.2.3",
     "eslint": "^10.14.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.7",
     "globals": "^17.14.0",
     "h3": "^1.15.11",
     "happy-dom": "^21.0.4",

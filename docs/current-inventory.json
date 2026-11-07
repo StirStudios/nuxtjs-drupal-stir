@@ -3,7 +3,7 @@
   "package": {
     "name": "nuxtjs-drupal-stir",
     "version": "4.5.1",
-    "packageManager": "pnpm@11.13.1",
+    "packageManager": "pnpm@12.18.0",
     "engines": {
       "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
     }
@@ -80,8 +80,6 @@
       "ajv",
       "chrome-launcher",
       "eslint",
-      "eslint-config-prettier",
-      "eslint-plugin-prettier",
       "globals",
       "h3",
       "happy-dom",
@@ -863,7 +861,7 @@
     "middleware": 5,
     "serverRoutes": 32,
     "productionDependencies": 37,
-    "developmentDependencies": 27,
+    "developmentDependencies": 25,
     "tests": 255,
     "testsByArea": {
       "composables": 14,

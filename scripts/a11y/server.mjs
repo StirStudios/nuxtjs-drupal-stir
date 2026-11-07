@@ -343,8 +343,12 @@ if (!address || typeof address === 'string') {
   throw new Error('Unable to start the accessibility Drupal fixture.')
 }
 
-const packageManager = process.env.npm_execpath
-  ? { command: process.execPath, args: [process.env.npm_execpath] }
+// pnpm 12 runs as a native binary; older pnpm is a script for Node.
+const execPath = process.env.npm_execpath
+const packageManager = execPath
+  ? /\.[cm]?js$/.test(execPath)
+    ? { command: process.execPath, args: [execPath] }
+    : { command: execPath, args: [] }
   : { command: process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', args: [] }
 const nuxtEnvironment = {
   ...process.env,
