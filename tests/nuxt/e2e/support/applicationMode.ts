@@ -43,8 +43,8 @@ export function describeApplicationMode(fixture: string, label: string) {
       expect(body).not.toContain('Sitemap:')
     })
 
-    it('returns a real 404 for sitemap paths instead of the application shell', async () => {
-      for (const path of ['/sitemap.xml', '/sitemap_index.xml', '/__sitemap__/style.xsl']) {
+    it('returns a real 404 for sitemap and llms.txt paths instead of the application shell', async () => {
+      for (const path of ['/sitemap.xml', '/sitemap_index.xml', '/__sitemap__/style.xsl', '/llms.txt']) {
         const response = await fetch(path)
         const body = await response.text()
 

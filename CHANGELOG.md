@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### SEO
+
+- **Added: a generated `/llms.txt`.** Websites with the SEO capability serve
+  a Markdown summary: the Drupal site name and slogan, the home page
+  description, the main menu, and up to 25 sitemap pages (top-level pages
+  first), each linked with its title and Metatag description from Stir Tools'
+  `/api/seo/summaries` (contract 1.39.0; without it, links keep their menu
+  title or path). Cached for an hour. It answers 404 when the site is not
+  indexable, in applications, or with `runtimeConfig: { llmsTxt: false }` (or
+  `NUXT_LLMS_TXT=false`). A site's own `server/routes/llms.txt.ts` replaces it.
+
 ### Errors
 
 - **Changed: a 503 is not reported.** The server and the browser now skip

@@ -46,12 +46,12 @@ const applicationMode = defineNuxtModule({
 
     if (nuxt.options.site) nuxt.options.site.indexable = false
 
-    // Sitemap paths return a real 404 instead of the application renderer.
+    // Sitemap and llms.txt paths return a real 404 instead of the application renderer.
     const handler = fileURLToPath(
       new URL('./server/handlers/sitemap-unavailable.ts', import.meta.url),
     )
 
-    for (const route of ['/sitemap.xml', '/sitemap_index.xml', '/__sitemap__/**']) {
+    for (const route of ['/sitemap.xml', '/sitemap_index.xml', '/__sitemap__/**', '/llms.txt']) {
       addServerHandler({ route, handler })
     }
 

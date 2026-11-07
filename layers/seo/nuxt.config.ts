@@ -18,6 +18,11 @@ export default defineNuxtConfig({
     '/login': { robots: false },
   },
 
+  // Sites turn the generated /llms.txt off with `runtimeConfig: { llmsTxt: false }`.
+  runtimeConfig: {
+    llmsTxt: true,
+  },
+
   nitro: {
     hooks: {
       'sitemap:resolved'(ctx: SitemapRenderCtx) {
