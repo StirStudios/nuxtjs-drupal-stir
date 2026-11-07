@@ -154,7 +154,7 @@
     "nuxtjs-drupal-ce": "2.9.0",
     "rate-limiter-flexible": "^11.3.0",
     "sharp": "^0.35.5",
-    "tailwindcss": "^4.3.4",
+    "tailwindcss": "^4.3.5",
     "ultrahtml": "^1.7.0",
     "undici": "^8.12.4",
     "unhead": "^3.4.3",
