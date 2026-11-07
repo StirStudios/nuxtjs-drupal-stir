@@ -79,7 +79,7 @@ GitHub source in `nuxt.config.ts`.
 ```json
 {
   "dependencies": {
-    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#4.5.1",
+    "@stir/base": "github:StirStudios/nuxtjs-drupal-stir#5.0.0",
     "nuxt": "^4.6.0"
   }
 }
