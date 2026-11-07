@@ -13,6 +13,8 @@ untouched do not need one.
 
 ## Unreleased
 
+## 5.0.0 (2026-11-07)
+
 ### SEO
 
 - **Added: a generated `/llms.txt`.** Websites with the SEO capability serve
