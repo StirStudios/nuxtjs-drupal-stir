@@ -15,6 +15,14 @@ untouched do not need one.
 
 ## 5.0.0 (2026-11-07)
 
+### Tooling
+
+- **Changed: pnpm 12.18.0** (from 11.13.1), with every dependency updated.
+  pnpm 12 runs as a native binary, so the accessibility and Lighthouse
+  scripts start it directly. `eslint-config-prettier` and
+  `eslint-plugin-prettier` are removed; ESLint never loaded them. TypeScript
+  stays on 6 until vue-tsc supports 7.
+
 ### SEO
 
 - **Added: a generated `/llms.txt`.** Websites with the SEO capability serve

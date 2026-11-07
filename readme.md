@@ -114,7 +114,7 @@ This layer declares Nuxt as a dependency. Applications should also declare their
 Nuxt runtime explicitly and use a compatible version so their own development
 and build commands resolve predictably.
 The package uses Nuxt's `dev:prepare` convention and does not run a lifecycle
-build when installed as a dependency. pnpm 11 applications must still keep
+build when installed as a dependency. pnpm 11 and later applications must still keep
 their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
 dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
 manager security policy belongs to the consuming application and is not
