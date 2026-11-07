@@ -51,6 +51,18 @@ Drupal remains the single source for favicon and manifest metadata and files;
 those links pass through unchanged. Do not duplicate them in the consumer's
 `public/` directory or route them through IPX.
 
+## llms.txt
+
+`/llms.txt` is generated from the Drupal site name and slogan (falling back
+to `NUXT_SITE_NAME`), the home page description, the `main` menu, and up to 25
+sitemap pages, shallowest path first and then by priority. Each link carries
+its title and Metatag description from Stir Tools' `/api/seo/summaries`; sign-in
+and account paths are left out. It is served as `text/markdown` with
+`Cache-Control: public, max-age=3600`, and answers 404 when the site is not
+indexable or a site sets `runtimeConfig: { llmsTxt: false }` (runtime override
+`NUXT_LLMS_TXT=false`). A site's own `server/routes/llms.txt.ts` replaces the
+layer's route.
+
 ## Sitemap extensions
 
 Drupal `/api/sitemap` stays the source of sitemap URLs, and `/sitemap.xml` from

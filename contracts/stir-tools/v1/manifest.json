@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.38.0",
+  "contractVersion": "1.39.0",
   "producer": "stirstudios/stir_tools",
   "platformRequirements": {
     "drupalCore": "^11",
@@ -195,6 +195,11 @@
       "capability": "seo.global",
       "schema": "schemas/global-seo.schema.json",
       "fixtures": ["fixtures/global-seo.json"]
+    },
+    "seo.summaries": {
+      "capability": "seo.global",
+      "schema": "schemas/page-summaries.schema.json",
+      "fixtures": ["fixtures/page-summaries.json"]
     },
     "seo.sitemap": {
       "capability": "seo.sitemap",

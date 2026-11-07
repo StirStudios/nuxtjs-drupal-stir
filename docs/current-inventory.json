@@ -509,6 +509,7 @@
       "/api/stir/presentation-catalogue",
       "/api/view/:paragraphId",
       "/api/webform/submit",
+      "/llms.txt",
       "/sites/default/files/**"
     ]
   },
@@ -860,16 +861,16 @@
     "utils": 81,
     "plugins": 11,
     "middleware": 5,
-    "serverRoutes": 31,
+    "serverRoutes": 32,
     "productionDependencies": 37,
     "developmentDependencies": 27,
-    "tests": 254,
+    "tests": 255,
     "testsByArea": {
       "composables": 14,
       "contracts": 2,
       "nuxt": 110,
       "scripts": 6,
-      "server": 35,
+      "server": 36,
       "unit": 12,
       "utils": 75
     }
@@ -1024,6 +1025,7 @@
     "tests/server/formattedTextApi.spec.ts",
     "tests/server/globalSeoApi.spec.ts",
     "tests/server/listingApi.spec.ts",
+    "tests/server/llmsTxt.spec.ts",
     "tests/server/outboundRetry.spec.ts",
     "tests/server/paragraphPresentationApi.spec.ts",
     "tests/server/paragraphTextApi.spec.ts",
