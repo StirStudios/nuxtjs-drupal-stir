@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Errors
+
+- **Changed: a failed module load report is smaller.** It no longer carries
+  the protocols (h2, h3) the site's files used or the connection type: Safari,
+  where these failures occur, reports no connection type, and no diagnosis
+  used the protocol counts. The failed and missing file names, the browser
+  and the page state are unchanged.
+- **Changed: Meta's crawlers send no browser reports.** `meta-webindexer`
+  and `meta-externalagent` run a page's scripts like a browser and are now
+  skipped with the other crawlers.
+
 ## 5.0.0 (2026-11-07)
 
 ### Tooling

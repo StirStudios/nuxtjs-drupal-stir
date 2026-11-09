@@ -175,6 +175,8 @@ describe('automated visitors', () => {
       'Mozilla/5.0 HeadlessChrome/130.0.0.0 Safari/537.36',
       'Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 PhantomJS/2.1.1 Safari/538.1',
       'facebookexternalhit/1.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 (compatible; meta-webindexer/1.1)',
+      'meta-externalagent/1.1',
       'Mozilla/5.0 (compatible; SomeSpider/1.0; +crawl)',
       'Prerender (+https://github.com/prerender/prerender)',
       'LinkPreview/1.0',
@@ -300,7 +302,6 @@ describe('failed module load diagnostics', () => {
     transferSize: 1500,
     decodedBodySize: 4000,
     responseStatus: 200,
-    nextHopProtocol: 'h2',
     ...extra,
   })
 
@@ -322,16 +323,16 @@ describe('failed module load diagnostics', () => {
   it('names the files that failed, with no query string', () => {
     const result = describeModuleLoad([
       entry('ok.js'),
-      entry('missing.js?v=abc#frag', { responseStatus: 404, transferSize: 300, decodedBodySize: 0, nextHopProtocol: 'h3' }),
+      entry('missing.js?v=abc#frag', { responseStatus: 404, transferSize: 300, decodedBodySize: 0 }),
       entry('dropped.js', { responseStatus: 0, transferSize: 0, decodedBodySize: 0 }),
       entry('no-status.js', { responseStatus: undefined, transferSize: 0, decodedBodySize: 0 }),
     ], prefix)
 
     expect(result.failedFiles).toBe(3)
     expect(result.failed).toEqual([
-      { file: 'missing.js', status: 404, protocol: 'h3', ms: 120 },
-      { file: 'dropped.js', status: 0, protocol: 'h2', ms: 120 },
-      { file: 'no-status.js', status: undefined, protocol: 'h2', ms: 120 },
+      { file: 'missing.js', status: 404, ms: 120 },
+      { file: 'dropped.js', status: 0, ms: 120 },
+      { file: 'no-status.js', status: undefined, ms: 120 },
     ])
   })
 
@@ -345,19 +346,16 @@ describe('failed module load diagnostics', () => {
     expect(result).toMatchObject({ ownFiles: 1, failedFiles: 0, failed: [] })
   })
 
-  it('reports how the site\'s files travelled, at most five failed names, and the connection when there is one', () => {
+  it('reports at most five failed names', () => {
     const entries = [
-      ...Array.from({ length: 8 }, (_, index) => entry(`f${index}.js`, { responseStatus: 0, transferSize: 0, decodedBodySize: 0, nextHopProtocol: index % 2 ? 'h3' : 'h2' })),
-      entry('fine.js', { nextHopProtocol: '' }),
+      ...Array.from({ length: 8 }, (_, index) => entry(`f${index}.js`, { responseStatus: 0, transferSize: 0, decodedBodySize: 0 })),
+      entry('fine.js'),
     ]
-    const result = describeModuleLoad(entries, prefix, { effectiveType: '4g', type: 'cellular', saveData: false })
+    const result = describeModuleLoad(entries, prefix)
 
     expect(result.ownFiles).toBe(9)
     expect(result.failedFiles).toBe(8)
     expect(result.failed).toHaveLength(5)
-    expect(result.protocols).toEqual({ h2: 4, h3: 4, unknown: 1 })
-    expect(result.connection).toEqual({ effectiveType: '4g', type: 'cellular', saveData: false })
-    expect(describeModuleLoad([], prefix).connection).toBeUndefined()
   })
 
   it('goes on the event as extra data only when given', () => {
@@ -384,7 +382,6 @@ describe('browser report pipeline', () => {
       allowed: () => overrides.allowed ?? true,
       pageUrl: () => `${page}/class/yoga`,
       resources: () => overrides.resources ?? [],
-      connection: () => ({ effectiveType: '4g' }),
       userAgent: () => iphoneApp,
       requestedModules: () => [`${ownScripts}ok.js`, `${ownScripts}gone.js?v=1`, `${ownScripts}never.js`, 'https://cdn.other.com/x.js'],
       pageState: () => ({ visibility: overrides.visibility ?? 'visible', online: true, msSinceStart: 1200, navigationType: 'reload' }),
@@ -485,8 +482,8 @@ describe('browser report pipeline', () => {
   it('names the failed file on a module load failure', () => {
     const { report, sent } = setup({
       resources: [
-        { name: `${ownScripts}ok.js`, duration: 10, transferSize: 900, decodedBodySize: 2000, responseStatus: 200, nextHopProtocol: 'h3' },
-        { name: `${ownScripts}gone.js?v=1`, duration: 40, transferSize: 0, decodedBodySize: 0, responseStatus: 0, nextHopProtocol: 'h3' },
+        { name: `${ownScripts}ok.js`, duration: 10, transferSize: 900, decodedBodySize: 2000, responseStatus: 200 },
+        { name: `${ownScripts}gone.js?v=1`, duration: 40, transferSize: 0, decodedBodySize: 0, responseStatus: 0 },
       ],
     })
 
@@ -498,9 +495,7 @@ describe('browser report pipeline', () => {
       // Asked for by the page, never recorded: WebKit keeps no entry for it.
       missingFiles: 1,
       missing: ['never.js'],
-      failed: [{ file: 'gone.js', status: 0, protocol: 'h3', ms: 40 }],
-      protocols: { h3: 2 },
-      connection: { effectiveType: '4g' },
+      failed: [{ file: 'gone.js', status: 0, ms: 40 }],
       inAppBrowser: true,
       page: { visibility: 'visible', online: true, msSinceStart: 1200, navigationType: 'reload' },
     })

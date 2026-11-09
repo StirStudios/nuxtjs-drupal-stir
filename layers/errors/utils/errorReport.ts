@@ -329,7 +329,7 @@ export function isIgnoredBrowserError(error: Error): boolean {
 
 // Crawlers, page checkers and automation: a script they give up loading is
 // not a visitor's problem, and every connected site would collect them.
-const AUTOMATED_USER_AGENT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headlesschrome|phantomjs|prerender|facebookexternalhit|preview/i
+const AUTOMATED_USER_AGENT = /bot|crawl|spider|slurp|lighthouse|pagespeed|headlesschrome|phantomjs|prerender|facebookexternalhit|meta-webindexer|meta-external|preview/i
 
 export function isAutomatedVisitor(userAgent?: string, webdriver?: boolean): boolean {
   return webdriver === true || AUTOMATED_USER_AGENT.test(userAgent || '')
@@ -369,20 +369,16 @@ export interface ResourceEntry {
   transferSize?: number
   decodedBodySize?: number
   responseStatus?: number
-  nextHopProtocol?: string
 }
 
 const MAX_FAILED_FILES = 5
 
-// Names the file behind a failed module load and how it travelled: the site's
-// own scripts and stylesheets that came back with no body or an error status,
-// the protocols (h2, h3) the site's files used, and the connection type where
-// the browser reports one (Safari does not). File names only, no query
-// string; nothing about the visitor.
+// Names the files behind a failed module load: the site's own scripts and
+// stylesheets that came back with no body or an error status. File names
+// only, no query string; nothing about the visitor.
 export function describeModuleLoad(
   entries: ResourceEntry[],
   prefix: string,
-  connection?: { effectiveType?: string, type?: string, saveData?: boolean },
   requested: string[] = [],
 ): Record<string, unknown> {
   const own = entries.filter(entry => entry.name.startsWith(prefix))
@@ -399,13 +395,6 @@ export function describeModuleLoad(
     return (typeof status === 'number' && status >= 400)
       || (!entry.decodedBodySize && !entry.transferSize && (status === 0 || status === undefined))
   })
-  const protocols: Record<string, number> = {}
-
-  for (const entry of own) {
-    const protocol = entry.nextHopProtocol || 'unknown'
-
-    protocols[protocol] = (protocols[protocol] || 0) + 1
-  }
 
   return {
     ownFiles: own.length,
@@ -415,13 +404,8 @@ export function describeModuleLoad(
     failed: failed.slice(0, MAX_FAILED_FILES).map(entry => ({
       file: fileOf(entry.name),
       status: entry.responseStatus,
-      protocol: entry.nextHopProtocol || undefined,
       ms: Math.round(entry.duration),
     })),
-    protocols,
-    connection: connection
-      ? { effectiveType: connection.effectiveType, type: connection.type, saveData: connection.saveData }
-      : undefined,
   }
 }
 
@@ -446,7 +430,6 @@ export interface BrowserReporterOptions {
   allowed: () => boolean
   pageUrl: () => string
   resources: () => ResourceEntry[]
-  connection?: () => { effectiveType?: string, type?: string, saveData?: boolean } | undefined
   userAgent?: () => string
   // The module files the page asked for (modulepreload links).
   requestedModules?: () => string[]
@@ -493,7 +476,7 @@ export function createBrowserReporter(options: BrowserReporterOptions) {
       userAgent,
       extra: moduleLoad
         ? {
-            ...describeModuleLoad(options.resources(), options.ownScripts, options.connection?.(), options.requestedModules?.()),
+            ...describeModuleLoad(options.resources(), options.ownScripts, options.requestedModules?.()),
             inAppBrowser: isInAppBrowser(userAgent),
             page,
           }

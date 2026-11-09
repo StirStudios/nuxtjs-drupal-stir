@@ -5,8 +5,6 @@ import {
   parseDsn,
 } from '../../utils/errorReport'
 
-type NetworkInformation = { effectiveType?: string, type?: string, saveData?: boolean }
-
 // Reports browser errors (uncaught errors, unhandled rejections and Vue
 // errors) to the site's GlitchTip, with the same small reporter the server
 // uses: nothing is downloaded, and nothing is sent without a DSN or without
@@ -29,7 +27,6 @@ export default defineNuxtPlugin({
       allowed,
       pageUrl: () => `${window.location.origin}${window.location.pathname}`,
       resources: () => performance.getEntriesByType('resource') as PerformanceResourceTiming[],
-      connection: () => (navigator as Navigator & { connection?: NetworkInformation }).connection,
       userAgent: () => navigator.userAgent,
       requestedModules: () => [...document.querySelectorAll<HTMLLinkElement>('link[rel="modulepreload"]')].map(link => link.href),
       pageState: () => ({
