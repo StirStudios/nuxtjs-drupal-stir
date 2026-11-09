@@ -10,6 +10,7 @@ export type InputType =
   | 'search'
   | 'password'
   | 'date'
+  | 'stir_availability_date'
   | 'datetime-local'
   | 'month'
   | 'time'
@@ -157,6 +158,7 @@ export interface WebformFieldProps {
   '#timezone'?: string
   '#dateMin'?: string
   '#dateMax'?: string
+  '#availabilityWebform'?: string
   '#disabled'?: boolean
   '#readonly'?: boolean
   '#floatingLabel'?: boolean

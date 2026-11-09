@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "producer": "stirstudios/stir_tools",
-  "contractVersion": "1.39.0",
+  "contractVersion": "1.40.0",
   "files": {
     "fixtures/account-settings-update-error.json": "55b9059ee49f33b77876622afd3dabc30369dec71f6eff56b9698610ab5a678f",
     "fixtures/account-settings-update-success.json": "23fca3887518f9ddbc9f52abae9bf2aab021dc9e0a185cbc83cfe22cea7c5076",
@@ -35,7 +35,7 @@
     "fixtures/webform-kitchen-sink.json": "97dbb5718438afedab3aad93128bbec7fc0a81a6a89a5d1faad64d4446610957",
     "fixtures/webform-submission-error.json": "ecffc4b1d317c61a9742cc9cbd2a36048d4a336e25ebdd86d4c7179fde800405",
     "fixtures/webform-submission-success.json": "2109e14f7a13a003e7473c006789fa71225f14467b2946a999d1ba70400fc233",
-    "manifest.json": "f0d7353f681c80030aa5c9af91c53ce001adbda1e47b6f406dc77eb696beba86",
+    "manifest.json": "2c2c19441446580dd57059823e0edba23d76e2501d9ee5128eef197266101e8a",
     "schemas/account-settings-update.schema.json": "6f3362b418e3b31afbd54e9f76be2d6bd052f8b4a59383ebdcab4666941ae252",
     "schemas/account-settings-values.schema.json": "189523229869b68ba03c8cbee22c83855d6f869b8a10ab06170463d241efb1ea",
     "schemas/account-snapshot.schema.json": "e2968ed767a19e6d206f0829eeab7ef01693bbcd66b2557d9aff0ae000e86786",
@@ -57,6 +57,6 @@
     "schemas/sitemap.schema.json": "d78833ae5008e807c0a047feb83e539f2c7a1e1d429ec654516d2c251b7dbad9",
     "schemas/webform-submission-response.schema.json": "2c587f3c7a25efc97c20c4bafaaedb988a6442731e9f19dceba2acc530849b41",
     "schemas/webform-submission-sample.schema.json": "0b27ece2f8fcf44ceba7963567cad17bf6d8e1ce1bcce44c87c6afb0b811ad98",
-    "schemas/webform.schema.json": "ef1f2d707620662999b4260ffdfe7e3abee2af4d419738189ed4c50cd67b2082"
+    "schemas/webform.schema.json": "0e1efab37f7669330b37e60a3cec1d0547a743031f27454f048a250b21f2223c"
   }
 }

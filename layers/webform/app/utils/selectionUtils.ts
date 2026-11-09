@@ -68,10 +68,10 @@ export const syncLinkedSelections = (
   )
 }
 
-export const enforceMaxSelected = (
-  val: string[],
+export const enforceMaxSelected = <T>(
+  val: T[],
   max: number = Infinity,
-): string[] => {
+): T[] => {
   if (val.length > max) {
     return val.slice(val.length - max)
   }
