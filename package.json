@@ -123,7 +123,7 @@
     "setup:hooks": "git config core.hooksPath .githooks"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.151",
+    "@iconify-json/lucide": "^1.2.152",
     "@internationalized/date": "^3.12.4",
     "@nuxt/image": "^2.2.1",
     "@nuxt/kit": "^4.6.4",
@@ -152,7 +152,7 @@
     "nuxt": "^4.6.4",
     "nuxt-vitalizer": "^3.0.0",
     "nuxtjs-drupal-ce": "2.9.0",
-    "rate-limiter-flexible": "^11.3.0",
+    "rate-limiter-flexible": "^11.4.0",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.5",
     "ultrahtml": "^1.7.0",
@@ -185,7 +185,7 @@
     "@axe-core/playwright": "^4.14.0",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/schema": "^4.6.4",
-    "@nuxt/test-utils": "^4.3.4",
+    "@nuxt/test-utils": "^4.4.0",
     "@playwright/test": "^1.65.0",
     "@tiptap/extension-document": "^3.33.0",
     "@tiptap/extension-paragraph": "^3.33.0",
