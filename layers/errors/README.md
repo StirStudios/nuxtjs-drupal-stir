@@ -47,8 +47,6 @@ away.
     the page asked for (its `modulepreload` links) that never arrived, which
     is how a cancelled load shows on iPhones, where Safari keeps no record of
     it (file names only, no query string);
-  - the protocols (h2, h3) the site's files used, and the connection type
-    where the browser reports one (Safari does not);
   - the page's state: whether it was visible, whether the device was online,
     how long after the page started it happened, and how the page was opened
     (`navigate`, `reload`, `back_forward`).
