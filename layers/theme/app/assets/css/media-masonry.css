@@ -17,6 +17,11 @@
     margin-bottom: var(--masonry-gap);
     overflow: clip;
     grid-column-start: var(--masonry-lane-default, 1);
+
+    /* Fill the trimmed item so its image crops and bottom overlays (credits) stay visible. */
+    > * {
+      height: 100%;
+    }
   }
 
   @media (width >= 30rem) {
