@@ -57,6 +57,7 @@ export default withNuxt(
     files: [
       'layers/auth/app/components/Account/ProfileForm.vue',
       'layers/webform/app/components/Field/Address.vue',
+      'layers/webform/app/components/Field/AvailabilityDate.vue',
       'layers/webform/app/components/Field/Checkbox.vue',
       'layers/webform/app/components/Field/Checkboxes.vue',
       'layers/webform/app/components/Field/Date.vue',

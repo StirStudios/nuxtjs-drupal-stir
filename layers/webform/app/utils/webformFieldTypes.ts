@@ -19,6 +19,7 @@ export const WEBFORM_FIELD_TYPES = new Set([
   'checkboxes',
   'datetime',
   'date',
+  'stir_availability_date',
   'address',
   'webform_likert',
   'processed_text',

@@ -69,6 +69,13 @@ field: it is reported with `console.error`, left out of the form, its state
 and its validation, and left to Drupal to judge. Add a component and its type
 to `WEBFORM_FIELD_TYPES` when a project needs one.
 
+### Availability dates
+
+`stir_availability_date` (from the `stir_webform_availability` Drupal module)
+renders an inline calendar. Booked days come month by month from
+`/api/webform/availability`; Drupal applies every rule and checks the dates
+again on submit.
+
 ### Dates
 
 Date and datetime pickers disable the days outside the field's `#dateMin`
