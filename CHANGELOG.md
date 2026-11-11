@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Pages
+
+- **Fixed: a path that matches a CMS API route answers 404, not 500.** A
+  front-end request such as `/api/menu_items/main` reached the CMS route of the
+  same name, got its JSON with a 200, and failed rendering it as a page. The
+  catch-all page now answers 404 when the response has no page content.
+
 ### Errors
 
 - **Changed: a failed module load report is smaller.** It no longer carries

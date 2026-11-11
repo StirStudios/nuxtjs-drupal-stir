@@ -1,4 +1,4 @@
-import { useRoute } from '#imports'
+import { clearError, useError, useRoute } from '#imports'
 import { describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, inject, ref } from 'vue'
@@ -79,6 +79,18 @@ describe('Drupal PageRoute ownership', () => {
     await refresh?.()
 
     expect(state.refreshNuxtData).toHaveBeenCalledWith('page:/about')
+    wrapper.unmount()
+  })
+
+  it('answers 404 when the CMS returns JSON that is not a page', async () => {
+    state.fetchPage.mockResolvedValue(ref([{ title: 'Home', relative: '/' }]))
+
+    const wrapper = await mountSuspended(PageRoute, {
+      global: { stubs: { NuxtLayout: Layout } },
+    })
+
+    expect(useError().value).toMatchObject({ statusCode: 404 })
+    clearError()
     wrapper.unmount()
   })
 })

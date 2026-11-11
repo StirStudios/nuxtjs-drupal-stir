@@ -39,6 +39,12 @@ const page = await fetchPage(
   customPageError,
 )
 
+// A front-end path that matches a CMS API route (/api/menu_items/main) gets
+// that route's JSON with a 200, which is not a page.
+if (!page.value?.content) {
+  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+}
+
 // fetchPage() is a keyed useFetch; this route component is keyed per page, so
 // the key is stable for its lifetime.
 const pageDataKey = page.value?.key
