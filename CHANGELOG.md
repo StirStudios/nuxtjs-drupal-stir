@@ -24,6 +24,12 @@ untouched do not need one.
   the server HTML stayed invisible when scripting was off. Elements rendered
   by `RevealMotion` now carry a `reveal-motion` class, and an
   `@media (scripting: none)` rule shows them.
+- **Added: `DrupalViewRowReveal` for custom View grids.** A View's `#grid`
+  slot skips the layer's row reveals, so a site grid that did not wire
+  `getRowMotionProps` never animated. Wrap each row in
+  `<DrupalViewRowReveal :index="i">` (optional `as`) to reveal it with the
+  page's effect and stagger. In development, a View on an animated page warns
+  when its `#grid` slot renders none. See `docs/downstream-overrides.md`.
 
 ### Motion
 

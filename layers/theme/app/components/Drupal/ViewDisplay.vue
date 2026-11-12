@@ -10,7 +10,7 @@ import {
   shouldPersistDrupalViewScroll,
   useDrupalViewScrollRestore,
 } from '#stir/composables/useDrupalViewScrollRestore'
-import { drupalViewQueryNamespaceKey } from '#stir/utils/drupalViewContext'
+import { drupalViewQueryNamespaceKey, drupalViewRowRevealKey } from '#stir/utils/drupalViewContext'
 import {
   layoutImageDeliveryProfileKey,
   resolveGridImageDeliveryProfile,
@@ -162,6 +162,22 @@ const getRowMotionProps = (index: number) =>
     + getRevealDelayMs(index, { mode: 'dense' }),
     { ssrVisible: true },
   )
+
+// A site's #grid slot reveals rows by wrapping each in DrupalViewRowReveal.
+let rowRevealCount = 0
+
+provide(drupalViewRowRevealKey, {
+  getRowMotionProps,
+  register: () => { rowRevealCount += 1 },
+})
+
+if (import.meta.dev) {
+  onMounted(() => {
+    if (vueSlots.grid && hasRows() && 'whileInView' in getRowMotionProps(0) && !rowRevealCount) {
+      console.warn('[stir] This View\'s #grid slot renders no DrupalViewRowReveal, so its rows do not reveal with the page animation.')
+    }
+  })
+}
 
 </script>
 

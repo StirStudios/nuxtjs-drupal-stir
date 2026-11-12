@@ -163,6 +163,23 @@ announces loading, errors, and updated or empty results, so a custom bar does
 not need its own. Keep visible labels on form controls and use `removeLabel`
 when a chip shows only the value.
 
+A View's `#grid` slot replaces the layer's grid, including its row reveals.
+Wrap each row in `DrupalViewRowReveal` so it reveals with the page's effect
+and stagger; outside a View it renders the row plainly:
+
+```vue
+<template #grid="{ rows, renderCustomElements, handleViewClick }">
+  <div class="grid gap-6 md:grid-cols-3" @click.capture="handleViewClick">
+    <DrupalViewRowReveal v-for="(row, i) in rows" :key="row.key" :index="i" as="article">
+      <component :is="row.type === 'dynamic' ? renderCustomElements(row.node) : row.node" />
+    </DrupalViewRowReveal>
+  </div>
+</template>
+```
+
+In development, a View whose page animates warns in the console when its
+`#grid` slot renders no `DrupalViewRowReveal`.
+
 Webform styling:
 
 ```ts
