@@ -189,6 +189,7 @@
       "layers/theme/app/components/App/Header.vue",
       "layers/theme/app/components/App/Integrations.vue",
       "layers/theme/app/components/App/Logo.vue",
+      "layers/theme/app/components/App/PageCover.vue",
       "layers/theme/app/components/App/ScrollToTop.vue",
       "layers/theme/app/components/ButtonModal.vue",
       "layers/theme/app/components/CardGradient.vue",
@@ -432,6 +433,7 @@
       "layers/theme/app/utils/pageLayout.ts",
       "layers/theme/app/utils/pageRefresh.ts",
       "layers/theme/app/utils/pageRequest.ts",
+      "layers/theme/app/utils/pageTransition.ts",
       "layers/theme/app/utils/paragraphLayoutArrangement.ts",
       "layers/theme/app/utils/paragraphLayoutTransition.ts",
       "layers/theme/app/utils/presentationClasses.ts",
@@ -471,7 +473,8 @@
       "layers/theme/app/plugins/color-mode-lock.client.ts",
       "layers/theme/app/plugins/drupalPageLayout.client.ts",
       "layers/theme/app/plugins/drupalPageLayout.server.ts",
-      "layers/theme/app/plugins/nav-lock.client.ts"
+      "layers/theme/app/plugins/nav-lock.client.ts",
+      "layers/theme/app/plugins/page-crossfade.ts"
     ],
     "middleware": [
       "layers/auth/app/middleware/auth-account.global.ts",
@@ -584,6 +587,7 @@
         "layers/theme/app/components/App/Header.vue",
         "layers/theme/app/components/App/Integrations.vue",
         "layers/theme/app/components/App/Logo.vue",
+        "layers/theme/app/components/App/PageCover.vue",
         "layers/theme/app/components/App/ScrollToTop.vue",
         "layers/theme/app/components/ButtonModal.vue",
         "layers/theme/app/components/CardGradient.vue",
@@ -827,6 +831,7 @@
         "layers/theme/app/utils/pageLayout.ts",
         "layers/theme/app/utils/pageRefresh.ts",
         "layers/theme/app/utils/pageRequest.ts",
+        "layers/theme/app/utils/pageTransition.ts",
         "layers/theme/app/utils/paragraphLayoutArrangement.ts",
         "layers/theme/app/utils/paragraphLayoutTransition.ts",
         "layers/theme/app/utils/presentationClasses.ts",
@@ -863,23 +868,23 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 142,
+    "components": 143,
     "composables": 75,
-    "utils": 81,
-    "plugins": 11,
+    "utils": 82,
+    "plugins": 12,
     "middleware": 5,
     "serverRoutes": 33,
     "productionDependencies": 37,
     "developmentDependencies": 25,
-    "tests": 261,
+    "tests": 263,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
-      "nuxt": 114,
+      "nuxt": 115,
       "scripts": 6,
       "server": 37,
       "unit": 12,
-      "utils": 75
+      "utils": 76
     }
   },
   "tests": [
@@ -952,6 +957,7 @@
     "tests/nuxt/runtime/NodePage.nuxt.spec.ts",
     "tests/nuxt/runtime/NodeTeaser.nuxt.spec.ts",
     "tests/nuxt/runtime/OptionValue.nuxt.spec.ts",
+    "tests/nuxt/runtime/PageCover.nuxt.spec.ts",
     "tests/nuxt/runtime/PageRoute.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphAccordion.nuxt.spec.ts",
     "tests/nuxt/runtime/ParagraphButton.nuxt.spec.ts",
@@ -1113,6 +1119,7 @@
     "tests/utils/nuxtUiProps.spec.ts",
     "tests/utils/nuxtUiTheme.spec.ts",
     "tests/utils/pageRequest.spec.ts",
+    "tests/utils/pageTransition.spec.ts",
     "tests/utils/paragraphRevealOwnership.spec.ts",
     "tests/utils/pathMatch.spec.ts",
     "tests/utils/presentationClasses.spec.ts",

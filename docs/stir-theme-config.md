@@ -966,6 +966,46 @@ Content stays visible in the server-rendered HTML and animates after
 hydration. A `motionProps` object, used by Drupal paragraphs, takes precedence
 over the shorthand props.
 
+### 🎞️ Page transitions
+
+Off by default. A site opts in with one type:
+
+```ts
+pageTransition: {
+  type: 'none', // 'crossfade' | 'cover'
+  durationMs: 250, // crossfade only
+  cover: {
+    color: 'var(--ui-primary)',
+    surface: { component: 'AppTransitionSurface', props: {}, class: '' },
+    shape: 'circle', // 'square' | 'triangle'
+    icon: 'i-custom-logo',
+    iconClass: 'size-20 text-white',
+    coverDurationMs: 620,
+    revealDurationMs: 720,
+    ease: [0.76, 0, 0.24, 1],
+  },
+},
+```
+
+- For every type, the site header (`.stir-header`) and the editors' admin bar
+  (`.admin-ui-nav-root`) stay still, and `prefers-reduced-motion` turns
+  transitions off.
+- `crossfade` uses browser View Transitions. The theme layer reads the type
+  from the app configs at build time and turns on Nuxt's
+  `experimental.viewTransition`, so changing it with `updateAppConfig()` at
+  runtime has no effect. Old and new pages crossfade over `durationMs`; new
+  content then arrives through the usual reveals. Browsers without View
+  Transitions navigate without one.
+- `cover` grows a panel from the pointer that started the navigation (the
+  top-right corner for keyboard and back/forward), navigates behind it with
+  scroll locked, waits for `page:finish` (at most 6 s) and fades it out. It
+  runs from router guards, so links, `navigateTo()` and back/forward all
+  transition and click handlers are untouched. Query and hash changes on the
+  same path do not transition. The panel sits at `z-index: 45`, under the
+  header and admin bar. `surface.component` must be a global component.
+  While it runs, `html[data-page-transition]` is set for site styles, such as
+  fading an open menu panel.
+
 ### 🧩 Card and gradients
 
 ```ts

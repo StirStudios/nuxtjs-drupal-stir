@@ -348,6 +348,13 @@ export default defineAppConfig({
       },
     },
 
+    // Opt-in page transitions; see docs/stir-theme-config.md.
+    pageTransition: {
+      type: 'none',
+      durationMs: 250,
+      cover: {},
+    },
+
     scrollButton: {
       enabled: true,
       base: 'fixed bottom-4 left-4 z-50 rounded-full p-2 shadow-md transition-opacity duration-300',

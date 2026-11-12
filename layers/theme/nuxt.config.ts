@@ -22,6 +22,7 @@ import {
   resolveImageCdnBase,
 } from './build/imageCdn'
 import { refuseProductionCalculatorOverride } from './build/calculatorLoader'
+import { pageTransitionViewTransition } from './build/pageTransition'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
 import { STIR_PRESENTATION_DEFAULTS } from './app/utils/presentationDefaults'
@@ -151,7 +152,10 @@ export default defineNuxtConfig({
 
       const importAppConfig = async (path: string): Promise<{
         ui?: { colors?: Record<string, unknown> }
-        stirTheme?: { presentation?: PresentationConfig }
+        stirTheme?: {
+          presentation?: PresentationConfig
+          pageTransition?: { type?: string }
+        }
       }> => {
         const globals = globalThis as typeof globalThis & {
           defineAppConfig?: (config: unknown) => unknown
@@ -183,6 +187,7 @@ export default defineNuxtConfig({
       // Every layer's app config, nearest first, as Nuxt merges them: a
       // catalogue declared in an intermediate layer must be compiled too.
       const layerPresentations: PresentationConfig[] = []
+      let pageTransitionType: string | undefined
 
       for (const layer of nuxt.options._layers) {
         const layerAppConfigPath = await findPath(resolvePath(layer.config.srcDir, 'app.config'))
@@ -193,7 +198,13 @@ export default defineNuxtConfig({
             : await importAppConfig(layerAppConfigPath)
 
           layerPresentations.push(layerAppConfig.stirTheme?.presentation || {})
+          pageTransitionType ??= layerAppConfig.stirTheme?.pageTransition?.type
         }
+      }
+
+      // Nuxt adds its view-transition plugin after modules:done.
+      if (pageTransitionViewTransition(pageTransitionType)) {
+        nuxt.options.experimental.viewTransition = true
       }
 
       if (nuxt.options.spaLoadingTemplate !== false) {
