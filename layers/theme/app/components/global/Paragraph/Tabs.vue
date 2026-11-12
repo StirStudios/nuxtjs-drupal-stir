@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBreakpoints, breakpointsTailwind, useScroll } from '@vueuse/core'
+import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import type { ComponentPublicInstance, VNode } from 'vue'
 
 defineProps<{
@@ -48,30 +48,12 @@ const tabList = computed(
       '[role="tablist"]',
     ) ?? null,
 )
-const { arrivedState, measure } = useScroll(tabList)
-const listFade = computed(() =>
-  isMobile.value
-    ? [
-        !arrivedState.left && 'mask-l-from-[calc(100%-3rem)]',
-        !arrivedState.right && 'mask-r-from-[calc(100%-3rem)]',
-      ]
-    : [],
-)
+const { fade: listFade, center } = useScrollRow(tabList, isMobile)
 
-watch([tabList, isMobile], () => nextTick(measure))
-
-// Scrolls only the tab row sideways, never the page.
+// Keeps the active tab in view.
 watch(active, async () => {
-  if (!isMobile.value) return
   await nextTick()
-  const list = tabList.value
-  const tab = list?.querySelector<HTMLElement>('[data-state="active"]')
-
-  if (!list || !tab) return
-  list.scrollTo({
-    left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
-    behavior: 'smooth',
-  })
+  center(tabList.value?.querySelector<HTMLElement>('[data-state="active"]'))
 })
 </script>
 
