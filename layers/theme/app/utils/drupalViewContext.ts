@@ -6,3 +6,11 @@ export const drupalViewQueryNamespaceKey: InjectionKey<ComputedRef<string | unde
 
 export const drupalViewQueryIdentityKey: InjectionKey<ComputedRef<DrupalViewQueryNamespaceIdentity>> =
   Symbol('stirDrupalViewQueryIdentity')
+
+export type DrupalViewRowReveal = {
+  getRowMotionProps: (index: number) => Record<string, unknown>
+  register: () => void
+}
+
+export const drupalViewRowRevealKey: InjectionKey<DrupalViewRowReveal> =
+  Symbol('stirDrupalViewRowReveal')

@@ -13,6 +13,91 @@ untouched do not need one.
 
 ## Unreleased
 
+### Page transitions
+
+- **Added: opt-in page transitions, `stirTheme.pageTransition`.** `type`
+  defaults to `'none'`, so nothing changes until a site opts in.
+  `'crossfade'` turns on Nuxt's View Transitions at build time and crossfades
+  the page over `durationMs` (250). `'cover'` grows a panel (colour, global
+  surface component, circle/square/triangle, centre icon, durations and ease)
+  from the pointer, navigates behind it and fades it out after `page:finish`.
+  It runs from router guards, so back/forward transitions too and link clicks
+  are never intercepted; `html[data-page-transition]` is set while it runs.
+  Both keep `.stir-header` and `.admin-ui-nav-root` still and are off under
+  `prefers-reduced-motion`. Sites with their own click-intercepting
+  transition can drop it for `type: 'cover'`. See
+  `docs/stir-theme-config.md`.
+
+### Motion
+
+- **Changed: reveals start as soon as a block reaches the trigger line.**
+  `stirTheme.animations.reveal.threshold` now defaults to `0` (was `0.1`) and
+  `rootMargin` to `0px 0px -10% 0px` (was `-12%`). Before, a block had to show
+  10% of its own height, so tall sections on phones left long empty gaps while
+  scrolling. A site that wants later reveals can still set `threshold`.
+- **Fixed: reveals are visible without JavaScript.** Content a reveal hides in
+  the server HTML stayed invisible when scripting was off. Elements rendered
+  by `RevealMotion` now carry a `reveal-motion` class, and an
+  `@media (scripting: none)` rule shows them.
+- **Added: `DrupalViewRowReveal` for custom View grids.** A View's `#grid`
+  slot skips the layer's row reveals, so a site grid that did not wire
+  `getRowMotionProps` never animated. Wrap each row in
+  `<DrupalViewRowReveal :index="i">` (optional `as`) to reveal it with the
+  page's effect and stagger. In development, a View on an animated page warns
+  when its `#grid` slot renders none. See `docs/downstream-overrides.md`.
+- **Fixed: remounted content keeps its stagger delay.** A reveal scope gave
+  every component setup a new index and never reused one, so content that
+  remounts within a page (tabs, toggles, filter changes) revealed with
+  ever-longer delays. An unmounted component now frees its index, and the
+  next one takes the lowest free index.
+
+### Motion
+
+- **Changed: reveals start as soon as a block reaches the trigger line.**
+  `stirTheme.animations.reveal.threshold` now defaults to `0` (was `0.1`) and
+  `rootMargin` to `0px 0px -10% 0px` (was `-12%`). Before, a block had to show
+  10% of its own height, so tall sections on phones left long empty gaps while
+  scrolling. A site that wants later reveals can still set `threshold`.
+- **Fixed: reveals are visible without JavaScript.** Content a reveal hides in
+  the server HTML stayed invisible when scripting was off. Elements rendered
+  by `RevealMotion` now carry a `reveal-motion` class, and an
+  `@media (scripting: none)` rule shows them.
+- **Added: `DrupalViewRowReveal` for custom View grids.** A View's `#grid`
+  slot skips the layer's row reveals, so a site grid that did not wire
+  `getRowMotionProps` never animated. Wrap each row in
+  `<DrupalViewRowReveal :index="i">` (optional `as`) to reveal it with the
+  page's effect and stagger. In development, a View on an animated page warns
+  when its `#grid` slot renders none. See `docs/downstream-overrides.md`.
+- **Fixed: remounted content keeps its stagger delay.** A reveal scope gave
+  every component setup a new index and never reused one, so content that
+  remounts within a page (tabs, toggles, filter changes) revealed with
+  ever-longer delays. An unmounted component now frees its index, and the
+  next one takes the lowest free index.
+- **Deprecated: `revealMotionKey`.** It has always been `0` since reveals
+  stopped remounting content, so the layer no longer puts it in component
+  keys. It stays on `useRevealMotionConfig()` and the View `#grid` slot props
+  for now and will be removed in a future release; drop it from your own keys,
+  and use `DrupalViewRowReveal` for custom grid rows.
+- **Changed: `RevealMotionElement` also plays entrances.** It now animates
+  `trigger: 'enter'` motion (`animate`) as well as viewport reveals, and the
+  Hero uses it instead of wiring `RevealMotion` directly. A Hero without an
+  animation no longer loads the motion library for its text.
+
+### Motion
+
+- **Fixed: reveals flashed after a page change.** A revealing block drawn on
+  the client, as on every page reached through the site, showed at full
+  opacity, then hid on mount and faded back in. It now starts hidden. Content
+  rendered on the server still stays visible until hydration ends, as before.
+  No configuration.
+- **Changed: a page's animation now reaches its hero after a page change.**
+  A hero with no animation of its own used to skip the page's inherited
+  reveal, so pages with a hero on top arrived with no motion. Its text now
+  enters with the page's effect after a page change. On the first load it is
+  already there, so it never delays the first paint or Lighthouse's LCP. A
+  hero's own animation setting is unchanged. Reduced motion shows everything at
+  once, as before.
+
 ### Media
 
 - **Changed: media heights are taller on wide screens.** The Small, Break and

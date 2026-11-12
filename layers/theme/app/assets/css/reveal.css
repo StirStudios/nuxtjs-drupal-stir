@@ -1,0 +1,9 @@
+/* Reveals can be hidden in the server HTML (Media's motion-safe:opacity-0,
+ * or motion-v's inline start state) and only JavaScript shows them. Without
+ * scripting, show them as they are. */
+@media (scripting: none) {
+  .reveal-motion {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

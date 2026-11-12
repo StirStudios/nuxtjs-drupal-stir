@@ -8,6 +8,7 @@ const embedded = computed(() => appConfig.stirTheme.embedded === true)
 const scrollButtonEnabled = computed(
   () => appConfig.stirTheme.scrollButton?.enabled !== false,
 )
+const pageCover = computed(() => appConfig.stirTheme.pageTransition?.type === 'cover')
 // Project-registered browser-only components, such as a custom cursor or page
 // transition. Unknown names render nothing.
 const clientComponents = computed(() =>
@@ -45,6 +46,9 @@ const clientComponents = computed(() =>
     <template v-if="!embedded">
       <LazyAppScrollToTop v-if="scrollButtonEnabled" />
       <LazyAppIntegrations />
+      <ClientOnly v-if="pageCover">
+        <LazyAppPageCover />
+      </ClientOnly>
       <ClientOnly v-if="clientComponents.length">
         <component
           :is="entry.component"

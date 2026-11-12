@@ -531,6 +531,41 @@ type StirThemeAnimationsConfig = {
   reveal?: StirThemeRevealConfig
 } & LooseRecord
 
+type StirThemePageTransitionType = 'none' | 'crossfade' | 'cover'
+
+type StirThemePageCoverConfig = {
+  /** CSS colour of the panel. Default `var(--ui-primary)`. */
+  color?: string
+  /** Global component drawn inside the panel, such as a branded surface. */
+  surface?: {
+    component: string
+    props?: LooseRecord
+    class?: ClassValue
+  }
+  /** Shape that grows from the pointer, or from the top-right corner. Default circle. */
+  shape?: 'circle' | 'square' | 'triangle'
+  /** Icon name shown in the centre of the cover, for example a logo icon. */
+  icon?: string
+  iconClass?: ClassValue
+  /** Default 620. */
+  coverDurationMs?: number
+  /** Fade-out once the new page has rendered. Default 720. */
+  revealDurationMs?: number
+  /** Cubic-bezier control points. Default [0.76, 0, 0.24, 1]. */
+  ease?: [number, number, number, number]
+}
+
+type StirThemePageTransitionConfig = {
+  /**
+   * Default 'none'. 'crossfade' uses browser View Transitions and is read
+   * at build time; 'cover' draws a panel over the page while it changes.
+   */
+  type?: StirThemePageTransitionType
+  /** Crossfade duration. Default 250. */
+  durationMs?: number
+  cover?: StirThemePageCoverConfig
+}
+
 type StirThemeArticleConfig = {
   container?: ClassValue
 } & LooseRecord
@@ -591,6 +626,7 @@ type StirThemeConfig = {
   card?: StirThemeCardConfig
   gradients?: Record<string, ClassValue>
   animations?: StirThemeAnimationsConfig
+  pageTransition?: StirThemePageTransitionConfig
   scrollButton?: StirThemeScrollButtonConfig
   /**
    * Render only the page and its layout, without the skip link, route
@@ -668,6 +704,11 @@ type ResolvedStirThemeConfig = StirThemeConfig & {
   card: ResolvedStirThemeCardConfig
   gradients: Record<string, ClassValue>
   animations: StirThemeAnimationsConfig
+  pageTransition: StirThemePageTransitionConfig & {
+    type: StirThemePageTransitionType
+    durationMs: number
+    cover: StirThemePageCoverConfig
+  }
   scrollButton: StirThemeScrollButtonConfig
   error: StirThemeErrorConfig
   auth: StirThemeAuthConfig

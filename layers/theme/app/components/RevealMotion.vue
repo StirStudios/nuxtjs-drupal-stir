@@ -11,7 +11,7 @@ export default defineComponent({
       LazyMotion,
       { features: domAnimation, strict: true },
       {
-        default: () => h(MotionElement, attrs, slots),
+        default: () => h(MotionElement, { ...attrs, class: ['reveal-motion', attrs.class] }, slots),
       },
     )
   },

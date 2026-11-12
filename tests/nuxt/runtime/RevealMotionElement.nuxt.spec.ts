@@ -30,6 +30,25 @@ describe('RevealMotionElement shorthand', () => {
     wrapper.unmount()
   })
 
+  it('reveals as soon as any part of a block crosses the trigger line', async () => {
+    let motionProps: Record<string, unknown> = {}
+    const Probe = defineComponent({
+      setup() {
+        const { getRevealMotionProps } = useRevealMotionConfig()
+
+        return () => {
+          motionProps = getRevealMotionProps('fade-up')
+          return h('div')
+        }
+      },
+    })
+    const wrapper = await mountSuspended(Probe)
+
+    await wrapper.vm.$forceUpdate()
+    expect(motionProps.inViewOptions).toMatchObject({ amount: 0, margin: '0px 0px -10% 0px' })
+    wrapper.unmount()
+  })
+
   it('renders the requested element with attributes and slot content', async () => {
     const wrapper = await mountSuspended(RevealMotionElement, {
       props: { as: 'h2', effect: 'fade-up', durationMs: 600, distancePx: 24 },
@@ -38,6 +57,19 @@ describe('RevealMotionElement shorthand', () => {
     })
 
     expect(wrapper.get('h2.section-title').text()).toBe('Selected work')
+    wrapper.unmount()
+  })
+
+  it('animates an entrance (trigger: enter) as well as a viewport reveal', async () => {
+    const wrapper = await mountSuspended(RevealMotionElement, {
+      props: {
+        as: 'div',
+        motionProps: { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } },
+      },
+      slots: { default: () => 'Hero' },
+    })
+
+    expect(wrapper.get('div.reveal-motion').text()).toBe('Hero')
     wrapper.unmount()
   })
 

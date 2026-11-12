@@ -103,7 +103,7 @@ const mediaComponent = computed(
   () => resolveComponent(drupalMediaComponentName(mediaProps.value.type)) as Component,
 )
 
-const { getRevealMotionProps, getRevealDelayMs, revealMotionKey } =
+const { getRevealMotionProps, getRevealDelayMs } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 
@@ -144,7 +144,7 @@ const shouldAnimate = computed(() =>
 
   <RevealMotion
     v-else-if="!overlay || isDocument || isAudio"
-    :key="`media-${props.index}-${revealMotionKey}`"
+    :key="`media-${props.index}`"
     class="motion-safe:opacity-0"
     v-bind="revealMotionProps"
   >
@@ -160,7 +160,7 @@ const shouldAnimate = computed(() =>
 
   <RevealMotion
     v-else
-    :key="`media-overlay-${props.index}-${revealMotionKey}`"
+    :key="`media-overlay-${props.index}`"
     as-child
     v-bind="shouldAnimate ? revealMotionProps : undefined"
   >

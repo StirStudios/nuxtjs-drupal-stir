@@ -54,7 +54,7 @@ const canInlineEdit = computed(
   () => editTarget.value !== null && canEditInline(props.editLink),
 )
 const richTextClass = 'prose max-w-none'
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+const { getRevealDelayMs, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 const motionProps = useRevealMotionProps(
@@ -147,7 +147,7 @@ watch(
       <template v-else>
         <LazyRevealMotion
           v-if="hasRevealMotion"
-          :key="`text-${paragraphId}-${revealMotionKey}`"
+          :key="`text-${paragraphId}`"
           as-child
           v-bind="motionProps"
         >

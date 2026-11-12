@@ -102,7 +102,7 @@ const {
   staggerIndex,
 } =
   useRevealMotionScope(() => props.direction)
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+const { getRevealDelayMs, useRevealMotionProps } =
   useRevealMotionConfig()
 const layoutMotionProps = useRevealMotionProps(
   () => animationScope.value === 'layout'
@@ -136,7 +136,7 @@ provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
 <template>
   <RevealMotionElement
     :id="sectionId"
-    :key="`layout-${id}-${'whileInView' in layoutMotionProps ? revealMotionKey : 0}`"
+    :key="`layout-${id}`"
     :as="layoutTag"
     :class="[presentationClasses || 'content', spacing]"
     :motion-props="layoutMotionProps"

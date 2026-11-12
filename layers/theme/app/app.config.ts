@@ -341,9 +341,18 @@ export default defineAppConfig({
         distancePx: 50,
         staggerMs: 110,
         ease: [0.22, 1, 0.36, 1],
-        threshold: 0.1,
-        rootMargin: '0px 0px -12% 0px',
+        // Share of a block that must be inside the trigger line (rootMargin)
+        // before it reveals; 0 reveals as soon as any of it crosses.
+        threshold: 0,
+        rootMargin: '0px 0px -10% 0px',
       },
+    },
+
+    // Opt-in page transitions; see docs/stir-theme-config.md.
+    pageTransition: {
+      type: 'none',
+      durationMs: 250,
+      cover: {},
     },
 
     scrollButton: {

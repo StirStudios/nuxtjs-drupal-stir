@@ -23,6 +23,7 @@ export type RevealMotionResolved = {
 export type RevealStaggerMode = 'default' | 'dense'
 
 export type RevealMotionOptions = {
+  /** true (default): server-rendered content stays visible while hydrating and only reveals later; false: it starts hidden in the server HTML. */
   ssrVisible?: boolean
   trigger?: 'enter' | 'in-view'
   durationMs?: number
@@ -35,8 +36,8 @@ export const REVEAL_DEFAULTS = {
   distancePx: 50,
   staggerMs: 110,
   ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-  threshold: 0.1,
-  rootMargin: '0px 0px -12% 0px',
+  threshold: 0,
+  rootMargin: '0px 0px -10% 0px',
 }
 
 const DENSE_REVEAL_STAGGER_GROUP = 6
@@ -175,8 +176,12 @@ export function useRevealMotionConfig() {
   const { resolved } = useRevealConfig()
   const preferredMotion = usePreferredReducedMotion()
   const supportsIntersectionObserver = useSupported(() => 'IntersectionObserver' in window)
-  const hasMounted = ref(false)
-  // Keep the public key stable: initializing an animation must not remount its content.
+  // Server-rendered content stays visible until hydration ends, so it never
+  // blinks out. Content rendered on the client after that (a page change) has
+  // no server HTML to keep, so it starts hidden instead of showing, hiding on
+  // mount and then revealing.
+  const hasMounted = ref(import.meta.client && !useNuxtApp().isHydrating)
+  /** @deprecated Always 0; no longer needed in keys. Removed in a future release. */
   const revealMotionKey = ref(0)
 
   onMounted(() => {

@@ -5,6 +5,7 @@
 @import './media';
 @import './media-masonry';
 @import './motion';
+@import './reveal';
 @import '#stir-presentation-source';
 
 @theme static {
