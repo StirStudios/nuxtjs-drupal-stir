@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Motion
+
+- **Fixed: reveals flashed after a page change.** A revealing block drawn on
+  the client, as on every page reached through the site, showed at full
+  opacity, then hid on mount and faded back in. It now starts hidden. Content
+  rendered on the server still stays visible until hydration ends, as before.
+  No configuration.
+
 ### Media
 
 - **Changed: media heights are taller on wide screens.** The Small, Break and

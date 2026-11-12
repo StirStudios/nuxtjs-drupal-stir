@@ -175,7 +175,11 @@ export function useRevealMotionConfig() {
   const { resolved } = useRevealConfig()
   const preferredMotion = usePreferredReducedMotion()
   const supportsIntersectionObserver = useSupported(() => 'IntersectionObserver' in window)
-  const hasMounted = ref(false)
+  // Server-rendered content stays visible until hydration ends, so it never
+  // blinks out. Content rendered on the client after that (a page change) has
+  // no server HTML to keep, so it starts hidden instead of showing, hiding on
+  // mount and then revealing.
+  const hasMounted = ref(import.meta.client && !useNuxtApp().isHydrating)
   // Keep the public key stable: initializing an animation must not remount its content.
   const revealMotionKey = ref(0)
 
