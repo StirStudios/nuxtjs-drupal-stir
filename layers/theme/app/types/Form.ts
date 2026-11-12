@@ -31,6 +31,7 @@ export type InputType =
   | 'section'
   | 'webform_wizard_page'
   | 'webform_flexbox'
+  | 'webform_container'
   | 'file'
   | 'managed_file'
   | 'webform_document_file'
