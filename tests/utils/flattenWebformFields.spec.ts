@@ -33,6 +33,37 @@ describe('flattenWebformFields', () => {
     expect(Object.keys(flat)).toEqual(['event_name', 'dates_times', 'phone_number'])
   })
 
+  it('stacks a container\'s fields in one column of a flexbox row', () => {
+    const definition = normalizeWebformDefinition({
+      webformId: 'booking',
+      fields: {
+        row: {
+          '#type': 'webform_flexbox',
+          '#name': 'row',
+          children: {
+            choices: {
+              '#type': 'webform_container',
+              '#name': 'choices',
+              children: {
+                room: { '#type': 'select', '#name': 'room' },
+                length: { '#type': 'select', '#name': 'length' },
+              },
+            },
+            day: { '#type': 'date', '#name': 'day' },
+          },
+        },
+      },
+    })
+
+    const flat = flattenWebformFields(definition.fields)
+
+    expect(Object.keys(flat)).toEqual(['room', 'length', 'day'])
+    expect(flat.room).toMatchObject({ row: 'row', column: 'choices' })
+    expect(flat.length).toMatchObject({ row: 'row', column: 'choices' })
+    expect(flat.day?.row).toBe('row')
+    expect(flat.day?.column).toBeUndefined()
+  })
+
   it('submits the event fixture under the names Drupal stores', () => {
     // The Stir Tools fixture is the wire shape after Custom Elements has
     // camel-cased every nested key. Submission must use Drupal's names.

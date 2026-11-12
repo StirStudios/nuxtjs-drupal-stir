@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Webform
+
+- **Added: stacked columns in a Webform flexbox row.** A Webform container
+  inside a flexbox now becomes one column of that row, with its fields stacked,
+  so a short field can sit under another beside a tall one (a list of choices
+  and a length beside a calendar). Rows without containers render as before.
+
 ### Composables
 
 - **Added: `useScrollRow(row, enabled?)`.** A row that scrolls sideways, such

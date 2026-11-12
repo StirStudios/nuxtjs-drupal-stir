@@ -68,9 +68,22 @@ const rowOf = (fieldName: string): string | undefined => {
   return typeof row === 'string' ? row : undefined
 }
 const rowFields = (row: string) => props.orderedFieldNames.filter(name => rowOf(name) === row)
+// A row's columns: each field on its own, or a container's fields stacked.
+const rowCells = (row: string) => {
+  const cells = new Map<string, string[]>()
+
+  for (const name of rowFields(row)) {
+    const column = props.fields[name]?.column
+    const key = typeof column === 'string' ? column : name
+
+    cells.set(key, [...(cells.get(key) ?? []), name])
+  }
+
+  return [...cells.values()]
+}
 // Written out in full so Tailwind finds them; a phone stacks the row.
 const rowColumns = (row: string) =>
-  ['', '', 'sm:grid-cols-2', 'sm:grid-cols-3', 'sm:grid-cols-4'][rowFields(row).length] ?? 'sm:grid-cols-4'
+  ['', '', 'sm:grid-cols-2', 'sm:grid-cols-3', 'sm:grid-cols-4'][rowCells(row).length] ?? 'sm:grid-cols-4'
 const stepperItems = computed(() =>
   wizardPages.value.map((page, index) => ({
     value: index,
@@ -299,15 +312,28 @@ defineExpose({
           v-if="rowFields(rowOf(fieldName)!)[0] === fieldName"
           :class="['grid gap-x-4 gap-y-8', rowColumns(rowOf(fieldName)!)]"
         >
-          <FieldRenderer
-            v-for="rowFieldName in rowFields(rowOf(fieldName)!)"
-            :key="rowFieldName"
-            :field="fields[rowFieldName]!"
-            :field-name="rowFieldName"
-            :fields="fields"
-            :ordered-field-names="orderedFieldNames"
-            :state="state"
-          />
+          <template v-for="cell in rowCells(rowOf(fieldName)!)" :key="cell[0]">
+            <FieldRenderer
+              v-if="cell.length === 1"
+              :field="fields[cell[0]!]!"
+              :field-name="cell[0]!"
+              :fields="fields"
+              :ordered-field-names="orderedFieldNames"
+              :state="state"
+            />
+            <!-- A container's fields stack in one column of the row. -->
+            <div v-else class="flex flex-col gap-8">
+              <FieldRenderer
+                v-for="rowFieldName in cell"
+                :key="rowFieldName"
+                :field="fields[rowFieldName]!"
+                :field-name="rowFieldName"
+                :fields="fields"
+                :ordered-field-names="orderedFieldNames"
+                :state="state"
+              />
+            </div>
+          </template>
         </div>
       </template>
 
