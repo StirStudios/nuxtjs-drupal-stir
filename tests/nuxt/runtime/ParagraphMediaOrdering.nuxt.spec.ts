@@ -43,7 +43,7 @@ describe('Drupal media ordering', () => {
     })
 
     expect(wrapper.findAll('[data-media-id]').map(item => item.attributes('data-height')))
-      .toEqual(['h-[clamp(12rem,22vw,18rem)]', 'h-[clamp(12rem,22vw,18rem)]'])
+      .toEqual(['h-[clamp(16rem,28vw,26rem)]', 'h-[clamp(16rem,28vw,26rem)]'])
     wrapper.unmount()
   })
 

@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Media
+
+- **Changed: media heights are taller on wide screens.** The Small, Break and
+  Feature heights (`stirTheme.media.heights`, also Hero's minimum heights)
+  stopped growing at 18, 30 and 42rem, so wide screens got thin letterboxed
+  strips. They are now `clamp(16rem,28vw,26rem)`, `clamp(20rem,40vw,40rem)`
+  and `min(clamp(28rem,56vw,52rem),85svh)`: about 256 / 320 / 448px on a
+  phone and 358 / 512 / 717px at 1280px, and Feature never exceeds 85% of
+  the viewport height. The keys are unchanged, so no content migration is
+  needed; a site can still override the heights in its `app.config`.
+
 ### Views
 
 - **Added: `DrupalViewEmpty`.** The "No results found" panel a View shows is

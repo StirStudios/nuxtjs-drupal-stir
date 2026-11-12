@@ -156,7 +156,7 @@ describe('MediaItem (Nuxt runtime)', () => {
       props: {
         index: 0,
         node: h('div'),
-        wrapperClass: 'h-[clamp(18rem,34vw,30rem)]',
+        wrapperClass: 'h-[clamp(20rem,40vw,40rem)]',
         tk: {
           propsOf: () => ({
             alt: 'Wide location image',
@@ -168,7 +168,7 @@ describe('MediaItem (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('.media').classes())
-      .toContain('h-[clamp(18rem,34vw,30rem)]')
+      .toContain('h-[clamp(20rem,40vw,40rem)]')
     expect(wrapper.get('img').classes()).toContain('h-full')
     expect(wrapper.get('img').classes()).toContain('object-cover')
   })

@@ -559,12 +559,12 @@ describe('MediaVideo (Nuxt runtime)', () => {
         mediaEmbed: 'https://example.com/embed/video',
         src: '/static-preview.webp',
         width: 1920,
-        wrapperClass: 'h-[clamp(24rem,48vw,42rem)]',
+        wrapperClass: 'h-[min(clamp(28rem,56vw,52rem),85svh)]',
       },
     })
 
     expect(wrapper.get('div').classes())
-      .toContain('h-[clamp(24rem,48vw,42rem)]')
+      .toContain('h-[min(clamp(28rem,56vw,52rem),85svh)]')
     expect(wrapper.get('div').classes()).not.toContain('h-full')
     expect(wrapper.get('div').classes()).not.toContain('aspect-[16/9]')
     expect(wrapper.get('div').attributes('style')).toBeUndefined()
