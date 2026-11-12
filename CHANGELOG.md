@@ -30,6 +30,11 @@ untouched do not need one.
   `<DrupalViewRowReveal :index="i">` (optional `as`) to reveal it with the
   page's effect and stagger. In development, a View on an animated page warns
   when its `#grid` slot renders none. See `docs/downstream-overrides.md`.
+- **Fixed: remounted content keeps its stagger delay.** A reveal scope gave
+  every component setup a new index and never reused one, so content that
+  remounts within a page (tabs, toggles, filter changes) revealed with
+  ever-longer delays. An unmounted component now frees its index, and the
+  next one takes the lowest free index.
 
 ### Motion
 

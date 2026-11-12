@@ -3,12 +3,13 @@ import type {
   InjectionKey,
   MaybeRefOrGetter,
 } from 'vue'
-import { toValue } from 'vue'
+import { onScopeDispose, toValue } from 'vue'
 
 type RevealMotionScope = {
   effect: ComputedRef<string | undefined>
   stagger: ComputedRef<boolean>
   takeIndex: () => number
+  releaseIndex: (index: number) => void
 }
 
 type RevealMotionScopeOptions = {
@@ -54,11 +55,21 @@ export function provideRevealMotionScope(
   effect: MaybeRefOrGetter<string | undefined>,
   options: RevealMotionScopeOptions = {},
 ): RevealMotionScope {
-  let nextIndex = 0
+  // Each child holds the lowest free index until it unmounts, so content that
+  // remounts (tabs, toggles, filters) reuses its place instead of staggering
+  // ever later.
+  const takenIndexes = new Set<number>()
   const scope: RevealMotionScope = {
     effect: computed(() => normalizeScopeEffect(toValue(effect))),
     stagger: computed(() => toValue(options.stagger) === true),
-    takeIndex: () => nextIndex++,
+    takeIndex: () => {
+      let index = 0
+
+      while (takenIndexes.has(index)) index++
+      takenIndexes.add(index)
+      return index
+    },
+    releaseIndex: index => takenIndexes.delete(index),
   }
 
   provide(revealMotionScopeKey, scope)
@@ -71,6 +82,8 @@ export function useRevealMotionScope(
 ) {
   const inheritedScope = inject(revealMotionScopeKey, null)
   const scopeIndex = inheritedScope?.takeIndex() ?? 0
+
+  if (inheritedScope) onScopeDispose(() => inheritedScope.releaseIndex(scopeIndex))
   const inheritedStagger = computed(() =>
     inheritedScope?.stagger.value === true)
   const isInherited = computed(() =>
