@@ -116,6 +116,14 @@
       both !important;
   }
 
+  /* The page cover (z-45) hides a navigation from the open menu: the menu
+  goes under it and closes without its slide-out, so nothing shows as the
+  cover fades. */
+  html[data-page-transition] :is(.stir-menu-panel, .stir-menu-overlay) {
+    z-index: 44 !important;
+    animation: none !important;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .stir-menu-overlay[data-state],
     .stir-menu-panel[data-state] {
