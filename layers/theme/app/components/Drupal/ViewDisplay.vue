@@ -288,15 +288,7 @@ const getRowMotionProps = (index: number) =>
     </template>
   </UEmpty>
 
-    <UEmpty
-    v-else
-    icon="i-lucide-search-x"
-    title="No results found"
-    :ui="{
-      title: 'text-highlighted text-pretty font-medium mb-0',
-    }"
-    variant="subtle"
-  >
+    <DrupalViewEmpty v-else>
     <template #description>
       <span
         v-if="trustedDynamicNoResults"
@@ -315,7 +307,7 @@ const getRowMotionProps = (index: number) =>
         Reset filters
       </UButton>
     </template>
-  </UEmpty>
+  </DrupalViewEmpty>
 
     <LazyDrupalViewsPagination
       v-if="effectivePager && !carousel && effectivePager.totalPages > 1"

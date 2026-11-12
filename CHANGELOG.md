@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+### Views
+
+- **Added: `DrupalViewEmpty`.** The "No results found" panel a View shows is
+  now its own component (Nuxt UI's `UEmpty`, with the layer's styling), so a
+  site's own filtering of view rows can show the same empty state. Props:
+  `title`, `description`, `icon`; slots: `description`, `actions`. Views look
+  the same as before.
+
 ### Webform
 
 - **Added: stacked columns in a Webform flexbox row.** A Webform container
