@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+### Composables
+
+- **Added: `useScrollRow(row, enabled?)`.** A row that scrolls sideways, such
+  as tabs or choice pills on a phone. It returns `fade`, classes that fade the
+  edge on whichever side has more, and `center(item)`, which scrolls the row,
+  never the page, to centre an item. Tabs now use it, with no visible change.
+
 ### Pages
 
 - **Fixed: a path that matches a CMS API route answers 404, not 500.** A
