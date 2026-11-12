@@ -15,6 +15,21 @@ untouched do not need one.
 
 ### Page transitions
 
+- **Fixed: `crossfade` never ran.** The layer turned on
+  `experimental.viewTransition` after Nuxt had already copied it into
+  `app.viewTransition`, so Nuxt's plugin loaded but stayed off. The layer now
+  sets `app.viewTransition.enabled` too. Sites with `type: 'crossfade'` get the
+  transition with no change of their own.
+
+### Page transitions
+
+- **Fixed: the cover hides an open mobile menu.** The menu (z-60) sat above
+  the cover (z-45) and slid out as the cover faded, so it showed through the
+  transition. While `html[data-page-transition]` is set, the menu panel and
+  overlay now sit under the cover and close without their slide-out.
+
+### Page transitions
+
 - **Added: opt-in page transitions, `stirTheme.pageTransition`.** `type`
   defaults to `'none'`, so nothing changes until a site opts in.
   `'crossfade'` turns on Nuxt's View Transitions at build time and crossfades
