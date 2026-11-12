@@ -60,7 +60,9 @@ describe('hero reveal accessibility', () => {
   })
 
   it('uses an SSR entrance animation instead of a viewport reveal', () => {
-    expect(heroSource).toContain('ssrVisible: false')
+    // Its own motion enters on every load; the page's inherited motion only
+    // after a page change (ParagraphHero.nuxt.spec.ts covers both, and reduced motion).
+    expect(heroSource).toContain('ssrVisible: isInherited.value')
     expect(heroSource).toContain('trigger: \'enter\'')
   })
 

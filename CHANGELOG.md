@@ -20,6 +20,13 @@ untouched do not need one.
   opacity, then hid on mount and faded back in. It now starts hidden. Content
   rendered on the server still stays visible until hydration ends, as before.
   No configuration.
+- **Changed: a page's animation now reaches its hero after a page change.**
+  A hero with no animation of its own used to skip the page's inherited
+  reveal, so pages with a hero on top arrived with no motion. Its text now
+  enters with the page's effect after a page change. On the first load it is
+  already there, so it never delays the first paint or Lighthouse's LCP. A
+  hero's own animation setting is unchanged. Reduced motion shows everything at
+  once, as before.
 
 ### Media
 

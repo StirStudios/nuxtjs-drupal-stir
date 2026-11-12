@@ -180,14 +180,16 @@ const { getRevealDelayMs, useRevealMotionProps } =
 const { effect, isInherited, staggerIndex } =
   useRevealMotionScope(() => props.direction)
 const heroMotionProps = useRevealMotionProps(
-  () => isInherited.value ? undefined : effect.value,
+  effect,
   () => getRevealDelayMs(staggerIndex.value),
-  {
-    // Explicit hero motion is an SSR-rendered entrance animation, not a
-    // viewport reveal. Inherited page motion continues to skip the hero.
-    ssrVisible: false,
+  () => ({
+    // An entrance, not a viewport reveal. The hero's own motion plays on
+    // every load. The page's inherited motion plays only after a page change:
+    // on the first load the hero text is already there, so it never delays
+    // the first paint the way a hidden hero would.
+    ssrVisible: isInherited.value,
     trigger: 'enter',
-  },
+  }),
 )
 
 // Keep inherited scroll reveals off hero content.

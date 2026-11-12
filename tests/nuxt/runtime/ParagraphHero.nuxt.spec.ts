@@ -1,4 +1,4 @@
-import { useAppConfig } from '#imports'
+import { useAppConfig, useNuxtApp } from '#imports'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, inject, nextTick, ref } from 'vue'
@@ -6,6 +6,7 @@ import Hero from '../../../layers/theme/app/components/global/Paragraph/Hero.vue
 import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
 import { sectionHeroMediaKey } from '../../../layers/theme/app/utils/imageDelivery'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
+import { provideRevealMotionScope } from '../../../layers/theme/app/composables/useRevealMotionScope'
 
 const shared = vi.hoisted(() => ({ getPage: vi.fn() }))
 
@@ -388,5 +389,55 @@ describe('Drupal Hero page ownership and headings', () => {
         wrapper.unmount()
       })
     })
+  })
+})
+
+describe('Drupal Hero with the page\'s inherited motion', () => {
+  // A hero on a page whose content fades up (the page's animation setting).
+  const PageWithMotion = defineComponent({
+    setup() {
+      provideRevealMotionScope(() => 'fade-up', { stagger: true })
+      return () => h(Hero)
+    },
+  })
+  const heroTextStyle = async () => {
+    shared.getPage.mockReturnValue(ref(makePage('Arriving')))
+    const wrapper = await mountSuspended(PageWithMotion)
+
+    // Left mounted: unmounting mid-entrance cancels the animation, which rejects.
+    return wrapper.get('.hero-content-flow').attributes('style') ?? ''
+  }
+
+  it('enters after a page change', async () => {
+    expect(await heroTextStyle()).toContain('opacity: 0')
+  })
+
+  it('never hides the hero after a page change when reduced motion is requested', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }) as unknown as MediaQueryList,
+    )
+    try {
+      expect(await heroTextStyle()).not.toContain('opacity: 0')
+    }
+    finally {
+      vi.restoreAllMocks()
+    }
+  })
+
+  it('is already there on the first load, so it never delays the first paint', async () => {
+    const nuxtApp = useNuxtApp()
+
+    nuxtApp.isHydrating = true
+    try {
+      expect(await heroTextStyle()).not.toContain('opacity: 0')
+    }
+    finally {
+      nuxtApp.isHydrating = false
+    }
   })
 })
