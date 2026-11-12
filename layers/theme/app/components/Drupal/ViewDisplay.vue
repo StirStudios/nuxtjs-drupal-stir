@@ -30,6 +30,7 @@ defineSlots<{
     rows: RenderedDrupalViewRow[]
     renderCustomElements: typeof renderCustomElements
     getRowMotionProps: typeof getRowMotionProps
+    /** @deprecated Always 0. Use DrupalViewRowReveal for row reveals. */
     revealMotionKey: typeof revealMotionKey.value
     handleViewClick: typeof handleViewClick
   }): unknown
@@ -278,7 +279,7 @@ if (import.meta.dev) {
   >
     <RevealMotion
       v-for="(row, i) in getRenderedRows()"
-      :key="`${row.key}-${revealMotionKey}`"
+      :key="row.key"
       as="div"
       class="item"
       v-bind="getRowMotionProps(i)"

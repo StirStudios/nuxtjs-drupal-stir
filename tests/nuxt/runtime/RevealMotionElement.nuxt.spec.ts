@@ -60,6 +60,19 @@ describe('RevealMotionElement shorthand', () => {
     wrapper.unmount()
   })
 
+  it('animates an entrance (trigger: enter) as well as a viewport reveal', async () => {
+    const wrapper = await mountSuspended(RevealMotionElement, {
+      props: {
+        as: 'div',
+        motionProps: { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } },
+      },
+      slots: { default: () => 'Hero' },
+    })
+
+    expect(wrapper.get('div.reveal-motion').text()).toBe('Hero')
+    wrapper.unmount()
+  })
+
   it('renders plain content without an effect', async () => {
     const wrapper = await mountSuspended(RevealMotionElement, {
       props: { as: 'p' },

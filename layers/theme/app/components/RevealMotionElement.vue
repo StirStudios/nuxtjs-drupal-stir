@@ -39,7 +39,9 @@ const effectMotionProps = props.effect && !props.motionProps
     )
   : undefined
 const resolvedMotionProps = computed(() => props.motionProps ?? effectMotionProps?.value ?? {})
-const hasRevealMotion = computed(() => 'whileInView' in resolvedMotionProps.value)
+// A viewport reveal (whileInView) or an entrance (animate, trigger: 'enter').
+const hasRevealMotion = computed(() =>
+  'whileInView' in resolvedMotionProps.value || 'animate' in resolvedMotionProps.value)
 </script>
 
 <template>

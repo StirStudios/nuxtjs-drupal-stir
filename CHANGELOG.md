@@ -35,6 +35,15 @@ untouched do not need one.
   remounts within a page (tabs, toggles, filter changes) revealed with
   ever-longer delays. An unmounted component now frees its index, and the
   next one takes the lowest free index.
+- **Deprecated: `revealMotionKey`.** It has always been `0` since reveals
+  stopped remounting content, so the layer no longer puts it in component
+  keys. It stays on `useRevealMotionConfig()` and the View `#grid` slot props
+  for now and will be removed in a future release; drop it from your own keys,
+  and use `DrupalViewRowReveal` for custom grid rows.
+- **Changed: `RevealMotionElement` also plays entrances.** It now animates
+  `trigger: 'enter'` motion (`animate`) as well as viewport reveals, and the
+  Hero uses it instead of wiring `RevealMotion` directly. A Hero without an
+  animation no longer loads the motion library for its text.
 
 ### Motion
 

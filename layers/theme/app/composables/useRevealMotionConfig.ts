@@ -23,6 +23,7 @@ export type RevealMotionResolved = {
 export type RevealStaggerMode = 'default' | 'dense'
 
 export type RevealMotionOptions = {
+  /** true (default): server-rendered content stays visible while hydrating and only reveals later; false: it starts hidden in the server HTML. */
   ssrVisible?: boolean
   trigger?: 'enter' | 'in-view'
   durationMs?: number
@@ -180,7 +181,7 @@ export function useRevealMotionConfig() {
   // no server HTML to keep, so it starts hidden instead of showing, hiding on
   // mount and then revealing.
   const hasMounted = ref(import.meta.client && !useNuxtApp().isHydrating)
-  // Keep the public key stable: initializing an animation must not remount its content.
+  /** @deprecated Always 0; no longer needed in keys. Removed in a future release. */
   const revealMotionKey = ref(0)
 
   onMounted(() => {

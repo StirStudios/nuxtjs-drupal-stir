@@ -100,7 +100,7 @@ const carouselImageDeliverySizes = computed(() =>
 )
 const widthClasses = computed(() => resolveWidthClasses(props.width, undefined))
 const carouselItemClasses = computed(() => resolveGridClasses(props.gridItems, 'carousel'))
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+const { getRevealDelayMs, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 const carouselMotionProps = useRevealMotionProps(
@@ -278,7 +278,7 @@ function releasePointerArrowFocus(event: PointerEvent) {
 
 <template>
   <RevealMotionElement
-    :key="`carousel-${id}-${'whileInView' in carouselMotionProps ? revealMotionKey : 0}`"
+    :key="`carousel-${id}`"
     class="relative z-10"
     :class="[indicatorPadding, widthClasses]"
     :motion-props="carouselMotionProps"

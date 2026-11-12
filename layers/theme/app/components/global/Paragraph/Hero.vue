@@ -231,19 +231,16 @@ provideRevealMotionScope(() => undefined)
           :class="heroTheme.backdrop"
         />
 
-        <RevealMotion
+        <RevealMotionElement
           v-if="hasVisibleHeroContent || pageTitleEffective"
-          as-child
-          v-bind="heroMotionProps"
-        >
-          <div
-            :class="tv({ base: [
+          :class="tv({ base: [
               hasVisibleHeroContent && !isSection && (isInline ? heroTheme.inline.text : heroTheme.text.base),
               isSection && 'relative z-10 w-full p-8 lg:p-24',
               hasVisibleHeroContent && isFrontEffective && !isInline && heroTheme.text.isFront,
               customContent && ['hero-content-aligned relative inset-auto w-full [&>*]:w-full [&_:is(h1,h2,h3,h4,h5,h6,.lead)]:[text-align:inherit]', alignment.horizontal, alignment.text],
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ] })()"
+          :motion-props="heroMotionProps"
           >
             <slot name="title">
               <template v-if="isSection">
@@ -282,8 +279,7 @@ provideRevealMotionScope(() => undefined)
             <div v-if="tk.slot('button').length" class="hero-actions" :class="tv({ base: [heroTheme.actions, customContent && alignment.actions] })()">
               <slot name="button" />
             </div>
-          </div>
-        </RevealMotion>
+        </RevealMotionElement>
 
         <component :is="heroMediaNode" />
 

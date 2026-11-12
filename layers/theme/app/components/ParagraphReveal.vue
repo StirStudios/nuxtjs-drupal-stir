@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<{
 })
 
 const attrs = useAttrs()
-const { getRevealDelayMs, revealMotionKey, useRevealMotionProps } =
+const { getRevealDelayMs, useRevealMotionProps } =
   useRevealMotionConfig()
 const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
 const motionProps = useRevealMotionProps(
@@ -27,7 +27,7 @@ const motionProps = useRevealMotionProps(
 
 <template>
   <RevealMotionElement
-    :key="`paragraph-${id ?? 'unknown'}-${'whileInView' in motionProps ? revealMotionKey : 0}`"
+    :key="`paragraph-${id ?? 'unknown'}`"
     :as="as"
     :motion-props="motionProps"
     v-bind="attrs"
