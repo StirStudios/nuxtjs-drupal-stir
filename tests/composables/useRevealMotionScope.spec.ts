@@ -31,8 +31,8 @@ describe('resolveScopedRevealEffect', () => {
       distancePx: 50,
       staggerMs: 110,
       ease: [0.22, 1, 0.36, 1],
-      threshold: 0.1,
-      rootMargin: '0px 0px -12% 0px',
+      threshold: 0,
+      rootMargin: '0px 0px -10% 0px',
     })
   })
 
@@ -40,6 +40,6 @@ describe('resolveScopedRevealEffect', () => {
     const [top, , bottom] = REVEAL_DEFAULTS.rootMargin.split(/\s+/)
 
     expect(top).toBe('0px')
-    expect(bottom).toBe('-12%')
+    expect(bottom).toBe('-10%')
   })
 })

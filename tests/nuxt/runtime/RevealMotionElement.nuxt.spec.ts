@@ -30,6 +30,25 @@ describe('RevealMotionElement shorthand', () => {
     wrapper.unmount()
   })
 
+  it('reveals as soon as any part of a block crosses the trigger line', async () => {
+    let motionProps: Record<string, unknown> = {}
+    const Probe = defineComponent({
+      setup() {
+        const { getRevealMotionProps } = useRevealMotionConfig()
+
+        return () => {
+          motionProps = getRevealMotionProps('fade-up')
+          return h('div')
+        }
+      },
+    })
+    const wrapper = await mountSuspended(Probe)
+
+    await wrapper.vm.$forceUpdate()
+    expect(motionProps.inViewOptions).toMatchObject({ amount: 0, margin: '0px 0px -10% 0px' })
+    wrapper.unmount()
+  })
+
   it('renders the requested element with attributes and slot content', async () => {
     const wrapper = await mountSuspended(RevealMotionElement, {
       props: { as: 'h2', effect: 'fade-up', durationMs: 600, distancePx: 24 },

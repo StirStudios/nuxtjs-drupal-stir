@@ -15,6 +15,18 @@ untouched do not need one.
 
 ### Motion
 
+- **Changed: reveals start as soon as a block reaches the trigger line.**
+  `stirTheme.animations.reveal.threshold` now defaults to `0` (was `0.1`) and
+  `rootMargin` to `0px 0px -10% 0px` (was `-12%`). Before, a block had to show
+  10% of its own height, so tall sections on phones left long empty gaps while
+  scrolling. A site that wants later reveals can still set `threshold`.
+- **Fixed: reveals are visible without JavaScript.** Content a reveal hides in
+  the server HTML stayed invisible when scripting was off. Elements rendered
+  by `RevealMotion` now carry a `reveal-motion` class, and an
+  `@media (scripting: none)` rule shows them.
+
+### Motion
+
 - **Fixed: reveals flashed after a page change.** A revealing block drawn on
   the client, as on every page reached through the site, showed at full
   opacity, then hid on mount and faded back in. It now starts hidden. Content
