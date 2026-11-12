@@ -13,6 +13,32 @@ untouched do not need one.
 
 ## Unreleased
 
+### Media
+
+- **Changed: media heights are taller on wide screens.** The Small, Break and
+  Feature heights (`stirTheme.media.heights`, also Hero's minimum heights)
+  stopped growing at 18, 30 and 42rem, so wide screens got thin letterboxed
+  strips. They are now `clamp(16rem,28vw,26rem)`, `clamp(20rem,40vw,40rem)`
+  and `min(clamp(28rem,56vw,52rem),85svh)`: about 256 / 320 / 448px on a
+  phone and 358 / 512 / 717px at 1280px, and Feature never exceeds 85% of
+  the viewport height. The keys are unchanged, so no content migration is
+  needed; a site can still override the heights in its `app.config`.
+
+### Views
+
+- **Added: `DrupalViewEmpty`.** The "No results found" panel a View shows is
+  now its own component (Nuxt UI's `UEmpty`, with the layer's styling), so a
+  site's own filtering of view rows can show the same empty state. Props:
+  `title`, `description`, `icon`; slots: `description`, `actions`. Views look
+  the same as before.
+
+### Webform
+
+- **Added: stacked columns in a Webform flexbox row.** A Webform container
+  inside a flexbox now becomes one column of that row, with its fields stacked,
+  so a short field can sit under another beside a tall one (a list of choices
+  and a length beside a calendar). Rows without containers render as before.
+
 ### Composables
 
 - **Added: `useScrollRow(row, enabled?)`.** A row that scrolls sideways, such

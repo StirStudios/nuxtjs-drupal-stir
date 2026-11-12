@@ -48,7 +48,7 @@ const isSection = computed(() => Boolean(props.placement && props.placement !== 
 provide(sectionHeroMediaKey, isSection)
 
 const sectionHeadingTag = computed(() => resolveHeadingTag(props.headerTag))
-const minimumHeight = computed(() => ({ small: 'clamp(12rem,22vw,18rem)', break: 'clamp(18rem,34vw,30rem)', feature: 'clamp(24rem,48vw,42rem)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
+const minimumHeight = computed(() => ({ small: 'clamp(16rem,28vw,26rem)', break: 'clamp(20rem,40vw,40rem)', feature: 'min(clamp(28rem,56vw,52rem),85svh)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const alignment = computed(() => {
   const align = props.align

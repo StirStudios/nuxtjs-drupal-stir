@@ -198,6 +198,7 @@
       "layers/theme/app/components/Drupal/PageRoute.vue",
       "layers/theme/app/components/Drupal/Tabs.vue",
       "layers/theme/app/components/Drupal/ViewDisplay.vue",
+      "layers/theme/app/components/Drupal/ViewEmpty.vue",
       "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
       "layers/theme/app/components/Drupal/ViewsFilters.vue",
       "layers/theme/app/components/Drupal/ViewsPagination.vue",
@@ -591,6 +592,7 @@
         "layers/theme/app/components/Drupal/PageRoute.vue",
         "layers/theme/app/components/Drupal/Tabs.vue",
         "layers/theme/app/components/Drupal/ViewDisplay.vue",
+        "layers/theme/app/components/Drupal/ViewEmpty.vue",
         "layers/theme/app/components/Drupal/ViewsDateRangeFilter.vue",
         "layers/theme/app/components/Drupal/ViewsFilters.vue",
         "layers/theme/app/components/Drupal/ViewsPagination.vue",
@@ -859,7 +861,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 140,
+    "components": 141,
     "composables": 75,
     "utils": 81,
     "plugins": 11,
