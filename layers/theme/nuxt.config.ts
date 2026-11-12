@@ -22,7 +22,7 @@ import {
   resolveImageCdnBase,
 } from './build/imageCdn'
 import { refuseProductionCalculatorOverride } from './build/calculatorLoader'
-import { pageTransitionViewTransition } from './build/pageTransition'
+import { enableViewTransition, pageTransitionViewTransition } from './build/pageTransition'
 import { buildSpaLoaderThemeStyle } from './build/spaLoaderTheme'
 import { writeFileIfChanged } from './build/writeFileIfChanged'
 import { STIR_PRESENTATION_DEFAULTS } from './app/utils/presentationDefaults'
@@ -204,7 +204,7 @@ export default defineNuxtConfig({
 
       // Nuxt adds its view-transition plugin after modules:done.
       if (pageTransitionViewTransition(pageTransitionType)) {
-        nuxt.options.experimental.viewTransition = true
+        enableViewTransition(nuxt.options)
       }
 
       if (nuxt.options.spaLoadingTemplate !== false) {

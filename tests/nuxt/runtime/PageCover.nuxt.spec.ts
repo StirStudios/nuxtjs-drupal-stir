@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
@@ -120,5 +122,12 @@ describe('AppPageCover', () => {
 
     expect(panel()).toBeNull()
     wrapper.unmount()
+  })
+
+  it('puts an open menu under the cover and closes it without its slide-out', () => {
+    const css = readFileSync(resolve(process.cwd(), 'layers/theme/app/assets/css/motion.css'), 'utf8')
+
+    expect(css).toMatch(/html\[data-page-transition\] :is\(\.stir-menu-panel, \.stir-menu-overlay\) \{\s*z-index: 44 !important;\s*animation: none !important;/)
+    expect(PAGE_COVER_Z_INDEX).toBe(45)
   })
 })
