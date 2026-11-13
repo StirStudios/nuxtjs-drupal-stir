@@ -150,6 +150,7 @@ type StirThemeNavigationConfig = {
   height?: string
   hidden?: boolean
   transparentAtTop?: boolean
+  /** Surface of the transparent header over a dark hero (an image, or text on a dark no-media fallback): 'dark' puts the header in dark mode so it reads on it. Elsewhere it keeps the page's colour mode. */
   transparentSurface?: 'auto' | 'light' | 'dark'
   base?: ClassValue
   background?: ClassValue

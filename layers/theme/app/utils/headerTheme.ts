@@ -50,6 +50,28 @@ export const headerDesktopClasses = (breakpoint: HeaderDesktopBreakpoint) =>
 export const headerLogoSurface = (value: unknown): HeaderLogoSurface =>
   value === 'light' || value === 'dark' ? value : 'auto'
 
+/**
+ * Whether the page hero renders as a dark band under the transparent header:
+ * it has an image, or it has text and the theme's no-media fallback is dark.
+ */
+export function heroUnderHeaderIsDark(
+  hero: { image?: unknown, description?: string } | null | undefined,
+  noMediaFallback: unknown,
+): boolean {
+  if (!hero) return false
+  if (hero.image) return true
+
+  return Boolean(hero.description) && headerClassName(noMediaFallback).split(/\s+/).includes('dark')
+}
+
+/**
+ * The transparent header's surface. It only overlays a dark hero: on a page
+ * without one the header sits on the page background, so it follows the
+ * page's colour mode.
+ */
+export const headerTransparentSurface = (value: unknown, overDarkHero: boolean): HeaderLogoSurface =>
+  overDarkHero ? headerLogoSurface(value) : 'auto'
+
 export const headerConfigString = <T extends string>(value: unknown): T | undefined =>
   typeof value === 'string' && value.trim() ? value.trim() as T : undefined
 
