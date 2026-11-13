@@ -14,22 +14,23 @@ const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
 const widget = useTemplateRef<{ reset: () => void }>('widget')
 const verificationFailed = ref(false)
 const isInteractive = ref(false)
-// No token long after the widget started usually means a blocker stopped it;
-// without this a webform's Send button just stays disabled, unexplained.
-const isStalled = ref(false)
+// A content blocker usually stops Cloudflare's script loading at all, which
+// no widget callback reports; Nuxt Scripts records the failed load.
+const { status: scriptStatus } = useScriptCloudflareTurnstile()
+const scriptFailed = computed(() => scriptStatus.value === 'error')
 let clearedByWidget = false
-let stallTimer: ReturnType<typeof setTimeout> | undefined
 
-const watchForStall = () => {
-  clearTimeout(stallTimer)
-  isStalled.value = false
-  stallTimer = setTimeout(() => {
-    isStalled.value = !turnstileToken.value && !isInteractive.value
-  }, TURNSTILE_WAIT_MS)
-}
+watch(scriptFailed, (failed) => {
+  turnstileState.scriptFailed = failed
+  if (failed) turnstileState.failures += 1
+}, { immediate: true })
 
-onMounted(watchForStall)
-onBeforeUnmount(() => clearTimeout(stallTimer))
+onMounted(() => {
+  turnstileState.widgets += 1
+})
+onBeforeUnmount(() => {
+  turnstileState.widgets -= 1
+})
 
 const clearVerification = () => {
   clearedByWidget = Boolean(turnstileToken.value)
@@ -37,9 +38,11 @@ const clearVerification = () => {
   isInteractive.value = false
 }
 
+// Errors and unsolved challenges end any submit waiting for a token.
 const handleVerificationError = () => {
   clearVerification()
   verificationFailed.value = true
+  turnstileState.failures += 1
   return true
 }
 
@@ -58,11 +61,9 @@ const handleInteractiveEnd = () => {
 watch(turnstileToken, (token, previous) => {
   if (token) {
     verificationFailed.value = false
-    isStalled.value = false
   }
   else if (previous && !clearedByWidget) {
     widget.value?.reset()
-    watchForStall()
   }
   clearedByWidget = false
 })
@@ -77,7 +78,7 @@ watch(turnstileToken, (token, previous) => {
           props.collapseWhenInactive &&
           !isInteractive &&
           !verificationFailed &&
-          !isStalled,
+          !scriptFailed,
       },
     ]"
   >
@@ -99,7 +100,7 @@ watch(turnstileToken, (token, previous) => {
       Security verification could not be completed. Please refresh the page and
       try again.
     </p>
-    <p v-else-if="isStalled" class="text-error mt-2" role="alert">
+    <p v-else-if="scriptFailed" class="text-error mt-2" role="alert">
       {{ TURNSTILE_BLOCKED_MESSAGE }}
     </p>
   </div>

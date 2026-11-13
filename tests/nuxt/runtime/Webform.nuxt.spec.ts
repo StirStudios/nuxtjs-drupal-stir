@@ -9,6 +9,10 @@ import type { WebformDefinition } from '../../../layers/theme/app/types'
 import kitchenSink from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink.json'
 import kitchenSinkSubmission from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink-submission.json'
 
+// The check itself is covered in awaitTurnstileToken.nuxt.spec.ts.
+mockNuxtImport('awaitTurnstileToken', () => async (token: { value?: string }) => token.value || '')
+mockNuxtImport('useScriptCloudflareTurnstile', () => () => ({ onLoaded: () => {}, status: { value: 'loaded' } }))
+
 // A submitted form schedules a scroll to the top; unmounting clears it before
 // the environment goes.
 enableAutoUnmount(afterEach)

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { mountSuspended, registerEndpoint, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { clearNuxtData } from '#app'
 import { flushPromises } from '@vue/test-utils'
 import { readBody } from 'h3'
@@ -13,6 +13,9 @@ import {
   useAuthRegister,
   type StirAuthRegisterOptions,
 } from '../../../layers/auth/app/composables/useAuthRegister'
+
+// The check itself is covered in awaitTurnstileToken.nuxt.spec.ts.
+mockNuxtImport('awaitTurnstileToken', () => async (token: { value?: string }) => token.value || '')
 
 type ExtraState = { first_name: string, newsletter: boolean }
 

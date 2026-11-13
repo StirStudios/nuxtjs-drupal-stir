@@ -88,6 +88,14 @@ remain available without a pre-existing session token.
 - Turnstile tokens are single-use and Drupal spends one on every attempt. The
   auth composables clear their token after each submission, which makes
   `FieldTurnstile` request a fresh one; custom forms should do the same.
+- Submit handlers read the token with `awaitTurnstileToken(token)` rather than
+  sending `token.value`. A visitor who presses submit before the check has
+  finished, or retries straight after a failure, would otherwise send an empty
+  token. It waits for Cloudflare's own signals: the token, an error or
+  unsolved challenge, or the script failing to load (usually a content
+  blocker), with a 30 s cap for a check that reports nothing. On failure it
+  throws `TurnstileTokenError`, whose message tells the visitor what to do.
+  Keep submit buttons enabled; the wait replaces disabling them.
 - The local `/auth/protected` password gate verifies Turnstile in Nuxt before
   comparing the configured password. `TURNSTILE_KEY` and `TURNSTILE_SECRET`
   are therefore required whenever `PROTECTED_PASSWORD` is enabled.
