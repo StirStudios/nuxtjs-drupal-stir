@@ -8,6 +8,8 @@ import {
   headerLogoSurface,
   headerMenuAngleStyle,
   headerToggleDirection,
+  headerTransparentSurface,
+  heroUnderHeaderIsDark,
   joinHeaderClasses,
 } from '../../layers/theme/app/utils/headerTheme'
 
@@ -34,6 +36,18 @@ describe('header theme', () => {
     expect(headerDesktopLayout(undefined)).toBe('default')
     expect(headerLogoSurface('dark')).toBe('dark')
     expect(headerLogoSurface(1)).toBe('auto')
+    expect(headerTransparentSurface('dark', true)).toBe('dark')
+    expect(headerTransparentSurface('dark', false)).toBe('auto')
+  })
+
+  it('treats a hero as dark under the header only when it renders dark', () => {
+    const fallback = 'dark text-default bg-black'
+
+    expect(heroUnderHeaderIsDark(null, fallback)).toBe(false)
+    expect(heroUnderHeaderIsDark({ image: { src: '/a.jpg' } }, '')).toBe(true)
+    expect(heroUnderHeaderIsDark({ description: 'Intro' }, fallback)).toBe(true)
+    expect(heroUnderHeaderIsDark({ description: 'Intro' }, 'bg-white')).toBe(false)
+    expect(heroUnderHeaderIsDark({ description: '' }, fallback)).toBe(false)
     expect(headerConfigString('  primary ')).toBe('primary')
     expect(headerConfigString('  ')).toBeUndefined()
     expect(headerConfigString(3)).toBeUndefined()

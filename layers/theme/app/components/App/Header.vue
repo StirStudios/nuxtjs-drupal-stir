@@ -17,9 +17,10 @@ import {
   headerDesktopBreakpoint,
   headerDesktopClasses,
   headerDesktopLayout,
-  headerLogoSurface,
   headerMenuAngleStyle,
   headerToggleDirection,
+  headerTransparentSurface,
+  heroUnderHeaderIsDark,
   joinHeaderClasses,
 } from '#stir/utils/headerTheme'
 
@@ -122,9 +123,15 @@ const finalIsScrolled = computed(() => {
 const isTransparentHeader = computed(() =>
   Boolean(theme.navigation.transparentAtTop && !finalIsScrolled.value),
 )
+const { hero: routeHero } = useRouteHero()
+// Over a dark hero the transparent header takes the configured surface; 'dark'
+// puts the whole header in dark mode, so its menu and toggle read on it.
 const logoSurface = computed(() =>
   isTransparentHeader.value
-    ? headerLogoSurface(theme.navigation.transparentSurface)
+    ? headerTransparentSurface(
+        theme.navigation.transparentSurface,
+        heroUnderHeaderIsDark(routeHero.value, theme.hero?.noMediaFallback),
+      )
     : 'auto',
 )
 const headerMode = computed<HeaderMode>(() => props.mode ?? 'fixed')
@@ -157,6 +164,7 @@ const headerClasses = computed(() => [
   isTransparentHeader.value
     ? 'bg-transparent backdrop-none border-none backdrop-blur-none'
     : theme.navigation.background,
+  logoSurface.value === 'dark' && 'dark',
   finalIsScrolled.value && 'is-scrolled stir-header--scrolled',
   shouldHide.value && '-translate-y-full',
 ])
