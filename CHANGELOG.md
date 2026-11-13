@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+### Views
+
+- **Fixed: rows that replace a View's rows no longer fade in.** After a
+  filter, sort or page change, or a site's own row filter, the new rows
+  mounted hidden and then revealed, so the skeleton gave way to an empty grid.
+  Rows added after the View is on screen now show at once; rows on first load
+  still reveal. The layer's own rows now render through `DrupalViewRowReveal`,
+  as a site's `#grid` slot does, so every View follows one rule.
+  `DrupalViewRowReveal` (the `drupalViewRowRevealKey` context) gains
+  `isShown()`; a site that provides that context itself must add it.
+
 ### Page transitions
 
 - **Fixed: the cover hides an open mobile menu.** The menu (z-60) sat above

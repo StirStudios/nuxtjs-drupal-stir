@@ -13,7 +13,7 @@ describe('DrupalViewRowReveal', () => {
     }))
     const Host = defineComponent({
       setup() {
-        provide(drupalViewRowRevealKey, { getRowMotionProps, register })
+        provide(drupalViewRowRevealKey, { getRowMotionProps, isShown: () => false, register })
         return () => h(ViewRowReveal, { index: 2, as: 'article' }, () => 'Row')
       },
     })
@@ -22,6 +22,21 @@ describe('DrupalViewRowReveal', () => {
     expect(getRowMotionProps).toHaveBeenCalledWith(2)
     expect(register).toHaveBeenCalledOnce()
     expect(wrapper.get('article.reveal-motion').text()).toBe('Row')
+    wrapper.unmount()
+  })
+
+  it('shows a row added after the View is on screen at once', async () => {
+    const getRowMotionProps = vi.fn(() => ({ whileInView: { opacity: 1 } }))
+    const Host = defineComponent({
+      setup() {
+        provide(drupalViewRowRevealKey, { getRowMotionProps, isShown: () => true, register: vi.fn() })
+        return () => h(ViewRowReveal, { index: 0 }, () => 'Row')
+      },
+    })
+    const wrapper = await mountSuspended(Host)
+
+    expect(getRowMotionProps).not.toHaveBeenCalled()
+    expect(wrapper.get('.reveal-motion').text()).toBe('Row')
     wrapper.unmount()
   })
 

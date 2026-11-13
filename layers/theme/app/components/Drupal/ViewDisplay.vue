@@ -164,11 +164,16 @@ const getRowMotionProps = (index: number) =>
     { ssrVisible: true },
   )
 
-// A site's #grid slot reveals rows by wrapping each in DrupalViewRowReveal.
+// Every row reveals through DrupalViewRowReveal: the layer's own rows below
+// and a site's #grid slot alike.
 let rowRevealCount = 0
+let isShown = false
+
+onMounted(() => { isShown = true })
 
 provide(drupalViewRowRevealKey, {
   getRowMotionProps,
+  isShown: () => isShown,
   register: () => { rowRevealCount += 1 },
 })
 
@@ -277,18 +282,17 @@ if (import.meta.dev) {
     :spacing="spacing"
     :width="width"
   >
-    <RevealMotion
+    <DrupalViewRowReveal
       v-for="(row, i) in getRenderedRows()"
       :key="row.key"
-      as="div"
       class="item"
-      v-bind="getRowMotionProps(i)"
+      :index="i"
       @click.capture="handleViewClick"
     >
       <component
         :is="row.type === 'dynamic' ? renderCustomElements(row.node) : row.node"
       />
-    </RevealMotion>
+    </DrupalViewRowReveal>
   </WrapGrid>
 
     <UEmpty

@@ -9,6 +9,8 @@ export const drupalViewQueryIdentityKey: InjectionKey<ComputedRef<DrupalViewQuer
 
 export type DrupalViewRowReveal = {
   getRowMotionProps: (index: number) => Record<string, unknown>
+  /** True once the View is on screen: rows added after that show at once. */
+  isShown: () => boolean
   register: () => void
 }
 
