@@ -36,7 +36,10 @@ export function useProtectedLogin() {
   ) => {
     isLoading.value = true
     try {
-      const hasAccess = await login(event.data.password || '', turnstileToken.value)
+      const hasAccess = await login(
+        event.data.password || '',
+        await awaitTurnstileToken(turnstileToken),
+      )
 
       if (hasAccess) {
         await navigateTo(
@@ -46,10 +49,12 @@ export function useProtectedLogin() {
           ),
         )
       }
-    } catch {
+    } catch (error: unknown) {
       toast.add({
         title: 'Access denied',
-        description: 'That password isn\'t right. Try again.',
+        description: error instanceof TurnstileTokenError
+          ? error.statusMessage
+          : 'That password isn\'t right. Try again.',
         color: 'error',
       })
     } finally {

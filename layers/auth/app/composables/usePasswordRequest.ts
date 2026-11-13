@@ -50,7 +50,7 @@ export function usePasswordRequest() {
     try {
       await requestPasswordReset({
         identifier: (event.data.identifier || '').trim(),
-        turnstile_response: turnstileToken.value,
+        turnstile_response: await awaitTurnstileToken(turnstileToken),
       })
 
       requestSent.value = true

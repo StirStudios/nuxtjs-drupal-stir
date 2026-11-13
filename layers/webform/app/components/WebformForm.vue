@@ -208,7 +208,7 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
       webform_id: webformId,
       ...serializeWebformSubmission(state),
       ...serializeWebformSubmission(hiddenDefaults),
-      turnstile_response: turnstileToken.value,
+      turnstile_response: await awaitTurnstileToken(turnstileToken),
     }
     const body = hasFileValue(payload)
       ? buildWebformFormData(payload)
@@ -258,7 +258,9 @@ async function onSubmit(_event: { data: Record<string, unknown> }) {
     )
 
     content.value?.setErrors(issues.fieldErrors)
-    submissionError.value = `Error submitting form: ${issues.message}`
+    submissionError.value = error instanceof TurnstileTokenError
+      ? error.statusMessage
+      : `Error submitting form: ${issues.message}`
 
     if (shouldShowToasts.value) {
       toast.add({

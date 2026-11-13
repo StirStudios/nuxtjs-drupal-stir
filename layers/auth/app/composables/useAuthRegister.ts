@@ -89,7 +89,7 @@ export function useAuthRegister<
       const response = await register({
         email: (event.data.email || '').trim(),
         password: event.data.password || '',
-        turnstile_response: turnstileToken.value,
+        turnstile_response: await awaitTurnstileToken(turnstileToken),
         ...(Object.keys(extraFields).length ? { fields: extraFields } : {}),
       })
 

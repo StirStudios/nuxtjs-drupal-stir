@@ -9,6 +9,10 @@ import type { WebformDefinition } from '../../../layers/theme/app/types'
 import kitchenSink from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink.json'
 import kitchenSinkSubmission from '../../../contracts/stir-tools/v1/fixtures/webform-kitchen-sink-submission.json'
 
+// The check itself is covered in awaitTurnstileToken.nuxt.spec.ts.
+mockNuxtImport('awaitTurnstileToken', () => async (token: { value?: string }) => token.value || '')
+mockNuxtImport('useScriptCloudflareTurnstile', () => () => ({ onLoaded: () => {}, status: { value: 'loaded' } }))
+
 // A submitted form schedules a scroll to the top; unmounting clears it before
 // the environment goes.
 enableAutoUnmount(afterEach)
@@ -51,7 +55,9 @@ const webform = {
 } satisfies WebformDefinition
 
 describe('Webform (Nuxt runtime)', () => {
-  it('keeps submission disabled until security verification completes', async () => {
+  // The submit waits for the token instead (awaitTurnstileToken), so a
+  // blocked check can explain itself rather than leave a grey button.
+  it('keeps submission available while security verification runs', async () => {
     const wrapper = await mountSuspended(WebformContent, {
       props: {
         fields: {},
@@ -72,11 +78,6 @@ describe('Webform (Nuxt runtime)', () => {
       },
     })
 
-    await flushPromises()
-
-    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
-
-    await wrapper.setProps({ turnstileToken: 'token' })
     await flushPromises()
 
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeUndefined()
