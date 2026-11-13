@@ -1113,6 +1113,8 @@ describe('layer contract', () => {
     expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(196)
     expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(39)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
+    // 32.5: motion-v 2.12 grew the deferred domAnimation chunk by 1.32 kB.
+    expect(budget.maxRevealMotionGzipKb).toBeLessThanOrEqual(32.5)
   })
 
   it('records presentation identity before Nitro serializes runtime config', () => {
