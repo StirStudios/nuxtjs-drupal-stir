@@ -12,13 +12,18 @@ const props = withDefaults(defineProps<{
 const rowReveal = inject(drupalViewRowRevealKey, undefined)
 
 rowReveal?.register()
+
+// Rows that come in after the View is on screen (a filter, sort, page or a
+// site's own row filter) take the place of what was there, or of the
+// skeleton, at once instead of mounting hidden and fading in.
+const showsAtOnce = rowReveal?.isShown() ?? false
 </script>
 
 <template>
   <RevealMotion
     v-if="rowReveal"
     :as="as"
-    v-bind="rowReveal.getRowMotionProps(props.index)"
+    v-bind="showsAtOnce ? { initial: false } : rowReveal.getRowMotionProps(props.index)"
   >
     <slot />
   </RevealMotion>
