@@ -14,7 +14,22 @@ const themeTurnstile = ((useAppConfig().stirTheme as { turnstile?: unknown })
 const widget = useTemplateRef<{ reset: () => void }>('widget')
 const verificationFailed = ref(false)
 const isInteractive = ref(false)
+// No token long after the widget started usually means a blocker stopped it;
+// without this a webform's Send button just stays disabled, unexplained.
+const isStalled = ref(false)
 let clearedByWidget = false
+let stallTimer: ReturnType<typeof setTimeout> | undefined
+
+const watchForStall = () => {
+  clearTimeout(stallTimer)
+  isStalled.value = false
+  stallTimer = setTimeout(() => {
+    isStalled.value = !turnstileToken.value && !isInteractive.value
+  }, TURNSTILE_WAIT_MS)
+}
+
+onMounted(watchForStall)
+onBeforeUnmount(() => clearTimeout(stallTimer))
 
 const clearVerification = () => {
   clearedByWidget = Boolean(turnstileToken.value)
@@ -43,9 +58,11 @@ const handleInteractiveEnd = () => {
 watch(turnstileToken, (token, previous) => {
   if (token) {
     verificationFailed.value = false
+    isStalled.value = false
   }
   else if (previous && !clearedByWidget) {
     widget.value?.reset()
+    watchForStall()
   }
   clearedByWidget = false
 })
@@ -59,7 +76,8 @@ watch(turnstileToken, (token, previous) => {
         'mb-0!':
           props.collapseWhenInactive &&
           !isInteractive &&
-          !verificationFailed,
+          !verificationFailed &&
+          !isStalled,
       },
     ]"
   >
@@ -80,6 +98,9 @@ watch(turnstileToken, (token, previous) => {
     <p v-if="verificationFailed" class="text-error mt-2" role="alert">
       Security verification could not be completed. Please refresh the page and
       try again.
+    </p>
+    <p v-else-if="isStalled" class="text-error mt-2" role="alert">
+      {{ TURNSTILE_BLOCKED_MESSAGE }}
     </p>
   </div>
 </template>

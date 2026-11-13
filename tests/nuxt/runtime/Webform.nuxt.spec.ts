@@ -51,7 +51,9 @@ const webform = {
 } satisfies WebformDefinition
 
 describe('Webform (Nuxt runtime)', () => {
-  it('keeps submission disabled until security verification completes', async () => {
+  // The submit waits for the token instead (awaitTurnstileToken), so a
+  // blocked check can explain itself rather than leave a grey button.
+  it('keeps submission available while security verification runs', async () => {
     const wrapper = await mountSuspended(WebformContent, {
       props: {
         fields: {},
@@ -72,11 +74,6 @@ describe('Webform (Nuxt runtime)', () => {
       },
     })
 
-    await flushPromises()
-
-    expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeDefined()
-
-    await wrapper.setProps({ turnstileToken: 'token' })
     await flushPromises()
 
     expect(wrapper.get('button[type="submit"]').attributes('disabled')).toBeUndefined()

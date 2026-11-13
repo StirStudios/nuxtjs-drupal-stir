@@ -164,7 +164,7 @@ export function useAuthLogin(options: StirAuthLoginOptions = {}) {
       const loginResult = await login({
         identifier: lastIdentifier,
         password: event.data.password || '',
-        turnstile_response: turnstileToken.value,
+        turnstile_response: await awaitTurnstileToken(turnstileToken),
       })
 
       if (loginResult.loggedIn) {

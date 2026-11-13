@@ -185,7 +185,7 @@ const buttonSize = computed<UiSize>(() =>
   resolveUiSize(props.themeWebform.submitButtonSize, 'md'),
 )
 const submitDisabled = computed(
-  () => !props.isSchemaReady || props.isLoading || !props.turnstileToken,
+  () => !props.isSchemaReady || props.isLoading,
 )
 const nuxtApp = useNuxtApp()
 const submitComponent = computed(() => {
