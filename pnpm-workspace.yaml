@@ -8,14 +8,12 @@ allowBuilds:
   vue-demi: false
 
 overrides:
+  # fontless (via @nuxt/fonts) still asks for esbuild 0.27, which has the
+  # Windows dev-server file-read advisory fixed in 0.28.1. Remove once it allows 0.28.
   fontless>esbuild: 0.28.2
-  # 14.0.2 fixes the AbortSignal bypass; Nitro's @vercel/nft and js-beautify
-  # still ask for 13. Remove once they allow 14.
+  # 14.0.2 fixes the AbortSignal bypass; js-beautify still asks for 13.
+  # Remove once it allows 14.
   glob@13: ^14.0.2
-  # 10.7.4 fixes the Address6 zone match. Pinned to 10.7.5, the newest past the
-  # release-age gate; remove once the
-  # lockfile resolves a fixed version unaided.
-  ip-address@10: 10.7.5
   # get-uri (via lighthouse) pins basic-ftp 5; 6.2.1 fixes GHSA-c475-qrg2-pj4r and
   # v6 only changes the separate-transfer-host default, which get-uri never uses.
   get-uri>basic-ftp: ^6.2.3
