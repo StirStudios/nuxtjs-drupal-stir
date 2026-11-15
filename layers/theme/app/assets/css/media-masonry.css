@@ -18,9 +18,13 @@
     overflow: clip;
     grid-column-start: var(--masonry-lane-default, 1);
 
-    /* Fill the trimmed item so its image crops and bottom overlays (credits) stay visible. */
+    /* Fill the trimmed item so its image crops and bottom overlays (credits)
+    stay visible. The row span sets the shape, so a media aspect ratio such
+    as square must not shrink the width to match the height. */
     > * {
+      width: 100%;
       height: 100%;
+      aspect-ratio: auto;
     }
   }
 
