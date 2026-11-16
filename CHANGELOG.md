@@ -13,6 +13,21 @@ untouched do not need one.
 
 ## Unreleased
 
+### Media
+
+- **Fixed: cover-cropped images no longer over-fetch.** `@nuxt/image` builds
+  a `sizes` entry's srcset width at that entry's screen width, so a cover
+  image sized in `vw` asked for up to twice the pixels it is shown at. Cover
+  images now size each entry, except the widest, in `px` at the width they are
+  shown. Srcset candidates wider than the source are clamped to it, so they no
+  longer request the same pixels under a larger URL: `Media/Image` passes the
+  source width to the image provider as a `maxWidth` modifier, which the
+  provider removes before building the URL.
+- **New: `audit:perf` flags over-fetched images.** Its image check now reports
+  an error when an image is delivered over 1.5x the size it needs and a much
+  smaller srcset candidate would have done. A site whose container is
+  narrower than the layer's 96rem default now shows up here.
+
 ### Views
 
 - **Fixed: rows that replace a View's rows no longer fade in.** After a

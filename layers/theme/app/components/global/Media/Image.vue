@@ -121,6 +121,9 @@ const providerSizes = computed(() => isBare.value && !isHero.value
       imageScreens,
     ),
 )
+const sourceWidthLimit = computed(() =>
+  Number(props.width) > 0 ? { maxWidth: Number(props.width) } : undefined,
+)
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
@@ -278,6 +281,7 @@ onMounted(() => {
     :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
+    :modifiers="sourceWidthLimit"
     :quality="theme.media.image.quality"
     :sizes="providerSizes"
     :src="providerSource"
@@ -323,6 +327,7 @@ onMounted(() => {
       :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
+      :modifiers="sourceWidthLimit"
       :quality="theme.media.image.quality"
       :sizes="providerSizes"
       :src="providerSource"

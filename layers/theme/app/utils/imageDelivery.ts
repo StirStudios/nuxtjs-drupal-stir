@@ -236,8 +236,15 @@ const coverHeightAt = (height: CoverHeight, viewport: number) =>
  * An object-cover image in a box of fixed height is shown at the box height
  * times its own aspect ratio when it is wider than the box, so a delivery
  * profile sized to the box width alone upscales it. Widens each profile entry
- * to the image's shown width across that entry's viewport range, but never
- * past the source width (IPX does not enlarge).
+ * to the image's shown width, never past the source width (IPX does not
+ * enlarge).
+ *
+ * @nuxt/image applies an entry up to its screen width and builds its srcset
+ * candidate at that width. A vw size scales with the viewport, but a cover
+ * image's width follows the box height, which is constant at the min or max of
+ * its clamp. So every entry but the last asks for the shown width at the
+ * widest viewport it covers, in px; a vw size would be multiplied by the
+ * screen width again and over-fetch.
  */
 export function resolveCoverImageSizes(
   sizes: string | undefined,
@@ -250,6 +257,8 @@ export function resolveCoverImageSizes(
 
   const aspectRatio = mediaAspectRatio(sourceWidth, sourceHeight)
   const maxWidth = Number(sourceWidth) > 0 ? Number(sourceWidth) : Infinity
+  const shownAt = (viewport: number) =>
+    Math.min(maxWidth, coverHeightAt(height, viewport) * aspectRatio)
 
   const entries = sizes.trim().split(/\s+/).map((entry) => {
     const [key = '', size = ''] = entry.split(':')
@@ -265,23 +274,21 @@ export function resolveCoverImageSizes(
 
   return entries.map(({ key, size, screen }, index) => {
     const amount = Number.parseFloat(size)
-    const next = entries[index + 1]
+    const fluid = size.endsWith('vw')
+    const last = index === entries.length - 1
 
-    if (size.endsWith('vw')) {
-      // The shown width relative to the viewport is largest at the narrowest
-      // viewport the entry covers.
-      const from = index === 0 ? MIN_VIEWPORT_PX : screen
-      const shownVw = (Math.min(maxWidth, coverHeightAt(height, from) * aspectRatio) * 100) / from
+    if (last && fluid) {
+      // Applies to every wider viewport too, so stay fluid at the largest
+      // shown-to-viewport ratio, at the narrowest viewport it covers.
+      const from = index === 0 ? MIN_VIEWPORT_PX : entries[index - 1]!.screen
 
-      return `${key}:${Math.ceil(Math.max(amount, shownVw))}vw`
+      return `${key}:${Math.ceil(Math.max(amount, (shownAt(from) * 100) / from))}vw`
     }
 
-    // A fixed-width box: the height, and so the shown width, peaks at the
-    // widest viewport the entry covers.
-    const shownPx = next
-      ? coverHeightAt(height, next.screen - 1) * aspectRatio
-      : height.max * aspectRatio
+    const widest = last ? Infinity : screen - 1
+    const box = fluid ? (amount / 100) * widest : amount
+    const shown = last ? Math.min(maxWidth, height.max * aspectRatio) : shownAt(widest)
 
-    return `${key}:${Math.ceil(Math.max(amount, Math.min(maxWidth, shownPx)))}px`
+    return shown > box ? `${key}:${Math.ceil(shown)}px` : `${key}:${size}`
   }).join(' ')
 }

@@ -17,7 +17,21 @@ import {
 } from '../../layers/theme/app/utils/imageDelivery'
 import type { GridConfig } from '../../layers/theme/app/utils/gridClasses'
 import { h } from 'vue'
-import createStirIpxProvider from '../../layers/theme/build/imageCdn'
+import createStirIpxProvider, { withinSourceWidth } from '../../layers/theme/build/imageCdn'
+
+describe('withinSourceWidth', () => {
+  it('clamps a candidate wider than the source, keeping its aspect ratio', () => {
+    expect(withinSourceWidth({ width: 6004, height: 2692, maxWidth: 2400, format: 'webp' }))
+      .toEqual({ width: 2400, height: 1076, format: 'webp' })
+  })
+
+  it('drops the limit and keeps candidates within the source', () => {
+    expect(withinSourceWidth({ width: 1499, height: 672, maxWidth: 2400 }))
+      .toEqual({ width: 1499, height: 672 })
+    expect(withinSourceWidth({ width: 640 })).toEqual({ width: 640 })
+    expect(withinSourceWidth(undefined)).toBeUndefined()
+  })
+})
 
 describe('versionImageSource', () => {
   it('adds a managed-file revision without changing the original path', () => {
@@ -286,20 +300,30 @@ describe('cover image sizes', () => {
       772,
       screens,
     )!
-    const xl = Number(/(?:^| )xl:(\d+)vw/.exec(sizes)![1])
+    const widest = Number(/(?:^| )2xl:(\d+)vw/.exec(sizes)![1])
 
     // At 1400px the box is 1400x560, so the image is shown about 2902px wide.
-    expect((xl / 100) * 1400).toBeGreaterThanOrEqual(560 * (4000 / 772))
+    expect((widest / 100) * 1400).toBeGreaterThanOrEqual(560 * (4000 / 772))
+    // Below sm the box is 320px tall: the shown width, not 100vw of the screen.
+    expect(sizes).toMatch(/^sm:1659px md:1659px lg:2121px xl:2651px 2xl:208vw$/)
+  })
+
+  it('asks for the shown width in px, not vw that @nuxt/image multiplies by the screen width', () => {
+    // A 2.23:1 hero 672px tall on a phone is shown about 1499px wide.
+    expect(resolveCoverImageSizes('sm:100vw md:100vw', { min: 672, vw: 40, max: 800 }, 2400, 1076, screens))
+      .toBe('sm:1499px md:235vw')
   })
 
   it('widens a fixed-width entry to the tallest box it covers', () => {
     expect(resolveCoverImageSizes('sm:100vw md:90vw xl:1200px', breakHeight, 4000, 772, screens))
-      .toBe('sm:519vw md:216vw xl:3317px')
+      .toBe('sm:1659px md:1659px xl:3317px')
   })
 
   it('never asks for more than the source width', () => {
     expect(resolveCoverImageSizes('sm:100vw xl:1200px', breakHeight, 2000, 386, screens))
-      .toBe('sm:519vw xl:2000px')
+      .toBe('sm:1659px xl:2000px')
+    expect(resolveCoverImageSizes('sm:100vw xl:1200px', breakHeight, 1200, 232, screens))
+      .toBe('sm:1200px xl:1200px')
   })
 
   it('keeps sizes when the image is narrower than the box or not cover-cropped', () => {

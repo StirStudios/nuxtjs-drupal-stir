@@ -2,7 +2,8 @@
 // images in the first viewport and its byte audits only flag images that are
 // too large, so an image requested too small (and upscaled) passes them. This
 // scrolls each route so lazy images load, then compares the pixels each image
-// delivered with the pixels it is shown at.
+// delivered with the pixels it is shown at, both ways: too small (upscaled)
+// and far too large (over-fetched).
 
 // Screens at DPR 3 still get 2x images, the usual cap (Lighthouse's too).
 export const IMAGE_VIEWPORTS = [
@@ -12,6 +13,9 @@ export const IMAGE_VIEWPORTS = [
 ]
 
 const TOLERANCE = 0.9
+// A browser picks the smallest candidate that covers its need, so a gap
+// between srcset widths alone over-fetches by up to the step between them.
+const OVERSIZE = 1.5
 const MIN_SHOWN_PX = 64
 
 /**
@@ -29,13 +33,24 @@ export function neededWidth({ boxWidth, boxHeight, aspectRatio, cover }, dpr) {
 
 /**
  * error: a larger candidate was in srcset but `sizes` led the browser to a
- * smaller one (a code fault). warning: the largest image available is still
- * smaller than shown (the source upload is too small).
+ * smaller one, or a much smaller candidate would have covered the need but
+ * `sizes` led it to a far larger one (code faults). warning: the largest image
+ * available is still smaller than shown (the source upload is too small).
  */
 export function classifyImage(image, dpr) {
   if (image.boxWidth < MIN_SHOWN_PX || !image.deliveredWidth) return undefined
 
   const needed = neededWidth(image, dpr)
+
+  if (image.deliveredWidth > needed * OVERSIZE) {
+    const enough = (image.candidateWidths ?? [])
+      .filter(width => width >= needed * TOLERANCE)
+      .sort((a, b) => a - b)[0]
+
+    return enough && enough * OVERSIZE < image.deliveredWidth
+      ? { level: 'error', kind: 'oversized', needed, available: enough }
+      : undefined
+  }
 
   if (image.deliveredWidth >= needed * TOLERANCE) return undefined
 
@@ -43,6 +58,7 @@ export function classifyImage(image, dpr) {
 
   return {
     level: available > image.deliveredWidth * 1.05 ? 'error' : 'warning',
+    kind: 'undersized',
     needed,
     available,
   }
@@ -92,6 +108,7 @@ async function describeImages() {
       cover: getComputedStyle(image).objectFit === 'cover',
       aspectRatio: image.naturalHeight ? image.naturalWidth / image.naturalHeight : 0,
       deliveredWidth,
+      candidateWidths: candidates.map(([, descriptor]) => Number.parseInt(descriptor)),
       largestWidth: largest && new URL(largest, location.href).href !== image.currentSrc
         ? await pixelWidth(largest)
         : deliveredWidth,
@@ -132,12 +149,14 @@ export async function auditImageResolution(urls) {
   return findings
 }
 
-export function describeFinding({ url, viewport, image, needed, available }) {
+export function describeFinding({ url, viewport, image, kind, needed, available }) {
   const file = decodeURIComponent(new URL(image.src).pathname.split('/').pop() ?? image.src)
   const shown = `${Math.round(image.boxWidth)}x${Math.round(image.boxHeight)}${image.cover ? ' cover' : ''}`
 
   return `${new URL(url).pathname} ${viewport}: ${file} (${shown}) delivered ${image.deliveredWidth}px, needs ${needed}px; `
-    + (available > image.deliveredWidth
+    + (kind === 'oversized'
+      ? `a ${available}px candidate was enough, so its sizes is too large.`
+      : available > image.deliveredWidth
       ? `${available}px was available, so its sizes is too small.`
       : 'the source is too small.')
 }

@@ -29,12 +29,23 @@ describe('image resolution audit', () => {
   it('reports a code fault when a larger candidate was available', () => {
     // The panorama before the fix: 1200px chosen though 2400px was in srcset.
     expect(classifyImage(image({ deliveredWidth: 1200, largestWidth: 2400 }), 1))
-      .toEqual({ level: 'error', needed: 2902, available: 2400 })
+      .toEqual({ level: 'error', kind: 'undersized', needed: 2902, available: 2400 })
   })
 
   it('reports only a warning when the source itself is too small', () => {
     expect(classifyImage(image({ cover: false, boxWidth: 1920, deliveredWidth: 1024, largestWidth: 1024 }), 1))
-      .toEqual({ level: 'warning', needed: 1920, available: 1024 })
+      .toEqual({ level: 'warning', kind: 'undersized', needed: 1920, available: 1024 })
+  })
+
+  it('reports a code fault when a much smaller candidate would have covered the need', () => {
+    // A short band on a phone shown 780px wide at 2x, delivered at 4260px.
+    expect(classifyImage(image({ boxWidth: 390, boxHeight: 75, deliveredWidth: 4260, candidateWidths: [1659, 3318, 6642] }), 2))
+      .toEqual({ level: 'error', kind: 'oversized', needed: 780, available: 1659 })
+  })
+
+  it('accepts an oversized image when no smaller candidate would do', () => {
+    expect(classifyImage(image({ boxWidth: 390, boxHeight: 75, deliveredWidth: 1659, candidateWidths: [1659, 3318] }), 2))
+      .toBeUndefined()
   })
 
   it('ignores icons and images that never loaded', () => {
