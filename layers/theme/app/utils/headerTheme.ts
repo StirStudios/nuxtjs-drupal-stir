@@ -72,6 +72,26 @@ export function heroUnderHeaderIsDark(
 export const headerTransparentSurface = (value: unknown, overDarkHero: boolean): HeaderLogoSurface =>
   overDarkHero ? headerLogoSurface(value) : 'auto'
 
+/**
+ * Desktop menu classes for the header's surface. On a dark transparent header
+ * the top-level links take the surface's highlighted text (white), and the
+ * dropdown panel returns to a light page's surface instead of inheriting the
+ * header's dark mode. A site's own `navigation.ui` classes come last and win.
+ */
+export const headerNavUi = (
+  ui: Partial<Record<string, unknown>> | undefined,
+  surface: HeaderLogoSurface,
+  pageIsDark: boolean,
+): Record<string, string> | undefined => {
+  if (surface !== 'dark') return ui as Record<string, string> | undefined
+
+  return {
+    ...ui as Record<string, string>,
+    link: joinHeaderClasses('text-highlighted', ui?.link),
+    viewport: joinHeaderClasses(!pageIsDark && 'light', ui?.viewport),
+  }
+}
+
 export const headerConfigString = <T extends string>(value: unknown): T | undefined =>
   typeof value === 'string' && value.trim() ? value.trim() as T : undefined
 

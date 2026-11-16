@@ -7,6 +7,7 @@ import {
   headerDesktopLayout,
   headerLogoSurface,
   headerMenuAngleStyle,
+  headerNavUi,
   headerToggleDirection,
   headerTransparentSurface,
   heroUnderHeaderIsDark,
@@ -38,6 +39,18 @@ describe('header theme', () => {
     expect(headerLogoSurface(1)).toBe('auto')
     expect(headerTransparentSurface('dark', true)).toBe('dark')
     expect(headerTransparentSurface('dark', false)).toBe('auto')
+  })
+
+  it('keeps menu links white and the dropdown on the page surface over a dark hero', () => {
+    const ui = { link: 'uppercase', item: 'px-2' }
+
+    expect(headerNavUi(ui, 'auto', false)).toBe(ui)
+    expect(headerNavUi(ui, 'dark', false)).toEqual({
+      link: 'text-highlighted uppercase',
+      item: 'px-2',
+      viewport: 'light',
+    })
+    expect(headerNavUi(undefined, 'dark', true)).toEqual({ link: 'text-highlighted', viewport: '' })
   })
 
   it('treats a hero as dark under the header only when it renders dark', () => {

@@ -18,6 +18,7 @@ import {
   headerDesktopClasses,
   headerDesktopLayout,
   headerMenuAngleStyle,
+  headerNavUi,
   headerToggleDirection,
   headerTransparentSurface,
   heroUnderHeaderIsDark,
@@ -108,13 +109,14 @@ const navProps = computed(() => {
     highlight,
     highlightColor: highlight ? headerConfigString<NavigationMenuColor>(navigation.highlight?.color) : undefined,
     variant: headerConfigString<NavigationMenuVariant>(navigation.variant),
-    ui: navigation.ui,
+    ui: headerNavUi(navigation.ui, logoSurface.value, isDark.value),
   }
 })
 const menuAngled = computed(() => Boolean(theme.navigation.slideover?.angle))
 const toggleComponent = computed(() => toRegisteredComponent(theme.navigation?.toggleComponent))
 const actionsComponent = computed(() => toRegisteredComponent(theme.navigation?.actionsComponent))
 const siteTitle = computed(() => page.value?.site_info?.name ?? '')
+const { isDark } = useDarkMode()
 const showColorModeToggle = computed(() => appConfig.colorMode?.showToggle !== false)
 const finalIsScrolled = computed(() => {
   if (!hydrated.value) return false
