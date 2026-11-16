@@ -180,7 +180,7 @@ Gates (`package.json`):
 
 Validation policy:
 
-- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts (`pnpm audit:inventory`, `pnpm contracts:sync`), then run `pnpm verify:ci`.
+- Default for production-impacting and upstream PR changes: reconcile the target branch, regenerate tracked inventories/contracts (`pnpm audit:inventory`, `pnpm contracts:sync`), run the local checks below, and let CI run `pnpm verify:ci` on the PR.
 - If debugging failures, run the individual commands:
   - `pnpm lint`
   - `pnpm typecheck`
@@ -189,9 +189,21 @@ Validation policy:
   - `pnpm test:e2e`
   - `pnpm test:a11y`
   - `pnpm build`
+- Local test load: Nuxt runtime specs each boot a Nuxt app and E2E specs each run a full build, so running them carelessly stalls a laptop.
+  - For quick checks run `pnpm test`, `pnpm lint` and `pnpm typecheck`.
+  - Run a heavy suite (`test:nuxt`, `test:e2e`, consumer or preset builds) only when the change needs it, one at a time, never in the background and never alongside `typecheck`, a dev server or DDEV work. Leave `test:all` and `verify:ci` to CI.
+  - If `scripts/test/heavy.mjs` refuses to start, wait for the other run or the load to drop. Do not set `STIR_HEAVY_OK=1` or raise `STIR_TEST_MAX_WORKERS` to get around it.
 - `pnpm generate` only when static output behavior is affected; `pnpm dev` for manual checks.
 - For docs-only or clearly isolated non-runtime edits, targeted validation is acceptable, but state what was intentionally skipped.
 - Any change touching auth, headers, route middleware, CE fetch/proxy behavior, or runtime config must run the full validation set above.
+
+Running tests locally without stalling the machine:
+
+- Each Nuxt runtime spec boots a full Nuxt app and each e2e spec runs a full build. Run in parallel next to other work, they have exhausted memory and stalled a developer's Mac.
+- For quick checks run `pnpm lint`, `pnpm typecheck` and `pnpm test` (unit only), one after another, not in parallel.
+- Run heavy suites (`test:nuxt`, `test:e2e`, `test:all`, `verify:*`, consumer and preset builds) one at a time. Never run them alongside typecheck, a dev server, a client site's build or DDEV work. Prefer leaving `verify:ci` to CI.
+- `scripts/test/heavy.mjs` refuses a heavy run when another one holds its lock or the load average is above 1.5x the cores. Don't bypass it with `STIR_HEAVY_OK=1` on a local machine; wait, or report the check as skipped.
+- Don't start a heavy run in the background and then start other heavy work.
 
 Security change smoke checklist (required when auth/header/routing behavior changes):
 
