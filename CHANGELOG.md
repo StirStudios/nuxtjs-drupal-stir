@@ -15,6 +15,33 @@ untouched do not need one.
 
 ### Media
 
+- **Changed (breaking): image `sizes` come from the layout, not named
+  profiles.** Each image's width is worked out from where it sits: the page
+  gives the viewport, a contained Layout the theme container, the Width field
+  caps it, and grid columns, gallery lanes and carousel slides split it, so
+  nesting composes. `sizes` is generated per breakpoint with exact `calc()`
+  values, and lazy images lead with `auto`. Phase 3 of
+  `docs/image-delivery-plan.md`.
+  - Removed: `stirTheme.media.image.profiles`, the
+    `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey` and
+    `fullBleedParagraphsKey` injection keys, `paragraphUuids`, the
+    `resolve*DeliveryProfile`, `resolveCarouselImageDeliverySizes` and
+    `resolveCoverImageSizes` functions, `NodeDisplay`'s `imageDeliveryProfile`
+    prop, `MediaItem`'s `deliveryProfile` prop, the `#stir-image-provider`
+    alias and the provider's `maxWidth` modifier.
+  - Added: `stirTheme.media.image.container` (the theme container in px; keep
+    it in step with `stirTheme.container` and `--ui-container`), the
+    `imageSlotKey` injection key with `viewportSlot`, `containerSlot`,
+    `widthSlot`, `gridSlot`, `wrapGridSlot`, `coverSlot` and
+    `imageSlotSizes`, and the `ImageSlotProvider` component.
+  - `useOptimizedDrupalHtml()` takes only its source: rich-text images use
+    the paragraph's slot, half of it when floated.
+  - `Media/Image` renders a plain `<img>` (no `data-nuxt-img`). Drupal's
+    `deliveryProfile` is read only as `full` (edge to edge); `deliverySizes`
+    still overrides `sizes`.
+  - A site passing `theme.media.image.profiles.*` as `delivery-sizes` should
+    drop the prop and let the layout's slot size the image.
+
 - **Changed: every image srcset comes from one width ladder.** `Media/Image`
   and rich-text images now offer 320, 480, 640, 750, 828, 1080, 1200, 1440,
   1920, 2400, 2880, 3360 and 3840px, capped at the source width, instead of

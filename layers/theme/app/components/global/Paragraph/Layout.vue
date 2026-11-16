@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { slugify } from '#stir/utils/stringUtils'
-import { useSlotVNode } from '#stir/composables/useSlotsToolkit'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import {
   provideRevealMotionScope,
   useRevealMotionScope,
 } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
-import {
-  fullBleedParagraphsKey,
-  layoutImageDeliveryProfileKey,
-  paragraphUuids,
-  resolveGridImageDeliveryProfile,
-} from '#stir/utils/imageDelivery'
+import { imageSlotKey, wrapGridSlot } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import { resolveAlignClasses, type AlignConfig, type GridConfig } from '#stir/utils/gridClasses'
 import { resolvePresentationCard, resolvePresentationClasses } from '#stir/utils/presentationClasses'
@@ -78,9 +72,21 @@ const isGridLayout = computed(
   () => props.layout === 'grid' || props.layout?.startsWith('grid_col') === true,
 )
 const hasGridItems = computed(() => isGridLayout.value && Boolean(vueSlots.items))
-const imageDeliveryProfile = computed(() =>
-  resolveGridImageDeliveryProfile(props.gridClass, props.layout, props.width, props.container),
-)
+const parentImageSlot = inject(imageSlotKey, undefined)
+const themeContainer = useAppConfig().stirTheme.media.image.container
+const fullSpanRegions = ['top', 'bottom']
+// Side-by-side regions take the grid's columns in order (an 8fr/4fr template
+// gives each its share); top and bottom span the grid.
+const columnRegions = computed(() => orderedSlots.value
+  .map(([name]) => name)
+  .filter(name => name !== 'items' && !fullSpanRegions.includes(name)))
+const imageSlotFor = (region?: string) => wrapGridSlot(parentImageSlot?.value, themeContainer, {
+  container: props.container,
+  grid: props.gridClass,
+  region: region ? Math.max(columnRegions.value.indexOf(region), 0) : undefined,
+  span: region ? fullSpanRegions.includes(region) : false,
+  width: props.width,
+})
 const reversesTwoColumnMobileStack = computed(
   () => props.reverseMobile === true && props.layout?.startsWith('two_column') === true,
 )
@@ -133,16 +139,7 @@ const headerMotionProps = useRevealMotionProps(
   () => getRevealDelayMs(headerStaggerIndex),
 )
 
-provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
-
-const parentFullBleed = inject(fullBleedParagraphsKey, undefined)
-
-provide(fullBleedParagraphsKey, computed(() => paragraphUuids(
-  props.uuid && parentFullBleed?.value.has(props.uuid)
-  && !props.container && !props.width && !imageDeliveryProfile.value
-    ? orderedSlots.value.flatMap(([name]) => useSlotVNode(vueSlots, name))
-    : [],
-)))
+provide(imageSlotKey, computed(() => imageSlotFor()))
 </script>
 
 <template>
@@ -186,7 +183,9 @@ provide(fullBleedParagraphsKey, computed(() => paragraphUuids(
             ['top', 'bottom'].includes(slotName) ? 'col-span-full' : '',
           ]"
         >
-          <slot :name="slotName" />
+          <ImageSlotProvider :image-slot="imageSlotFor(slotName)">
+            <slot :name="slotName" />
+          </ImageSlotProvider>
         </div>
       </template>
     </WrapGrid>

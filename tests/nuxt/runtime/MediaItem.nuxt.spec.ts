@@ -252,30 +252,9 @@ describe('MediaItem (Nuxt runtime)', () => {
     expect(playIcon.classes()).toContain('size-9')
   })
 
-  it('uses the contextual delivery profile for gallery images', async () => {
+  it('preserves explicit delivery sizes over the layout slot', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {
-        deliveryProfile: 'card',
-        index: 0,
-        node: h('div'),
-        tk: {
-          propsOf: () => ({
-            alt: 'Gallery image',
-            src: '/gallery.webp',
-            type: 'image',
-          }),
-        } as Pick<SlotsToolkit, 'propsOf'>,
-      },
-    })
-
-    expect(wrapper.get('img').attributes('sizes'))
-      .toBe('(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 34vw, 480px')
-  })
-
-  it('preserves explicit delivery sizes over the contextual profile', async () => {
-    const wrapper = await mountSuspended(MediaItem, {
-      props: {
-        deliveryProfile: 'card',
         index: 0,
         node: h('div'),
         tk: {

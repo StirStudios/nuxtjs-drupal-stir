@@ -12,8 +12,8 @@ import {
 } from '#stir/composables/useDrupalViewScrollRestore'
 import { drupalViewQueryNamespaceKey, drupalViewRowRevealKey } from '#stir/utils/drupalViewContext'
 import {
-  layoutImageDeliveryProfileKey,
-  resolveGridImageDeliveryProfile,
+  imageSlotKey,
+  wrapGridSlot,
 } from '#stir/utils/imageDelivery'
 
 const props = defineProps<DrupalViewProps>()
@@ -40,16 +40,14 @@ const vueSlots = useSlots()
 const tk = useSlotsToolkit(vueSlots)
 const viewRoot = useTemplateRef<HTMLElement>('viewRoot')
 const inheritedQueryNamespace = inject(drupalViewQueryNamespaceKey, undefined)
-const inheritedImageDeliveryProfile = inject(
-  layoutImageDeliveryProfileKey,
-  undefined,
-)
-const viewImageDeliveryProfile = computed(() =>
-  resolveGridImageDeliveryProfile(props.gridItems, undefined, props.width)
-    || inheritedImageDeliveryProfile?.value,
-)
+const parentImageSlot = inject(imageSlotKey, undefined)
+const themeContainer = useAppConfig().stirTheme.media.image.container
 
-provide(layoutImageDeliveryProfileKey, viewImageDeliveryProfile)
+provide(imageSlotKey, computed(() => wrapGridSlot(parentImageSlot?.value, themeContainer, {
+  container: props.container,
+  grid: props.gridItems,
+  width: props.width,
+})))
 
 const {
   isLoading,
