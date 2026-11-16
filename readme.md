@@ -166,7 +166,7 @@ parameters so campaign attribution and query-driven state are not lost.
 - Real consumer pilots: `STIR_CONSUMER_TARGETS=/path/to/consumer-targets.json STIR_CONSUMER_EXAMPLE=/path/to/site-nuxt pnpm audit:consumers example --verify`; the target list names client sites, so it lives in the private ops repository (archives committed source into a disposable directory, installs the packed layer and its Nuxt version, then typechecks/builds without changing the project checkout)
 - Accessibility auditing: `pnpm test:a11y` (Playwright + axe across responsive and color-scheme states)
 - SEO auditing: `pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
-- Performance auditing: `pnpm audit:perf` (Lighthouse mobile and desktop on representative routes, against budgets)
+- Performance auditing: `pnpm audit:perf` (Lighthouse mobile and desktop on representative routes, against budgets, plus an image resolution scan that scrolls each route at desktop 1920 @1x, laptop 1400 @2x and mobile 390 @2x and fails when an image is delivered smaller than shown although a larger size was available; `--no-images` skips it)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
 
 ### Running tests without stalling the machine

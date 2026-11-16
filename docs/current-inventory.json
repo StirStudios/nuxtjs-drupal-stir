@@ -878,12 +878,12 @@
     "serverRoutes": 33,
     "productionDependencies": 37,
     "developmentDependencies": 25,
-    "tests": 266,
+    "tests": 267,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
       "nuxt": 118,
-      "scripts": 6,
+      "scripts": 7,
       "server": 37,
       "unit": 12,
       "utils": 76
@@ -1029,6 +1029,7 @@
     "tests/scripts/complianceReview.spec.ts",
     "tests/scripts/complianceWebforms.spec.ts",
     "tests/scripts/perfGrowth.spec.ts",
+    "tests/scripts/perfImageResolution.spec.ts",
     "tests/scripts/privateNames.spec.ts",
     "tests/scripts/seoHtml.spec.ts",
     "tests/server/adminMenuApi.spec.ts",
