@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { useMediaModal } from '#stir/composables/useMediaModal'
 import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
-import { resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
+import { fullBleedParagraphsKey, resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
 import { maxGridColumns, resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
 import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { masonryGridStyle, masonryItemStyles } from '../../../utils/masonryLayout'
@@ -110,9 +110,14 @@ const layoutGrid = computed<GridConfig | undefined>(() => {
 
   return { columns: props.masonry.lanes ?? { default: 1 }, gap } as GridConfig
 })
-const deliveryProfile = computed(() =>
-  resolveStableMediaDeliveryProfile(layoutGrid.value, false),
-)
+const fullBleedParagraphs = inject(fullBleedParagraphsKey, undefined)
+const deliveryProfile = computed(() => {
+  const profile = resolveStableMediaDeliveryProfile(layoutGrid.value, false)
+  const isFullBleed = !resolvedWidth.value
+    && Boolean(props.uuid && fullBleedParagraphs?.value.has(props.uuid))
+
+  return profile === 'container' && isFullBleed ? 'full' : profile
+})
 // The first row of the page's first media paragraph is the likely LCP: those
 // images load eagerly without a reveal, and everything after stays lazy.
 const isLead = useLeadMedia(props.uuid ?? props.id)

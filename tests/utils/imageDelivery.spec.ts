@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import {
   MODAL_FRAME,
   mediaAspectRatio,
+  paragraphUuids,
   resolveModalImageSizes,
   resolveLayoutImageDeliveryProfile,
   resolveGridImageDeliveryProfile,
@@ -15,6 +16,7 @@ import {
   resolveCoverImageSizes,
 } from '../../layers/theme/app/utils/imageDelivery'
 import type { GridConfig } from '../../layers/theme/app/utils/gridClasses'
+import { h } from 'vue'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
 
 describe('versionImageSource', () => {
@@ -302,5 +304,16 @@ describe('cover image sizes', () => {
       .toBe('sm:100vw xl:1200px')
     expect(resolveCoverImageSizes('sm:100vw xl:1200px', undefined, 5000, 1000, screens))
       .toBe('sm:100vw xl:1200px')
+  })
+})
+
+describe('paragraphUuids', () => {
+  it('collects the uuids of rendered paragraphs, skipping blanks', () => {
+    expect([...paragraphUuids([
+      h('div', { uuid: 'a' }),
+      h('div', { uuid: '' }),
+      h('div'),
+      h('div', { uuid: 'b' }),
+    ])]).toEqual(['a', 'b'])
   })
 })

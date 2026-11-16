@@ -3,9 +3,12 @@ import type { NodeDefaultProps } from '#stir/types'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
+import { useSlotVNode } from '#stir/composables/useSlotsToolkit'
 import {
   carouselImageDeliverySizesKey,
+  fullBleedParagraphsKey,
   layoutImageDeliveryProfileKey,
+  paragraphUuids,
 } from '#stir/utils/imageDelivery'
 
 const props = withDefaults(
@@ -78,6 +81,14 @@ const nestedCarouselImageDeliverySizes = computed(() => {
 provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
 provide(carouselImageDeliverySizesKey, nestedCarouselImageDeliverySizes)
 provide(layoutImageDeliveryProfileKey, nestedImageDeliveryProfile)
+// Only a page's own default rendering puts its fields straight into the page
+// width; articles, teasers, wrappers and nested nodes are contained.
+provide(fullBleedParagraphsKey, computed(() => paragraphUuids(
+  renderMode.value === 'default' && !props.contentClass && !slots.default
+  && !props.imageDeliveryProfile && !parentLayoutImageDeliveryProfile
+    ? contentSlotNames.value.flatMap(name => useSlotVNode(slots, name))
+    : [],
+)))
 provideRevealMotionScope(
   () => props.pageAnimation,
   { stagger: () => resolveBooleanProp(props.pageAnimationStagger) },
