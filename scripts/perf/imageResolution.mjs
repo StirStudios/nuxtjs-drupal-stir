@@ -9,6 +9,9 @@
 export const IMAGE_VIEWPORTS = [
   { name: 'desktop', width: 1920, height: 1080, deviceScaleFactor: 1 },
   { name: 'laptop', width: 1400, height: 900, deviceScaleFactor: 2 },
+  { name: 'small laptop', width: 1280, height: 800, deviceScaleFactor: 2 },
+  { name: 'tablet landscape', width: 1024, height: 768, deviceScaleFactor: 2 },
+  { name: 'tablet', width: 768, height: 1024, deviceScaleFactor: 2 },
   { name: 'mobile', width: 390, height: 844, deviceScaleFactor: 2 },
 ]
 

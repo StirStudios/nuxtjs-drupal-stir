@@ -74,23 +74,43 @@ causes are structural, not individual bugs:
 
 ## Public contract changes
 
-These are consumer-affecting and go in `CHANGELOG.md`.
+These are consumer-affecting and go in `CHANGELOG.md`. Stir controls every
+site's rollout, so there are no compatibility shims: each removal lands with
+the matching site changes in the same rollout. A site that has not updated
+keeps its locked layer version and is unaffected until it does.
 
 | Today | After |
 | --- | --- |
-| `stirTheme.media.image.profiles` (named `sizes` strings) | Removed. Replaced by container settings and the slot model. Kept, ignored, for one release with a dev warning. |
-| `stirTheme.media.image.coverHeights` | Merged into one `mediaHeights` table that also generates the height classes. |
-| `deliveryProfile` prop (Drupal payload) | Accepted for one release, mapped to a slot (`full`, `container`); then removed. |
-| `deliverySizes` prop | Kept as an explicit override of `sizes` only; `srcset` still comes from the ladder. |
-| `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey`, `fullBleedParagraphsKey`, `sectionHeroMediaKey` | Replaced by `imageSlotKey`. Run `pnpm audit:consumers` before removing; sites may inject them. |
+| `stirTheme.media.image.profiles` (named `sizes` strings) | Removed. Replaced by container settings and the slot model. No site overrides it; the Stir site reads `profiles.container` and `profiles.split` in its work teasers and moves to the slot model in the same rollout. |
+| `stirTheme.media.image.coverHeights` | Merged into one `mediaHeights` table that also generates the height classes. No site overrides it. |
+| `deliveryProfile` (Drupal payload) | Stir Tools sends it from every site's exported CE display config (`full`, `container`, `card`, `auto`). With the slot model only "edge to edge" carries information, so Stir Tools replaces the setting in phase 3 (see below). Until a site has run that update, the layer reads `full` as edge to edge and ignores the rest. |
+| `deliverySizes` prop | Kept as an explicit override of `sizes` only; `srcset` still comes from the ladder. One site passes fixed px values to it in its own components. |
+| `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey`, `fullBleedParagraphsKey`, `sectionHeroMediaKey` | Replaced by `imageSlotKey`. No site uses them. |
 | `maxWidth` image modifier (new in 90750764) | Superseded by the ladder cap; removed with it. |
 
-No Drupal schema change is required. Drupal may later send a focal point for
-cover crops; that is optional.
+Site usage was checked in every local site checkout (November 2026); rerun
+`pnpm audit:consumers` before each removal.
+
+### Stir Tools
+
+Phase 3 includes a Stir Tools change, shipped with the layer change:
+
+- Replace the media formatter's `delivery_profile` setting
+  (`StirMediaFormatterSettings`, `StirMediaCeFieldFormatter`, the
+  `ImageMediaBuilder` and `ImageAssetMetadataBuilder` output, and the
+  Instagram processor's resolved profile) with nothing, or with a boolean
+  edge-to-edge flag if a case remains that layout cannot express.
+- Update the bundled CE display config (hero, popup, media, carousel and
+  carousel item) and add a post-update that removes the setting from each
+  site's active config, following Stir Tools'
+  `docs/upstreaming-and-update-paths.md`. Each site runs `drush updb` and
+  `drush cex` in the same commit.
+- Optional, phase 4: send the image's focal point, if the site uses one, so
+  cover crops keep the subject in frame.
 
 ## Phases
 
-Each phase ships on its own and leaves every site working.
+Each phase ships on its own; each site is updated as it takes the layer.
 
 1. **Measure.** Add a browser-selection simulator to the unit tests: parse
    the emitted `sizes` and `srcset`, pick a candidate the way a browser does,
@@ -102,14 +122,15 @@ Each phase ships on its own and leaves every site working.
    tablets and 2x laptops, and fewer cached URLs.
 3. **Slot model.** Add the container settings and `imageSlotKey`; make
    Layout, grids, Views, carousels and heroes narrow and provide it; generate
-   `sizes` from it. Profile names and the four old keys become adapters onto
-   the slot model, then are deprecated.
+   `sizes` from it. Remove the profiles and the four old keys, update the
+   Stir site's work teasers, and ship the Stir Tools change above, in the
+   same rollout.
 4. **Heights and cover crops.** One `mediaHeights` table; explicit hero
    height; per-breakpoint cropped sources for fixed-height cover boxes.
 5. **Loading policy.** One lead image with preload; remove `opacity-0` on
    server-rendered images.
-6. **Remove the old path** after one release: profiles, `coverHeights`,
-   `resolve*Profile` functions, the old keys and `maxWidth`.
+6. **Clean up** whatever the earlier phases left: `coverHeights`, the
+   remaining `resolve*Profile` functions and `maxWidth`.
 
 ## Verification per phase
 
