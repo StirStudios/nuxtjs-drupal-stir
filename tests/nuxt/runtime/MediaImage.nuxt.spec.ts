@@ -193,7 +193,7 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(wrapper.get('img').attributes()).toMatchObject({
         'data-nuxt-img': '',
-        'sizes': '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 400px',
+        'sizes': '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 34vw, 480px',
         src: 'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       })
     expect(wrapper.get('img').attributes('srcset')).toContain(
@@ -236,7 +236,7 @@ describe('MediaImage (Nuxt runtime)', () => {
         'image.jpg?v=42-1710000000-293400',
       )
       expect(wrapper.get('img').attributes('sizes')).toBe(
-        '(max-width: 767px) 100vw, (max-width: 1279px) 90vw, 1200px',
+        '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
       )
   })
 
@@ -372,7 +372,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes('sizes')).toBe(
-      '(max-width: 767px) 100vw, (max-width: 1279px) 90vw, 1200px',
+      '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
     )
   })
 

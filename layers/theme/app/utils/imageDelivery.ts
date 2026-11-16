@@ -72,6 +72,9 @@ export function resolveGridImageDeliveryProfile(
   const maxColumns = maxGridColumns(grid)
 
   if (maxColumns >= 3) return 'card'
+  if (layoutKey === 'two_column_8_4' || layoutKey === 'two_column_4_8') {
+    return contained ? 'splitWide' : 'splitWideFull'
+  }
   if (maxColumns === 2 || layoutKey?.startsWith('two_column')) {
     return contained ? 'split' : 'splitFull'
   }

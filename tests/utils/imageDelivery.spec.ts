@@ -108,12 +108,14 @@ describe('resolveGridImageDeliveryProfile', () => {
     )).toBe('splitFull')
   })
 
-  it('uses split delivery for the asymmetric two-column presets', () => {
+  it('sizes the asymmetric two-column presets to their wide column', () => {
     // two_column_8_4 / two_column_4_8 use an arbitrary grid-template value,
     // not a numeric column count, so only the layout key identifies them.
     const grid: GridConfig = { columns: { lg: '[8fr_4fr]' } }
 
-    expect(resolveGridImageDeliveryProfile(grid, 'two_column_8_4', undefined)).toBe('split')
+    expect(resolveGridImageDeliveryProfile(grid, 'two_column_8_4', undefined)).toBe('splitWide')
+    expect(resolveGridImageDeliveryProfile(grid, 'two_column_4_8', undefined, false)).toBe('splitWideFull')
+    expect(resolveGridImageDeliveryProfile(undefined, 'two_column', undefined)).toBe('split')
   })
 
   it('does not constrain ordinary one-column content', () => {
@@ -266,9 +268,10 @@ describe('cover image sizes', () => {
       /(\w+): \{ min: (\d+), vw: (\d+), max: (\d+) \}/g,
     )]
 
-    expect(coverHeights.map(match => match[1])).toEqual(['small', 'break', 'feature'])
+    expect(coverHeights.map(match => match[1])).toEqual(['small', 'break', 'feature', 'hero'])
 
-    for (const [, key, min, vw, max] of coverHeights) {
+    // hero is an estimate: hero heights follow their content, not a class.
+    for (const [, key, min, vw, max] of coverHeights.filter(match => match[1] !== 'hero')) {
       expect(config).toMatch(new RegExp(
         `${key}: '[^']*clamp\\(${Number(min) / 16}rem,${vw}vw,${Number(max) / 16}rem\\)`,
       ))
