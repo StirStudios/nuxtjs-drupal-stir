@@ -22,6 +22,7 @@ const props = defineProps<{
   direction?: string
   revealMode?: RevealMode
   deliveryProfile?: string
+  mediaHeight?: string
   titleDisplay?: string
   overlay?: boolean
   roundedClass?: string
@@ -39,6 +40,7 @@ const theme = useAppConfig().stirTheme
 
 const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
   const raw = props.tk.propsOf(props.node)
+  const type = normalizeDrupalMediaType(raw.type)
   const explicitDeliveryProfile = typeof raw.deliveryProfile === 'string'
     ? raw.deliveryProfile.trim()
     : ''
@@ -48,10 +50,11 @@ const mediaProps = computed<NormalizedDrupalMediaNodeProps>(() => {
 
   return {
     ...raw,
-    type: normalizeDrupalMediaType(raw.type),
+    type,
     deliveryProfile: explicitDeliverySizes
       ? explicitDeliveryProfile
       : props.deliveryProfile || explicitDeliveryProfile,
+    ...(type === 'image' ? { mediaHeight: props.mediaHeight } : {}),
   }
 })
 const loadingProps = computed(() => {

@@ -350,6 +350,7 @@ type StirThemeMediaConfig = {
     format?: 'avif' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
     quality?: number
     profiles?: Record<string, string>
+    coverHeights?: Record<string, { min: number, vw: number, max: number }>
   } & LooseRecord
   video?: {
     loadMinWidth?: number

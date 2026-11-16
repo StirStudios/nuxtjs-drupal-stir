@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   MODAL_FRAME,
@@ -10,7 +12,6 @@ import {
   resolveMediaGalleryDeliveryProfile,
   resolveStableMediaDeliveryProfile,
   versionImageSource,
-  parseCoverHeight,
   resolveCoverImageSizes,
 } from '../../layers/theme/app/utils/imageDelivery'
 import type { GridConfig } from '../../layers/theme/app/utils/gridClasses'
@@ -252,14 +253,24 @@ describe('media modal image sizes', () => {
 
 describe('cover image sizes', () => {
   const screens = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }
-  const breakHeight = parseCoverHeight('h-[clamp(20rem,40vw,40rem)]')
+  const breakHeight = { min: 320, vw: 40, max: 640 }
 
-  it('reads clamp heights, including a viewport-height cap', () => {
-    expect(breakHeight).toEqual({ minPx: 320, vw: 40, maxPx: 640 })
-    expect(parseCoverHeight(['x', 'h-[min(clamp(28rem,56vw,52rem),85svh)]']))
-      .toEqual({ minPx: 448, vw: 56, maxPx: 832 })
-    expect(parseCoverHeight('')).toBeUndefined()
-    expect(parseCoverHeight('h-64')).toBeUndefined()
+  it('matches the default media height classes', () => {
+    const config = readFileSync(
+      resolve(__dirname, '../../layers/theme/app/app.config.ts'),
+      'utf8',
+    )
+    const coverHeights = [...config.matchAll(
+      /(\w+): \{ min: (\d+), vw: (\d+), max: (\d+) \}/g,
+    )]
+
+    expect(coverHeights.map(match => match[1])).toEqual(['small', 'break', 'feature'])
+
+    for (const [, key, min, vw, max] of coverHeights) {
+      expect(config).toMatch(new RegExp(
+        `${key}: '[^']*clamp\\(${Number(min) / 16}rem,${vw}vw,${Number(max) / 16}rem\\)`,
+      ))
+    }
   })
 
   it('asks for the shown width of a panorama in a full-bleed break box', () => {

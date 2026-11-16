@@ -9,7 +9,6 @@ import {
   sectionHeroMediaKey,
   viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
-  parseCoverHeight,
   resolveCoverImageSizes,
   resolveImageDeliveryProfile,
   versionImageSource,
@@ -29,6 +28,8 @@ const props = defineProps<{
   originalSrc?: string
   deliverySizes?: string
   deliveryProfile?: string
+  // A Media paragraph height key (media.heights) when the box crops the image.
+  mediaHeight?: string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
@@ -113,7 +114,7 @@ const providerSizes = computed(() => isBare.value
   ? profileSizes.value
   : resolveCoverImageSizes(
       profileSizes.value,
-      parseCoverHeight(props.wrapperClass),
+      props.mediaHeight ? theme.media.image.coverHeights?.[props.mediaHeight] : undefined,
       props.width,
       props.height,
       imageScreens,

@@ -273,6 +273,14 @@ export default defineAppConfig({
           // The media modal frame is at most 72rem wide.
           modal: 'sm:100vw lg:1152px',
         },
+        // media.heights as numbers (px, vw) for sizing cover-cropped images;
+        // keep in step with those classes when overriding them. The feature
+        // height's 85svh cap is left out so requests stay large enough.
+        coverHeights: {
+          small: { min: 256, vw: 28, max: 416 },
+          break: { min: 320, vw: 40, max: 640 },
+          feature: { min: 448, vw: 56, max: 832 },
+        },
       },
       rounded: 'rounded-xl',
       video: {

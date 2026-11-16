@@ -209,34 +209,12 @@ export function resolveModalImageSizes(
 }
 
 const MIN_VIEWPORT_PX = 320
-const LENGTH = String.raw`(\d+(?:\.\d+)?)(rem|px)`
-const COVER_HEIGHT_PATTERN = new RegExp(
-  String.raw`(?:^|\s)h-\[(?:min\()?clamp\(${LENGTH},(\d+(?:\.\d+)?)vw,${LENGTH}\)`,
-)
 
-export interface CoverHeight { minPx: number, vw: number, maxPx: number }
-
-const toPx = (value: string, unit: string) => Number(value) * (unit === 'rem' ? 16 : 1)
-
-/**
- * Reads a cover box height written as `h-[clamp(min,Nvw,max)]` (optionally
- * inside `min(…, Nsvh)`, whose cap is ignored so requests stay large enough).
- */
-export function parseCoverHeight(classes: unknown): CoverHeight | undefined {
-  const value = Array.isArray(classes) ? classes.flat(Infinity).join(' ') : classes
-  const match = typeof value === 'string' ? COVER_HEIGHT_PATTERN.exec(value) : null
-
-  if (!match) return undefined
-
-  return {
-    minPx: toPx(match[1]!, match[2]!),
-    vw: Number(match[3]),
-    maxPx: toPx(match[4]!, match[5]!),
-  }
-}
+// A cover box height as CSS clamp(min, vw, max), in pixels.
+export interface CoverHeight { min: number, vw: number, max: number }
 
 const coverHeightAt = (height: CoverHeight, viewport: number) =>
-  Math.min(height.maxPx, Math.max(height.minPx, (height.vw / 100) * viewport))
+  Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
 
 /**
  * An object-cover image in a box of fixed height is shown at the box height
@@ -286,7 +264,7 @@ export function resolveCoverImageSizes(
     // widest viewport the entry covers.
     const shownPx = next
       ? coverHeightAt(height, next.screen - 1) * aspectRatio
-      : height.maxPx * aspectRatio
+      : height.max * aspectRatio
 
     return `${key}:${Math.ceil(Math.max(amount, Math.min(maxWidth, shownPx)))}px`
   }).join(' ')
