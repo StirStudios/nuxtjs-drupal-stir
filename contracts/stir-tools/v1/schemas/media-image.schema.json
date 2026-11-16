@@ -12,7 +12,6 @@
     "alt",
     "width",
     "height",
-    "deliveryProfile",
     "loading",
     "fetchpriority"
   ],
@@ -31,9 +30,6 @@
     "alt": { "type": "string" },
     "width": { "type": ["integer", "null"], "minimum": 0 },
     "height": { "type": ["integer", "null"], "minimum": 0 },
-    "deliveryProfile": {
-      "enum": ["auto", "card", "split", "container", "full", "hero"]
-    },
     "loading": { "enum": ["lazy", "eager"] },
     "fetchpriority": { "enum": ["low", "auto", "high"] },
     "credit": { "type": "string", "minLength": 1 },
