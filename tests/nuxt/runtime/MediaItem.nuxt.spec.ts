@@ -269,7 +269,7 @@ describe('MediaItem (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes('sizes'))
-      .toBe('(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 400px')
+      .toBe('(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 34vw, 480px')
   })
 
   it('preserves explicit delivery sizes over the contextual profile', async () => {

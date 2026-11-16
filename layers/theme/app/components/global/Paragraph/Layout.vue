@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { slugify } from '#stir/utils/stringUtils'
+import { useSlotVNode } from '#stir/composables/useSlotsToolkit'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import {
   provideRevealMotionScope,
@@ -7,7 +8,9 @@ import {
 } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import {
+  fullBleedParagraphsKey,
   layoutImageDeliveryProfileKey,
+  paragraphUuids,
   resolveGridImageDeliveryProfile,
 } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
@@ -131,6 +134,15 @@ const headerMotionProps = useRevealMotionProps(
 )
 
 provide(layoutImageDeliveryProfileKey, imageDeliveryProfile)
+
+const parentFullBleed = inject(fullBleedParagraphsKey, undefined)
+
+provide(fullBleedParagraphsKey, computed(() => paragraphUuids(
+  props.uuid && parentFullBleed?.value.has(props.uuid)
+  && !props.container && !props.width && !imageDeliveryProfile.value
+    ? orderedSlots.value.flatMap(([name]) => useSlotVNode(vueSlots, name))
+    : [],
+)))
 </script>
 
 <template>

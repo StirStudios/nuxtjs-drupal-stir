@@ -110,11 +110,12 @@ const profileSizes = computed(() =>
 )
 // A cover-cropped image in a fixed-height box (Media height other than
 // natural) is shown wider than the box when it is wider than the box's ratio.
-const providerSizes = computed(() => isBare.value
+const coverHeightKey = computed(() => isHero.value ? 'hero' : props.mediaHeight)
+const providerSizes = computed(() => isBare.value && !isHero.value
   ? profileSizes.value
   : resolveCoverImageSizes(
       profileSizes.value,
-      props.mediaHeight ? theme.media.image.coverHeights?.[props.mediaHeight] : undefined,
+      coverHeightKey.value ? theme.media.image.coverHeights?.[coverHeightKey.value] : undefined,
       props.width,
       props.height,
       imageScreens,

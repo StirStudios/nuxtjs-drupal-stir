@@ -266,10 +266,16 @@ export default defineAppConfig({
         profiles: {
           hero: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
           full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-          container: 'sm:100vw md:90vw xl:1200px',
-          split: 'sm:100vw md:50vw xl:600px',
+          // Caps match the content box of the 96rem (8xl) --ui-container
+          // client sites use (1472px inside its padding); a site with another
+          // container width overrides these.
+          container: 'sm:100vw md:100vw xl:1472px',
+          split: 'sm:100vw md:50vw xl:736px',
           splitFull: 'sm:100vw md:50vw',
-          card: 'sm:100vw md:50vw lg:33vw xl:400px',
+          // The wide column of an 8/4 or 4/8 Layout, side by side from lg.
+          splitWide: 'sm:100vw md:100vw lg:67vw xl:982px',
+          splitWideFull: 'sm:100vw md:100vw lg:67vw',
+          card: 'sm:100vw md:50vw lg:34vw xl:480px',
           // The media modal frame is at most 72rem wide.
           modal: 'sm:100vw lg:1152px',
         },
@@ -280,6 +286,9 @@ export default defineAppConfig({
           small: { min: 256, vw: 28, max: 416 },
           break: { min: 320, vw: 40, max: 640 },
           feature: { min: 448, vw: 56, max: 832 },
+          // Hero heights follow their content, so this is a generous
+          // estimate of a section or front hero's height.
+          hero: { min: 672, vw: 40, max: 800 },
         },
       },
       rounded: 'rounded-xl',

@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
 import { readUrlArgument, resolveSiteUrl } from '../seo/html.mjs'
+import { auditImageResolution, describeFinding } from './imageResolution.mjs'
 
 const args = process.argv.slice(2)
 const compliance = await readFile(resolve(process.cwd(), 'compliance/site.json'), 'utf8')
@@ -205,6 +206,22 @@ for (const route of routes) {
       if (exceeds(budget.error)) errors.push(`${message} error budget ${format[metric](budget.error)}.`)
       else if (exceeds(budget.warn)) warnings.push(`${message} warning budget ${format[metric](budget.warn)}.`)
     }
+  }
+}
+
+if (!args.includes('--no-images')) {
+  console.log('\nImage resolution (desktop 1920 @1x, laptop 1400 @2x, mobile 390 @2x)')
+
+  try {
+    const findings = await auditImageResolution(routes.map(route => new URL(route, siteUrl).href))
+
+    for (const finding of findings) {
+      (finding.level === 'error' ? errors : warnings).push(`Image resolution ${describeFinding(finding)}`)
+    }
+    console.log(`  ${findings.length ? `${findings.length} undersized image${findings.length === 1 ? '' : 's'}` : 'Every image is delivered at least at its shown size.'}`)
+  }
+  catch (error) {
+    errors.push(`Image resolution: ${error.message}`)
   }
 }
 

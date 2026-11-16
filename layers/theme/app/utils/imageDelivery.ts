@@ -1,4 +1,4 @@
-import type { ComputedRef, InjectionKey } from 'vue'
+import type { ComputedRef, InjectionKey, VNode } from 'vue'
 import type { GridConfig } from './gridClasses'
 import { GRID_BREAKPOINTS, maxGridColumns } from './gridClasses'
 
@@ -11,6 +11,19 @@ export const leadImageKey: InjectionKey<() => boolean> = Symbol('stirLeadImage')
 // Set by Paragraph/Hero when it renders as a section hero; media sizes itself as the section background.
 export const sectionHeroMediaKey: InjectionKey<ComputedRef<boolean>> =
   Symbol('stirSectionHeroMedia')
+
+// The uuids of paragraphs that span the viewport edge to edge: a default page's
+// top-level paragraphs, and the children of an uncontained single-column
+// Layout that is itself edge to edge. Matching by uuid keeps the signal from
+// reaching paragraphs nested inside others (accordions, tabs, cards).
+export const fullBleedParagraphsKey: InjectionKey<ComputedRef<ReadonlySet<string>>> =
+  Symbol('stirFullBleedParagraphs')
+
+export function paragraphUuids(nodes: VNode[]): Set<string> {
+  return new Set(nodes
+    .map(node => node.props?.uuid)
+    .filter((uuid): uuid is string => typeof uuid === 'string' && uuid !== ''))
+}
 
 export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
   Symbol('stirCarouselImageDeliverySizes')
@@ -59,6 +72,9 @@ export function resolveGridImageDeliveryProfile(
   const maxColumns = maxGridColumns(grid)
 
   if (maxColumns >= 3) return 'card'
+  if (layoutKey === 'two_column_8_4' || layoutKey === 'two_column_4_8') {
+    return contained ? 'splitWide' : 'splitWideFull'
+  }
   if (maxColumns === 2 || layoutKey?.startsWith('two_column')) {
     return contained ? 'split' : 'splitFull'
   }
