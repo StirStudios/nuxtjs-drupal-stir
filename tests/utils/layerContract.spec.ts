@@ -869,7 +869,7 @@ describe('layer contract', () => {
     expect(editableRichText).toContain('defineProps<EditableRichTextProps>()')
     expect(editableRichText).toContain(':show-quick-edit=')
     expect(editableRichText).toContain('<LazyEditText')
-    expect(editableRichText).toContain('<EditLoadingState')
+    expect(editableRichText).toContain('<LazyEditLoadingState')
     expect(editableRichText).not.toContain('animate-spin')
     expect(editableRichText).toContain('async function handleSaved(value: string)')
     expect(editableRichText).toContain('renderedText.value = value')

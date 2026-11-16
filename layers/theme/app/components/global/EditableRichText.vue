@@ -124,7 +124,7 @@ watch(
     @quick-edit="startEditing"
   >
     <template v-if="(isEditing || isLoadingEditor) && canInlineEdit">
-      <EditLoadingState v-if="isLoadingEditor" />
+      <LazyEditLoadingState v-if="isLoadingEditor" />
       <Suspense v-else>
         <LazyEditText
           :classes="classes"
@@ -135,7 +135,7 @@ watch(
         />
 
         <template #fallback>
-          <EditLoadingState />
+          <LazyEditLoadingState />
         </template>
       </Suspense>
     </template>
