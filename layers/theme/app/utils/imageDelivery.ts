@@ -207,3 +207,87 @@ export function resolveModalImageSizes(
 
   return `${MODAL_IMAGE_WIDTHS.find(width => width >= shown) ?? MODAL_FRAME.maxWidthPx}px`
 }
+
+const MIN_VIEWPORT_PX = 320
+const LENGTH = String.raw`(\d+(?:\.\d+)?)(rem|px)`
+const COVER_HEIGHT_PATTERN = new RegExp(
+  String.raw`(?:^|\s)h-\[(?:min\()?clamp\(${LENGTH},(\d+(?:\.\d+)?)vw,${LENGTH}\)`,
+)
+
+export interface CoverHeight { minPx: number, vw: number, maxPx: number }
+
+const toPx = (value: string, unit: string) => Number(value) * (unit === 'rem' ? 16 : 1)
+
+/**
+ * Reads a cover box height written as `h-[clamp(min,Nvw,max)]` (optionally
+ * inside `min(…, Nsvh)`, whose cap is ignored so requests stay large enough).
+ */
+export function parseCoverHeight(classes: unknown): CoverHeight | undefined {
+  const value = Array.isArray(classes) ? classes.flat(Infinity).join(' ') : classes
+  const match = typeof value === 'string' ? COVER_HEIGHT_PATTERN.exec(value) : null
+
+  if (!match) return undefined
+
+  return {
+    minPx: toPx(match[1]!, match[2]!),
+    vw: Number(match[3]),
+    maxPx: toPx(match[4]!, match[5]!),
+  }
+}
+
+const coverHeightAt = (height: CoverHeight, viewport: number) =>
+  Math.min(height.maxPx, Math.max(height.minPx, (height.vw / 100) * viewport))
+
+/**
+ * An object-cover image in a box of fixed height is shown at the box height
+ * times its own aspect ratio when it is wider than the box, so a delivery
+ * profile sized to the box width alone upscales it. Widens each profile entry
+ * to the image's shown width across that entry's viewport range, but never
+ * past the source width (IPX does not enlarge).
+ */
+export function resolveCoverImageSizes(
+  sizes: string | undefined,
+  height: CoverHeight | undefined,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+  screens: Record<string, number>,
+): string | undefined {
+  if (!sizes || !height) return sizes
+
+  const aspectRatio = mediaAspectRatio(sourceWidth, sourceHeight)
+  const maxWidth = Number(sourceWidth) > 0 ? Number(sourceWidth) : Infinity
+
+  const entries = sizes.trim().split(/\s+/).map((entry) => {
+    const [key = '', size = ''] = entry.split(':')
+
+    return { key, size, screen: screens[key] ?? Number.parseInt(key) }
+  })
+
+  if (entries.some(({ screen, size }) => !screen || !/^\d+(?:\.\d+)?(?:vw|px)$/.test(size))) {
+    return sizes
+  }
+
+  entries.sort((a, b) => a.screen - b.screen)
+
+  return entries.map(({ key, size, screen }, index) => {
+    const amount = Number.parseFloat(size)
+    const next = entries[index + 1]
+
+    if (size.endsWith('vw')) {
+      // The shown width relative to the viewport is largest at the narrowest
+      // viewport the entry covers.
+      const from = index === 0 ? MIN_VIEWPORT_PX : screen
+      const shownVw = (Math.min(maxWidth, coverHeightAt(height, from) * aspectRatio) * 100) / from
+
+      return `${key}:${Math.ceil(Math.max(amount, shownVw))}vw`
+    }
+
+    // A fixed-width box: the height, and so the shown width, peaks at the
+    // widest viewport the entry covers.
+    const shownPx = next
+      ? coverHeightAt(height, next.screen - 1) * aspectRatio
+      : height.maxPx * aspectRatio
+
+    return `${key}:${Math.ceil(Math.max(amount, Math.min(maxWidth, shownPx)))}px`
+  }).join(' ')
+}

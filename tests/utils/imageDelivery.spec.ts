@@ -10,6 +10,8 @@ import {
   resolveMediaGalleryDeliveryProfile,
   resolveStableMediaDeliveryProfile,
   versionImageSource,
+  parseCoverHeight,
+  resolveCoverImageSizes,
 } from '../../layers/theme/app/utils/imageDelivery'
 import type { GridConfig } from '../../layers/theme/app/utils/gridClasses'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
@@ -245,5 +247,49 @@ describe('media modal image sizes', () => {
     expect(resolveModalImageSizes(2 / 3, 390, 844)).toBe('640px')
     expect(resolveModalImageSizes(1.5, 800, 1000)).toBe('768px')
     expect(MODAL_FRAME.maxWidthPx).toBe(1152)
+  })
+})
+
+describe('cover image sizes', () => {
+  const screens = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }
+  const breakHeight = parseCoverHeight('h-[clamp(20rem,40vw,40rem)]')
+
+  it('reads clamp heights, including a viewport-height cap', () => {
+    expect(breakHeight).toEqual({ minPx: 320, vw: 40, maxPx: 640 })
+    expect(parseCoverHeight(['x', 'h-[min(clamp(28rem,56vw,52rem),85svh)]']))
+      .toEqual({ minPx: 448, vw: 56, maxPx: 832 })
+    expect(parseCoverHeight('')).toBeUndefined()
+    expect(parseCoverHeight('h-64')).toBeUndefined()
+  })
+
+  it('asks for the shown width of a panorama in a full-bleed break box', () => {
+    const sizes = resolveCoverImageSizes(
+      'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
+      breakHeight,
+      4000,
+      772,
+      screens,
+    )!
+    const xl = Number(/(?:^| )xl:(\d+)vw/.exec(sizes)![1])
+
+    // At 1400px the box is 1400x560, so the image is shown about 2902px wide.
+    expect((xl / 100) * 1400).toBeGreaterThanOrEqual(560 * (4000 / 772))
+  })
+
+  it('widens a fixed-width entry to the tallest box it covers', () => {
+    expect(resolveCoverImageSizes('sm:100vw md:90vw xl:1200px', breakHeight, 4000, 772, screens))
+      .toBe('sm:519vw md:216vw xl:3317px')
+  })
+
+  it('never asks for more than the source width', () => {
+    expect(resolveCoverImageSizes('sm:100vw xl:1200px', breakHeight, 2000, 386, screens))
+      .toBe('sm:519vw xl:2000px')
+  })
+
+  it('keeps sizes when the image is narrower than the box or not cover-cropped', () => {
+    expect(resolveCoverImageSizes('sm:100vw xl:1200px', breakHeight, 1000, 1000, screens))
+      .toBe('sm:100vw xl:1200px')
+    expect(resolveCoverImageSizes('sm:100vw xl:1200px', undefined, 5000, 1000, screens))
+      .toBe('sm:100vw xl:1200px')
   })
 })
