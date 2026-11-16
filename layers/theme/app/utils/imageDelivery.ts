@@ -239,12 +239,12 @@ const coverHeightAt = (height: CoverHeight, viewport: number) =>
  * to the image's shown width, never past the source width (IPX does not
  * enlarge).
  *
- * @nuxt/image applies an entry up to its screen width and builds its srcset
- * candidate at that width. A vw size scales with the viewport, but a cover
- * image's width follows the box height, which is constant at the min or max of
- * its clamp. So every entry but the last asks for the shown width at the
- * widest viewport it covers, in px; a vw size would be multiplied by the
- * screen width again and over-fetch.
+ * @nuxt/image applies an entry from its own screen up to the next entry's
+ * (the first from 0, the last with no upper bound) and builds its srcset
+ * candidate at its own screen width. A cover image's width follows the box
+ * height, so every entry but the last asks, in px, for the shown width at the
+ * widest viewport of its band; the last stays fluid at its largest
+ * shown-to-viewport ratio, at its own screen.
  */
 export function resolveCoverImageSizes(
   sizes: string | undefined,
@@ -278,14 +278,12 @@ export function resolveCoverImageSizes(
     const last = index === entries.length - 1
 
     if (last && fluid) {
-      // Applies to every wider viewport too, so stay fluid at the largest
-      // shown-to-viewport ratio, at the narrowest viewport it covers.
-      const from = index === 0 ? MIN_VIEWPORT_PX : entries[index - 1]!.screen
+      const from = index === 0 ? MIN_VIEWPORT_PX : screen
 
       return `${key}:${Math.ceil(Math.max(amount, (shownAt(from) * 100) / from))}vw`
     }
 
-    const widest = last ? Infinity : screen - 1
+    const widest = last ? Infinity : entries[index + 1]!.screen - 1
     const box = fluid ? (amount / 100) * widest : amount
     const shown = last ? Math.min(maxWidth, height.max * aspectRatio) : shownAt(widest)
 
