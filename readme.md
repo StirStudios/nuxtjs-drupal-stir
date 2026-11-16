@@ -168,6 +168,15 @@ parameters so campaign attribution and query-driven state are not lost.
 - SEO auditing: `pnpm audit:seo` (rendered sitemap, routes, links, images, metadata, headings, robots, and JSON-LD)
 - Performance auditing: `pnpm audit:perf` (Lighthouse mobile and desktop on representative routes, against budgets)
 - CI/local gate: `pnpm verify:ci` (all tests, lint, typecheck, root build, and consumer checks)
+
+### Running tests without stalling the machine
+
+Each Nuxt runtime spec boots a full Nuxt app and each E2E spec runs a full build, so these suites can exhaust a laptop's memory.
+
+- For quick checks, run `pnpm test` (unit only), plus `pnpm lint` and `pnpm typecheck`.
+- Run heavy suites (`test:nuxt`, `test:e2e`, `test:all`, consumer and preset builds) one at a time. Never run them alongside `typecheck`, a dev server or DDEV work. Leave `test:all` and `verify:ci` to CI.
+- Heavy scripts run through `scripts/test/heavy.mjs`. It refuses to start while another heavy run from this checkout holds the lock, or while the load average is above 1.5× the core count. Set `STIR_HEAVY_OK=1` to override; CI skips it.
+- The Nuxt runtime suite uses a quarter of the cores (`STIR_TEST_MAX_WORKERS` raises it), and E2E builds run one file at a time unless `CI` is set.
 - Bundle/perf visibility: `pnpm perf:report`; after an analyzed build use `pnpm perf:report --no-build --warn-budget` to reuse it. CI blocks initial editor leakage and reports historical size overruns without hiding them by raising the limits.
 - Coverage: explicit config/server/shared/utility TypeScript (including unimported files); Vue/composable behavior has a separate Nuxt runtime suite. The percentage is not whole-layer coverage.
 - TypeScript: generated Nuxt app/server/shared/node project references; aliases are configured once in the layer, not duplicated in root TypeScript paths.

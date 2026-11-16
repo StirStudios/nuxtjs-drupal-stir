@@ -9,6 +9,7 @@ import {
   sectionHeroMediaKey,
   viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
+  resolveCoverImageSizes,
   resolveImageDeliveryProfile,
   versionImageSource,
 } from '#stir/utils/imageDelivery'
@@ -27,6 +28,8 @@ const props = defineProps<{
   originalSrc?: string
   deliverySizes?: string
   deliveryProfile?: string
+  // A Media paragraph height key (media.heights) when the box crops the image.
+  mediaHeight?: string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
@@ -93,7 +96,8 @@ const isHero = computed(() =>
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const sectionHero = inject(sectionHeroMediaKey, undefined)
 const isSectionHero = computed(() => isHero.value && Boolean(sectionHero?.value))
-const providerSizes = computed(() =>
+const imageScreens = useImage().options.screens ?? {}
+const profileSizes = computed(() =>
   props.deliverySizes?.trim()
   || carouselDeliverySizes?.value?.trim()
   || resolveImageDeliveryProfile(
@@ -103,6 +107,18 @@ const providerSizes = computed(() =>
     isHero.value,
     theme.media.image.profiles,
   ),
+)
+// A cover-cropped image in a fixed-height box (Media height other than
+// natural) is shown wider than the box when it is wider than the box's ratio.
+const providerSizes = computed(() => isBare.value
+  ? profileSizes.value
+  : resolveCoverImageSizes(
+      profileSizes.value,
+      props.mediaHeight ? theme.media.image.coverHeights?.[props.mediaHeight] : undefined,
+      props.width,
+      props.height,
+      imageScreens,
+    ),
 )
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(

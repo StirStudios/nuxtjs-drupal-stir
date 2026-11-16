@@ -207,3 +207,65 @@ export function resolveModalImageSizes(
 
   return `${MODAL_IMAGE_WIDTHS.find(width => width >= shown) ?? MODAL_FRAME.maxWidthPx}px`
 }
+
+const MIN_VIEWPORT_PX = 320
+
+// A cover box height as CSS clamp(min, vw, max), in pixels.
+export interface CoverHeight { min: number, vw: number, max: number }
+
+const coverHeightAt = (height: CoverHeight, viewport: number) =>
+  Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
+
+/**
+ * An object-cover image in a box of fixed height is shown at the box height
+ * times its own aspect ratio when it is wider than the box, so a delivery
+ * profile sized to the box width alone upscales it. Widens each profile entry
+ * to the image's shown width across that entry's viewport range, but never
+ * past the source width (IPX does not enlarge).
+ */
+export function resolveCoverImageSizes(
+  sizes: string | undefined,
+  height: CoverHeight | undefined,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+  screens: Record<string, number>,
+): string | undefined {
+  if (!sizes || !height) return sizes
+
+  const aspectRatio = mediaAspectRatio(sourceWidth, sourceHeight)
+  const maxWidth = Number(sourceWidth) > 0 ? Number(sourceWidth) : Infinity
+
+  const entries = sizes.trim().split(/\s+/).map((entry) => {
+    const [key = '', size = ''] = entry.split(':')
+
+    return { key, size, screen: screens[key] ?? Number.parseInt(key) }
+  })
+
+  if (entries.some(({ screen, size }) => !screen || !/^\d+(?:\.\d+)?(?:vw|px)$/.test(size))) {
+    return sizes
+  }
+
+  entries.sort((a, b) => a.screen - b.screen)
+
+  return entries.map(({ key, size, screen }, index) => {
+    const amount = Number.parseFloat(size)
+    const next = entries[index + 1]
+
+    if (size.endsWith('vw')) {
+      // The shown width relative to the viewport is largest at the narrowest
+      // viewport the entry covers.
+      const from = index === 0 ? MIN_VIEWPORT_PX : screen
+      const shownVw = (Math.min(maxWidth, coverHeightAt(height, from) * aspectRatio) * 100) / from
+
+      return `${key}:${Math.ceil(Math.max(amount, shownVw))}vw`
+    }
+
+    // A fixed-width box: the height, and so the shown width, peaks at the
+    // widest viewport the entry covers.
+    const shownPx = next
+      ? coverHeightAt(height, next.screen - 1) * aspectRatio
+      : height.max * aspectRatio
+
+    return `${key}:${Math.ceil(Math.max(amount, Math.min(maxWidth, shownPx)))}px`
+  }).join(' ')
+}
