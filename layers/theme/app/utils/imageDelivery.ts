@@ -224,6 +224,38 @@ export function resolveModalImageSizes(
   return `${MODAL_IMAGE_WIDTHS.find(width => width >= shown) ?? MODAL_FRAME.maxWidthPx}px`
 }
 
+// Every srcset is built from one width ladder, capped at the source, so no
+// two candidates are more than a third apart (a quarter above 1440px) and the
+// CDN caches a fixed set of widths. `sizes` only tells the browser the slot.
+// 3840 is IPX's maxOutputDimension.
+export const IMAGE_WIDTH_LADDER = [320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400, 2880, 3360, 3840]
+
+export function imageLadderWidths(sourceWidth: unknown): number[] {
+  const source = Number(sourceWidth)
+  const max = IMAGE_WIDTH_LADDER.at(-1)!
+
+  if (!(source > 0)) return IMAGE_WIDTH_LADDER
+
+  const cap = Math.min(Math.round(source), max)
+
+  return [...IMAGE_WIDTH_LADDER.filter(width => width < cap), cap]
+}
+
+/** A width-descriptor srcset over the ladder; `url` builds one candidate. */
+export function ladderSrcset(
+  url: (width: number, height: number | undefined) => string,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+): string {
+  const width = Number(sourceWidth)
+  const height = Number(sourceHeight)
+  const ratio = width > 0 && height > 0 ? height / width : undefined
+
+  return imageLadderWidths(sourceWidth)
+    .map(candidate => `${url(candidate, ratio ? Math.round(candidate * ratio) : undefined)} ${candidate}w`)
+    .join(', ')
+}
+
 const MIN_VIEWPORT_PX = 320
 
 // A cover box height as CSS clamp(min, vw, max), in pixels.

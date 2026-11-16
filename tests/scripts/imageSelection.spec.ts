@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createImage } from '@nuxt/image/runtime'
 import { parseSrcset, pickCandidate, sizesWidth } from '../../scripts/perf/imageSelection.mjs'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
-import { resolveCoverImageSizes } from '../../layers/theme/app/utils/imageDelivery'
+import { ladderSrcset, resolveCoverImageSizes } from '../../layers/theme/app/utils/imageDelivery'
 
 const screens = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }
 const VIEWPORTS = [320, 390, 640, 768, 900, 1024, 1180, 1280, 1400, 1536, 1920, 2560]
@@ -27,8 +27,9 @@ describe('browser image selection', () => {
   })
 })
 
-// The layer's real delivery path: @nuxt/image's getSizes with the layer's
-// provider, then a browser's pick, then IPX's output (it never enlarges).
+// The layer's real delivery path: `sizes` from @nuxt/image's getSizes,
+// srcset from the width ladder through the layer's provider, then a browser's
+// pick, then IPX's output (it never enlarges).
 const $img = createImage({
   screens,
   densities: [1, 2],
@@ -45,7 +46,12 @@ function deliveredAt(sizes: string, source: { width: number, height: number }, v
     sizes,
     modifiers: { width: source.width, height: source.height, maxWidth: source.width },
   })
-  const candidate = pickCandidate(parseSrcset(image.srcset), sizesWidth(image.sizes!, viewport), dpr)
+  const srcset = ladderSrcset(
+    (width, height) => $img('/photo.jpg', { width, height }),
+    source.width,
+    source.height,
+  )
+  const candidate = pickCandidate(parseSrcset(srcset), sizesWidth(image.sizes!, viewport), dpr)
   const requested = Number(/s_(\d+)x/.exec(candidate.url)?.[1] ?? candidate.width)
 
   return Math.min(requested, source.width)
@@ -96,10 +102,10 @@ describe('image delivery baseline', () => {
     expect(Object.fromEntries(Object.entries(profiles).map(([name, sizes]) =>
       [name, sweep(sizes, LAYOUTS[name]!)]))).toMatchInlineSnapshot(`
         {
-          "card": "under 1.00, over 1.37",
-          "container": "under 1.00, over 2.22",
-          "full": "under 0.77, over 2.00",
-          "split": "under 1.00, over 1.79",
+          "card": "under 1.00, over 1.61",
+          "container": "under 1.00, over 1.58",
+          "full": "under 0.96, over 1.25",
+          "split": "under 1.00, over 1.62",
         }
       `)
   })
@@ -111,6 +117,6 @@ describe('image delivery baseline', () => {
     const shown = (viewport: number) =>
       Math.max(viewport, Math.min(height.max, Math.max(height.min, 0.4 * viewport)) * (source.width / source.height))
 
-    expect(sweep(sizes, shown, source)).toMatchInlineSnapshot('"under 1.00, over 1.28"')
+    expect(sweep(sizes, shown, source)).toMatchInlineSnapshot('"under 0.96, over 1.45"')
   })
 })

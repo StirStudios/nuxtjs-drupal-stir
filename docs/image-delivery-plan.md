@@ -34,10 +34,10 @@ causes are structural, not individual bugs:
 
 1. **One width ladder.** `srcset` always comes from a fixed list, capped at
    the source width: 320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400,
-   2880. Built with `$img` per width by our own builder; @nuxt/image's
+   2880, 3360, 3840. Built with `$img` per width by our own builder; @nuxt/image's
    `sizes`-driven candidates are no longer used for these components. The CDN
-   caches a bounded set of URLs, and the browser always has a candidate within
-   about 25% of its need.
+   caches a bounded set of URLs, and no two candidates are more than a third
+   apart.
 2. **A slot width model instead of profile names.** One injection key,
    `imageSlotKey`, holds the width available to an image per breakpoint:
    `{ [breakpoint]: { fraction, gapPx, capPx } }`. The page root provides it
@@ -112,13 +112,13 @@ Phase 3 includes a Stir Tools change, shipped with the layer change:
 
 Each phase ships on its own; each site is updated as it takes the layer.
 
-1. **Measure.** Add a browser-selection simulator to the unit tests: parse
+1. **Measure.** Done (November 2026). Add a browser-selection simulator to the unit tests: parse
    the emitted `sizes` and `srcset`, pick a candidate the way a browser does,
    and compare it with the shown width across 320-2560px at DPR 1, 2 and 3.
    Add 768, 1024 and 1280px (DPR 2) to the `audit:perf` image viewports. Run
    both against today's code to get a baseline per layout.
-2. **Ladder.** Build `srcset` from the fixed ladder, capped at the source,
-   for `Media/Image` and rich text. `sizes` unchanged. Expect fewer bytes on
+2. **Ladder.** Done (November 2026). Build `srcset` from the fixed ladder,
+   capped at the source, for `Media/Image` and rich text. `sizes` unchanged. Expect fewer bytes on
    tablets and 2x laptops, and fewer cached URLs.
 3. **Slot model.** Add the container settings and `imageSlotKey`; make
    Layout, grids, Views, carousels and heroes narrow and provide it; generate

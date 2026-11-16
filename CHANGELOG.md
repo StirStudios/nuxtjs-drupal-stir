@@ -15,6 +15,15 @@ untouched do not need one.
 
 ### Media
 
+- **Changed: every image srcset comes from one width ladder.** `Media/Image`
+  and rich-text images now offer 320, 480, 640, 750, 828, 1080, 1200, 1440,
+  1920, 2400, 2880, 3360 and 3840px, capped at the source width, instead of
+  widths derived from each `sizes` entry and its breakpoint. `sizes` is
+  unchanged. No two candidates are more than a third apart, so tablets and 2x
+  laptops no longer fall through to a file twice the size they need, and the
+  CDN caches one fixed set of widths. Image URLs change, so CDN and IPX caches
+  refill once. Phase 2 of `docs/image-delivery-plan.md`.
+
 - **Fixed: cover-cropped images no longer over-fetch.** `@nuxt/image` builds
   a `sizes` entry's srcset width at that entry's screen width, so a cover
   image sized in `vw` asked for up to twice the pixels it is shown at. Cover

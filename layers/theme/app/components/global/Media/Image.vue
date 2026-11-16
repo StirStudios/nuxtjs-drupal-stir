@@ -9,6 +9,7 @@ import {
   sectionHeroMediaKey,
   viewportImageLoadingKey,
   layoutImageDeliveryProfileKey,
+  ladderSrcset,
   resolveCoverImageSizes,
   resolveImageDeliveryProfile,
   versionImageSource,
@@ -129,6 +130,23 @@ const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
+const $img = useImage()
+const providerSrcset = computed(() => {
+  const source = providerSource.value
+
+  if (!source) return undefined
+
+  return ladderSrcset(
+    (width, height) => $img(source, {
+      format: theme.media.image.format,
+      height,
+      quality: theme.media.image.quality,
+      width,
+    }),
+    props.width,
+    props.height,
+  )
+})
 const bareImageAttrs = computed(() => ({
   ...forwardedAttrs.value,
 }))
@@ -285,6 +303,7 @@ onMounted(() => {
     :quality="theme.media.image.quality"
     :sizes="providerSizes"
     :src="providerSource"
+    :srcset="providerSrcset"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -331,6 +350,7 @@ onMounted(() => {
       :quality="theme.media.image.quality"
       :sizes="providerSizes"
       :src="providerSource"
+      :srcset="providerSrcset"
       :width="width"
       @error="handleError"
       @load="handleLoad"

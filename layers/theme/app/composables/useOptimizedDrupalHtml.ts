@@ -3,7 +3,7 @@ import {
   trustedDrupalHtml,
 } from '#stir/utils/trustedDrupalHtml'
 import type { MaybeRefOrGetter } from 'vue'
-import { resolveLayoutImageDeliveryProfile } from '#stir/utils/imageDelivery'
+import { ladderSrcset, resolveLayoutImageDeliveryProfile } from '#stir/utils/imageDelivery'
 
 type HtmlSource = string | null | undefined
 
@@ -44,15 +44,23 @@ export function useOptimizedDrupalHtml(
             ? image.profiles.split
             : image.profiles.container
 
-        return getSizes(canonicalSource, {
-          sizes,
-          modifiers: {
-            format: image.format,
-            height,
-            quality: image.quality,
+        const modifiers = { format: image.format, quality: image.quality }
+
+        return {
+          ...getSizes(canonicalSource, {
+            sizes,
+            modifiers: { ...modifiers, height, maxWidth: width, width },
+          }),
+          srcset: ladderSrcset(
+            (candidateWidth, candidateHeight) => $img(canonicalSource, {
+              ...modifiers,
+              height: candidateHeight,
+              width: candidateWidth,
+            }),
             width,
-          },
-        })
+            height,
+          ),
+        }
       },
       {
         baseClass: appConfig.stirTheme.media.base,

@@ -14,10 +14,30 @@ import {
   resolveStableMediaDeliveryProfile,
   versionImageSource,
   resolveCoverImageSizes,
+  IMAGE_WIDTH_LADDER,
+  imageLadderWidths,
+  ladderSrcset,
 } from '../../layers/theme/app/utils/imageDelivery'
 import type { GridConfig } from '../../layers/theme/app/utils/gridClasses'
 import { h } from 'vue'
 import createStirIpxProvider, { withinSourceWidth } from '../../layers/theme/build/imageCdn'
+
+describe('image width ladder', () => {
+  it('stops at the source width and includes it', () => {
+    expect(imageLadderWidths(1000)).toEqual([320, 480, 640, 750, 828, 1000])
+    expect(imageLadderWidths(1200)).toEqual([320, 480, 640, 750, 828, 1080, 1200])
+  })
+
+  it('caps at the largest ladder width and uses the whole ladder for unknown sources', () => {
+    expect(imageLadderWidths(6000).at(-1)).toBe(3840)
+    expect(imageLadderWidths(undefined)).toEqual(IMAGE_WIDTH_LADDER)
+  })
+
+  it('builds a width-descriptor srcset keeping the aspect ratio', () => {
+    expect(ladderSrcset((width, height) => `/i/${width}x${height}`, 700, 350))
+      .toBe('/i/320x160 320w, /i/480x240 480w, /i/640x320 640w, /i/700x350 700w')
+  })
+})
 
 describe('withinSourceWidth', () => {
   it('clamps a candidate wider than the source, keeping its aspect ratio', () => {

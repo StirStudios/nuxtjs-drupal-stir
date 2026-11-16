@@ -280,25 +280,27 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('sizes')).toBe(
         '(max-width: 767px) 100vw, (max-width: 1023px) 100vw, (max-width: 1279px) 100vw, (max-width: 1535px) 100vw, 100vw',
       )
-    expect(wrapper.get('img').attributes('srcset')).toContain('3072')
+    // Without a known source width the srcset is the whole width ladder.
+    expect(wrapper.get('img').attributes('srcset')).toContain(' 3840w')
   })
 
-  it('turns a modal image\'s single width into that width and its double', async () => {
+  it('keeps a fixed sizes value and builds srcset from the width ladder, capped at the source', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Portrait photo',
         deliverySizes: '640px',
+        height: 1500,
         noWrapper: true,
         originalSrc: 'https://drupal.example/files/portrait.jpg',
         src: '/styles/card/portrait.webp',
+        width: 1000,
       },
     })
     const srcset = wrapper.get('img').attributes('srcset') ?? ''
 
     expect(wrapper.get('img').attributes('sizes')).toBe('640px')
-    expect(srcset).toContain('640w')
-    expect(srcset).toContain('1280w')
-    expect(srcset).not.toContain('2304w')
+    expect(srcset.split(', ').map(entry => entry.split(' ').at(-1)))
+      .toEqual(['320w', '480w', '640w', '750w', '828w', '1000w'])
   })
 
   it('avoids native auto-sizing for responsive wrapped images', async () => {
