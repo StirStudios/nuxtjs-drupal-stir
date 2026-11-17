@@ -8,6 +8,7 @@ import {
   containerSlot,
   coverCropSources,
   coverSlot,
+  HERO_HIGH_DENSITY_SCALE,
   imageSlotKey,
   imageSlotSizes,
   ladderSrcset,
@@ -122,7 +123,9 @@ const providerSizes = computed(() => {
   return explicit
     ? $img.getSizes(providerSource.value || '/', { sizes: explicit }).sizes
     // `sizes="auto"` uses the box width, which a cover-cropped image overflows.
-    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value)
+    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value, {
+        highDensityScale: isHero.value ? HERO_HIGH_DENSITY_SCALE : undefined,
+      })
 })
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
