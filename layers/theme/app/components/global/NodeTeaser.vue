@@ -95,7 +95,10 @@ const postUi = computed<Partial<Record<'root' | 'header' | 'date' | 'title' | 'b
 
 // UBlogPost's markup and theme without its reka-ui date formatter, which pulls
 // every @internationalized/date calendar into pages that show teasers.
-const ui = computed(() => tv({ extend: theme, ...appConfig.ui?.blogPost || {} })({
+// A site's app.config type for ui.blogPost would widen the theme's slots and
+// variants; read it as the theme's own shape, as UBlogPost does at runtime.
+const blogPostOverride = appConfig.ui?.blogPost as Partial<typeof theme> | undefined
+const ui = computed(() => tv({ extend: theme, ...blogPostOverride })({
   orientation: orientation.value,
   image: Boolean(teaserImage.value),
   to: Boolean(post.value.to),
