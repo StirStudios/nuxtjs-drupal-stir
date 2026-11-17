@@ -40,7 +40,7 @@ describe('optimizeDrupalRichTextImages', () => {
         structured: true,
       },
     )
-    expect(result).toContain('data-nuxt-img=""')
+    expect(result).not.toContain('data-nuxt-img')
     expect(result).toContain('class="stir-rich-text-media-element stir-rich-text-media-image relative w-full object-cover rounded-xl"')
     expect(result).toContain('src="/_ipx/f_webp&s_1200x800/https://cdn.example/image.jpg?v=42"')
     expect(result).not.toContain('/styles/')

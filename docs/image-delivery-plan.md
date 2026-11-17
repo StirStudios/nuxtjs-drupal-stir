@@ -156,7 +156,9 @@ Each phase ships on its own; each site is updated as it takes the layer.
    height; per-breakpoint cropped sources for fixed-height cover boxes.
 5. **Loading policy.** Done (November 2026). One lead image with preload; remove `opacity-0` on
    server-rendered images.
-6. **Clean up** whatever the earlier phases left: `coverHeights`, the
+6. **Clean up.** Done (November 2026): the earlier phases removed their own
+   superseded code as they went; this pass dropped the last NuxtImg marker
+   (`data-nuxt-img` on rich-text images). Originally: clean up whatever the earlier phases left: `coverHeights`, the
    remaining `resolve*Profile` functions and `maxWidth`.
 
 ## Verification per phase

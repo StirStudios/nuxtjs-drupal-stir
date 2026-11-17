@@ -154,7 +154,6 @@ export function optimizeDrupalRichTextImages(
       removeAttribute(element, name)
     }
 
-    setAttribute(element, 'data-nuxt-img', '')
     setAttribute(element, 'src', resolved.src)
     setAttribute(element, 'srcset', resolved.srcset)
 
