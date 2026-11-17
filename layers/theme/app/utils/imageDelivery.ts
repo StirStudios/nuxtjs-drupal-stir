@@ -213,13 +213,22 @@ export function wrapGridSlot(
   return gridSlot(widthSlot(contained, options.width), options.grid, options)
 }
 
-// A cover box height as CSS clamp(min, vw, max), in pixels.
-export interface CoverHeight { min: number, vw: number, max: number }
+// A box height as CSS clamp(min, vw, max) in px, optionally capped at a share
+// of the small viewport height (svh).
+export interface CoverHeight { min: number, vw: number, max: number, maxSvh?: number }
+
+/** The CSS length for a cover height, as its media.heights class writes it. */
+export function coverHeightCss({ min, vw, max, maxSvh }: CoverHeight): string {
+  const clamp = `clamp(${min / 16}rem,${vw}vw,${max / 16}rem)`
+
+  return maxSvh ? `min(${clamp},${maxSvh}svh)` : clamp
+}
 
 /**
  * An object-cover image in a box of fixed height is shown at the box height
  * times its aspect ratio when it is wider than the box, never past the source
- * width (IPX does not enlarge).
+ * width (IPX does not enlarge). An svh cap is left out, so a short viewport
+ * still gets enough pixels.
  */
 export function coverSlot(
   parent: ImageSlot,
@@ -283,4 +292,58 @@ export function imageSlotSizes(slot: ImageSlot, lazy = false): string {
     .join(', ')
 
   return lazy ? `auto, ${sizes}` : sizes
+}
+
+export interface CoverCropSource { media: string, sizes: string, srcset: string }
+
+/**
+ * Art-direction sources for an object-cover image in a fixed-height box: in
+ * each breakpoint band where the image is wider than the box, a centre crop to
+ * the box's widest shape in that band, so a phone downloads the slice it shows
+ * rather than the whole panorama. `box` is the box's width (the slot before
+ * coverSlot); `url` builds one cropped candidate. Bands without a crop fall
+ * through to the <img>.
+ */
+export function coverCropSources(
+  box: ImageSlot,
+  height: CoverHeight,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+  url: (width: number, height: number) => string,
+): CoverCropSource[] {
+  const width = Number(sourceWidth)
+  const sourceHeightPx = Number(sourceHeight)
+
+  if (!(width > 0) || !(sourceHeightPx > 0)) return []
+
+  const sources: CoverCropSource[] = []
+
+  SIZES_BANDS.forEach((from, index) => {
+    const next = SIZES_BANDS[index + 1]
+    const to = next ? next - 1 : WIDEST_VIEWPORT
+    const boxHeightAt = (viewport: number) =>
+      Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
+    // The crop must be as wide as the box's widest shape anywhere in the band.
+    const aspect = Math.max(...[Math.max(from, 320), to].map(viewport => box(viewport) / boxHeightAt(viewport)))
+
+    if (width / sourceHeightPx <= aspect * 1.05) return
+
+    const cropWidth = Math.min(width, Math.round(sourceHeightPx * aspect))
+    const media = [
+      index > 0 ? `(min-width: ${from}px)` : '',
+      next ? `(max-width: ${to}px)` : '',
+    ].filter(Boolean).join(' and ')
+
+    sources.push({
+      media,
+      // Cut to the band's widest box shape, the crop is drawn at the box
+      // height times that shape wherever the box is narrower.
+      sizes: sizesLength(viewport => Math.max(box(viewport), boxHeightAt(viewport) * aspect), Math.max(from, 320), to),
+      srcset: imageLadderWidths(cropWidth)
+        .map(candidate => `${url(candidate, Math.round(candidate / aspect))} ${candidate}w`)
+        .join(', '),
+    })
+  })
+
+  return sources
 }

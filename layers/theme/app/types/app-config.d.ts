@@ -354,7 +354,7 @@ type StirThemeMediaConfig = {
       maxWidth: number
       padding: Partial<Record<'default' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl', number>>
     }
-    coverHeights?: Record<string, { min: number, vw: number, max: number }>
+    coverHeights?: Record<string, { min: number, vw: number, max: number, maxSvh?: number }>
   } & LooseRecord
   video?: {
     loadMinWidth?: number

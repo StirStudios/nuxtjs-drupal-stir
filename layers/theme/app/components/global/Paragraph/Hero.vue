@@ -14,7 +14,7 @@ import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
-import { sectionHeroMediaKey } from '#stir/utils/imageDelivery'
+import { coverHeightCss, sectionHeroMediaKey } from '#stir/utils/imageDelivery'
 import { resolveHeadingTag } from '#stir/utils/headingTag'
 import type { AlignConfig } from '#stir/utils/gridClasses'
 
@@ -48,7 +48,14 @@ const isSection = computed(() => Boolean(props.placement && props.placement !== 
 provide(sectionHeroMediaKey, isSection)
 
 const sectionHeadingTag = computed(() => resolveHeadingTag(props.headerTag))
-const minimumHeight = computed(() => ({ small: 'clamp(16rem,28vw,26rem)', break: 'clamp(20rem,40vw,40rem)', feature: 'min(clamp(28rem,56vw,52rem),85svh)' })[props.mediaHeight as 'small' | 'break' | 'feature'])
+const coverHeights = useAppConfig().stirTheme.media.image.coverHeights
+const minimumHeight = computed(() => {
+  const height = ['small', 'break', 'feature'].includes(props.mediaHeight ?? '')
+    ? coverHeights?.[props.mediaHeight!]
+    : undefined
+
+  return height ? coverHeightCss(height) : undefined
+})
 const customContent = computed(() => isSection.value || Boolean(props.align) || Boolean(minimumHeight.value))
 const alignment = computed(() => {
   const align = props.align

@@ -75,3 +75,14 @@ export function pickCandidate(candidates, slotWidth, dpr) {
 
   return candidates.find(candidate => candidate.width >= needed) ?? candidates.at(-1)
 }
+
+/** Whether a `<source media>` query matches a viewport width (min/max-width, joined by `and`). */
+export function mediaMatches(media, viewport) {
+  return !media || media.split(/\s+and\s+/).every((query) => {
+    const match = MEDIA.exec(query.trim())
+
+    if (!match) throw new Error(`Unsupported media query: ${query}`)
+
+    return match[1] === 'max' ? viewport <= Number(match[2]) : viewport >= Number(match[2])
+  })
+}

@@ -15,6 +15,22 @@ untouched do not need one.
 
 ### Media
 
+- **New: cover-cropped Media images are cropped to their box.** An image in a
+  Media box of fixed height (small, break, feature) that is wider than the box
+  now renders in a `<picture>` with one `<source>` per breakpoint band, each a
+  centre crop (IPX `fit: cover`) to the box's widest shape in that band, so a
+  phone loads the slice it shows rather than the whole panorama. Heroes stay
+  whole. Phase 4 of `docs/image-delivery-plan.md`.
+  - Markup: such an image is `.media > picture > img`, not `.media > img`. The
+    layer's `media-hover-zoom` matches both; a site selector written as
+    `.media > img` must add `.media > picture > img` (or use `.media img`).
+  - `stirTheme.media.image.coverHeights` is the one numeric source for the
+    media heights: Paragraph Hero builds its minimum height from it
+    (`coverHeightCss`), and `feature` gains `maxSvh: 85`. The
+    `media.heights` classes stay, and a test keeps the two in step.
+  - `audit:perf`'s image check reads the matched `<source>` for an image in a
+    `<picture>`.
+
 - **Changed (breaking): image `sizes` come from the layout, not named
   profiles.** Each image's width is worked out from where it sits: the page
   gives the viewport, a contained Layout the theme container, the Width field

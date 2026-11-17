@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
+import type { FunctionalComponent } from 'vue'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import type { CoverCropSource } from '#stir/utils/imageDelivery'
 import {
   containerSlot,
+  coverCropSources,
   coverSlot,
   imageSlotKey,
   imageSlotSizes,
@@ -104,13 +107,12 @@ const $img = useImage()
 const coverHeight = computed(() => isHero.value
   ? theme.media.image.coverHeights?.hero
   : isBare.value ? undefined : theme.media.image.coverHeights?.[props.mediaHeight ?? ''])
-const imageSlot = computed(() => {
-  const slot = isHero.value || props.deliveryProfile?.trim() === 'full'
-    ? viewportSlot
-    : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container)
-
-  return coverHeight.value ? coverSlot(slot, coverHeight.value, props.width, props.height) : slot
-})
+const boxSlot = computed(() => isHero.value || props.deliveryProfile?.trim() === 'full'
+  ? viewportSlot
+  : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container))
+const imageSlot = computed(() => coverHeight.value
+  ? coverSlot(boxSlot.value, coverHeight.value, props.width, props.height)
+  : boxSlot.value)
 // An explicit delivery size (@nuxt/image `sizes` syntax) wins over the slot.
 const providerSizes = computed(() => {
   const explicit = props.deliverySizes?.trim()
@@ -136,6 +138,25 @@ const providerSrcset = computed(() => {
 
   return source ? ladderSrcset((width, height) => imageUrl(source, width, height), props.width, props.height) : undefined
 })
+// A Media box of fixed height crops the image to its shape per breakpoint
+// band, so a phone loads the slice it shows. Heroes are left whole: their
+// object position varies by theme.
+const coverSources = computed(() => {
+  const source = providerSource.value
+
+  if (!source || !coverHeight.value || isHero.value || props.deliverySizes?.trim()) return []
+
+  return coverCropSources(boxSlot.value, coverHeight.value, props.width, props.height, (width, height) =>
+    $img(source, { fit: 'cover', format: theme.media.image.format, height, quality: theme.media.image.quality, width }))
+})
+// Wraps the image in <picture> only when it has cropped sources.
+const CoverPicture: FunctionalComponent<{ sources: CoverCropSource[] }> = (pictureProps, { slots }) =>
+  pictureProps.sources.length
+    ? h('picture', { class: 'contents' }, [
+        ...pictureProps.sources.map(source => h('source', { key: source.media, ...source })),
+        slots.default?.(),
+      ])
+    : slots.default?.()
 // The fallback for browsers without srcset: the source, at most 1920px wide.
 const providerSrc = computed(() => {
   const source = providerSource.value
@@ -317,27 +338,28 @@ onMounted(() => {
       role="presentation"
     />
 
-    <img
-      v-if="!isSourceDeferred"
-      ref="imageElement"
-      :alt="alt || ''"
-      :class="[
-        theme.media.base,
-        resolvedRoundedClass,
-        !isEager && platform === 'instagram' ? 'aspect-3/4' : '',
-        !isLoaded && 'opacity-0',
-        imageClass,
-      ]"
-      :fetchpriority="normalizedFetchPriority"
-      :height="height"
-      :loading="normalizedLoading"
-      :sizes="providerSizes"
-      :src="providerSrc"
-      :srcset="providerSrcset"
-      :width="width"
-      @error="handleError"
-      @load="handleLoad"
-    />
+    <CoverPicture v-if="!isSourceDeferred" :sources="coverSources">
+      <img
+        ref="imageElement"
+        :alt="alt || ''"
+        :class="[
+          theme.media.base,
+          resolvedRoundedClass,
+          !isEager && platform === 'instagram' ? 'aspect-3/4' : '',
+          !isLoaded && 'opacity-0',
+          imageClass,
+        ]"
+        :fetchpriority="normalizedFetchPriority"
+        :height="height"
+        :loading="normalizedLoading"
+        :sizes="providerSizes"
+        :src="providerSrc"
+        :srcset="providerSrcset"
+        :width="width"
+        @error="handleError"
+        @load="handleLoad"
+      />
+    </CoverPicture>
 
     <ClientOnly>
       <div

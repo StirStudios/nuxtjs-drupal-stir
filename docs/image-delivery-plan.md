@@ -92,6 +92,15 @@ The Stir site's `Work/PreviewTeaser.vue` passes `profiles.container` and
 `profiles.split` as `delivery-sizes`; when it takes this layer, drop both
 props so the View or carousel slot sizes the teasers.
 
+One site's own Media paragraph applies scroll effects through `.media>img`
+selectors; cover-cropped images are now `.media > picture > img`, so widen
+those selectors to `.media img` when it takes phase 4.
+
+Phase 4 kept the `media.heights` classes (Tailwind needs them written out) and
+made `coverHeights` the numbers both the hero and the image sizing read, with a
+test that fails if the classes and numbers disagree. Heroes keep an estimated
+height and are not cropped: their object position varies by theme.
+
 Site usage was checked in every local site checkout (November 2026); rerun
 `pnpm audit:consumers` before each removal.
 
@@ -129,7 +138,7 @@ Each phase ships on its own; each site is updated as it takes the layer.
    `sizes` from it. Remove the profiles and the four old keys, update the
    Stir site's work teasers, and ship the Stir Tools change above, in the
    same rollout.
-4. **Heights and cover crops.** One `mediaHeights` table; explicit hero
+4. **Heights and cover crops.** Done (November 2026). One `mediaHeights` table; explicit hero
    height; per-breakpoint cropped sources for fixed-height cover boxes.
 5. **Loading policy.** One lead image with preload; remove `opacity-0` on
    server-rendered images.

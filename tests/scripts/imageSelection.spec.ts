@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { createImage } from '@nuxt/image/runtime'
-import { parseSrcset, pickCandidate, sizesWidth } from '../../scripts/perf/imageSelection.mjs'
+import { mediaMatches, parseSrcset, pickCandidate, sizesWidth } from '../../scripts/perf/imageSelection.mjs'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
 import {
   containerSlot,
+  coverCropSources,
   coverSlot,
   imageSlotSizes,
   ladderSrcset,
@@ -115,13 +116,38 @@ describe('image delivery baseline', () => {
       `)
   })
 
-  it('delivers a full-bleed cover panorama in a break-height box', () => {
+  it('delivers a full-bleed cover panorama in a break-height box, cropped to the box', () => {
     const height = { min: 320, vw: 40, max: 640 }
     const source = { width: 4000, height: 772 }
-    const sizes = imageSlotSizes(coverSlot(viewportSlot, height, source.width, source.height))
-    const shown = (viewport: number) =>
-      Math.max(viewport, Math.min(height.max, Math.max(height.min, 0.4 * viewport)) * (source.width / source.height))
+    const boxHeight = (viewport: number) => Math.min(height.max, Math.max(height.min, 0.4 * viewport))
+    const sources = coverCropSources(viewportSlot, height, source.width, source.height, (width, cropHeight) =>
+      $img('/photo.jpg', { width, height: cropHeight, fit: 'cover' }))
+    let under = 1
+    let over = 1
 
-    expect(sweep(sizes, shown, source)).toMatchInlineSnapshot('"under 0.96, over 1.45"')
+    for (const viewport of VIEWPORTS) {
+      const crop = sources.find(candidate => mediaMatches(candidate.media, viewport))
+
+      for (const dpr of DPRS) {
+        // Either image is drawn object-cover: at least the box width, or the
+        // box height times its own shape (the crop's, read from its URL).
+        const candidates = crop ? parseSrcset(crop.srcset) : []
+        const [, cropWidth, cropHeight] = /s_(\d+)x(\d+)/.exec(candidates.at(-1)?.url ?? '') ?? []
+        const aspect = crop ? Number(cropWidth) / Number(cropHeight) : source.width / source.height
+        const shown = Math.max(viewport, boxHeight(viewport) * aspect)
+        // A crop can be no wider than the source's height allows at its shape.
+        const available = crop ? candidates.at(-1)!.width : source.width
+        const needed = Math.min(available, Math.ceil(shown * Math.min(dpr, 2)))
+        const delivered = crop
+          ? pickCandidate(parseSrcset(crop.srcset), sizesWidth(crop.sizes, viewport), dpr).width
+          : deliveredAt(imageSlotSizes(coverSlot(viewportSlot, height, source.width, source.height)), source, viewport, dpr)
+        const ratio = Math.min(delivered, source.width) / needed
+
+        under = Math.min(under, ratio)
+        over = Math.max(over, ratio)
+      }
+    }
+
+    expect(`under ${under.toFixed(2)}, over ${over.toFixed(2)}`).toMatchInlineSnapshot('"under 1.00, over 1.35"')
   })
 })

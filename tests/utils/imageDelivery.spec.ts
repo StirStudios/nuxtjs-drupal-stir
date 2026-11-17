@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 import {
   MODAL_FRAME,
   containerSlot,
+  coverCropSources,
+  coverHeightCss,
   coverSlot,
   gridSlot,
   imageSlotSizes,
@@ -116,19 +118,23 @@ describe('cover heights', () => {
       'utf8',
     )
     const coverHeights = [...config.matchAll(
-      /(\w+): \{ min: (\d+), vw: (\d+), max: (\d+) \}/g,
+      /(\w+): \{ min: (\d+), vw: (\d+), max: (\d+)(?:, maxSvh: (\d+))? \}/g,
     )]
 
     expect(coverHeights.map(match => match[1])).toEqual(['small', 'break', 'feature', 'hero'])
 
     // hero is an estimate: hero heights follow their content, not a class.
-    for (const [, key, min, vw, max] of coverHeights.filter(match => match[1] !== 'hero')) {
-      expect(config).toMatch(new RegExp(
-        `${key}: '[^']*clamp\\(${Number(min) / 16}rem,${vw}vw,${Number(max) / 16}rem\\)`,
-      ))
+    for (const [, key, min, vw, max, maxSvh] of coverHeights.filter(match => match[1] !== 'hero')) {
+      const css = coverHeightCss({
+        min: Number(min),
+        vw: Number(vw),
+        max: Number(max),
+        maxSvh: maxSvh ? Number(maxSvh) : undefined,
+      })
+
+      expect(config).toContain(`${key}: 'h-[${css}]'`)
     }
   })
-
 })
 
 describe('image slots', () => {
@@ -216,5 +222,27 @@ describe('imageSlotSizes', () => {
     // The box stays 320px tall up to 800px wide, so the image is 1659px wide
     // there; from 800px it grows with the viewport.
     expect(sizes.startsWith('(max-width: 767px) 1659px, (max-width: 1023px) 2121px')).toBe(true)
+  })
+})
+
+describe('coverCropSources', () => {
+  const height = { min: 320, vw: 40, max: 640 }
+  const url = (width: number, cropHeight: number) => `/i/${width}x${cropHeight}`
+
+  it('crops a panorama to the box shape per band, centre, never past the source', () => {
+    const sources = coverCropSources(viewportSlot, height, 4000, 772, url)
+    const phone = sources[0]!
+
+    expect(phone.media).toBe('(max-width: 479px)')
+    // At 479px the box is 479x320: a 1.5:1 crop, drawn 479px wide at 320px tall
+    // across the band, as wide as 772px of height allows.
+    expect(phone.sizes).toBe('479px')
+    expect(phone.srcset.split(', ').at(-1)).toBe('/i/1156x772 1156w')
+    expect(sources.at(-1)!.media).toBe('(min-width: 1536px)')
+  })
+
+  it('makes no sources when the image is no wider than the box or has no dimensions', () => {
+    expect(coverCropSources(viewportSlot, height, 1000, 1000, url)).toEqual([])
+    expect(coverCropSources(viewportSlot, height, undefined, undefined, url)).toEqual([])
   })
 })

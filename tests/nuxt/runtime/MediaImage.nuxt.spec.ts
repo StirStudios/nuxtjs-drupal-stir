@@ -376,6 +376,18 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(sizes.startsWith('auto')).toBe(false)
     expect(sizes).toContain('1659px')
+    // It is wider than its box, so each band gets a crop to the box's shape.
+    expect(wrapper.find('.media > picture > img').exists()).toBe(true)
+    expect(wrapper.findAll('picture > source').length).toBeGreaterThan(0)
+  })
+
+  it('leaves an image no wider than its box out of <picture>', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { alt: 'Square', height: 1000, mediaHeight: 'break', src: '/square.webp', width: 1000 },
+    })
+
+    expect(wrapper.find('picture').exists()).toBe(false)
+    expect(wrapper.find('.media > img').exists()).toBe(true)
   })
 
   it('sizes to the theme container without a layout slot', async () => {

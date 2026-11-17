@@ -96,7 +96,11 @@ async function describeImages() {
   return Promise.all(images.map(async (image) => {
     const box = image.getBoundingClientRect()
     const deliveredWidth = await pixelWidth(image.currentSrc)
-    const candidates = image.srcset
+    // In a <picture>, the candidates are those of the <source> the browser matched.
+    const picture = image.parentElement?.tagName === 'PICTURE' ? image.parentElement : null
+    const source = picture && [...picture.querySelectorAll('source')]
+      .find(candidate => !candidate.media || matchMedia(candidate.media).matches)
+    const candidates = (source?.srcset ?? image.srcset)
       .split(',')
       .map(entry => entry.trim().split(/\s+/))
       .filter(([, descriptor]) => descriptor?.endsWith('w'))

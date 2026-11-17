@@ -270,13 +270,13 @@ export default defineAppConfig({
           maxWidth: 1536,
           padding: { default: 16, md: 20, lg: 32 },
         },
-        // media.heights as numbers (px, vw) for sizing cover-cropped images;
-        // keep in step with those classes when overriding them. The feature
-        // height's 85svh cap is left out so requests stay large enough.
+        // media.heights as numbers (px, vw, svh) for sizing cover-cropped
+        // images and for heroes' minimum heights; keep in step with those
+        // classes when overriding them (a test checks the defaults).
         coverHeights: {
           small: { min: 256, vw: 28, max: 416 },
           break: { min: 320, vw: 40, max: 640 },
-          feature: { min: 448, vw: 56, max: 832 },
+          feature: { min: 448, vw: 56, max: 832, maxSvh: 85 },
           // Hero heights follow their content, so this is a generous
           // estimate of a section or front hero's height.
           hero: { min: 672, vw: 40, max: 800 },
