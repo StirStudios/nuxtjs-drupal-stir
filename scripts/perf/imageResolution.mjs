@@ -43,7 +43,9 @@ export function neededWidth({ boxWidth, boxHeight, aspectRatio, cover }, dpr) {
 export function classifyImage(image, dpr) {
   if (image.boxWidth < MIN_SHOWN_PX || !image.deliveredWidth) return undefined
 
-  const needed = neededWidth(image, dpr)
+  // Images whose sizes scale down on high-density screens (the layer's heroes)
+  // deliberately ask for about 1x there; judge them at 1x.
+  const needed = neededWidth(image, image.densityCapped && dpr >= 1.5 ? 1 : dpr)
 
   if (image.deliveredWidth > needed * OVERSIZE) {
     const enough = (image.candidateWidths ?? [])
@@ -113,6 +115,7 @@ async function describeImages() {
       boxWidth: box.width,
       boxHeight: box.height,
       cover: getComputedStyle(image).objectFit === 'cover',
+      densityCapped: /min-resolution/.test(image.sizes),
       aspectRatio: image.naturalHeight ? image.naturalWidth / image.naturalHeight : 0,
       deliveredWidth,
       candidateWidths: candidates.map(([, descriptor]) => Number.parseInt(descriptor)),
