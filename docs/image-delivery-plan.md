@@ -98,9 +98,17 @@ those selectors to `.media img` when it takes phase 4.
 
 Phase 5 did not add an image preload: the lead image is in the server HTML
 with `fetchpriority="high"`, so the browser finds it as early as a preload
-would. Measured on one client home page with the HTTP/2 harness, the hero
-(168 KB, a whole 2400px photo even on a phone) is now the largest image cost;
-cropping heroes needs their theme's object position, so it is a separate step.
+would.
+
+Heroes stay whole, by decision (November 2026). A safe crop must be at least
+as wide as the hero's widest box, which needs each site's shortest hero and
+its object position. Sites set those in their own classes (min heights from
+20rem to full screen, percentage object positions IPX cannot crop to), so the
+layer cannot know them. A per-site declared height range would work but must be
+kept in step with each site's classes, and an error cuts photos rather than
+costing bytes. Focal points need editors to set them. On one client home page
+the uncropped hero costs about 70 KB (about 0.35 s of simulated LCP) more than
+a crop would; that is accepted.
 
 Phase 4 kept the `media.heights` classes (Tailwind needs them written out) and
 made `coverHeights` the numbers both the hero and the image sizing read, with a
