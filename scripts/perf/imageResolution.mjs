@@ -140,7 +140,10 @@ export async function auditImageResolution(urls) {
       const page = await context.newPage()
 
       for (const url of urls) {
-        await page.goto(url, { waitUntil: 'networkidle' })
+        // A page that streams video never goes network-idle; images have
+        // loaded by then, so wait for idle only as long as is useful.
+        await page.goto(url, { waitUntil: 'load' })
+        await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
 
         for (const image of await page.evaluate(describeImages)) {
           const result = classifyImage(image, viewport.deviceScaleFactor)
