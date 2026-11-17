@@ -24,7 +24,7 @@ describe('optimizeDrupalRichTextImages', () => {
       src: '/_ipx/f_webp&s_1200x800/https://cdn.example/image.jpg?v=42',
       srcset: '/_ipx/f_webp&s_640x427/https://cdn.example/image.jpg?v=42 640w',
     }))
-    const html = '<drupal-media class="align-left" data-media-type="image" data-original-src="https://cdn.example/image.jpg" data-original-revision="42"><img class="stir-rich-text-media-element stir-rich-text-media-image" src="/styles/1024/image.webp" srcset="/styles/640/image.webp 640w" width="1200" height="800" alt="Example"></drupal-media>'
+    const html = '<drupal-media class="align-left" data-media-type="image" data-original-src="https://cdn.example/image.jpg" data-original-revision="42"><img class="stir-rich-text-media-element stir-rich-text-media-image" src="/styles/1024/image.webp" srcset="/styles/640/image.webp 640w" width="1200" height="800" loading="lazy" alt="Example"></drupal-media>'
     const result = optimizeDrupalRichTextImages(html, resolve, {
       baseClass: 'relative w-full object-cover',
       roundedClass: 'rounded-xl',
@@ -37,6 +37,7 @@ describe('optimizeDrupalRichTextImages', () => {
       {
         alignment: 'left',
         containerClass: undefined,
+        lazy: true,
         structured: true,
       },
     )
@@ -136,6 +137,7 @@ describe('optimizeDrupalRichTextImages', () => {
       {
         alignment: undefined,
         containerClass: 'grid md:grid-cols-2 lg:grid-cols-3',
+        lazy: false,
         structured: true,
       },
     )

@@ -11,6 +11,7 @@ export interface RichTextImageResolution {
 export interface RichTextImageContext {
   alignment?: 'center' | 'left' | 'right'
   containerClass?: string
+  lazy: boolean
   structured: boolean
 }
 
@@ -140,6 +141,7 @@ export function optimizeDrupalRichTextImages(
       {
         alignment,
         containerClass: attribute(container, 'class'),
+        lazy: attribute(element, 'loading') === 'lazy',
         structured: isStructuredImage,
       },
     )
