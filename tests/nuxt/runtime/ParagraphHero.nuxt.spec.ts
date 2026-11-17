@@ -7,6 +7,7 @@ import { drupalPageKey } from '../../../layers/theme/app/utils/drupalPage'
 import { sectionHeroMediaKey } from '../../../layers/theme/app/utils/imageDelivery'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
 import { provideRevealMotionScope } from '../../../layers/theme/app/composables/useRevealMotionScope'
+import { provideLeadMediaTracker, useLeadMedia } from '../../../layers/theme/app/composables/useLeadMedia'
 
 const shared = vi.hoisted(() => ({ getPage: vi.fn() }))
 
@@ -24,6 +25,51 @@ const makePage = (title: string): Page => ({
   content_format: 'json',
   local_tasks: { primary: [], secondary: [] },
   metatags: { meta: [], link: [], jsonld: [] },
+})
+
+describe('Paragraph Hero lead loading', () => {
+  const HeroImage = defineComponent({
+    props: { type: String, loading: String, fetchpriority: String },
+    setup: props => () => h('img', { 'data-loading': props.loading, 'data-priority': props.fetchpriority }),
+  })
+  const EarlierMedia = defineComponent({
+    setup() {
+      useLeadMedia('earlier')
+
+      return () => h('div')
+    },
+  })
+  const Page = (before: boolean) => defineComponent({
+    setup() {
+      provideLeadMediaTracker()
+
+      return () => [
+        before ? h(EarlierMedia) : null,
+        h(Hero, { placement: 'field_section', header: 'Hero' }, {
+          // Drupal marks every hero image eager and high priority.
+          media: () => [h(HeroImage, { type: 'image', loading: 'eager', fetchpriority: 'high' })],
+        }),
+      ]
+    },
+  })
+
+  it('loads the hero image eagerly when the hero is the page\'s lead', async () => {
+    const wrapper = await mountSuspended(Page(false), {
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Lead')) } },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ 'data-loading': 'eager', 'data-priority': 'high' })
+    wrapper.unmount()
+  })
+
+  it('loads a hero image lazily when other media is the page\'s lead', async () => {
+    const wrapper = await mountSuspended(Page(true), {
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Lower')) } },
+    })
+
+    expect(wrapper.get('img').attributes()).toMatchObject({ 'data-loading': 'lazy', 'data-priority': 'auto' })
+    wrapper.unmount()
+  })
 })
 
 describe('Drupal Hero page ownership and headings', () => {

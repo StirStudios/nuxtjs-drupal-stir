@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import type { ComponentPublicInstance } from 'vue'
+import type { ImageModifiers } from '@nuxt/image'
 import { useIntersectionObserver } from '@vueuse/core'
-import ProviderImage from '#stir-image-provider'
+import type { FunctionalComponent } from 'vue'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
+import type { CoverCropSource } from '#stir/utils/imageDelivery'
 import {
-  carouselImageDeliverySizesKey,
+  containerSlot,
+  coverCropSources,
+  coverSlot,
+  imageSlotKey,
+  imageSlotSizes,
+  ladderSrcset,
   leadImageKey,
   sectionHeroMediaKey,
-  viewportImageLoadingKey,
-  layoutImageDeliveryProfileKey,
-  resolveCoverImageSizes,
-  resolveImageDeliveryProfile,
   versionImageSource,
+  viewportImageLoadingKey,
+  viewportSlot,
 } from '#stir/utils/imageDelivery'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
@@ -27,7 +31,6 @@ const props = defineProps<{
   originalRevision?: string
   originalSrc?: string
   deliverySizes?: string
-  deliveryProfile?: string
   // A Media paragraph height key (media.heights) when the box crops the image.
   mediaHeight?: string
   width?: number
@@ -62,7 +65,9 @@ const resolvedRoundedClass = computed(() =>
 )
 const attrs = useAttrs()
 const forwardedAttrs = computed(() => {
+  // deliveryProfile: sent by Drupal before Stir Tools contract 1.41.0; unused.
   const {
+    deliveryProfile: _deliveryProfile,
     modalResponsiveStyle: _modalResponsiveStyle,
     modalSizes: _modalSizes,
     modalSrc: _modalSrc,
@@ -88,44 +93,89 @@ const normalizedFetchPriority = computed(() => {
 })
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
-const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
-const layoutDeliveryProfile = inject(layoutImageDeliveryProfileKey, undefined)
+const injectedSlot = inject(imageSlotKey, undefined)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const sectionHero = inject(sectionHeroMediaKey, undefined)
 const isSectionHero = computed(() => isHero.value && Boolean(sectionHero?.value))
-const imageScreens = useImage().options.screens ?? {}
-const profileSizes = computed(() =>
-  props.deliverySizes?.trim()
-  || carouselDeliverySizes?.value?.trim()
-  || resolveImageDeliveryProfile(
-    props.deliveryProfile?.trim() === 'container'
-      ? layoutDeliveryProfile?.value || props.deliveryProfile
-      : props.deliveryProfile || layoutDeliveryProfile?.value,
-    isHero.value,
-    theme.media.image.profiles,
-  ),
-)
-// A cover-cropped image in a fixed-height box (Media height other than
-// natural) is shown wider than the box when it is wider than the box's ratio.
-const coverHeightKey = computed(() => isHero.value ? 'hero' : props.mediaHeight)
-const providerSizes = computed(() => isBare.value && !isHero.value
-  ? profileSizes.value
-  : resolveCoverImageSizes(
-      profileSizes.value,
-      coverHeightKey.value ? theme.media.image.coverHeights?.[coverHeightKey.value] : undefined,
-      props.width,
-      props.height,
-      imageScreens,
-    ),
-)
+const $img = useImage()
+// The width the image is shown at: a hero or an edge-to-edge image spans the
+// viewport; anything else takes the slot its layout provides, or the theme
+// container. A cover-cropped image in a fixed-height box (a Media height
+// other than natural, or a hero) is shown wider than the box when it is wider
+// than the box's ratio.
+const coverHeight = computed(() => isHero.value
+  ? theme.media.image.coverHeights?.hero
+  : isBare.value ? undefined : theme.media.image.coverHeights?.[props.mediaHeight ?? ''])
+const boxSlot = computed(() => isHero.value
+  ? viewportSlot
+  : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container))
+const imageSlot = computed(() => coverHeight.value
+  ? coverSlot(boxSlot.value, coverHeight.value, props.width, props.height)
+  : boxSlot.value)
+// An explicit delivery size (@nuxt/image `sizes` syntax) wins over the slot.
+const providerSizes = computed(() => {
+  const explicit = props.deliverySizes?.trim()
+
+  return explicit
+    ? $img.getSizes(providerSource.value || '/', { sizes: explicit }).sizes
+    // `sizes="auto"` uses the box width, which a cover-cropped image overflows.
+    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value)
+})
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
+// Sites don't depend on @nuxt/image directly, so its generated provider types
+// resolve to nothing there and $img's modifiers parameter becomes `undefined`.
+// Type the modifiers against @nuxt/image itself.
+const imageUrl = (source: string, width?: number, height?: number, fit?: 'cover') => $img(source, {
+  fit,
+  format: theme.media.image.format,
+  height,
+  quality: theme.media.image.quality,
+  width,
+} satisfies Partial<ImageModifiers> as never)
+const providerSrcset = computed(() => {
+  const source = providerSource.value
+
+  return source ? ladderSrcset((width, height) => imageUrl(source, width, height), props.width, props.height) : undefined
+})
+// A Media box of fixed height crops the image to its shape per breakpoint
+// band, so a phone loads the slice it shows. Heroes are left whole: their
+// object position varies by theme.
+const coverSources = computed(() => {
+  const source = providerSource.value
+
+  if (!source || !coverHeight.value || isHero.value || props.deliverySizes?.trim()) return []
+
+  return coverCropSources(boxSlot.value, coverHeight.value, props.width, props.height, (width, height) =>
+    imageUrl(source, width, height, 'cover'))
+})
+// Wraps the image in <picture> only when it has cropped sources.
+const CoverPicture: FunctionalComponent<{ sources: CoverCropSource[] }> = (pictureProps, { slots }) =>
+  pictureProps.sources.length
+    ? h('picture', { class: 'contents' }, [
+        ...pictureProps.sources.map(source => h('source', { key: source.media, ...source })),
+        slots.default?.(),
+      ])
+    : slots.default?.()
+// The fallback for browsers without srcset: the source, at most 1920px wide.
+const providerSrc = computed(() => {
+  const source = providerSource.value
+
+  if (!source) return undefined
+
+  const width = Math.min(Number(props.width) || 1920, 1920)
+  const height = Number(props.width) > 0 && Number(props.height) > 0
+    ? Math.round((width * Number(props.height)) / Number(props.width))
+    : undefined
+
+  return imageUrl(source, width, height)
+})
 const bareImageAttrs = computed(() => ({
   ...forwardedAttrs.value,
 }))
@@ -168,19 +218,6 @@ const deferredFrameStyle = computed(() => {
 })
 const imageElement = ref<HTMLImageElement | null>(null)
 
-function setImageElementRef(
-  value: Element | ComponentPublicInstance | null,
-): void {
-  if (value instanceof HTMLImageElement) {
-    imageElement.value = value
-    return
-  }
-
-  const element = value && '$el' in value ? value.$el : null
-
-  imageElement.value = element instanceof HTMLImageElement ? element : null
-}
-
 const { isSupported, stop } = useIntersectionObserver(
   imageRoot,
   ([entry]) => {
@@ -197,12 +234,14 @@ const { isSupported, stop } = useIntersectionObserver(
 
 const nuxtApp = useNuxtApp()
 // An image starts visible when it has no source, when this browser already
-// loaded it, or when it's eager and server-rendered (the server and hydration
-// agree, and the image isn't hidden until JavaScript runs). Others fade in.
+// loaded it, or when it was server-rendered: the browser paints it as it
+// arrives, without waiting for JavaScript, and it can count as the page's
+// largest paint. Images added after hydration fade in.
 const startsVisible = () =>
   !hasImageSource.value ||
   isImageSourceLoaded(providerSource.value) ||
-  (isEager.value && (import.meta.server || nuxtApp.isHydrating))
+  import.meta.server ||
+  nuxtApp.isHydrating
 const isLoaded = ref(startsVisible())
 
 function syncLoadedFromImageElement() {
@@ -252,9 +291,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <ProviderImage
+  <img
     v-if="isBare"
-    :ref="setImageElementRef"
+    ref="imageElement"
     v-bind="bareImageAttrs"
     :alt="alt || ''"
     :class="
@@ -275,12 +314,11 @@ onMounted(() => {
         ]
     "
     :fetchpriority="normalizedFetchPriority"
-    :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
-    :quality="theme.media.image.quality"
     :sizes="providerSizes"
-    :src="providerSource"
+    :src="providerSrc"
+    :srcset="providerSrcset"
     :width="width"
     @error="handleError"
     @load="handleLoad"
@@ -308,28 +346,28 @@ onMounted(() => {
       role="presentation"
     />
 
-    <ProviderImage
-      v-if="!isSourceDeferred"
-      :ref="setImageElementRef"
-      :alt="alt || ''"
-      :class="[
-        theme.media.base,
-        resolvedRoundedClass,
-        !isEager && platform === 'instagram' ? 'aspect-3/4' : '',
-        !isLoaded && 'opacity-0',
-        imageClass,
-      ]"
-      :fetchpriority="normalizedFetchPriority"
-      :format="theme.media.image.format"
-      :height="height"
-      :loading="normalizedLoading"
-      :quality="theme.media.image.quality"
-      :sizes="providerSizes"
-      :src="providerSource"
-      :width="width"
-      @error="handleError"
-      @load="handleLoad"
-    />
+    <CoverPicture v-if="!isSourceDeferred" :sources="coverSources">
+      <img
+        ref="imageElement"
+        :alt="alt || ''"
+        :class="[
+          theme.media.base,
+          resolvedRoundedClass,
+          !isEager && platform === 'instagram' ? 'aspect-3/4' : '',
+          !isLoaded && 'opacity-0',
+          imageClass,
+        ]"
+        :fetchpriority="normalizedFetchPriority"
+        :height="height"
+        :loading="normalizedLoading"
+        :sizes="providerSizes"
+        :src="providerSrc"
+        :srcset="providerSrcset"
+        :width="width"
+        @error="handleError"
+        @load="handleLoad"
+      />
+    </CoverPicture>
 
     <ClientOnly>
       <div

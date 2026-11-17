@@ -46,10 +46,7 @@ const sourceText = computed(() => {
   )
 })
 
-const trustedTextHtml = useOptimizedDrupalHtml(
-  renderedText,
-  () => props.classes,
-)
+const trustedTextHtml = useOptimizedDrupalHtml(renderedText)
 const canInlineEdit = computed(
   () => editTarget.value !== null && canEditInline(props.editLink),
 )
@@ -124,7 +121,7 @@ watch(
     @quick-edit="startEditing"
   >
     <template v-if="(isEditing || isLoadingEditor) && canInlineEdit">
-      <EditLoadingState v-if="isLoadingEditor" />
+      <LazyEditLoadingState v-if="isLoadingEditor" />
       <Suspense v-else>
         <LazyEditText
           :classes="classes"
@@ -135,7 +132,7 @@ watch(
         />
 
         <template #fallback>
-          <EditLoadingState />
+          <LazyEditLoadingState />
         </template>
       </Suspense>
     </template>

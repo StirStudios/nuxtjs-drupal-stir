@@ -34,12 +34,14 @@ export function provideLeadMediaSection(): void {
  * Paint and should load eagerly. Only the first media paragraph on the page
  * can be the lead, and only when it renders before or inside the first
  * section; anything lower stays lazy because it may be below the fold.
+ * Undefined outside a tracked page, where nothing decides the lead.
  */
-export function useLeadMedia(key: string | number | undefined): boolean {
+export function useLeadMedia(key: string | number | undefined): boolean | undefined {
   const tracker = inject(leadMediaTrackerKey, undefined)
   const id = key === undefined || key === '' ? '' : String(key)
 
-  if (!tracker || !id) return false
+  if (!tracker) return undefined
+  if (!id) return false
   if (tracker.lead === undefined) {
     tracker.lead = id
     tracker.eager = inject(sectionIndexKey, tracker.sections) === 0

@@ -13,6 +13,104 @@ untouched do not need one.
 
 ## Unreleased
 
+### Performance
+
+- **Changed: `NodeTeaser` no longer renders `UBlogPost`.** It renders the same
+  markup with Nuxt UI's `blog-post` theme, so `ui.blogPost` in `app.config`
+  still applies, and formats the date with `Intl.DateTimeFormat` (medium, UTC,
+  the Nuxt UI locale). `UBlogPost` always imported reka-ui's date formatter,
+  which shipped every `@internationalized/date` calendar to any page with a
+  teaser. A client home page loads 15 KB less JS in 3 fewer requests. The
+  `authors`, `badge` and `footer` parts of `UBlogPost` were never used here.
+  Sites that override `NodeTeaser` or target `UBlogPost` in it are unaffected
+  unless they relied on the component instance itself.
+- **Changed: the inline-edit loading state is lazy.** `EditableRichText` uses
+  `LazyEditLoadingState`, keeping the admin UI theme off anonymous pages.
+
+### Media
+
+- **Changed: one loading rule for the lead image.** On a page that tracks its
+  lead media (the catch-all page), a Paragraph Hero's image now takes its
+  loading from the page's lead, not the payload: eager and high priority when
+  the hero is the first media on the page, lazy otherwise. Stir Tools marks
+  every hero eager, so a hero lower on the page competed with the real lead.
+  `useLeadMedia()` returns `undefined` outside a tracked page (it returned
+  `false`), where the payload's hints still apply. Phase 5 of
+  `docs/image-delivery-plan.md`.
+- **Changed: server-rendered images are never hidden.** A lazy image rendered
+  on the server used to start at `opacity-0` until JavaScript saw it load, so
+  it could not paint, or count as the largest paint, before hydration. Every
+  server-rendered image now starts visible; images added after hydration still
+  fade in.
+
+- **New: cover-cropped Media images are cropped to their box.** An image in a
+  Media box of fixed height (small, break, feature) that is wider than the box
+  now renders in a `<picture>` with one `<source>` per breakpoint band, each a
+  centre crop (IPX `fit: cover`) to the box's widest shape in that band, so a
+  phone loads the slice it shows rather than the whole panorama. Heroes stay
+  whole. Phase 4 of `docs/image-delivery-plan.md`.
+  - Markup: such an image is `.media > picture > img`, not `.media > img`. The
+    layer's `media-hover-zoom` matches both; a site selector written as
+    `.media > img` must add `.media > picture > img` (or use `.media img`).
+  - `stirTheme.media.image.coverHeights` is the one numeric source for the
+    media heights: Paragraph Hero builds its minimum height from it
+    (`coverHeightCss`), and `feature` gains `maxSvh: 85`. The
+    `media.heights` classes stay, and a test keeps the two in step.
+  - `audit:perf`'s image check reads the matched `<source>` for an image in a
+    `<picture>`.
+
+- **Changed (breaking): image `sizes` come from the layout, not named
+  profiles.** Each image's width is worked out from where it sits: the page
+  gives the viewport, a contained Layout the theme container, the Width field
+  caps it, and grid columns, gallery lanes and carousel slides split it, so
+  nesting composes. `sizes` is generated per breakpoint with exact `calc()`
+  values, and lazy images lead with `auto`. Phase 3 of
+  `docs/image-delivery-plan.md`.
+  - Removed: `stirTheme.media.image.profiles`, the
+    `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey` and
+    `fullBleedParagraphsKey` injection keys, `paragraphUuids`, the
+    `resolve*DeliveryProfile`, `resolveCarouselImageDeliverySizes` and
+    `resolveCoverImageSizes` functions, `NodeDisplay`'s `imageDeliveryProfile`
+    prop, `MediaItem`'s `deliveryProfile` prop, the `#stir-image-provider`
+    alias and the provider's `maxWidth` modifier.
+  - Added: `stirTheme.media.image.container` (the theme container in px; keep
+    it in step with `stirTheme.container` and `--ui-container`), the
+    `imageSlotKey` injection key with `viewportSlot`, `containerSlot`,
+    `widthSlot`, `gridSlot`, `wrapGridSlot`, `coverSlot` and
+    `imageSlotSizes`, and the `ImageSlotProvider` component.
+  - `useOptimizedDrupalHtml()` takes only its source: rich-text images use
+    the paragraph's slot, half of it when floated.
+  - `Media/Image` and rich-text images render a plain `<img>` (no
+    `data-nuxt-img`).
+    `deliverySizes` still overrides `sizes`. Drupal's `deliveryProfile` is no
+    longer read (Stir Tools contract 1.41.0 stops sending it) and is removed
+    from the `MediaImage`, `MediaVideo` and `VideoBackground` props and from
+    `DrupalMediaNodeProps`; an older payload's value is dropped, not rendered.
+  - A site passing `theme.media.image.profiles.*` as `delivery-sizes` should
+    drop the prop and let the layout's slot size the image.
+
+- **Changed: every image srcset comes from one width ladder.** `Media/Image`
+  and rich-text images now offer 320, 480, 640, 750, 828, 1080, 1200, 1440,
+  1920, 2400, 2880, 3360 and 3840px, capped at the source width, instead of
+  widths derived from each `sizes` entry and its breakpoint. `sizes` is
+  unchanged. No two candidates are more than a third apart, so tablets and 2x
+  laptops no longer fall through to a file twice the size they need, and the
+  CDN caches one fixed set of widths. Image URLs change, so CDN and IPX caches
+  refill once. Phase 2 of `docs/image-delivery-plan.md`.
+
+- **Fixed: cover-cropped images no longer over-fetch.** `@nuxt/image` builds
+  a `sizes` entry's srcset width at that entry's screen width, so a cover
+  image sized in `vw` asked for up to twice the pixels it is shown at. Cover
+  images now size each entry, except the widest, in `px` at the width they are
+  shown. Srcset candidates wider than the source are clamped to it, so they no
+  longer request the same pixels under a larger URL: `Media/Image` passes the
+  source width to the image provider as a `maxWidth` modifier, which the
+  provider removes before building the URL.
+- **New: `audit:perf` flags over-fetched images.** Its image check now reports
+  an error when an image is delivered over 1.5x the size it needs and a much
+  smaller srcset candidate would have done. A site whose container is
+  narrower than the layer's 96rem default now shows up here.
+
 ### Views
 
 - **Fixed: rows that replace a View's rows no longer fade in.** After a

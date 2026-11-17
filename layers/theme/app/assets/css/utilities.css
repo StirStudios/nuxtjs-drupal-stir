@@ -5,12 +5,14 @@
 }
 
 @utility media-hover-zoom {
-  .media > img {
+  /* A cover-cropped image sits in a <picture>. */
+  .media > img,
+  .media > picture > img {
     @apply motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out;
   }
 
-  &:hover .media > img,
-  &:focus-within .media > img {
+  &:hover .media > :is(img, picture > img),
+  &:focus-within .media > :is(img, picture > img) {
     @apply motion-safe:scale-105;
   }
 }

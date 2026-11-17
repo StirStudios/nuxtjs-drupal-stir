@@ -22,7 +22,6 @@ const props = defineProps<{
   originalRevision?: string
   originalSrc?: string
   deliverySizes?: string
-  deliveryProfile?: string
   loading?: 'eager' | 'lazy'
   fetchpriority?: 'high' | 'low' | 'auto'
   isHero?: boolean
@@ -114,7 +113,6 @@ watchEffect(() => {
     v-bind="$attrs"
     :alt="alt || ''"
     aria-hidden="true"
-    :delivery-profile="deliveryProfile"
     :delivery-sizes="deliverySizes"
     :fetchpriority="fetchpriority"
     :height="height"

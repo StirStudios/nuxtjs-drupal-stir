@@ -8,10 +8,10 @@ import {
   resolveCarouselArrowButton,
 } from '#stir/utils/nuxtUiProps'
 import {
-  carouselImageDeliverySizesKey,
+  imageSlotKey,
   leadImageKey,
   viewportImageLoadingKey,
-  resolveCarouselImageDeliverySizes,
+  wrapGridSlot,
 } from '#stir/utils/imageDelivery'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import {
@@ -92,12 +92,7 @@ const hovered = ref(false)
 const contentId = useId()
 const motionPaused = computed(() => userPaused.value || hovered.value
   || preferredMotion.value === 'reduce' || !carouselIsVisible.value)
-const carouselImageDeliverySizes = computed(() =>
-  resolveCarouselImageDeliverySizes(
-    props.gridItems,
-    theme.media.image.profiles.full,
-  ),
-)
+const parentImageSlot = inject(imageSlotKey, undefined)
 const widthClasses = computed(() => resolveWidthClasses(props.width, undefined))
 const carouselItemClasses = computed(() => resolveGridClasses(props.gridItems, 'carousel'))
 const { getRevealDelayMs, useRevealMotionProps } =
@@ -108,7 +103,11 @@ const carouselMotionProps = useRevealMotionProps(
   () => getRevealDelayMs(staggerIndex.value),
 )
 
-provide(carouselImageDeliverySizesKey, carouselImageDeliverySizes)
+// Each slide is one of the slides shown per view, inside the Width cap.
+provide(imageSlotKey, computed(() => wrapGridSlot(parentImageSlot?.value, theme.media.image.container, {
+  grid: props.gridItems,
+  width: props.width,
+})))
 // Source hero hints do not describe a slide's current viewport position.
 provide(viewportImageLoadingKey, true)
 // The first slide of the page's first media paragraph is the likely LCP.

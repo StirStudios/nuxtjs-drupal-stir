@@ -109,8 +109,8 @@ blocked by its host's `robots.txt`.
 Projects using IPX
 must also permit the package manager to build Sharp in their
 trusted-dependency policy. Nuxt Image is the single frontend image-delivery
-path; Drupal supplies the original asset, revision, intrinsic dimensions, and
-semantic delivery profile rather than generating frontend derivatives.
+path; Drupal supplies the original asset, revision and intrinsic dimensions
+rather than generating frontend derivatives.
 
 Set `NUXT_IMAGE_CDN` to an absolute CDN origin such as
 `https://cdn.example.com` to render IPX derivative URLs through an ordinary
@@ -126,15 +126,19 @@ that safe. IPX errors (a missing file, an untrusted host, a bad modifier) get
 retries within a minute instead of keeping the error.
 
 `MediaImage` versions `originalSrc` (falling back to `src`) with
-`originalRevision` and passes the canonical source to Nuxt Image. Unknown or
-missing profiles use the `container` profile, so payload omissions remain safe
-without reviving Drupal derivative delivery.
+`originalRevision`. Its `srcset` comes from one fixed width ladder, capped at
+the source width, and its `sizes` from the image slot: the width the layout
+gives the image, provided by the page, containers, the Width field, grids,
+galleries and carousels through `imageSlotKey`, so nesting composes. Without
+a slot an image sizes to the theme container. See
+`docs/image-delivery-plan.md`.
 
-Default profile sizes and WebP quality live under
-`stirTheme.media.image`. Downstream apps may override those app-config values,
-but should keep the semantic keys (`hero`, `full`, `container`, `split`, and
-`card`) instead of scattering provider-specific size strings through
-components.
+WebP quality, the theme container in px (`container`, kept in step with
+`stirTheme.container` and `--ui-container`) and the cover heights live under
+`stirTheme.media.image`. A component that places content in cells of its own
+provides a slot (`ImageSlotProvider`, or `provide(imageSlotKey, ...)`) rather
+than passing size strings; `deliverySizes` remains for a genuinely fixed
+size.
 
 ### SPA loading presentation
 

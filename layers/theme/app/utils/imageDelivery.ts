@@ -1,6 +1,6 @@
-import type { ComputedRef, InjectionKey, VNode } from 'vue'
-import type { GridConfig } from './gridClasses'
-import { GRID_BREAKPOINTS, maxGridColumns } from './gridClasses'
+import type { ComputedRef, InjectionKey } from 'vue'
+import type { GridBreakpoint, GridConfig } from './gridClasses'
+import { GRID_BREAKPOINTS, WIDTH_MAX_WIDTH_CLASSES } from './gridClasses'
 
 export const viewportImageLoadingKey: InjectionKey<boolean> =
   Symbol('stirViewportImageLoading')
@@ -8,146 +8,9 @@ export const viewportImageLoadingKey: InjectionKey<boolean> =
 // Provided by a lead carousel: the first image to claim it is the likely LCP.
 export const leadImageKey: InjectionKey<() => boolean> = Symbol('stirLeadImage')
 
-// Set by Paragraph/Hero when it renders as a section hero; media sizes itself as the section background.
+// Set by Paragraph/Hero when it renders as a section hero, for its media's classes.
 export const sectionHeroMediaKey: InjectionKey<ComputedRef<boolean>> =
   Symbol('stirSectionHeroMedia')
-
-// The uuids of paragraphs that span the viewport edge to edge: a default page's
-// top-level paragraphs, and the children of an uncontained single-column
-// Layout that is itself edge to edge. Matching by uuid keeps the signal from
-// reaching paragraphs nested inside others (accordions, tabs, cards).
-export const fullBleedParagraphsKey: InjectionKey<ComputedRef<ReadonlySet<string>>> =
-  Symbol('stirFullBleedParagraphs')
-
-export function paragraphUuids(nodes: VNode[]): Set<string> {
-  return new Set(nodes
-    .map(node => node.props?.uuid)
-    .filter((uuid): uuid is string => typeof uuid === 'string' && uuid !== ''))
-}
-
-export const carouselImageDeliverySizesKey: InjectionKey<ComputedRef<string | undefined>> =
-  Symbol('stirCarouselImageDeliverySizes')
-export const layoutImageDeliveryProfileKey: InjectionKey<ComputedRef<string | undefined>> =
-  Symbol('stirLayoutImageDeliveryProfile')
-
-export function resolveLayoutImageDeliveryProfile(
-  layout: string | undefined,
-  gridClass: string | undefined,
-  contained = true,
-): string | undefined {
-  const values = `${layout || ''} ${gridClass || ''}`
-  const columns = [...values.matchAll(
-    /(?:^|[:\s])(?:grid-cols-|grid_col_|col_?)(\d+)(?:\s|$)/g,
-  )]
-    .map(match => Number(match[1]))
-    .filter(Number.isFinite)
-  const maximumColumns = columns.length > 0 ? Math.max(...columns) : 0
-
-  if (maximumColumns >= 3) return 'card'
-  if (maximumColumns === 2 || layout?.startsWith('two_column')) {
-    return contained ? 'split' : 'splitFull'
-  }
-  if (layout === 'grid') return 'card'
-  if (/(?:^|\s)(?:\w+:)*max-w-(?:xs|sm|md|lg|xl|[2-7]xl)(?:\s|$)/.test(values)) {
-    return 'split'
-  }
-
-  return undefined
-}
-
-/**
- * Resolves an image delivery profile from a grid-mode paragraph's own
- * layout key and structured column config (e.g. the Layout paragraph's
- * `grid_class`, or a View's `grid_items`). See
- * resolveLayoutImageDeliveryProfile() for the rich-text-HTML equivalent,
- * which still parses author-entered container classes, not Drupal's
- * structured contract.
- */
-export function resolveGridImageDeliveryProfile(
-  grid: GridConfig | undefined,
-  layoutKey: string | undefined,
-  width: string | undefined,
-  contained = true,
-): string | undefined {
-  const maxColumns = maxGridColumns(grid)
-
-  if (maxColumns >= 3) return 'card'
-  if (layoutKey === 'two_column_8_4' || layoutKey === 'two_column_4_8') {
-    return contained ? 'splitWide' : 'splitWideFull'
-  }
-  if (maxColumns === 2 || layoutKey?.startsWith('two_column')) {
-    return contained ? 'split' : 'splitFull'
-  }
-  if (layoutKey === 'grid') return 'card'
-  if (width) return 'split'
-
-  return undefined
-}
-
-export function resolveMediaGalleryDeliveryProfile(
-  gridItems: GridConfig | undefined,
-  itemCount: number,
-  laneCount?: number,
-): string | undefined {
-  if (itemCount <= 1) return undefined
-
-  if (laneCount !== undefined) {
-    if (laneCount >= 3) return 'card'
-    if (laneCount === 2) return 'split'
-    return 'container'
-  }
-
-  const maximumColumns = maxGridColumns(gridItems)
-
-  if (maximumColumns >= 3) return 'card'
-  if (maximumColumns === 2) return 'split'
-  if (maximumColumns === 1) return 'container'
-
-  return itemCount >= 3 ? 'card' : 'split'
-}
-
-export function resolveStableMediaDeliveryProfile(
-  gridItems: GridConfig | undefined,
-  isMasonry: boolean,
-): string {
-  if (isMasonry || !gridItems?.columns || Object.keys(gridItems.columns).length === 0) {
-    return 'container'
-  }
-
-  return resolveMediaGalleryDeliveryProfile(gridItems, 2) || 'container'
-}
-
-export function resolveCarouselImageDeliverySizes(
-  gridItems: GridConfig | undefined,
-  fullProfile: string | undefined,
-): string | undefined {
-  const profile = fullProfile?.trim()
-
-  if (!profile) return undefined
-
-  const columns = gridItems?.columns
-
-  // A single (or no) full-width slide gets the plain full profile, matching
-  // the default single-slide carousel with no per-breakpoint override.
-  if (!columns || maxGridColumns(gridItems) <= 1) return profile
-
-  const responsiveWidths: string[] = []
-
-  for (const breakpoint of GRID_BREAKPOINTS) {
-    const value = columns[breakpoint]
-
-    if (typeof value !== 'number') continue
-
-    const width = Math.round(100 / value)
-    const label = breakpoint === 'default' ? 'sm' : breakpoint
-
-    responsiveWidths.push(`${label}:${width}vw`)
-  }
-
-  return responsiveWidths.length > 0
-    ? responsiveWidths.join(' ')
-    : profile
-}
 
 export function versionImageSource(
   source: string | undefined,
@@ -175,31 +38,9 @@ export function versionImageSource(
   return `${path}?${params.toString()}${hash}`
 }
 
-export function resolveImageDeliveryProfile(
-  deliveryProfile: string | undefined,
-  isHero: boolean,
-  profiles: Record<string, string>,
-): string | undefined {
-  const requestedKey = deliveryProfile?.trim()
-  const key = isHero || requestedKey === 'auto'
-    ? (isHero ? 'hero' : 'container')
-    : requestedKey || 'container'
-
-  if (!key) return undefined
-
-  const profile = (profiles[key] || profiles.container)?.trim()
-
-  return profile || undefined
-}
-
 // The media modal's frame: at most 72rem wide, a 1rem gutter each side, and
 // no taller than 80% of the viewport. MediaModal builds its CSS from this.
 export const MODAL_FRAME = { maxWidthPx: 1152, gutterPx: 32, maxHeightShare: 0.8 }
-
-// The widths the modal profile (sm:100vw lg:1152px) already produces, so a
-// modal asks for images the CDN has cached; each also comes at twice the width
-// for high-density screens.
-const MODAL_IMAGE_WIDTHS = [640, 768, 1152]
 
 export function mediaAspectRatio(width: unknown, height: unknown): number {
   const w = Number(width)
@@ -208,8 +49,8 @@ export function mediaAspectRatio(width: unknown, height: unknown): number {
   return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 ? w / h : 16 / 9
 }
 
-// A modal image's width as shown, snapped up to a cached width: a portrait
-// photo on a wide screen is held back by the height, not the width.
+// A modal image's width as shown: a portrait photo on a wide screen is held
+// back by the height, not the width.
 export function resolveModalImageSizes(
   aspectRatio: number,
   viewportWidth: number,
@@ -221,67 +62,288 @@ export function resolveModalImageSizes(
     viewportHeight * MODAL_FRAME.maxHeightShare * aspectRatio,
   )
 
-  return `${MODAL_IMAGE_WIDTHS.find(width => width >= shown) ?? MODAL_FRAME.maxWidthPx}px`
+  return `${Math.ceil(shown)}px`
 }
 
-const MIN_VIEWPORT_PX = 320
+// Every srcset is built from one width ladder, capped at the source, so no
+// two candidates are more than a third apart (a quarter above 1440px) and the
+// CDN caches a fixed set of widths. `sizes` only tells the browser the slot.
+// 3840 is IPX's maxOutputDimension.
+export const IMAGE_WIDTH_LADDER = [320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400, 2880, 3360, 3840]
 
-// A cover box height as CSS clamp(min, vw, max), in pixels.
-export interface CoverHeight { min: number, vw: number, max: number }
+export function imageLadderWidths(sourceWidth: unknown): number[] {
+  const source = Number(sourceWidth)
+  const max = IMAGE_WIDTH_LADDER.at(-1)!
 
-const coverHeightAt = (height: CoverHeight, viewport: number) =>
-  Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
+  if (!(source > 0)) return IMAGE_WIDTH_LADDER
+
+  const cap = Math.min(Math.round(source), max)
+
+  return [...IMAGE_WIDTH_LADDER.filter(width => width < cap), cap]
+}
+
+/** A width-descriptor srcset over the ladder; `url` builds one candidate. */
+export function ladderSrcset(
+  url: (width: number, height: number | undefined) => string,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+): string {
+  const width = Number(sourceWidth)
+  const height = Number(sourceHeight)
+  const ratio = width > 0 && height > 0 ? height / width : undefined
+
+  return imageLadderWidths(sourceWidth)
+    .map(candidate => `${url(candidate, ratio ? Math.round(candidate * ratio) : undefined)} ${candidate}w`)
+    .join(', ')
+}
+
+/**
+ * The width an image is shown at, in CSS px, for a viewport width. The page
+ * provides the viewport; every container, width cap, grid or carousel narrows
+ * the slot it receives and provides the result, so nesting composes.
+ * `sizes` is generated from the slot (imageSlotSizes).
+ */
+export type ImageSlot = (viewport: number) => number
+
+export const imageSlotKey: InjectionKey<ComputedRef<ImageSlot>> = Symbol('stirImageSlot')
+
+export const viewportSlot: ImageSlot = viewport => viewport
+
+// Tailwind's breakpoints, as the grid uses them (GRID_BREAKPOINTS).
+const BREAKPOINT_PX: Record<GridBreakpoint, number> = {
+  default: 0, xs: 480, sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536,
+}
+
+type Responsive<T> = Partial<Record<GridBreakpoint, T>>
+
+/** The value set for the widest breakpoint at or below a viewport, as Tailwind cascades. */
+function responsive<T>(values: Responsive<T> | undefined, viewport: number): T | undefined {
+  let value: T | undefined
+
+  for (const breakpoint of GRID_BREAKPOINTS) {
+    if (viewport >= BREAKPOINT_PX[breakpoint] && values?.[breakpoint] !== undefined) {
+      value = values[breakpoint]
+    }
+  }
+
+  return value
+}
+
+/** The theme container's size, matching its classes (stirTheme.container). */
+export interface ImageContainer {
+  maxWidth: number
+  padding: Responsive<number>
+}
+
+/** A `mx-auto max-w-* px-*` container inside the parent slot. */
+export function containerSlot(parent: ImageSlot, container: ImageContainer): ImageSlot {
+  return viewport => Math.min(parent(viewport), container.maxWidth)
+    - 2 * (responsive(container.padding, viewport) ?? 0)
+}
+
+// Tailwind's container scale, in px, for the Width field's max-w classes.
+const MAX_WIDTH_PX: Record<string, number> = {
+  xs: 320, sm: 384, md: 448, lg: 512, xl: 576, '2xl': 672,
+  '3xl': 768, '4xl': 896, '5xl': 1024, '6xl': 1152, '7xl': 1280,
+}
+
+/** A paragraph's Width field (WIDTH_MAX_WIDTH_CLASSES) caps the slot from its breakpoint. */
+export function widthSlot(parent: ImageSlot, width: string | undefined): ImageSlot {
+  const match = /^(?:(\w+):)?max-w-(\w+)$/.exec((width && WIDTH_MAX_WIDTH_CLASSES[width]) || '')
+  const cap = match ? MAX_WIDTH_PX[match[2]!] : undefined
+
+  if (!match || !cap) return parent
+
+  const from = match[1] ? BREAKPOINT_PX[match[1] as GridBreakpoint] ?? 0 : 0
+
+  return viewport => viewport >= from ? Math.min(parent(viewport), cap) : parent(viewport)
+}
+
+/**
+ * One cell of a grid inside the parent slot: columns and gaps follow the
+ * structured GridConfig (Tailwind gap steps are 4px). A fixed-ratio template
+ * such as "[8fr_4fr]" gives each region its share; `region` picks the column,
+ * defaulting to the widest. `span` is true for regions spanning every column.
+ */
+export function gridSlot(
+  parent: ImageSlot,
+  grid: GridConfig | undefined,
+  options: { region?: number, span?: boolean } = {},
+): ImageSlot {
+  if (!grid?.columns || options.span) return parent
+
+  return (viewport) => {
+    const width = parent(viewport)
+    const columns = responsive(grid.columns, viewport) ?? 1
+    const gap = 4 * (responsive(grid.gap, viewport) ?? 0)
+    const shares = typeof columns === 'string'
+      ? [...columns.matchAll(/(\d+(?:\.\d+)?)fr/g)].map(match => Number(match[1]))
+      : Array.from({ length: Math.max(1, Number(columns) || 1) }, () => 1)
+    const total = shares.reduce((sum, share) => sum + share, 0)
+
+    if (shares.length === 0 || total === 0) return width
+
+    const share = options.region === undefined
+      ? Math.max(...shares)
+      : shares[options.region % shares.length]!
+
+    return ((width - gap * (shares.length - 1)) * share) / total
+  }
+}
+
+/**
+ * A WrapGrid's cell inside the parent slot, in WrapGrid's own order: the
+ * theme container, then the Width field's cap, then the grid. Without a
+ * parent slot, content sits in the theme container.
+ */
+export function wrapGridSlot(
+  parent: ImageSlot | undefined,
+  themeContainer: ImageContainer,
+  options: {
+    container?: boolean
+    width?: string
+    grid?: GridConfig
+    region?: number
+    span?: boolean
+  },
+): ImageSlot {
+  const outer = parent ?? containerSlot(viewportSlot, themeContainer)
+  const contained = options.container ? containerSlot(outer, themeContainer) : outer
+
+  return gridSlot(widthSlot(contained, options.width), options.grid, options)
+}
+
+// A box height as CSS clamp(min, vw, max) in px, optionally capped at a share
+// of the small viewport height (svh).
+export interface CoverHeight { min: number, vw: number, max: number, maxSvh?: number }
+
+/** The CSS length for a cover height, as its media.heights class writes it. */
+export function coverHeightCss({ min, vw, max, maxSvh }: CoverHeight): string {
+  const clamp = `clamp(${min / 16}rem,${vw}vw,${max / 16}rem)`
+
+  return maxSvh ? `min(${clamp},${maxSvh}svh)` : clamp
+}
 
 /**
  * An object-cover image in a box of fixed height is shown at the box height
- * times its own aspect ratio when it is wider than the box, so a delivery
- * profile sized to the box width alone upscales it. Widens each profile entry
- * to the image's shown width across that entry's viewport range, but never
- * past the source width (IPX does not enlarge).
+ * times its aspect ratio when it is wider than the box, never past the source
+ * width (IPX does not enlarge). An svh cap is left out, so a short viewport
+ * still gets enough pixels.
  */
-export function resolveCoverImageSizes(
-  sizes: string | undefined,
-  height: CoverHeight | undefined,
+export function coverSlot(
+  parent: ImageSlot,
+  height: CoverHeight,
   sourceWidth: unknown,
   sourceHeight: unknown,
-  screens: Record<string, number>,
-): string | undefined {
-  if (!sizes || !height) return sizes
-
+): ImageSlot {
   const aspectRatio = mediaAspectRatio(sourceWidth, sourceHeight)
   const maxWidth = Number(sourceWidth) > 0 ? Number(sourceWidth) : Infinity
 
-  const entries = sizes.trim().split(/\s+/).map((entry) => {
-    const [key = '', size = ''] = entry.split(':')
+  return (viewport) => {
+    const boxHeight = Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
 
-    return { key, size, screen: screens[key] ?? Number.parseInt(key) }
+    return Math.max(parent(viewport), Math.min(maxWidth, boxHeight * aspectRatio))
+  }
+}
+
+const SIZES_BANDS = GRID_BREAKPOINTS.map(breakpoint => BREAKPOINT_PX[breakpoint])
+const WIDEST_VIEWPORT = 2560
+
+function sizesLength(slot: ImageSlot, from: number, to: number): string {
+  const start = slot(from)
+  const end = slot(to)
+  const scale = (end - start) / (to - from)
+  const offset = start - scale * from
+  const linear = [0.25, 0.5, 0.75].every((step) => {
+    const viewport = from + (to - from) * step
+
+    return Math.abs(slot(viewport) - (scale * viewport + offset)) < 1
   })
 
-  if (entries.some(({ screen, size }) => !screen || !/^\d+(?:\.\d+)?(?:vw|px)$/.test(size))) {
-    return sizes
-  }
+  if (!linear || Math.abs(scale) < 0.001) return `${Math.ceil(Math.max(start, end))}px`
 
-  entries.sort((a, b) => a.screen - b.screen)
+  const vw = Math.round(scale * 1000) / 10
+  const px = Math.round(offset)
 
-  return entries.map(({ key, size, screen }, index) => {
-    const amount = Number.parseFloat(size)
-    const next = entries[index + 1]
+  if (px === 0) return `${vw}vw`
 
-    if (size.endsWith('vw')) {
-      // The shown width relative to the viewport is largest at the narrowest
-      // viewport the entry covers.
-      const from = index === 0 ? MIN_VIEWPORT_PX : screen
-      const shownVw = (Math.min(maxWidth, coverHeightAt(height, from) * aspectRatio) * 100) / from
+  return `calc(${vw}vw ${px < 0 ? '-' : '+'} ${Math.abs(px)}px)`
+}
 
-      return `${key}:${Math.ceil(Math.max(amount, shownVw))}vw`
-    }
+/**
+ * `sizes` for a slot: one entry per breakpoint band, exact where the slot is
+ * linear in the band (calc of vw and px), else the band's widest width. Lazy
+ * images lead with `auto`, so browsers that support it use the laid-out width.
+ */
+export function imageSlotSizes(slot: ImageSlot, lazy = false): string {
+  const entries: Array<{ to?: number, length: string }> = []
 
-    // A fixed-width box: the height, and so the shown width, peaks at the
-    // widest viewport the entry covers.
-    const shownPx = next
-      ? coverHeightAt(height, next.screen - 1) * aspectRatio
-      : height.max * aspectRatio
+  SIZES_BANDS.forEach((from, index) => {
+    const next = SIZES_BANDS[index + 1]
+    const length = sizesLength(slot, Math.max(from, 320), next ? next - 1 : WIDEST_VIEWPORT)
+    const previous = entries.at(-1)
 
-    return `${key}:${Math.ceil(Math.max(amount, Math.min(maxWidth, shownPx)))}px`
-  }).join(' ')
+    if (previous?.length === length) previous.to = next ? next - 1 : undefined
+    else entries.push({ to: next ? next - 1 : undefined, length })
+  })
+
+  const sizes = entries
+    .map(({ to, length }) => to === undefined ? length : `(max-width: ${to}px) ${length}`)
+    .join(', ')
+
+  return lazy ? `auto, ${sizes}` : sizes
+}
+
+export interface CoverCropSource { media: string, sizes: string, srcset: string }
+
+/**
+ * Art-direction sources for an object-cover image in a fixed-height box: in
+ * each breakpoint band where the image is wider than the box, a centre crop to
+ * the box's widest shape in that band, so a phone downloads the slice it shows
+ * rather than the whole panorama. `box` is the box's width (the slot before
+ * coverSlot); `url` builds one cropped candidate. Bands without a crop fall
+ * through to the <img>.
+ */
+export function coverCropSources(
+  box: ImageSlot,
+  height: CoverHeight,
+  sourceWidth: unknown,
+  sourceHeight: unknown,
+  url: (width: number, height: number) => string,
+): CoverCropSource[] {
+  const width = Number(sourceWidth)
+  const sourceHeightPx = Number(sourceHeight)
+
+  if (!(width > 0) || !(sourceHeightPx > 0)) return []
+
+  const sources: CoverCropSource[] = []
+
+  SIZES_BANDS.forEach((from, index) => {
+    const next = SIZES_BANDS[index + 1]
+    const to = next ? next - 1 : WIDEST_VIEWPORT
+    const boxHeightAt = (viewport: number) =>
+      Math.min(height.max, Math.max(height.min, (height.vw / 100) * viewport))
+    // The crop must be as wide as the box's widest shape anywhere in the band.
+    const aspect = Math.max(...[Math.max(from, 320), to].map(viewport => box(viewport) / boxHeightAt(viewport)))
+
+    if (width / sourceHeightPx <= aspect * 1.05) return
+
+    const cropWidth = Math.min(width, Math.round(sourceHeightPx * aspect))
+    const media = [
+      index > 0 ? `(min-width: ${from}px)` : '',
+      next ? `(max-width: ${to}px)` : '',
+    ].filter(Boolean).join(' and ')
+
+    sources.push({
+      media,
+      // Cut to the band's widest box shape, the crop is drawn at the box
+      // height times that shape wherever the box is narrower.
+      sizes: sizesLength(viewport => Math.max(box(viewport), boxHeightAt(viewport) * aspect), Math.max(from, 320), to),
+      srcset: imageLadderWidths(cropWidth)
+        .map(candidate => `${url(candidate, Math.round(candidate / aspect))} ${candidate}w`)
+        .join(', '),
+    })
+  })
+
+  return sources
 }

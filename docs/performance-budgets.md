@@ -12,6 +12,27 @@ The core production build runs with `STIR_PERF_ANALYZE=true`. Each build owns it
 
 The existing 229kB initial, 192.5kB initial-JS and 170kB largest-editor thresholds currently warn. They have not been raised. CSS and motion limits remain unchanged. Investigate future growth using the report's largest assets and editor graph; do not confuse a chunk cap with total feature cost.
 
+## How to measure
+
+Measure the page as production serves it, or the numbers mislead.
+
+1. **Deployed site (preferred).** `pnpm audit:perf` in the site, with
+   `PAGESPEED_API_KEY` set, runs Google PageSpeed Insights against the deployed
+   URL: the same engine as pagespeed.web.dev, on the real server, CDN, HTTP/2
+   and compression. Use staging for before/after comparisons.
+2. **Local production build.** `pnpm perf:lighthouse:local` builds, starts the
+   preview server and measures it through an HTTP/2 front that gzips HTML.
+   The Node preview server alone speaks HTTP/1.1 without HTML compression;
+   Lighthouse's simulated throttling models HTTP/1.1 as six connections per
+   host, so a hydrated page's ~150 module requests queue up and LCP is
+   inflated. On one client home page the same build measured score 74 /
+   LCP 7.6 s direct and score 88 / LCP 3.9 s through the front. Results from
+   before November 2026 were taken direct and are not comparable.
+
+Under HTTP/2, JavaScript costs roughly 5 ms of simulated mobile LCP per KB
+transferred. Merging chunks to cut requests made LCP worse (more bytes
+before the hero paints).
+
 ## Runtime evidence
 
 Use at least three mobile production Lighthouse runs per variant with representative Drupal content, the same dependencies and comparable caches. Report score, FCP, LCP, TBT, CLS, transfer, media and video requests. Run CPU-heavy builds/tests separately. Record the throttling method; simulated estimates and actual browser throttling are not interchangeable.

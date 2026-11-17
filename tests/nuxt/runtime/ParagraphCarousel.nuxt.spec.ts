@@ -4,7 +4,7 @@ import { defineComponent, h, inject, ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
 import ParagraphCarousel from '../../../layers/theme/app/components/global/Paragraph/Carousel.vue'
-import { carouselImageDeliverySizesKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { imageSlotKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 const preferredMotion = ref<'no-preference' | 'reduce'>('no-preference')
 
@@ -117,39 +117,25 @@ describe('ParagraphCarousel (Nuxt runtime)', () => {
     expect(wrapper.getComponent({ name: 'UCarousel' }).props('autoScroll')).toBe(false)
   })
 
-  it('lets nested Drupal node slides inherit the carousel delivery width', async () => {
+  it('gives nested slides one slide\'s share of the carousel', async () => {
     const NodeSlide = defineComponent({
       name: 'NodeSlide',
-      props: {
-        imageDeliveryProfile: String,
-        uid: String,
-      },
-      setup: (props) => {
-        const deliverySizes = inject(carouselImageDeliverySizesKey)
+      props: { uid: String },
+      setup: () => {
+        const slot = inject(imageSlotKey)
 
-        return () => h(
-          'article',
-          {
-            'data-delivery-profile': props.imageDeliveryProfile,
-            'data-delivery-sizes': deliverySizes?.value,
-          },
-          'Nested node',
-        )
+        return () => h('article', { 'data-width': String(slot?.value(1400)) }, 'Nested node')
       },
     })
     const wrapper = await mountSuspended(ParagraphCarousel, {
       props: {
-        items: [
-          h(NodeSlide, { uid: '2' }),
-          h(NodeSlide, { uid: '3' }),
-        ],
+        gridItems: { columns: { default: 1, lg: 2 } },
+        items: [h(NodeSlide, { uid: '2' }), h(NodeSlide, { uid: '3' })],
       },
     })
 
-    expect(wrapper.find('[data-delivery-profile="card"]').exists()).toBe(false)
-    expect(wrapper.getComponent(NodeSlide).props('imageDeliveryProfile')).toBeUndefined()
-    expect(wrapper.get('[data-delivery-sizes]').attributes('data-delivery-sizes'))
-      .toBe('sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw')
+    // Without a parent layout the carousel sits in the theme container (1336px at 1400).
+    expect(wrapper.get('[data-width]').attributes('data-width')).toBe(String(1336 / 2))
   })
 
   it('releases arrow focus after pointer activation', async () => {

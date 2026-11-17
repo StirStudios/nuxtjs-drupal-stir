@@ -8,7 +8,6 @@
   "alt": "Two people reviewing a design together",
   "width": 1600,
   "height": 900,
-  "deliveryProfile": "card",
   "loading": "lazy",
   "fetchpriority": "auto"
 }

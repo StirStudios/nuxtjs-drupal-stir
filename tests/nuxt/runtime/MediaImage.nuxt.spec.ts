@@ -3,7 +3,9 @@ import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-import { carouselImageDeliverySizesKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { imageSlotKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+
+const CONTAINER_SIZES = 'auto, (max-width: 767px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 40px), (max-width: 1535px) calc(100vw - 64px), 1472px'
 
 describe('MediaImage (Nuxt runtime)', () => {
   it('reports the cached responsive source without waiting for another load event', async () => {
@@ -176,7 +178,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('originalsrc')).toBeUndefined()
   })
 
-  it('uses the versioned original through Nuxt Image', async () => {
+  it('uses the versioned original through the image provider', async () => {
     const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Provider image',
@@ -192,8 +194,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes()).toMatchObject({
-        'data-nuxt-img': '',
-        'sizes': '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 34vw, 480px',
+        sizes: CONTAINER_SIZES,
         src: 'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       })
     expect(wrapper.get('img').attributes('srcset')).toContain(
@@ -213,31 +214,28 @@ describe('MediaImage (Nuxt runtime)', () => {
         },
     })
 
-    expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
     expect(wrapper.get('img').attributes('srcset')).not.toContain('styles/640')
     expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
   })
 
-  it('falls back to the container profile when a profile is unknown', async () => {
+  it('ignores a legacy Drupal delivery profile and keeps it off the markup', async () => {
       const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Fallback image',
           noWrapper: true,
           originalRevision: '42-1710000000-293400',
           originalSrc: 'https://drupal.example/files/image.jpg',
-          deliveryProfile: 'project-specific',
+          deliveryProfile: 'full',
           src: '/styles/project/image.webp',
           srcset: '/styles/640/image.webp 640w',
         },
       })
 
-      expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
       expect(wrapper.get('img').attributes('src')).toContain(
         'image.jpg?v=42-1710000000-293400',
       )
-      expect(wrapper.get('img').attributes('sizes')).toBe(
-        '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
-      )
+      expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
+      expect(wrapper.get('img').attributes('deliveryprofile')).toBeUndefined()
   })
 
   it('allows a layout to narrow Nuxt Image sizes without changing Drupal sizes', async () => {
@@ -259,46 +257,50 @@ describe('MediaImage (Nuxt runtime)', () => {
       )
   })
 
-  it('uses a full-width carousel profile instead of a nested card profile', async () => {
-    const wrapper = await mountSuspended(MediaImage, {
-        global: {
-          provide: {
-            [carouselImageDeliverySizesKey as symbol]: computed(() =>
-              'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-            ),
-          },
-        },
-        props: {
-          alt: 'Full-width carousel image',
-          noWrapper: true,
-          originalSrc: 'https://drupal.example/files/image.jpg',
-          deliveryProfile: 'card',
-          src: '/styles/card/image.webp',
-        },
+  it('sizes an edge-to-edge image, or the slot its layout provides, to that width', async () => {
+    const full = await mountSuspended(MediaImage, {
+      global: {
+        provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport) },
+      },
+      props: {
+        alt: 'Edge-to-edge image',
+        noWrapper: true,
+        originalSrc: 'https://drupal.example/files/image.jpg',
+        src: '/styles/card/image.webp',
+      },
     })
 
-    expect(wrapper.get('img').attributes('sizes')).toBe(
-        '(max-width: 767px) 100vw, (max-width: 1023px) 100vw, (max-width: 1279px) 100vw, (max-width: 1535px) 100vw, 100vw',
-      )
-    expect(wrapper.get('img').attributes('srcset')).toContain('3072')
+    expect(full.get('img').attributes('sizes')).toBe('auto, 100vw')
+    // Without a known source width the srcset is the whole width ladder.
+    expect(full.get('img').attributes('srcset')).toContain(' 3840w')
+
+    const column = await mountSuspended(MediaImage, {
+      global: {
+        provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport / 2) },
+      },
+      props: { alt: 'Half-width image', noWrapper: true, src: '/image.webp' },
+    })
+
+    expect(column.get('img').attributes('sizes')).toBe('auto, 50vw')
   })
 
-  it('turns a modal image\'s single width into that width and its double', async () => {
+  it('keeps a fixed sizes value and builds srcset from the width ladder, capped at the source', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Portrait photo',
         deliverySizes: '640px',
+        height: 1500,
         noWrapper: true,
         originalSrc: 'https://drupal.example/files/portrait.jpg',
         src: '/styles/card/portrait.webp',
+        width: 1000,
       },
     })
     const srcset = wrapper.get('img').attributes('srcset') ?? ''
 
     expect(wrapper.get('img').attributes('sizes')).toBe('640px')
-    expect(srcset).toContain('640w')
-    expect(srcset).toContain('1280w')
-    expect(srcset).not.toContain('2304w')
+    expect(srcset.split(', ').map(entry => entry.split(' ').at(-1)))
+      .toEqual(['320w', '480w', '640w', '750w', '828w', '1000w'])
   })
 
   it('avoids native auto-sizing for responsive wrapped images', async () => {
@@ -363,7 +365,35 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
-  it('uses the container profile when no delivery profile is provided', async () => {
+  it('does not let a cover-cropped image use sizes="auto", which would size it to its box', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Panorama',
+        height: 772,
+        mediaHeight: 'break',
+        src: '/panorama.webp',
+        width: 4000,
+      },
+    })
+    const sizes = wrapper.get('img').attributes('sizes') ?? ''
+
+    expect(sizes.startsWith('auto')).toBe(false)
+    expect(sizes).toContain('1659px')
+    // It is wider than its box, so each band gets a crop to the box's shape.
+    expect(wrapper.find('.media > picture > img').exists()).toBe(true)
+    expect(wrapper.findAll('picture > source').length).toBeGreaterThan(0)
+  })
+
+  it('leaves an image no wider than its box out of <picture>', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { alt: 'Square', height: 1000, mediaHeight: 'break', src: '/square.webp', width: 1000 },
+    })
+
+    expect(wrapper.find('picture').exists()).toBe(false)
+    expect(wrapper.find('.media > img').exists()).toBe(true)
+  })
+
+  it('sizes to the theme container without a layout slot', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Example',
@@ -371,9 +401,7 @@ describe('MediaImage (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('img').attributes('sizes')).toBe(
-      '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
-    )
+    expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
   })
 
   it('preserves image dimensions without exposing deferred sources', async () => {
