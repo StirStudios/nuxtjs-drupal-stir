@@ -83,7 +83,7 @@ keeps its locked layer version and is unaffected until it does.
 | --- | --- |
 | `stirTheme.media.image.profiles` (named `sizes` strings) | Removed. Replaced by container settings and the slot model. No site overrides it; the Stir site reads `profiles.container` and `profiles.split` in its work teasers and moves to the slot model in the same rollout. |
 | `stirTheme.media.image.coverHeights` | Merged into one `mediaHeights` table that also generates the height classes. No site overrides it. |
-| `deliveryProfile` (Drupal payload) | Stir Tools sends it from every site's exported CE display config (`full`, `container`, `card`, `auto`). With the slot model only "edge to edge" carries information, so Stir Tools replaces the setting in phase 3 (see below). Until a site has run that update, the layer reads `full` as edge to edge and ignores the rest. |
+| `deliveryProfile` (Drupal payload) | Stir Tools sends it from every site's exported CE display config (`full`, `container`, `card`, `auto`). With the slot model only "edge to edge" carries information, so Stir Tools replaces the setting in phase 3 (see below). Done: Stir Tools 1.41.0 no longer sends it, and the layer no longer reads it (heroes span the viewport on their own). |
 | `deliverySizes` prop | Kept as an explicit override of `sizes` only; `srcset` still comes from the ladder. One site passes fixed px values to it in its own components. |
 | `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey`, `fullBleedParagraphsKey`, `sectionHeroMediaKey` | Replaced by `imageSlotKey`. No site uses them. |
 | `maxWidth` image modifier (new in 90750764) | Superseded by the ladder cap; removed with it. |

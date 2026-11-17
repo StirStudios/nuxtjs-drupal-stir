@@ -31,7 +31,6 @@ const props = defineProps<{
   originalRevision?: string
   originalSrc?: string
   deliverySizes?: string
-  deliveryProfile?: string
   // A Media paragraph height key (media.heights) when the box crops the image.
   mediaHeight?: string
   width?: number
@@ -66,7 +65,9 @@ const resolvedRoundedClass = computed(() =>
 )
 const attrs = useAttrs()
 const forwardedAttrs = computed(() => {
+  // deliveryProfile: sent by Drupal before Stir Tools contract 1.41.0; unused.
   const {
+    deliveryProfile: _deliveryProfile,
     modalResponsiveStyle: _modalResponsiveStyle,
     modalSizes: _modalSizes,
     modalSrc: _modalSrc,
@@ -108,7 +109,7 @@ const $img = useImage()
 const coverHeight = computed(() => isHero.value
   ? theme.media.image.coverHeights?.hero
   : isBare.value ? undefined : theme.media.image.coverHeights?.[props.mediaHeight ?? ''])
-const boxSlot = computed(() => isHero.value || props.deliveryProfile?.trim() === 'full'
+const boxSlot = computed(() => isHero.value
   ? viewportSlot
   : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container))
 const imageSlot = computed(() => coverHeight.value
@@ -131,7 +132,8 @@ const providerSource = computed(() => versionImageSource(
 // Sites don't depend on @nuxt/image directly, so its generated provider types
 // resolve to nothing there and $img's modifiers parameter becomes `undefined`.
 // Type the modifiers against @nuxt/image itself.
-const imageUrl = (source: string, width?: number, height?: number) => $img(source, {
+const imageUrl = (source: string, width?: number, height?: number, fit?: 'cover') => $img(source, {
+  fit,
   format: theme.media.image.format,
   height,
   quality: theme.media.image.quality,
@@ -151,7 +153,7 @@ const coverSources = computed(() => {
   if (!source || !coverHeight.value || isHero.value || props.deliverySizes?.trim()) return []
 
   return coverCropSources(boxSlot.value, coverHeight.value, props.width, props.height, (width, height) =>
-    $img(source, { fit: 'cover', format: theme.media.image.format, height, quality: theme.media.image.quality, width }))
+    imageUrl(source, width, height, 'cover'))
 })
 // Wraps the image in <picture> only when it has cropped sources.
 const CoverPicture: FunctionalComponent<{ sources: CoverCropSource[] }> = (pictureProps, { slots }) =>

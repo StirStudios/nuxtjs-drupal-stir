@@ -32,7 +32,6 @@ const props = withDefaults(
     originalRevision?: string
     originalSrc?: string
     deliverySizes?: string
-    deliveryProfile?: string
     loading?: 'eager' | 'lazy'
     fetchpriority?: 'high' | 'low' | 'auto'
     credit?: string
@@ -67,7 +66,6 @@ const props = withDefaults(
     originalRevision: undefined,
     originalSrc: undefined,
     deliverySizes: undefined,
-    deliveryProfile: undefined,
     loading: 'lazy',
     fetchpriority: 'auto',
     credit: undefined,
@@ -223,11 +221,6 @@ const staticPosterOriginalSrc = computed(() =>
 const staticPosterOriginalRevision = computed(() =>
   isAnimatedPreviewActive.value ? undefined : props.originalRevision,
 )
-const staticPosterDeliveryProfile = computed(() =>
-  isAnimatedPreviewActive.value
-    ? undefined
-    : props.deliveryProfile,
-)
 
 const emit = defineEmits<{
   (e: 'edit-action-select', key: EditActionKey): void
@@ -290,7 +283,6 @@ watch(
     v-if="isBare"
     v-bind="forwardedAttrs"
     :alt="alt"
-    :delivery-profile="deliveryProfile"
     :delivery-sizes="deliverySizes"
     :fetchpriority="fetchpriority"
     :height="height"
@@ -403,7 +395,6 @@ watch(
         <MediaImage
           v-else
           :alt="alt || title || 'Video thumbnail'"
-          :delivery-profile="staticPosterDeliveryProfile"
           :delivery-sizes="deliverySizes"
           :fetchpriority="fetchpriority"
           :height="height"

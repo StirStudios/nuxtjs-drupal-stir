@@ -218,14 +218,14 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
   })
 
-  it('sizes to the theme container when a Drupal delivery profile means nothing to the layout', async () => {
+  it('ignores a legacy Drupal delivery profile and keeps it off the markup', async () => {
       const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Fallback image',
           noWrapper: true,
           originalRevision: '42-1710000000-293400',
           originalSrc: 'https://drupal.example/files/image.jpg',
-          deliveryProfile: 'project-specific',
+          deliveryProfile: 'full',
           src: '/styles/project/image.webp',
           srcset: '/styles/640/image.webp 640w',
         },
@@ -235,6 +235,7 @@ describe('MediaImage (Nuxt runtime)', () => {
         'image.jpg?v=42-1710000000-293400',
       )
       expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
+      expect(wrapper.get('img').attributes('deliveryprofile')).toBeUndefined()
   })
 
   it('allows a layout to narrow Nuxt Image sizes without changing Drupal sizes', async () => {
@@ -258,9 +259,11 @@ describe('MediaImage (Nuxt runtime)', () => {
 
   it('sizes an edge-to-edge image, or the slot its layout provides, to that width', async () => {
     const full = await mountSuspended(MediaImage, {
+      global: {
+        provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport) },
+      },
       props: {
         alt: 'Edge-to-edge image',
-        deliveryProfile: 'full',
         noWrapper: true,
         originalSrc: 'https://drupal.example/files/image.jpg',
         src: '/styles/card/image.webp',

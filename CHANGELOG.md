@@ -66,9 +66,11 @@ untouched do not need one.
     `imageSlotSizes`, and the `ImageSlotProvider` component.
   - `useOptimizedDrupalHtml()` takes only its source: rich-text images use
     the paragraph's slot, half of it when floated.
-  - `Media/Image` renders a plain `<img>` (no `data-nuxt-img`). Drupal's
-    `deliveryProfile` is read only as `full` (edge to edge); `deliverySizes`
-    still overrides `sizes`.
+  - `Media/Image` renders a plain `<img>` (no `data-nuxt-img`).
+    `deliverySizes` still overrides `sizes`. Drupal's `deliveryProfile` is no
+    longer read (Stir Tools contract 1.41.0 stops sending it) and is removed
+    from the `MediaImage`, `MediaVideo` and `VideoBackground` props and from
+    `DrupalMediaNodeProps`; an older payload's value is dropped, not rendered.
   - A site passing `theme.media.image.profiles.*` as `delivery-sizes` should
     drop the prop and let the layout's slot size the image.
 
