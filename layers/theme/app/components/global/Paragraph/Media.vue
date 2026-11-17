@@ -3,7 +3,7 @@ import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { useMediaModal } from '#stir/composables/useMediaModal'
 import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
-import { fullBleedParagraphsKey, resolveStableMediaDeliveryProfile } from '../../../utils/imageDelivery'
+import { imageSlotKey, wrapGridSlot } from '../../../utils/imageDelivery'
 import { maxGridColumns, resolveAlignClasses, type AlignConfig, type GridConfig } from '../../../utils/gridClasses'
 import { useLeadMedia } from '#stir/composables/useLeadMedia'
 import { masonryGridStyle, masonryItemStyles } from '../../../utils/masonryLayout'
@@ -110,14 +110,12 @@ const layoutGrid = computed<GridConfig | undefined>(() => {
 
   return { columns: props.masonry.lanes ?? { default: 1 }, gap } as GridConfig
 })
-const fullBleedParagraphs = inject(fullBleedParagraphsKey, undefined)
-const deliveryProfile = computed(() => {
-  const profile = resolveStableMediaDeliveryProfile(layoutGrid.value, false)
-  const isFullBleed = !resolvedWidth.value
-    && Boolean(props.uuid && fullBleedParagraphs?.value.has(props.uuid))
+const parentImageSlot = inject(imageSlotKey, undefined)
 
-  return profile === 'container' && isFullBleed ? 'full' : profile
-})
+provide(imageSlotKey, computed(() => wrapGridSlot(parentImageSlot?.value, theme.media.image.container, {
+  grid: layoutGrid.value,
+  width: resolvedWidth.value,
+})))
 // The first row of the page's first media paragraph is the likely LCP: those
 // images load eagerly without a reveal, and everything after stays lazy.
 const isLead = useLeadMedia(props.uuid ?? props.id)
@@ -153,7 +151,6 @@ const masonryStyles = computed(() =>
           >
             <LazyMediaItem
               :defer-load="isImageGallery && i >= 4"
-              :delivery-profile="deliveryProfile"
               :direction="direction"
               :edit-actions="i === 0 ? actions : undefined"
               :hydrate-on-visible="{ rootMargin: '200px' }"
@@ -184,7 +181,6 @@ const masonryStyles = computed(() =>
           v-for="(node, i) in slotMedia"
           :key="getMediaItemKey(node, i)"
           :defer-load="isImageGallery && i >= 4"
-          :delivery-profile="deliveryProfile"
           :direction="direction"
           :edit-actions="
             i === 0 ? actions : undefined

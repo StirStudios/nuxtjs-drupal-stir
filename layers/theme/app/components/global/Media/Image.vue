@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { ComponentPublicInstance } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
-import ProviderImage from '#stir-image-provider'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
-  carouselImageDeliverySizesKey,
+  containerSlot,
+  coverSlot,
+  imageSlotKey,
+  imageSlotSizes,
+  ladderSrcset,
   leadImageKey,
   sectionHeroMediaKey,
-  viewportImageLoadingKey,
-  layoutImageDeliveryProfileKey,
-  ladderSrcset,
-  resolveCoverImageSizes,
-  resolveImageDeliveryProfile,
   versionImageSource,
+  viewportImageLoadingKey,
+  viewportSlot,
 } from '#stir/utils/imageDelivery'
 import { getDrupalOrigin, toDrupalUrl } from '#stir/utils/drupalUrl'
 
@@ -89,63 +88,66 @@ const normalizedFetchPriority = computed(() => {
 })
 const isEager = computed(() => normalizedLoading.value === 'eager')
 const injectedIsHero = inject<boolean>('isHero', false)
-const carouselDeliverySizes = inject(carouselImageDeliverySizesKey, undefined)
-const layoutDeliveryProfile = inject(layoutImageDeliveryProfileKey, undefined)
+const injectedSlot = inject(imageSlotKey, undefined)
 const isHero = computed(() =>
   props.isHero !== undefined ? props.isHero : injectedIsHero,
 )
 const isBare = computed(() => isHero.value || props.noWrapper === true)
 const sectionHero = inject(sectionHeroMediaKey, undefined)
 const isSectionHero = computed(() => isHero.value && Boolean(sectionHero?.value))
-const imageScreens = useImage().options.screens ?? {}
-const profileSizes = computed(() =>
-  props.deliverySizes?.trim()
-  || carouselDeliverySizes?.value?.trim()
-  || resolveImageDeliveryProfile(
-    props.deliveryProfile?.trim() === 'container'
-      ? layoutDeliveryProfile?.value || props.deliveryProfile
-      : props.deliveryProfile || layoutDeliveryProfile?.value,
-    isHero.value,
-    theme.media.image.profiles,
-  ),
-)
-// A cover-cropped image in a fixed-height box (Media height other than
-// natural) is shown wider than the box when it is wider than the box's ratio.
-const coverHeightKey = computed(() => isHero.value ? 'hero' : props.mediaHeight)
-const providerSizes = computed(() => isBare.value && !isHero.value
-  ? profileSizes.value
-  : resolveCoverImageSizes(
-      profileSizes.value,
-      coverHeightKey.value ? theme.media.image.coverHeights?.[coverHeightKey.value] : undefined,
-      props.width,
-      props.height,
-      imageScreens,
-    ),
-)
-const sourceWidthLimit = computed(() =>
-  Number(props.width) > 0 ? { maxWidth: Number(props.width) } : undefined,
-)
+const $img = useImage()
+// The width the image is shown at: a hero or an edge-to-edge image spans the
+// viewport; anything else takes the slot its layout provides, or the theme
+// container. A cover-cropped image in a fixed-height box (a Media height
+// other than natural, or a hero) is shown wider than the box when it is wider
+// than the box's ratio.
+const coverHeight = computed(() => isHero.value
+  ? theme.media.image.coverHeights?.hero
+  : isBare.value ? undefined : theme.media.image.coverHeights?.[props.mediaHeight ?? ''])
+const imageSlot = computed(() => {
+  const slot = isHero.value || props.deliveryProfile?.trim() === 'full'
+    ? viewportSlot
+    : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container)
+
+  return coverHeight.value ? coverSlot(slot, coverHeight.value, props.width, props.height) : slot
+})
+// An explicit delivery size (@nuxt/image `sizes` syntax) wins over the slot.
+const providerSizes = computed(() => {
+  const explicit = props.deliverySizes?.trim()
+
+  return explicit
+    ? $img.getSizes(providerSource.value || '/', { sizes: explicit }).sizes
+    // `sizes="auto"` uses the box width, which a cover-cropped image overflows.
+    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value)
+})
 const drupalOrigin = computed(() => getDrupalOrigin(runtimeConfig.public))
 const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
-const $img = useImage()
+const imageUrl = (source: string, width?: number, height?: number) => $img(source, {
+  format: theme.media.image.format,
+  height,
+  quality: theme.media.image.quality,
+  width,
+})
 const providerSrcset = computed(() => {
+  const source = providerSource.value
+
+  return source ? ladderSrcset((width, height) => imageUrl(source, width, height), props.width, props.height) : undefined
+})
+// The fallback for browsers without srcset: the source, at most 1920px wide.
+const providerSrc = computed(() => {
   const source = providerSource.value
 
   if (!source) return undefined
 
-  return ladderSrcset(
-    (width, height) => $img(source, {
-      format: theme.media.image.format,
-      height,
-      quality: theme.media.image.quality,
-      width,
-    }),
-    props.width,
-    props.height,
-  )
+  const width = Math.min(Number(props.width) || 1920, 1920)
+  const height = Number(props.width) > 0 && Number(props.height) > 0
+    ? Math.round((width * Number(props.height)) / Number(props.width))
+    : undefined
+
+  return imageUrl(source, width, height)
 })
 const bareImageAttrs = computed(() => ({
   ...forwardedAttrs.value,
@@ -188,19 +190,6 @@ const deferredFrameStyle = computed(() => {
   return { aspectRatio: `${width} / ${height}` }
 })
 const imageElement = ref<HTMLImageElement | null>(null)
-
-function setImageElementRef(
-  value: Element | ComponentPublicInstance | null,
-): void {
-  if (value instanceof HTMLImageElement) {
-    imageElement.value = value
-    return
-  }
-
-  const element = value && '$el' in value ? value.$el : null
-
-  imageElement.value = element instanceof HTMLImageElement ? element : null
-}
 
 const { isSupported, stop } = useIntersectionObserver(
   imageRoot,
@@ -273,9 +262,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <ProviderImage
+  <img
     v-if="isBare"
-    :ref="setImageElementRef"
+    ref="imageElement"
     v-bind="bareImageAttrs"
     :alt="alt || ''"
     :class="
@@ -296,13 +285,10 @@ onMounted(() => {
         ]
     "
     :fetchpriority="normalizedFetchPriority"
-    :format="theme.media.image.format"
     :height="height"
     :loading="normalizedLoading"
-    :modifiers="sourceWidthLimit"
-    :quality="theme.media.image.quality"
     :sizes="providerSizes"
-    :src="providerSource"
+    :src="providerSrc"
     :srcset="providerSrcset"
     :width="width"
     @error="handleError"
@@ -331,9 +317,9 @@ onMounted(() => {
       role="presentation"
     />
 
-    <ProviderImage
+    <img
       v-if="!isSourceDeferred"
-      :ref="setImageElementRef"
+      ref="imageElement"
       :alt="alt || ''"
       :class="[
         theme.media.base,
@@ -343,13 +329,10 @@ onMounted(() => {
         imageClass,
       ]"
       :fetchpriority="normalizedFetchPriority"
-      :format="theme.media.image.format"
       :height="height"
       :loading="normalizedLoading"
-      :modifiers="sourceWidthLimit"
-      :quality="theme.media.image.quality"
       :sizes="providerSizes"
-      :src="providerSource"
+      :src="providerSrc"
       :srcset="providerSrcset"
       :width="width"
       @error="handleError"

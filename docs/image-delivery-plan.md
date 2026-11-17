@@ -88,6 +88,10 @@ keeps its locked layer version and is unaffected until it does.
 | `layoutImageDeliveryProfileKey`, `carouselImageDeliverySizesKey`, `fullBleedParagraphsKey`, `sectionHeroMediaKey` | Replaced by `imageSlotKey`. No site uses them. |
 | `maxWidth` image modifier (new in 90750764) | Superseded by the ladder cap; removed with it. |
 
+The Stir site's `Work/PreviewTeaser.vue` passes `profiles.container` and
+`profiles.split` as `delivery-sizes`; when it takes this layer, drop both
+props so the View or carousel slot sizes the teasers.
+
 Site usage was checked in every local site checkout (November 2026); rerun
 `pnpm audit:consumers` before each removal.
 
@@ -120,7 +124,7 @@ Each phase ships on its own; each site is updated as it takes the layer.
 2. **Ladder.** Done (November 2026). Build `srcset` from the fixed ladder,
    capped at the source, for `Media/Image` and rich text. `sizes` unchanged. Expect fewer bytes on
    tablets and 2x laptops, and fewer cached URLs.
-3. **Slot model.** Add the container settings and `imageSlotKey`; make
+3. **Slot model.** Done (November 2026, layer side). Add the container settings and `imageSlotKey`; make
    Layout, grids, Views, carousels and heroes narrow and provide it; generate
    `sizes` from it. Remove the profiles and the four old keys, update the
    Stir site's work teasers, and ship the Stir Tools change above, in the

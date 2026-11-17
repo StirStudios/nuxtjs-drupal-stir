@@ -46,10 +46,7 @@ const sourceText = computed(() => {
   )
 })
 
-const trustedTextHtml = useOptimizedDrupalHtml(
-  renderedText,
-  () => props.classes,
-)
+const trustedTextHtml = useOptimizedDrupalHtml(renderedText)
 const canInlineEdit = computed(
   () => editTarget.value !== null && canEditInline(props.editLink),
 )

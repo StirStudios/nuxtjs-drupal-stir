@@ -3,13 +3,7 @@ import type { NodeDefaultProps } from '#stir/types'
 import { usePageContext } from '#stir/composables/usePageContext'
 import { provideRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
-import { useSlotVNode } from '#stir/composables/useSlotsToolkit'
-import {
-  carouselImageDeliverySizesKey,
-  fullBleedParagraphsKey,
-  layoutImageDeliveryProfileKey,
-  paragraphUuids,
-} from '#stir/utils/imageDelivery'
+import { containerSlot, imageSlotKey, viewportSlot } from '#stir/utils/imageDelivery'
 
 const props = withDefaults(
   defineProps<NodeDefaultProps & {
@@ -17,13 +11,11 @@ const props = withDefaults(
     // space its pages without forking this component. The content is wrapped
     // only when set, keeping existing markup unchanged.
     contentClass?: string
-    imageDeliveryProfile?: string
     showBeforeMain?: boolean
     teaserModes?: string[]
   }>(),
   {
     contentClass: undefined,
-    imageDeliveryProfile: undefined,
     showBeforeMain: true,
     teaserModes: () => ['teaser', 'listing', 'card'],
   },
@@ -58,37 +50,24 @@ const contentSlotNames = computed(() =>
   Object.keys(slots).filter((name) => !reservedSlotNames.has(name)),
 )
 const theme = useAppConfig().stirTheme
-const parentCarouselImageDeliverySizes = inject(
-  carouselImageDeliverySizesKey,
-  undefined,
-)
-const parentLayoutImageDeliveryProfile = inject(
-  layoutImageDeliveryProfileKey,
-  undefined,
-)
-const nestedImageDeliveryProfile = computed(() =>
-  props.imageDeliveryProfile
-  || parentLayoutImageDeliveryProfile?.value,
-)
-const nestedCarouselImageDeliverySizes = computed(() => {
-  const profile = props.imageDeliveryProfile
-
-  return profile
-    ? theme.media.image.profiles[profile]
-    : parentCarouselImageDeliverySizes?.value
-})
+const parentImageSlot = inject(imageSlotKey, undefined)
 
 provide('renderMode', renderMode.value === 'teaser' ? 'teaser' : 'full')
-provide(carouselImageDeliverySizesKey, nestedCarouselImageDeliverySizes)
-provide(layoutImageDeliveryProfileKey, nestedImageDeliveryProfile)
-// Only a page's own default rendering puts its fields straight into the page
-// width; articles, teasers, wrappers and nested nodes are contained.
-provide(fullBleedParagraphsKey, computed(() => paragraphUuids(
-  renderMode.value === 'default' && !props.contentClass && !slots.default
-  && !props.imageDeliveryProfile && !parentLayoutImageDeliveryProfile
-    ? contentSlotNames.value.flatMap(name => useSlotVNode(slots, name))
-    : [],
-)))
+// A page's own default rendering puts its fields straight into the page
+// width, edge to edge; articles and site wrappers are contained. A teaser, or
+// a node nested in a layout (a View row, a carousel slide), keeps its slot.
+provide(imageSlotKey, computed(() => {
+  const parent = parentImageSlot?.value
+
+  if (renderMode.value === 'article' || props.contentClass || slots.default) {
+    return containerSlot(parent ?? viewportSlot, theme.media.image.container)
+  }
+  if (renderMode.value === 'teaser') {
+    return parent ?? containerSlot(viewportSlot, theme.media.image.container)
+  }
+
+  return parent ?? viewportSlot
+}))
 provideRevealMotionScope(
   () => props.pageAnimation,
   { stagger: () => resolveBooleanProp(props.pageAnimationStagger) },

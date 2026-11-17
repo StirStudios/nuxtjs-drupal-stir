@@ -349,7 +349,11 @@ type StirThemeMediaConfig = {
   image?: {
     format?: 'avif' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
     quality?: number
-    profiles?: Record<string, string>
+    // The theme container in px (max width, horizontal padding per breakpoint).
+    container?: {
+      maxWidth: number
+      padding: Partial<Record<'default' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl', number>>
+    }
     coverHeights?: Record<string, { min: number, vw: number, max: number }>
   } & LooseRecord
   video?: {
@@ -656,7 +660,7 @@ type ResolvedStirThemeHeroConfig = StirThemeHeroConfig & {
 
 type ResolvedStirThemeMediaConfig = StirThemeMediaConfig & {
   image: NonNullable<StirThemeMediaConfig['image']> & {
-    profiles: Record<string, string>
+    container: NonNullable<NonNullable<StirThemeMediaConfig['image']>['container']>
   }
   video: NonNullable<StirThemeMediaConfig['video']>
   transitions: Record<string, ClassValue>

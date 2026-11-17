@@ -5,19 +5,36 @@
 const MEDIA = /^\(\s*(min|max)-width:\s*(\d+(?:\.\d+)?)px\s*\)$/
 
 function lengthPx(value, viewport) {
-  const match = /^(\d+(?:\.\d+)?)(px|vw)$/.exec(value.trim())
+  const trimmed = value.trim()
+  const calc = /^calc\(\s*(\d+(?:\.\d+)?)vw\s*([+-])\s*(\d+(?:\.\d+)?)px\s*\)$/.exec(trimmed)
+
+  if (calc) {
+    const vw = (Number(calc[1]) / 100) * viewport
+
+    return calc[2] === '-' ? vw - Number(calc[3]) : vw + Number(calc[3])
+  }
+
+  const match = /^(\d+(?:\.\d+)?)(px|vw)$/.exec(trimmed)
 
   if (!match) throw new Error(`Unsupported sizes length: ${value}`)
 
   return match[2] === 'vw' ? (Number(match[1]) / 100) * viewport : Number(match[1])
 }
 
-/** The slot width `sizes` gives at a viewport width: the first entry whose media query matches. */
+// Splits on commas outside parentheses.
+const sizesEntries = sizes => sizes.split(/,(?![^(]*\))/).map(part => part.trim()).filter(Boolean)
+
+/**
+ * The slot width `sizes` gives at a viewport width: the first entry whose
+ * media query matches. A leading `auto` (lazy images) is skipped, as browsers
+ * without support for it do.
+ */
 export function sizesWidth(sizes, viewport) {
-  for (const entry of sizes.split(',').map(part => part.trim()).filter(Boolean)) {
-    const split = entry.lastIndexOf(' ')
-    const media = split > 0 ? entry.slice(0, split).trim() : ''
-    const value = split > 0 ? entry.slice(split + 1) : entry
+  for (const entry of sizesEntries(sizes)) {
+    if (entry === 'auto') continue
+
+    const media = entry.startsWith('(') ? entry.slice(0, entry.indexOf(')') + 1) : ''
+    const value = entry.slice(media.length).trim()
 
     if (!media) return lengthPx(value, viewport)
 

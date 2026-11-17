@@ -263,21 +263,12 @@ export default defineAppConfig({
       image: {
         format: 'webp',
         quality: 75,
-        profiles: {
-          hero: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-          full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-          // Caps match the content box of the 96rem (8xl) --ui-container
-          // client sites use (1472px inside its padding); a site with another
-          // container width overrides these.
-          container: 'sm:100vw md:100vw xl:1472px',
-          split: 'sm:100vw md:50vw xl:736px',
-          splitFull: 'sm:100vw md:50vw',
-          // The wide column of an 8/4 or 4/8 Layout, side by side from lg.
-          splitWide: 'sm:100vw md:100vw lg:67vw xl:982px',
-          splitWideFull: 'sm:100vw md:100vw lg:67vw',
-          card: 'sm:100vw md:50vw lg:34vw xl:480px',
-          // The media modal frame is at most 72rem wide.
-          modal: 'sm:100vw lg:1152px',
+        // The theme container (container above, and --ui-container: 96rem in
+        // main.css) in px, so image sizes follow the layout. Keep in step
+        // when overriding either.
+        container: {
+          maxWidth: 1536,
+          padding: { default: 16, md: 20, lg: 32 },
         },
         // media.heights as numbers (px, vw) for sizing cover-cropped images;
         // keep in step with those classes when overriding them. The feature

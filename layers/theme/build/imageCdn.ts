@@ -33,29 +33,6 @@ function extractRevision(source: string): {
   }
 }
 
-type Modifiers = Record<string, unknown> & { width?: unknown, height?: unknown, maxWidth?: unknown }
-
-// Media/Image passes the source width as `maxWidth`. IPX does not enlarge, so
-// a srcset candidate wider than the source returns the same pixels under
-// another URL: clamp it to the source, keeping the requested aspect ratio.
-export function withinSourceWidth(modifiers: Modifiers | undefined): Modifiers | undefined {
-  if (!modifiers || !('maxWidth' in modifiers)) return modifiers
-
-  const { maxWidth, ...rest } = modifiers
-  const limit = Number(maxWidth)
-  const width = Number(rest.width)
-
-  if (!(limit > 0) || !(width > limit)) return rest
-
-  const height = Number(rest.height)
-
-  return {
-    ...rest,
-    width: limit,
-    ...(height > 0 ? { height: Math.round((height * limit) / width) } : {}),
-  }
-}
-
 export default () => {
   const provider = createIpxProvider()
 
@@ -67,11 +44,7 @@ export default () => {
       context: Parameters<typeof provider.getImage>[2],
     ) {
       const normalized = extractRevision(source)
-      const image = provider.getImage(
-        normalized.source,
-        { ...options, modifiers: withinSourceWidth(options.modifiers) as typeof options.modifiers },
-        context,
-      )
+      const image = provider.getImage(normalized.source, options, context)
 
       if (!normalized.revision) return image
 

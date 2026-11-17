@@ -3,7 +3,9 @@ import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-import { carouselImageDeliverySizesKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { imageSlotKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+
+const CONTAINER_SIZES = 'auto, (max-width: 767px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 40px), (max-width: 1535px) calc(100vw - 64px), 1472px'
 
 describe('MediaImage (Nuxt runtime)', () => {
   it('reports the cached responsive source without waiting for another load event', async () => {
@@ -176,7 +178,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.get('img').attributes('originalsrc')).toBeUndefined()
   })
 
-  it('uses the versioned original through Nuxt Image', async () => {
+  it('uses the versioned original through the image provider', async () => {
     const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Provider image',
@@ -192,8 +194,7 @@ describe('MediaImage (Nuxt runtime)', () => {
     })
 
     expect(wrapper.get('img').attributes()).toMatchObject({
-        'data-nuxt-img': '',
-        'sizes': '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 34vw, 480px',
+        sizes: CONTAINER_SIZES,
         src: 'https://drupal.example/files/image.jpg?download=1&v=42-1710000000-293400',
       })
     expect(wrapper.get('img').attributes('srcset')).toContain(
@@ -213,12 +214,11 @@ describe('MediaImage (Nuxt runtime)', () => {
         },
     })
 
-    expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
     expect(wrapper.get('img').attributes('srcset')).not.toContain('styles/640')
     expect(wrapper.get('img').attributes('srcset')).toContain('styles/1024')
   })
 
-  it('falls back to the container profile when a profile is unknown', async () => {
+  it('sizes to the theme container when a Drupal delivery profile means nothing to the layout', async () => {
       const wrapper = await mountSuspended(MediaImage, {
         props: {
           alt: 'Fallback image',
@@ -231,13 +231,10 @@ describe('MediaImage (Nuxt runtime)', () => {
         },
       })
 
-      expect(wrapper.get('img').attributes('data-nuxt-img')).toBe('')
       expect(wrapper.get('img').attributes('src')).toContain(
         'image.jpg?v=42-1710000000-293400',
       )
-      expect(wrapper.get('img').attributes('sizes')).toBe(
-        '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
-      )
+      expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
   })
 
   it('allows a layout to narrow Nuxt Image sizes without changing Drupal sizes', async () => {
@@ -259,29 +256,29 @@ describe('MediaImage (Nuxt runtime)', () => {
       )
   })
 
-  it('uses a full-width carousel profile instead of a nested card profile', async () => {
-    const wrapper = await mountSuspended(MediaImage, {
-        global: {
-          provide: {
-            [carouselImageDeliverySizesKey as symbol]: computed(() =>
-              'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-            ),
-          },
-        },
-        props: {
-          alt: 'Full-width carousel image',
-          noWrapper: true,
-          originalSrc: 'https://drupal.example/files/image.jpg',
-          deliveryProfile: 'card',
-          src: '/styles/card/image.webp',
-        },
+  it('sizes an edge-to-edge image, or the slot its layout provides, to that width', async () => {
+    const full = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Edge-to-edge image',
+        deliveryProfile: 'full',
+        noWrapper: true,
+        originalSrc: 'https://drupal.example/files/image.jpg',
+        src: '/styles/card/image.webp',
+      },
     })
 
-    expect(wrapper.get('img').attributes('sizes')).toBe(
-        '(max-width: 767px) 100vw, (max-width: 1023px) 100vw, (max-width: 1279px) 100vw, (max-width: 1535px) 100vw, 100vw',
-      )
+    expect(full.get('img').attributes('sizes')).toBe('auto, 100vw')
     // Without a known source width the srcset is the whole width ladder.
-    expect(wrapper.get('img').attributes('srcset')).toContain(' 3840w')
+    expect(full.get('img').attributes('srcset')).toContain(' 3840w')
+
+    const column = await mountSuspended(MediaImage, {
+      global: {
+        provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport / 2) },
+      },
+      props: { alt: 'Half-width image', noWrapper: true, src: '/image.webp' },
+    })
+
+    expect(column.get('img').attributes('sizes')).toBe('auto, 50vw')
   })
 
   it('keeps a fixed sizes value and builds srcset from the width ladder, capped at the source', async () => {
@@ -365,7 +362,23 @@ describe('MediaImage (Nuxt runtime)', () => {
     }
   })
 
-  it('uses the container profile when no delivery profile is provided', async () => {
+  it('does not let a cover-cropped image use sizes="auto", which would size it to its box', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: {
+        alt: 'Panorama',
+        height: 772,
+        mediaHeight: 'break',
+        src: '/panorama.webp',
+        width: 4000,
+      },
+    })
+    const sizes = wrapper.get('img').attributes('sizes') ?? ''
+
+    expect(sizes.startsWith('auto')).toBe(false)
+    expect(sizes).toContain('1659px')
+  })
+
+  it('sizes to the theme container without a layout slot', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
         alt: 'Example',
@@ -373,9 +386,7 @@ describe('MediaImage (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('img').attributes('sizes')).toBe(
-      '(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1472px',
-    )
+    expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
   })
 
   it('preserves image dimensions without exposing deferred sources', async () => {

@@ -49,8 +49,6 @@ const drupalImageDomains = resolveDrupalImageDomains(
   process.env.DRUPAL_CDN,
   process.env.NUXT_IMAGE_CDN,
 )
-const imageModuleDir = dirname(fileURLToPath(import.meta.resolve('@nuxt/image')))
-const imageProviderComponent = resolvePath(imageModuleDir, 'runtime/components/NuxtImg.vue')
 const ipxRuntimeProvider = resolvePath(
   themeLayerDir,
   'build/imageCdn.ts',
@@ -72,9 +70,6 @@ function hasCssEntry(entries: unknown[], path: string): boolean {
 }
 
 export default defineNuxtConfig({
-  alias: {
-    '#stir-image-provider': imageProviderComponent,
-  },
   modules: [
     () => refuseProductionCalculatorOverride(),
     '@nuxt/image',

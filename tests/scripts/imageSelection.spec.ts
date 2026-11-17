@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { createImage } from '@nuxt/image/runtime'
 import { parseSrcset, pickCandidate, sizesWidth } from '../../scripts/perf/imageSelection.mjs'
 import createStirIpxProvider from '../../layers/theme/build/imageCdn'
-import { ladderSrcset, resolveCoverImageSizes } from '../../layers/theme/app/utils/imageDelivery'
+import {
+  containerSlot,
+  coverSlot,
+  imageSlotSizes,
+  ladderSrcset,
+  viewportSlot,
+  wrapGridSlot,
+} from '../../layers/theme/app/utils/imageDelivery'
 
 const screens = { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 }
 const VIEWPORTS = [320, 390, 640, 768, 900, 1024, 1180, 1280, 1400, 1536, 1920, 2560]
@@ -27,9 +34,9 @@ describe('browser image selection', () => {
   })
 })
 
-// The layer's real delivery path: `sizes` from @nuxt/image's getSizes,
-// srcset from the width ladder through the layer's provider, then a browser's
-// pick, then IPX's output (it never enlarges).
+// The layer's real delivery path: `sizes` from the image slot, srcset from
+// the width ladder through the layer's provider, then a browser's pick, then
+// IPX's output (it never enlarges).
 const $img = createImage({
   screens,
   densities: [1, 2],
@@ -42,25 +49,21 @@ const $img = createImage({
 } as unknown as Parameters<typeof createImage>[0])
 
 function deliveredAt(sizes: string, source: { width: number, height: number }, viewport: number, dpr: number) {
-  const image = $img.getSizes('/photo.jpg', {
-    sizes,
-    modifiers: { width: source.width, height: source.height, maxWidth: source.width },
-  })
   const srcset = ladderSrcset(
     (width, height) => $img('/photo.jpg', { width, height }),
     source.width,
     source.height,
   )
-  const candidate = pickCandidate(parseSrcset(srcset), sizesWidth(image.sizes!, viewport), dpr)
+  const candidate = pickCandidate(parseSrcset(srcset), sizesWidth(sizes, viewport), dpr)
   const requested = Number(/s_(\d+)x/.exec(candidate.url)?.[1] ?? candidate.width)
 
   return Math.min(requested, source.width)
 }
 
-// What each layout really shows, from the theme's container (96rem, px-4
-// sm:px-6 lg:px-8) and a 2rem column gap.
+// What each layout really shows, written out by hand from the theme's
+// container (96rem, px-4 md:px-5 lg:px-8) and a gap-8 (2rem) grid.
 const content = (viewport: number) =>
-  Math.min(viewport, 1536) - (viewport >= 1024 ? 64 : viewport >= 640 ? 48 : 32)
+  Math.min(viewport, 1536) - (viewport >= 1024 ? 64 : viewport >= 768 ? 40 : 32)
 const columns = (count: number, viewport: number) => (content(viewport) - 32 * (count - 1)) / count
 const LAYOUTS: Record<string, (viewport: number) => number> = {
   full: viewport => viewport,
@@ -91,21 +94,23 @@ function sweep(sizes: string, shown: (viewport: number) => number, source = { wi
 // these numbers; they should move towards under 1.00 and over within one
 // width-ladder step.
 describe('image delivery baseline', () => {
-  const profiles = {
-    full: 'sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw',
-    container: 'sm:100vw md:100vw xl:1472px',
-    split: 'sm:100vw md:50vw xl:736px',
-    card: 'sm:100vw md:50vw lg:34vw xl:480px',
+  const container = { maxWidth: 1536, padding: { default: 16, md: 20, lg: 32 } }
+  const contained = containerSlot(viewportSlot, container)
+  const slots = {
+    full: viewportSlot,
+    container: contained,
+    split: wrapGridSlot(contained, container, { grid: { columns: { md: 2 }, gap: { md: 8 } } }),
+    card: wrapGridSlot(contained, container, { grid: { columns: { md: 2, lg: 3 }, gap: { md: 8 } } }),
   }
 
-  it('delivers each layout profile', () => {
-    expect(Object.fromEntries(Object.entries(profiles).map(([name, sizes]) =>
-      [name, sweep(sizes, LAYOUTS[name]!)]))).toMatchInlineSnapshot(`
+  it('delivers each layout', () => {
+    expect(Object.fromEntries(Object.entries(slots).map(([name, slot]) =>
+      [name, sweep(imageSlotSizes(slot), LAYOUTS[name]!)]))).toMatchInlineSnapshot(`
         {
-          "card": "under 1.00, over 1.61",
-          "container": "under 1.00, over 1.58",
+          "card": "under 1.00, over 1.38",
+          "container": "under 1.00, over 1.34",
           "full": "under 0.96, over 1.25",
-          "split": "under 1.00, over 1.62",
+          "split": "under 1.00, over 1.38",
         }
       `)
   })
@@ -113,7 +118,7 @@ describe('image delivery baseline', () => {
   it('delivers a full-bleed cover panorama in a break-height box', () => {
     const height = { min: 320, vw: 40, max: 640 }
     const source = { width: 4000, height: 772 }
-    const sizes = resolveCoverImageSizes(profiles.full, height, source.width, source.height, screens)!
+    const sizes = imageSlotSizes(coverSlot(viewportSlot, height, source.width, source.height))
     const shown = (viewport: number) =>
       Math.max(viewport, Math.min(height.max, Math.max(height.min, 0.4 * viewport)) * (source.width / source.height))
 
