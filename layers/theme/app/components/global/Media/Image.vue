@@ -9,6 +9,7 @@ import {
   coverCropSources,
   coverSlot,
   HERO_HIGH_DENSITY_SCALE,
+  imageBoxAspectKey,
   imageSlotKey,
   imageSlotSizes,
   ladderSrcset,
@@ -119,8 +120,9 @@ const boxSlot = computed(() => isHero.value
   ? viewportSlot
   : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container))
 // How much wider than a fixed-aspect box (coverAspect) the image is drawn.
+const injectedBoxAspect = inject(imageBoxAspectKey, undefined)
 const coverAspectOverflow = computed(() => {
-  const [width = Number.NaN, height = 1] = String(props.coverAspect ?? '').split('/').map(Number)
+  const [width = Number.NaN, height = 1] = String(props.coverAspect ?? injectedBoxAspect?.value ?? '').split('/').map(Number)
   const box = width / height
   const known = Number(props.width) > 0 && Number(props.height) > 0
 

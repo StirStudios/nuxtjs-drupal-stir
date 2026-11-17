@@ -3,7 +3,7 @@ import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
-import { imageSlotKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
+import { imageBoxAspectKey, imageSlotKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
 
 const CONTAINER_SIZES = 'auto, (max-width: 767px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 40px), (max-width: 1535px) calc(100vw - 64px), 1472px'
 
@@ -415,6 +415,21 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(sizes.startsWith('auto')).toBe(false)
     expect(sizes).toBe('56.9vw')
+  })
+
+  it('takes the box shape from a provider when coverAspect is not set', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      global: {
+        provide: {
+          [imageSlotKey as symbol]: computed(() => () => 160),
+          [imageBoxAspectKey as symbol]: computed(() => 1),
+        },
+      },
+      // A 4:3 photo in a 160px square avatar is drawn about 213px wide.
+      props: { alt: 'Avatar', height: 900, src: '/avatar.webp', width: 1200 },
+    })
+
+    expect(wrapper.get('img').attributes('sizes')).toBe('214px')
   })
 
   it('ignores coverAspect when the image is no wider than its box or has no dimensions', async () => {

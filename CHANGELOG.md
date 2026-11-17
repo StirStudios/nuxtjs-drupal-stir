@@ -15,6 +15,15 @@ untouched do not need one.
 
 ### Media (after the image delivery release)
 
+- **New: `ImageSlotProvider` `boxAspect`.** For images rendered through a
+  slot (a Drupal custom element inside a site's own fixed-aspect box, such
+  as a square `UAvatar`), wrap the slot in
+  `<ImageSlotProvider :image-slot="…" :box-aspect="1">`; `MediaImage` uses it
+  as its `coverAspect` when none is set. `imageSlot` is now optional.
+- **Changed: `audit:perf` judges density-capped images at 1x.** Images whose
+  `sizes` scale down on high-density screens (heroes) ask for about 1x there
+  by design, so the image check no longer reports them as too small at 2x.
+
 - **New: `MediaImage` `coverAspect`.** A site that places an image in its own
   fixed-aspect box (for example `aspect-[261/167]` with `object-cover`) can
   pass the box's shape (`cover-aspect="261/167"` or a number). An image wider

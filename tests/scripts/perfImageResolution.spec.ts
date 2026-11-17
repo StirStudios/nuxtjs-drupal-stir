@@ -48,6 +48,14 @@ describe('image resolution audit', () => {
       .toBeUndefined()
   })
 
+  it('judges a density-capped hero at 1x on high-density screens', () => {
+    const hero = image({ cover: false, boxWidth: 390, aspectRatio: 1, densityCapped: true, deliveredWidth: 480, largestWidth: 3840 })
+
+    expect(classifyImage(hero, 2)).toBeUndefined()
+    expect(classifyImage({ ...hero, densityCapped: false }, 2))
+      .toEqual({ level: 'error', kind: 'undersized', needed: 780, available: 3840 })
+  })
+
   it('ignores icons and images that never loaded', () => {
     expect(classifyImage(image({ boxWidth: 40, deliveredWidth: 10 }), 1)).toBeUndefined()
     expect(classifyImage(image({ deliveredWidth: 0 }), 1)).toBeUndefined()

@@ -110,6 +110,10 @@ export const imageSlotKey: InjectionKey<ComputedRef<ImageSlot>> = Symbol('stirIm
 
 export const viewportSlot: ImageSlot = viewport => viewport
 
+// The shape (width / height) of a fixed-aspect box that object-cover crops
+// images to, for content rendered through slots; MediaImage's coverAspect wins.
+export const imageBoxAspectKey: InjectionKey<ComputedRef<number | undefined>> = Symbol('stirImageBoxAspect')
+
 // Tailwind's breakpoints, as the grid uses them (GRID_BREAKPOINTS).
 const BREAKPOINT_PX: Record<GridBreakpoint, number> = {
   default: 0, xs: 480, sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536,
