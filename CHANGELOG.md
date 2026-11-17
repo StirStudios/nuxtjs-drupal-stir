@@ -13,6 +13,11 @@ untouched do not need one.
 
 ## Unreleased
 
+- Lazy rich-text images lead their `sizes` with `auto`, like other lazy
+  images, so browsers size them to the column they are laid out in. On one
+  client site, article images in a narrow column downloaded at 2560px where
+  1440px was enough. `RichTextImageContext` gains a `lazy` field.
+
 ### Media (after the image delivery release)
 
 - **New: `ImageSlotProvider` `boxAspect`.** For images rendered through a

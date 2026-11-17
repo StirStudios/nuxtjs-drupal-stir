@@ -46,7 +46,7 @@ export function useOptimizedDrupalHtml(source: MaybeRefOrGetter<HtmlSource>) {
         const fallbackWidth = Math.min(width || 1920, 1920)
 
         return {
-          sizes: imageSlotSizes(viewport => slot(viewport) / divisor),
+          sizes: imageSlotSizes(viewport => slot(viewport) / divisor, context?.lazy),
           src: url(fallbackWidth, width && height ? Math.round((fallbackWidth * height) / width) : undefined),
           srcset: ladderSrcset(url, width, height),
         }
