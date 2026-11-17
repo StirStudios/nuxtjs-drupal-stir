@@ -448,6 +448,7 @@ describe('MediaImage (Nuxt runtime)', () => {
 
   it('measures a lazy cover image in a box of its own shape and sizes it at the width it is drawn', async () => {
     const callbacks: ResizeObserverCallback[] = []
+
     vi.stubGlobal('ResizeObserver', class {
       constructor(callback: ResizeObserverCallback) { callbacks.push(callback) }
       observe() {}
