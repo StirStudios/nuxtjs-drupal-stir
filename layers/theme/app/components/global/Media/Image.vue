@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ImageModifiers } from '@nuxt/image'
 import { useIntersectionObserver } from '@vueuse/core'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import {
@@ -125,12 +126,15 @@ const providerSource = computed(() => versionImageSource(
   toDrupalUrl(props.originalSrc || props.src, drupalOrigin.value),
   props.originalRevision,
 ))
+// Sites don't depend on @nuxt/image directly, so its generated provider types
+// resolve to nothing there and $img's modifiers parameter becomes `undefined`.
+// Type the modifiers against @nuxt/image itself.
 const imageUrl = (source: string, width?: number, height?: number) => $img(source, {
   format: theme.media.image.format,
   height,
   quality: theme.media.image.quality,
   width,
-})
+} satisfies Partial<ImageModifiers> as never)
 const providerSrcset = computed(() => {
   const source = providerSource.value
 
