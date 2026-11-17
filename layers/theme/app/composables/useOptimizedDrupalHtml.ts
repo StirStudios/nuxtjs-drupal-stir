@@ -1,3 +1,4 @@
+import type { ImageModifiers } from '@nuxt/image'
 import {
   optimizeDrupalRichTextImages,
   trustedDrupalHtml,
@@ -34,12 +35,14 @@ export function useOptimizedDrupalHtml(source: MaybeRefOrGetter<HtmlSource>) {
         const columns = Math.max(1, ...[...(context?.containerClass ?? '').matchAll(/grid-cols-(\d+)/g)]
           .map(match => Number(match[1])))
         const divisor = context?.alignment === 'left' || context?.alignment === 'right' ? 2 : columns
+        // Typed against @nuxt/image: in sites its provider types resolve to
+        // nothing and $img's modifiers parameter becomes `undefined`.
         const url = (candidateWidth: number, candidateHeight?: number) => $img(canonicalSource, {
           format: image.format,
           height: candidateHeight,
           quality: image.quality,
           width: candidateWidth,
-        })
+        } satisfies Partial<ImageModifiers> as never)
         const fallbackWidth = Math.min(width || 1920, 1920)
 
         return {

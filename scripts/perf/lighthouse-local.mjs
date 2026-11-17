@@ -1,5 +1,12 @@
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import { once } from 'node:events'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { request } from 'node:http'
+import { createSecureServer } from 'node:http2'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { createGzip } from 'node:zlib'
 
 const args = process.argv.slice(2)
 const option = (name, fallback) => {
@@ -13,12 +20,15 @@ const host = '127.0.0.1'
 const port = numberOption('port', 3012)
 const routePath = option('path', '/')
 const origin = `http://${host}:${port}`
+const frontPort = numberOption('front-port', port + 1)
 const targetUrl = new URL(routePath, `${origin}/`).toString()
+const frontUrl = new URL(routePath, `https://${host}:${frontPort}/`).toString()
 const forwardedArgs = args.filter(
   (arg) =>
     arg !== '--' &&
     !arg.startsWith('--path=') &&
-    !arg.startsWith('--port='),
+    !arg.startsWith('--port=') &&
+    !arg.startsWith('--front-port='),
 )
 const delay = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds))
@@ -119,6 +129,67 @@ async function assertCompressedAssets(html) {
   console.log(`Ready: ${targetUrl} (${encoding} assets)`)
 }
 
+// Production sits behind a server that speaks HTTP/2 and compresses HTML; the
+// Node preview server does neither. Lighthouse's simulated throttling models
+// HTTP/1.1 as six connections per host, which turns the ~150 module requests
+// of a hydrated page into a queue and inflates LCP far beyond what production
+// shows. Front the preview with HTTP/2 and gzip so local runs measure the page
+// as it is served.
+function startProductionFront() {
+  const certDirectory = mkdtempSync(join(tmpdir(), 'stir-lighthouse-'))
+  const keyPath = join(certDirectory, 'key.pem')
+  const certPath = join(certDirectory, 'cert.pem')
+
+  execFileSync('openssl', [
+    'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
+    '-subj', `/CN=${host}`, '-keyout', keyPath, '-out', certPath,
+  ], { stdio: 'ignore' })
+
+  const front = createSecureServer({
+    allowHTTP1: true,
+    cert: readFileSync(certPath),
+    key: readFileSync(keyPath),
+  }, (clientRequest, clientResponse) => {
+    const headers = Object.fromEntries(
+      Object.entries(clientRequest.headers).filter(([name]) => !name.startsWith(':')),
+    )
+    const authority = clientRequest.headers[':authority'] || clientRequest.headers.host
+
+    const upstream = request({
+      headers: { ...headers, 'host': authority, 'x-forwarded-host': authority, 'x-forwarded-proto': 'https' },
+      host,
+      method: clientRequest.method,
+      path: clientRequest.url,
+      port,
+    }, (upstreamResponse) => {
+      const responseHeaders = { ...upstreamResponse.headers }
+
+      for (const name of ['connection', 'keep-alive', 'transfer-encoding']) delete responseHeaders[name]
+
+      const compressHtml = !responseHeaders['content-encoding']
+        && String(responseHeaders['content-type'] || '').includes('text/html')
+        && /\bgzip\b/.test(String(clientRequest.headers['accept-encoding'] || ''))
+
+      if (compressHtml) {
+        delete responseHeaders['content-length']
+        responseHeaders['content-encoding'] = 'gzip'
+      }
+
+      clientResponse.writeHead(upstreamResponse.statusCode || 502, responseHeaders)
+      ;(compressHtml ? upstreamResponse.pipe(createGzip()) : upstreamResponse).pipe(clientResponse)
+    })
+
+    upstream.on('error', () => clientResponse.destroy())
+    clientRequest.pipe(upstream)
+  })
+
+  front.listen(frontPort, host)
+  rmSync(certDirectory, { force: true, recursive: true })
+  console.log(`Measuring ${frontUrl} (HTTP/2, gzip HTML) in front of ${targetUrl}`)
+
+  return front
+}
+
 async function stopServer(server) {
   const usesProcessGroup = process.platform !== 'win32' && server.pid
   const signal = (name) => {
@@ -171,14 +242,18 @@ async function main() {
   process.once('SIGINT', stopOnSignal)
   process.once('SIGTERM', stopOnSignal)
 
+  let front
+
   try {
     const html = await waitForPage(server, serverOutput)
     await assertCompressedAssets(html)
+    front = startProductionFront()
+    await once(front, 'listening')
     await run(
       process.execPath,
       [
-        'scripts/perf/lighthouse.mjs',
-        `--url=${targetUrl}`,
+        fileURLToPath(new URL('./lighthouse.mjs', import.meta.url)),
+        `--url=${frontUrl}`,
         ...forwardedArgs,
       ],
       { env: process.env },
@@ -186,6 +261,7 @@ async function main() {
   } finally {
     process.removeListener('SIGINT', stopOnSignal)
     process.removeListener('SIGTERM', stopOnSignal)
+    front?.close()
     await stopServer(server)
   }
 }

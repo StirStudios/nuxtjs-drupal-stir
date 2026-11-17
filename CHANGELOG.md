@@ -13,6 +13,20 @@ untouched do not need one.
 
 ## Unreleased
 
+### Performance
+
+- **Changed: `NodeTeaser` no longer renders `UBlogPost`.** It renders the same
+  markup with Nuxt UI's `blog-post` theme, so `ui.blogPost` in `app.config`
+  still applies, and formats the date with `Intl.DateTimeFormat` (medium, UTC,
+  the Nuxt UI locale). `UBlogPost` always imported reka-ui's date formatter,
+  which shipped every `@internationalized/date` calendar to any page with a
+  teaser. A client home page loads 15 KB less JS in 3 fewer requests. The
+  `authors`, `badge` and `footer` parts of `UBlogPost` were never used here.
+  Sites that override `NodeTeaser` or target `UBlogPost` in it are unaffected
+  unless they relied on the component instance itself.
+- **Changed: the inline-edit loading state is lazy.** `EditableRichText` uses
+  `LazyEditLoadingState`, keeping the admin UI theme off anonymous pages.
+
 ### Media
 
 - **New: cover-cropped Media images are cropped to their box.** An image in a

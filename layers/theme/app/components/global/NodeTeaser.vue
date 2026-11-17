@@ -1,4 +1,10 @@
+<script lang="ts">
+import theme from '#build/ui/blog-post'
+</script>
+
 <script setup lang="ts">
+import { useLocale } from '@nuxt/ui/composables/useLocale'
+import { tv } from '@nuxt/ui/utils/tv'
 import { useTeaserPost } from '#stir/composables/useTeaserPost'
 import { resolveDrupalTeaserLink } from '#stir/composables/useDrupalTeaserLink'
 
@@ -37,7 +43,9 @@ const { post, orientation } = useTeaserPost(props.teaser, {
 
 const showDate = computed(() => props.showDate ?? true)
 const showDescription = computed(() => props.showDescription ?? true)
-const theme = useAppConfig().stirTheme
+const appConfig = useAppConfig()
+const stirTheme = appConfig.stirTheme
+const { locale } = useLocale()
 const trustedDescription = computed(() =>
   trustedDrupalHtml(post.value.description),
 )
@@ -70,52 +78,87 @@ const teaserImageProps = computed<Record<string, unknown>>(() => {
   return image && typeof image === 'object' ? image : {}
 })
 const teaserImageRoundedClass = computed(() =>
-  `${theme.media.rounded} rounded-b-none`,
+  `${stirTheme.media.rounded} rounded-b-none`,
 )
 
-const postUi = computed(() => {
-  if (!titleOverlay.value) {
-    return {
-      image: 'object-center',
-    }
-  }
+const postUi = computed<Partial<Record<'root' | 'header' | 'date' | 'title' | 'body', string>>>(() => {
+  if (!titleOverlay.value) return {}
 
   return {
     root: 'rounded-none',
     header: 'rounded-none',
-    image: 'object-center duration-800',
     date: 'sr-only',
     title: 'text-white text-lg mb-0',
     body: 'pointer-events-none absolute inset-0 flex items-center justify-center text-center bg-black/50',
   }
 })
 
+// UBlogPost's markup and theme without its reka-ui date formatter, which pulls
+// every @internationalized/date calendar into pages that show teasers.
+// A site's app.config type for ui.blogPost would widen the theme's slots and
+// variants; read it as the theme's own shape, as UBlogPost does at runtime.
+const blogPostOverride = appConfig.ui?.blogPost as Partial<typeof theme> | undefined
+const ui = computed(() => tv({ extend: theme, ...blogPostOverride })({
+  orientation: orientation.value,
+  image: Boolean(teaserImage.value),
+  to: Boolean(post.value.to),
+}))
+const date = computed(() => {
+  const value = showDate.value ? post.value.date : ''
+  const parsed = value ? new Date(value) : null
+
+  if (!parsed || Number.isNaN(parsed.getTime())) return null
+
+  return {
+    iso: parsed.toISOString(),
+    label: new Intl.DateTimeFormat(locale.value.code, { dateStyle: 'medium', timeZone: 'UTC' }).format(parsed),
+  }
+})
 </script>
 
 <template>
   <EditLink :link="post.editLink">
-    <UBlogPost
-      :date="showDate ? post.date : undefined"
-      :description="showDescription ? trustedDescription : undefined"
-      :orientation="orientation"
-      :title="post.title"
-      :to="post.to"
-      :ui="postUi"
+    <article
+      :class="ui.root({ class: postUi.root })"
+      :data-orientation="orientation"
+      data-slot="root"
     >
-      <template #header>
+      <ULink
+        v-if="post.to"
+        :aria-label="post.title || 'Post link'"
+        class="absolute inset-0 focus:outline-none"
+        raw
+        :to="post.to"
+      />
+
+      <div v-if="teaserImage" :class="ui.header({ class: postUi.header })" data-slot="header">
         <MediaImage
-          v-if="teaserImage"
           v-bind="teaserImageProps"
           :rounded-class="teaserImageRoundedClass"
           :wrapper-class="[
             'h-full w-full transform transition-transform duration-300 group-hover:scale-105 group-hover/blog-post:scale-105',
           ]"
         />
-      </template>
+      </div>
 
-      <template v-if="showDescription" #description>
-        <div v-html="trustedDescription" />
-      </template>
-    </UBlogPost>
+      <div :class="ui.body({ class: postUi.body })" data-slot="body">
+        <div v-if="date" :class="ui.meta()" data-slot="meta">
+          <time :class="ui.date({ class: postUi.date })" data-slot="date" :datetime="date.iso">
+            {{ date.label }}
+          </time>
+        </div>
+
+        <h2 v-if="post.title" :class="ui.title({ class: postUi.title })" data-slot="title">
+          {{ post.title }}
+        </h2>
+
+        <div
+          v-if="showDescription && trustedDescription"
+          :class="ui.description()"
+          data-slot="description"
+          v-html="trustedDescription"
+        />
+      </div>
+    </article>
   </EditLink>
 </template>
