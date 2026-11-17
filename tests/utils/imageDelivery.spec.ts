@@ -211,6 +211,11 @@ describe('imageSlotSizes', () => {
     )
   })
 
+  it('scales the slot on high-density screens only, ahead of the standard entries', () => {
+    expect(imageSlotSizes(viewportSlot, false, { highDensityScale: 0.5 }))
+      .toBe('(min-resolution: 1.5dppx) 50vw, 100vw')
+  })
+
   it('writes 100vw for the viewport and leads with auto for lazy images', () => {
     expect(imageSlotSizes(viewportSlot)).toBe('100vw')
     expect(imageSlotSizes(viewportSlot, true)).toBe('auto, 100vw')

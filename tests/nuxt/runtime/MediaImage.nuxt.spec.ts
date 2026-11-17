@@ -393,6 +393,16 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(wrapper.find('.media > img').exists()).toBe(true)
   })
 
+  it('asks for about 1x of a hero on high-density screens only', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      props: { alt: 'Hero', height: 3000, isHero: true, src: '/hero.webp', width: 5000 },
+    })
+    const sizes = wrapper.get('img').attributes('sizes') ?? ''
+
+    expect(sizes.startsWith('(min-resolution: 1.5dppx) and (max-width: ')).toBe(true)
+    expect(sizes).toContain(', (max-width: ')
+  })
+
   it('sizes to the theme container without a layout slot', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

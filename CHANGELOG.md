@@ -13,6 +13,20 @@ untouched do not need one.
 
 ## Unreleased
 
+### Media (after the image delivery release)
+
+- **Changed: heroes ask for about 1x on high-density screens.** A hero's
+  `sizes` now leads with `(min-resolution: 1.5dppx)` entries at half the slot,
+  so a phone loads roughly one image pixel per CSS pixel of a full-bleed
+  photo instead of two. Standard-density screens keep full sharpness.
+  `imageSlotSizes()` takes `{ highDensityScale }`; `HERO_HIGH_DENSITY_SCALE`
+  is 0.5. On one client home page this keeps its mobile Lighthouse score
+  (97, LCP 2.42s, as before the release) while its hero is 1080px instead of
+  the 768px the old profiles asked for.
+- **Fixed: small images.** The width ladder now starts at 64px (64, 128,
+  256), so avatars and logos sized in tens of pixels no longer load 320px
+  files.
+
 ### Performance
 
 - **Changed: `NodeTeaser` no longer renders `UBlogPost`.** It renders the same

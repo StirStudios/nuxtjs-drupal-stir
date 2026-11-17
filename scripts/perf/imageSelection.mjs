@@ -2,7 +2,7 @@
 // so image delivery can be checked against what is shown across viewports and
 // pixel densities without a browser.
 
-const MEDIA = /^\(\s*(min|max)-width:\s*(\d+(?:\.\d+)?)px\s*\)$/
+const MEDIA = /^\(\s*(min|max)-(width|resolution):\s*(\d+(?:\.\d+)?)(px|dppx)\s*\)$/
 
 function lengthPx(value, viewport) {
   const trimmed = value.trim()
@@ -29,24 +29,15 @@ const sizesEntries = sizes => sizes.split(/,(?![^(]*\))/).map(part => part.trim(
  * media query matches. A leading `auto` (lazy images) is skipped, as browsers
  * without support for it do.
  */
-export function sizesWidth(sizes, viewport) {
+export function sizesWidth(sizes, viewport, dpr = 1) {
   for (const entry of sizesEntries(sizes)) {
     if (entry === 'auto') continue
 
-    const media = entry.startsWith('(') ? entry.slice(0, entry.indexOf(')') + 1) : ''
+    // The media condition is the leading run of `(...)` joined by `and`.
+    const media = /^(?:\([^()]*\)\s*(?:and\s+)?)*/.exec(entry)?.[0] ?? ''.trim()
     const value = entry.slice(media.length).trim()
 
-    if (!media) return lengthPx(value, viewport)
-
-    const match = MEDIA.exec(media)
-
-    if (!match) throw new Error(`Unsupported sizes media query: ${media}`)
-
-    const limit = Number(match[2])
-
-    if (match[1] === 'max' ? viewport <= limit : viewport >= limit) {
-      return lengthPx(value, viewport)
-    }
+    if (mediaMatches(media, viewport, dpr)) return lengthPx(value, viewport)
   }
 
   return viewport
@@ -76,13 +67,15 @@ export function pickCandidate(candidates, slotWidth, dpr) {
   return candidates.find(candidate => candidate.width >= needed) ?? candidates.at(-1)
 }
 
-/** Whether a `<source media>` query matches a viewport width (min/max-width, joined by `and`). */
-export function mediaMatches(media, viewport) {
+/** Whether a media condition (min/max width or resolution, joined by `and`) matches. */
+export function mediaMatches(media, viewport, dpr = 1) {
   return !media || media.split(/\s+and\s+/).every((query) => {
     const match = MEDIA.exec(query.trim())
 
     if (!match) throw new Error(`Unsupported media query: ${query}`)
 
-    return match[1] === 'max' ? viewport <= Number(match[2]) : viewport >= Number(match[2])
+    const actual = match[2] === 'width' ? viewport : dpr
+
+    return match[1] === 'max' ? actual <= Number(match[3]) : actual >= Number(match[3])
   })
 }

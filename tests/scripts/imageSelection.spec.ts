@@ -33,6 +33,14 @@ describe('browser image selection', () => {
     expect(pickCandidate(candidates, 600, 3).url).toBe('/b')
     expect(pickCandidate(candidates, 1200, 2).url).toBe('/c')
   })
+
+  it('reads resolution conditions in sizes', () => {
+    const sizes = '(min-resolution: 1.5dppx) and (max-width: 767px) 50vw, (max-width: 767px) 100vw, 1000px'
+
+    expect(sizesWidth(sizes, 400, 2)).toBe(200)
+    expect(sizesWidth(sizes, 400, 1)).toBe(400)
+    expect(sizesWidth(sizes, 1200, 2)).toBe(1000)
+  })
 })
 
 // The layer's real delivery path: `sizes` from the image slot, srcset from
@@ -94,6 +102,23 @@ function sweep(sizes: string, shown: (viewport: number) => number, source = { wi
 // image delivery restructure (docs/image-delivery-plan.md). Each phase updates
 // these numbers; they should move towards under 1.00 and over within one
 // width-ladder step.
+describe('hero delivery', () => {
+  it('gives a hero about one image pixel per CSS pixel on phones and full sharpness at 1x', () => {
+    const height = { min: 672, vw: 40, max: 800 }
+    const source = { width: 5000, height: 3000 }
+    const slot = coverSlot(viewportSlot, height, source.width, source.height)
+    const sizes = imageSlotSizes(slot, false, { highDensityScale: 0.5 })
+    const srcset = parseSrcset(ladderSrcset((width, h) => $img('/hero.jpg', { width, height: h }), source.width, source.height))
+    // Drawn about 1120px wide on a 390px phone (672px tall, 5:3).
+    const phone = pickCandidate(srcset, sizesWidth(sizes, 390, 2), 2).width / slot(390)
+    const desktop = pickCandidate(srcset, sizesWidth(sizes, 1920, 1), 1).width / slot(1920)
+
+    expect(phone).toBeGreaterThanOrEqual(1)
+    expect(phone).toBeLessThan(1.4)
+    expect(desktop).toBeGreaterThanOrEqual(1)
+  })
+})
+
 describe('image delivery baseline', () => {
   const container = { maxWidth: 1536, padding: { default: 16, md: 20, lg: 32 } }
   const contained = containerSlot(viewportSlot, container)

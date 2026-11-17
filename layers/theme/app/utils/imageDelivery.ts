@@ -271,12 +271,7 @@ function sizesLength(slot: ImageSlot, from: number, to: number): string {
   return `calc(${vw}vw ${px < 0 ? '-' : '+'} ${Math.abs(px)}px)`
 }
 
-/**
- * `sizes` for a slot: one entry per breakpoint band, exact where the slot is
- * linear in the band (calc of vw and px), else the band's widest width. Lazy
- * images lead with `auto`, so browsers that support it use the laid-out width.
- */
-export function imageSlotSizes(slot: ImageSlot, lazy = false): string {
+function bandSizes(slot: ImageSlot, condition = ''): string[] {
   const entries: Array<{ to?: number, length: string }> = []
 
   SIZES_BANDS.forEach((from, index) => {
@@ -288,12 +283,40 @@ export function imageSlotSizes(slot: ImageSlot, lazy = false): string {
     else entries.push({ to: next ? next - 1 : undefined, length })
   })
 
-  const sizes = entries
-    .map(({ to, length }) => to === undefined ? length : `(max-width: ${to}px) ${length}`)
-    .join(', ')
+  return entries.map(({ to, length }) => {
+    const media = [condition, to === undefined ? '' : `(max-width: ${to}px)`].filter(Boolean).join(' and ')
+
+    return media ? `${media} ${length}` : length
+  })
+}
+
+/**
+ * `sizes` for a slot: one entry per breakpoint band, exact where the slot is
+ * linear in the band (calc of vw and px), else the band's widest width. Lazy
+ * images lead with `auto`, so browsers that support it use the laid-out width.
+ * `highDensityScale` scales the slot on high-density screens (1.5dppx and
+ * up) only: 0.5 gives a phone about one image pixel per CSS pixel while a
+ * standard screen keeps full sharpness.
+ */
+export function imageSlotSizes(
+  slot: ImageSlot,
+  lazy = false,
+  options: { highDensityScale?: number } = {},
+): string {
+  const scale = options.highDensityScale
+  const entries = [
+    ...(scale ? bandSizes(viewport => slot(viewport) * scale, '(min-resolution: 1.5dppx)') : []),
+    ...bandSizes(slot),
+  ]
+  const sizes = entries.join(', ')
 
   return lazy ? `auto, ${sizes}` : sizes
 }
+
+// Heroes are large photographs, usually under text, and the page's largest
+// paint: on high-density screens they ask for about 1x, so a phone does not
+// load a file four times the size for detail it barely shows.
+export const HERO_HIGH_DENSITY_SCALE = 0.5
 
 export interface CoverCropSource { media: string, sizes: string, srcset: string }
 
