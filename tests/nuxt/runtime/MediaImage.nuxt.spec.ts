@@ -403,6 +403,34 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(sizes).toContain(', (max-width: ')
   })
 
+  it('sizes an image wider than its fixed-aspect box at the width it is drawn', async () => {
+    const wrapper = await mountSuspended(MediaImage, {
+      global: {
+        provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport / 2) },
+      },
+      // A 16:9 poster in a 261:167 box is drawn about 13.7% wider than the box.
+      props: { alt: 'Poster', coverAspect: '261/167', height: 900, src: '/poster.webp', width: 1600 },
+    })
+    const sizes = wrapper.get('img').attributes('sizes') ?? ''
+
+    expect(sizes.startsWith('auto')).toBe(false)
+    expect(sizes).toBe('56.9vw')
+  })
+
+  it('ignores coverAspect when the image is no wider than its box or has no dimensions', async () => {
+    const square = await mountSuspended(MediaImage, {
+      global: { provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport / 2) } },
+      props: { alt: 'Square', coverAspect: '261/167', height: 1000, src: '/square.webp', width: 1000 },
+    })
+    const unknown = await mountSuspended(MediaImage, {
+      global: { provide: { [imageSlotKey as symbol]: computed(() => (viewport: number) => viewport / 2) } },
+      props: { alt: 'Unknown', coverAspect: '261/167', src: '/unknown.webp' },
+    })
+
+    expect(square.get('img').attributes('sizes')).toBe('auto, 50vw')
+    expect(unknown.get('img').attributes('sizes')).toBe('auto, 50vw')
+  })
+
   it('sizes to the theme container without a layout slot', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {
