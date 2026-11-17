@@ -102,19 +102,27 @@ const nodeTypeHero = computed(() => isSection.value ? undefined : heroTheme.node
 const isInline = computed(() => nodeTypeHero.value?.layout === 'inline')
 
 const slotMedia = computed(() => tk.slot('media'))
+// A hero with media claims the page's lead, so later media paragraphs do not;
+// it loads eagerly only when it is the first thing on the page. A text-only
+// hero leaves the lead. Setup runs outside render, so check the slot without
+// calling it.
+const isLead = useLeadMedia(vueSlots.media ? `hero-${props.id ?? ''}` : undefined)
 const heroMediaNode = computed(() => {
   const node = nodeTypeHero.value?.media === 'last' ? slotMedia.value.at(-1) : slotMedia.value[0]
 
   if (!node) return null
   // Inline media flows after the text, so it must not take background sizing.
-  return cloneVNode(node, { isHero: !isInline.value }, true)
+  // On a tracked page the lead decides loading, not the payload: Drupal marks
+  // every hero eager, wherever it sits.
+  return cloneVNode(node, {
+    isHero: !isInline.value,
+    ...(isLead !== undefined && normalizeDrupalMediaType(node.props?.type) === 'image'
+      ? { loading: isLead ? 'eager' : 'lazy', fetchpriority: isLead ? 'high' : 'auto' }
+      : {}),
+  }, true)
 })
 const hasMediaSlot = computed(() => Boolean(heroMediaNode.value))
 
-// A hero's media is above the fold and loads eagerly itself, so later media
-// paragraphs must not also claim the lead. A text-only hero leaves it.
-// Setup runs outside render, so check the slot is given without calling it.
-useLeadMedia(vueSlots.media ? `hero-${props.id ?? ''}` : undefined)
 const hasHero = computed(() => !!props.text || hasMediaSlot.value)
 const containsVideo = computed(() =>
   slotMedia.value

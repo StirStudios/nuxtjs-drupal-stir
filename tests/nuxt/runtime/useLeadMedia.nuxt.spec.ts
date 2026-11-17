@@ -8,7 +8,7 @@ import {
   useLeadMedia,
 } from '../../../layers/theme/app/composables/useLeadMedia'
 
-const results: Record<string, boolean> = {}
+const results: Record<string, boolean | undefined> = {}
 
 const MediaProbe = defineComponent({
   props: { id: { type: String, required: true } },
@@ -57,9 +57,9 @@ describe('useLeadMedia (Nuxt runtime)', () => {
     expect(results).toMatchObject({ gallery: false, later: false })
   })
 
-  it('is never the lead outside a tracked page', async () => {
+  it('leaves the lead undecided outside a tracked page', async () => {
     await mountSuspended(MediaProbe, { props: { id: 'untracked' } })
 
-    expect(results.untracked).toBe(false)
+    expect(results.untracked).toBeUndefined()
   })
 })

@@ -29,6 +29,20 @@ untouched do not need one.
 
 ### Media
 
+- **Changed: one loading rule for the lead image.** On a page that tracks its
+  lead media (the catch-all page), a Paragraph Hero's image now takes its
+  loading from the page's lead, not the payload: eager and high priority when
+  the hero is the first media on the page, lazy otherwise. Stir Tools marks
+  every hero eager, so a hero lower on the page competed with the real lead.
+  `useLeadMedia()` returns `undefined` outside a tracked page (it returned
+  `false`), where the payload's hints still apply. Phase 5 of
+  `docs/image-delivery-plan.md`.
+- **Changed: server-rendered images are never hidden.** A lazy image rendered
+  on the server used to start at `opacity-0` until JavaScript saw it load, so
+  it could not paint, or count as the largest paint, before hydration. Every
+  server-rendered image now starts visible; images added after hydration still
+  fade in.
+
 - **New: cover-cropped Media images are cropped to their box.** An image in a
   Media box of fixed height (small, break, feature) that is wider than the box
   now renders in a `<picture>` with one `<source>` per breakpoint band, each a

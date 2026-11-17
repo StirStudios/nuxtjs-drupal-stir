@@ -234,12 +234,14 @@ const { isSupported, stop } = useIntersectionObserver(
 
 const nuxtApp = useNuxtApp()
 // An image starts visible when it has no source, when this browser already
-// loaded it, or when it's eager and server-rendered (the server and hydration
-// agree, and the image isn't hidden until JavaScript runs). Others fade in.
+// loaded it, or when it was server-rendered: the browser paints it as it
+// arrives, without waiting for JavaScript, and it can count as the page's
+// largest paint. Images added after hydration fade in.
 const startsVisible = () =>
   !hasImageSource.value ||
   isImageSourceLoaded(providerSource.value) ||
-  (isEager.value && (import.meta.server || nuxtApp.isHydrating))
+  import.meta.server ||
+  nuxtApp.isHydrating
 const isLoaded = ref(startsVisible())
 
 function syncLoadedFromImageElement() {
