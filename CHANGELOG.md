@@ -15,6 +15,13 @@ untouched do not need one.
 
 ### Media (after the image delivery release)
 
+- **New: `MediaImage` `coverAspect`.** A site that places an image in its own
+  fixed-aspect box (for example `aspect-[261/167]` with `object-cover`) can
+  pass the box's shape (`cover-aspect="261/167"` or a number). An image wider
+  than the box is then sized at the width it is drawn, not the box width, and
+  does not use `sizes="auto"`. Found on a production work grid where 16:9
+  posters in a 261:167 box received about 0.88x the pixels they needed.
+
 - **Changed: heroes ask for about 1x on high-density screens.** A hero's
   `sizes` now leads with `(min-resolution: 1.5dppx)` entries at half the slot,
   so a phone loads roughly one image pixel per CSS pixel of a full-bleed

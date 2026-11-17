@@ -13,6 +13,7 @@ import {
   imageSlotSizes,
   ladderSrcset,
   leadImageKey,
+  mediaAspectRatio,
   sectionHeroMediaKey,
   versionImageSource,
   viewportImageLoadingKey,
@@ -34,6 +35,10 @@ const props = defineProps<{
   deliverySizes?: string
   // A Media paragraph height key (media.heights) when the box crops the image.
   mediaHeight?: string
+  // The shape of a box of fixed aspect ratio that object-cover crops the image
+  // to, as width / height ('261/167' or 1.56), so a wider image is sized at
+  // the width it is drawn rather than the box width.
+  coverAspect?: number | string
   width?: number
   height?: number
   loading?: 'lazy' | 'eager'
@@ -113,9 +118,22 @@ const coverHeight = computed(() => isHero.value
 const boxSlot = computed(() => isHero.value
   ? viewportSlot
   : injectedSlot?.value ?? containerSlot(viewportSlot, theme.media.image.container))
-const imageSlot = computed(() => coverHeight.value
-  ? coverSlot(boxSlot.value, coverHeight.value, props.width, props.height)
-  : boxSlot.value)
+// How much wider than a fixed-aspect box (coverAspect) the image is drawn.
+const coverAspectOverflow = computed(() => {
+  const [width = Number.NaN, height = 1] = String(props.coverAspect ?? '').split('/').map(Number)
+  const box = width / height
+  const known = Number(props.width) > 0 && Number(props.height) > 0
+
+  return box > 0 && known ? Math.max(1, mediaAspectRatio(props.width, props.height) / box) : 1
+})
+const imageSlot = computed(() => {
+  const slot = coverHeight.value
+    ? coverSlot(boxSlot.value, coverHeight.value, props.width, props.height)
+    : boxSlot.value
+  const overflow = coverAspectOverflow.value
+
+  return overflow > 1 ? (viewport: number) => slot(viewport) * overflow : slot
+})
 // An explicit delivery size (@nuxt/image `sizes` syntax) wins over the slot.
 const providerSizes = computed(() => {
   const explicit = props.deliverySizes?.trim()
@@ -123,7 +141,7 @@ const providerSizes = computed(() => {
   return explicit
     ? $img.getSizes(providerSource.value || '/', { sizes: explicit }).sizes
     // `sizes="auto"` uses the box width, which a cover-cropped image overflows.
-    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value, {
+    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value && coverAspectOverflow.value === 1, {
         highDensityScale: isHero.value ? HERO_HIGH_DENSITY_SCALE : undefined,
       })
 })
