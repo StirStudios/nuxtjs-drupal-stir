@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ImageModifiers } from '@nuxt/image'
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useResizeObserver } from '@vueuse/core'
 import type { FunctionalComponent } from 'vue'
 import type { EditAction, EditActionKey } from '#stir/types/EditControls'
 import type { CoverCropSource } from '#stir/utils/imageDelivery'
@@ -136,14 +136,16 @@ const imageSlot = computed(() => {
 
   return overflow > 1 ? (viewport: number) => slot(viewport) * overflow : slot
 })
+// `sizes="auto"` uses the box width, which a cover-cropped image overflows.
+const usesAutoSizes = computed(() => !props.deliverySizes?.trim()
+  && normalizedLoading.value === 'lazy' && !coverHeight.value && coverAspectOverflow.value === 1)
 // An explicit delivery size (@nuxt/image `sizes` syntax) wins over the slot.
 const providerSizes = computed(() => {
   const explicit = props.deliverySizes?.trim()
 
   return explicit
     ? $img.getSizes(providerSource.value || '/', { sizes: explicit }).sizes
-    // `sizes="auto"` uses the box width, which a cover-cropped image overflows.
-    : imageSlotSizes(imageSlot.value, normalizedLoading.value === 'lazy' && !coverHeight.value && coverAspectOverflow.value === 1, {
+    : imageSlotSizes(imageSlot.value, usesAutoSizes.value, {
         highDensityScale: isHero.value ? HERO_HIGH_DENSITY_SCALE : undefined,
       })
 })
@@ -240,6 +242,25 @@ const deferredFrameStyle = computed(() => {
   return { aspectRatio: `${width} / ${height}` }
 })
 const imageElement = ref<HTMLImageElement | null>(null)
+// A lazy image that object-cover draws wider than a box of its own shape (a
+// site's square or portrait frame) is measured before it loads and sized at
+// the width it is drawn; `sizes="auto"` would give only the box width.
+const measuredSizes = ref<string>()
+
+useResizeObserver(imageElement, ([entry]) => {
+  const img = imageElement.value
+  const { width, height } = entry?.contentRect ?? { width: 0, height: 0 }
+  const aspect = Number(props.width) / Number(props.height)
+
+  if (!img || !usesAutoSizes.value || !width || !height || !(aspect > 0) || getComputedStyle(img).objectFit !== 'cover') {
+    measuredSizes.value = undefined
+    return
+  }
+
+  const drawn = Math.ceil(Math.max(width, height * aspect))
+
+  measuredSizes.value = drawn > width + 1 ? `${drawn}px` : undefined
+})
 
 const { isSupported, stop } = useIntersectionObserver(
   imageRoot,
@@ -339,7 +360,7 @@ onMounted(() => {
     :fetchpriority="normalizedFetchPriority"
     :height="height"
     :loading="normalizedLoading"
-    :sizes="providerSizes"
+    :sizes="measuredSizes ?? providerSizes"
     :src="providerSrc"
     :srcset="providerSrcset"
     :width="width"
@@ -383,7 +404,7 @@ onMounted(() => {
         :fetchpriority="normalizedFetchPriority"
         :height="height"
         :loading="normalizedLoading"
-        :sizes="providerSizes"
+        :sizes="measuredSizes ?? providerSizes"
         :src="providerSrc"
         :srcset="providerSrcset"
         :width="width"

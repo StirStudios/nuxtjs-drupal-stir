@@ -446,6 +446,41 @@ describe('MediaImage (Nuxt runtime)', () => {
     expect(unknown.get('img').attributes('sizes')).toBe('auto, 50vw')
   })
 
+  it('measures a lazy cover image in a box of its own shape and sizes it at the width it is drawn', async () => {
+    const callbacks: ResizeObserverCallback[] = []
+
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: ResizeObserverCallback) { callbacks.push(callback) }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    })
+    const style = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ objectFit: 'cover' } as CSSStyleDeclaration)
+    const resize = async (wrapper: Awaited<ReturnType<typeof mountSuspended>>, width: number, height: number) => {
+      for (const callback of callbacks) callback([{ contentRect: { width, height } } as ResizeObserverEntry], {} as ResizeObserver)
+      await wrapper.vm.$nextTick()
+    }
+
+    try {
+      // A 3:2 photo in a 240px square frame is drawn 360px wide.
+      const wrapper = await mountSuspended(MediaImage, {
+        props: { alt: 'Poster', height: 1000, src: '/frame.webp', width: 1500 },
+      })
+
+      expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
+      await resize(wrapper, 240, 240)
+      expect(wrapper.get('img').attributes('sizes')).toBe('360px')
+      // Laid out at its own shape, it keeps sizes="auto".
+      await resize(wrapper, 300, 200)
+      expect(wrapper.get('img').attributes('sizes')).toBe(CONTAINER_SIZES)
+      wrapper.unmount()
+    }
+    finally {
+      style.mockRestore()
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('sizes to the theme container without a layout slot', async () => {
     const wrapper = await mountSuspended(MediaImage, {
       props: {

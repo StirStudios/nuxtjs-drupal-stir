@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+- A lazy `Media/Image` drawn object-cover in a box of a different shape
+  (a site's square poster or portrait tile) is measured in the browser before
+  it loads and asks for the width it is drawn at, instead of `sizes="auto"`'s
+  box width. Sites no longer need `coverAspect` or `ImageSlotProvider`
+  `boxAspect` for these boxes; both still work. Behaviour change only.
+
 - Lazy rich-text images lead their `sizes` with `auto`, like other lazy
   images, so browsers size them to the column they are laid out in. On one
   client site, article images in a narrow column downloaded at 2560px where
