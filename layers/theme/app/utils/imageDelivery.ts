@@ -66,10 +66,11 @@ export function resolveModalImageSizes(
 }
 
 // Every srcset is built from one width ladder, capped at the source, so no
-// two candidates are more than a third apart (a quarter above 1440px) and the
-// CDN caches a fixed set of widths. `sizes` only tells the browser the slot.
+// two candidates are more than a third apart above 256px (a quarter above
+// 1440px) and the CDN caches a fixed set of widths. The small rungs serve
+// avatars and logos sized in tens of pixels. `sizes` only tells the browser the slot.
 // 3840 is IPX's maxOutputDimension.
-export const IMAGE_WIDTH_LADDER = [320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400, 2880, 3360, 3840]
+export const IMAGE_WIDTH_LADDER = [64, 128, 256, 320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400, 2880, 3360, 3840]
 
 export function imageLadderWidths(sourceWidth: unknown): number[] {
   const source = Number(sourceWidth)

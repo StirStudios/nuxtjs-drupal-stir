@@ -300,7 +300,7 @@ describe('MediaImage (Nuxt runtime)', () => {
 
     expect(wrapper.get('img').attributes('sizes')).toBe('640px')
     expect(srcset.split(', ').map(entry => entry.split(' ').at(-1)))
-      .toEqual(['320w', '480w', '640w', '750w', '828w', '1000w'])
+      .toEqual(['64w', '128w', '256w', '320w', '480w', '640w', '750w', '828w', '1000w'])
   })
 
   it('avoids native auto-sizing for responsive wrapped images', async () => {

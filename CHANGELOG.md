@@ -90,7 +90,7 @@ untouched do not need one.
     drop the prop and let the layout's slot size the image.
 
 - **Changed: every image srcset comes from one width ladder.** `Media/Image`
-  and rich-text images now offer 320, 480, 640, 750, 828, 1080, 1200, 1440,
+  and rich-text images now offer 64, 128, 256, 320, 480, 640, 750, 828, 1080, 1200, 1440,
   1920, 2400, 2880, 3360 and 3840px, capped at the source width, instead of
   widths derived from each `sizes` entry and its breakpoint. `sizes` is
   unchanged. No two candidates are more than a third apart, so tablets and 2x

@@ -23,8 +23,8 @@ import createStirIpxProvider from '../../layers/theme/build/imageCdn'
 
 describe('image width ladder', () => {
   it('stops at the source width and includes it', () => {
-    expect(imageLadderWidths(1000)).toEqual([320, 480, 640, 750, 828, 1000])
-    expect(imageLadderWidths(1200)).toEqual([320, 480, 640, 750, 828, 1080, 1200])
+    expect(imageLadderWidths(1000)).toEqual([64, 128, 256, 320, 480, 640, 750, 828, 1000])
+    expect(imageLadderWidths(1200)).toEqual([64, 128, 256, 320, 480, 640, 750, 828, 1080, 1200])
   })
 
   it('caps at the largest ladder width and uses the whole ladder for unknown sources', () => {
@@ -34,7 +34,7 @@ describe('image width ladder', () => {
 
   it('builds a width-descriptor srcset keeping the aspect ratio', () => {
     expect(ladderSrcset((width, height) => `/i/${width}x${height}`, 700, 350))
-      .toBe('/i/320x160 320w, /i/480x240 480w, /i/640x320 640w, /i/700x350 700w')
+      .toBe('/i/64x32 64w, /i/128x64 128w, /i/256x128 256w, /i/320x160 320w, /i/480x240 480w, /i/640x320 640w, /i/700x350 700w')
   })
 })
 

@@ -33,7 +33,7 @@ causes are structural, not individual bugs:
 ## Target design
 
 1. **One width ladder.** `srcset` always comes from a fixed list, capped at
-   the source width: 320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400,
+   the source width: 64, 128, 256, 320, 480, 640, 750, 828, 1080, 1200, 1440, 1920, 2400,
    2880, 3360, 3840. Built with `$img` per width by our own builder; @nuxt/image's
    `sizes`-driven candidates are no longer used for these components. The CDN
    caches a bounded set of URLs, and no two candidates are more than a third
