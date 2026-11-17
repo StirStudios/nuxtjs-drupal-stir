@@ -20,8 +20,9 @@ const keepTemporary = process.argv.includes('--keep-temporary')
 // It exists to catch an accidentally published directory rather than to police
 // kilobytes of feature code, so it keeps headroom above the current archive.
 // Raised from 420,000 when feature work reached it (420,055 bytes in October
-// 2026), keeping about 7% headroom.
-const maxArchiveBytes = 450_000
+// 2026), and from 450,000 for the image delivery work (450,345 bytes in
+// November 2026), each time keeping about 7% headroom.
+const maxArchiveBytes = 480_000
 
 function run(command, args, cwd, environment = {}) {
   return new Promise((resolvePromise, reject) => {
