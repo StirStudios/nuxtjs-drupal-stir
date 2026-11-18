@@ -245,6 +245,28 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(load).toHaveBeenCalledOnce()
   })
 
+  it('offers phones the 480p Bunny Stream rendition before 720p', async () => {
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {})
+    const src = 'https://vz-1.b-cdn.net/abc/play_720p.mp4?token=t'
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: {
+        loadStrategy: 'immediate',
+        mediaEmbed: src,
+        noWrapper: true,
+        src: '/hero-poster.webp',
+      },
+    })
+
+    await nextTick()
+
+    const sources = wrapper.findAll('source')
+
+    expect(sources.map(source => source.attributes())).toEqual([
+      { media: '(max-width: 767px)', src: 'https://vz-1.b-cdn.net/abc/play_480p.mp4?token=t' },
+      { src },
+    ])
+  })
+
   it('keeps the poster static when reduced motion is preferred', async () => {
     vi.spyOn(window, 'matchMedia').mockReturnValue({
       matches: true,

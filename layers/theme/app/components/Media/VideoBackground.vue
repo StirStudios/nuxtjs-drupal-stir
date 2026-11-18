@@ -2,6 +2,7 @@
 import { useElementVisibility } from '@vueuse/core'
 import { useDeferredVideoSource } from '#stir/composables/useDeferredVideoSource'
 import { useVideoPlayers } from '#stir/composables/useVideoPlayers'
+import { phoneVideoSource } from '../../utils/heroVideoSource'
 import type { resolveHeroVideoSource } from '../../utils/heroVideoSource'
 
 // The decorative background mode of MediaVideo, used by heroes and bare
@@ -40,6 +41,7 @@ const playerKey = computed(() =>
   props.mid === undefined ? `background-${backgroundPlayerId}` : String(props.mid),
 )
 const directSrc = computed(() => props.source?.kind === 'direct' ? props.source.src : undefined)
+const phoneSrc = computed(() => directSrc.value && phoneVideoSource(directSrc.value))
 const remoteSrc = computed(() => props.source?.kind === 'embed' ? props.source.src : undefined)
 const loadStrategy = computed<'after-load' | 'immediate'>(() =>
   (props.loadStrategy ?? mediaTheme.video?.loadStrategy) === 'immediate' ? 'immediate' : 'after-load',
@@ -143,10 +145,14 @@ watchEffect(() => {
     :preload="isSourceActive ? 'metadata' : 'none'"
     tabindex="-1"
   >
-    <source
-      v-if="isSourceActive"
-      :src="directSrc"
-    />
+    <template v-if="isSourceActive">
+      <source
+        v-if="phoneSrc"
+        media="(max-width: 767px)"
+        :src="phoneSrc"
+      />
+      <source :src="directSrc" />
+    </template>
   </video>
 
   <iframe
