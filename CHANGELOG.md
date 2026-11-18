@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- Background and hero videos served from Bunny Stream (`…b-cdn.net/<id>/play_720p.mp4`)
+  offer phones (up to 767px) the 480p rendition first, through a
+  `<source media>` ahead of the 720p file. Browsers fall back to 720p when a
+  library has no 480p rendition. On three client home pages this cuts the
+  full looping file by 45-50% on phones (for example 22.0 to 11.0 MB). Other
+  video URLs are unchanged. `phoneVideoSource` is a new util in
+  `heroVideoSource`.
+
 - A lazy `Media/Image` drawn object-cover in a box of a different shape
   (a site's square poster or portrait tile) is measured in the browser before
   it loads and asks for the width it is drawn at, instead of `sizes="auto"`'s

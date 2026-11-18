@@ -88,3 +88,17 @@ export function resolveHeroVideoSource(value: string | undefined): HeroVideoSour
     ? { kind: 'embed', src: embed }
     : { kind: 'direct', src: source }
 }
+
+const BUNNY_STREAM_720P = /\/play_720p\.mp4$/
+
+// Bunny Stream signs the video's directory, so its 480p rendition shares the
+// 720p file's token. Phones get it first; a 404 falls through to 720p.
+export function phoneVideoSource(src: string): string | undefined {
+  const url = normalizedUrl(src)
+
+  if (!url?.hostname.endsWith('.b-cdn.net') || !BUNNY_STREAM_720P.test(url.pathname)) return undefined
+
+  url.pathname = url.pathname.replace(BUNNY_STREAM_720P, '/play_480p.mp4')
+
+  return url.toString()
+}

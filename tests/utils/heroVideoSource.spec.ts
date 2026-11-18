@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   isDirectVideoFile,
+  phoneVideoSource,
   resolveHeroVideoSource,
 } from '../../layers/theme/app/utils/heroVideoSource'
 
@@ -68,5 +69,18 @@ describe('resolveHeroVideoSource', () => {
   it('returns no source for empty input', () => {
     expect(resolveHeroVideoSource(undefined)).toBeUndefined()
     expect(resolveHeroVideoSource('  ')).toBeUndefined()
+  })
+})
+
+describe('phoneVideoSource', () => {
+  it('swaps a signed Bunny Stream 720p file for 480p and keeps the token', () => {
+    expect(phoneVideoSource('https://vz-1.b-cdn.net/abc/play_720p.mp4?token=t&expires=1&token_path=%2Fabc%2F'))
+      .toBe('https://vz-1.b-cdn.net/abc/play_480p.mp4?token=t&expires=1&token_path=%2Fabc%2F')
+  })
+
+  it('leaves other files alone', () => {
+    expect(phoneVideoSource('https://example.com/abc/play_720p.mp4')).toBeUndefined()
+    expect(phoneVideoSource('https://vz-1.b-cdn.net/abc/original.mp4')).toBeUndefined()
+    expect(phoneVideoSource('/hero.mp4')).toBeUndefined()
   })
 })
