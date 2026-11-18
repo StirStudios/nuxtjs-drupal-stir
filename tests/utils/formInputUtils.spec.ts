@@ -7,6 +7,8 @@ import {
   sanitizeTelValue,
   shouldPreventTelBeforeInput,
   shouldPreventTelKeydown,
+  showsCharacterCount,
+  textMaxLength,
 } from '../../layers/theme/app/utils/formInputUtils'
 
 describe('formInputUtils', () => {
@@ -101,5 +103,19 @@ describe('formInputUtils', () => {
       expect(clampNumberToBounds(4, { min: 1, max: 3 })).toBe(3)
       expect(clampNumberToBounds(2, { min: 1, max: 3 })).toBe(2)
     })
+  })
+
+  it('reads Drupal\'s character limit, taking the lower of #maxlength and a character counter', () => {
+    expect(textMaxLength({ '#maxlength': 60 })).toBe(60)
+    expect(textMaxLength({ '#maxlength': 255, '#counter_type': 'character', '#counter_maximum': 100 })).toBe(100)
+    expect(textMaxLength({ '#counter_type': 'word', '#counter_maximum': 50 })).toBeUndefined()
+    expect(textMaxLength({ '#maxlength': '' })).toBeUndefined()
+    expect(textMaxLength({})).toBeUndefined()
+  })
+
+  it('shows the count from 80% of the limit', () => {
+    expect(showsCharacterCount(47, 60)).toBe(false)
+    expect(showsCharacterCount(48, 60)).toBe(true)
+    expect(showsCharacterCount(500, undefined)).toBe(false)
   })
 })

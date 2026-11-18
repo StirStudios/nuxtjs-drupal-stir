@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+- Webform text fields and textareas honour Drupal's `#maxlength` (and a
+  Webform character counter's `#counter_maximum`, whichever is lower), so
+  visitors can no longer type past the limit and only find out on submit. A
+  `count/limit` indicator appears once 80% is used. Server validation is
+  unchanged. `WebformFieldProps` gains `#maxlength`, `#counter_type` and
+  `#counter_maximum`.
 - Server-side calls to the CMS give up on a connection that has not opened
   within 2.5 s and retry once (GET, HEAD and OPTIONS only), trying IPv6 and
   IPv4 addresses in turn. A connect that hung briefly used to stall both the

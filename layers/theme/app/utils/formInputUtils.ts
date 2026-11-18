@@ -87,6 +87,21 @@ export function normalizeNumberBounds(
   }
 }
 
+// Drupal's #maxlength, or Webform's character counter maximum when that is
+// lower. Word counters are left to server validation.
+export function textMaxLength(field: Record<string, unknown>): number | undefined {
+  const limits = [field['#maxlength'], field['#counter_type'] === 'character' ? field['#counter_maximum'] : undefined]
+    .map(Number)
+    .filter(limit => Number.isInteger(limit) && limit > 0)
+
+  return limits.length ? Math.min(...limits) : undefined
+}
+
+// Show the count once a visitor has used most of the allowance.
+export function showsCharacterCount(length: number, max: number | undefined): max is number {
+  return max !== undefined && length >= max * 0.8
+}
+
 export function clampNumberToBounds(
   value: number,
   bounds: { min: number, max?: number },
