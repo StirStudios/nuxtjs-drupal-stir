@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WebformFieldProps } from '#stir/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
+import { showsCharacterCount, textMaxLength } from '#stir/utils/formInputUtils'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
 const props = defineProps<{
@@ -20,6 +21,8 @@ const id = computed(() => injectedInputId?.value ?? props.fieldName)
 // Drupal's #rows sets the starting height; autoresize grows from there.
 const isRequired = computed(() => props.field['#required'] === true)
 const rows = computed(() => Number(props.field['#rows']) || 1)
+const maxLength = computed(() => textMaxLength(props.field))
+const length = computed(() => String(props.state[props.fieldName] ?? '').length)
 </script>
 
 <template>
@@ -29,6 +32,7 @@ const rows = computed(() => Number(props.field['#rows']) || 1)
     :aria-required="isRequired || undefined"
     autoresize
     :class="['w-full', webform.fieldText]"
+    :maxlength="maxLength"
     :placeholder="props.floatingLabel ? ' ' : ''"
     :rows="rows"
     :ui="textareaUi"
@@ -43,5 +47,10 @@ const rows = computed(() => Number(props.field['#rows']) || 1)
         {{ props.field['#title'] }}
       </span>
     </label>
+    <template v-if="showsCharacterCount(length, maxLength)" #trailing>
+      <span class="text-xs text-muted tabular-nums" role="status">
+        {{ length }}/{{ maxLength }}
+      </span>
+    </template>
   </UTextarea>
 </template>

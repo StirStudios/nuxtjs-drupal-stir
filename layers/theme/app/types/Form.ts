@@ -137,6 +137,9 @@ export interface WebformFieldProps {
   '#placeholder'?: string
   '#autocomplete'?: string
   '#pattern'?: string
+  '#maxlength'?: number
+  '#counter_type'?: string
+  '#counter_maximum'?: number
   '#inputType'?: string
   '#widget'?: string
   '#required'?: boolean

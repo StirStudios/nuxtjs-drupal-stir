@@ -211,6 +211,31 @@ describe('Webform (Nuxt runtime)', () => {
     expect(wrapper.get('textarea').attributes('rows')).toBe('4')
   })
 
+  it('limits text to Drupal\'s #maxlength and shows the count near the limit', async () => {
+    const wrapper = await mountSuspended(Webform, {
+      props: {
+        webform: {
+          ...webform,
+          fields: {
+            event: { '#name': 'event', '#maxlength': 10, '#title': 'Event', '#type': 'textfield' },
+            fee: { '#name': 'fee', '#maxlength': 10, '#title': 'Fee', '#type': 'textarea' },
+          },
+        },
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('input').attributes('maxlength')).toBe('10')
+    expect(wrapper.get('textarea').attributes('maxlength')).toBe('10')
+    expect(wrapper.find('[role="status"]').exists()).toBe(false)
+
+    await wrapper.get('input').setValue('12345678')
+    await wrapper.get('textarea').setValue('1234')
+
+    expect(wrapper.findAll('[role="status"]').map(count => count.text())).toEqual(['8/10'])
+  })
+
   it('keeps a single-row textarea when Drupal sets no height', async () => {
     const wrapper = await mountSuspended(Webform, {
       props: {

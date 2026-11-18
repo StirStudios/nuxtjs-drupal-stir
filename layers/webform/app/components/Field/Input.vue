@@ -3,9 +3,11 @@ import type { WebformFieldProps } from '#stir/types'
 import { inputIdInjectionKey } from '@nuxt/ui/composables/useFormField'
 import {
   formatTelDisplayValue,
+  showsCharacterCount,
   shouldPreventTelBeforeInput,
   shouldPreventTelKeydown,
   telPattern,
+  textMaxLength,
 } from '#stir/utils/formInputUtils'
 import { resolveUiFieldVariant } from '#stir/utils/nuxtUiProps'
 
@@ -52,6 +54,8 @@ const inputPattern = computed(() => {
 
   return isTel.value ? telPattern : undefined
 })
+const maxLength = computed(() => isNumber.value ? undefined : textMaxLength(props.field))
+const length = computed(() => String(props.state[props.fieldName] ?? '').length)
 const inputType = computed(() => {
   const rawType = String(props.field['#type'] ?? 'text')
 
@@ -96,6 +100,7 @@ function updateFieldValue(value: string | number | null | undefined): void {
     :class="[webform.fieldInput, webform.fieldText]"
     :inputmode="isTel ? 'tel' : undefined"
     :max="isNumber ? field['#max'] : undefined"
+    :maxlength="maxLength"
     :min="isNumber ? field['#min'] : undefined"
     :model-value="state[fieldName]"
     :pattern="inputPattern"
@@ -117,5 +122,10 @@ function updateFieldValue(value: string | number | null | undefined): void {
         {{ field['#title'] }}
       </span>
     </label>
+    <template v-if="showsCharacterCount(length, maxLength)" #trailing>
+      <span class="text-xs text-muted tabular-nums" role="status">
+        {{ length }}/{{ maxLength }}
+      </span>
+    </template>
   </UInput>
 </template>
