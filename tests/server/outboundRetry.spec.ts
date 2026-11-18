@@ -41,6 +41,8 @@ describe('outbound retry policy', () => {
   it('retries a request without a body after a connection error only', () => {
     expect(shouldRetryOutbound('GET', 'ECONNRESET')).toBe(true)
     expect(shouldRetryOutbound('head', 'UND_ERR_SOCKET')).toBe(true)
+    expect(shouldRetryOutbound('GET', 'UND_ERR_CONNECT_TIMEOUT')).toBe(true)
+    expect(shouldRetryOutbound('POST', 'UND_ERR_CONNECT_TIMEOUT')).toBe(false)
     expect(shouldRetryOutbound('POST', 'ECONNRESET')).toBe(false)
     expect(shouldRetryOutbound('GET', 'UND_ERR_HEADERS_TIMEOUT')).toBe(false)
     expect(shouldRetryOutbound('GET', undefined)).toBe(false)
