@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { addServerHandler, defineNuxtModule, hasNuxtModule, useLogger } from '@nuxt/kit'
 import { addMissingReviewSections } from '../../scripts/compliance/review.mjs'
 import {
+  buildAssetsDirectory,
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
@@ -19,6 +20,13 @@ const foundationCss = fileURLToPath(
 )
 const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 const isDevelopment = process.env.NODE_ENV === 'development'
+const revisionFile = resolve(process.cwd(), 'REVISION')
+const buildAssetsDir = isDevelopment
+  ? undefined
+  : buildAssetsDirectory(
+      process.env.STIR_BUILD_ID,
+      existsSync(revisionFile) ? readFileSync(revisionFile, 'utf8') : undefined,
+    )
 const siteUrl = process.env.NUXT_SITE_URL || ''
 const developmentNoStore = 'private, no-store, max-age=0'
 const isIndexable =
@@ -100,6 +108,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-05-29',
 
   app: {
+    ...(buildAssetsDir && { buildAssetsDir }),
     head: {
       htmlAttrs: {
         lang: 'en',
