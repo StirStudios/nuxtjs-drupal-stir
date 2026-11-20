@@ -1102,14 +1102,12 @@ describe('layer contract', () => {
     // Ratchet: these track the enforced baseline in docs/perf-budget.json and
     // only ever move down. Raising them is a deliberate re-baseline, not a way
     // to absorb a regression -- see docs/perf-initial-graph.md.
-    // 233 / 196 / 39: Nuxt UI 4.12 moved about 1.1 kB from JavaScript to theme
-    // CSS while cutting the total, the errors reporter's browser half then
-    // added 0.48 kB and its module-load diagnostics 0.35 kB to the entry, and
-    // the availability calendar's classes added 0.7 kB of CSS
-    // (docs/perf-budget.json rationale).
-    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(233)
-    expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(196)
-    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(39)
+    // 213 / 174 / 40.3: Nuxt UI 4.13 cut about 22 kB of initial JavaScript
+    // and its Toggle theme added about 1.9 kB of CSS (docs/perf-budget.json
+    // rationale).
+    expect(budget.maxInitialGzipKb).toBeLessThanOrEqual(213)
+    expect(budget.maxInitialJavascriptGzipKb).toBeLessThanOrEqual(174)
+    expect(budget.maxInitialCssGzipKb).toBeLessThanOrEqual(40.3)
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
     // 32.5: motion-v 2.12 grew the deferred domAnimation chunk by 1.32 kB.
     expect(budget.maxRevealMotionGzipKb).toBeLessThanOrEqual(32.5)
