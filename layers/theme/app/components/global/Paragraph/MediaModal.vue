@@ -70,9 +70,13 @@ watch(open, (isOpen) => {
 
 // Images ask for the width the frame shows them at, so a portrait photo on a
 // wide screen does not load a landscape-sized file. The slide sets its own key.
+// Opened from inside a hero (a hero Button), the modal would otherwise inherit
+// the hero's isHero: a video would play as a full-bleed background and an
+// image would load as the page's lead image.
 function mediaProps({ key: _key, ...item }: ModalMediaItem) {
   return {
     ...item,
+    isHero: false,
     ...(item.type === 'video' ? { deferEmbed: false } : {}),
     ...(item.type === 'image'
       ? {
