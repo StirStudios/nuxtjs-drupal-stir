@@ -239,6 +239,27 @@ describe('componentTree', () => {
         },
       },
       {
+        element: 'paragraph-button',
+        props: {
+          block: false,
+          color: 'primary',
+          icon: 'i-lucide-play',
+          size: 'lg',
+          variant: 'solid',
+        },
+        slots: {
+          media: [{
+            element: 'media-video',
+            props: {
+              type: 'video',
+              src: '/sites/default/files/reel-poster.jpg',
+              title: 'Showreel',
+              mediaEmbed: 'https://www.youtube-nocookie.com/embed/example',
+            },
+          }],
+        },
+      },
+      {
         element: 'paragraph-webform',
         props: {
           webform: {
