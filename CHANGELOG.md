@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- Dependencies: Nuxt UI 4.13.0, motion-v 2.13.0, `@iconify-json/lucide`
+  1.2.157, and Vitest with its coverage plugin 5.1.1. Nuxt UI 4.13 brings
+  `@nuxt/fonts` with fontless 1.3, which no longer pulls esbuild 0.27, so the
+  `fontless>esbuild` override is removed. The `glob@13` and
+  `get-uri>basic-ftp` overrides stay (js-beautify and pac-proxy-agent still pin
+  the old versions), as do the Drupal CE 2.9.0 patch and `h3` extension (no
+  newer CE release). H3 2, nuxt-vitalizer 4 and TypeScript 7 are major
+  upgrades and are not part of this update.
 - **Buttons can play a video in a pop-up.** Attach a video (Bunny or remote,
   such as YouTube) to a Button paragraph, and clicking the button plays it in
   the same pop-up the Media paragraph's Overlay uses. The button shows the

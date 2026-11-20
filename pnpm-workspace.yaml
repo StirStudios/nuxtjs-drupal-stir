@@ -8,14 +8,13 @@ allowBuilds:
   vue-demi: false
 
 overrides:
-  # fontless (via @nuxt/fonts) still asks for esbuild 0.27, which has the
-  # Windows dev-server file-read advisory fixed in 0.28.1. Remove once it allows 0.28.
-  fontless>esbuild: 0.28.2
   # 14.0.2 fixes the AbortSignal bypass; js-beautify still asks for 13.
   # Remove once it allows 14.
   glob@13: ^14.0.2
-  # get-uri (via lighthouse) pins basic-ftp 5; 6.2.1 fixes GHSA-c475-qrg2-pj4r and
-  # v6 only changes the separate-transfer-host default, which get-uri never uses.
+  # get-uri 8.0.1 asks for basic-ftp 5, and pac-proxy-agent (via lighthouse and
+  # release-it) pins that version. 6.2.1 fixes GHSA-c475-qrg2-pj4r, and v6 only
+  # changes the separate-transfer-host default, which get-uri never uses.
+  # get-uri 8.0.2 allows 6; remove once pac-proxy-agent allows it.
   get-uri>basic-ftp: ^6.2.3
 
 # CE 2.9.0 imports H3 without declaring it; Nuxt 4 uses H3 1.
