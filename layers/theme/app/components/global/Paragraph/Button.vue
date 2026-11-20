@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useMediaModal } from '#stir/composables/useMediaModal'
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
+import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { resolveDrupalLink, type DrupalLink } from '#stir/utils/drupalLink'
 import {
   resolveBooleanProp,
@@ -76,7 +78,25 @@ const pdfProps = computed(() => {
 })
 
 const hasPdf = computed(() => !!pdfProps.value)
-const hasLink = computed(() => !hasPdf.value && !!linkData.value.url)
+const videoMedia = computed(() => hasPdf.value
+  ? []
+  : slotMedia.value
+      .filter(node => normalizeDrupalMediaType(tk.propsOf<MediaDocumentProps>(node).type) === 'video')
+      .slice(0, 1))
+const {
+  open: videoOpen,
+  activeIndex: videoIndex,
+  startIndex: videoStartIndex,
+  itemsOrdered: videoItems,
+  openModal: openVideo,
+  onSelect: onSelectVideo,
+} = useMediaModal(videoMedia, tk)
+const hasVideo = computed(() => videoItems.value.length > 0)
+const hasLink = computed(() => !hasPdf.value && !hasVideo.value && !!linkData.value.url)
+// As with a document, the editor's link text wins over the media title.
+const videoLabel = computed(() =>
+  linkText.value || String(videoItems.value[0]?.title || 'Watch video'),
+)
 // The editor's link text labels the button; the document's own title, which
 // editors keep for the media library, only fills in when it is empty.
 const pdfTitle = computed(() =>
@@ -110,6 +130,19 @@ const pdfUrl = computed(() =>
       />
 
       <UButton
+        v-else-if="hasVideo"
+        aria-haspopup="dialog"
+        :aria-label="`${videoLabel}, opens video`"
+        :block="btnBlock"
+        :color="btnColor"
+        :icon="iconName ?? 'i-lucide-play'"
+        :label="videoLabel"
+        :size="btnSize"
+        :variant="btnVariant"
+        @click="openVideo(0)"
+      />
+
+      <UButton
         v-else-if="hasLink"
         :block="btnBlock"
         :color="btnColor"
@@ -123,6 +156,15 @@ const pdfUrl = computed(() =>
       />
     </EditLink>
   </ParagraphReveal>
+
+  <ParagraphMediaModal
+    v-if="hasVideo"
+    v-model:open="videoOpen"
+    :active-index="videoIndex"
+    :items="videoItems"
+    :start-index="videoStartIndex"
+    @select="onSelectVideo"
+  />
 
   <LazyUModal
     v-if="hasPdf && theme.showPdf"
