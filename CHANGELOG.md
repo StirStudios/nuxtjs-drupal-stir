@@ -13,13 +13,6 @@ untouched do not need one.
 
 ## Unreleased
 
-- Production builds deployed with Capistrano serve their assets from their own
-  folder, `/_nuxt/<commit>/`, taken from the release's `REVISION` file (or
-  `STIR_BUILD_ID`). A chunk's hash does not cover the stylesheet name it
-  injects, so two releases could ship the same file name with different
-  contents, and Cloudflare's immutable copy of the old one kept loading the old
-  CSS after a deploy. Local, CI and test builds keep `/_nuxt/`. A site's own
-  `app.buildAssetsDir` or `NUXT_APP_BUILD_ASSETS_DIR` still wins.
 - Webform text fields and textareas honour Drupal's `#maxlength` (and a
   Webform character counter's `#counter_maximum`, whichever is lower), so
   visitors can no longer type past the limit and only find out on submit. A

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  buildAssetsDirectory,
   commaSeparatedEnvironment,
   normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
@@ -61,18 +60,5 @@ describe('root configuration helpers', () => {
       { loc: '/search?q=one&amp;page=2', lastmod: '2026-01-01' },
       invalid,
     ])
-  })
-})
-
-describe('buildAssetsDirectory', () => {
-  it('names the folder after the deploy, so each build has its own', () => {
-    expect(buildAssetsDirectory(undefined, '0123456789abcdef0123456789abcdef01234567\n')).toBe('/_nuxt/0123456789ab/')
-    expect(buildAssetsDirectory('20261120120000', 'abc')).toBe('/_nuxt/20261120120000/')
-  })
-
-  it('keeps /_nuxt/ without a build ID or with an unsafe one', () => {
-    expect(buildAssetsDirectory(undefined, undefined)).toBeUndefined()
-    expect(buildAssetsDirectory(' ', '')).toBeUndefined()
-    expect(buildAssetsDirectory('..', undefined)).toBeUndefined()
   })
 })
