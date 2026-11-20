@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, provide } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import ParagraphButton from '../../../layers/theme/app/components/global/Paragraph/Button.vue'
@@ -117,5 +117,34 @@ describe('Paragraph Button (Nuxt runtime)', () => {
     await new Promise(resolve => setTimeout(resolve, 50))
 
     expect(document.activeElement).toBe(button)
+  })
+
+  it('plays a hero Button\'s video in the framed modal, not as a hero background', async () => {
+    const seen: unknown[] = []
+    const MediaVideoStub = defineComponent({
+      props: { isHero: { type: Boolean, default: undefined } },
+      setup: (props) => {
+        seen.push(props.isHero)
+        return () => h('div', { 'data-video': '' })
+      },
+    })
+    const InHero = defineComponent({
+      setup: () => {
+        provide('isHero', true)
+        return () => h(ParagraphButton, { link: { title: 'Watch the reel' } }, { media: () => h('div', video) })
+      },
+    })
+    const wrapper = await mountSuspended(InHero, {
+      attachTo: document.body,
+      global: { stubs: { MediaVideo: MediaVideoStub } },
+    })
+
+    await wrapper.get('button').trigger('click')
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    expect(document.querySelector('[data-video]')).not.toBeNull()
+    expect(seen.at(-1)).toBe(false)
+    wrapper.unmount()
   })
 })

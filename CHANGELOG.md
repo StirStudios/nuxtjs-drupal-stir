@@ -13,6 +13,9 @@ untouched do not need one.
 
 ## Unreleased
 
+- A Button in a hero now opens its video in the normal framed pop-up. The
+  pop-up inherited the hero's setting, so the video played edge to edge as a
+  background, and an image would have loaded as the page's lead image.
 - Dependencies: Nuxt UI 4.13.0, motion-v 2.13.0, `@iconify-json/lucide`
   1.2.157, and Vitest with its coverage plugin 5.1.1. Nuxt UI 4.13 brings
   `@nuxt/fonts` with fontless 1.3, which no longer pulls esbuild 0.27, so the
