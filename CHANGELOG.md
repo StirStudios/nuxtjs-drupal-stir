@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+- **Buttons can play a video in a pop-up.** Attach a video (Bunny or remote,
+  such as YouTube) to a Button paragraph, and clicking the button plays it in
+  the same pop-up the Media paragraph's Overlay uses. The button shows the
+  link text, or the video's title when that is empty, with a play icon unless
+  an icon is chosen. A document attached to a Button still opens the PDF
+  viewer, and a Button without media is still a link. Editors can attach
+  videos once Stir Tools allows video media on the Button's Media field.
 - Production builds deployed with Capistrano serve their assets from their own
   folder, `/_nuxt/<commit>/`, taken from the release's `REVISION` file (or
   `STIR_BUILD_ID`). A chunk's hash does not cover the stylesheet name it
