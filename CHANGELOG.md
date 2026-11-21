@@ -37,7 +37,9 @@ untouched do not need one.
   injects, so two releases could ship the same file name with different
   contents, and Cloudflare's immutable copy of the old one kept loading the old
   CSS after a deploy. Local, CI and test builds keep `/_nuxt/`. A site's own
-  `app.buildAssetsDir` or `NUXT_APP_BUILD_ASSETS_DIR` still wins.
+  `app.buildAssetsDir` or `NUXT_APP_BUILD_ASSETS_DIR` still wins. A post-build
+  script that expects files directly in `.output/public/_nuxt` will find them
+  one folder deeper; such a site sets `app.buildAssetsDir: '/_nuxt/'`.
 - Webform text fields and textareas honour Drupal's `#maxlength` (and a
   Webform character counter's `#counter_maximum`, whichever is lower), so
   visitors can no longer type past the limit and only find out on submit. A
