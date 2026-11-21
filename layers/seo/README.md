@@ -67,7 +67,7 @@ layer's route.
 
 Canonical URLs never end in a slash, so a GET or HEAD for `/some/path/` answers
 301 to `/some/path`, keeping the query string. `/`, files with an extension,
-`//` paths and `/_*`, `/api` and `/ce-api` paths are left alone. A site turns
+`//` paths, paths with a backslash or an encoded slash, and `/_*`, `/api` and `/ce-api` paths are left alone. A site turns
 it off with `runtimeConfig: { trailingSlashRedirect: false }` (runtime override
 `NUXT_TRAILING_SLASH_REDIRECT=false`).
 
