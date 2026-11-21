@@ -13,6 +13,11 @@ untouched do not need one.
 
 ## Unreleased
 
+- Pages whose cache tags go over the header budget now fold their `user:N`
+  tags into one `stir:users` tag before dropping any other per-entity tag, so
+  a page listing many people keeps its own node and media tags. Stir Tools
+  sends `stir:users` with every user purge, so those pages still update when
+  a profile changes.
 - A Button in a hero now opens its video in the normal framed pop-up. The
   pop-up inherited the hero's setting, so the video played edge to edge as a
   background, and an image would have loaded as the page's lead image.
