@@ -18,9 +18,11 @@ export default defineNuxtConfig({
     '/login': { robots: false },
   },
 
-  // Sites turn the generated /llms.txt off with `runtimeConfig: { llmsTxt: false }`.
+  // Sites turn the generated /llms.txt off with `runtimeConfig: { llmsTxt: false }`,
+  // and the trailing-slash 301 off with `trailingSlashRedirect: false`.
   runtimeConfig: {
     llmsTxt: true,
+    trailingSlashRedirect: true,
   },
 
   nitro: {

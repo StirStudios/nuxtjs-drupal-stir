@@ -13,6 +13,13 @@ untouched do not need one.
 
 ## Unreleased
 
+- A page requested with a trailing slash now answers 301 to the same path
+  without it, keeping the query string, so the redirect agrees with the
+  canonical URL and search engines stop indexing both forms. `/`, files with
+  an extension, and `/_*`, `/api` and `/ce-api` paths are left alone. A site
+  turns it off with `runtimeConfig: { trailingSlashRedirect: false }` or
+  `NUXT_TRAILING_SLASH_REDIRECT=false`. An old URL with a slash that Drupal
+  Redirect also handles now takes two hops (slash, then Drupal's 301).
 - Pages whose cache tags go over the header budget now fold their `user:N`
   tags into one `stir:users` tag before dropping any other per-entity tag, so
   a page listing many people keeps its own node and media tags. Stir Tools

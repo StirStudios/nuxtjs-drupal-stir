@@ -880,13 +880,13 @@
     "serverRoutes": 33,
     "productionDependencies": 37,
     "developmentDependencies": 25,
-    "tests": 268,
+    "tests": 269,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
       "nuxt": 118,
       "scripts": 8,
-      "server": 37,
+      "server": 38,
       "unit": 12,
       "utils": 76
     }
@@ -1069,6 +1069,7 @@
     "tests/server/stirCacheTags.spec.ts",
     "tests/server/stirDrupalApi.spec.ts",
     "tests/server/stirRequestSecurity.spec.ts",
+    "tests/server/trailingSlashRedirect.spec.ts",
     "tests/server/webformAvailability.spec.ts",
     "tests/server/webformLimits.spec.ts",
     "tests/server/webformSubmit.spec.ts",
