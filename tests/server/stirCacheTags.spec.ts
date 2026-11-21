@@ -9,6 +9,7 @@ import {
   parseStirCacheTags,
   recordStirCacheTags,
   STIR_OVERSIZE_CACHE_TAG,
+  STIR_USERS_CACHE_TAG,
 } from '../../layers/foundation/server/utils/stirCacheTags'
 
 type Hook = (event: never) => void
@@ -70,6 +71,17 @@ describe('Drupal cache tags on responses', () => {
     const tags = ['node_list', 'config:system.menu.main', ...Array.from({ length: 50 }, (_, i) => `node:${i}`)]
 
     expect(formatStirCacheTags(tags, 60)).toBe(`${STIR_OVERSIZE_CACHE_TAG} config:system.menu.main node_list`)
+  })
+
+  it('folds user tags into the users tag before dropping entity tags', () => {
+    const users = Array.from({ length: 50 }, (_, i) => `user:${i + 100}`)
+
+    expect(formatStirCacheTags(['node:7', 'node_list', ...users], 60)).toBe(`node:7 node_list ${STIR_USERS_CACHE_TAG}`)
+
+    const nodes = Array.from({ length: 10 }, (_, i) => `node:${i + 10}`)
+
+    expect(formatStirCacheTags(['node:7', 'node_list', ...users, ...nodes], 60))
+      .toBe(`${STIR_OVERSIZE_CACHE_TAG} node_list ${STIR_USERS_CACHE_TAG}`)
   })
 
   it('falls back to the oversize tag alone', () => {

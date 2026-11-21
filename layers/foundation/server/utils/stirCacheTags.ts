@@ -25,6 +25,12 @@ export const STIR_CACHE_TAGS_MAX_BYTES = 3000
 export const STIR_OVERSIZE_CACHE_TAG = 'stir:oversize'
 
 /**
+ * Replaces `user:N` tags on a page whose tags do not fit, such as a listing
+ * of many people. Drupal sends it with every user purge (Stir Tools).
+ */
+export const STIR_USERS_CACHE_TAG = 'stir:users'
+
+/**
  * Prefix of the tag naming the site a response belongs to. Several frontends
  * share one Drupal (Domain module) and may share one Varnish; the tag lets a
  * purge reach one site's pages only. Its value is the host of the configured
@@ -41,6 +47,7 @@ export const stirSiteCacheTag = (baseUrl: string): string | undefined => {
 
 const VALID_TAG = /^[a-z0-9_:.-]+$/
 const ENTITY_TAG = /^[a-z0-9_]+:\d+$/
+const USER_TAG = /^user:\d+$/
 
 type HeaderValue = string | number | readonly string[] | null | undefined
 
@@ -60,19 +67,28 @@ export const parseStirCacheTags = (value: HeaderValue): string[] => {
 /**
  * Joins tags into one header value within the byte budget.
  *
- * Over budget, per-entity tags (`node:5`) give way to the oversize tag and the
- * list and config tags stay; if those still do not fit, the oversize tag and
- * the site tag remain. Either way the page is still purged when its content
- * changes.
+ * Over budget, user tags (`user:5`) first give way to the users tag. If that
+ * is not enough, per-entity tags (`node:5`) give way to the oversize tag and
+ * the list and config tags stay; if those still do not fit, the oversize tag
+ * and the site tag remain. Either way the page is still purged when its
+ * content changes.
  */
 export const formatStirCacheTags = (
   tags: Iterable<string>,
   maxBytes = STIR_CACHE_TAGS_MAX_BYTES,
 ): string => {
-  const unique = [...new Set(tags)].sort()
+  let unique = [...new Set(tags)].sort()
   const joined = unique.join(' ')
 
   if (joined.length <= maxBytes) return joined
+
+  if (unique.some(tag => USER_TAG.test(tag))) {
+    unique = [...new Set([...unique.filter(tag => !USER_TAG.test(tag)), STIR_USERS_CACHE_TAG])].sort()
+
+    const folded = unique.join(' ')
+
+    if (folded.length <= maxBytes) return folded
+  }
 
   const reduced = [
     STIR_OVERSIZE_CACHE_TAG,
