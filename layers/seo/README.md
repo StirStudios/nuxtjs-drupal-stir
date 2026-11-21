@@ -63,6 +63,14 @@ indexable or a site sets `runtimeConfig: { llmsTxt: false }` (runtime override
 `NUXT_LLMS_TXT=false`). A site's own `server/routes/llms.txt.ts` replaces the
 layer's route.
 
+## Trailing slashes
+
+Canonical URLs never end in a slash, so a GET or HEAD for `/some/path/` answers
+301 to `/some/path`, keeping the query string. `/`, files with an extension,
+`//` paths, paths with a backslash or an encoded slash, and `/_*`, `/api` and `/ce-api` paths are left alone. A site turns
+it off with `runtimeConfig: { trailingSlashRedirect: false }` (runtime override
+`NUXT_TRAILING_SLASH_REDIRECT=false`).
+
 ## Sitemap extensions
 
 Drupal `/api/sitemap` stays the source of sitemap URLs, and `/sitemap.xml` from
