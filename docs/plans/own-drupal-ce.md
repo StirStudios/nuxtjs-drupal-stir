@@ -200,6 +200,35 @@ page envelope and snapshots which component each element resolves to.
 - 404 pages render `drupal-markup` with a fallback hero. `props` arrives as `[]`
   (an empty PHP array), not `{}`.
 
+**Safety net in place:**
+- `tests/nuxt/runtime/CeContract.nuxt.spec.ts`: the page envelope, and a
+  snapshot mapping 19 elements to their components, including the `…Default`
+  fallbacks.
+- `tests/nuxt/e2e/navigation.e2e.spec.ts`, with the
+  `tests/fixtures/navigation-consumer` app. It covers:
+  - server render;
+  - a Drupal redirect (301) and a 404;
+  - in the browser: shared UI stays on the outgoing page during a slow
+    navigation, back and forward work, and a redirect during client
+    navigation lands on its target.
+
+  With the PR #538 behaviour removed, the browser test fails: the shared UI
+  showed the next page while the old page was still visible.
+
+**Baselines (2026-11-23):**
+- `pnpm perf:report`: initial client 212.1 kB gzip; editor-only 282.1 kB.
+- Lighthouse on the Stir site's home page, three mobile runs, median: score
+  100, FCP 1.22 s, LCP 1.22 s, TBT 26 ms, transfer 0.82 MB, JS 0.56 MB, media
+  0.13 MB, no video requests.
+
+Site code that touches the module is listed by running this in each site:
+
+```bash
+git grep -l -E "useDrupalCe|useStirDrupalCe|drupalCe\b|renderCustomElements|fetchPage|getPage\(" -- app server nuxt.config.ts
+```
+
+That finds 22 files across 9 sites, at most 7 on any one site.
+
 **For Phase 1 (Drupal):**
 - `#cache` render metadata leaks into the JSON on most pages.
 - `local_tasks` shows the "View" and "API" (`/ce-api/node/N`) tabs to
