@@ -119,18 +119,9 @@ their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
 dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
 manager security policy belongs to the consuming application and is not
 inherited from a layer.
-Until `fontless` moves its esbuild range to the patched release, pnpm consumers
-should also carry this temporary workspace policy and retain it only while
-`pnpm audit --prod` requires it:
-
-```yaml
-overrides:
-  fontless>esbuild: 0.28.2
-```
-
-For Vite 8.2.2, see the [temporary preload bookkeeping patch](patches/README.md).
-Its package-manager configuration must be applied in each consumer root; it is
-not inherited by extending the layer.
+Until the layer drops `nuxtjs-drupal-ce`, each consumer root also carries the
+[Drupal CE runtime dependency repair](patches/README.md). It is not inherited
+by extending the layer.
 
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can

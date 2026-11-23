@@ -32,6 +32,7 @@ type StirDrupalPage = Omit<DrupalPage, 'content'> & Partial<AppContextPayload> &
 
 export function useStirDrupalCe() {
   const drupal = useDrupalCe()
+  const pages = useDrupalPage()
 
   const prepare = (content: unknown): CustomElementContent => {
     const renderable = withoutPresentationEditMetadata(content) as CustomElementContent
@@ -47,10 +48,11 @@ export function useStirDrupalCe() {
 
   return {
     ...drupal,
-    fetchPage: (...args: Parameters<DrupalComposable['fetchPage']>) =>
-      drupal.fetchPage(...args) as Promise<Ref<StirDrupalPage>>,
-    getPage: (...args: Parameters<DrupalComposable['getPage']>) =>
-      drupal.getPage(...args) as Ref<StirDrupalPage>,
+    fetchPage: (...args: Parameters<typeof pages.fetchPage>) =>
+      pages.fetchPage(...args) as Promise<Ref<StirDrupalPage>>,
+    getPage: (customKey?: string) =>
+      pages.getPage(customKey) as unknown as Ref<StirDrupalPage>,
+    getMessages: pages.getMessages,
     renderCustomElements: (content: unknown) =>
       drupal.renderCustomElements(prepare(content)),
     renderCustomElementsToVNodes: (content: unknown) =>

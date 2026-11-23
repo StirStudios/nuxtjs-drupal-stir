@@ -1,7 +1,8 @@
 // @vitest-environment nuxt
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
-import { useDrupalCe, useNuxtApp, useRouter, useState } from '#imports'
+import { useNuxtApp, useRouter, useState } from '#imports'
+import { useDrupalPage } from '../../../layers/theme/app/composables/useDrupalPage'
 
 describe('committed Drupal page state', () => {
   beforeEach(() => {
@@ -12,17 +13,17 @@ describe('committed Drupal page state', () => {
       content: { title: 'Destination content' },
     }))
 
-    nuxtApp.payload.data['page-origin-proxy'] = {
+    nuxtApp.payload.data['page:/origin'] = {
       title: 'Origin page',
       content: { title: 'Origin content' },
     }
-    useState<string>('drupal-ce-current-page-key').value = 'page-origin-proxy'
-    useState<string>('drupal-ce-pending-page-key').value = ''
+    useState<string>('stir-page-current-key').value = 'page:/origin'
+    useState<string>('stir-page-pending-key').value = ''
   })
 
   it('keeps the rendered page current until Nuxt commits the destination', async () => {
     const nuxtApp = useNuxtApp()
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
 
     const destination = await fetchPage('/destination', {
@@ -31,17 +32,17 @@ describe('committed Drupal page state', () => {
 
     expect(destination.value.title).toBe('Destination page')
     expect(currentPage.value.title).toBe('Origin page')
-    expect(useState<string>('drupal-ce-pending-page-key').value).toBe('page-destination-proxy')
+    expect(useState<string>('stir-page-pending-key').value).toBe('page-destination-proxy')
 
     await nuxtApp.callHook('page:finish')
 
     expect(currentPage.value.title).toBe('Destination page')
-    expect(useState<string>('drupal-ce-pending-page-key').value).toBe('')
+    expect(useState<string>('stir-page-pending-key').value).toBe('')
   })
 
   it('does not promote a destination when navigation errors', async () => {
     const nuxtApp = useNuxtApp()
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
 
     await fetchPage('/destination', {
@@ -51,13 +52,13 @@ describe('committed Drupal page state', () => {
     await nuxtApp.callHook('page:finish')
 
     expect(currentPage.value.title).toBe('Origin page')
-    expect(useState<string>('drupal-ce-pending-page-key').value).toBe('')
+    expect(useState<string>('stir-page-pending-key').value).toBe('')
   })
 
   it('preserves a pending page when a later navigation fails', async () => {
     const nuxtApp = useNuxtApp()
     const router = useRouter()
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
 
     await router.push('/destination')
@@ -65,13 +66,13 @@ describe('committed Drupal page state', () => {
       key: 'page-destination-proxy',
     })
 
-    expect(useState<string>('drupal-ce-pending-page-key').value).toBe('page-destination-proxy')
+    expect(useState<string>('stir-page-pending-key').value).toBe('page-destination-proxy')
 
     await router.push('/destination')
     await nuxtApp.callHook('page:finish')
 
     expect(currentPage.value.title).toBe('Destination page')
-    expect(useState<string>('drupal-ce-pending-page-key').value).toBe('')
+    expect(useState<string>('stir-page-pending-key').value).toBe('')
   })
 
   it('does not let a slower request replace the latest pending page', async () => {
@@ -85,7 +86,7 @@ describe('committed Drupal page state', () => {
       await gate
       return { title: 'Slow page', content: {} }
     })
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
     const slow = fetchPage('/slow-page', { key: 'slow-request' })
 
@@ -108,7 +109,7 @@ describe('committed Drupal page state', () => {
       await gate
       return { title: 'Late page', content: {} }
     })
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
     const pending = fetchPage('/error-late-page', { key: 'error-late-request' })
 
@@ -122,11 +123,11 @@ describe('committed Drupal page state', () => {
 
   it('never promotes a cached redirect payload', async () => {
     const nuxtApp = useNuxtApp()
-    const { getPage } = useDrupalCe()
+    const { getPage } = useDrupalPage()
     const currentPage = getPage()
 
     nuxtApp.payload.data['cached-redirect'] = { redirect: { url: '/destination', statusCode: 302 } }
-    useState<string>('drupal-ce-pending-page-key').value = 'cached-redirect'
+    useState<string>('stir-page-pending-key').value = 'cached-redirect'
     await nuxtApp.callHook('page:finish')
     expect(currentPage.value.title).toBe('Origin page')
   })
@@ -137,7 +138,7 @@ describe('committed Drupal page state', () => {
     const router = useRouter()
 
     await router.push('/destination')
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
 
     await fetchPage('/destination', { key: 'custom-hash-page' })
@@ -152,7 +153,7 @@ describe('committed Drupal page state', () => {
     const router = useRouter()
 
     await router.push('/destination')
-    const { fetchPage, getPage } = useDrupalCe()
+    const { fetchPage, getPage } = useDrupalPage()
     const currentPage = getPage()
 
     await fetchPage('/destination', { key: 'guard-pending-page' })
@@ -171,10 +172,10 @@ describe('committed Drupal page state', () => {
   it('promotes cached pages on return without another fetch', async () => {
     const nuxtApp = useNuxtApp()
     const router = useRouter()
-    const { getPage } = useDrupalCe()
+    const { getPage } = useDrupalPage()
     const currentPage = getPage()
 
-    nuxtApp.payload.data['page-/cached-return-proxy'] = { title: 'Cached page', content: {} }
+    nuxtApp.payload.data['page:/cached-return'] = { title: 'Cached page', content: {} }
     await router.push('/cached-return')
     expect(currentPage.value.title).toBe('Origin page')
     await nuxtApp.callHook('page:finish')

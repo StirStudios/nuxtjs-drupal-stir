@@ -667,12 +667,12 @@ describe('layer contract', () => {
     }
     expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
     expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
-    // A universal plugin would keep the Drupal CE client in the browser bundle;
-    // the client plugin imports it lazily.
+    // The client plugin runs on every navigation, so it fetches with $fetch
+    // and keeps the Drupal CE client out of the initial bundle.
     const clientLayout = read('layers/theme/app/plugins/drupalPageLayout.client.ts')
 
-    expect(clientLayout).toContain('await import(\'../composables/useStirDrupalCe\')')
-    expect(clientLayout).not.toMatch(/^import .*useStirDrupalCe/m)
+    expect(clientLayout).toContain('baseURL: \'/api/drupal-ce\'')
+    expect(clientLayout).not.toMatch(/useStirDrupalCe|useDrupalCe/)
     expect(clientLayout).toContain('to.meta.layout =')
     // Sites map the layout after these with dependsOn (a member app shell).
     for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {

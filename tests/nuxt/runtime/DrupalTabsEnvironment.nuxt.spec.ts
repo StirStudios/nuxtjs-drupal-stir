@@ -16,7 +16,7 @@ describe('Drupal/Tabs environment badge', () => {
       content: {},
       current_user: { id: 9, name: 'Editor', authenticated: true, capabilities: { editorialUi: true } },
     }
-    useState<string>('drupal-ce-current-page-key').value = 'page-environment-badge'
+    useState<string>('stir-page-current-key').value = 'page-environment-badge'
     useRuntimeConfig().public.environment = environment
 
     const bar = await mountSuspended(DrupalTabs)

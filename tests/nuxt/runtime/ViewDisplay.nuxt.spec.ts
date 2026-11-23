@@ -11,6 +11,9 @@ const state = vi.hoisted(() => ({
 }))
 
 mockNuxtImport('$fetch', () => state.api)
+// These specs cover View controls; the Drupal page-layout middleware would
+// otherwise fetch the page through the same mocked $fetch on each navigation.
+mockNuxtImport('takesDrupalPageLayout', () => () => false)
 
 enableAutoUnmount(afterEach)
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h, ref } from 'vue'
 import Footer from '../../../layers/theme/app/components/App/Footer.vue'
@@ -54,6 +54,14 @@ let appFooterContextExecuteCalls = 0
 
 mockNuxtImport('useAppConfig', () => {
   return () => appConfig.value
+})
+
+mockNuxtImport('useDrupalPage', () => {
+  return () => ({
+    getPage: () => page,
+    fetchPage: vi.fn(),
+    getMessages: () => ref([]),
+  })
 })
 
 mockNuxtImport('useDrupalCe', () => {

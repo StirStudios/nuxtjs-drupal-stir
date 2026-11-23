@@ -22,6 +22,3 @@ packageExtensions:
   nuxtjs-drupal-ce@2.9.0:
     dependencies:
       h3: ^1.15.11
-
-patchedDependencies:
-  nuxtjs-drupal-ce@2.9.0: patches/nuxtjs-drupal-ce@2.9.0.patch

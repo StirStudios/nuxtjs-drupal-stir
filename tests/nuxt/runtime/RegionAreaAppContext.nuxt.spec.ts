@@ -22,6 +22,14 @@ const state = vi.hoisted(() => ({
   },
 }))
 
+mockNuxtImport('useDrupalPage', () => {
+  return () => ({
+    getPage: () => state.page,
+    fetchPage: vi.fn(),
+    getMessages: () => ref([]),
+  })
+})
+
 mockNuxtImport('useDrupalCe', () => {
   return () => ({
     getPage: () => state.page,

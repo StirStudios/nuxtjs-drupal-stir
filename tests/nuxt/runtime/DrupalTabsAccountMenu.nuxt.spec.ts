@@ -19,7 +19,7 @@ describe('Drupal/Tabs account menu', () => {
       content: {},
       current_user: { id: 7, authenticated: true, capabilities: { editorialUi: true } },
     }
-    useState<string>('drupal-ce-current-page-key').value = 'page-account-menu-proxy'
+    useState<string>('stir-page-current-key').value = 'page-account-menu-proxy'
 
     const first = await mountSuspended(DrupalTabs)
 
