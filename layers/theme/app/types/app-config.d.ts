@@ -210,6 +210,13 @@ type StirThemeHeroNodeTypeConfig = {
   media?: 'first' | 'last'
 }
 
+type StirThemeHeroSpacing = {
+  mediaSpacing?: ClassValue
+  noMediaSpacing?: ClassValue
+  textSpacing?: ClassValue
+  hide?: ClassValue
+}
+
 type StirThemeHeroConfig = {
   actions?: ClassValue
   base?: ClassValue
@@ -224,6 +231,8 @@ type StirThemeHeroConfig = {
     text?: ClassValue
   } & LooseRecord
   nodeTypes?: Record<string, StirThemeHeroNodeTypeConfig>
+  /** Spacing under a sticky header, which takes its own space; the plain keys clear a fixed header that sits over the page. */
+  sticky?: StirThemeHeroSpacing
   front?: {
     subtitle?: 'replace' | 'below'
     subtitleClass?: ClassValue

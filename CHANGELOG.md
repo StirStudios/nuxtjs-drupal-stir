@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- Page heroes now take their spacing from `stirTheme.hero.sticky` when the
+  page's header is sticky (`navigation.mode: 'sticky'` or `modeRoutes`). A
+  sticky header takes its own space, so the defaults clear nothing (`pt-10`
+  without media). The plain `mediaSpacing`, `noMediaSpacing` and `hide` still
+  clear a fixed header. **Sites with a sticky header** that customised hero
+  spacing move those values into `hero.sticky`; the plain keys no longer apply
+  under a sticky header. Keys `hero.sticky` leaves out fall back to the plain
+  ones.
 - The layer now fetches Drupal pages and keeps the current-page state itself
   (`useDrupalPage`, behind `useStirDrupalCe().fetchPage`, `getPage` and
   `getMessages`), instead of through `nuxtjs-drupal-ce`. Shared UI still keeps

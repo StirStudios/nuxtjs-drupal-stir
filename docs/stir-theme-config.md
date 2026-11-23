@@ -823,8 +823,20 @@ hero: {
   nodeTypes: {
     'node-work': { layout: 'inline', media: 'last' },
   },
+  // Used instead of the spacing above when the page's header is sticky.
+  sticky: {
+    mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
+    noMediaSpacing: 'pt-10',
+    hide: 'pt-10',
+  },
 },
 ```
+
+The plain `mediaSpacing`, `noMediaSpacing`, `textSpacing` and `hide` clear a
+`fixed` header, which sits over the page. A `sticky` header
+(`navigation.mode`, or `navigation.modeRoutes` for some routes) takes its own
+space, so the hero uses `hero.sticky` instead, and any key it leaves out falls
+back to the plain one. A sticky site styles its hero in `hero.sticky`.
 
 `nodeTypes` is keyed by the Drupal page payload `type` (for example
 `node-work`) and only applies to page heroes (`field_hero`), not section

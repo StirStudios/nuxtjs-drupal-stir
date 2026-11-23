@@ -487,3 +487,40 @@ describe('Drupal Hero with the page\'s inherited motion', () => {
     }
   })
 })
+
+describe('Paragraph Hero spacing by header mode', () => {
+  const mountTextHero = async () => {
+    const wrapper = await mountSuspended(Hero, {
+      props: { header: 'Spacing' },
+      global: { provide: { [drupalPageKey as symbol]: ref(makePage('Spacing')) } },
+    })
+    const classes = wrapper.get('section').classes()
+
+    wrapper.unmount()
+    return classes
+  }
+
+  it('clears a fixed header with the plain spacing', async () => {
+    const theme = useAppConfig().stirTheme
+
+    theme.navigation.mode = 'fixed'
+    expect((await mountTextHero()).join(' ')).toContain('var(--ui-header-height)')
+  })
+
+  it('uses hero.sticky under a sticky header, which takes its own space', async () => {
+    const theme = useAppConfig().stirTheme
+    const fixedSpacing = theme.hero.mediaSpacing
+
+    theme.navigation.mode = 'sticky'
+    try {
+      const classes = (await mountTextHero()).join(' ')
+
+      expect(classes).not.toContain('var(--ui-header-height)')
+      expect(classes.split(' ')).toContain(theme.hero.sticky?.noMediaSpacing)
+      expect(theme.hero.mediaSpacing).toBe(fixedSpacing)
+    }
+    finally {
+      theme.navigation.mode = 'fixed'
+    }
+  })
+})
