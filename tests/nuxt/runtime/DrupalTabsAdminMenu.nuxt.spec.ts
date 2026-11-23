@@ -27,7 +27,7 @@ const mountBar = async (pageKey: string, capabilities: Record<string, boolean>) 
       admin_dashboard_url: '/admin/dashboard',
     },
   }
-  useState<string>('drupal-ce-current-page-key').value = pageKey
+  useState<string>('stir-page-current-key').value = pageKey
 
   return mountSuspended(DrupalTabs)
 }

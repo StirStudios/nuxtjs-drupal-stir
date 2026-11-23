@@ -1,0 +1,46 @@
+{
+  "title": "Articles",
+  "breadcrumbs": [{ "frontpage": true, "url": "/", "label": "Home" }],
+  "metatags": { "meta": [], "link": [], "jsonld": [] },
+  "content_format": "json",
+  "content": {
+    "element": "node-page",
+    "props": { "title": "Articles", "type": "page" },
+    "slots": {
+      "hero": [],
+      "section": [
+        {
+          "element": "paragraph-view",
+          "props": { "id": 20, "uuid": "view-1", "region": "section" },
+          "slots": {
+            "content": [
+              {
+                "element": "drupal-view-articles",
+                "props": { "viewId": "articles", "displayId": "page_1", "paragraphId": 20, "paragraphUuid": "view-1", "pager": { "current": 0, "totalPages": 2 }, "gridItems": 3 },
+                "slots": {
+                  "rows": [
+                    {
+                      "element": "node-article",
+                      "props": { "title": "First article", "type": "article", "created": "1767225600", "url": "/articles/first-article" },
+                      "slots": { "featuredMedia": [{ "element": "media-image", "props": { "mid": 30, "type": "image", "src": "https://cms.example.com/a.jpg", "alt": "", "width": 800, "height": 600 } }] }
+                    },
+                    { "element": "entity-reference", "props": { "entityType": "node", "bundle": "article", "id": "31", "uuid": "ref-1", "label": "Second article", "url": "/articles/second-article", "type": "node" } }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        { "element": "paragraph-webform", "props": { "id": 21, "uuid": "webform-1", "region": "section", "webform": { "id": "contact" } } }
+      ]
+    }
+  },
+  "page_layout": "default",
+  "footer_menu": [],
+  "site_info": { "name": "Example Site", "slogan": "", "mail": "info@example.com" },
+  "current_user": { "id": 0, "name": "Anonymous", "roles": ["anonymous"], "capabilities": { "editorialUi": false, "adminMenu": false } },
+  "local_tasks": [],
+  "messages": [],
+  "published": true,
+  "is_front_page": false
+}

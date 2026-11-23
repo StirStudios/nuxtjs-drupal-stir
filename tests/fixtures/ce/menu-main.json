@@ -1,0 +1,10 @@
+[
+  { "key": "menu-1", "title": "About", "description": null, "uri": "internal:/about", "alias": "about", "external": false, "absolute": "https://cms.example.com/about", "relative": "/about", "existing": true, "weight": "0", "expanded": false, "enabled": true, "uuid": "menu-1", "options": [] },
+  {
+    "key": "menu-2", "title": "Services", "description": null, "uri": "internal:/services", "alias": "services", "external": false, "absolute": "https://cms.example.com/services", "relative": "/services", "existing": true, "weight": "1", "expanded": true, "enabled": true, "uuid": "menu-2", "options": [],
+    "below": [
+      { "key": "menu-3", "title": "Design", "description": null, "uri": "internal:/services/design", "alias": "services/design", "external": false, "absolute": "https://cms.example.com/services/design", "relative": "/services/design", "existing": true, "weight": "0", "expanded": false, "enabled": true, "uuid": "menu-3", "options": { "attributes": { "class": [] } } }
+    ]
+  },
+  { "key": "menu-4", "title": "Elsewhere", "description": null, "uri": "https://www.example.org/", "alias": "", "external": true, "absolute": "https://www.example.org/", "relative": "https://www.example.org/", "existing": false, "weight": "2", "expanded": false, "enabled": true, "uuid": "menu-4", "options": [] }
+]

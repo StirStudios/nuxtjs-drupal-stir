@@ -1,0 +1,21 @@
+{
+  "title": "Page not found",
+  "breadcrumbs": [{ "frontpage": true, "url": "/", "label": "Home" }],
+  "metatags": { "meta": [], "link": [] },
+  "content_format": "json",
+  "content": {
+    "element": "drupal-markup",
+    "slots": {
+      "default": "The requested page could not be found.",
+      "section": [],
+      "hero": [{ "element": "paragraph-hero", "props": { "mode": "fallback_simple" } }]
+    },
+    "props": []
+  },
+  "page_layout": "default",
+  "footer_menu": [],
+  "site_info": { "name": "Example Site", "slogan": "", "mail": "info@example.com" },
+  "current_user": { "id": 0, "name": "Anonymous", "roles": ["anonymous"], "capabilities": { "editorialUi": false, "adminMenu": false } },
+  "local_tasks": [],
+  "messages": []
+}

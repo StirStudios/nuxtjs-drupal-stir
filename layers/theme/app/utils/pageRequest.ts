@@ -74,6 +74,3 @@ export function pageFetchOptions() {
     },
   }
 }
-
-/** @deprecated Use pageFetchOptions(), which also reuses the page in the browser. */
-export const serverPageFetchOptions = pageFetchOptions

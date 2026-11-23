@@ -13,6 +13,21 @@ untouched do not need one.
 
 ## Unreleased
 
+- The layer now fetches Drupal pages and keeps the current-page state itself
+  (`useDrupalPage`, behind `useStirDrupalCe().fetchPage`, `getPage` and
+  `getMessages`), instead of through `nuxtjs-drupal-ce`. Shared UI still keeps
+  the outgoing page until the destination is on screen. This is Phase 2a of
+  docs/plans/own-drupal-ce.md.
+  - **Each site:** remove the `nuxtjs-drupal-ce@2.9.0` entry from
+    `patchedDependencies` in `pnpm-workspace.yaml`, delete
+    `patches/nuxtjs-drupal-ce@2.9.0.patch` and reinstall. Keep the `h3`
+    `packageExtensions` repair until Phase 2c.
+  - **Site code:** call `useStirDrupalCe()` for `getPage`, `fetchPage` and
+    `getMessages`. `useDrupalCe().getPage()` no longer sees the page.
+  - **Removed:** `serverPageFetchOptions`; use `pageFetchOptions`.
+  - **State keys:** pages are keyed `page:<path>` (`page:ssr` on the server),
+    and the state keys are `stir-page-current-key`, `stir-page-pending-key`
+    and `stir-page-messages`.
 - A page requested with a trailing slash now answers 301 to the same path
   without it, keeping the query string, so the redirect agrees with the
   canonical URL and search engines stop indexing both forms. `/`, files with

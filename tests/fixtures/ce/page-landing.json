@@ -1,0 +1,84 @@
+{
+  "title": "Example landing page",
+  "breadcrumbs": [{ "frontpage": true, "url": "/", "label": "Home" }],
+  "metatags": {
+    "meta": [{ "name": "description", "content": "An example landing page." }],
+    "link": [{ "rel": "canonical", "href": "https://www.example.com/landing" }],
+    "jsonld": []
+  },
+  "content_format": "json",
+  "content": {
+    "element": "node-page",
+    "props": { "title": "Example landing page", "type": "page", "created": "1767225600", "hideTitle": false },
+    "slots": {
+      "hero": [
+        {
+          "element": "paragraph-hero",
+          "props": { "id": 1, "uuid": "hero-1", "header": "Welcome", "headerTag": "h1", "mode": "media" },
+          "slots": {
+            "media": [
+              {
+                "element": "media-image",
+                "props": { "mid": 10, "type": "image", "src": "https://cms.example.com/hero.jpg", "alt": "A sunny courtyard", "width": 1600, "height": 900, "loading": "eager", "fetchpriority": "high" }
+              }
+            ]
+          }
+        }
+      ],
+      "section": [
+        {
+          "element": "paragraph-layout",
+          "props": { "id": 2, "uuid": "layout-1", "container": "default", "region": "section" },
+          "slots": {
+            "first": [
+              { "element": "paragraph-text", "props": { "id": 3, "uuid": "text-1", "parentUuid": "layout-1", "region": "first", "text": "<p>Plain rich text with a <a href=\"/about\">link</a>.</p>" } },
+              { "element": "paragraph-button", "props": { "id": 4, "uuid": "button-1", "parentUuid": "layout-1", "region": "first", "link": { "url": "/contact", "title": "Contact us" } } }
+            ],
+            "second": [
+              {
+                "element": "paragraph-media",
+                "props": { "id": 5, "uuid": "media-1", "parentUuid": "layout-1", "region": "second" },
+                "slots": {
+                  "media": [
+                    { "element": "media-video", "props": { "mid": 11, "type": "video", "platform": "youtube", "src": "https://www.youtube.com/watch?v=example", "title": "Example video" } }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "element": "paragraph-accordion",
+          "props": { "id": 6, "uuid": "accordion-1", "region": "section" },
+          "slots": {
+            "items": [
+              { "element": "paragraph-accordion-item", "props": { "id": 7, "uuid": "item-1", "header": "A question", "headerTag": "h3", "text": "<p>An answer.</p>" } }
+            ]
+          }
+        },
+        {
+          "element": "paragraph-tabs",
+          "props": { "id": 8, "uuid": "tabs-1", "region": "section" },
+          "slots": {
+            "tab": [
+              {
+                "element": "paragraph-tab",
+                "props": { "id": 9, "uuid": "tab-1", "title": "First tab", "headerTag": "h3" },
+                "slots": { "tabContent": [{ "element": "paragraph-text", "props": { "id": 12, "uuid": "text-2", "text": "<p>Tab body.</p>" } }] }
+              }
+            ]
+          }
+        },
+        { "element": "paragraph-unknown-bundle", "props": { "id": 13, "uuid": "unknown-1", "region": "section" } }
+      ]
+    }
+  },
+  "page_layout": "default",
+  "footer_menu": [],
+  "site_info": { "name": "Example Site", "slogan": "", "mail": "info@example.com" },
+  "current_user": { "id": 0, "name": "Anonymous", "roles": ["anonymous"], "capabilities": { "editorialUi": false, "adminMenu": false } },
+  "local_tasks": { "primary": [], "secondary": [] },
+  "messages": [],
+  "published": true,
+  "is_front_page": false
+}

@@ -5,8 +5,8 @@ import { forgetPrefetchedPage, rememberPrefetchedPage, withoutLegacyDrupalViewPa
 // app.vue's NuxtLayout persists, and a layout set after the page has started
 // rendering remounts it mid-load or lands on whichever route is current by
 // then. The page's fetchPage() reuses this payload (pageFetchOptions), so
-// Drupal is asked once. The Drupal CE client is imported here, lazily, to keep
-// it out of the initial bundle. The server side is drupalPageLayout.server.ts.
+// Drupal is asked once. It fetches with $fetch, so no Drupal client code joins
+// the initial bundle. The server side is drupalPageLayout.server.ts.
 export default defineNuxtPlugin({
   // Named so a site can map the layout after it with dependsOn.
   name: 'stir:drupal-page-layout',
@@ -21,14 +21,15 @@ export default defineNuxtPlugin({
       // Drupal answers instead.
       preloadRouteComponents(to)
 
-      const { useStirDrupalCe } = await import('../composables/useStirDrupalCe')
       const { path } = useResolvedPageRequest(to)
       let page: { page_layout?: unknown } | undefined
 
       try {
-        page = await nuxtApp.runWithContext(() =>
-          useStirDrupalCe().$ceApi({ query: withoutLegacyDrupalViewPage(to.query) })<{ page_layout?: unknown }>(path.value),
-        )
+        page = await $fetch<{ page_layout?: unknown }>(path.value, {
+          baseURL: '/api/drupal-ce',
+          query: withoutLegacyDrupalViewPage(to.query),
+          credentials: 'include',
+        })
       } catch {
         // Drupal/PageRoute.vue fetches the page again and reports the error.
         return

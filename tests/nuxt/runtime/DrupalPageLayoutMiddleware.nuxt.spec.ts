@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { getQuery } from 'h3'
 import type { RouteMiddleware } from '#app'
 import type { RouteLocationNormalized } from '#vue-router'
 import plugin from '../../../layers/theme/app/plugins/drupalPageLayout.client'
@@ -15,9 +16,6 @@ mockNuxtImport('addRouteMiddleware', () => (_name: string, middleware: RouteMidd
   state.middleware = middleware
 })
 mockNuxtImport('preloadRouteComponents', () => state.preload)
-vi.mock('../../../layers/theme/app/composables/useStirDrupalCe', () => ({
-  useStirDrupalCe: () => ({ $ceApi: (options: unknown) => (path: string) => state.ceApi(path, options) }),
-}))
 
 type TestApp = Parameters<typeof plugin>[0] & { $router: { currentRoute: { value: { fullPath: string } } } }
 
@@ -52,6 +50,15 @@ async function navigate(to: RouteLocationNormalized) {
 const pageCache = (cause = 'initial') =>
   pageFetchOptions().getCachedData('page-key', nuxtApp as never, { cause })
 
+// The middleware fetches through the layer's Drupal proxy.
+for (const path of ['/', '/about', '/class', '/dashboard', '/links', '/missing', '/news', '/one', '/two', '/work']) {
+  registerEndpoint(`/api/drupal-ce${path === '/' ? '' : path}`, async (event) => {
+    const query = getQuery(event)
+
+    return await state.ceApi(path, Object.keys(query).length ? { query } : {})
+  })
+}
+
 beforeEach(() => {
   state.ceApi.mockReset()
   state.preload.mockReset()
@@ -69,7 +76,7 @@ describe('Drupal page layout before render, in the browser', () => {
     expect(await navigate(route('/links?tab=1#top'))).toBe('links')
     expect(state.ceApi).toHaveBeenCalledWith('/links', { query: { tab: '1' } })
     expect(state.preload).toHaveBeenCalledOnce()
-    expect(pageCache()).toBe(page)
+    expect(pageCache()).toEqual(page)
     // A second fetch, such as a refresh, goes to Drupal.
     expect(pageCache()).toBeUndefined()
   })

@@ -55,8 +55,8 @@ Nuxt client navigation follows the framework's native Suspense contract:
 Page-owned layout, page classes and editor target indexes use the ref returned
 by that component's `fetchPage()`. Pass it to `usePageContext(page)` to resolve
 context from the same payload. Calling `usePageContext()` without an argument
-continues to use the shared current Drupal page. This distinction works with
-both current releases and the pending upstream page-commit fix.
+continues to use the shared current Drupal page, which switches only when the
+destination page is on screen (`useDrupalPage`).
 
 Shared route-derived presentation must use `useNavLockedSnapshot()`. The
 navigation lock begins at Nuxt's `page:loading:start` hook, before route
