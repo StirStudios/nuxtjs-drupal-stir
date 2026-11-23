@@ -183,6 +183,30 @@ security-sensitive and follow Drupal core changes.
 and Stir's formatter plugins depend on it, and replacing it would mean
 migrating every site's config for no gain.
 
+## Phase 0 findings (live capture, 2026-11-23)
+
+Captured from the public `/api/drupal-ce` and `/api/menu` endpoints of all 12
+sites: 104 pages and 36 menus. The neutral fixtures in `tests/fixtures/ce/`
+mirror these shapes; `tests/nuxt/runtime/CeContract.nuxt.spec.ts` checks the
+page envelope and snapshots which component each element resolves to.
+
+- Every payload uses the explicit format, with no legacy nodes. The
+  legacy-format branch can go.
+- 66 distinct elements appear. Site-specific ones (Views displays,
+  project-specific node types) resolve through `…Default` fallbacks or site
+  components, so the fallback chain is part of the contract.
+- Redirect pages carry `redirect: { url, statusCode, external }` and a content
+  object with no `element`.
+- 404 pages render `drupal-markup` with a fallback hero. `props` arrives as `[]`
+  (an empty PHP array), not `{}`.
+
+**For Phase 1 (Drupal):**
+- `#cache` render metadata leaks into the JSON on most pages.
+- `local_tasks` shows the "View" and "API" (`/ce-api/node/N`) tabs to
+  anonymous visitors.
+- `local_tasks` is `[]` when empty and `{ primary, secondary }` otherwise.
+- `site_info.mail` is sent on every page; check that this is intended.
+
 ## Open questions
 
 - Are any site-specific uses of the module's less common functions hidden in
