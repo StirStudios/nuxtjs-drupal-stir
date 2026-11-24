@@ -235,6 +235,22 @@ describe('Drupal CE proxy boundary', () => {
     })
   })
 
+  it('fetches menus through the CE API unless a menu origin is configured', () => {
+    // Under /ce-api Lupus Decoupled answers as an API: menu links stay
+    // relative paths instead of absolute frontend URLs.
+    stubRuntimeConfig({
+      public: {
+        api: 'https://cms.example.test',
+        drupalCe: { ceApiEndpoint: '/ce-api', drupalBaseUrl: 'https://cms.example.test' },
+      },
+    })
+
+    expect(getStirDrupalCeProxyTargets()).toEqual({
+      ceBaseUrl: 'https://cms.example.test/ce-api',
+      menuBaseUrl: 'https://cms.example.test/ce-api',
+    })
+  })
+
   it('preserves deployment-time Drupal CE origin overrides', () => {
     stubRuntimeConfig({
       api: 'https://build-time.example.test',
