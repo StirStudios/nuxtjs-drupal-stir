@@ -233,28 +233,19 @@ describe('MediaItem (Nuxt runtime)', () => {
   it('reveals a gallery with no Animation set, unless the paragraph or theme turns it off', async () => {
     const theme = useAppConfig().stirTheme
     const mountGalleryItem = async (direction?: string, pageAnimation?: string) => {
-      const wrapper = await mountSuspended(pageAnimation
-        ? defineComponent({
-            setup() {
-              provideRevealMotionScope(() => pageAnimation)
-              return () => h(MediaItem, {
-                index: 1,
-                direction,
-                node: h('div'),
-                revealMode: 'gallery',
-                tk: { propsOf: () => ({ type: 'image', src: '/gallery.webp', alt: 'Gallery image' }) },
-              })
-            },
+      const Page = defineComponent({
+        setup() {
+          if (pageAnimation) provideRevealMotionScope(() => pageAnimation)
+          return () => h(MediaItem, {
+            index: 1,
+            direction,
+            node: h('div'),
+            revealMode: 'gallery',
+            tk: { propsOf: () => ({ type: 'image', src: '/gallery.webp', alt: 'Gallery image' }) } as Pick<SlotsToolkit, 'propsOf'>,
           })
-        : MediaItem, {
-        props: {
-          index: 1,
-          direction,
-          node: h('div'),
-          revealMode: 'gallery',
-          tk: { propsOf: () => ({ type: 'image', src: '/gallery.webp', alt: 'Gallery image' }) } as Pick<SlotsToolkit, 'propsOf'>,
         },
       })
+      const wrapper = await mountSuspended(Page)
       const revealed = wrapper.find('.reveal-motion').exists()
 
       wrapper.unmount()
