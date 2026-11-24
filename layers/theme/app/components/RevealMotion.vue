@@ -40,9 +40,7 @@ export default defineComponent({
         !(REVEAL_KEYS as readonly string[]).includes(key)))
       const { opacity: _opacity, transform: _transform, ...keptStyle } = typeof style === 'object' && style ? style : {}
 
-      // Media hides itself in the server HTML with motion-safe:opacity-0 and
-      // relies on the reveal to show it, so show it here explicitly.
-      return { ...kept, initial: false, style: { ...keptStyle, opacity: 1 } }
+      return { ...kept, initial: false, style: keptStyle }
     }
 
     return () => h(

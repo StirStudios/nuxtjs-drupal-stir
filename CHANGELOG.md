@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+- Media reveals the same way as every other reveal. It no longer hides itself
+  in the server HTML with `motion-safe:opacity-0`: it shows at once, and only
+  media below the screen at hydration waits and fades in. Reduced motion still
+  shows everything at once.
 - Reveals no longer blink on a fresh load. Since 7 September (9e6d8762),
   hydration gave every server-rendered reveal its hidden start state, so
   content already on screen disappeared and faded back in. Content on screen

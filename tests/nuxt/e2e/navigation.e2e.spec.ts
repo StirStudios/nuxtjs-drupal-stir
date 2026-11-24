@@ -46,7 +46,21 @@ const pages: Record<string, unknown> = {
       props: { title: 'Reveal', type: 'page', hideTitle: true },
       slots: {
         hero: [],
+        // The lead image never reveals; the next media on screen must not
+        // blink; the rows below include media that reveals on scroll.
         section: [{
+          element: 'paragraph-media',
+          props: { id: 'lead-media', uuid: 'lead-media' },
+          slots: {
+            media: [{ element: 'media-image', props: { mid: 2, type: 'image', src: '/lead-media.png', alt: 'lead-media', width: 600, height: 80 } }],
+          },
+        }, {
+          element: 'paragraph-media',
+          props: { id: 'second-media', uuid: 'second-media', direction: 'fade-up' },
+          slots: {
+            media: [{ element: 'media-image', props: { mid: 3, type: 'image', src: '/second-media.png', alt: 'second-media', width: 600, height: 80 } }],
+          },
+        }, {
           element: 'paragraph-view',
           props: { id: 'reveal-view', uuid: 'reveal-view', direction: 'fade-up' },
           slots: {
@@ -54,10 +68,16 @@ const pages: Record<string, unknown> = {
               element: 'drupal-view-reveal',
               props: { viewId: 'reveal', displayId: 'page' },
               slots: {
-                rows: Array.from({ length: 8 }, (_, index) => ({
-                  element: 'paragraph-text',
-                  props: { id: `row-${index}`, uuid: `row-${index}`, text: `<p class="reveal-row" style="min-height:420px">Row ${index}</p>` },
-                })),
+                rows: Array.from({ length: 8 }, (_, index) => index === 5
+                  ? {
+                      element: 'paragraph-media',
+                      props: { id: 'row-media', uuid: 'row-media', direction: 'fade-up' },
+                      slots: { media: [{ element: 'media-image', props: { mid: 4, type: 'image', src: '/row-media.png', alt: 'row media', width: 600, height: 420 } }] },
+                    }
+                  : {
+                      element: 'paragraph-text',
+                      props: { id: `row-${index}`, uuid: `row-${index}`, text: `<p class="reveal-row" style="min-height:420px">Row ${index}</p>` },
+                    }),
               },
             }],
           },
@@ -180,12 +200,36 @@ describe('Drupal page navigation', async () => {
       expect(row.lowest, 'an on-screen row never blinks out').toBe(1)
     }
 
+    // Media below the screen waits and reveals too.
+    const mediaBelow = await page.evaluate(() => [...document.querySelectorAll('.reveal-motion')]
+      .findIndex(row => row.querySelector('img[alt="row media"]') && row.getBoundingClientRect().top > innerHeight))
+
+    expect(mediaBelow, 'the row media starts below the screen').toBeGreaterThan(-1)
+    expect(rows[mediaBelow]!.opacity, 'media below the screen waits to reveal').toBe(0)
+
     const below = rows.findIndex(row => !row.onScreen)
 
     expect(below, 'some rows start below the screen').toBeGreaterThan(-1)
     expect(rows[below]!.opacity, 'rows below the screen wait to reveal').toBe(0)
     await page.evaluate(index => document.querySelectorAll('.reveal-motion')[index]?.scrollIntoView({ block: 'center' }), below)
     await page.waitForFunction(index => Number(getComputedStyle(document.querySelectorAll('.reveal-motion')[index]!).opacity) === 1, below)
+    await page.evaluate(index => document.querySelectorAll('.reveal-motion')[index]?.scrollIntoView({ block: 'center' }), mediaBelow)
+    await page.waitForFunction(index => Number(getComputedStyle(document.querySelectorAll('.reveal-motion')[index]!).opacity) === 1, mediaBelow)
+    await page.close()
+  }, 60_000)
+
+  it.runIf(browserEnabled)('shows everything at once when reduced motion is requested', async () => {
+    const page = await createPage()
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto(url('/reveal'), { waitUntil: 'networkidle' })
+    await page.waitForFunction(() => Boolean((document.querySelector('#__nuxt') as { __vue_app__?: unknown } | null)?.__vue_app__))
+    await page.waitForTimeout(500)
+
+    const hidden = await page.evaluate(() => [...document.querySelectorAll('.reveal-motion')]
+      .filter(row => Number(getComputedStyle(row).opacity) < 1).length)
+
+    expect(hidden, 'no reveal waits hidden under reduced motion').toBe(0)
     await page.close()
   }, 60_000)
 
