@@ -243,13 +243,15 @@ describe('Drupal page navigation', async () => {
       for (const row of [...document.querySelectorAll('.reveal-motion')]) {
         const style = getComputedStyle(row)
 
-        if (style.transform !== 'none' && !/^matrix\(1, 0, 0, 1, 0, 0\)$/.test(style.transform)) result.push(`${row.textContent?.trim().slice(0, 20)}: ${style.transform}`)
+        if (Number(style.opacity) < 1 || (style.transform !== 'none' && !/^matrix\(1, 0, 0, 1, 0, 0\)$/.test(style.transform))) {
+          result.push(`${row.textContent?.trim().slice(0, 20)}: ${style.opacity} ${style.transform}`)
+        }
       }
 
       return result
     })
 
-    expect(stuck, 'no revealed row stays offset after a hard refresh').toEqual([])
+    expect(stuck, 'every row ends visible and in place after a hard refresh').toEqual([])
     await page.close()
   }, 90_000)
 
