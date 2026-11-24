@@ -17,18 +17,18 @@ explicitly overrides them.
 - `DRUPAL_SESSION_COOKIE_NAMES` is an optional comma-separated server-only
   allowlist for sites that override Drupal's normal session cookie name.
 
-The Drupal CE module also supports deployment-time public runtime overrides:
+The Drupal CE settings (`runtimeConfig.public.drupalCe`) also take deployment-time public runtime overrides:
 
 - `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`
 - `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`
 - `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`
 - `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`
 
-Use these only when a built deployment must change the corresponding module
-URL or endpoint. Menus are fetched through the CE API endpoint by default
+Use these only when a built deployment must change the corresponding
+URL or endpoint. The fleet env schema sets none of them. Menus are fetched through the CE API endpoint by default
 (`/ce-api/api/menu_items/<name>`), where Lupus Decoupled keeps menu links
 relative; setting `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL` to the plain Drupal
-origin brings back absolute frontend URLs in the menu payload. All Drupal CE module URL and endpoint overrides are serialized
+origin brings back absolute frontend URLs in the menu payload. All Drupal CE URL and endpoint overrides are serialized
 into public runtime config, including `SERVER_DRUPAL_BASE_URL`; do not use
 credentials, secret-only hostnames, or other sensitive topology in these
 values.

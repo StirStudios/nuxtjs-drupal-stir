@@ -1,6 +1,6 @@
 # Backend requirements and capability ownership
 
-This is Stir's opinionated Nuxt layer for its Drupal publishing workflow. It uses the public `nuxtjs-drupal-ce` integration and Lupus Custom Elements, and adds contracts implemented by the currently private Stir Tools Drupal project. The backend is not included or installed by the frontend package.
+This is Stir's opinionated Nuxt layer for its Drupal publishing workflow. It fetches and renders Lupus Custom Elements itself (it replaced the `nuxtjs-drupal-ce` module), and adds contracts implemented by the currently private Stir Tools Drupal project. The backend is not included or installed by the frontend package.
 
 | Capability | What the backend must provide |
 |---|---|

@@ -289,6 +289,8 @@ Existing Paragraphs content is not part of this immediate replacement decision. 
 
 ### P1 — Keep Lupus and `nuxtjs-drupal-ce`; own a stable Stir adapter, not a fork
 
+> **Superseded (2026-11):** the layer replaced `nuxtjs-drupal-ce` with its own page fetching and rendering (see `docs/plans/own-drupal-ce.md`). Lupus Decoupled stays on the Drupal side. The text below is the original decision.
+
 Going fully independent is not justified by the evidence. [Lupus Decoupled](https://www.drupal.org/project/lupus_decoupled) remains a security-covered Drupal 11-compatible project that already owns page routing, previews, authentication integration, redirects, metatags, messages, and the component-oriented API. [`nuxtjs-drupal-ce`](https://github.com/drunomics/nuxtjs-drupal-ce) is actively maintained for Nuxt 4; its current 2.7 line provides wildcard page routing, SSR data, component resolution/fallback, menus, messages, previews, and Drupal library loading. Stir is already contributing generally useful fixes and proposals upstream, including the [PageRoute wrapper proposal](https://github.com/drunomics/nuxtjs-drupal-ce/issues/457).
 
 The current Nuxt base does, however, depend on an upstream implementation detail: it removes the module's generated proxy handler by matching its source path, then installs a security-hardened replacement. The upstream renderer also silently resolves unknown Custom Elements to nothing and provides no first-class field normalization/diagnostic hook. These are extension seams to propose upstream, while containing today's behavior behind a Stir-owned facade.
@@ -461,7 +463,7 @@ These can remain in one pnpm workspace and release at one synchronized version; 
 | --- | --- | --- |
 | Page API, Drupal path resolution, preview/auth/metatag/redirect integration | Lupus Decoupled upstream | Mature maintained foundation; replacing it adds broad responsibility without a demonstrated benefit |
 | Entity-to-Custom-Element generation and CE rendering | Custom Elements / Lupus CE Renderer upstream | Generic Drupal capability; contribute broadly useful fixes upstream |
-| Nuxt route fetch, CE rendering kernel, menus/messages/preview wiring | `nuxtjs-drupal-ce` upstream | Active Nuxt 4 implementation; consume through the Stir adapter rather than directly |
+| Nuxt route fetch, CE rendering kernel, menus/messages | The layer (`useStirDrupalCe()`) | Replaced `nuxtjs-drupal-ce` in 2026-11 |
 | Secure proxy policy, schemas, normalized fields, diagnostics, capability compatibility | Stir | These are Stir's product guarantees and currently exceed the upstream defaults |
 | Layout Paragraphs-to-CE nesting | Stir bridge first; upstream candidate | It solves a real integration gap and can be contributed if it remains project-neutral |
 | Canvas page composition | Canvas and Lupus upstream; Stir owns only contract/registration policy | Canvas is now maintained and decoupled-capable; duplicating its editor or storage would be wasteful |
