@@ -140,10 +140,18 @@ describe('extractHeaderActions', () => {
         item: { label: 'Join now' },
         as: 'button',
         mobile: 'button',
+        desktop: 'show',
         button: { color: 'secondary', variant: undefined, size: 'lg', class: undefined, icon: undefined },
       },
       expect.objectContaining({ item: { label: 'Account' }, as: 'navigation', mobile: 'menu' }),
     ])
+  })
+
+  it('keeps desktop: hidden actions out of the desktop header', () => {
+    const result = extractHeaderActions(items, [{ match: 'Account', as: 'button', mobile: 'button', desktop: 'hidden' }])
+
+    expect(result.items).toHaveLength(3)
+    expect(result.actions).toEqual([expect.objectContaining({ item: { label: 'Account' }, mobile: 'button', desktop: 'hidden' })])
   })
 
   it('ignores unmatched, out-of-range and duplicate rules', () => {

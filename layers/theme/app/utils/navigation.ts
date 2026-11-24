@@ -116,6 +116,7 @@ export type HeaderActionRule = {
   match?: string | number
   as?: 'button' | 'navigation' | string
   mobile?: 'menu' | 'button' | 'hidden' | string
+  desktop?: 'show' | 'hidden' | string
   color?: string
   variant?: string
   size?: string
@@ -127,6 +128,7 @@ export type HeaderActionItem = {
   item: NavigationMenuItem
   as: 'button' | 'navigation'
   mobile: 'menu' | 'button' | 'hidden'
+  desktop: 'show' | 'hidden'
   button: Pick<ButtonProps, 'color' | 'variant' | 'size' | 'icon'> & { class?: string }
 }
 
@@ -152,6 +154,7 @@ export function extractHeaderActions(
       item,
       as: rule.as === 'button' ? 'button' : 'navigation',
       mobile: rule.mobile === 'button' || rule.mobile === 'hidden' ? rule.mobile : 'menu',
+      desktop: rule.desktop === 'hidden' ? 'hidden' : 'show',
       button: {
         color: rule.color as ButtonProps['color'],
         variant: rule.variant as ButtonProps['variant'],

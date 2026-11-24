@@ -538,7 +538,9 @@ Project hooks, all optional:
   numbers count from the end), `as` (`'navigation'`, the default, or
   `'button'`) and `mobile` (`'menu'`, the default, keeps the item in its menu
   position; `'button'` renders it as a full-width button below the mobile menu;
-  `'hidden'` omits it). Button rules accept `color`, `variant`, `size`, `class`
+  `'hidden'` omits it), and `desktop` (`'show'`, the default, or `'hidden'` to
+  keep the item out of the desktop header, so a `mobile: 'button'` rule adds a
+  mobile-only button without changing the desktop layout). Button rules accept `color`, `variant`, `size`, `class`
   and `icon`. Navigation items share one `Secondary navigation` menu, so
   dropdown children and keyboard behavior match the main menu. Action items
   show from `lg` up; below that they live in the mobile panel. Positions count

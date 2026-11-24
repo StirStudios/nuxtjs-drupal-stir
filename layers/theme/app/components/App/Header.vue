@@ -276,11 +276,14 @@ const navLinks = computed<NavigationMenuItem[]>(() =>
     .map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
 )
 const headerActions = computed(() => extractHeaderActions(navLinks.value, theme.navigation?.actionItems))
-const actionButtons = computed(() => headerActions.value.actions.filter(action => action.as === 'button'))
+// Actions with desktop: 'hidden' live only in the mobile panel, so they do not
+// claim the desktop right region.
+const desktopActions = computed(() => headerActions.value.actions.filter(action => action.desktop === 'show'))
+const actionButtons = computed(() => desktopActions.value.filter(action => action.as === 'button'))
 const actionNavLinks = computed(() =>
-  headerActions.value.actions.filter(action => action.as === 'navigation').map(action => action.item),
+  desktopActions.value.filter(action => action.as === 'navigation').map(action => action.item),
 )
-const hasDesktopActions = computed(() => Boolean(headerActions.value.actions.length || actionsComponent.value))
+const hasDesktopActions = computed(() => Boolean(desktopActions.value.length || actionsComponent.value))
 const splitMenu = computed(() => splitMenuAtMarker(
   headerActions.value.items,
   isSplitLogoLayout.value ? splitLogoMarker.value : undefined,

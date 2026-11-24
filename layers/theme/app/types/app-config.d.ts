@@ -132,6 +132,7 @@ type StirThemeNavigationActionItem = {
   match: string | number
   as?: 'button' | 'navigation'
   mobile?: 'menu' | 'button' | 'hidden'
+  desktop?: 'show' | 'hidden'
   color?: UiColorName
   variant?: UiButtonVariantName
   size?: UiSizeName
