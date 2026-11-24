@@ -7,7 +7,7 @@ describe('field-entity-reference compatibility component', () => {
   it('is registered with the Drupal runtime component resolver', async () => {
     const wrapper = await mountSuspended(defineComponent({
       setup() {
-        const { resolveCustomElement } = useDrupalCe()
+        const { resolveCustomElement } = useStirDrupalCe()
 
         return {
           resolved: Boolean(resolveCustomElement?.('field-entity-reference')),

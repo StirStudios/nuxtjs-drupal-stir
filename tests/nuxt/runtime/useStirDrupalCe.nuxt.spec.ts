@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
   renderedContent: undefined as unknown,
 }))
 
-mockNuxtImport('useDrupalCe', () => {
+mockNuxtImport('useDrupalElements', () => {
   return () => ({
     getPage: () => ({ value: {} }),
     resolveCustomElement: (element: string) =>

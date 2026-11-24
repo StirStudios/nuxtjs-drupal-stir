@@ -30,7 +30,7 @@ mockNuxtImport('useDrupalPage', () => {
   })
 })
 
-mockNuxtImport('useDrupalCe', () => {
+mockNuxtImport('useDrupalElements', () => {
   return () => ({
     getPage: () => state.page,
     renderCustomElements: (blocks: unknown) => {

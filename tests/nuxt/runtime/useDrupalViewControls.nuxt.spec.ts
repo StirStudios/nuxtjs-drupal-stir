@@ -14,7 +14,7 @@ const state = vi.hoisted(() => ({
   legacyApi: vi.fn(),
 }))
 
-mockNuxtImport('useDrupalCe', () => {
+mockNuxtImport('useDrupalElements', () => {
   return () => ({
     $ceApi: () => state.legacyApi,
   })

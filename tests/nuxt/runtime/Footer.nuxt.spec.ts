@@ -64,7 +64,7 @@ mockNuxtImport('useDrupalPage', () => {
   })
 })
 
-mockNuxtImport('useDrupalCe', () => {
+mockNuxtImport('useDrupalElements', () => {
   return () => ({
     getPage: () => page,
   })

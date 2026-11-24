@@ -1,4 +1,5 @@
 import { withoutPresentationEditMetadata } from '../utils/layoutEditLinks'
+import type { DrupalElementContent } from './useDrupalElements'
 import { prepareComponentTreeForDevelopment } from '../utils/componentTreeDiagnostics'
 import type { AppContextPayload } from '../../../core/shared/types/appContext'
 import type { DrupalNodeRelatedItem } from '../types/Node'
@@ -7,8 +8,19 @@ import type {
   StirDrupalLocalTasks,
 } from '../types/DrupalPageUser'
 
-type DrupalComposable = ReturnType<typeof useDrupalCe>
-type DrupalPage = ReturnType<DrupalComposable['getPage']>['value']
+// The page Drupal CE sends (the shape nuxtjs-drupal-ce typed as DrupalCePage).
+type DrupalPage = {
+  breadcrumbs: Array<{ label: string, url?: string, frontpage?: boolean }>
+  content: DrupalElementContent | Record<string, unknown>
+  content_format: string
+  local_tasks: { primary: unknown[], secondary: unknown[] }
+  settings: Record<string, unknown>
+  messages: unknown[]
+  metatags: { meta: Array<Record<string, string>>, link: Array<Record<string, string>>, jsonld: unknown[] }
+  page_layout: string
+  title: string
+  key?: string
+}
 type StirPageContent = {
   element?: string
   props?: Record<string, unknown> & {
@@ -31,31 +43,26 @@ type StirDrupalPage = Omit<DrupalPage, 'content'> & Partial<AppContextPayload> &
 }
 
 export function useStirDrupalCe() {
-  const drupal = useDrupalCe()
+  const elements = useDrupalElements()
   const pages = useDrupalPage()
 
-  const prepare = (content: unknown): CustomElementContent => {
-    const renderable = withoutPresentationEditMetadata(content) as CustomElementContent
-
-    return typeof drupal.resolveCustomElement === 'function'
-      ? prepareComponentTreeForDevelopment(
-          renderable,
-          drupal.resolveCustomElement,
-          import.meta.dev,
-        ) as CustomElementContent
-      : renderable
-  }
+  const prepare = (content: unknown): DrupalElementContent =>
+    prepareComponentTreeForDevelopment(
+      withoutPresentationEditMetadata(content),
+      elements.resolveCustomElement,
+      import.meta.dev,
+    ) as DrupalElementContent
 
   return {
-    ...drupal,
+    ...elements,
     fetchPage: (...args: Parameters<typeof pages.fetchPage>) =>
       pages.fetchPage(...args) as Promise<Ref<StirDrupalPage>>,
     getPage: (customKey?: string) =>
       pages.getPage(customKey) as unknown as Ref<StirDrupalPage>,
     getMessages: pages.getMessages,
     renderCustomElements: (content: unknown) =>
-      drupal.renderCustomElements(prepare(content)),
+      elements.renderCustomElements(prepare(content)),
     renderCustomElementsToVNodes: (content: unknown) =>
-      drupal.renderCustomElementsToVNodes(prepare(content)),
+      elements.renderCustomElementsToVNodes(prepare(content)),
   }
 }
