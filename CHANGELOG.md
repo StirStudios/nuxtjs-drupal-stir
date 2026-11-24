@@ -13,6 +13,15 @@ untouched do not need one.
 
 ## Unreleased
 
+- A View paragraph's Animation (direction) reveals its rows again. Since July
+  the paragraph accepted the setting but never passed it to the rows, so a
+  View only animated through the page's animation. Without one, rows keep the
+  page's animation.
+- Images show their loading placeholder again until they arrive. Since
+  16 November server-rendered images showed at once (for page speed) and the
+  placeholder went with the hiding; the image now stays visible and paints
+  over the placeholder as it downloads. Images added after the page loads
+  still fade in.
 - Page heroes now take their spacing from `stirTheme.hero.sticky` when the
   page's header is sticky (`navigation.mode: 'sticky'` or `modeRoutes`). A
   sticky header takes its own space, so the defaults clear nothing (`pt-10`

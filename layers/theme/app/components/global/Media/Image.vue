@@ -287,10 +287,19 @@ const startsVisible = () =>
   import.meta.server ||
   nuxtApp.isHydrating
 const isLoaded = ref(startsVisible())
+// Whether the image itself has arrived. Until then the placeholder shows
+// behind it: a server-rendered image stays visible and paints over the
+// placeholder as it downloads; one added later is also hidden (isLoaded) and
+// fades in. Hydration starts like the server, so the markup matches.
+const hasArrivedOnClient = () =>
+  !hasImageSource.value ||
+  (import.meta.client && !nuxtApp.isHydrating && isImageSourceLoaded(providerSource.value))
+const hasArrived = ref(hasArrivedOnClient())
 
 function syncLoadedFromImageElement() {
   if (!hasImageSource.value) {
     isLoaded.value = true
+    hasArrived.value = true
     return
   }
 
@@ -299,6 +308,7 @@ function syncLoadedFromImageElement() {
   if (!img) return
   if (img.complete) {
     isLoaded.value = true
+    hasArrived.value = true
     if (img.naturalWidth) markImageSourceLoaded(providerSource.value)
     emit('resolved-src', img.naturalWidth ? img.currentSrc || img.src : undefined)
   }
@@ -308,6 +318,7 @@ watch(
   () => [providerSource.value, providerSizes.value, props.width, props.height],
   () => {
     isLoaded.value = startsVisible()
+    hasArrived.value = hasArrivedOnClient()
     emit('resolved-src', undefined)
     nextTick(syncLoadedFromImageElement)
   },
@@ -316,12 +327,14 @@ watch(
 
 function handleLoad() {
   isLoaded.value = true
+  hasArrived.value = true
   markImageSourceLoaded(providerSource.value)
   syncLoadedFromImageElement()
 }
 
 function handleError() {
   isLoaded.value = true
+  hasArrived.value = true
   emit('resolved-src', undefined)
 }
 
@@ -346,14 +359,14 @@ onMounted(() => {
           isSectionHero
             ? theme.hero.image.section
             : [theme.hero.image.base, isFront ? theme.hero.image.isFront : 'max-w-none'],
-          !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+          !hasArrived && 'bg-elevated text-transparent motion-safe:animate-pulse',
           imageClass,
         ]
         : [
           theme.media.base,
           resolvedRoundedClass,
           'm-auto object-contain!',
-          !isLoaded && 'bg-elevated text-transparent motion-safe:animate-pulse',
+          !hasArrived && 'bg-elevated text-transparent motion-safe:animate-pulse',
           imageClass,
         ]
     "
@@ -383,7 +396,7 @@ onMounted(() => {
     :style="deferredFrameStyle"
   >
     <USkeleton
-      v-if="isSourceDeferred || !isLoaded"
+      v-if="isSourceDeferred || !hasArrived"
       aria-hidden="true"
       aria-live="off"
       class="absolute inset-0 z-0 h-full w-full rounded-none"
