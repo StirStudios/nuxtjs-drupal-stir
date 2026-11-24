@@ -13,6 +13,11 @@ untouched do not need one.
 
 ## Unreleased
 
+- Revealed content no longer stays offset after a hard refresh. Server- or
+  first-rendered reveals carry their hidden start state as a style; when a
+  parent re-rendered after the reveal (an image arriving), that style came
+  back, leaving rows faded in but 50px low over what followed. RevealMotion
+  now drops the start state once motion reports the reveal finished.
 - Images: the number of IPX transforms run at once now follows the machine
   (half its cores or the unit's CPUQuota, between 2 and 6, fewer under a small
   MemoryMax) instead of a fixed 2 set in the PM2 era. A fresh page full of
