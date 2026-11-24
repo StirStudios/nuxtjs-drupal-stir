@@ -13,6 +13,22 @@ untouched do not need one.
 
 ## Unreleased
 
+- **Breaking:** the layer no longer installs `nuxtjs-drupal-ce`. Page
+  fetching, rendering, menus and messages already came from the layer; the
+  `v-drupal-markup` directive and the encoded-path hydration fix are now layer
+  plugins, and the CE settings are the layer's own runtime config under the
+  same `drupalCe` keys, so `NUXT_PUBLIC_DRUPAL_CE_*` overrides keep working.
+  Consumers must:
+  - replace any `useDrupalCe()` call with `useStirDrupalCe()` (`useMenu`
+    returns `{ data }`; there is no `fetchMenu`);
+  - remove the `nuxtjs-drupal-ce@2.9.0` `packageExtensions` entry from
+    `pnpm-workspace.yaml`;
+  - drop any `CustomElementContent` type use.
+  The module's per-request server log lines (`[GET] https://…`) stop.
+  `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL` and
+  `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL` now apply at runtime too; before,
+  the module never declared those keys, so Nuxt ignored them.
+
 - Rich-text links inside an inverted surface (a solid card, a `text-white`
   presentation) now take the surrounding text colour with an underline. They
   kept the primary link colour, which on a dark card left a phone number at

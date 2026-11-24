@@ -11,7 +11,7 @@ Two repos:
 - **stir-tools** — Drupal 11 backend. Custom functionality lives in `modules/stir_*`.
 
 They talk to each other via **Lupus Decoupled Custom Elements**
-(`drupal/custom_elements`, wired into Nuxt via the `nuxtjs-drupal-ce` module) plus a
+(`drupal/custom_elements`, fetched and rendered by the layer itself) plus a
 set of bespoke `stir_*` REST/JSON endpoints for everything CE doesn't cover
 (auth, webforms, listings, SEO, sitemap).
 
@@ -50,14 +50,14 @@ component tree, app-context, media (image/video/summary), SEO global meta, sitem
 listing response. These are REST/JSON *response shapes*, not raw JSON:API resource
 shapes.
 
-**`nuxtjs-drupal-ce` config (Nuxt side, set in `layers/platform/nuxt.config.ts`):**
+**Drupal CE runtime config (Nuxt side, `runtimeConfig.public.drupalCe` in
+`layers/platform/nuxt.config.ts`):** the layer replaced the `nuxtjs-drupal-ce`
+module and keeps its key names so `NUXT_PUBLIC_DRUPAL_CE_*` overrides still
+apply.
 
-- `drupalBaseUrl` / `menuBaseUrl`: both derived from `DRUPAL_URL`.
-- `exposeAPIRouteRules: true`, `disableFormHandler: true` (webform submission is
-  handled by the custom `webform` layer instead), `enableComponentPreview: false`,
-  `customErrorPages: true`.
-- `customElementJsonFormat` is **not** overridden on the Nuxt side — it silently
-  relies on Drupal's default.
+- `drupalBaseUrl` from `DRUPAL_URL`; `ceApiEndpoint` `/ce-api`; menus go through
+  the CE API unless `menuBaseUrl` is set.
+- Only the explicit Custom Elements JSON format is supported.
 
 **Custom Elements config (Drupal side):** package is `drupal/custom_elements`
 (`^3.4.1`), not literally named "Lupus" in this codebase. Default install config
@@ -66,13 +66,9 @@ shapes.
 CE display config lives under each `stir_layout_builder_paragraph_*` submodule
 (~20 paragraph bundles: hero, text, accordion, webform, carousel, timeline, etc.).
 
-**`core` layer's proxy override:** `layers/core` intentionally replaces
-`nuxtjs-drupal-ce`'s own Nitro proxy handlers for `/api/drupal-ce/**` and
-`/api/menu/**` — filtered out in `layers/core/nuxt.config.ts` by matching the
-resolved handler file path — because the upstream module doesn't expose the H3
-cookie-filter hooks needed for secure cookie forwarding. Per its README, this
-preserves the *public* `/api/drupal-ce` and `/api/menu` contracts unchanged; only
-the internal proxy implementation is swapped.
+**`core` layer's proxies:** `layers/core` owns the `/api/drupal-ce/**` and
+`/api/menu/**` Nitro handlers, which filter cookies through H3's proxy hooks.
+They keep the public contract the former `nuxtjs-drupal-ce` module defined.
 
 **API key enforcement:** Drupal-side, in
 `stir-tools/modules/stir_layout_builder/src/EventSubscriber/ApiAuthSubscriber.php`
@@ -88,7 +84,7 @@ spoofing through the proxy.
 
 **Other tight-coupling points:**
 
-- **CE machine-name ↔ Vue component mapping:** `nuxtjs-drupal-ce` resolves a
+- **CE machine-name ↔ Vue component mapping:** `useDrupalElements` resolves a
   custom element by PascalCasing its name to a global component name, so every
   Drupal paragraph bundle needs a matching
   `layers/*/app/components/global/Paragraph/<Bundle>.vue` (`paragraph-hero` →
@@ -129,22 +125,20 @@ Drupal-session requests, one-time-login redirect passthrough).
 
 ### `platform`
 
-Composes `foundation` + `core` + `theme` and is the layer that actually installs
-`nuxtjs-drupal-ce`. Adds site-metadata defaults, icon bundling for Drupal-authored
+Composes `foundation` + `core` + `theme` and sets the Drupal CE runtime config.
+Adds site-metadata defaults, icon bundling for Drupal-authored
 contact data, theme path aliases, Vite build tweaks. Per its README, narrow
 capability layers (auth, Turnstile) extend `foundation` directly rather than
 `platform` — only `webform` still depends on `platform` pending extraction.
 
-- **Consumes:** configures `nuxtjs-drupal-ce` directly (see §1); doesn't parse
+- **Consumes:** sets the Drupal CE runtime config (see §1); doesn't parse
   payloads itself.
-- **Custom vs. stock:** mostly stock module usage with explicit overrides
-  (`disableFormHandler`, `enableComponentPreview: false`); site-block config and
-  icon collections are project glue.
-- **Coupling:** low/indirect — enables CE integration that `core` then overrides.
+- **Custom vs. stock:** site-block config and icon collections are project glue.
+- **Coupling:** low/indirect.
 
 ### `core`
 
-Replaces `nuxtjs-drupal-ce`'s server-side proxy handlers (see §1) and adds a
+Owns the Drupal CE and menu proxy handlers (see §1) and adds a
 first-party `/api/app-context` endpoint with strict schema validation (falls back
 to an empty shell on failure rather than throwing).
 
@@ -169,14 +163,14 @@ image/CDN delivery, and a build-time presentation source that compiles the
 layout vocabulary plus each project's Surface/Variant catalogue and rich-text
 utilities into Tailwind CSS, with nothing fetched from Drupal.
 
-- **Consumes:** wraps `nuxtjs-drupal-ce`'s `useDrupalCe()` with a typed
+- **Consumes:** `useStirDrupalCe()` gives page fetching and rendering a typed
   `StirDrupalPage` shape (`content.element/props/slots`, `metatags`,
   `is_front_page`, `local_tasks`, `related.prevNode/nextNode`); proxies Drupal
   Views refreshes to a hardcoded `stir-layout-builder/paragraph/{id}/view` path;
   directly imports SEO-layer utilities for global meta injection.
-- **Custom vs. stock:** `useDrupalCe()`/`resolveCustomElement`/render helpers are
-  stock `nuxtjs-drupal-ce`; everything wrapping them (typed page composable,
-  presentation CSS generation, custom IPX image provider) is custom.
+- **Custom vs. stock:** all custom: page fetching (`useDrupalPage`), element
+  rendering (`useDrupalElements`), presentation CSS generation and the IPX image
+  provider.
 - **Coupling:** high — hardcoded `stir-layout-builder` paths; the layout
   vocabulary mirrors `stir_layout_builder`'s grid, spacing, width and alignment
   options; core field names
@@ -233,8 +227,7 @@ page" password gate (separate concern, no Drupal involvement).
   strict `version: literal(2)` schema. `stir_login_switch` contributes only an
   admin form/redirect controller — not consumed as an API.
 - **Custom vs. stock:** entirely custom Nitro routes/composables on top of
-  `foundation`'s shared request primitives; no `nuxtjs-drupal-ce` auth helpers
-  exist.
+  `foundation`'s shared request primitives.
 - **Coupling:** hardcoded Drupal path strings throughout; `session.get.ts` assumes
   a specific response shape that would break silently on a Drupal field rename;
   the `version: literal(2)` auth-config schema hard-fails on an uncoordinated
@@ -294,7 +287,7 @@ Owns the optional popup/privacy-notice UI and site-wide consent policy consumed 
 - **Consumes:** not a direct REST client — reads popup config
   (`paragraph-popup` element, `visibility.requestPath` rules) out of the
   already-fetched Drupal CE page/app-context payload, i.e. depends on
-  `nuxtjs-drupal-ce`'s page-fetch contract and Layout Paragraphs' element/prop
+  the layer's page-fetch contract and Layout Paragraphs' element/prop
   naming rather than a dedicated `stir_*` module.
 - **Custom vs. stock:** fully custom traversal/visibility logic on top of the CE
   page shape.

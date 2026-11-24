@@ -16,9 +16,3 @@ overrides:
   # changes the separate-transfer-host default, which get-uri never uses.
   # get-uri 8.0.2 allows 6; remove once pac-proxy-agent allows it.
   get-uri>basic-ftp: ^6.2.3
-
-# CE 2.9.0 imports H3 without declaring it; Nuxt 4 uses H3 1.
-packageExtensions:
-  nuxtjs-drupal-ce@2.9.0:
-    dependencies:
-      h3: ^1.15.11

@@ -1,5 +1,4 @@
 import { fileURLToPath } from 'node:url'
-import { useNuxt } from '@nuxt/kit'
 import { normalizeEnvironmentUrl } from '../../config/runtime'
 
 const resolveLayerPath = (path: string) =>
@@ -89,39 +88,36 @@ export default defineNuxtConfig({
     '#stir/types': resolveLayerPath('./layers/theme/app/types'),
   },
 
-  modules: [
-    [
-      'nuxtjs-drupal-ce',
-      {
+  // Drupal CE settings, under the keys the nuxtjs-drupal-ce module used so
+  // the NUXT_PUBLIC_DRUPAL_CE_* runtime overrides keep working.
+  runtimeConfig: {
+    drupalCe: {
+      // Drupal response headers the page fetch passes to the HTML response:
+      // x-cache-tags reaches the foundation cache-tags plugin, and
+      // x-stir-cache-until (Stir Tools) is the clock time the page's cache
+      // ends, as its s-maxage may be a countdown Drupal's page cache repeated
+      // from hours ago.
+      passThroughHeaders: [
+        ...(isDevelopment ? [] : ['cache-control']),
+        'content-language',
+        'set-cookie',
+        'x-drupal-cache',
+        'x-drupal-dynamic-cache',
+        'x-cache-tags',
+        'x-stir-cache-until',
+      ],
+    },
+    public: {
+      drupalCe: {
         drupalBaseUrl: drupalUrl,
-        // Menus go through the CE API (the module's default), where Lupus
-        // Decoupled keeps menu links relative.
-        exposeAPIRouteRules: true,
-        disableFormHandler: true,
-        enableComponentPreview: false,
-        customErrorPages: true,
+        serverDrupalBaseUrl: '',
+        ceApiEndpoint: '/ce-api',
+        // Menus go through the CE API, where Lupus Decoupled keeps menu
+        // links relative.
+        menuBaseUrl: '',
+        menuEndpoint: 'api/menu_items/$$$NAME$$$',
+        useLocalizedMenuEndpoint: true,
       },
-    ],
-  ] as Array<string | [string, Record<string, unknown>]>,
-
-  hooks: {
-    'modules:done'() {
-      const nuxt = useNuxt()
-      const drupalCe = nuxt.options.runtimeConfig.drupalCe as {
-        passThroughHeaders?: string[]
-      }
-      const headers = drupalCe.passThroughHeaders ?? []
-
-      // The page's Drupal cache tags reach the HTML response, where the
-      // foundation cache-tags plugin merges them with the other requests'.
-      if (!headers.includes('x-cache-tags')) headers.push('x-cache-tags')
-      // And the clock time it ends (Stir Tools): the page's own s-maxage may
-      // be a countdown Drupal's page cache repeated from hours ago.
-      if (!headers.includes('x-stir-cache-until')) headers.push('x-stir-cache-until')
-
-      drupalCe.passThroughHeaders = isDevelopment
-        ? headers.filter(header => header.toLowerCase() !== 'cache-control')
-        : headers
     },
   },
 })

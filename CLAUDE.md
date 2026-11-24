@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 This repository is a **Nuxt 4 layer/base theme** using **Nuxt UI 4 + Tailwind 4** with
-**Lupus Decoupled Drupal (Custom Elements)** via **nuxtjs-drupal-ce**.
+**Lupus Decoupled Drupal (Custom Elements)**, fetched and rendered by the layer itself.
 Use these rules for all changes.
 
 ## Required skills
@@ -20,7 +20,7 @@ Use these rules for all changes.
 
 - **Framework:** Nuxt 4 (SSR by default, Nitro runtime)
 - **UI:** Nuxt UI 4 + Tailwind CSS 4
-- **CMS integration:** `nuxtjs-drupal-ce` (Lupus Decoupled Custom Elements)
+- **CMS integration:** Lupus Decoupled Custom Elements through `useStirDrupalCe()` (the layer replaced `nuxtjs-drupal-ce`)
 - **Performance modules:** `nuxt-vitalizer`
 - **Additional modules:** robots, sitemap, turnstile, scripts, eslint
 
@@ -105,14 +105,14 @@ Use these rules for all changes.
 
 ## Drupal CE integration guidance
 
-- Prefer existing `nuxtjs-drupal-ce` utilities/composables before custom fetch logic.
+- Prefer `useStirDrupalCe()` and the layer's Drupal composables before custom fetch logic.
 - Preserve internal Nuxt CE proxy behavior (`/api/*`) when changing auth/header middleware.
 - API key responsibilities must stay explicit:
   - Nuxt layer: forwards `x-api-key` on internal proxy/server calls to Drupal.
   - Drupal/edge: enforces access policy for CE/data endpoints.
 - Do not narrow API-key middleware scope without verifying homepage, CE page fetch, and menu endpoint behavior.
 - Keep schema and mapping assumptions explicit with types or concise inline notes.
-- Custom elements resolve by Nuxt component name: `nuxtjs-drupal-ce`
+- Custom elements resolve by Nuxt component name: `useDrupalElements`
   (`resolveCustomElement`) PascalCases the element name and looks up a global
   component, so `paragraph-hero` renders `ParagraphHero`. Paragraph bundles
   live at `layers/*/app/components/global/Paragraph/<Bundle>.vue` in
@@ -140,7 +140,7 @@ Use these rules for all changes.
   - request cookie forwarding
   - `set-cookie` response forwarding
   - upstream error normalization
-- Prefer aligning custom auth proxy behavior with `nuxtjs-drupal-ce` proxy/header conventions before adding custom behavior.
+- Prefer aligning custom auth proxy behavior with the layer's `/api/drupal-ce` proxy/header conventions before adding custom behavior.
 - Do not route custom auth endpoints through CE page-fetch helpers unless explicitly supported.
 - Protected page access should remain lightweight and local to Nuxt unless Drupal auth is intentionally required.
 - Global route middleware should only gate configured protected routes.

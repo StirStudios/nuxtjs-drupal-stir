@@ -21,10 +21,8 @@ and resolved `meta`/`link` attribute maps before Nuxt head code consumes them.
 An unavailable or malformed provider returns empty tag lists, preserving the
 configured frontend language fallback.
 
-The core layer replaces only the proxy handlers registered by
-`nuxtjs-drupal-ce`; its public composables and `/api/drupal-ce` and `/api/menu`
-contracts remain unchanged. This allows request and response cookies to be
-filtered at H3's supported proxy hooks.
+The core layer owns the `/api/drupal-ce` and `/api/menu` proxy routes, which
+filter request and response cookies at H3's supported proxy hooks.
 
 The base repository enables this layer from root `nuxt.config.ts`:
 

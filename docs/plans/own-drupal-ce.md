@@ -191,6 +191,47 @@ migrating every site's config for no gain.
 - Phase 2b: rendering, menus, metatags and `$ceApi` in `useDrupalElements`.
   Site code still calling `useDrupalCe()` (one site's `fetchMenu`, one site's
   `$ceApi`) moves to `useStirDrupalCe()` before Phase 2c.
+- Phase 2b rolled out to every site (2026-11-24).
+
+## Phase 2c inventory (2026-11-24, module 2.9.0)
+
+**What the module still does at runtime:**
+
+| Piece | Status | Replacement |
+|---|---|---|
+| `drupalMarkup` plugin (`v-drupal-markup`) | used by two layer components and one site | layer plugin, same name |
+| `payloadPath.client` plugin | active: keeps the payload path when the address differs only by encoding | layer plugin, with a test |
+| `errorLogger` Nitro plugin | active at `serverLogLevel: 'info'`: logs every request | drop; keep the error line only if wanted |
+| `useDrupalCe` auto-import | two sites call it (`$ceApi`, `fetchMenu`) | `useStirDrupalCe()` first |
+| `CustomElementContent` type import | no layer use | drop |
+| Proxy and menu handlers | registered, then removed by `layers/core/nuxt.config.ts` | drop the filter hook with the module |
+| Form handler, component preview | disabled by our options | nothing |
+| Runtime config defaults (`public.drupalCe`, `drupalCe`) | the layer reads them | layer's own keys, below |
+
+**Runtime config keys the layer reads:** `drupalBaseUrl`,
+`serverDrupalBaseUrl`, `ceApiEndpoint`, `menuBaseUrl`, `menuEndpoint`,
+`useLocalizedMenuEndpoint` (public) and `passThroughHeaders` (server, set by
+the `modules:done` hook). Unread defaults: `customErrorPages`,
+`customElementJsonFormat`, `fetchOptions`, `fetchProxyHeaders`,
+`addRequestFormat`, `skipLibraryScripts`, `serverApiProxy`, `serverLogLevel`.
+`customErrorPages: true` is passed but nothing reads it; `useDrupalPage`
+handles errors itself.
+
+**Env vars:** the fleet env schema in stir-server-config has no
+`NUXT_PUBLIC_DRUPAL_CE_*` names; sites set `DRUPAL_URL` at build. Whether any
+server `.env` sets them is checked by name with `stir env check` before the
+rename. The layer keeps reading the old names for one release.
+
+**Site code to move first:**
+- Two sites still call `useDrupalCe()` (`$ceApi` in one, `fetchMenu` in the other).
+- Every site's `pnpm-workspace.yaml` `packageExtensions` entry
+  `nuxtjs-drupal-ce@2.9.0` (`h3`), and the smoke tests in the starter and one site
+  that assert it.
+- One site's embeddable widget loader writes `public.drupalCe` keys in the browser; it must
+  follow the key rename.
+
+`/api/drupal-ce` stays as the proxy path: sites, one site's widget and tests use
+it, and it is the layer's own route.
 
 ## Phase 0 findings (live capture, 2026-11-23)
 
