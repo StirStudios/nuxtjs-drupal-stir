@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { availableParallelism } from 'node:os'
 import type { H3Event } from 'h3'
 
 /**
@@ -28,6 +26,21 @@ export function createIpxLimiter(maxConcurrent: number): (event: H3Event) => Pro
   }
 }
 
+// Node built-ins through process.getBuiltinModule, typed here: sites that
+// install the layer need not have @types/node for their typecheck to pass.
+type NodeBuiltins = {
+  fs?: { readFileSync(path: string, encoding: 'utf8'): string }
+  os?: { availableParallelism(): number }
+}
+const builtin = <T>(id: string): T | undefined =>
+  (globalThis as { process?: { getBuiltinModule?: (id: string) => unknown } })
+    .process?.getBuiltinModule?.(id) as T | undefined
+const node: NodeBuiltins = {
+  fs: builtin('node:fs'),
+  os: builtin('node:os'),
+}
+const FALLBACK_CPUS = 4
+
 const MB = 1024 * 1024
 // Measured: a burst of 40 uncached sizes from real 1-4MB masters added about
 // 100MB whatever the concurrency; larger masters cost more, so budget 64MB
@@ -40,7 +53,7 @@ const MAX_CONCURRENCY = 6
 /** The cgroup's CPU limit in cores (systemd CPUQuota), if one is set. */
 function readCgroupCpus(): number | undefined {
   try {
-    const [quota, period] = readFileSync('/sys/fs/cgroup/cpu.max', 'utf8').trim().split(/\s+/)
+    const [quota, period] = node.fs!.readFileSync('/sys/fs/cgroup/cpu.max', 'utf8').trim().split(/\s+/)
 
     return quota === 'max' || !quota || !period ? undefined : Number(quota) / Number(period)
   }
@@ -52,7 +65,7 @@ function readCgroupCpus(): number | undefined {
 /** The cgroup's memory limit in bytes (systemd MemoryMax), if one is set. */
 function readCgroupMemoryMax(): number | undefined {
   try {
-    const value = readFileSync('/sys/fs/cgroup/memory.max', 'utf8').trim()
+    const value = node.fs!.readFileSync('/sys/fs/cgroup/memory.max', 'utf8').trim()
 
     return value === 'max' ? undefined : Number(value)
   }
@@ -68,7 +81,7 @@ function readCgroupMemoryMax(): number | undefined {
  * too small to hold them beside the app.
  */
 export function resolveIpxConcurrency(
-  cpus: number = readCgroupCpus() ?? availableParallelism(),
+  cpus: number = readCgroupCpus() ?? node.os?.availableParallelism() ?? FALLBACK_CPUS,
   memoryMax: number | undefined = readCgroupMemoryMax(),
 ): number {
   const byCpu = Math.floor(cpus / 2)
