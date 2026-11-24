@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+- The layer now renders Drupal custom elements, fetches menus and applies page
+  metatags itself (`useDrupalElements`, behind `useStirDrupalCe()`:
+  `renderCustomElements`, `renderCustomElementsToVNodes`,
+  `resolveCustomElement`, `useMenu`, `usePageHead`, `$ceApi`). Phase 2b of
+  docs/plans/own-drupal-ce.md. Element resolution and the `…Default` fallback
+  are unchanged (the contract snapshot is identical); only the explicit JSON
+  format is supported, which every site sends. `usePageHead` now follows the
+  page reactively. `nuxtjs-drupal-ce` still supplies the `v-drupal-markup`
+  directive and payload-path plugin until Phase 2c.
+  - **Site code:** call these through `useStirDrupalCe()`. `useDrupalCe()`
+    still works until Phase 2c removes the module.
 - Media reveals the same way as every other reveal. It no longer hides itself
   in the server HTML with `motion-safe:opacity-0`: it shows at once, and only
   media below the screen at hydration waits and fades in. Reduced motion still

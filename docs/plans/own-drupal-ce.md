@@ -183,6 +183,15 @@ security-sensitive and follow Drupal core changes.
 and Stir's formatter plugins depend on it, and replacing it would mean
 migrating every site's config for no gain.
 
+## Progress
+
+- Phase 0: done (contract fixtures, navigation and reveal e2e, baselines).
+- Phase 1: done (Stir Tools 077b067, rolled out to every site).
+- Phase 2a: done (layer 2b91afb, rolled out; the CE patch is gone).
+- Phase 2b: rendering, menus, metatags and `$ceApi` in `useDrupalElements`.
+  Site code still calling `useDrupalCe()` (one site's `fetchMenu`, one site's
+  `$ceApi`) moves to `useStirDrupalCe()` before Phase 2c.
+
 ## Phase 0 findings (live capture, 2026-11-23)
 
 Captured from the public `/api/drupal-ce` and `/api/menu` endpoints of all 12
