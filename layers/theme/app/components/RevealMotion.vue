@@ -6,6 +6,15 @@ const MotionElement = m.div as Component
 
 // Props that hide content and play it back in.
 const REVEAL_KEYS = ['initial', 'animate', 'whileInView', 'inViewOptions', 'transition'] as const
+// The hidden start state the reveal config passes as style after hydration.
+const START_STYLE_KEYS = ['opacity', 'transform', 'x', 'y', 'scale', 'rotateX', 'rotateY'] as const
+
+type StyleRecord = Record<string, unknown>
+
+const withoutStartStyle = (style: unknown): StyleRecord => Object.fromEntries(
+  Object.entries(typeof style === 'object' && style ? style as StyleRecord : {})
+    .filter(([key]) => !(START_STYLE_KEYS as readonly string[]).includes(key)),
+)
 
 export default defineComponent({
   inheritAttrs: false,
@@ -18,6 +27,14 @@ export default defineComponent({
     // screen, or drawn later on the client, reveals as before.
     const hydrating = import.meta.client && nuxtApp.isHydrating
     const seenAtLoad = ref(false)
+    // Once a reveal has played, its start state must not come back: a parent
+    // re-render (an image arriving, say) would re-apply the style and leave
+    // the content faded in but still offset over what follows.
+    const settled = ref(false)
+    const onAnimationComplete = (...args: unknown[]) => {
+      settled.value = true
+      ;(attrs.onAnimationComplete as ((...a: unknown[]) => void) | undefined)?.(...args)
+    }
 
     onMounted(() => {
       if (!hydrating) return
@@ -33,14 +50,20 @@ export default defineComponent({
 
     // Built at render: attrs are not reactive outside it.
     const motionAttrs = () => {
-      if (!seenAtLoad.value) return attrs
+      const { style, ...rest } = attrs as StyleRecord & { style?: unknown }
 
-      const { style, ...rest } = attrs as Record<string, unknown> & { style?: Record<string, unknown> }
-      const kept = Object.fromEntries(Object.entries(rest).filter(([key]) =>
-        !(REVEAL_KEYS as readonly string[]).includes(key)))
-      const { opacity: _opacity, transform: _transform, ...keptStyle } = typeof style === 'object' && style ? style : {}
+      if (seenAtLoad.value) {
+        const kept = Object.fromEntries(Object.entries(rest).filter(([key]) =>
+          !(REVEAL_KEYS as readonly string[]).includes(key)))
 
-      return { ...kept, initial: false, style: keptStyle }
+        return { ...kept, initial: false, style: withoutStartStyle(style) }
+      }
+
+      return {
+        ...rest,
+        onAnimationComplete,
+        style: settled.value ? withoutStartStyle(style) : style,
+      }
     }
 
     return () => h(
