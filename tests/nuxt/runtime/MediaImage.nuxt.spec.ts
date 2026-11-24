@@ -2,6 +2,7 @@ import { computed, defineComponent, h } from 'vue'
 import { UApp } from '#components'
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { useNuxtApp } from '#imports'
 import MediaImage from '../../../layers/theme/app/components/global/Media/Image.vue'
 import { imageBoxAspectKey, imageSlotKey, sectionHeroMediaKey, viewportImageLoadingKey } from '../../../layers/theme/app/utils/imageDelivery'
 
@@ -54,6 +55,29 @@ describe('MediaImage (Nuxt runtime)', () => {
       unseen.unmount()
     }
     finally {
+      complete.mockRestore()
+    }
+  })
+
+  it('shows a server-rendered image at once, over a placeholder until it arrives', async () => {
+    const complete = vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(false)
+    const nuxtApp = useNuxtApp()
+    const placeholder = (wrapper: Awaited<ReturnType<typeof mountSuspended>>) =>
+      wrapper.find('[role="presentation"][aria-hidden="true"]').exists()
+
+    nuxtApp.isHydrating = true
+    try {
+      const wrapper = await mountSuspended(MediaImage, { props: { src: '/server-rendered-slow.jpg' } })
+
+      // Visible from the start, so it paints as it downloads.
+      expect(wrapper.get('img').classes()).not.toContain('opacity-0')
+      expect(placeholder(wrapper)).toBe(true)
+      await wrapper.get('img').trigger('load')
+      expect(placeholder(wrapper)).toBe(false)
+      wrapper.unmount()
+    }
+    finally {
+      nuxtApp.isHydrating = false
       complete.mockRestore()
     }
   })
