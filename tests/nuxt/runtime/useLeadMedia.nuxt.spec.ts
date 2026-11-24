@@ -2,6 +2,7 @@ import type { VNodeArrayChildren } from 'vue'
 import { defineComponent, h } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
+import { useNuxtApp, useState } from '#imports'
 import {
   provideLeadMediaSection,
   provideLeadMediaTracker,
@@ -61,5 +62,25 @@ describe('useLeadMedia (Nuxt runtime)', () => {
     await mountSuspended(MediaProbe, { props: { id: 'untracked' } })
 
     expect(results.untracked).toBeUndefined()
+  })
+})
+
+describe('useLeadMedia during hydration', () => {
+  it('follows the server\'s decision, not the order components hydrate in', async () => {
+    const nuxtApp = useNuxtApp()
+
+    // The server chose "page-hero"; in the browser a region's carousel sets up first.
+    useState('stir-lead-media').value = { lead: 'page-hero', eager: true }
+    nuxtApp.isHydrating = true
+    try {
+      await mountSuspended(page(() => [h(MediaProbe, { id: 'region-carousel' }), h(Section, () => [h(MediaProbe, { id: 'page-hero' })])]))
+
+      expect(results['region-carousel']).toBe(false)
+      expect(results['page-hero']).toBe(true)
+    }
+    finally {
+      nuxtApp.isHydrating = false
+      useState('stir-lead-media').value = null
+    }
   })
 })
