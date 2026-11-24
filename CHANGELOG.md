@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- Images: the number of IPX transforms run at once now follows the machine
+  (half its cores or the unit's CPUQuota, between 2 and 6, fewer under a small
+  MemoryMax) instead of a fixed 2 set in the PM2 era. A fresh page full of
+  uncached sizes queued behind 2 transforms past the CDN's origin timeout, so
+  some images failed (502) after a release. On the shared 12-core server with
+  1G units, each site now runs 6. Measured: a burst of 40 uncached sizes from
+  real masters finished in 2.9s at 2 and about 1s at 4 or more, adding about
+  100MB either way. No configuration.
 - The layer now renders Drupal custom elements, fetches menus and applies page
   metatags itself (`useDrupalElements`, behind `useStirDrupalCe()`:
   `renderCustomElements`, `renderCustomElementsToVNodes`,
