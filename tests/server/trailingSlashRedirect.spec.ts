@@ -30,6 +30,11 @@ describe('trailingSlashTarget', () => {
     ['/some/path/', '/some/path'],
     ['/some/path//', '/some/path'],
     ['/articles/?page=2&sort=new', '/articles?page=2&sort=new'],
+    // Encoded characters stay as sent; decoded ones are encoded for the header.
+    ['/events/pop-%E2%80%A2-fizz/', '/events/pop-%E2%80%A2-fizz'],
+    ['/events/pop-\u2022-fizz/', '/events/pop-%E2%80%A2-fizz'],
+    ['/caf\u00e9/?q=cr\u00e8me br\u00fbl\u00e9e', '/caf%C3%A9?q=cr%C3%A8me%20br%C3%BBl%C3%A9e'],
+    ['/emoji-\u{1F600}/', '/emoji-%F0%9F%98%80'],
   ])('strips the slash from %s', (path, target) => {
     expect(trailingSlashTarget(path)).toBe(target)
   })
@@ -72,6 +77,16 @@ describe('trailing-slash middleware', () => {
 
     expect(res.statusCode).toBe(301)
     expect(headers.get('location')).toBe('/articles?page=2')
+  })
+
+  it('answers 301, not 500, for a path with a decoded non-ASCII character', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({ trailingSlashRedirect: true }))
+    const { event, headers, res } = createEvent('/events/pop-\u2022-fizz/')
+
+    await trailingSlashRedirect(event as never)
+
+    expect(res.statusCode).toBe(301)
+    expect(headers.get('location')).toBe('/events/pop-%E2%80%A2-fizz')
   })
 
   it('does nothing when a site opts out', async () => {

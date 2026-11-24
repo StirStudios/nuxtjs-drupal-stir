@@ -79,5 +79,7 @@ export function useAppFooterContext(options: AppContextOptions = {}) {
 }
 
 export function useAppRegionBlocks(area: MaybeRefOrGetter<string>, options: AppContextOptions = {}) {
-  return selectAppContext<AppContextBlock[]>(options, payload => payload.blocks[toValue(area)] ?? [])
+  // A response without blocks (a stale tab after a deploy) shows no blocks
+  // rather than throwing once per region.
+  return selectAppContext<AppContextBlock[]>(options, payload => payload.blocks?.[toValue(area)] ?? [])
 }

@@ -107,6 +107,22 @@ describe('RegionArea app context fallback', () => {
     ])
   })
 
+  it('renders no blocks, without throwing, when app context has no blocks at all', async () => {
+    // A stale tab after a deploy can get a response without blocks.
+    state.appContextBlocks = undefined as unknown as Record<string, unknown[]>
+
+    const wrapper = await mountSuspended(RegionArea, {
+      props: {
+        area: 'top',
+      },
+    })
+
+    wrappers.push(wrapper)
+    await vi.waitFor(() => expect(state.layoutBlockCalls).toBe(1))
+    await flushPromises()
+    expect(state.renderedBlocks).toEqual([])
+  })
+
   it('falls back to CE page blocks when app context has no blocks for the area', async () => {
     state.appContextBlocks = {}
     state.page.value = {
