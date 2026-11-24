@@ -76,6 +76,12 @@ const page = owningPage ?? getPage()
 const { isFront, canEditInline } = usePageContext(page)
 const canEdit = computed(() => Boolean(props.id) && canEditInline(props.editLink))
 const { hero: heroTheme } = useAppConfig().stirTheme
+const headerMode = useHeaderMode()
+// A fixed header sits over the page, so the plain spacing clears it; a sticky
+// one takes its own space and uses hero.sticky.
+const spacing = computed(() => headerMode.value === 'sticky'
+  ? { ...heroTheme, ...heroTheme.sticky }
+  : heroTheme)
 const pageProps = computed(() => page.value?.content?.props || {})
 const pageTitle = computed(() => {
   const title = pageProps.value?.title
@@ -174,12 +180,12 @@ const sectionClasses = computed(() => {
     hasMediaSlot.value && heroTheme.mediaAppearance,
 
     pageHideTitleEffective.value && !hasHeroContent && !isFrontEffective.value
-      ? heroTheme.hide
+      ? spacing.value.hide
       : hasMediaSlot.value
-        ? heroTheme.mediaSpacing
+        ? spacing.value.mediaSpacing
         : hasHeroContent
-          ? [heroTheme.textSpacing ?? heroTheme.mediaSpacing, heroTheme.noMediaFallback]
-          : heroTheme.noMediaSpacing,
+          ? [spacing.value.textSpacing ?? spacing.value.mediaSpacing, heroTheme.noMediaFallback]
+          : spacing.value.noMediaSpacing,
 
     hasMediaSlot.value && heroTheme.overlay,
     isFrontEffective.value && heroTheme.isFront,

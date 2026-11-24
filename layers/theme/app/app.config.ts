@@ -141,6 +141,14 @@ export default defineAppConfig({
       // Header clearance for a hidden title with no hero content; lg keeps the
       // former 7.5rem floor.
       hide: 'pt-[calc(var(--ui-header-height)_-_0.25rem)] lg:pt-[max(calc(var(--ui-header-height)_-_0.25rem),7.5rem)]',
+      // Under a sticky header (navigation.mode or modeRoutes) the header takes
+      // its own space, so the hero clears nothing. A site that styles the
+      // sticky hero sets these, not the plain keys above.
+      sticky: {
+        mediaSpacing: 'mb-12 min-h-[22rem] lg:mb-20 lg:min-h-[35rem]',
+        noMediaSpacing: 'pt-10',
+        hide: 'pt-10',
+      },
       backdrop: '',
       inline: {
         base: 'mx-auto w-full max-w-(--ui-container) px-4 sm:px-6 lg:px-8',
