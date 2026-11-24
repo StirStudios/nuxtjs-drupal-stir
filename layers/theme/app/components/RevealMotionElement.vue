@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
+import type { RevealPlay } from '#stir/components/RevealMotion.vue'
 import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 
 const props = withDefaults(defineProps<{
@@ -10,6 +11,7 @@ const props = withDefaults(defineProps<{
   durationMs?: number
   distancePx?: number
   rootMargin?: string
+  play?: RevealPlay
 }>(), {
   as: 'div',
   motionProps: undefined,
@@ -18,6 +20,7 @@ const props = withDefaults(defineProps<{
   durationMs: undefined,
   distancePx: undefined,
   rootMargin: undefined,
+  play: 'inView',
 })
 
 defineOptions({
@@ -39,7 +42,6 @@ const effectMotionProps = props.effect && !props.motionProps
     )
   : undefined
 const resolvedMotionProps = computed(() => props.motionProps ?? effectMotionProps?.value ?? {})
-// A viewport reveal (whileInView) or an entrance (animate, trigger: 'enter').
 const hasRevealMotion = computed(() =>
   'whileInView' in resolvedMotionProps.value || 'animate' in resolvedMotionProps.value)
 </script>
@@ -48,6 +50,7 @@ const hasRevealMotion = computed(() =>
   <LazyRevealMotion
     v-if="hasRevealMotion"
     as-child
+    :play="play"
     v-bind="resolvedMotionProps"
   >
     <component :is="as" v-bind="attrs">

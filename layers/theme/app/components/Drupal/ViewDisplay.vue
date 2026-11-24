@@ -159,7 +159,6 @@ const getRowMotionProps = (index: number) =>
     effect.value,
     getRevealDelayMs(staggerIndex.value)
     + getRevealDelayMs(index, { mode: 'dense' }),
-    { ssrVisible: true },
   )
 
 // Every row reveals through DrupalViewRowReveal: the layer's own rows below

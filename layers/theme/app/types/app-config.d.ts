@@ -353,6 +353,8 @@ type StirThemeFooterConfig = {
 
 type StirThemeMediaConfig = {
   base?: ClassValue
+  /** Reveal for galleries (several images or videos) when neither the paragraph nor the page sets an Animation; false for none. */
+  galleryReveal?: string | false
   heights?: Record<string, ClassValue>
   rounded?: ClassValue
   image?: {

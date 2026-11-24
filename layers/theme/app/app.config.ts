@@ -291,6 +291,7 @@ export default defineAppConfig({
         },
       },
       rounded: 'rounded-xl',
+      galleryReveal: 'fade',
       video: {
         loadMinWidth: 0,
         loadStrategy: 'after-load',

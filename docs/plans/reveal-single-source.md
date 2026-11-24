@@ -1,6 +1,7 @@
 # Plan: one source of truth for reveals
 
-Status: draft for review. Nothing here has started.
+Status: steps 1 to 4 done (2026-11-23). Steps 5 (local site checks) and 6
+(rollout) remain.
 
 ## Goal
 
@@ -160,6 +161,22 @@ fixture pages:
 So the `as-child` lookup already works; the gallery gap is only that a gallery
 without an Animation has no reveal. Still to add in step 2: rows added later
 (View filter and pager), and a dev-mode hydration-warning run.
+
+## Steps 2 to 4 results (2026-11-23)
+
+- `RevealMotion` owns load behaviour, including reduced motion and missing
+  IntersectionObserver, and takes `play: 'inView' | 'enter' | 'load'`. Hero
+  passes `enter` for the page's inherited Animation and `load` for its own.
+- `getRevealMotionProps` returns the animation only; `ssrVisible` and
+  `trigger` are deprecated no-ops.
+- Galleries default to `stirTheme.media.galleryReveal: 'fade'`.
+- All 10 browser reveal tests pass, the gallery test included. The gallery
+  fixture now has a single lead image first, since the page's first media row
+  loads eagerly without a reveal by design.
+- Rows added later are covered by the View row runtime tests (876750f6). The
+  dev-mode hydration-warning run is left for the local site checks.
+- Both sites' direct `<Motion>` uses moved to `RevealMotion`. That works on
+  the current layer too, so the sites can land first.
 
 ## Steps
 

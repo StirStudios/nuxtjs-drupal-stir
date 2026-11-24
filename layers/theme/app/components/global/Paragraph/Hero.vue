@@ -203,15 +203,12 @@ const { effect, isInherited, staggerIndex } =
 const heroMotionProps = useRevealMotionProps(
   effect,
   () => getRevealDelayMs(staggerIndex.value),
-  () => ({
-    // An entrance, not a viewport reveal. The hero's own motion plays on
-    // every load. The page's inherited motion plays only after a page change:
-    // on the first load the hero text is already there, so it never delays
-    // the first paint the way a hidden hero would.
-    ssrVisible: isInherited.value,
-    trigger: 'enter',
-  }),
 )
+// An entrance, not a viewport reveal. The hero's own motion plays on every
+// load. The page's inherited motion plays only after a page change: on the
+// first load the hero text is already there, so it never delays the first
+// paint the way a hidden hero would.
+const heroPlay = computed(() => isInherited.value ? 'enter' : 'load')
 
 // Keep inherited scroll reveals off hero content.
 provideRevealMotionScope(() => undefined)
@@ -262,6 +259,7 @@ provideRevealMotionScope(() => undefined)
               'hero-content-flow flex flex-col gap-[var(--stir-content-action-gap,1.5rem)] motion-reduce:!opacity-100 motion-reduce:!transform-none',
             ] })()"
           :motion-props="heroMotionProps"
+          :play="heroPlay"
           >
             <slot name="title">
               <template v-if="isSection">

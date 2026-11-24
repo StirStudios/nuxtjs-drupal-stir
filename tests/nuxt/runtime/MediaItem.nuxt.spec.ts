@@ -229,6 +229,35 @@ describe('MediaItem (Nuxt runtime)', () => {
     expect(trigger.element.parentElement?.classList).not.toContain('motion-safe:opacity-0')
   })
 
+  it('reveals a gallery with no Animation set, unless the theme turns it off', async () => {
+    const theme = useAppConfig().stirTheme
+    const mountGalleryItem = async (direction?: string) => {
+      const wrapper = await mountSuspended(MediaItem, {
+        props: {
+          index: 1,
+          direction,
+          node: h('div'),
+          revealMode: 'gallery',
+          tk: { propsOf: () => ({ type: 'image', src: '/gallery.webp', alt: 'Gallery image' }) } as Pick<SlotsToolkit, 'propsOf'>,
+        },
+      })
+      const revealed = wrapper.find('.reveal-motion').exists()
+
+      wrapper.unmount()
+      return revealed
+    }
+
+    expect(await mountGalleryItem()).toBe(true)
+    expect(await mountGalleryItem('off')).toBe(false)
+    theme.media.galleryReveal = false
+    try {
+      expect(await mountGalleryItem()).toBe(false)
+    }
+    finally {
+      theme.media.galleryReveal = 'fade'
+    }
+  })
+
   it('uses the shared untinted play indicator for modal video triggers', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {

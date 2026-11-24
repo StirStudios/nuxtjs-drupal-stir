@@ -66,7 +66,10 @@ const revealPage = page('Reveal', [
 ])
 
 // A gallery with no Animation set, as one site's photo page is.
+// The page's first media paragraph is the lead (eager, no reveal), so a
+// single image comes first and every gallery item is a reveal.
 const galleryPage = page('Gallery', [
+  { element: 'paragraph-media', props: { id: 'gallery-lead', uuid: 'gallery-lead' }, slots: { media: [image(49, 'gallery lead', 80)] } },
   text('gallery-spacer', 900),
   {
     element: 'paragraph-media',
@@ -177,7 +180,6 @@ const scrollThrough = (target: Page) => target.evaluate(async () => {
   await new Promise(resolve => setTimeout(resolve, 1500))
 })
 
-const knownGap = browserEnabled ? it.fails : it.skip
 const browserIt = browserEnabled ? it : it.skip
 
 describe('Reveals: one behaviour for every load path', async () => {
@@ -268,7 +270,7 @@ describe('Reveals: one behaviour for every load path', async () => {
       await target.close()
     }, 60_000)
 
-    knownGap('KNOWN GAP: reveals a gallery with no Animation set as it is scrolled to', async () => {
+    browserIt('reveals a gallery with no Animation set as it is scrolled to (stirTheme.media.galleryReveal)', async () => {
       const target = await createPage()
 
       await target.goto(url('/gallery'), { waitUntil: 'networkidle' })

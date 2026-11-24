@@ -13,6 +13,21 @@ untouched do not need one.
 
 ## Unreleased
 
+- Reveals have one owner. `RevealMotion` alone decides how a reveal starts
+  (server HTML on screen: as rendered; below the screen: hidden, then revealed
+  in view; drawn in the browser: motion's `initial` plus `whileInView`;
+  reduced motion: shown). `useRevealMotionConfig().getRevealMotionProps` now
+  only describes the animation: it always returns the hidden `initial`, no
+  longer passes the start state as `style`, and ignores the deprecated
+  `ssrVisible` and `trigger` options. **Sites binding its result to motion-v's
+  `<Motion>` must bind it to `RevealMotion` instead**, or server-rendered
+  content starts hidden. Entrances use `RevealMotion`'s new `play` prop
+  (`inView`, `enter`, `load`), also on `RevealMotionElement`.
+- Galleries (a Media paragraph with several images or videos) fade in as they
+  are scrolled to when no Animation is set, on every load path. Before, they
+  relied on the image load fade, which server-rendered images skip, so a hard
+  refresh showed no fade. Set `stirTheme.media.galleryReveal` to another
+  Animation, or `false` for none.
 - Revealed content no longer stays offset after a hard refresh. Server-rendered
   reveals got their hidden start state as a style after hydration, and any
   re-render (an image arriving) re-applied it, leaving rows faded in but 50px

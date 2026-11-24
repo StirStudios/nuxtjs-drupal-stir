@@ -1,6 +1,5 @@
 import type { ComputedRef, MaybeRefOrGetter } from 'vue'
-import { usePreferredReducedMotion, useSupported } from '@vueuse/core'
-import { onMounted, toValue } from 'vue'
+import { toValue } from 'vue'
 
 type RevealLike = {
   durationMs?: unknown
@@ -23,8 +22,9 @@ export type RevealMotionResolved = {
 export type RevealStaggerMode = 'default' | 'dense'
 
 export type RevealMotionOptions = {
-  /** true (default): server-rendered content stays visible while hydrating and only reveals later; false: it starts hidden in the server HTML. */
+  /** @deprecated Ignored: RevealMotion decides how server-rendered content starts. Removed in a future release. */
   ssrVisible?: boolean
+  /** @deprecated Ignored: use RevealMotion's `play` prop. Removed in a future release. */
   trigger?: 'enter' | 'in-view'
   durationMs?: number
   distancePx?: number
@@ -174,19 +174,8 @@ export function useRevealMotionConfig() {
   const theme = useAppConfig().stirTheme
   const animateOnce = computed(() => theme.animations?.once !== false)
   const { resolved } = useRevealConfig()
-  const preferredMotion = usePreferredReducedMotion()
-  const supportsIntersectionObserver = useSupported(() => 'IntersectionObserver' in window)
-  // Server-rendered content stays visible until hydration ends, so it never
-  // blinks out. Content rendered on the client after that (a page change) has
-  // no server HTML to keep, so it starts hidden instead of showing, hiding on
-  // mount and then revealing.
-  const hasMounted = ref(import.meta.client && !useNuxtApp().isHydrating)
   /** @deprecated Always 0; no longer needed in keys. Removed in a future release. */
   const revealMotionKey = ref(0)
-
-  onMounted(() => {
-    hasMounted.value = true
-  })
 
   const getStaggerDelayMs = (index: number, startIndex: number = 0) => {
     return Math.max(0, index - startIndex) * Math.max(0, resolved.value.staggerMs)
@@ -214,18 +203,7 @@ export function useRevealMotionConfig() {
     delayMs: number = 0,
     options: RevealMotionOptions = {},
   ): Record<string, unknown> => {
-    const shouldReduceMotion =
-      hasMounted.value && preferredMotion.value === 'reduce'
-    const shouldUseStaticReveal =
-      shouldReduceMotion ||
-      (hasMounted.value && !supportsIntersectionObserver.value)
-
-    if (shouldUseStaticReveal) {
-      return { initial: false }
-    }
-
     const resolvedDelay = Math.max(0, Number(delayMs || 0)) / 1000
-    const ssrVisible = options.ssrVisible !== false
 
     const normalizedEffect = normalizeRevealEffect(effect)
 
@@ -243,31 +221,22 @@ export function useRevealMotionConfig() {
     }
 
     return {
-      initial: ssrVisible && !hasMounted.value ? false : initial,
-      ...(options.trigger === 'enter'
-        ? { animate: REVEAL_VISIBLE_TARGET }
-        : { whileInView: REVEAL_VISIBLE_TARGET }),
+      initial,
+      whileInView: REVEAL_VISIBLE_TARGET,
       transition: {
         type: 'tween',
         duration: Math.max(0, options.durationMs ?? resolved.value.durationMs) / 1000,
         ease: resolved.value.ease,
         delay: resolvedDelay,
       },
-      ...(options.trigger === 'enter'
-        ? {}
-        : {
-            inViewOptions: {
-              once: animateOnce.value,
-              amount: resolved.value.threshold,
-              margin: options.rootMargin ?? resolved.value.rootMargin,
-            },
-          }),
-      style: {
-        ...(ssrVisible && hasMounted.value ? initial : {}),
-        ...(normalizedEffect.startsWith('flip-')
-          ? { transformStyle: 'preserve-3d' }
-          : {}),
+      inViewOptions: {
+        once: animateOnce.value,
+        amount: resolved.value.threshold,
+        margin: options.rootMargin ?? resolved.value.rootMargin,
       },
+      ...(normalizedEffect.startsWith('flip-')
+        ? { style: { transformStyle: 'preserve-3d' } }
+        : {}),
     }
   }
 

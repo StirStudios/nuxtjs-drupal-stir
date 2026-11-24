@@ -98,7 +98,13 @@ const mediaComponent = computed(
 
 const { getRevealMotionProps, getRevealDelayMs } =
   useRevealMotionConfig()
-const { effect, staggerIndex } = useRevealMotionScope(() => props.direction)
+const { effect, isInherited, staggerIndex } = useRevealMotionScope(() => props.direction)
+// A gallery reveals on scroll unless its paragraph or page says otherwise.
+const revealEffect = computed(() => {
+  if (effect.value || !isInherited.value || props.revealMode !== 'gallery') return effect.value
+
+  return theme.media.galleryReveal || undefined
+})
 
 const resolvedDelayMs = computed(() =>
   getRevealDelayMs(staggerIndex.value)
@@ -108,11 +114,7 @@ const resolvedDelayMs = computed(() =>
 )
 
 const revealMotionProps = computed(() =>
-  getRevealMotionProps(effect.value, resolvedDelayMs.value, {
-    // Like every reveal: visible in the server HTML, and RevealMotion hides
-    // only what is below the screen once the page hydrates.
-    ssrVisible: true,
-  }),
+  getRevealMotionProps(revealEffect.value, resolvedDelayMs.value),
 )
 
 const visualRoundedClass = computed(() =>
