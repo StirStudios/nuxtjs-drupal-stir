@@ -13,6 +13,19 @@ untouched do not need one.
 
 ## Unreleased
 
+- Media reveals the same way as every other reveal. It no longer hides itself
+  in the server HTML with `motion-safe:opacity-0`: it shows at once, and only
+  media below the screen at hydration waits and fades in. Reduced motion still
+  shows everything at once.
+- Reveals no longer blink on a fresh load. Since 7 September (9e6d8762),
+  hydration gave every server-rendered reveal its hidden start state, so
+  content already on screen disappeared and faded back in. Content on screen
+  when the page hydrates now stays as it is; content below the screen still
+  reveals as you scroll.
+- The page's lead image no longer mismatches between server and browser.
+  Drupal elements hydrate in the order their chunks arrive, so the browser
+  could pick a different lead (another image's `loading` and `sizes`); the
+  browser now uses the server's decision while hydrating.
 - A View paragraph's Animation (direction) reveals its rows again. Since July
   the paragraph accepted the setting but never passed it to the rows, so a
   View only animated through the page's animation. Without one, rows keep the

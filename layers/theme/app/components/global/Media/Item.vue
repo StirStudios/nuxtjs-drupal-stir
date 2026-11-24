@@ -109,7 +109,8 @@ const resolvedDelayMs = computed(() =>
 
 const revealMotionProps = computed(() =>
   getRevealMotionProps(effect.value, resolvedDelayMs.value, {
-    // CSS supplies the motion-safe pre-hydration state; Motion owns the reveal.
+    // Like every reveal: visible in the server HTML, and RevealMotion hides
+    // only what is below the screen once the page hydrates.
     ssrVisible: true,
   }),
 )
@@ -138,7 +139,6 @@ const shouldAnimate = computed(() =>
   <RevealMotion
     v-else-if="!overlay || isDocument || isAudio"
     :key="`media-${props.index}`"
-    class="motion-safe:opacity-0"
     v-bind="revealMotionProps"
   >
     <component
@@ -159,7 +159,6 @@ const shouldAnimate = computed(() =>
   >
     <MediaImage
       v-bind="{ ...overlayImageProps, link: undefined, hideCredit: isVideo }"
-      :class="{ 'motion-safe:opacity-0': shouldAnimate }"
       :edit-actions="editActions"
       :image-class="[
         theme.media.transitions.slow,

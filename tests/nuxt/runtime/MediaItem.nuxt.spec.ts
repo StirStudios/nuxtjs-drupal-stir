@@ -127,7 +127,8 @@ describe('MediaItem (Nuxt runtime)', () => {
 
     expect(poster.parentElement?.tagName).toBe('DIV')
     expect(poster.parentElement).toBe(wrapper.get('video').element.parentElement)
-    expect(poster.parentElement?.classList.contains('motion-safe:opacity-0')).toBe(true)
+    // One wrapper reveals both roots, through the shared reveal.
+    expect(poster.parentElement?.classList.contains('reveal-motion')).toBe(true)
     wrapper.unmount()
   })
 
@@ -272,7 +273,7 @@ describe('MediaItem (Nuxt runtime)', () => {
       .toBe('(max-width: 1279px) 100vw, 960px')
   })
 
-  it('preserves the hidden initial state for animated overlay media', async () => {
+  it('reveals animated overlay media through the shared reveal, visible in the server HTML', async () => {
     const wrapper = await mountSuspended(MediaItem, {
       props: {
         direction: 'fade-up',
@@ -289,8 +290,10 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    expect(wrapper.get('[aria-label="Open media modal"]').element.parentElement?.classList)
-      .toContain('motion-safe:opacity-0')
+    const revealed = wrapper.get('[aria-label="Open media modal"]').element.parentElement?.classList
+
+    expect(revealed).toContain('reveal-motion')
+    expect(revealed).not.toContain('motion-safe:opacity-0')
   })
 
   it('activates a deferred gallery source near the viewport', async () => {
