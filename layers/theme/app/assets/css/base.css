@@ -145,6 +145,13 @@
       @apply text-primary-900 dark:text-primary-200;
     }
 
+    /* On an inverted surface (a solid card, a white-text presentation) the
+       link colour can match the background, so links take the surrounding
+       text colour and an underline instead. */
+    a:any-link:not(:where(.not-prose, .not-prose *)):where(.text-inverted *, .text-white *) {
+      @apply text-current underline hover:text-current;
+    }
+
     :where(blockquote) {
       @apply border-accented my-[1.5em] border-s-4 ps-[1.25em] italic;
     }
