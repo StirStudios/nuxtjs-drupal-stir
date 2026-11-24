@@ -13,6 +13,11 @@ untouched do not need one.
 
 ## Unreleased
 
+- Rich-text links inside an inverted surface (a solid card, a `text-white`
+  presentation) now take the surrounding text colour with an underline. They
+  kept the primary link colour, which on a dark card left a phone number at
+  about 1.4:1 contrast. Links elsewhere are unchanged; links with their own
+  utility classes still win.
 - A trailing-slash URL containing a non-ASCII character (such as `•` in an
   event title) now 301s to its canonical form instead of answering 500. The
   redirect put the decoded character into `Location`, which Node refuses;

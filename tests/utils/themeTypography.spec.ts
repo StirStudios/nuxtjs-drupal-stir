@@ -33,4 +33,8 @@ describe('shared theme typography and containment', () => {
     expect(source('components/HeroContent.vue')).not.toContain('text-white')
     expect(source('assets/css/utilities.css')).not.toContain('.front')
   })
+
+  it('keeps prose links readable on inverted surfaces', () => {
+    expect(source('assets/css/base.css')).toMatch(/a:any-link:not\(:where\(\.not-prose, \.not-prose \*\)\):where\(\.text-inverted \*, \.text-white \*\) \{\s*@apply text-current underline hover:text-current;/)
+  })
 })
