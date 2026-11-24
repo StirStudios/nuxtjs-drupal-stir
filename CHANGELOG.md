@@ -26,8 +26,9 @@ untouched do not need one.
 - Galleries (a Media paragraph with several images or videos) fade in as they
   are scrolled to when no Animation is set, on every load path. Before, they
   relied on the image load fade, which server-rendered images skip, so a hard
-  refresh showed no fade. Set `stirTheme.media.galleryReveal` to another
-  Animation, or `false` for none.
+  refresh showed no fade. A page whose Animation is off keeps it, as before;
+  the Media paragraph's own Animation set to off turns it off. Set
+  `stirTheme.media.galleryReveal` to another Animation, or `false` for none.
 - Revealed content no longer stays offset after a hard refresh. Server-rendered
   reveals got their hidden start state as a style after hydration, and any
   re-render (an image arriving) re-applied it, leaving rows faded in but 50px

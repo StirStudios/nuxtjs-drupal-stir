@@ -8,7 +8,7 @@ import {
   drupalMediaComponentName,
   normalizeDrupalMediaType,
 } from '../../../utils/drupalMediaTypes'
-import { useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
+import { normalizeRevealEffect, useRevealMotionConfig } from '#stir/composables/useRevealMotionConfig'
 import { useRevealMotionScope } from '#stir/composables/useRevealMotionScope'
 
 type RevealMode = 'default' | 'gallery'
@@ -99,9 +99,13 @@ const mediaComponent = computed(
 const { getRevealMotionProps, getRevealDelayMs } =
   useRevealMotionConfig()
 const { effect, isInherited, staggerIndex } = useRevealMotionScope(() => props.direction)
-// A gallery reveals on scroll unless its paragraph or page says otherwise.
+// A gallery reveals on scroll unless its own paragraph says otherwise. A page
+// with no Animation, or one turned off, still gets it: galleries faded in
+// before this setting existed, through the image load fade.
 const revealEffect = computed(() => {
-  if (effect.value || !isInherited.value || props.revealMode !== 'gallery') return effect.value
+  if (!isInherited.value || props.revealMode !== 'gallery' || normalizeRevealEffect(effect.value)) {
+    return effect.value
+  }
 
   return theme.media.galleryReveal || undefined
 })

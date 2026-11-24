@@ -2,6 +2,7 @@ import type { SlotsToolkit } from '../../../layers/theme/app/composables/useSlot
 import { defineComponent, h, nextTick } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { provideRevealMotionScope } from '../../../layers/theme/app/composables/useRevealMotionScope'
 import MediaItem from '../../../layers/theme/app/components/global/Media/Item.vue'
 
 describe('MediaItem (Nuxt runtime)', () => {
@@ -229,10 +230,23 @@ describe('MediaItem (Nuxt runtime)', () => {
     expect(trigger.element.parentElement?.classList).not.toContain('motion-safe:opacity-0')
   })
 
-  it('reveals a gallery with no Animation set, unless the theme turns it off', async () => {
+  it('reveals a gallery with no Animation set, unless the paragraph or theme turns it off', async () => {
     const theme = useAppConfig().stirTheme
-    const mountGalleryItem = async (direction?: string) => {
-      const wrapper = await mountSuspended(MediaItem, {
+    const mountGalleryItem = async (direction?: string, pageAnimation?: string) => {
+      const wrapper = await mountSuspended(pageAnimation
+        ? defineComponent({
+            setup() {
+              provideRevealMotionScope(() => pageAnimation)
+              return () => h(MediaItem, {
+                index: 1,
+                direction,
+                node: h('div'),
+                revealMode: 'gallery',
+                tk: { propsOf: () => ({ type: 'image', src: '/gallery.webp', alt: 'Gallery image' }) },
+              })
+            },
+          })
+        : MediaItem, {
         props: {
           index: 1,
           direction,
@@ -249,6 +263,8 @@ describe('MediaItem (Nuxt runtime)', () => {
 
     expect(await mountGalleryItem()).toBe(true)
     expect(await mountGalleryItem('off')).toBe(false)
+    // A page whose Animation is off still fades its galleries in.
+    expect(await mountGalleryItem(undefined, 'off')).toBe(true)
     theme.media.galleryReveal = false
     try {
       expect(await mountGalleryItem()).toBe(false)

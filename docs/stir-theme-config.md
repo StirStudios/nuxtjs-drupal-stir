@@ -723,8 +723,9 @@ media: {
 ```
 
 `galleryReveal` is the reveal a gallery (a Media paragraph with several images
-or videos) uses when neither the paragraph nor the page sets an Animation. Use
-any Animation value, or `false` for none.
+or videos) uses when its paragraph sets no Animation, even on a page whose
+Animation is off (galleries always faded in). Use any Animation value, or
+`false` for none.
 
 Hero and bare background videos keep their poster in the initial HTML. By
 default, their source URL is deferred until after the window load milestone at

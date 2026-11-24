@@ -120,7 +120,8 @@ function toViewportMargin(value: unknown, fallback: string): string {
     : fallback
 }
 
-function normalizeRevealEffect(effect: string | undefined): string | undefined {
+/** The effect's canonical name, or undefined when it is empty or turned off. */
+export function normalizeRevealEffect(effect: string | undefined): string | undefined {
   if (typeof effect !== 'string') return undefined
 
   const normalized = effect.trim().toLowerCase().replace(/[\s_]+/g, '-')
