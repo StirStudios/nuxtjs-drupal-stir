@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- A trailing-slash URL containing a non-ASCII character (such as `•` in an
+  event title) now 301s to its canonical form instead of answering 500. The
+  redirect put the decoded character into `Location`, which Node refuses;
+  the target is now percent-encoded.
+- Region blocks no longer throw when an app-context response has no `blocks`
+  (seen from a stale tab after a deploy): the regions render empty instead of
+  raising one TypeError each.
+
 - Menus are fetched through Drupal's CE API again
   (`/ce-api/api/menu_items/<name>`), the module's default. Since May the layer
   sent them to `/api/menu_items/<name>` directly, which Lupus Decoupled does

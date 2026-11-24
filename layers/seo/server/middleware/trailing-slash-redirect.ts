@@ -5,6 +5,9 @@ const SKIPPED_PREFIX = /^\/(?:_|api(?:\/|$)|ce-api(?:\/|$))/
 const FILE_SEGMENT = /\.[^/]+\/+$/
 // Browsers read `\` as `/`, so these could turn into a redirect to another host.
 const UNSAFE_PATH = /^\/\/|\\|%5c|%2f/i
+// Node refuses a header value outside printable ASCII, and the path can
+// arrive with such characters decoded (an event title with a bullet).
+const UNENCODED = /[^\x21-\x7E]/gu
 
 export function trailingSlashTarget(path: string): string | undefined {
   const queryStart = path.indexOf('?')
@@ -15,7 +18,10 @@ export function trailingSlashTarget(path: string): string | undefined {
 
   const target = pathname.replace(/\/+$/, '')
 
-  return target ? target + (queryStart === -1 ? '' : path.slice(queryStart)) : undefined
+  if (!target) return
+
+  return (target + (queryStart === -1 ? '' : path.slice(queryStart)))
+    .replace(UNENCODED, encodeURIComponent)
 }
 
 // Canonical URLs never end in a slash, so the duplicate form 301s to them.
