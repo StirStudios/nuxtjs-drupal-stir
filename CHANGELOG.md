@@ -13,11 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
-- Revealed content no longer stays offset after a hard refresh. Server- or
-  first-rendered reveals carry their hidden start state as a style; when a
-  parent re-rendered after the reveal (an image arriving), that style came
-  back, leaving rows faded in but 50px low over what followed. RevealMotion
-  now drops the start state once motion reports the reveal finished.
+- Revealed content no longer stays offset after a hard refresh. Server-rendered
+  reveals got their hidden start state as a style after hydration, and any
+  re-render (an image arriving) re-applied it, leaving rows faded in but 50px
+  low over what followed. RevealMotion never applies that style now: content
+  on screen at hydration stays as rendered, and content below the screen
+  re-mounts its motion element once, off screen, so motion-v starts it hidden
+  through `initial` and reveals it with `whileInView`, as on a page rendered
+  in the browser.
 - Images: the number of IPX transforms run at once now follows the machine
   (half its cores or the unit's CPUQuota, between 2 and 6, fewer under a small
   MemoryMax) instead of a fixed 2 set in the PM2 era. A fresh page full of
