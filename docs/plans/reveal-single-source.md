@@ -141,6 +141,26 @@ One browser fixture page per load path, each checked frame by frame:
 Each test must fail on today's code where today's behaviour is wrong (gallery
 after a hard refresh, `as-child`) and pass where it is right.
 
+## Step 1 results (2026-11-23)
+
+`tests/nuxt/e2e/reveal.e2e.spec.ts`, against layer fb75fd98 on its own
+fixture pages:
+
+| Load path | Test | Today |
+|---|---|---|
+| Hard refresh | On-screen reveals never dip | passes |
+| Hard refresh | Below-screen rows start hidden, then all end in place | passes |
+| Hard refresh | Content stays in place when the page re-renders afterwards | passes |
+| Hard refresh | An animated gallery (as-child) starts hidden below the screen | passes |
+| Hard refresh | A gallery with no Animation reveals on scroll | **fails (known gap, `it.fails`)** |
+| Soft navigation | Below-screen rows start hidden, then end in place | passes |
+| Signed-in first load (`ssr: false`) | The same | passes |
+| Reduced motion (each path) | Nothing waits hidden | passes |
+
+So the `as-child` lookup already works; the gallery gap is only that a gallery
+without an Animation has no reveal. Still to add in step 2: rows added later
+(View filter and pager), and a dev-mode hydration-warning run.
+
 ## Steps
 
 1. **Tests first:** add the fixture pages and the tests above. Record which
