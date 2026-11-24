@@ -40,8 +40,8 @@ marked `private, no-store, max-age=0`. Expected Drupal
 4xx contract messages are preserved for form feedback; upstream 5xx details are
 replaced with a generic message.
 
-The layer-owned `/api/drupal-ce` and `/api/menu` handlers preserve the
-`nuxtjs-drupal-ce` public proxy contract while filtering cookies through H3's
+The layer-owned `/api/drupal-ce` and `/api/menu` handlers keep the public
+proxy contract the `nuxtjs-drupal-ce` module defined while filtering cookies through H3's
 proxy request and response hooks. Downstream applications do not need a new
 route or compatibility configuration. Proxy paths stay confined to the
 configured CE/menu endpoints, forwarding headers are removed, and upstream

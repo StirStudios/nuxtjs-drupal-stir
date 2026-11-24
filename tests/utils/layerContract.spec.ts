@@ -27,10 +27,8 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(platformConfig).toContain('\'modules:done\'()')
-    expect(platformConfig).toContain(
-      'header => header.toLowerCase() !== \'cache-control\'',
-    )
+    // Drupal's cache-control is not passed through in development.
+    expect(platformConfig).toContain('...(isDevelopment ? [] : [\'cache-control\'])')
   })
 
   it('composes the compatibility root from explicit capability layers', () => {
@@ -342,15 +340,6 @@ describe('layer contract', () => {
   })
 
   it('owns the Drupal CE proxy boundary without changing its routes', () => {
-    const coreConfig = readFileSync(
-      resolve(rootDir, 'layers/core/nuxt.config.ts'),
-      'utf8',
-    )
-
-    expect(coreConfig).toContain('\'nitro:config\'')
-    expect(coreConfig).toContain('\'/api/drupal-ce/**\'')
-    expect(coreConfig).toContain('\'/api/menu/**\'')
-    expect(coreConfig).toContain('\'/dist/runtime/server/api/\'')
     expect(existsSync(resolve(
       rootDir,
       'layers/core/server/api/drupal-ce/[...].ts',

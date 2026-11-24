@@ -11,7 +11,6 @@ const deps = pkg.dependencies || {}
 const nuxtVersion = deps.nuxt || 'unknown'
 const nuxtUiVersion = deps['@nuxt/ui'] || 'unknown'
 const tailwindVersion = deps.tailwindcss || 'unknown'
-const drupalCeVersion = deps['nuxtjs-drupal-ce'] || 'unknown'
 const nuxtUiDisplay = nuxtUiVersion.startsWith('https://pkg.pr.new/@nuxt/ui@')
   ? `pinned PR build (${nuxtUiVersion.split('@').at(-1) || nuxtUiVersion})`
   : nuxtUiVersion
@@ -20,7 +19,6 @@ const generatedBlock = [
   '- **[Nuxt 4](https://nuxt.com/)**: `' + nuxtVersion + '`',
   '- **[Nuxt UI 4](https://ui.nuxt.com/)**: `' + nuxtUiDisplay + '`',
   '- **[Tailwind CSS 4](https://tailwindcss.com/)**: `' + tailwindVersion + '`',
-  '- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `' + drupalCeVersion + '`',
   '- **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization',
 ].join('\n')
 

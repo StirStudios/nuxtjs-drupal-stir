@@ -55,7 +55,6 @@
       "nostics",
       "nuxt",
       "nuxt-vitalizer",
-      "nuxtjs-drupal-ce",
       "rate-limiter-flexible",
       "sharp",
       "tailwindcss",
@@ -439,6 +438,7 @@
       "layers/theme/app/utils/pageTransition.ts",
       "layers/theme/app/utils/paragraphLayoutArrangement.ts",
       "layers/theme/app/utils/paragraphLayoutTransition.ts",
+      "layers/theme/app/utils/payloadPath.ts",
       "layers/theme/app/utils/presentationClasses.ts",
       "layers/theme/app/utils/presentationDefaults.ts",
       "layers/theme/app/utils/responsiveGrid.ts",
@@ -475,10 +475,12 @@
       "layers/scripts/app/plugins/userway.client.ts",
       "layers/seo/app/plugins/cms-global-seo.ts",
       "layers/theme/app/plugins/color-mode-lock.client.ts",
+      "layers/theme/app/plugins/drupalMarkup.ts",
       "layers/theme/app/plugins/drupalPageLayout.client.ts",
       "layers/theme/app/plugins/drupalPageLayout.server.ts",
       "layers/theme/app/plugins/nav-lock.client.ts",
-      "layers/theme/app/plugins/page-crossfade.ts"
+      "layers/theme/app/plugins/page-crossfade.ts",
+      "layers/theme/app/plugins/payloadPath.client.ts"
     ],
     "middleware": [
       "layers/auth/app/middleware/auth-account.global.ts",
@@ -841,6 +843,7 @@
         "layers/theme/app/utils/pageTransition.ts",
         "layers/theme/app/utils/paragraphLayoutArrangement.ts",
         "layers/theme/app/utils/paragraphLayoutTransition.ts",
+        "layers/theme/app/utils/payloadPath.ts",
         "layers/theme/app/utils/presentationClasses.ts",
         "layers/theme/app/utils/presentationDefaults.ts",
         "layers/theme/app/utils/responsiveGrid.ts",
@@ -878,21 +881,21 @@
   "counts": {
     "components": 144,
     "composables": 77,
-    "utils": 83,
-    "plugins": 12,
+    "utils": 84,
+    "plugins": 14,
     "middleware": 5,
     "serverRoutes": 33,
-    "productionDependencies": 37,
+    "productionDependencies": 36,
     "developmentDependencies": 25,
-    "tests": 274,
+    "tests": 276,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
-      "nuxt": 123,
+      "nuxt": 124,
       "scripts": 8,
       "server": 38,
       "unit": 12,
-      "utils": 76
+      "utils": 77
     }
   },
   "tests": [
@@ -940,6 +943,7 @@
     "tests/nuxt/runtime/ColorModeMiddleware.nuxt.spec.ts",
     "tests/nuxt/runtime/ContentCompactTagList.nuxt.spec.ts",
     "tests/nuxt/runtime/DateTimeValue.nuxt.spec.ts",
+    "tests/nuxt/runtime/DrupalMarkup.nuxt.spec.ts",
     "tests/nuxt/runtime/DrupalPageLayoutMiddleware.nuxt.spec.ts",
     "tests/nuxt/runtime/DrupalTabsAccountMenu.nuxt.spec.ts",
     "tests/nuxt/runtime/DrupalTabsAdminMenu.nuxt.spec.ts",
@@ -1141,6 +1145,7 @@
     "tests/utils/pageTransition.spec.ts",
     "tests/utils/paragraphRevealOwnership.spec.ts",
     "tests/utils/pathMatch.spec.ts",
+    "tests/utils/payloadPath.spec.ts",
     "tests/utils/presentationClasses.spec.ts",
     "tests/utils/presentationSource.spec.ts",
     "tests/utils/privacyConsent.spec.ts",

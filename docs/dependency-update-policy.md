@@ -52,8 +52,7 @@ For major upgrades:
 3. Run the full gate.
 4. Fix typing/linting regressions before continuing.
 
-When updating `nuxtjs-drupal-ce`, H3, or Nitro, verify that only the
-layer-owned `/api/drupal-ce` and `/api/menu` handlers are generated and that H3
+When updating H3 or Nitro, verify that H3
 still invokes `proxyRequest.onResponse` after copying headers but before
 streaming the body.
 

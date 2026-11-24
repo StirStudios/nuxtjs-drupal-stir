@@ -119,10 +119,6 @@ their own `onlyBuiltDependencies` policy in `pnpm-workspace.yaml` for native
 dependencies such as `esbuild`, `@parcel/watcher`, and `unrs-resolver`; package
 manager security policy belongs to the consuming application and is not
 inherited from a layer.
-Until the layer drops `nuxtjs-drupal-ce`, each consumer root also carries the
-[Drupal CE runtime dependency repair](patches/README.md). It is not inherited
-by extending the layer.
-
 Extending `github:StirStudios/nuxtjs-drupal-stir#...` directly while also
 installing `@stir/base` is unsupported because Nuxt and the package manager can
 resolve different revisions of the same layer.
@@ -142,7 +138,6 @@ parameters so campaign attribution and query-driven state are not lost.
 - **[Nuxt 4](https://nuxt.com/)**: `^4.6.4`
 - **[Nuxt UI 4](https://ui.nuxt.com/)**: `^4.13.0`
 - **[Tailwind CSS 4](https://tailwindcss.com/)**: `^4.3.5`
-- **[nuxtjs-drupal-ce](https://github.com/drunomics/nuxtjs-drupal-ce)**: `2.9.0`
 - **[Vite](https://vitejs.dev/)** + **[Nitro](https://nitro.unjs.io/)**: provided by Nuxt build/runtime for asset optimization
 <!-- tech-stack:end -->
 
@@ -303,7 +298,7 @@ Notes:
 
 - `DRUPAL_API_KEY` is injected automatically only for the internal Drupal CE and menu proxies. Custom server endpoints add it explicitly when calling Drupal; unrelated `/api/*` routes never receive it.
 - Most names above are build-time inputs: a deployed app sees a change only after a rebuild, unless it uses the matching `NUXT_*` runtime name. See [Runtime environment](docs/runtime-environment.md) for which settings change on restart and how Stir servers pass `.env` to the app.
-- Deployed runtime overrides supported by `nuxtjs-drupal-ce` include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
+- Deployed runtime overrides for the Drupal CE settings include `NUXT_PUBLIC_DRUPAL_CE_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_SERVER_DRUPAL_BASE_URL`, `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL`, and `NUXT_PUBLIC_DRUPAL_CE_CE_API_ENDPOINT`.
 - Turnstile verification for webform submissions is enforced in Drupal (`stir_webform_rest`); this layer requires token presence before forwarding.
 - The local `/auth/protected` password gate verifies Turnstile server-side before checking the configured password. Its limiter atomically reserves attempts within one Nitro process. Multi-instance deployments must provide the shared atomic adapter described in [the auth guide](docs/auth-integration.md#local-protected-page-rate-limiting), or enforce an equivalent shared edge limit using a trusted client-IP boundary.
 - Protected-access cookies are signed with `PROTECTED_PASSWORD`; rotating the password immediately invalidates every existing protected session.
