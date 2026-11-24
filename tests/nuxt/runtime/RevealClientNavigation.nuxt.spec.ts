@@ -26,6 +26,7 @@ async function revealStyle(play: RevealPlay = 'inView'): Promise<string> {
       return () => h(RevealMotion, { ...motionProps, play }, () => 'Content')
     },
   })
+
   // Left mounted: unmounting mid-entrance cancels the animation, which rejects.
   return wrapper.get('.reveal-motion').attributes('style') ?? ''
 }
