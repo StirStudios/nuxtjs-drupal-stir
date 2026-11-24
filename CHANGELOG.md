@@ -56,6 +56,9 @@ untouched do not need one.
   directive and payload-path plugin until Phase 2c.
   - **Site code:** call these through `useStirDrupalCe()`. `useDrupalCe()`
     still works until Phase 2c removes the module.
+  - **Breaking:** `useStirDrupalCe()` no longer has `fetchMenu`. Use
+    `const { data } = await useMenu('main')`; `data` is `null` if the fetch
+    fails, where `fetchMenu` gave an empty list.
 - Media reveals the same way as every other reveal. It no longer hides itself
   in the server HTML with `motion-safe:opacity-0`: it shows at once, and only
   media below the screen at hydration waits and fades in. Reduced motion still
