@@ -1,7 +1,9 @@
-import { defineComponent, h } from 'vue'
+import { h } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { useNuxtApp } from '#app'
+import RevealMotion from '../../../layers/theme/app/components/RevealMotion.vue'
+import type { RevealPlay } from '../../../layers/theme/app/components/RevealMotion.vue'
 import { useRevealMotionConfig } from '../../../layers/theme/app/composables/useRevealMotionConfig'
 
 function preferReducedMotion() {
@@ -15,19 +17,17 @@ function preferReducedMotion() {
   )
 }
 
-// What a reveal asks for on its very first render, before it mounts.
-async function firstRender(): Promise<Record<string, unknown>> {
-  let props: Record<string, unknown> = {}
-  const Probe = defineComponent({
+// The inline style a fade-up reveal has once it is drawn.
+async function revealStyle(play: RevealPlay = 'inView'): Promise<string> {
+  const wrapper = await mountSuspended({
     setup() {
-      props = useRevealMotionConfig().getRevealMotionProps('fade-up')
-      return () => h('div')
+      const motionProps = useRevealMotionConfig().getRevealMotionProps('fade-up')
+
+      return () => h(RevealMotion, { ...motionProps, play }, () => 'Content')
     },
   })
-  const wrapper = await mountSuspended(Probe)
-
-  wrapper.unmount()
-  return props
+  // Left mounted: unmounting mid-entrance cancels the animation, which rejects.
+  return wrapper.get('.reveal-motion').attributes('style') ?? ''
 }
 
 describe('reveal start state', () => {
@@ -36,26 +36,37 @@ describe('reveal start state', () => {
     vi.restoreAllMocks()
   })
 
-  it('starts hidden when rendered on the client, as after a page change', async () => {
-    const props = await firstRender()
-
-    expect(props.initial).toMatchObject({ opacity: 0 })
-    expect(props.style).toMatchObject({ opacity: 0 })
-  })
-
-  it('never hides content after a page change when reduced motion is requested', async () => {
-    preferReducedMotion()
-    const props = await firstRender()
-
-    expect(props.initial).toBe(false)
-    expect(props.style ?? {}).not.toHaveProperty('opacity')
-  })
-
-  it('keeps server-rendered content visible while it hydrates', async () => {
+  it('describes the animation only, whatever the load path', async () => {
     useNuxtApp().isHydrating = true
-    const props = await firstRender()
+    const wrapper = await mountSuspended({
+      setup() {
+        const props = useRevealMotionConfig().getRevealMotionProps('fade-up')
 
-    expect(props.initial).toBe(false)
-    expect(props.style).not.toHaveProperty('opacity')
+        expect(props.initial).toMatchObject({ opacity: 0 })
+        expect(props).not.toHaveProperty('style')
+        return () => h('div')
+      },
+    })
+
+    wrapper.unmount()
+  })
+
+  it('starts hidden when drawn in the browser, as after a page change', async () => {
+    expect(await revealStyle()).toContain('opacity: 0')
+  })
+
+  it('never hides content drawn in the browser when reduced motion is requested', async () => {
+    preferReducedMotion()
+    expect(await revealStyle()).not.toContain('opacity: 0')
+  })
+
+  it('keeps server-rendered content as rendered while it hydrates', async () => {
+    useNuxtApp().isHydrating = true
+    expect(await revealStyle()).not.toContain('opacity: 0')
+  })
+
+  it('starts a load entrance hidden, server HTML included', async () => {
+    useNuxtApp().isHydrating = true
+    expect(await revealStyle('load')).toContain('opacity: 0')
   })
 })

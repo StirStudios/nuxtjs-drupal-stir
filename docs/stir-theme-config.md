@@ -714,12 +714,18 @@ IMDb; downstream projects should configure only the profiles they maintain.
 media: {
   base: 'relative h-full w-full overflow-hidden object-cover',
   rounded: 'rounded-xl',
+  galleryReveal: 'fade',
   video: {
     loadMinWidth: 0,
     loadStrategy: 'after-load',
   },
 },
 ```
+
+`galleryReveal` is the reveal a gallery (a Media paragraph with several images
+or videos) uses when its paragraph sets no Animation, even on a page whose
+Animation is off (galleries always faded in). Use any Animation value, or
+`false` for none.
 
 Hero and bare background videos keep their poster in the initial HTML. By
 default, their source URL is deferred until after the window load milestone at
@@ -974,9 +980,24 @@ motion-v. Shorthand props override the `reveal` config for that element only:
 </RevealMotionElement>
 ```
 
-Content stays visible in the server-rendered HTML and animates after
-hydration. A `motionProps` object, used by Drupal paragraphs, takes precedence
-over the shorthand props.
+Every reveal starts the same way however the page arrived. `RevealMotion`
+alone decides this; `useRevealMotionConfig` only describes the animation:
+
+| How the content appeared | What happens |
+|---|---|
+| Server HTML, on screen at hydration | Shown as rendered, never hidden |
+| Server HTML, below the screen | Hidden off screen once, then revealed when scrolled to |
+| Drawn in the browser (page change, signed in, rows added later) | Starts hidden, revealed when scrolled to |
+| Reduced motion, or no IntersectionObserver | Shown at once |
+
+`play` sets when a reveal plays: `inView` (default) when scrolled to, `enter`
+as soon as it is drawn in the browser, and `load` on every load, starting
+hidden in the server HTML too (a Hero's own Animation). A `motionProps`
+object, used by Drupal paragraphs, takes precedence over the shorthand props.
+
+`getRevealMotionProps` options `ssrVisible` and `trigger` are deprecated and
+ignored. Bind its result to `RevealMotion` (or `RevealMotionElement`), never to
+motion-v's `<Motion>` directly, so the load rules above apply.
 
 ### 🎞️ Page transitions
 
