@@ -94,7 +94,8 @@ export default defineNuxtConfig({
       'nuxtjs-drupal-ce',
       {
         drupalBaseUrl: drupalUrl,
-        menuBaseUrl: drupalUrl,
+        // Menus go through the CE API (the module's default), where Lupus
+        // Decoupled keeps menu links relative.
         exposeAPIRouteRules: true,
         disableFormHandler: true,
         enableComponentPreview: false,

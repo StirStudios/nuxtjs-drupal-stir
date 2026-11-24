@@ -13,6 +13,14 @@ untouched do not need one.
 
 ## Unreleased
 
+- Menus are fetched through Drupal's CE API again
+  (`/ce-api/api/menu_items/<name>`), the module's default. Since May the layer
+  sent them to `/api/menu_items/<name>` directly, which Lupus Decoupled does
+  not treat as an API response, so each item's `relative` and `absolute`
+  fields came back as absolute frontend URLs. The layer's menus already
+  turned them back into paths; site code reading `relative` directly now gets
+  a real path. No configuration; `NUXT_PUBLIC_DRUPAL_CE_MENU_BASE_URL` still
+  overrides the origin.
 - Reveals have one owner. `RevealMotion` alone decides how a reveal starts
   (server HTML on screen: as rendered; below the screen: hidden, then revealed
   in view; drawn in the browser: motion's `initial` plus `whileInView`;
