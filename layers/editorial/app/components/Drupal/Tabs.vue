@@ -147,7 +147,7 @@ const {
   error: accountMenuError,
   execute: executeAccountMenu,
   status: accountMenuStatus,
-} = useMenu('account', {
+} = useMenu<AccountMenuItem>('account', {
   key: computed(() => `menu-account--${accountMenuKey.value}`),
   immediate: false,
   server: false,
@@ -206,7 +206,7 @@ const normalizeAdminUrl = (value: string): string => {
 }
 
 const accountMenu = computed<MenuLink[]>(() =>
-  (Array.isArray(rawAccountMenu.value) ? rawAccountMenu.value : [])
+  rawAccountMenu.value
     .map((item: AccountMenuItem): MenuLink | null => {
       const label = item.title || ''
       const rawTo = getValidTo(item.relative || item.url)

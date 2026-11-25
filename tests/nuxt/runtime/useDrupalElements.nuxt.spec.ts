@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import { createError } from 'h3'
 import { defineComponent, h } from 'vue'
 import { useDrupalElements } from '../../../layers/theme/app/composables/useDrupalElements'
 
@@ -37,10 +38,26 @@ describe('useDrupalElements', () => {
       async setup() {
         const { data } = await useDrupalElements().useMenu('elements-test')
 
-        return () => h('p', (data.value as Array<{ title: string }>)?.[0]?.title)
+        return () => h('p', data.value[0]?.title)
       },
     }))
 
     expect(wrapper.text()).toBe('From the proxy')
+  })
+
+  it('gives an empty menu when the fetch fails', async () => {
+    registerEndpoint('/api/menu/api/menu_items/elements-missing', () => {
+      throw createError({ statusCode: 404 })
+    })
+
+    const wrapper = await mountSuspended(defineComponent({
+      async setup() {
+        const { data, error } = await useDrupalElements().useMenu('elements-missing')
+
+        return () => h('p', `${data.value.length} ${Boolean(error.value)}`)
+      },
+    }))
+
+    expect(wrapper.text()).toBe('0 true')
   })
 })

@@ -1,6 +1,7 @@
 import type { Component, Ref, VNode } from 'vue'
 import { Fragment } from 'vue'
 import type { UseFetchOptions } from '#app'
+import type { DrupalMenuTreeItem } from '../utils/navigation'
 import { NuxtErrorBoundary } from '#components'
 import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
@@ -111,18 +112,22 @@ export function useDrupalElements() {
     headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
   })
 
-  /** Fetches a Drupal menu by machine name through the layer's proxy. */
-  function useMenu(name: string, options: Partial<UseFetchOptions<unknown>> = {}) {
+  /**
+   * Fetches a Drupal menu by machine name through the layer's proxy. `data`
+   * is the menu tree, or an empty list before it loads or if the fetch fails.
+   */
+  function useMenu<T = DrupalMenuTreeItem>(name: string, options: Omit<UseFetchOptions<T[]>, 'default'> = {}) {
     const path = menuEndpoint.replace('$$$NAME$$$', name).replace(/^\/+/, '')
 
-    return useFetch(path, {
+    return useFetch<T[]>(path, {
       key: `menu-${name}--${path}`,
       baseURL: MENU_PROXY,
       credentials: 'include',
       headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
-      getCachedData: (key: string) => nuxtApp.payload.data[key] as never,
+      getCachedData: (key: string) => nuxtApp.payload.data[key] as T[] | undefined,
       ...options,
-    } as never)
+      default: () => [],
+    })
   }
 
   /** Applies a Drupal page's title and metatags to the document head. */

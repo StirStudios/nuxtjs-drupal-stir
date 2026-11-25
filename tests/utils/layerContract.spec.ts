@@ -730,7 +730,7 @@ describe('layer contract', () => {
 
     expect(header).toContain('const { getPage, useMenu } = useStirDrupalCe()')
     expect(header).toContain('await useMenu(\'main\')')
-    expect(header).toContain('Array.isArray(mainMenu.value) ? mainMenu.value : []')
+    expect(header).toContain('mainMenu.value.map(')
     expect(header).not.toContain('fetchMenu(\'main\')')
   })
 
@@ -764,7 +764,7 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(tabs).toContain('useMenu(\'account\', {')
+    expect(tabs).toContain('useMenu<AccountMenuItem>(\'account\', {')
     expect(tabs).toContain('immediate: false')
     expect(tabs).toContain('server: false')
     expect(tabs).toContain('execute: executeAccountMenu')
