@@ -1,6 +1,7 @@
 import type { Component, Ref, VNode } from 'vue'
 import { Fragment } from 'vue'
 import type { UseFetchOptions } from '#app'
+import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
 /** A Drupal Custom Elements node in the explicit format Stir Tools sends. */
 export type DrupalElementContent =
@@ -23,7 +24,6 @@ type DrupalPageHead = { title?: string, metatags?: DrupalMetatags }
 
 const CE_PROXY = '/api/drupal-ce'
 const MENU_PROXY = '/api/menu'
-const DEFAULT_MENU_ENDPOINT = 'api/menu_items/$$$NAME$$$'
 
 const pascalCase = (name: string) =>
   name.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('')
@@ -41,8 +41,7 @@ const isComponent = (value: unknown): value is Component =>
  */
 export function useDrupalElements() {
   const nuxtApp = useNuxtApp()
-  const menuEndpoint = (useRuntimeConfig().public.drupalCe as { menuEndpoint?: string } | undefined)?.menuEndpoint
-    || DEFAULT_MENU_ENDPOINT
+  const { menuEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
 
   function resolveCustomElement(element: string): Component | null {
     const exact = nuxtApp.vueApp.component(pascalCase(element))

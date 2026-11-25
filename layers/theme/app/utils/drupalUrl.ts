@@ -1,19 +1,15 @@
-type DrupalCePublicConfig = {
-  drupalBaseUrl?: string
-}
+import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
 type RuntimePublicConfigLike = {
   api?: string
-  drupalCe?: DrupalCePublicConfig | Record<string, unknown>
+  drupalCe?: unknown
 }
 
 const isAbsoluteUrl = (value: string): boolean => /^https?:\/\//.test(value)
 
 export const getDrupalOrigin = (publicConfig: RuntimePublicConfigLike): string => {
-  const drupalCe = (publicConfig.drupalCe || {}) as DrupalCePublicConfig
-  const raw = String(drupalCe.drupalBaseUrl || publicConfig.api || '').trim()
-
-  return raw.replace(/\/$/, '')
+  return resolveDrupalCeConfig(publicConfig).drupalBaseUrl
+    || String(publicConfig.api || '').trim().replace(/\/$/, '')
 }
 
 export const toDrupalUrl = (value: string | undefined, drupalOrigin: string): string => {

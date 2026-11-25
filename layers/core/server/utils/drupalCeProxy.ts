@@ -16,13 +16,13 @@ import {
   markStirPrivateResponse,
   replaceStirDrupalSetCookies,
 } from '../../../foundation/server/utils/stirDrupalApi'
+import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
 interface StirDrupalCeProxyTargets {
   ceBaseUrl: string
   menuBaseUrl: string
 }
 
-const DEFAULT_MENU_ENDPOINT = 'api/menu_items/$$$NAME$$$'
 const FORWARDED_HEADERS = [
   'forwarded',
   'x-forwarded-for',
@@ -35,17 +35,6 @@ const FORWARDED_HEADERS = [
 const MENU_NAME_PATTERN = '[A-Za-z0-9_-]+'
 const SHARED_REVALIDATION_CACHE_CONTROL
   = 'public, max-age=0, must-revalidate, s-maxage=300'
-
-const normalizeBaseUrl = (value: unknown): string =>
-  typeof value === 'string' ? value.trim().replace(/\/+$/, '') : ''
-
-const normalizeEndpoint = (value: unknown): string => {
-  const endpoint = typeof value === 'string' && value.trim()
-    ? value.trim()
-    : '/ce-api'
-
-  return `/${endpoint.replace(/^\/+|\/+$/g, '')}`
-}
 
 const hasUnsafeProxyPathCharacter = (value: string): boolean =>
   Array.from(value).some((character) => {
@@ -144,19 +133,10 @@ const assertContainedProxyTarget = (
 }
 
 export const getStirDrupalCeProxyTargets = (): StirDrupalCeProxyTargets => {
-  const config = useRuntimeConfig()
-  const publicConfig = config.public as Record<string, unknown>
-  const drupalCeConfig = publicConfig.drupalCe
-    && typeof publicConfig.drupalCe === 'object'
-    ? publicConfig.drupalCe as Record<string, unknown>
-    : {}
-  const apiBaseUrl = getStirDrupalApiConfig().baseUrl
-  const ceBaseUrl = `${apiBaseUrl}${normalizeEndpoint(
-    drupalCeConfig.ceApiEndpoint,
-  )}`
-  const menuBaseUrl = normalizeBaseUrl(drupalCeConfig.menuBaseUrl) || ceBaseUrl
+  const { ceApiEndpoint, menuBaseUrl } = resolveDrupalCeConfig(useRuntimeConfig().public)
+  const ceBaseUrl = `${getStirDrupalApiConfig().baseUrl}${ceApiEndpoint}`
 
-  return { ceBaseUrl, menuBaseUrl }
+  return { ceBaseUrl, menuBaseUrl: menuBaseUrl || ceBaseUrl }
 }
 
 export const createStirDrupalProxyFetch = (
@@ -348,20 +328,9 @@ export const proxyStirDrupalMenuRequest = async (
     })
   }
 
-  const publicConfig = useRuntimeConfig().public as Record<string, unknown>
-  const drupalCeConfig = publicConfig.drupalCe
-    && typeof publicConfig.drupalCe === 'object'
-    ? publicConfig.drupalCe as Record<string, unknown>
-    : {}
-  const menuEndpoint = typeof drupalCeConfig.menuEndpoint === 'string'
-    ? drupalCeConfig.menuEndpoint
-    : DEFAULT_MENU_ENDPOINT
+  const { menuEndpoint, useLocalizedMenuEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
 
-  if (!isStirDrupalMenuProxyPathAllowed(
-    path,
-    menuEndpoint,
-    drupalCeConfig.useLocalizedMenuEndpoint !== false,
-  )) {
+  if (!isStirDrupalMenuProxyPathAllowed(path, menuEndpoint, useLocalizedMenuEndpoint)) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Menu path was not found',

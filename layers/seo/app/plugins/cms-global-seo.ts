@@ -1,6 +1,7 @@
 import type { GlobalSeoResponse } from '../../shared/types/globalSeo'
 import type { CmsGlobalSeoAssetConfig, SeoImageResolver } from '../utils/globalSeoAssets'
 import { prepareGlobalSeoAssets } from '../utils/globalSeoAssets'
+import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
 type CmsGlobalSeoConfig = {
   enabled?: boolean
@@ -24,11 +25,8 @@ type UseHeadFactory = Extract<
 >
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
 function drupalOrigin(publicConfig: Record<string, unknown>): string {
-  const drupalCe = publicConfig.drupalCe && typeof publicConfig.drupalCe === 'object'
-    ? publicConfig.drupalCe as Record<string, unknown>
-    : {}
-
-  return String(drupalCe.drupalBaseUrl || publicConfig.api || '').trim().replace(/\/$/, '')
+  return resolveDrupalCeConfig(publicConfig).drupalBaseUrl
+    || String(publicConfig.api || '').trim().replace(/\/$/, '')
 }
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {

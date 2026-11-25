@@ -41,9 +41,9 @@ private to the theme layer; select the Material presentation through
 
 ### Drupal Custom Elements
 
-Theme code consumes `useStirDrupalCe()` rather than `useDrupalCe()` directly.
-The Stir facade delegates the upstream Lupus/Custom Elements API unchanged and
-owns Stir-specific rendering policy. In development it turns unresolved Custom
+Theme code consumes `useStirDrupalCe()`, the layer's own page fetching
+(`useDrupalPage`) and element rendering (`useDrupalElements`), which owns
+Stir-specific rendering policy. In development it turns unresolved Custom
 Elements and unknown `field-*` elements into visible diagnostics; production
 keeps the upstream rendering path without traversing the component tree.
 

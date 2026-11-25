@@ -887,7 +887,7 @@
     "serverRoutes": 33,
     "productionDependencies": 36,
     "developmentDependencies": 25,
-    "tests": 276,
+    "tests": 277,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
@@ -895,7 +895,7 @@
       "scripts": 8,
       "server": 38,
       "unit": 12,
-      "utils": 77
+      "utils": 78
     }
   },
   "tests": [
@@ -1108,6 +1108,7 @@
     "tests/utils/colorMode.spec.ts",
     "tests/utils/componentTreeDiagnostics.spec.ts",
     "tests/utils/dateUtils.spec.ts",
+    "tests/utils/drupalCeConfig.spec.ts",
     "tests/utils/drupalLink.spec.ts",
     "tests/utils/drupalPublicFiles.spec.ts",
     "tests/utils/drupalUrl.spec.ts",
