@@ -38,8 +38,7 @@ describe('Drupal one-time login handoff', () => {
 
   it('redirects only a signed one-time-login path to Drupal', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      api: 'https://cms.example.test',
-      public: {},
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const { event, headers } = createEvent(`${tokenPath}?destination=/admin`)
 
@@ -59,8 +58,7 @@ describe('Drupal one-time login handoff', () => {
     '/user/reset/1/1784408905/token/edit',
   ])('does not redirect an unrelated account path: %s', async (path) => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      api: 'https://cms.example.test',
-      public: {},
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const { event, headers } = createEvent(path)
 
@@ -71,8 +69,7 @@ describe('Drupal one-time login handoff', () => {
 
   it('does not loop when Nuxt and Drupal share an origin', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      api: 'https://www.example.test',
-      public: {},
+      public: { drupalCe: { drupalBaseUrl: 'https://www.example.test' } },
     }))
     const { event, headers } = createEvent(tokenPath)
 

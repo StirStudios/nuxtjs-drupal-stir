@@ -8,12 +8,13 @@ import {
   buildStirDrupalHeaders,
   captureStirDrupalApiError,
   createStirDrupalUpstreamError,
+  getStirDrupalApiConfig,
   getStirForwardedCookie,
   markStirPrivateResponse,
   stirDrupalTimeoutOptions,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
-import { resolveDrupalCeApiConfig } from '../../../../core/server/utils/drupalCeApiConfig'
+import { resolveDrupalCeConfig } from '../../../../foundation/shared/utils/drupalCeConfig'
 import {
   buildParagraphViewPath,
   normalizeParagraphViewQuery,
@@ -25,12 +26,8 @@ const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as co
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphViewId(event.context.params?.paragraphId)
   const query = normalizeParagraphViewQuery(getQuery(event))
-  const {
-    apiKey,
-    ceApiEndpoint,
-    drupalBaseUrl,
-    requestTimeoutMs,
-  } = resolveDrupalCeApiConfig(useRuntimeConfig())
+  const { apiKey, baseUrl: drupalBaseUrl, requestTimeoutMs } = getStirDrupalApiConfig()
+  const { ceApiEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
   const requestPath = buildParagraphViewPath(ceApiEndpoint, paragraphId)
   const cookie = getStirForwardedCookie(event)
 

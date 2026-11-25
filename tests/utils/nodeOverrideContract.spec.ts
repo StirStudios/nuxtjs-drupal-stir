@@ -60,7 +60,7 @@ describe('node override contract', () => {
 
     expect(pageRoute).toContain('const currentPage = page.value || {')
     expect(pageRoute).toContain('useDrupalMetatagPreparer()')
-    expect(pageRoute).toContain('prepareMetatags(metatags as unknown as StirDrupalMetatags)')
+    expect(pageRoute).toContain('prepareMetatags(metatags)')
     expect(pageRoute).toContain('usePageHead(pageHead, [\'meta\', \'link\'])')
   })
 

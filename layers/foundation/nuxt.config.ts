@@ -7,7 +7,6 @@ import { addMissingReviewSections } from '../../scripts/compliance/review.mjs'
 import {
   buildAssetsDirectory,
   commaSeparatedEnvironment,
-  normalizeEnvironmentUrl,
   positiveIntegerEnvironment,
 } from '../../config/runtime'
 
@@ -18,7 +17,6 @@ const isLayerWorkspace = resolve(process.cwd()) === resolve(resolveLayerPath('.'
 const foundationCss = fileURLToPath(
   new URL('./app/assets/css/main.css', import.meta.url),
 )
-const drupalUrl = normalizeEnvironmentUrl(process.env.DRUPAL_URL)
 const isDevelopment = process.env.NODE_ENV === 'development'
 const revisionFile = resolve(process.cwd(), 'REVISION')
 const buildAssetsDir = isDevelopment
@@ -206,7 +204,6 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     siteUrl,
-    api: drupalUrl,
     apiKey: process.env.DRUPAL_API_KEY || '',
     drupalRequestTimeoutMs: positiveIntegerEnvironment(
       process.env.DRUPAL_REQUEST_TIMEOUT_MS,
@@ -220,7 +217,6 @@ export default defineNuxtConfig({
       trustProxy: process.env.DRUPAL_TRUST_PROXY === 'true',
     },
     public: {
-      api: drupalUrl,
       // Build-time label like indexability: anything but production shows the
       // environment badge in the editorial tabs.
       environment: process.env.NUXT_ENV || 'development',

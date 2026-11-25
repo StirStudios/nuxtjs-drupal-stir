@@ -26,7 +26,6 @@ type UseHeadFactory = Extract<
 type ConsumerReactiveHead = Exclude<ReturnType<UseHeadFactory>, false | null | undefined>
 function drupalOrigin(publicConfig: Record<string, unknown>): string {
   return resolveDrupalCeConfig(publicConfig).drupalBaseUrl
-    || String(publicConfig.api || '').trim().replace(/\/$/, '')
 }
 function resolveCmsGlobalSeoConfig(config: CmsGlobalSeoConfig = {}): Required<CmsGlobalSeoConfig> {
   return {

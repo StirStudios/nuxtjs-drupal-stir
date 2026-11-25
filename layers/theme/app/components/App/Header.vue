@@ -9,7 +9,6 @@ import {
   extractHeaderActions,
   mapDrupalMenuItem,
   splitMenuAtMarker,
-  type DrupalMenuTreeItem,
 } from '#stir/utils/navigation'
 import {
   headerClassName,
@@ -272,8 +271,7 @@ const splitDesktopNavClasses = computed(() =>
 const showSlideoverBrand = computed(() => theme.navigation.slideover?.logo !== false)
 
 const navLinks = computed<NavigationMenuItem[]>(() =>
-  (Array.isArray(mainMenu.value) ? mainMenu.value : [])
-    .map((item: DrupalMenuTreeItem) => mapDrupalMenuItem(item)),
+  mainMenu.value.map(item => mapDrupalMenuItem(item)),
 )
 const headerActions = computed(() => extractHeaderActions(navLinks.value, theme.navigation?.actionItems))
 const actionButtons = computed(() => headerActions.value.actions.filter(action => action.as === 'button'))

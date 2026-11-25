@@ -68,7 +68,7 @@ CE display config lives under each `stir_layout_builder_paragraph_*` submodule
 
 **`core` layer's proxies:** `layers/core` owns the `/api/drupal-ce/**` and
 `/api/menu/**` Nitro handlers, which filter cookies through H3's proxy hooks.
-They keep the public contract the former `nuxtjs-drupal-ce` module defined.
+Their paths and behaviour are a public contract sites rely on.
 
 **API key enforcement:** Drupal-side, in
 `stir-tools/modules/stir_layout_builder/src/EventSubscriber/ApiAuthSubscriber.php`
@@ -329,8 +329,8 @@ the other, ranked roughly by blast radius:
 
 1. **CE machine-name ↔ Vue component name** (`paragraph-hero` → `ParagraphHero`) — a
    Drupal paragraph bundle rename breaks rendering unless mirrored in Nuxt.
-2. **`customElementJsonFormat`** — Nuxt relies on Drupal's `explicit` default with
-   no explicit override; a Drupal-side change would break every CE response
+2. **Custom Elements JSON format** — the layer only reads Drupal's `explicit`
+   format; a Drupal-side change to `legacy` would break every CE response
    silently.
 3. **Contract snapshot drift** — `contracts:sync` is manual; the two repos can be
    out of sync between runs with no runtime detection, only test-time checksum

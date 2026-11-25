@@ -1,6 +1,6 @@
 # Plan: own the Drupal–Nuxt page contract
 
-Status: Phases 0–2 done; Phase 3 rolling out; Phase 4 deferred.
+Status: complete (2026-11-25). Phases 0–3 done; Phase 4 deferred (see its revisit triggers).
 
 ## Goal
 
@@ -218,8 +218,8 @@ Meanwhile, ask for a review of MR !70 and offer an MR for #3629280.
   `v-drupal-markup`, the payload-path plugin and a typed
   `resolveDrupalCeConfig()`. The `drupalCe` runtime keys and
   `NUXT_PUBLIC_DRUPAL_CE_*` overrides are kept as they are.
-- Phase 3: every site is on the new layer and the Stir site is checked live;
-  the other sites are checked as they deploy.
+- Phase 3: done (2026-11-25). Every site was deployed on the new layer and
+  checked live.
 - Phase 4: decided not now (see above); watch the revisit triggers.
 
 ## Phase 2c inventory (2026-11-24, module 2.9.0)

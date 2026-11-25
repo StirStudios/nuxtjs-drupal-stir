@@ -127,7 +127,7 @@ const seoTitle = computed(() => {
   return typeof titleTag?.content === 'string' ? titleTag.content : ''
 })
 
-const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld as JsonLdValue))
+const jsonLd = computed(() => cleanJsonLd(page.value?.metatags?.jsonld))
 const prepareMetatags = useDrupalMetatagPreparer()
 const pageHead = computed(() => {
   const currentPage = page.value || {
@@ -142,7 +142,7 @@ const pageHead = computed(() => {
 
   if (!metatags) return currentPage
 
-  const prepared = prepareMetatags(metatags as unknown as StirDrupalMetatags)
+  const prepared = prepareMetatags(metatags)
 
   return {
     ...currentPage,

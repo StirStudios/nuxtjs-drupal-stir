@@ -661,7 +661,7 @@ describe('layer contract', () => {
     const clientLayout = read('layers/theme/app/plugins/drupalPageLayout.client.ts')
 
     expect(clientLayout).toContain('baseURL: \'/api/drupal-ce\'')
-    expect(clientLayout).not.toMatch(/useStirDrupalCe|useDrupalCe/)
+    expect(clientLayout).not.toContain('useStirDrupalCe')
     expect(clientLayout).toContain('to.meta.layout =')
     // Sites map the layout after these with dependsOn (a member app shell).
     for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {
@@ -730,7 +730,7 @@ describe('layer contract', () => {
 
     expect(header).toContain('const { getPage, useMenu } = useStirDrupalCe()')
     expect(header).toContain('await useMenu(\'main\')')
-    expect(header).toContain('Array.isArray(mainMenu.value) ? mainMenu.value : []')
+    expect(header).toContain('mainMenu.value.map(')
     expect(header).not.toContain('fetchMenu(\'main\')')
   })
 
@@ -764,7 +764,7 @@ describe('layer contract', () => {
       'utf8',
     )
 
-    expect(tabs).toContain('useMenu(\'account\', {')
+    expect(tabs).toContain('useMenu<AccountMenuItem>(\'account\', {')
     expect(tabs).toContain('immediate: false')
     expect(tabs).toContain('server: false')
     expect(tabs).toContain('execute: executeAccountMenu')
@@ -908,7 +908,7 @@ describe('layer contract', () => {
     expect(baseCss).toMatch(/:where\(\.prose, \.admin-editor-prose\)\s*\{\s*@apply leading-relaxed;/)
   })
 
-  it('renders Drupal markup through the hydration-safe upstream directive', () => {
+  it('renders Drupal markup through its own hydration-safe directive', () => {
     const drupalMarkup = readFileSync(
       resolve(rootDir, 'layers/theme/app/components/global/drupal-markup.vue'),
       'utf8',

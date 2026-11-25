@@ -4,7 +4,7 @@ import { getDrupalOrigin, toDrupalUrl } from '../../layers/theme/app/utils/drupa
 describe('Drupal URL normalization', () => {
   it('uses the configured Drupal origin for root-relative media paths', () => {
     const origin = getDrupalOrigin({
-      api: 'https://drupal.example/',
+      drupalCe: { drupalBaseUrl: 'https://drupal.example/' },
     })
 
     expect(toDrupalUrl('/sites/default/files/logo.png', origin)).toBe(

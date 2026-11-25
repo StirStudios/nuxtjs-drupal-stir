@@ -27,7 +27,7 @@ describe('GET /api/webform/availability', () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
       drupalRequestTimeoutMs: 2500,
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
   })
 

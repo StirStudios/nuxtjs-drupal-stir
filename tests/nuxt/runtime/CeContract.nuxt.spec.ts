@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent } from 'vue'
 
-// The Drupal page contract the layer must keep while nuxtjs-drupal-ce is
-// replaced (docs/plans/own-drupal-ce.md). Fixtures mirror live payload shapes.
+// The Drupal page contract the layer renders. Fixtures mirror live payload
+// shapes.
 const fixture = (name: string) => JSON.parse(
   readFileSync(resolve(__dirname, '../../fixtures/ce', `${name}.json`), 'utf8'),
 )

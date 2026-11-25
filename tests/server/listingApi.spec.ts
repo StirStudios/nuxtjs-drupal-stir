@@ -151,8 +151,7 @@ function routeEvent(listing: string, search = '') {
 function stubListingRuntime(raw: ReturnType<typeof vi.fn>): void {
   vi.stubGlobal('$fetch', { raw })
   vi.stubGlobal('useRuntimeConfig', () => ({
-    api: 'https://cms.example.test',
     apiKey: 'server-key',
-    public: { api: 'https://cms.example.test', drupalCe: {} },
+    public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
   }))
 }
