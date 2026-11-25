@@ -183,6 +183,28 @@ security-sensitive and follow Drupal core changes.
 and Stir's formatter plugins depend on it, and replacing it would mean
 migrating every site's config for no gain.
 
+**Decision (2026-11-24): not now.** Keep `custom_elements` for good and keep
+`lupus_ce_renderer` and `lupus_decoupled_ce_api`. The evaluation
+(`lupus-ownership-evaluation.md` in the shared notes) found:
+- 11 Stir Tools workarounds in about two years, mostly a few lines each and
+  several no longer needed, against 100 to 180 commits on the Nuxt side before
+  Phase 2;
+- that an owned module would be 2,000 to 3,700 lines, reproducing the
+  contracts/v1 payload exactly;
+- that upstream still releases (lupus_decoupled 1.7.0 in Nov 2026) but is slow
+  to review: MR !70 has had no review since 18 Oct and neither module supports
+  Drupal 12 yet.
+
+Revisit if any of these happens:
+- the fleet is ready for Drupal 12 and Lupus still does not support it;
+- MR !70 or #3629280 gets no maintainer response by about late February 2027;
+- about three new workarounds land in a quarter, or another cache or access
+  bug like #3629280 appears (its stopgap is Stir Tools PR #595);
+- a Lupus release breaks the `stir_domain` base-URL decorator (watch
+  #3530039).
+
+Meanwhile, ask for a review of MR !70 and offer an MR for #3629280.
+
 ## Progress
 
 - Phase 0: done (contract fixtures, navigation and reveal e2e, baselines).
