@@ -1,6 +1,6 @@
 # Plan: own the Drupal–Nuxt page contract
 
-Status: draft for review. Nothing here has started.
+Status: Phases 0–2 done; Phase 3 rolling out; Phase 4 deferred.
 
 ## Goal
 
@@ -214,6 +214,13 @@ Meanwhile, ask for a review of MR !70 and offer an MR for #3629280.
   Site code still calling `useDrupalCe()` (one site's `fetchMenu`, one site's
   `$ceApi`) moves to `useStirDrupalCe()` before Phase 2c.
 - Phase 2b rolled out to every site (2026-11-24).
+- Phase 2c: done (2026-11-25). `nuxtjs-drupal-ce` is removed; the layer owns
+  `v-drupal-markup`, the payload-path plugin and a typed
+  `resolveDrupalCeConfig()`. The `drupalCe` runtime keys and
+  `NUXT_PUBLIC_DRUPAL_CE_*` overrides are kept as they are.
+- Phase 3: every site is on the new layer and the Stir site is checked live;
+  the other sites are checked as they deploy.
+- Phase 4: decided not now (see above); watch the revisit triggers.
 
 ## Phase 2c inventory (2026-11-24, module 2.9.0)
 

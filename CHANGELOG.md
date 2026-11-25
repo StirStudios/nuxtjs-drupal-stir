@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+- `nuxt-vitalizer` 4. It needs Nuxt 4.6 or later and drops the
+  `disableStylesheets` option; a site that sets
+  `vitalizer.disableStylesheets` must remove it.
+
 - A Drupal paragraph whose component throws while server-rendering no longer
   fails the whole page with a 500. Each outermost `paragraph-*` element
   renders inside a `<NuxtErrorBoundary>` (Nuxt 4.7
