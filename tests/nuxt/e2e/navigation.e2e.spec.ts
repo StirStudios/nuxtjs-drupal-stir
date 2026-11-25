@@ -39,6 +39,20 @@ const pageFixture = (title: string, body: string, link?: { url: string, title: s
 const pages: Record<string, unknown> = {
   '/first': pageFixture('First', 'First page body', { url: '/second', title: 'Go to second' }),
   '/second': pageFixture('Second', 'Second page body', { url: '/old-path', title: 'Go to old path' }),
+  '/broken-section': {
+    ...pageFixture('Broken section', 'Survives the broken section'),
+    content: {
+      element: 'node-page',
+      props: { title: 'Broken section', type: 'page', hideTitle: true },
+      slots: {
+        hero: [],
+        section: [
+          { element: 'paragraph-broken', props: { id: 'broken', uuid: 'broken' } },
+          { element: 'paragraph-text', props: { id: 'survivor', uuid: 'survivor', text: '<p id="page-body">Survives the broken section</p>' } },
+        ],
+      },
+    },
+  },
   '/old-path': {
     ...pageFixture('', ''),
     content: { props: [], slots: { section: [], hero: [] } },
@@ -111,6 +125,15 @@ describe('Drupal page navigation', async () => {
       sourcemap: { client: false, server: false },
       vite: { build: { sourcemap: false } },
     },
+  })
+
+  it('drops a paragraph that throws while server-rendering and keeps the page', async () => {
+    const response = await fetch('/broken-section')
+    const html = await response.text()
+
+    expect(response.status).toBe(200)
+    expect(html).toContain('Survives the broken section')
+    expect(html).not.toContain('Never rendered')
   })
 
   it('renders the shared probe and page on the server', async () => {

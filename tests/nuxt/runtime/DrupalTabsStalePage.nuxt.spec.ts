@@ -1,6 +1,7 @@
 // @vitest-environment nuxt
 import { describe, expect, it } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
+import type { Router } from 'vue-router'
 import { useNuxtApp, useRouter, useState } from '#imports'
 import DrupalTabs from '../../../layers/editorial/app/components/Drupal/Tabs.vue'
 
@@ -39,7 +40,8 @@ describe('Drupal/Tabs page tasks', () => {
   it('leaves them off a page the site builds in Nuxt', async () => {
     lastNode()
     // A page the site builds in Nuxt, like /instructors.
-    useRouter().addRoute({ path: '/instructors', name: 'instructors', component: { render: () => null } })
+    // staticRoutes drops addRoute from the router type; this test env allows it.
+    ;(useRouter() as unknown as Router).addRoute({ path: '/instructors', name: 'instructors', component: { render: () => null } })
     const bar = await mountSuspended(DrupalTabs, { route: '/instructors' })
 
     expect(useRoute().meta.drupalPage).not.toBe(true)

@@ -167,6 +167,12 @@ export default defineNuxtConfig({
 
   experimental: {
     appManifest: false,
+    // NuxtErrorBoundary also catches server-render errors, so one broken
+    // Drupal paragraph no longer fails the whole page with a 500.
+    ssrErrorBoundary: true,
+    // Routes are fixed at build (Drupal pages go through the catch-all), so
+    // the server builds the route matcher once instead of per request.
+    staticRoutes: true,
     entryImportMap: false,
     // Render error.vue inside the failed request, keeping its headers and
     // cookies, instead of re-entering Nitro via /__nuxt_error (Nuxt 4.6).

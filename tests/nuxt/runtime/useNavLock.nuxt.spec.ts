@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { defineComponent, h } from 'vue'
+import type { Router } from 'vue-router'
 import { useNavLock } from '../../../layers/theme/app/composables/useNavLock'
 
 const NavLockHarness = defineComponent({
@@ -36,7 +37,8 @@ describe('useNavLock', () => {
   it('locks before route-derived state changes', async () => {
     const wrapper = await mountSuspended(NavLockHarness)
     const nuxtApp = useNuxtApp()
-    const router = useRouter()
+    // staticRoutes drops addRoute from the router type; this test env allows it.
+    const router = useRouter() as unknown as Router
     const routeName = 'nav-lock-timing-target'
     const routePath = '/nav-lock-timing-target'
     let lockedInsideGuard = false
@@ -67,7 +69,8 @@ describe('useNavLock', () => {
   it('stays locked while a superseding navigation is still pending', async () => {
     const wrapper = await mountSuspended(NavLockHarness)
     const nuxtApp = useNuxtApp()
-    const router = useRouter()
+    // staticRoutes drops addRoute from the router type; this test env allows it.
+    const router = useRouter() as unknown as Router
     const firstRouteName = 'nav-lock-overlap-first'
     const secondRouteName = 'nav-lock-overlap-second'
     let releaseFirst: (() => void) | undefined

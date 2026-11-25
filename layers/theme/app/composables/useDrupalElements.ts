@@ -1,6 +1,7 @@
 import type { Component, Ref, VNode } from 'vue'
 import { Fragment } from 'vue'
 import type { UseFetchOptions } from '#app'
+import { NuxtErrorBoundary } from '#components'
 import { resolveDrupalCeConfig } from '../../../foundation/shared/utils/drupalCeConfig'
 
 /** A Drupal Custom Elements node in the explicit format Stir Tools sends. */
@@ -68,7 +69,7 @@ export function useDrupalElements() {
 
   type Rendered = VNode | null | Rendered[]
 
-  function renderCustomElementsToVNodes(content: DrupalElementContent): Rendered {
+  function renderCustomElementsToVNodes(content: DrupalElementContent, inBoundary = false): Rendered {
     if (content == null) return null
     if (typeof content === 'string') {
       const markup = resolveCustomElement('drupal-markup')
@@ -76,7 +77,7 @@ export function useDrupalElements() {
       return markup ? h(markup, { content }) : h('div', content)
     }
     if (Array.isArray(content)) {
-      return content.map(item => renderCustomElementsToVNodes(item))
+      return content.map(item => renderCustomElementsToVNodes(item, inBoundary))
     }
     if (!content.element) return null
 
@@ -84,12 +85,17 @@ export function useDrupalElements() {
 
     if (!component) return null
 
+    // A paragraph that throws drops out of the page, which still renders.
+    // Only the outermost paragraphs get a boundary: each one buffers its
+    // server output and keeps a payload entry.
+    const isBoundary = !inBoundary && content.element.startsWith('paragraph-')
     // Drupal sends an empty PHP array as [] instead of {}.
     const props = Array.isArray(content.props) ? {} : (content.props ?? {})
     const slots = Object.fromEntries(Object.entries(content.slots ?? {}).map(([name, slot]) =>
-      [name, () => renderCustomElementsToVNodes(slot)]))
+      [name, () => renderCustomElementsToVNodes(slot, inBoundary || isBoundary)]))
+    const render = () => h(component, props, slots)
 
-    return h(component, props, slots)
+    return isBoundary ? h(NuxtErrorBoundary, null, { default: render, error: () => null }) : render()
   }
 
   function renderCustomElements(content: DrupalElementContent): VNode | null {
