@@ -122,11 +122,11 @@
     "setup:hooks": "git config core.hooksPath .githooks"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.158",
+    "@iconify-json/lucide": "^1.2.159",
     "@internationalized/date": "^3.12.4",
     "@nuxt/image": "^2.2.1",
     "@nuxt/kit": "^4.7.0",
-    "@nuxt/scripts": "^1.3.12",
+    "@nuxt/scripts": "^1.3.13",
     "@nuxt/ui": "^4.13.1",
     "@nuxtjs/plausible": "^4.1.0",
     "@nuxtjs/robots": "^7.1.0",
@@ -141,7 +141,7 @@
     "@tiptap/extension-list-item": "^3.35.0",
     "@tiptap/extension-ordered-list": "^3.35.0",
     "@tiptap/vue-3": "^3.35.0",
-    "@unhead/vue": "^3.5.0",
+    "@unhead/vue": "^3.5.2",
     "@vue/shared": "^3.5.46",
     "@vueuse/core": "^15.1.0",
     "h3": "^1.15.11",
@@ -155,7 +155,7 @@
     "tailwindcss": "^4.3.5",
     "ultrahtml": "^1.7.0",
     "undici": "^8.13.1",
-    "unhead": "^3.5.0",
+    "unhead": "^3.5.2",
     "valibot": "^1.5.0",
     "vue-draggable-plus": "^0.6.1"
   },
@@ -180,7 +180,7 @@
     }
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.14.0",
+    "@axe-core/playwright": "^4.14.1",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/schema": "^4.7.0",
     "@nuxt/test-utils": "^4.4.0",
