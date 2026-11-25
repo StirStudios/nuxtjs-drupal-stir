@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createReusableTemplate } from '@vueuse/core'
-import { getDrupalOrigin } from '#stir/utils/drupalUrl'
+import { resolveDrupalCeConfig } from '../../../../foundation/shared/utils/drupalCeConfig'
 import {
   resolveUiButtonVariant,
   resolveUiColor,
@@ -156,7 +156,7 @@ const resolvedBackgroundImage = computed(() => {
     return image
   }
 
-  const apiBase = getDrupalOrigin(runtimeConfig.public)
+  const apiBase = resolveDrupalCeConfig(runtimeConfig.public).drupalBaseUrl
 
   return apiBase ? `${apiBase}${image}` : image
 })
