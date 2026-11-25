@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+- A Drupal paragraph whose component throws while server-rendering no longer
+  fails the whole page with a 500. Each outermost `paragraph-*` element
+  renders inside a `<NuxtErrorBoundary>` (Nuxt 4.7
+  `experimental.ssrErrorBoundary`); a failing one renders nothing and the
+  error still reaches the error reporter.
+- `experimental.staticRoutes` is on: the server builds the route matcher once
+  instead of per request. **Breaking** for code that adds routes at runtime:
+  `router.addRoute()`, `removeRoute()` and `clearRoutes()` now throw and are
+  removed from the router type. No consumer site uses them; build-time page
+  hooks are unaffected.
+
 - The Drupal page type is now exported as `StirDrupalPage` (with
   `StirPageContent`) from the theme layer's types, and
   `useStirDrupalCe().getPage()` returns it as a read-only computed ref
