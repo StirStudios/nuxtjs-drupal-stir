@@ -1,16 +1,9 @@
 import { appendResponseHeader } from 'h3'
 import type { pageFetchOptions } from '../utils/pageRequest'
+import type { StirDrupalPage } from '../types/DrupalPage'
 
 export type DrupalMessage = { type: 'error' | 'success', message: string }
 
-type DrupalPagePayload = {
-  key?: string
-  title?: string
-  content?: unknown
-  messages?: { error?: string[], success?: string[] } | unknown[]
-  redirect?: { url: string, statusCode?: number, external?: boolean }
-  [key: string]: unknown
-}
 
 type FetchPageOptions = {
   query?: Record<string, unknown>
@@ -24,7 +17,7 @@ const PROXY_BASE = '/api/drupal-ce'
 // render for several visitor URLs, so the server cannot key by its own URL.
 const SERVER_KEY = 'page:ssr'
 
-const emptyPage = (): DrupalPagePayload => ({
+const emptyPage = (): StirDrupalPage => ({
   breadcrumbs: [],
   content: {},
   content_format: 'json',
@@ -69,7 +62,7 @@ export function useDrupalPage() {
   }
 
   const promotePending = () => {
-    const page = pendingKey.value ? nuxtApp.payload.data[pendingKey.value] as DrupalPagePayload | undefined : undefined
+    const page = pendingKey.value ? nuxtApp.payload.data[pendingKey.value] as StirDrupalPage | undefined : undefined
 
     if (!page) return
     if (!page.redirect) currentKey.value = pendingKey.value
@@ -94,7 +87,7 @@ export function useDrupalPage() {
     if (nuxtApp.isHydrating || !currentKey.value) promotePending()
   }
 
-  const queueMessages = (raw: DrupalPagePayload['messages']) => {
+  const queueMessages = (raw: StirDrupalPage['messages']) => {
     if (import.meta.server || !raw || Array.isArray(raw)) return
 
     messages.value.push(
@@ -105,7 +98,7 @@ export function useDrupalPage() {
 
   // Read now: the response callback runs outside the Nuxt context.
   const allowedHeaders = import.meta.server
-    ? (useRuntimeConfig().drupalCe as { passThroughHeaders?: string[] } | undefined)?.passThroughHeaders ?? []
+    ? useRuntimeConfig().drupalCe?.passThroughHeaders ?? []
     : []
 
   const passThroughHeaders = (headers: Headers) => {
@@ -125,13 +118,13 @@ export function useDrupalPage() {
     path: string,
     options: FetchPageOptions = {},
     onError: (error: { value: unknown }) => never | void = defaultPageError,
-  ): Promise<Ref<DrupalPagePayload>> {
+  ): Promise<Ref<StirDrupalPage>> {
     watchNavigation()
 
     const version = import.meta.client ? ++requestVersion.value : requestVersion.value
     const requestRoute = import.meta.client ? withoutHash(nuxtApp.$router.currentRoute.value.fullPath) : ''
     const key = options.key ?? routeKey()
-    const { data, error } = await useFetch<DrupalPagePayload>(path, {
+    const { data, error } = await useFetch<StirDrupalPage>(path, {
       key,
       baseURL: PROXY_BASE,
       query: options.query,
@@ -141,7 +134,7 @@ export function useDrupalPage() {
       ...(options.getCachedData ? { getCachedData: options.getCachedData as never } : {}),
       onResponse: import.meta.server ? ({ response }) => passThroughHeaders(response.headers) : undefined,
     })
-    let page = data as Ref<DrupalPagePayload>
+    let page = data as Ref<StirDrupalPage>
 
     // A newer navigation started while this one waited: leave its state alone.
     if (import.meta.client && (version !== requestVersion.value
@@ -183,14 +176,14 @@ export function useDrupalPage() {
   function getPage(customKey?: string) {
     if (!customKey) watchNavigation()
 
-    return computed<DrupalPagePayload>(() => {
+    return computed<StirDrupalPage>(() => {
       const key = customKey || currentKey.value
-      const current = key ? nuxtApp.payload.data[key] as DrupalPagePayload | undefined : undefined
+      const current = key ? nuxtApp.payload.data[key] as StirDrupalPage | undefined : undefined
 
       if (current) return current
 
       const pending = !customKey && pendingKey.value
-        ? nuxtApp.payload.data[pendingKey.value] as DrupalPagePayload | undefined
+        ? nuxtApp.payload.data[pendingKey.value] as StirDrupalPage | undefined
         : undefined
 
       return pending && !pending.redirect ? pending : emptyPage()

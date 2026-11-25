@@ -4,8 +4,9 @@ import {
   resolveDrupalPageAccess,
 } from '../utils/editorialAccess'
 import { isDrupalRenderedRoute } from '../utils/drupalPage'
+import type { StirDrupalPage } from '../types/DrupalPage'
 
-export function usePageContext(page = useStirDrupalCe().getPage()) {
+export function usePageContext(page: Readonly<Ref<StirDrupalPage>> = useStirDrupalCe().getPage()) {
   const route = useRoute()
   // Null when the auth layer is not installed: the page payload alone decides.
   const session = useOptionalAuthSession()

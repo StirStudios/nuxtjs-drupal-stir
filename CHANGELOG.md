@@ -13,6 +13,17 @@ untouched do not need one.
 
 ## Unreleased
 
+- The Drupal page type is now exported as `StirDrupalPage` (with
+  `StirPageContent`) from the theme layer's types, and
+  `useStirDrupalCe().getPage()` returns it as a read-only computed ref
+  without a cast. `usePageContext()` and the `drupalPageKey` injection accept
+  any read-only ref of it. Code that assigned to `getPage().value` was
+  writing to a computed and must stop; reads are unchanged. The page's
+  `messages` field is typed as Drupal sends it (grouped by type, or an empty
+  list), and `settings` is optional.
+- The Drupal CE settings are read through one typed helper,
+  `resolveDrupalCeConfig()`, which fills the same defaults as before.
+
 - **Breaking:** the layer no longer installs `nuxtjs-drupal-ce`. Page
   fetching, rendering, menus and messages already came from the layer; the
   `v-drupal-markup` directive and the encoded-path hydration fix are now layer

@@ -1,7 +1,7 @@
-import type { InjectionKey } from 'vue'
-import type { useStirDrupalCe } from '../composables/useStirDrupalCe'
+import type { InjectionKey, Ref } from 'vue'
+import type { StirDrupalPage } from '../types/DrupalPage'
 
-export const drupalPageKey: InjectionKey<ReturnType<ReturnType<typeof useStirDrupalCe>['getPage']>> = Symbol('stir-drupal-page')
+export const drupalPageKey: InjectionKey<Readonly<Ref<StirDrupalPage>>> = Symbol('stir-drupal-page')
 
 /** Drupal renders the front page and the catch-all slug route; other routes are Nuxt pages. */
 export function isDrupalRenderedRoute(route: { params: object, path: string }): boolean {

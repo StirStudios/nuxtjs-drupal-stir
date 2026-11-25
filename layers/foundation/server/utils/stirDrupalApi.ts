@@ -10,6 +10,7 @@ import {
 } from 'h3'
 import { recordStirCacheTags } from './stirCacheTags'
 import { readStirDrupalMaintenanceMessage } from '../../shared/utils/drupalMaintenance'
+import { resolveDrupalCeConfig } from '../../shared/utils/drupalCeConfig'
 import { assertStirSameOrigin } from './stirRequestSecurity'
 
 // Shared by focused server capabilities and the full Drupal CE platform.
@@ -159,12 +160,7 @@ export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
 
 export function getStirDrupalApiConfig() {
   const config = useRuntimeConfig()
-  // The CE module copies serverDrupalBaseUrl into public config at runtime, but
-  // its generated type omits it, and consumers without the module see unknown.
-  const drupalCeConfig = (config.public.drupalCe ?? {}) as {
-    drupalBaseUrl?: string
-    serverDrupalBaseUrl?: string
-  }
+  const drupalCeConfig = resolveDrupalCeConfig(config.public)
 
   // One order for every server request to Drupal, the CE proxy included: a
   // deployment-time drupalCe URL beats the build-time `api`. With several
