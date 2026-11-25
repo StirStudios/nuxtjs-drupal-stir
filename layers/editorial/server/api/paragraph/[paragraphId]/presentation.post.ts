@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import { stirDrupalApiRequest } from '../../../../../foundation/server/utils/stirDrupalApi'
-import { resolveDrupalCeApiConfig } from '../../../../../core/server/utils/drupalCeApiConfig'
+import { resolveDrupalCeConfig } from '../../../../../foundation/shared/utils/drupalCeConfig'
 import type {
   ParagraphLayoutUpdate,
   ParagraphPresentationKey,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
   const values = (body.values ?? {}) as PresentationValues
   const layout = body.layout as ParagraphLayoutUpdate | undefined
-  const { ceApiEndpoint } = resolveDrupalCeApiConfig(useRuntimeConfig())
+  const { ceApiEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
 
   try {
     return await stirDrupalApiRequest<ParagraphPresentationResponse>(

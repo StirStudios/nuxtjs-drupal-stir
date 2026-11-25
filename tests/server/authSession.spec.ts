@@ -18,7 +18,7 @@ describe('/api/auth/session', () => {
   it('maps authenticated Drupal session response', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', {
       raw: vi.fn().mockResolvedValue({
@@ -49,7 +49,7 @@ describe('/api/auth/session', () => {
   it('keeps Drupal CSRF and logout tokens out of the client session', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', {
       raw: vi.fn().mockResolvedValue({ _data: authenticatedSession }),
@@ -70,7 +70,7 @@ describe('/api/auth/session', () => {
   it('returns unauthenticated payload when Drupal base URL is missing', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: '',
-      public: { api: '' },
+      public: { drupalCe: { drupalBaseUrl: '' } },
     }))
 
     const response = await sessionHandler(mockEvent)

@@ -13,6 +13,16 @@ untouched do not need one.
 
 ## Unreleased
 
+- **Breaking:** the `runtimeConfig.api` and `runtimeConfig.public.api` keys are
+  removed. They held the same Drupal URL as `public.drupalCe.drupalBaseUrl`
+  and were only kept for the old module. Use `getDrupalOrigin(config.public)`
+  (with `toDrupalUrl()` for file paths). Every server request to Drupal now
+  uses `drupalCe.serverDrupalBaseUrl`, then `drupalCe.drupalBaseUrl`. The
+  server-only `apiKey` (`DRUPAL_API_KEY`) is unchanged.
+- The editorial and paragraph-view server routes read the CE endpoint
+  straight from the shared config; the `resolveDrupalCeApiConfig` server
+  helper is removed.
+
 - `useMenu()` is typed and never `null`: `data` is the menu tree
   (`DrupalMenuTreeItem[]` by default, or `useMenu<MyItem>('name')`), and an
   empty list before it loads or when the fetch fails, as `fetchMenu` gave.

@@ -88,8 +88,8 @@ export default defineNuxtConfig({
     '#stir/types': resolveLayerPath('./layers/theme/app/types'),
   },
 
-  // Drupal CE settings, under the keys the nuxtjs-drupal-ce module used so
-  // the NUXT_PUBLIC_DRUPAL_CE_* runtime overrides keep working.
+  // Drupal CE settings, kept under `drupalCe` so the
+  // NUXT_PUBLIC_DRUPAL_CE_* runtime overrides keep working.
   runtimeConfig: {
     drupalCe: {
       // Drupal response headers the page fetch passes to the HTML response:

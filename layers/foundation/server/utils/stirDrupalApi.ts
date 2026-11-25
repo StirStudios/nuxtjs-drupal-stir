@@ -162,16 +162,9 @@ export function getStirDrupalApiConfig() {
   const config = useRuntimeConfig()
   const drupalCeConfig = resolveDrupalCeConfig(config.public)
 
-  // One order for every server request to Drupal, the CE proxy included: a
-  // deployment-time drupalCe URL beats the build-time `api`. With several
-  // sites on one Drupal, this URL's host is what tells them apart.
-  const baseUrl = String(
-    drupalCeConfig.serverDrupalBaseUrl
-    || drupalCeConfig.drupalBaseUrl
-    || config.api
-    || config.public.api
-    || '',
-  ).replace(/\/+$/, '')
+  // One order for every server request to Drupal, the CE proxy included.
+  // With several sites on one Drupal, this URL's host is what tells them apart.
+  const baseUrl = drupalCeConfig.serverDrupalBaseUrl || drupalCeConfig.drupalBaseUrl
   const apiKey = stirServerEnv('DRUPAL_API_KEY', config.apiKey)
   const requestTimeoutMs = normalizePositiveInteger(
     config.drupalRequestTimeoutMs,

@@ -153,7 +153,7 @@ const {
   server: false,
 })
 const drupalOrigin = computed(() =>
-  getDrupalOrigin(config.public as Record<string, unknown>),
+  getDrupalOrigin(config.public),
 )
 
 const normalizeAdminUrl = (value: string): string => {

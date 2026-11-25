@@ -88,11 +88,9 @@ describe('Stir Drupal API boundary', () => {
 
   it('prefers the server Drupal URL and normalizes the timeout', () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-      api: 'https://private.example.test',
       apiKey: 'api-key',
       drupalRequestTimeoutMs: 2500,
       public: {
-        api: 'https://public.example.test',
         drupalCe: {
           drupalBaseUrl: 'https://browser.example.test',
           serverDrupalBaseUrl: 'http://drupal.internal/',
@@ -105,31 +103,6 @@ describe('Stir Drupal API boundary', () => {
       baseUrl: 'http://drupal.internal',
       requestTimeoutMs: 2500,
     })
-  })
-
-  it('falls back through the Drupal URLs in the CE proxy\'s order', () => {
-    const resolve = (config: Record<string, unknown>) => {
-      vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue(config))
-
-      return getStirDrupalApiConfig().baseUrl
-    }
-
-    // A deployment-time drupalCe URL beats the build-time `api`, so every
-    // server request reaches the same Drupal host as the CE proxy.
-    expect(resolve({
-      api: 'https://build-time.example.test',
-      public: {
-        api: 'https://public.example.test',
-        drupalCe: { drupalBaseUrl: 'https://site-b.cms.example.test/' },
-      },
-    })).toBe('https://site-b.cms.example.test')
-    expect(resolve({
-      api: 'https://build-time.example.test',
-      public: { api: 'https://public.example.test' },
-    })).toBe('https://build-time.example.test')
-    expect(resolve({
-      public: { api: 'https://public.example.test' },
-    })).toBe('https://public.example.test')
   })
 
   it('forwards only strictly named Drupal session cookies', () => {
@@ -161,7 +134,7 @@ describe('Stir Drupal API boundary', () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
       drupalRequestTimeoutMs: 3500,
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn().mockResolvedValue({
       _data: { authenticated: true },
@@ -196,7 +169,7 @@ describe('Stir Drupal API boundary', () => {
   it('adds a Drupal CSRF token to cookie-authenticated mutations', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn()
       .mockResolvedValueOnce({
@@ -249,7 +222,7 @@ describe('Stir Drupal API boundary', () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
       siteUrl: 'https://www.example.test',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn()
 
@@ -274,7 +247,7 @@ describe('Stir Drupal API boundary', () => {
   it('marks anonymous mutations private and no-store', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', {
       raw: vi.fn().mockResolvedValue({
@@ -296,7 +269,7 @@ describe('Stir Drupal API boundary', () => {
   it('forwards multipart bodies through the protected mutation boundary', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn().mockResolvedValue({
       _data: { uploaded: true },
@@ -326,7 +299,7 @@ describe('Stir Drupal API boundary', () => {
   it('supports an explicit same-origin opt-out for trusted server integrations', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn().mockResolvedValue({
       _data: { accepted: true },
@@ -352,7 +325,7 @@ describe('Stir Drupal API boundary', () => {
   it('rejects upstream redirects instead of returning a false success', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', {
       raw: vi.fn().mockResolvedValue({
@@ -395,7 +368,7 @@ describe('Stir Drupal API boundary', () => {
         enabled: true,
         trustProxy: true,
       },
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const raw = vi.fn().mockResolvedValue({
       _data: { authenticated: true },
@@ -532,7 +505,7 @@ describe('Stir Drupal API boundary', () => {
   it('reports upstream failures through the Nitro error hook', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     const upstreamError = new Error('Drupal unavailable')
     const captureError = vi.fn()

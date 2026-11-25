@@ -62,15 +62,12 @@ const stubRuntimeConfig = (
   overrides: Record<string, unknown> = {},
 ): void => {
   vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
-    api: 'https://cms.example.test',
     apiKey: 'server-api-key',
     public: {
-      api: 'https://cms.example.test',
       drupalCe: {
         ceApiEndpoint: '/ce-api',
         drupalBaseUrl: 'https://cms.example.test',
         menuBaseUrl: 'https://menus.example.test',
-        serverApiProxy: true,
       },
     },
     ...overrides,
@@ -240,7 +237,6 @@ describe('Drupal CE proxy boundary', () => {
     // relative paths instead of absolute frontend URLs.
     stubRuntimeConfig({
       public: {
-        api: 'https://cms.example.test',
         drupalCe: { ceApiEndpoint: '/ce-api', drupalBaseUrl: 'https://cms.example.test' },
       },
     })
@@ -253,14 +249,11 @@ describe('Drupal CE proxy boundary', () => {
 
   it('preserves deployment-time Drupal CE origin overrides', () => {
     stubRuntimeConfig({
-      api: 'https://build-time.example.test',
       public: {
-        api: 'https://build-time.example.test',
         drupalCe: {
           ceApiEndpoint: '/custom-ce',
           drupalBaseUrl: 'https://runtime.example.test',
           menuBaseUrl: 'https://runtime-menu.example.test',
-          serverApiProxy: true,
         },
       },
     })

@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
 import { stirDrupalApiRequest } from '../../../../../../foundation/server/utils/stirDrupalApi'
-import { resolveDrupalCeApiConfig } from '../../../../../../core/server/utils/drupalCeApiConfig'
+import { resolveDrupalCeConfig } from '../../../../../../foundation/shared/utils/drupalCeConfig'
 import { createUpstreamParagraphTextError } from '../../../../utils/paragraphTextApi'
 import {
   buildFormattedTextPath,
@@ -9,7 +9,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   const target = parseFormattedTextRouteTarget(event.context.params)
-  const { ceApiEndpoint } = resolveDrupalCeApiConfig(useRuntimeConfig())
+  const { ceApiEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
 
   try {
     return await stirDrupalApiRequest<{

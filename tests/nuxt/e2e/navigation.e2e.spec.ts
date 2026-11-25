@@ -3,9 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 import { createPage, fetch, setup, url } from '@nuxt/test-utils/e2e'
 
-// Pins how shared UI follows Drupal pages during client navigation, the
-// behaviour the nuxtjs-drupal-ce replacement must keep
-// (docs/plans/own-drupal-ce.md, Phase 0). Shared UI outside the page must
+// Pins how shared UI follows Drupal pages during client navigation. Shared UI outside the page must
 // keep the outgoing page until the destination renders: never the next
 // page early and never an empty page.
 const SLOW_PAGE_DELAY_MS = 1200

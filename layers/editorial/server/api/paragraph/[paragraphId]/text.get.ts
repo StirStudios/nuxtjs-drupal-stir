@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3'
 import { stirDrupalApiRequest } from '../../../../../foundation/server/utils/stirDrupalApi'
-import { resolveDrupalCeApiConfig } from '../../../../../core/server/utils/drupalCeApiConfig'
+import { resolveDrupalCeConfig } from '../../../../../foundation/shared/utils/drupalCeConfig'
 import {
   buildParagraphTextPath,
   createUpstreamParagraphTextError,
@@ -9,7 +9,7 @@ import {
 
 export default defineEventHandler(async (event) => {
   const paragraphId = parseParagraphId(event.context.params?.paragraphId)
-  const { ceApiEndpoint } = resolveDrupalCeApiConfig(useRuntimeConfig())
+  const { ceApiEndpoint } = resolveDrupalCeConfig(useRuntimeConfig().public)
 
   try {
     return await stirDrupalApiRequest<{

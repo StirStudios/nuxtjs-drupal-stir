@@ -22,7 +22,7 @@ describe('/api/admin-menu', () => {
 
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', { raw })
 
@@ -39,7 +39,7 @@ describe('/api/admin-menu', () => {
   it('passes Drupal\'s refusal through for editors without the menu', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
-      public: { api: 'https://cms.example.test' },
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
     }))
     vi.stubGlobal('$fetch', {
       raw: vi.fn().mockRejectedValue(Object.assign(new Error('Forbidden'), {
