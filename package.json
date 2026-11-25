@@ -149,7 +149,7 @@
     "motion-v": "^2.13.0",
     "nostics": "^1.4.0",
     "nuxt": "^4.7.0",
-    "nuxt-vitalizer": "^3.0.0",
+    "nuxt-vitalizer": "^4.0.0",
     "rate-limiter-flexible": "^11.5.0",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.5",
