@@ -365,10 +365,10 @@ export default defineAppConfig({
       },
     },
 
-    // Opt-in page transitions; see docs/stir-theme-config.md.
+    // Page transitions; see docs/stir-theme-config.md.
     pageTransition: {
-      type: 'none',
-      durationMs: 250,
+      type: 'crossfade',
+      durationMs: 150,
       cover: {},
     },
 

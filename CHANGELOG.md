@@ -13,6 +13,12 @@ untouched do not need one.
 
 ## Unreleased
 
+- Page transitions now default to a 150 ms crossfade
+  (`stirTheme.pageTransition.type: 'crossfade'`, `durationMs: 150`) using
+  browser View Transitions; browsers without them and `prefers-reduced-motion`
+  navigate without one. A site that wants none sets `type: 'none'`; sites
+  that already set a type or duration keep it.
+
 - `nuxt-vitalizer` 4. It needs Nuxt 4.6 or later and drops the
   `disableStylesheets` option; a site that sets
   `vitalizer.disableStylesheets` must remove it.

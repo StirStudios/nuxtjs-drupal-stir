@@ -1005,8 +1005,8 @@ Off by default. A site opts in with one type:
 
 ```ts
 pageTransition: {
-  type: 'none', // 'crossfade' | 'cover'
-  durationMs: 250, // crossfade only
+  type: 'crossfade', // 'none' | 'cover'
+  durationMs: 150, // crossfade only
   cover: {
     color: 'var(--ui-primary)',
     surface: { component: 'AppTransitionSurface', props: {}, class: '' },

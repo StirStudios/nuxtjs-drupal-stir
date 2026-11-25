@@ -574,11 +574,11 @@ type StirThemePageCoverConfig = {
 
 type StirThemePageTransitionConfig = {
   /**
-   * Default 'none'. 'crossfade' uses browser View Transitions and is read
-   * at build time; 'cover' draws a panel over the page while it changes.
+   * Default 'crossfade'. 'crossfade' uses browser View Transitions and is read
+   * at build time; 'cover' draws a panel over the page while it changes; 'none' turns transitions off.
    */
   type?: StirThemePageTransitionType
-  /** Crossfade duration. Default 250. */
+  /** Crossfade duration. Default 150. */
   durationMs?: number
   cover?: StirThemePageCoverConfig
 }
