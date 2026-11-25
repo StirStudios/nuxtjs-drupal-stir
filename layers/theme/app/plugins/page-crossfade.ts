@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
   useHead({
     style: [{
       key: 'stir-page-crossfade',
-      innerHTML: pageCrossfadeCss(transition.durationMs ?? 250),
+      innerHTML: pageCrossfadeCss(transition.durationMs ?? 150),
     }],
   })
 })
