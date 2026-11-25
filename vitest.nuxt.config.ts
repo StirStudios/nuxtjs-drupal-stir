@@ -36,6 +36,9 @@ export default defineVitestConfig({
     environmentOptions: {
       nuxt: {
         rootDir,
+        // Some specs add a page route at runtime to stand in for a site's
+        // own Nuxt page, which staticRoutes forbids. Builds keep it on.
+        overrides: { experimental: { staticRoutes: false } },
       },
     },
   },
