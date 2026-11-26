@@ -130,6 +130,8 @@ export function useDrupalPage() {
       query: options.query,
       credentials: 'include',
       headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
+      // The proxy's answer stands: a 5xx from the CMS is not asked for twice.
+      retryStatusCodes: [],
       // Nuxt types getCachedData with its own app type; pageRequest narrows it.
       ...(options.getCachedData ? { getCachedData: options.getCachedData as never } : {}),
       onResponse: import.meta.server ? ({ response }) => passThroughHeaders(response.headers) : undefined,

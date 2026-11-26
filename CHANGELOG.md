@@ -13,6 +13,24 @@ untouched do not need one.
 
 ## Unreleased
 
+- A Button paragraph with a document attached links to the file in a new tab
+  while `stirTheme.showPdf` is off (the default). It rendered a button that
+  did nothing; with `showPdf` on it still opens the PDF viewer.
+- The menu proxy (`/api/menu/**`) refuses what a menu cannot be: a CMS
+  redirect is a 404 and its `Location` is not passed on, and a non-JSON 2xx
+  is a 502, as the CE page proxy already did.
+- A request the CMS answered is never repeated: server requests to Drupal and
+  the page fetch no longer retry a 5xx (Maintenance mode's 503 included). A
+  request that got no answer is still retried once.
+- `/api/app-context` marks its empty stand-in for a failed fetch
+  `private, no-store`.
+- Blank authored values: a blank tab title falls back to `Tab N`, a
+  whitespace-only Layout or Feature header renders no heading, gallery
+  triggers are named after their media (`Open media modal: <title or alt>`),
+  and a social link without a title reads "Visit our social page".
+- The packed `stir-perf` bin ships `scripts/perf/imageResolution.mjs`, which it
+  imports; it could not start in a site.
+
 - **Breaking:** the `runtimeConfig.api` and `runtimeConfig.public.api` keys are
   removed. They held the same Drupal URL as `public.drupalCe.drupalBaseUrl`
   and were only kept for the old module. Use `getDrupalOrigin(config.public)`

@@ -24,7 +24,7 @@ type TabsItem = { label: string; value: string }
 
 const items = computed<TabsItem[]>(() =>
   tabNodes.value.map((tab, index) => ({
-    label: tab.props?.title ?? `Tab ${index + 1}`,
+    label: String(tab.props?.title ?? '').trim() || `Tab ${index + 1}`,
     value: String(index),
   })),
 )

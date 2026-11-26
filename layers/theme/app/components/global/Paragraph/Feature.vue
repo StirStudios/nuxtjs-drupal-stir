@@ -46,7 +46,7 @@ const cardVariant = computed(() => resolveUiPageCardVariant(props.cardVariant))
         :to="cardLink"
         :variant="cardVariant"
       >
-        <template v-if="header" #title>
+        <template v-if="header?.trim()" #title>
           <component :is="headingTag">
             {{ header }}
           </component>

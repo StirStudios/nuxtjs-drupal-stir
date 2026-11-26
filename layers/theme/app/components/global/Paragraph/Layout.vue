@@ -131,7 +131,7 @@ const childRevealScope = provideRevealMotionScope(
 )
 // The heading is the first visual child, so reserve the first stagger index
 // before descendant components register themselves during setup.
-const headerStaggerIndex = props.header ? childRevealScope.takeIndex() : 0
+const headerStaggerIndex = props.header?.trim() ? childRevealScope.takeIndex() : 0
 const headerMotionProps = useRevealMotionProps(
   () => animationScope.value === 'children'
     ? resolvedLayoutEffect.value
@@ -158,7 +158,7 @@ provide(imageSlotKey, computed(() => imageSlotFor()))
       :width="width"
     >
       <RevealMotionElement
-        v-if="header"
+        v-if="header?.trim()"
         :as="headingTag"
         class="col-span-full"
         :motion-props="headerMotionProps"

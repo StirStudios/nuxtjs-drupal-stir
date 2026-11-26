@@ -54,6 +54,7 @@
     "scripts/a11y",
     "scripts/compliance",
     "scripts/perf/audit.mjs",
+    "scripts/perf/imageResolution.mjs",
     "scripts/seo",
     "server",
     "nuxt.config.ts",

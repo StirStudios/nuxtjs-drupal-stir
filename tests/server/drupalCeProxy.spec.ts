@@ -186,21 +186,40 @@ describe('Drupal CE proxy boundary', () => {
     }
   })
 
-  it('leaves mutations and menu reads to their own handling', async () => {
+  it('leaves mutations to their own handling', () => {
     const { event } = createEvent('', '/', { method: 'POST' })
 
     expect(() => assertStirDrupalPageResponse(event, new Response('<html>', { status: 307 }))).not.toThrow()
+  })
 
+  it('refuses a CMS redirect or an HTML answer to a menu read', async () => {
     stubRuntimeConfig()
     vi.mocked(proxyRequest).mockClear()
 
-    await proxyStirDrupalMenuRequest(createEvent().event, 'api/menu_items/main')
+    const { event, responseHeaders } = createEvent()
+
+    await proxyStirDrupalMenuRequest(event, 'api/menu_items/main')
 
     const { onResponse } = vi.mocked(proxyRequest).mock.calls[0]![2] as unknown as {
       onResponse: (event: never, response: Response) => void
     }
 
-    expect(onResponse).toBe(handleStirDrupalProxyResponse)
+    responseHeaders.set('location', 'https://cms.example.test/user/login')
+    expect(() => onResponse(event as never, new Response('', {
+      status: 302,
+      headers: { location: 'https://cms.example.test/user/login' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
+    expect(responseHeaders.has('location')).toBe(false)
+
+    expect(() => onResponse(event as never, new Response('<html>', {
+      status: 200,
+      headers: { 'content-type': 'text/html' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 502 }))
+
+    expect(() => onResponse(event as never, new Response('[]', {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }))).not.toThrow()
   })
 
   it('reports a CMS that misses the request timeout as a 504, other failures as 502', async () => {

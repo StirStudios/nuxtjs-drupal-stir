@@ -345,6 +345,7 @@ export const proxyStirDrupalMenuRequest = async (
   )
 
   // Drupal's response cache headers pass through; menus are access-filtered,
-  // so caching them is Drupal's decision, not the proxy's.
-  return await withGatewayTimeout(proxyRequest(event, target, stirDrupalProxyOptions(event)))
+  // so caching them is Drupal's decision, not the proxy's. A menu is JSON like
+  // a page, so a CMS redirect or an HTML answer is refused the same way.
+  return await withGatewayTimeout(proxyRequest(event, target, stirDrupalCeProxyOptions(event)))
 }

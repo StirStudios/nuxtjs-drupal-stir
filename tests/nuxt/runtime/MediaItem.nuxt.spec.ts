@@ -94,7 +94,7 @@ describe('MediaItem (Nuxt runtime)', () => {
         tk: { propsOf: () => ({ type: 'video', title, src: '/preview.webp' }) } as Pick<SlotsToolkit, 'propsOf'>,
       },
     })
-    const trigger = wrapper.get('button[aria-label="Open video modal"]')
+    const trigger = wrapper.get('button[aria-label^="Open video modal"]')
     const icon = trigger.get('.i-lucide\\:play')
 
     expect(icon.classes()).toContain(corner ? 'size-6' : 'size-9')
@@ -220,8 +220,9 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    const trigger = wrapper.get('button[aria-label="Open media modal"]')
+    const trigger = wrapper.get('button[aria-label^="Open media modal"]')
 
+    expect(trigger.attributes('aria-label')).toBe('Open media modal: Project detail')
     expect(trigger.find('div, a, button, h1, h2, h3').exists()).toBe(false)
     expect(trigger.element.parentElement).toBe(wrapper.get('.media').element)
     expect(wrapper.get('img').element.parentElement).toBe(trigger.element.parentElement)
@@ -281,7 +282,7 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    const trigger = wrapper.get('[aria-label="Open video modal"]')
+    const trigger = wrapper.get('[aria-label^="Open video modal"]')
     const playIcon = trigger.get('.i-lucide\\:play')
 
     expect(trigger.classes()).not.toContain('after:bg-black/30')
@@ -326,7 +327,7 @@ describe('MediaItem (Nuxt runtime)', () => {
       },
     })
 
-    const revealed = wrapper.get('[aria-label="Open media modal"]').element.parentElement?.classList
+    const revealed = wrapper.get('[aria-label^="Open media modal"]').element.parentElement?.classList
 
     expect(revealed).toContain('reveal-motion')
     expect(revealed).not.toContain('motion-safe:opacity-0')

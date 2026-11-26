@@ -161,6 +161,8 @@ export async function fetchAppContext(event: H3Event, path = '') {
     }
 
     logAppContextFetchError(event, path, error)
+    // A stand-in for a failed fetch must not be kept by a cache.
+    markStirPrivateResponse(event)
 
     return emptyAppContext()
   }

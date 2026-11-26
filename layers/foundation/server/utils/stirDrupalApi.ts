@@ -146,6 +146,9 @@ interface StirDrupalFetchRequestOptions {
 // connection, gets the full timeout.
 export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
   timeout: requestTimeoutMs,
+  // An answer is never retried: ofetch would otherwise repeat a GET on a 5xx,
+  // Maintenance mode's 503 included.
+  retryStatusCodes: [] as number[],
   onRequest({ options }: { options: StirDrupalFetchRequestOptions }) {
     if (options.signal?.reason?.name === 'TimeoutError') options.signal = undefined
 

@@ -125,8 +125,10 @@ const pdfUrl = computed(() =>
         :icon="iconName ?? 'i-lucide-file-text'"
         :label="pdfTitle"
         :size="btnSize"
+        :target="theme.showPdf ? undefined : '_blank'"
+        :to="theme.showPdf ? undefined : pdfUrl"
         :variant="btnVariant"
-        @click="() => { open = true }"
+        @click="() => { open = !!theme.showPdf }"
       />
 
       <UButton
