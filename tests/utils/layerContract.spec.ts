@@ -1000,10 +1000,12 @@ describe('layer contract', () => {
       ),
       'utf8',
     )
-    const adminCss = readFileSync(
-      resolve(rootDir, 'layers/editorial/app/assets/css/admin-ui.css'),
-      'utf8',
-    )
+    const adminCss = ['tokens', 'overlays', 'controls', 'navigation', 'editor']
+      .map(partial => readFileSync(
+        resolve(rootDir, `layers/editorial/app/assets/css/admin-ui/${partial}.css`),
+        'utf8',
+      ))
+      .join('\n')
 
     expect(editLink).toContain(
       'controlsPlacement?: \'sibling\' | \'slot\' | \'isolated\'',

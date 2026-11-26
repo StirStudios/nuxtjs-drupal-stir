@@ -1,0 +1,119 @@
+@reference '../../../../../theme/app/assets/css/main.css';
+
+:root {
+  --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);
+}
+
+.dark {
+  --admin-border: color-mix(in srgb, #3f3f46 45%, transparent);
+}
+
+.admin-ui {
+  color-scheme: light dark;
+}
+
+.admin-ui-scope {
+  --admin-z-50: #fafafa;
+  --admin-z-100: #f4f4f5;
+  --admin-z-200: #e4e4e7;
+  --admin-z-400: #a1a1aa;
+  --admin-z-700: #3f3f46;
+  --admin-z-800: #27272a;
+  --admin-z-900: #18181b;
+  --admin-z-950: #09090b;
+  --admin-white: #ffffff;
+
+  --admin-amber-50: #fffbeb;
+  --admin-amber-100: #fef3c7;
+  --admin-amber-700: #b45309;
+  --admin-amber-300: #fcd34d;
+  --admin-amber-500: #f59e0b;
+
+  --admin-bg: var(--admin-z-50);
+  --admin-bg-muted: var(--admin-z-100);
+  --admin-bg-strong: var(--admin-z-200);
+  --admin-bg-inverted: var(--admin-z-900);
+  --admin-text-dimmed: var(--admin-z-400);
+  --admin-text: var(--admin-z-900);
+  --admin-text-muted: var(--admin-z-700);
+  --admin-text-strong: var(--admin-z-950);
+  --admin-border: color-mix(in srgb, #d4d4d8 55%, transparent);
+
+  --admin-accent-text: var(--admin-amber-700);
+  --admin-accent-bg: color-mix(
+    in srgb,
+    var(--admin-amber-100) 70%,
+    transparent
+  );
+  --admin-accent-bg-subtle: var(--admin-amber-50);
+
+  --ui-primary: var(--admin-amber-700);
+  --ui-radius: 0.25rem;
+  --ui-text-dimmed: var(--admin-text-dimmed);
+  --ui-bg: var(--admin-bg);
+  --ui-bg-muted: var(--admin-bg-muted);
+  --ui-bg-elevated: var(--admin-bg-muted);
+  --ui-bg-accented: var(--admin-bg-strong);
+  --ui-bg-inverted: var(--admin-bg-inverted);
+  --ui-text: var(--admin-text);
+  --ui-text-muted: var(--admin-text-muted);
+  --ui-text-toned: var(--admin-text-muted);
+  --ui-text-highlighted: var(--admin-text-strong);
+  --ui-text-inverted: var(--admin-white);
+  --ui-border: var(--admin-border);
+  --ui-border-muted: var(--admin-border);
+  --ui-border-accented: var(--admin-z-400);
+  --ui-border-inverted: var(--admin-bg-inverted);
+
+  --admin-status-saving: var(--admin-text-muted);
+  --admin-status-error: #b91c1c;
+}
+
+.app-admin-tabs-font {
+  font-family: var(--font-admin);
+}
+
+.dark {
+  .admin-ui-scope {
+    --admin-bg: var(--admin-z-950);
+    --admin-bg-muted: var(--admin-z-900);
+    --admin-bg-strong: var(--admin-z-800);
+    --admin-bg-inverted: var(--admin-white);
+    --admin-text-dimmed: var(--admin-z-400);
+    --admin-text: #f4f4f5;
+    --admin-text-muted: var(--admin-z-200);
+    --admin-text-strong: var(--admin-white);
+    --admin-border: color-mix(in srgb, #3f3f46 45%, transparent);
+
+    --admin-accent-text: var(--admin-amber-300);
+    --admin-accent-bg: color-mix(
+      in srgb,
+      var(--admin-amber-500) 15%,
+      transparent
+    );
+    --admin-accent-bg-subtle: color-mix(
+      in srgb,
+      var(--admin-amber-500) 10%,
+      transparent
+    );
+
+    --ui-primary: var(--admin-amber-300);
+    --ui-text-inverted: var(--admin-z-950);
+
+    --admin-status-saving: var(--admin-text-muted);
+    --admin-status-error: #f87171;
+  }
+}
+
+:where(*):has(> [data-admin-ui-controls]) {
+  @apply relative;
+
+  &:is(:hover, :focus-within) > [data-admin-ui-controls],
+  > [data-admin-ui-controls]:is(:hover, :focus-within) {
+    @apply pointer-events-auto opacity-100;
+  }
+
+  > [data-admin-ui-controls]:has([aria-expanded='true']) {
+    @apply pointer-events-auto opacity-100;
+  }
+}
