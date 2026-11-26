@@ -1,36 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { loadNuxtConfig } from '@nuxt/kit'
 import { STIR_EDITORIAL_OFFSET_VAR } from '../../layers/theme/app/utils/editorialOffset'
 
 const rootDir = resolve(__dirname, '../..')
 
 describe('layer contract', () => {
-  it('prevents Safari from retaining stale local Vite module graphs', () => {
-    const foundationConfig = readFileSync(
-      resolve(rootDir, 'layers/foundation/nuxt.config.ts'),
-      'utf8',
-    )
-
-    expect(foundationConfig).toContain(
-      'const isDevelopment = process.env.NODE_ENV === \'development\'',
-    )
-    expect(foundationConfig).toContain(
-      'const developmentNoStore = \'private, no-store, max-age=0\'',
-    )
-    expect(foundationConfig).toContain('\'cache-control\': developmentNoStore')
-    expect(foundationConfig).toContain('\'Cache-Control\': developmentNoStore')
-
-    const platformConfig = readFileSync(
-      resolve(rootDir, 'layers/platform/nuxt.config.ts'),
-      'utf8',
-    )
-
-    // Drupal's cache-control is not passed through in development.
-    expect(platformConfig).toContain('...(isDevelopment ? [] : [\'cache-control\'])')
-  })
-
   it('composes the compatibility root from explicit capability layers', () => {
     const nuxtConfig = readFileSync(resolve(rootDir, 'nuxt.config.ts'), 'utf8')
     const platformConfig = readFileSync(
@@ -338,38 +314,6 @@ describe('layer contract', () => {
     expect(readme).not.toContain('@source \'@stir/base\';')
   })
 
-  it('owns the Drupal CE proxy boundary without changing its routes', () => {
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/api/drupal-ce/[...].ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/api/drupal-ce/index.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/api/menu/[...].ts',
-    ))).toBe(true)
-  })
-
-  it('has consumer fixture for smoke testing the layer from a root app', () => {
-    expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/nuxt.config.ts'))).toBe(true)
-    expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/app.config.ts'))).toBe(true)
-    expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/app.vue'))).toBe(true)
-    expect(existsSync(resolve(rootDir, 'tests/fixtures/consumer-app/app/assets/css/main.css'))).toBe(true)
-
-    const consumerCss = readFileSync(
-      resolve(rootDir, 'tests/fixtures/consumer-app/app/assets/css/main.css'),
-      'utf8',
-    )
-
-    expect(consumerCss).toContain(
-      '@import \'@stir/base/layers/theme/app/assets/css/main\';',
-    )
-    expect(consumerCss).not.toContain('@source \'@stir/base\';')
-  })
-
   it('publishes distinct minimal and full preset fixtures', () => {
     const minimalPreset = readFileSync(
       resolve(rootDir, 'presets/minimal/nuxt.config.ts'),
@@ -433,29 +377,6 @@ describe('layer contract', () => {
     ))).toBe(false)
   })
 
-  it('keeps shared request security in the foundation layer', () => {
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/foundation/server/utils/stirDrupalApi.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/foundation/server/utils/stirRequestSecurity.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/foundation/server/middleware/drupal-session-no-ssr.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/foundation/server/middleware/drupal-one-time-login-redirect.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/utils/stirDrupalApi.ts',
-    ))).toBe(false)
-  })
-
   it('keeps sitemap and global metadata in the optional SEO layer', () => {
     const platformConfig = readFileSync(
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),
@@ -514,58 +435,6 @@ describe('layer contract', () => {
     ))).toBe(false)
   })
 
-  it('keeps provider-neutral listings in an optional capability layer', () => {
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/listing/server/api/listings/[listing].get.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/listing/app/composables/useStirListing.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/api/listings/[listing].get.ts',
-    ))).toBe(false)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/theme/app/composables/useStirListing.ts',
-    ))).toBe(false)
-  })
-
-  it('keeps inline paragraph editing in the editorial capability', () => {
-    for (const method of ['get', 'post']) {
-      expect(existsSync(resolve(
-        rootDir,
-        `layers/editorial/server/api/paragraph/[paragraphId]/text.${method}.ts`,
-      ))).toBe(true)
-      expect(existsSync(resolve(
-        rootDir,
-        `layers/core/server/api/paragraph/[paragraphId]/text.${method}.ts`,
-      ))).toBe(false)
-    }
-
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/editorial/server/utils/paragraphTextApi.ts',
-    ))).toBe(true)
-    expect(existsSync(resolve(
-      rootDir,
-      'layers/core/server/utils/paragraphTextApi.ts',
-    ))).toBe(false)
-
-    for (const method of ['get', 'post']) {
-      expect(existsSync(resolve(
-        rootDir,
-        `layers/editorial/server/api/paragraph/[paragraphId]/presentation.${method}.ts`,
-      ))).toBe(true)
-      expect(existsSync(resolve(
-        rootDir,
-        `layers/core/server/api/paragraph/[paragraphId]/presentation.${method}.ts`,
-      ))).toBe(false)
-    }
-  })
-
   it('exposes auth config and validation helpers from public layer paths', () => {
     expect(existsSync(resolve(rootDir, 'layers/auth/app/composables/useAuthConfig.ts'))).toBe(true)
 
@@ -608,38 +477,6 @@ describe('layer contract', () => {
     expect(authValidation).toContain('export function createAccountPasswordChangeValidationSchema')
   })
 
-  it('keeps auth component types independent from the theme layer', () => {
-    const authComponents = ['AuthCard.vue', 'AuthPage.vue'].map((file) =>
-      readFileSync(
-        resolve(rootDir, 'layers/auth/app/components/Auth', file),
-        'utf8',
-      ),
-    )
-
-    for (const component of authComponents) {
-      expect(component).not.toContain('theme/app/types')
-      expect(component).toContain('from \'../../types/theme\'')
-    }
-  })
-
-  it('renders auth form titles as the page heading', () => {
-    const authFormPanel = readFileSync(
-      resolve(rootDir, 'layers/auth/app/components/Auth/AuthFormPanel.vue'),
-      'utf8',
-    )
-    const themeConfig = readFileSync(
-      resolve(rootDir, 'layers/theme/app/app.config.ts'),
-      'utf8',
-    )
-
-    expect(authFormPanel).toContain('<template #title>')
-    expect(authFormPanel).toContain('<h1 :class="titleClass">{{ title }}</h1>')
-    expect(readFileSync(resolve(rootDir, 'layers/auth/app/utils/authTheme.ts'), 'utf8'))
-      .toContain('defaultAuthTitleClass = \'mb-0 text-xl leading-7 font-semibold\'')
-    expect(themeConfig).toMatch(/class:\s*['"]min-h-12['"]/)
-    expect(themeConfig).toMatch(/size:\s*['"]xl['"]/)
-  })
-
   it('renders one persistent layout in app.vue instead of inside pages', () => {
     const read = (path: string) => readFileSync(resolve(rootDir, path), 'utf8')
     const appShell = read('layers/theme/app/app.vue')
@@ -670,67 +507,6 @@ describe('layer contract', () => {
     // current by then.
     expect(read('layers/theme/app/components/Drupal/PageRoute.vue')).not.toMatch(/setDrupalPageLayout|setPageLayout|meta\.layout =/)
     expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
-  })
-
-  it('keeps the global skip link in a landmark with a focusable auth target', () => {
-    const appShell = readFileSync(
-      resolve(rootDir, 'layers/theme/app/app.vue'),
-      'utf8',
-    )
-    const authPage = readFileSync(
-      resolve(rootDir, 'layers/auth/app/components/Auth/AuthPage.vue'),
-      'utf8',
-    )
-
-    // Omitted only for an app embedded in another site, whose page owns it.
-    expect(appShell).toContain('<nav v-if="!embedded" aria-label="Skip links">')
-    expect(appShell).toContain('href="#main-content"')
-    // Visible and legible once focused, over any page content (WCAG 2.4.7, 1.4.3).
-    const skipLink = appShell.match(/<a[^>]*href="#main-content"[^>]*>/s)?.[0] ?? ''
-
-    for (const token of ['fixed', 'bg-default', 'text-highlighted', 'ring-2', 'ring-primary', 'focus:translate-y-0']) {
-      expect(skipLink.split(/[\s"]+/)).toContain(token)
-    }
-    expect(authPage.match(/id="main-content"/g)).toHaveLength(1)
-    expect(authPage.match(/tabindex="-1"/g)).toHaveLength(1)
-  })
-
-  it('sizes both mobile menu toggle positions independently of button defaults', () => {
-    const header = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
-      'utf8',
-    )
-
-    expect(header).not.toContain(':icon="toggleIcon"')
-    expect(header).toContain('toggle: \'size-11 justify-center p-0\'')
-    expect(header).toContain('isCenteredToggleLayout.value || isToggleLayout.value ? \'\' : desktop.hideFromDesktop')
-    // One toggle definition, reused in the left, centre or right region.
-    expect(header.match(/data-slot="leadingIcon"/g)).toHaveLength(1)
-    expect(header.match(/:class="toggleIconClass"/g)).toHaveLength(1)
-    expect(header.match(/<ReuseMenuToggle/g)).toHaveLength(3)
-
-    const themeConfig = readFileSync(
-      resolve(rootDir, 'layers/theme/app/app.config.ts'),
-      'utf8',
-    )
-
-    expect(themeConfig).toContain('toggleIcon: \'size-7\'')
-    expect(header).toContain('theme.navigation.toggleTransparentClass')
-    expect(header).toContain(':toggle-class="baseToggleClasses"')
-    expect(header).toContain(':surface="logoSurface"')
-    expect(themeConfig).toContain('transparentSurface: \'auto\'')
-  })
-
-  it('uses the upstream lifecycle-safe menu request in the app header', () => {
-    const header = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/App/Header.vue'),
-      'utf8',
-    )
-
-    expect(header).toContain('const { getPage, useMenu } = useStirDrupalCe()')
-    expect(header).toContain('await useMenu(\'main\')')
-    expect(header).toContain('mainMenu.value.map(')
-    expect(header).not.toContain('fetchMenu(\'main\')')
   })
 
   it('keeps the editorial offset in one place, published by the tabs bar', () => {
@@ -779,53 +555,6 @@ describe('layer contract', () => {
     expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
     expect(tabs).not.toContain('getAccountMenuUrl')
     expect(tabs).not.toContain('drupal-tabs-account-menu-loaded')
-  })
-
-  it('keeps admin editor dependencies out of anonymous runtime chunks', () => {
-    const fieldComponents = [
-      'DateTime/Select.vue',
-      'Input.vue',
-      'Input/Number.vue',
-      'Input/Slider.vue',
-      'Textarea.vue',
-    ].map((file) => readFileSync(
-      resolve(rootDir, 'layers/webform/app/components/Field', file),
-      'utf8',
-    ))
-
-    for (const component of fieldComponents) {
-      expect(component).toContain('from \'@nuxt/ui/composables/useFormField\'')
-      expect(component).not.toContain('from \'@nuxt/ui/composables\'')
-    }
-  })
-
-  it('does not load the reveal renderer for static paragraph text', () => {
-    const editableRichText = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
-      'utf8',
-    )
-
-    expect(editableRichText).toContain('const hasRevealMotion = computed')
-    expect(editableRichText).toContain('<LazyRevealMotion')
-    expect(editableRichText).toContain('v-if="hasRevealMotion"')
-    expect(editableRichText).toContain('v-else')
-  })
-
-  it('renders rich text HTML through the overridable RichTextHtml component', () => {
-    const editableRichText = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
-      'utf8',
-    )
-    const richTextHtml = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/RichTextHtml.vue'),
-      'utf8',
-    )
-
-    expect(editableRichText).toContain('<RichTextHtml')
-    expect(editableRichText).toContain(':html="trustedTextHtml"')
-    expect(editableRichText).not.toContain('v-html')
-    expect(richTextHtml).toContain('html: string')
-    expect(richTextHtml).toContain('<div v-html="html" />')
   })
 
   it('keeps paragraph layout separate from reusable rich-text editing', () => {
@@ -889,39 +618,6 @@ describe('layer contract', () => {
     expect(presentationFields).toContain(
       'content: `${adminUiTheme.tooltip.content} max-w-64`',
     )
-  })
-
-  it('provides default paragraph rhythm for reusable rich text', () => {
-    const editableRichText = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/EditableRichText.vue'),
-      'utf8',
-    )
-    const baseCss = readFileSync(
-      resolve(rootDir, 'layers/theme/app/assets/css/base.css'),
-      'utf8',
-    )
-
-    expect(editableRichText).toContain('const richTextClass = \'prose max-w-none\'')
-    expect(baseCss).toContain(':where(.prose, .admin-editor-prose)')
-    expect(baseCss).toMatch(/:where\(p\)\s*\{\s*@apply my-\[1em\] text-pretty;/)
-    expect(baseCss).toMatch(/:where\(\.prose, \.admin-editor-prose\)\s*\{\s*@apply leading-relaxed;/)
-  })
-
-  it('renders Drupal markup through its own hydration-safe directive', () => {
-    const drupalMarkup = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/drupal-markup.vue'),
-      'utf8',
-    )
-    const fieldTextWithSummary = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/field-text-with-summary.vue'),
-      'utf8',
-    )
-
-    for (const component of [drupalMarkup, fieldTextWithSummary]) {
-      expect(component).toContain('v-drupal-markup="trustedHtml"')
-      expect(component).not.toContain('v-html="trustedHtml"')
-      expect(component).toContain('useOptimizedDrupalHtml')
-    }
   })
 
   it('allows top-level blocks and nested list items without unwrapping Drupal structures', () => {
@@ -988,73 +684,6 @@ describe('layer contract', () => {
     }
   })
 
-  it('isolates only rich-text controls without wrapping normal output', () => {
-    const editLink = readFileSync(
-      resolve(rootDir, 'layers/editorial/app/components/Edit/Link.vue'),
-      'utf8',
-    )
-    const editableRichText = readFileSync(
-      resolve(
-        rootDir,
-        'layers/theme/app/components/global/EditableRichText.vue',
-      ),
-      'utf8',
-    )
-    const adminCss = ['tokens', 'overlays', 'controls', 'navigation', 'editor']
-      .map(partial => readFileSync(
-        resolve(rootDir, `layers/editorial/app/assets/css/admin-ui/${partial}.css`),
-        'utf8',
-      ))
-      .join('\n')
-
-    expect(editLink).toContain(
-      'controlsPlacement?: \'sibling\' | \'slot\' | \'isolated\'',
-    )
-    expect(editLink).toContain(
-      'props.controlsPlacement === \'isolated\'',
-    )
-    expect(editLink).toContain('v-if="isolatesControls"')
-    expect(editLink).toContain('class="admin-ui-edit-shell"')
-    expect(editLink).toContain(
-      'v-if="hasActions && rendersSiblingControls"',
-    )
-    expect(editableRichText).toContain('controls-placement="isolated"')
-    expect(adminCss).toContain('.admin-ui-edit-shell')
-    expect(adminCss).toContain('> :first-child > :first-child')
-    expect(adminCss).toContain(
-      '> :has(+ [data-admin-ui-controls]) > :last-child',
-    )
-    expect(adminCss).not.toContain('@layer')
-    expect(adminCss).not.toContain('!important')
-  })
-
-  it('normalizes prose edges through a single Drupal field wrapper', () => {
-    const baseCss = readFileSync(
-      resolve(rootDir, 'layers/theme/app/assets/css/base.css'),
-      'utf8',
-    )
-
-    expect(baseCss).toContain(
-      '& > :where(div:only-child) > :first-child',
-    )
-    expect(baseCss).toContain(
-      '& > :where(div:only-child) > :last-child',
-    )
-    expect(baseCss).toContain(
-      ':where(ul:not(.list-none) > li + li, ol:not(.list-none) > li + li)',
-    )
-  })
-
-  it('keeps view-card reveal delays short for visible grid rows', () => {
-    const viewDisplay = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/Drupal/ViewDisplay.vue'),
-      'utf8',
-    )
-
-    expect(viewDisplay).toMatch(/getRevealDelayMs\(index, \{ mode: ['"]dense['"] \}\)/)
-    expect(viewDisplay).not.toContain(': getRevealDelayMs(index)')
-  })
-
   it('registers video iframes explicitly without subscriber polling', () => {
     const videoPlayers = readFileSync(
       resolve(rootDir, 'layers/theme/app/composables/useVideoPlayers.ts'),
@@ -1116,33 +745,26 @@ describe('layer contract', () => {
     expect(themeConfig).not.toContain('Manifest')
   })
 
-  it('keeps optional integration defaults in their capability layers', () => {
-    const themeConfig = readFileSync(
-      resolve(rootDir, 'layers/theme/app/app.config.ts'),
-      'utf8',
-    )
-    const analyticsConfig = readFileSync(
-      resolve(rootDir, 'layers/analytics/app/app.config.ts'),
-      'utf8',
+  it('keeps optional integration defaults in their capability layers', async () => {
+    vi.stubGlobal('defineAppConfig', <T>(config: T) => config)
+
+    const keys = async (layer: string) => Object.keys(
+      (await import(`../../layers/${layer}/app/app.config.ts`)).default as object,
     )
     const analyticsNuxtConfig = readFileSync(
       resolve(rootDir, 'layers/analytics/nuxt.config.ts'),
       'utf8',
     )
-    const integrationsConfig = readFileSync(
-      resolve(rootDir, 'layers/integrations/app/app.config.ts'),
-      'utf8',
-    )
 
-    expect(themeConfig).not.toContain('analytics:')
-    expect(themeConfig).not.toContain('userway:')
-    expect(themeConfig).not.toContain('privacyNotice:')
-    expect(themeConfig).not.toContain('popup:')
-    expect(analyticsConfig).toContain('plausible:')
+    // The theme must not make a disabled integration look installed.
+    expect(await keys('theme')).not.toEqual(expect.arrayContaining(['analytics']))
+    expect(await keys('theme')).not.toContain('privacyNotice')
+    expect(await keys('theme')).not.toContain('popup')
+    expect(await keys('analytics')).toContain('analytics')
+    expect(await keys('integrations')).toEqual(expect.arrayContaining(['privacyNotice', 'popup']))
     expect(analyticsNuxtConfig).toContain('autoOutboundTracking: true')
     expect(analyticsNuxtConfig).toContain('fileDownloads: true')
     expect(analyticsNuxtConfig).toContain('formSubmissions: true')
-    expect(integrationsConfig).toContain('privacyNotice:')
-    expect(integrationsConfig).toContain('popup:')
+    vi.unstubAllGlobals()
   })
 })

@@ -110,6 +110,29 @@ describe('DrupalViewDisplay controls slot (Nuxt runtime)', () => {
     expect(withoutGrid.get('section').classes()).not.toContain('pt-5')
   })
 
+  it('keeps row reveal delays short however many rows a View has', async () => {
+    const delays: number[] = []
+
+    await mountSuspended(DrupalViewDisplay, {
+      route: '/work',
+      props: { ...viewProps, direction: 'fade-up' },
+      slots: {
+        rows: () => [h('div', 'Row')],
+        grid: ({ getRowMotionProps }: { getRowMotionProps: (index: number) => { transition?: { delay?: number } } }) => {
+          delays.length = 0
+          for (let index = 0; index < 24; index += 1) {
+            delays.push(getRowMotionProps(index).transition?.delay ?? 0)
+          }
+          return h('div', { class: 'site-grid' })
+        },
+      },
+    })
+
+    // Dense stagger: rows reveal in short groups, not one long cascade.
+    expect(delays[1]).toBeGreaterThan(delays[0]!)
+    expect(Math.max(...delays)).toBeLessThan(0.2)
+  })
+
   it('shows the site skeleton while results load', async () => {
     state.api.mockReturnValue(new Promise(() => {}))
     const received: { current?: DrupalViewControlsSlotProps } = {}

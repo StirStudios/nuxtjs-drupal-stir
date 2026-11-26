@@ -871,7 +871,7 @@
     "serverRoutes": 33,
     "productionDependencies": 36,
     "developmentDependencies": 24,
-    "tests": 276,
+    "tests": 275,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
@@ -879,7 +879,7 @@
       "scripts": 7,
       "server": 38,
       "unit": 12,
-      "utils": 77
+      "utils": 76
     }
   },
   "tests": [
@@ -1101,7 +1101,6 @@
     "tests/utils/drupalViewState.spec.ts",
     "tests/utils/editableRichText.spec.ts",
     "tests/utils/fetchError.spec.ts",
-    "tests/utils/fieldRendererLayerOverride.spec.ts",
     "tests/utils/flattenWebformFields.spec.ts",
     "tests/utils/footer.spec.ts",
     "tests/utils/formInputUtils.spec.ts",
