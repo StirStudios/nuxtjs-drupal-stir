@@ -541,6 +541,10 @@ describe('stirDrupalTimeoutOptions', () => {
     expect(retry).toEqual({ method: 'GET', retry: 0, signal: undefined, timeout: 10_000 })
   })
 
+  it('never repeats a request the CMS answered', () => {
+    expect(stirDrupalTimeoutOptions(10_000).retryStatusCodes).toEqual([])
+  })
+
   it('keeps the full timeout for mutations and short configured timeouts', () => {
     const post = { method: 'POST' }
     const short = { method: 'GET' }

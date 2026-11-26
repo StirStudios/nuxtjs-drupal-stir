@@ -13,6 +13,67 @@ untouched do not need one.
 
 ## Unreleased
 
+- New `stirDrupalApiFetch()` server helper: the same request as
+  `stirDrupalApiRequest()` (API key, Drupal session, CSRF token for a signed-in
+  mutation, refused redirects, cache tags) but returning the whole response,
+  with `query`, extra `headers` and `ignoreResponseError` options. The view,
+  listing, availability, CSRF-token and webform submit routes use it instead
+  of their own copies. `forwardStirDrupalCacheHeaders()` passes Drupal's
+  `cache-control`, `etag` and `last-modified` on.
+- Webform submissions from anonymous visitors no longer fetch a CSRF token
+  first, one Drupal request fewer; Drupal only checks the token for a
+  signed-in session. The submit route also forwards the visitor's IP when
+  `drupalClientIpForwarding` is enabled, as the auth routes do.
+
+- **Breaking:** removed unused exports. No site uses them, and the consumer
+  audit passed against every site:
+  - the `TabContent` and `WrapArticle` components;
+  - `materialVariant`, `materialVariantWithPB` and `materialVariantMuted`
+    (`utils/uiVariants.ts`); use the `material` variant of the Nuxt UI
+    component;
+  - `resolveResponsiveGridValue`, `extractFieldName`, `resolveOptionalUiColor`,
+    `resolveOptionalUiButtonVariant` and `resolveUiFieldNoMaterialVariant`;
+  - the `AppContextResponse` type alias (use `AppContextPayload`);
+  - the `btn-block` CSS utility.
+- Webform payloads are read only in the shape Stir Tools has sent since
+  October (camelCase properties, `#conditions` built in Drupal). The layer no
+  longer renames snake_case properties, rebuilds `#conditions` from `#states`
+  or accepts the old `#submit_label` spellings.
+- `resolveDrupalCeConfig()` accepts any config object, so a preset without the
+  platform layer typechecks again.
+
+- **Breaking:** the `scripts` layer and its UserWay widget are removed, with
+  the `userway` app config key and its type. No site enabled it. A site that
+  still sets `userway` in its `app.config.ts` should delete it.
+- **Breaking:** the CE proxy (`/api/drupal-ce/**`) accepts only GET and HEAD
+  (anything else is a 405), and passes on only the visitor's `accept`,
+  `accept-language`, `if-modified-since`, `if-none-match` and `user-agent`
+  headers, beside the session cookie and API key it adds. Edits already go
+  through the editorial routes (`/api/paragraph/**`, `/api/formatted-text/**`),
+  which check the origin and send Drupal's CSRF token. No site writes through
+  the proxy.
+- A missing page asks Drupal once instead of three times: on the server a
+  failed page fetch is reused for the rest of the request by the layout
+  middleware, the page and the error render.
+
+- A Button paragraph with a document attached links to the file in a new tab
+  while `stirTheme.showPdf` is off (the default). It rendered a button that
+  did nothing; with `showPdf` on it still opens the PDF viewer.
+- The menu proxy (`/api/menu/**`) refuses what a menu cannot be: a CMS
+  redirect is a 404 and its `Location` is not passed on, and a non-JSON 2xx
+  is a 502, as the CE page proxy already did.
+- A request the CMS answered is never repeated: server requests to Drupal and
+  the page fetch no longer retry a 5xx (Maintenance mode's 503 included). A
+  request that got no answer is still retried once.
+- `/api/app-context` marks its empty stand-in for a failed fetch
+  `private, no-store`.
+- Blank authored values: a blank tab title falls back to `Tab N`, a
+  whitespace-only Layout or Feature header renders no heading, gallery
+  triggers are named after their media (`Open media modal: <title or alt>`),
+  and a social link without a title reads "Visit our social page".
+- The packed `stir-perf` bin ships `scripts/perf/imageResolution.mjs`, which it
+  imports; it could not start in a site.
+
 - **Breaking:** the `runtimeConfig.api` and `runtimeConfig.public.api` keys are
   removed. They held the same Drupal URL as `public.drupalCe.drupalBaseUrl`
   and were only kept for the old module. Use `getDrupalOrigin(config.public)`

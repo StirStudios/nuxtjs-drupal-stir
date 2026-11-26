@@ -67,6 +67,14 @@ const visibleTitle = computed(() =>
     ? mediaProps.value.title.trim()
     : '',
 )
+// Names each trigger after its media, so a gallery's buttons can be told apart.
+const triggerLabel = computed(() => {
+  const base = isVideo.value ? 'Open video modal' : 'Open media modal'
+  const { title, alt } = mediaProps.value as { title?: unknown, alt?: unknown }
+  const name = [title, alt].find(value => typeof value === 'string' && value.trim())
+
+  return name ? `${base}: ${String(name).trim()}` : base
+})
 // Keep captions clear of inline video playback controls.
 const TitleFrame = defineComponent({
   setup(_, { slots }) {
@@ -190,7 +198,7 @@ const shouldAnimate = computed(() =>
         </span>
 
         <button
-          :aria-label="isVideo ? 'Open video modal' : 'Open media modal'"
+          :aria-label="triggerLabel"
           class="absolute inset-0 z-20 grid cursor-pointer place-items-center focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
           type="button"
           @click="openOverlay"

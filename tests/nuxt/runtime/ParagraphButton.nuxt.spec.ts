@@ -17,13 +17,20 @@ describe('Paragraph Button (Nuxt runtime)', () => {
   it('labels a document button with the editor\'s link text', async () => {
     const wrapper = await mountPdfButton('Menu')
 
-    expect(wrapper.get('button').text()).toBe('Menu')
+    expect(wrapper.get('a').text()).toBe('Menu')
+  })
+
+  it('links to the document in a new tab while the PDF viewer is off', async () => {
+    const link = (await mountPdfButton('Menu')).get('a')
+
+    expect(link.attributes('href')).toBe('/files/catering.pdf')
+    expect(link.attributes('target')).toBe('_blank')
   })
 
   it('falls back to the document\'s title when the link text is empty', async () => {
     const wrapper = await mountPdfButton('  ')
 
-    expect(wrapper.get('button').text()).toBe('Catering menu')
+    expect(wrapper.get('a').text()).toBe('Catering menu')
   })
 
   const video = { type: 'video', mid: 7, title: 'Showreel', src: 'https://www.example.com/reel.mp4' }
@@ -83,7 +90,7 @@ describe('Paragraph Button (Nuxt runtime)', () => {
       global: { stubs: { ParagraphMediaModal: MediaModalStub } },
     })
 
-    expect(wrapper.get('button').attributes('aria-label')).toBeUndefined()
+    expect(wrapper.get('a').attributes('aria-label')).toBeUndefined()
     expect(wrapper.find('[data-modal]').exists()).toBe(false)
   })
 

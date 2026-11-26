@@ -14,7 +14,6 @@ import type {
 } from '../../shared/types/appContext'
 import { parseComponentTreeNode } from './componentTree'
 
-export type { AppContextPayload as AppContextResponse } from '../../shared/types/appContext'
 
 const emptyAppContext = (): AppContextPayload => ({
   blocks: {},
@@ -161,6 +160,8 @@ export async function fetchAppContext(event: H3Event, path = '') {
     }
 
     logAppContextFetchError(event, path, error)
+    // A stand-in for a failed fetch must not be kept by a cache.
+    markStirPrivateResponse(event)
 
     return emptyAppContext()
   }

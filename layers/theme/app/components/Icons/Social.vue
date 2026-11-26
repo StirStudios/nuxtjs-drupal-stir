@@ -8,7 +8,7 @@ const iconSize = props.iconSize || 'size-8'
 <template>
   <ULink
     v-if="url && icon"
-    :aria-label="`Visit our ${title} page`"
+    :aria-label="title?.trim() ? `Visit our ${title.trim()} page` : 'Visit our social page'"
     inactive-class="transition-colors hover:text-primary"
     raw
     rel="noopener noreferrer"

@@ -15,7 +15,6 @@ export default defineNuxtConfig({
     './layers/editorial',
     './layers/integrations',
     './layers/analytics',
-    './layers/scripts',
     './layers/webform',
     './layers/auth',
     './layers/errors',

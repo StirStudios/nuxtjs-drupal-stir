@@ -39,10 +39,29 @@ export interface StirDrupalHeaderOptions {
 export type StirDrupalRequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: FormData | Record<string, unknown>
+  query?: Record<string, unknown>
+  /** Extra request headers; the API key, cookie and CSRF token win. */
+  headers?: Record<string, string>
   enforceSameOrigin?: boolean
   forwardClientIp?: boolean
   forwardCookies?: boolean
   forwardSetCookies?: boolean
+  /** Return a 4xx or 5xx answer instead of throwing, for the caller to read. */
+  ignoreResponseError?: boolean
+}
+
+const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
+
+/** Passes Drupal's own cache headers on, for an answer a cache may keep. */
+export const forwardStirDrupalCacheHeaders = (
+  event: H3Event,
+  headers: Headers,
+): void => {
+  for (const header of FORWARDED_CACHE_HEADERS) {
+    const value = headers.get(header)
+
+    if (value) setResponseHeader(event, header, value)
+  }
 }
 
 const normalizePositiveInteger = (
@@ -146,6 +165,9 @@ interface StirDrupalFetchRequestOptions {
 // connection, gets the full timeout.
 export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
   timeout: requestTimeoutMs,
+  // An answer is never retried: ofetch would otherwise repeat a GET on a 5xx,
+  // Maintenance mode's 503 included.
+  retryStatusCodes: [] as number[],
   onRequest({ options }: { options: StirDrupalFetchRequestOptions }) {
     if (options.signal?.reason?.name === 'TimeoutError') options.signal = undefined
 
@@ -561,37 +583,26 @@ export const assertStirDrupalResponseNotRedirect = (
 export async function fetchStirDrupalCsrfToken(
   event: H3Event,
 ): Promise<string> {
-  const { baseUrl, apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
-  const cookie = getStirForwardedCookie(event)
+  const response = await stirDrupalApiFetch<string>(event, '/session/token', {
+    method: 'GET',
+    forwardCookies: true,
+  })
 
-  if (cookie) {
-    markStirPrivateResponse(event)
-  }
-
-  try {
-    const response = await $fetch.raw<string>(`${baseUrl}/session/token`, {
-      headers: buildStirDrupalHeaders({
-        apiKey,
-        cookie,
-      }),
-      redirect: 'manual',
-      ...stirDrupalTimeoutOptions(requestTimeoutMs),
-    })
-
-    assertStirDrupalResponseNotRedirect(response)
-
-    return response._data as string
-  } catch (error) {
-    captureStirDrupalApiError(event, error)
-    throw error
-  }
+  return response._data as string
 }
 
-export async function stirDrupalApiRequest<T>(
+/**
+ * One request to Drupal from a Nuxt server route, with the API key, the
+ * visitor's Drupal session (`forwardCookies`) and, for a signed-in mutation,
+ * Drupal's CSRF token. A redirect is refused and the answer's cache tags are
+ * recorded. Returns the whole response; stirDrupalApiRequest() returns its
+ * body.
+ */
+export async function stirDrupalApiFetch<T>(
   event: H3Event,
   path: string,
   options: StirDrupalRequestOptions = {},
-): Promise<T> {
+) {
   const method = options.method || 'POST'
   const isMutation = method !== 'GET'
 
@@ -606,7 +617,7 @@ export async function stirDrupalApiRequest<T>(
   const clientIp = options.forwardClientIp
     ? getStirForwardedClientIp(event)
     : undefined
-  const csrfToken = cookie && method !== 'GET'
+  const csrfToken = cookie && isMutation
     ? await fetchStirDrupalCsrfToken(event)
     : undefined
 
@@ -620,13 +631,18 @@ export async function stirDrupalApiRequest<T>(
     response = await $fetch.raw<T>(`${baseUrl}${path}`, {
       method,
       body: options.body,
-      headers: buildStirDrupalHeaders({
-        apiKey,
-        clientIp,
-        cookie,
-        csrfToken,
-      }),
+      query: options.query,
+      headers: {
+        ...options.headers,
+        ...buildStirDrupalHeaders({
+          apiKey,
+          clientIp,
+          cookie,
+          csrfToken,
+        }),
+      },
       redirect: 'manual',
+      ignoreResponseError: options.ignoreResponseError,
       ...stirDrupalTimeoutOptions(requestTimeoutMs),
     })
   } catch (error) {
@@ -641,5 +657,13 @@ export async function stirDrupalApiRequest<T>(
     appendStirDrupalSetCookies(event, response)
   }
 
-  return response._data as T
+  return response
+}
+
+export async function stirDrupalApiRequest<T>(
+  event: H3Event,
+  path: string,
+  options: StirDrupalRequestOptions = {},
+): Promise<T> {
+  return (await stirDrupalApiFetch<T>(event, path, options))._data as T
 }

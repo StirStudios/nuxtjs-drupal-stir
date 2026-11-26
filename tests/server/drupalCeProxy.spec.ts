@@ -80,13 +80,13 @@ describe('Drupal CE proxy boundary', () => {
     vi.unstubAllGlobals()
   })
 
-  it('rejects a cross-origin mutation sent through the CE proxy', async () => {
+  it.each(['POST', 'PATCH', 'PUT', 'DELETE'])('refuses a %s through the CE proxy', async (method) => {
     stubRuntimeConfig({ siteUrl: 'https://site.example.test' })
     vi.mocked(proxyRequest).mockClear()
 
     const { event } = createEvent('', '/', {
-      method: 'POST',
-      origin: 'https://attacker.example.test',
+      method,
+      origin: 'https://site.example.test',
     })
 
     await expect(
@@ -94,26 +94,9 @@ describe('Drupal CE proxy boundary', () => {
         event,
         'ce-api/stir-layout-builder/paragraph/42/text',
       ),
-    ).rejects.toMatchObject({ statusCode: 403 })
+    ).rejects.toMatchObject({ statusCode: 405 })
 
     expect(proxyRequest).not.toHaveBeenCalled()
-  })
-
-  it('allows a same-origin mutation through the CE proxy', async () => {
-    stubRuntimeConfig({ siteUrl: 'https://site.example.test' })
-    vi.mocked(proxyRequest).mockClear()
-
-    const { event } = createEvent('', '/', {
-      method: 'POST',
-      origin: 'https://site.example.test',
-    })
-
-    await proxyStirDrupalCeRequest(
-      event,
-      'ce-api/stir-layout-builder/paragraph/42/text',
-    )
-
-    expect(proxyRequest).toHaveBeenCalledTimes(1)
   })
 
   it('does not require an origin for CE proxy reads', async () => {
@@ -186,21 +169,40 @@ describe('Drupal CE proxy boundary', () => {
     }
   })
 
-  it('leaves mutations and menu reads to their own handling', async () => {
+  it('leaves mutations to their own handling', () => {
     const { event } = createEvent('', '/', { method: 'POST' })
 
     expect(() => assertStirDrupalPageResponse(event, new Response('<html>', { status: 307 }))).not.toThrow()
+  })
 
+  it('refuses a CMS redirect or an HTML answer to a menu read', async () => {
     stubRuntimeConfig()
     vi.mocked(proxyRequest).mockClear()
 
-    await proxyStirDrupalMenuRequest(createEvent().event, 'api/menu_items/main')
+    const { event, responseHeaders } = createEvent()
+
+    await proxyStirDrupalMenuRequest(event, 'api/menu_items/main')
 
     const { onResponse } = vi.mocked(proxyRequest).mock.calls[0]![2] as unknown as {
       onResponse: (event: never, response: Response) => void
     }
 
-    expect(onResponse).toBe(handleStirDrupalProxyResponse)
+    responseHeaders.set('location', 'https://cms.example.test/user/login')
+    expect(() => onResponse(event as never, new Response('', {
+      status: 302,
+      headers: { location: 'https://cms.example.test/user/login' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 404 }))
+    expect(responseHeaders.has('location')).toBe(false)
+
+    expect(() => onResponse(event as never, new Response('<html>', {
+      status: 200,
+      headers: { 'content-type': 'text/html' },
+    }))).toThrowError(expect.objectContaining({ statusCode: 502 }))
+
+    expect(() => onResponse(event as never, new Response('[]', {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }))).not.toThrow()
   })
 
   it('reports a CMS that misses the request timeout as a 504, other failures as 502', async () => {
@@ -264,7 +266,7 @@ describe('Drupal CE proxy boundary', () => {
     })
   })
 
-  it('forwards only the Drupal session cookie and server API key', async () => {
+  it('forwards only the Drupal session cookie, server API key and read headers', async () => {
     stubRuntimeConfig()
     const fetchMock = vi.fn().mockResolvedValue(new Response('{}'))
 
@@ -286,6 +288,12 @@ describe('Drupal CE proxy boundary', () => {
         'x-forwarded-proto': 'http',
         'x-real-ip': '203.0.113.10',
         'x-request-id': 'request-id',
+        'x-csrf-token': 'client-token',
+        authorization: 'Bearer client-token',
+        accept: 'application/json',
+        'accept-language': 'fr',
+        'if-none-match': '"etag"',
+        'user-agent': 'Test browser',
       },
     })
 
@@ -301,7 +309,13 @@ describe('Drupal CE proxy boundary', () => {
     expect(requestHeaders.has('x-forwarded-port')).toBe(false)
     expect(requestHeaders.has('x-forwarded-proto')).toBe(false)
     expect(requestHeaders.has('x-real-ip')).toBe(false)
-    expect(requestHeaders.get('x-request-id')).toBe('request-id')
+    expect(requestHeaders.has('x-request-id')).toBe(false)
+    expect(requestHeaders.has('x-csrf-token')).toBe(false)
+    expect(requestHeaders.has('authorization')).toBe(false)
+    expect(requestHeaders.get('accept')).toBe('application/json')
+    expect(requestHeaders.get('accept-language')).toBe('fr')
+    expect(requestHeaders.get('if-none-match')).toBe('"etag"')
+    expect(requestHeaders.get('user-agent')).toBe('Test browser')
     expect(fetchMock.mock.calls[0]?.[1]?.redirect).toBe('manual')
   })
 

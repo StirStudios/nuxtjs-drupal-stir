@@ -2,28 +2,10 @@ import { resolveBooleanProp } from '#stir/utils/nuxtUiProps'
 import type {
   WebformActionProps,
   WebformConditionGroup,
-  WebformConditionRule,
   WebformDefinition,
   WebformFieldProps,
-  WebformStateCondition,
 } from '#stir/types'
 import { isConditionGroup } from './webformConditions'
-
-const PROPERTY_ALIASES: Record<string, string> = {
-  '#default': '#defaultValue',
-  '#default_value': '#defaultValue',
-  '#floating_label': '#floatingLabel',
-  '#group_max_selected': '#groupMaxSelected',
-  '#input_type': '#inputType',
-  '#is_taxable': '#isTaxable',
-  '#max_selected': '#maxSelected',
-  '#min_selected': '#minSelected',
-  '#option_properties': '#optionProperties',
-  '#per_guest': '#perGuest',
-  '#required_error': '#requiredError',
-  '#service_fee_applicable': '#serviceFeeApplicable',
-  '#tab_group': '#tabGroup',
-}
 
 const BOOLEAN_PROPERTIES = [
   '#disabled',
@@ -215,13 +197,6 @@ function normalizeWebformField(
       ? { ...(value as Record<string, unknown>) }
       : {}
 
-  for (const [legacyName, canonicalName] of Object.entries(PROPERTY_ALIASES)) {
-    if (source[canonicalName] === undefined && source[legacyName] !== undefined) {
-      source[canonicalName] = source[legacyName]
-    }
-    Reflect.deleteProperty(source, legacyName)
-  }
-
   for (const property of BOOLEAN_PROPERTIES) {
     if (source[property] !== undefined) {
       source[property] = resolveBooleanProp(source[property])
@@ -341,79 +316,6 @@ function collectConditionTargets(
   return targets
 }
 
-function resolveSelectorName(selector: string, targets: ConditionTargets): string | null {
-  const match = selector.match(/:input\[name="([^"]+)"\]/)
-
-  if (!match?.[1]) return null
-
-  const parts = match[1].replace(/\]\[|\[/g, '|').replace(/\]/g, '').split('|')
-
-  if (parts[0] === 'files' && parts.length > 1) parts.shift()
-
-  const [head = '', ...rest] = parts
-  const name = resolveDrupalMachineName(head, [...targets.keys()])
-  const children = targets.get(name) ?? []
-
-  return [name, ...rest.map(part => resolveDrupalMachineName(part, children))].join('.')
-}
-
-function legacyConditionGroup(
-  conditions: unknown,
-  targets: ConditionTargets,
-): WebformConditionGroup {
-  if (Array.isArray(conditions)) {
-    return {
-      logic: conditions.includes('xor') ? 'xor' : 'or',
-      rules: conditions.filter(isRecord).map(item => legacyConditionGroup(item, targets)),
-    }
-  }
-
-  const rules: WebformConditionRule[] = Object.entries(isRecord(conditions) ? conditions : {})
-    .map(([selector, condition]) => ({
-      name: resolveSelectorName(selector, targets),
-      selector,
-      triggers: (Array.isArray(condition) ? condition : [condition])
-        .filter(isRecord)
-        .flatMap((trigger) => {
-          const [name, value] = Object.entries(trigger)[0] ?? []
-
-          if (!name) return []
-          // Older producers sent an empty value as 'any', meaning filled.
-          if (name === 'value' && value === 'any') return [{ trigger: 'filled', value: true }]
-          if (name === 'value' && isRecord(value)) {
-            const [comparison, operand] = Object.entries(value)[0] ?? []
-
-            if (comparison) return [{ trigger: toDrupalMachineName(comparison), value: operand }]
-          }
-
-          return [{ trigger: name, value }]
-        }),
-    }))
-
-  return { logic: 'and', rules }
-}
-
-/**
- * Builds `#conditions` from `#states` for producers before contract 1.32,
- * whose selector keys Custom Elements camel-cased.
- */
-function legacyConditions(
-  states: unknown,
-  targets: ConditionTargets,
-): WebformStateCondition[] {
-  if (!isRecord(states)) return []
-
-  return Object.entries(states).flatMap(([state, conditions]) => {
-    if (!conditions || typeof conditions !== 'object') return []
-
-    return [{
-      // `visible-slide` arrives as `visibleSlide`.
-      state: toDrupalMachineName(state).replace(/[-_]slide$/, ''),
-      ...legacyConditionGroup(conditions, targets),
-    }]
-  })
-}
-
 function warnUnknownTargets(
   formId: string,
   group: WebformConditionGroup,
@@ -437,9 +339,7 @@ function attachConditions(
   targets: ConditionTargets,
 ): void {
   for (const field of Object.values(fields)) {
-    if (!Array.isArray(field['#conditions'])) {
-      field['#conditions'] = legacyConditions(field['#states'], targets)
-    }
+    if (!Array.isArray(field['#conditions'])) field['#conditions'] = []
     for (const group of field['#conditions']) {
       warnUnknownTargets(formId, group, targets)
     }
@@ -454,16 +354,9 @@ function normalizeWebformAction(value: unknown): WebformActionProps {
     value && typeof value === 'object'
       ? { ...(value as Record<string, unknown>) }
       : {}
-  const submitLabel =
-    action['#submitLabel'] ??
-    action['#submit__label'] ??
-    action['#submit_label'] ??
-    action['#submit_Label']
+  const submitLabel = action['#submitLabel']
 
   if (submitLabel !== undefined) action['#submitLabel'] = String(submitLabel)
-  delete action['#submit__label']
-  delete action['#submit_label']
-  delete action['#submit_Label']
 
   return action as WebformActionProps
 }
@@ -481,7 +374,8 @@ function normalizeWebformActions(value: unknown): WebformActionProps[] {
 }
 
 /**
- * Validates and adapts legacy payloads once at the Drupal/Nuxt boundary.
+ * Validates a Stir Tools webform payload once at the Drupal/Nuxt boundary.
+ * Stir Tools already names properties in camelCase and builds `#conditions`.
  */
 export function normalizeWebformDefinition(value: unknown): WebformDefinition {
   const source =

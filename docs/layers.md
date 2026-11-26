@@ -2,7 +2,8 @@
 
 This repository is structured into focused Nuxt layers with clear ownership:
 
-- `layers/core`: server/runtime integration concerns (Drupal API proxy utilities, secure API middleware, shared backend endpoints).
+- `layers/foundation`: shared server utilities every layer relies on (Drupal base URL, API key forwarding, request security, cache headers) and the Drupal CE config.
+- `layers/core`: the Drupal CE and menu proxies and the app-context endpoint.
 - `layers/theme`: UI/theming concerns (components, layouts, styles, app-facing composables, UI helpers).
 - `layers/auth`: authentication and account flows (auth pages, auth/account composables, auth/account API routes, auth middleware).
 - `layers/webform`: Drupal Webform rendering, validation, and submission.
@@ -11,9 +12,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 - `layers/integrations`: optional popup/privacy UI and the shared consent policy used by analytics and trusted scripts.
 - `layers/analytics`: optional Plausible integration.
 - `layers/errors`: error reporting to GlitchTip (a Sentry-compatible tracker), part of platform and switched on per site by `NUXT_PUBLIC_ERRORS_DSN`.
-- `layers/scripts`: optional third-party script integrations.
 - `layers/diagnostics`: repository-only performance analysis selected explicitly by maintainers; never registered by installed consumers.
-- `server/utils`: shared Nitro utilities used by multiple layers when behavior must stay identical across boundaries.
 
 ## Ownership Rules
 
@@ -21,7 +20,7 @@ This repository is structured into focused Nuxt layers with clear ownership:
 - Keep capability-specific app-config defaults with that layer; the theme layer must not make disabled integrations appear installed.
 - Keep layer-internal logic inside that layer.
 - Keep root-level config focused on orchestration (`extends`, shared modules/runtime config).
-- Put cross-layer server behavior in `server/utils` and keep layer-local files as stable wrappers when downstream imports may exist.
+- Put cross-layer server behavior in `layers/foundation/server/utils`.
 
 ## Type Placement
 

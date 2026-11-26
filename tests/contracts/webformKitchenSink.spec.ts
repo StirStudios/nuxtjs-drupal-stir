@@ -52,17 +52,6 @@ function sampleState(fields: Record<string, WebformFieldProps>): WebformState {
   return state
 }
 
-function withoutConditions(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(withoutConditions)
-  if (!value || typeof value !== 'object') return value
-
-  return Object.fromEntries(
-    Object.entries(value)
-      .filter(([key]) => key !== '#conditions')
-      .map(([key, item]) => [key, withoutConditions(item)]),
-  )
-}
-
 describe('Stir Tools kitchen-sink webform', () => {
   const fields = loadFields()
 
@@ -146,17 +135,4 @@ describe('Stir Tools kitchen-sink webform', () => {
     expect(resolveWebformFieldStates(extrasNote, free).visible).toBe(false)
   })
 
-  it('reads the same conditions from #states sent by older producers', () => {
-    const legacy = loadFields(withoutConditions(payload))
-    const states = [
-      sampleState(fields),
-      { ...sampleState(fields), event_type: 'free_event', extras: [] },
-    ]
-
-    for (const state of states) {
-      for (const [name, field] of Object.entries(fields)) {
-        expect(resolveWebformFieldStates(legacy[name]!, state), name).toEqual(resolveWebformFieldStates(field, state))
-      }
-    }
-  })
 })

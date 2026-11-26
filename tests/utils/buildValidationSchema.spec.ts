@@ -4,8 +4,8 @@ import { buildValidationSchema } from '../../layers/webform/app/utils/buildValid
 import { normalizeWebformDefinition } from '../../layers/webform/app/utils/webformFieldUtils'
 import type { WebformFieldProps, WebformState } from '../../layers/theme/app/types'
 
-// Fields reach validation through the payload boundary, which turns
-// `#states` into `#conditions` and keys fields by their Drupal names.
+// Fields reach validation through the payload boundary, which keys them by
+// their Drupal names. Stir Tools sends `#conditions` built from `#states`.
 function normalizeFields(
   fields: Record<string, WebformFieldProps>,
 ): Record<string, WebformFieldProps> {
@@ -103,11 +103,11 @@ describe('buildValidationSchema', () => {
         '#title': 'Contact Email',
         '#name': 'contact_email',
         '#required': true,
-        '#states': {
-          visible: {
-            ':input[name="mode"]': { value: 'email' },
-          },
-        },
+        '#conditions': [{
+          state: 'visible',
+          logic: 'and',
+          rules: [{ name: 'mode', selector: ':input[name="mode"]', triggers: [{ trigger: 'value', value: 'email' }] }],
+        }],
       },
     })
     const state: WebformState = { mode: 'none' }
@@ -131,7 +131,6 @@ describe('buildValidationSchema', () => {
   })
 
   it('does not validate hidden required datetime fields until they become visible', async () => {
-    // The selector arrives camel-cased, as Custom Elements sends #states.
     const fields = normalizeFields({
       showDates: {
         '#type': 'text',
@@ -142,11 +141,11 @@ describe('buildValidationSchema', () => {
         '#required': true,
         '#multiple': true,
         '#cardinality': 3,
-        '#states': {
-          visible: {
-            ':input[name="showDates"]': { value: 'yes' },
-          },
-        },
+        '#conditions': [{
+          state: 'visible',
+          logic: 'and',
+          rules: [{ name: 'show_dates', selector: ':input[name="show_dates"]', triggers: [{ trigger: 'value', value: 'yes' }] }],
+        }],
       }),
     })
     const state: WebformState = { show_dates: 'no' }

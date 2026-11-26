@@ -1,12 +1,3 @@
-export const extractFieldName = (selector: string): string | null => {
-  const match = selector.match(/name="(.+?)"/)
-
-  if (!match || !match[1]) {
-    return null
-  }
-  return match[1].replace(/\[([^\]]+)\]/g, '.$1')
-}
-
 export const normalizeValue = (value: string): string => {
   return value.replace(/([A-Z])/g, '_$1').toLowerCase()
 }

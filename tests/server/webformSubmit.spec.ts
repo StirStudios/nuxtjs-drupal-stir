@@ -66,12 +66,13 @@ describe('POST /api/webform/submit', () => {
     const request = new Request('https://example.test', { method: 'POST', body: form })
 
     vi.mocked(readWebformBody).mockResolvedValue(Buffer.from(await request.arrayBuffer()))
-    const raw = vi.fn().mockResolvedValueOnce({ _data: 'csrf', headers: {}, status: 200 })
-      .mockResolvedValueOnce({ _data: { ok: true }, headers: {}, status: 200 })
+    const raw = vi.fn().mockResolvedValueOnce({ _data: { ok: true }, headers: {}, status: 200 })
 
     vi.stubGlobal('$fetch', { raw })
     await webformSubmitHandler(createEvent({ 'content-type': request.headers.get('content-type')! }))
-    const forwarded = raw.mock.calls[1]?.[1].body as FormData
+    // An anonymous visitor has no Drupal session, so no CSRF token is fetched.
+    expect(raw).toHaveBeenCalledTimes(1)
+    const forwarded = raw.mock.calls[0]?.[1].body as FormData
 
     expect(forwarded.getAll('topics[]')).toEqual(['one', 'two'])
     expect((forwarded.get('attachment') as File).name).toBe('sample.txt')
@@ -172,11 +173,6 @@ describe('POST /api/webform/submit', () => {
     }
     const raw = vi.fn()
       .mockResolvedValueOnce({
-        _data: 'csrf-token',
-        headers: { getSetCookie: () => [] },
-        status: 200,
-      })
-      .mockResolvedValueOnce({
         _data: validation,
         headers: { getSetCookie: () => [] },
         status: 400,
@@ -191,7 +187,7 @@ describe('POST /api/webform/submit', () => {
     expect(event.node.res.getHeader('cache-control'))
       .toBe('private, no-store, max-age=0')
     expect(raw).toHaveBeenNthCalledWith(
-      2,
+      1,
       'https://cms.example.test/api/stir_webform_rest/submit',
       expect.objectContaining({ ignoreResponseError: true }),
     )
@@ -203,11 +199,6 @@ describe('POST /api/webform/submit', () => {
       turnstile_response: 'token',
     })))
     const raw = vi.fn()
-      .mockResolvedValueOnce({
-        _data: 'csrf-token',
-        headers: { getSetCookie: () => [] },
-        status: 200,
-      })
       .mockResolvedValueOnce({
         _data: { error: { message: 'Database password leaked' } },
         headers: { getSetCookie: () => [] },
@@ -230,11 +221,6 @@ describe('POST /api/webform/submit', () => {
       turnstile_response: 'token',
     })))
     const raw = vi.fn()
-      .mockResolvedValueOnce({
-        _data: 'csrf-token',
-        headers: { getSetCookie: () => [] },
-        status: 200,
-      })
       .mockRejectedValueOnce(Object.assign(new Error('Database password leaked'), {
         statusCode: 500,
       }))
@@ -255,11 +241,6 @@ describe('POST /api/webform/submit', () => {
       turnstile_response: 'token',
     })))
     const raw = vi.fn()
-      .mockResolvedValueOnce({
-        _data: 'csrf-token',
-        headers: { getSetCookie: () => [] },
-        status: 200,
-      })
       .mockResolvedValueOnce({
         _data: undefined,
         headers: { getSetCookie: () => [] },

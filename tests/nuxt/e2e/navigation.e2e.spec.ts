@@ -58,9 +58,13 @@ const pages: Record<string, unknown> = {
   },
 }
 
+const pageRequests: string[] = []
+
 const drupalFixtureServer = createServer((request, response) => {
   const path = new URL(request.url || '/', 'http://127.0.0.1').pathname
   const pagePath = path.replace(/^\/ce-api/, '') || '/'
+
+  if (path.startsWith('/ce-api')) pageRequests.push(pagePath)
 
   if (path === '/api/app-context') {
     response.writeHead(200, { 'content-type': 'application/json' })
@@ -148,8 +152,12 @@ describe('Drupal page navigation', async () => {
     expect(response.headers.get('location')).toBe('/first')
   })
 
-  it('answers 404 for a missing Drupal page', async () => {
+  it('answers 404 for a missing Drupal page, asking Drupal once', async () => {
+    pageRequests.length = 0
+
     expect((await fetch('/missing-page')).status).toBe(404)
+    // The layout middleware, the page and the error render share one answer.
+    expect(pageRequests.filter(path => path === '/missing-page')).toHaveLength(1)
   })
 
   it.runIf(browserEnabled)('keeps shared UI on the outgoing page until the destination renders', async () => {

@@ -26,6 +26,7 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
     { layoutTag: 'div', header: 'Child heading', tag: 'DIV' },
     { layoutTag: undefined, header: '', tag: 'SECTION' },
     { layoutTag: 'script', header: '', tag: 'SECTION' },
+    { layoutTag: 'section', header: '   ', tag: 'SECTION' },
   ])('uses $tag for a layout with heading "$header"', async ({ layoutTag, header, tag }) => {
     const wrapper = await mountSuspended(ParagraphLayout, {
       props: { id: 'semantics', layoutTag, header, surface: 'muted', gridClass: {} },
@@ -34,7 +35,7 @@ describe('ParagraphLayout (Nuxt runtime)', () => {
 
     expect(wrapper.get('#section-semantics').element.tagName).toBe(tag)
     expect(wrapper.get('#section-semantics').classes()).toContain('bg-muted')
-    expect(wrapper.find('h2').exists()).toBe(Boolean(header))
+    expect(wrapper.find('h2').exists()).toBe(Boolean(header.trim()))
     expect(wrapper.get('h3').text()).toBe('Independent child heading')
     wrapper.unmount()
   })

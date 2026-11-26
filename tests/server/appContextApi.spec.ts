@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   captureStirDrupalApiError,
+  markStirPrivateResponse,
   stirDrupalApiRequest,
 } from '../../layers/foundation/server/utils/stirDrupalApi'
 import {
@@ -22,6 +23,7 @@ describe('appContextApi', () => {
   beforeEach(() => {
     vi.mocked(stirDrupalApiRequest).mockReset()
     vi.mocked(captureStirDrupalApiError).mockReset()
+    vi.mocked(markStirPrivateResponse).mockReset()
   })
 
   it('builds the Drupal app context endpoint with route path context', () => {
@@ -106,6 +108,7 @@ describe('appContextApi', () => {
       method: 'GET',
       forwardCookies: true,
     })
+    expect(markStirPrivateResponse).not.toHaveBeenCalled()
   })
 
   it('passes Drupal Maintenance mode on as a 503 with its message', async () => {
@@ -156,6 +159,8 @@ describe('appContextApi', () => {
       site_info: { name: '', mail: '', slogan: '' },
     })
 
+    // The stand-in must not be kept by a cache.
+    expect(markStirPrivateResponse).toHaveBeenCalledWith(event)
     expect(captureStirDrupalApiError).toHaveBeenCalledTimes(1)
 
     const [capturedEvent, capturedError] = vi.mocked(

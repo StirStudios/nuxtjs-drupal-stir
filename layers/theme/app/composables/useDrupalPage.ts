@@ -28,6 +28,13 @@ const emptyPage = (): StirDrupalPage => ({
   title: '',
 })
 
+// A failed page fetch on the server, kept for the rest of the request: the
+// layout middleware, the page and the middleware's second run while Nuxt
+// renders the error each ask for the same page, and Drupal's answer does not
+// change within one request. Keyed by the request, not the Nuxt app: the
+// error render runs in a fresh app.
+const serverPageErrors = new WeakMap<object, Map<string, unknown>>()
+
 const withoutHash = (fullPath: string) => fullPath.split('#')[0] ?? fullPath
 const clientKey = (fullPath: string) => `page:${withoutHash(fullPath)}`
 
@@ -124,12 +131,24 @@ export function useDrupalPage() {
     const version = import.meta.client ? ++requestVersion.value : requestVersion.value
     const requestRoute = import.meta.client ? withoutHash(nuxtApp.$router.currentRoute.value.fullPath) : ''
     const key = options.key ?? routeKey()
+    const failedKey = `${key}:${path}`
+    const requestEvent = import.meta.server ? nuxtApp.ssrContext?.event : undefined
+    const serverErrors = requestEvent ? serverPageErrors.get(requestEvent) : undefined
+
+    if (serverErrors?.has(failedKey)) {
+      onError({ value: serverErrors.get(failedKey) })
+
+      return ref({ ...emptyPage(), key })
+    }
+
     const { data, error } = await useFetch<StirDrupalPage>(path, {
       key,
       baseURL: PROXY_BASE,
       query: options.query,
       credentials: 'include',
       headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
+      // The proxy's answer stands: a 5xx from the CMS is not asked for twice.
+      retryStatusCodes: [],
       // Nuxt types getCachedData with its own app type; pageRequest narrows it.
       ...(options.getCachedData ? { getCachedData: options.getCachedData as never } : {}),
       onResponse: import.meta.server ? ({ response }) => passThroughHeaders(response.headers) : undefined,
@@ -159,6 +178,10 @@ export function useDrupalPage() {
     }
 
     if (error.value) {
+      if (requestEvent) {
+        if (!serverPageErrors.has(requestEvent)) serverPageErrors.set(requestEvent, new Map())
+        serverPageErrors.get(requestEvent)!.set(failedKey, error.value)
+      }
       onError({ value: error.value })
       page = ref(emptyPage())
     }

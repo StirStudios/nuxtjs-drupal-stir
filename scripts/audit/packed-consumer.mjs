@@ -90,8 +90,10 @@ async function main() {
       && !entry.startsWith('package/scripts/a11y/')
       && !entry.startsWith('package/scripts/compliance/')
       && !entry.startsWith('package/scripts/seo/')
-      // The stir-perf bin; the other perf scripts are repository-only.
-      && entry !== 'package/scripts/perf/audit.mjs',
+      // The stir-perf bin and the module it imports; the other perf scripts
+      // are repository-only.
+      && entry !== 'package/scripts/perf/audit.mjs'
+      && entry !== 'package/scripts/perf/imageResolution.mjs',
     )
     if (unexpectedScripts.length > 0) {
       throw new Error(
@@ -111,6 +113,8 @@ async function main() {
       'package/scripts/compliance/init.mjs',
       'package/scripts/compliance/templates/site.json',
       'package/scripts/compliance/templates/REVIEW.md',
+      'package/scripts/perf/audit.mjs',
+      'package/scripts/perf/imageResolution.mjs',
       'package/scripts/seo/audit.mjs',
       'package/scripts/seo/html.mjs',
       'package/nuxt.config.ts',

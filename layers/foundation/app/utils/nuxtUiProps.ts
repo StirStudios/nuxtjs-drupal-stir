@@ -35,23 +35,11 @@ export function resolveUiColor(
   return resolveStringProp(value, fallback)
 }
 
-export function resolveOptionalUiColor(value: unknown): UiColor | undefined {
-  return typeof value === 'string' && value.trim()
-    ? value.trim() as UiColor
-    : undefined
-}
-
 export function resolveUiButtonVariant(
   value: unknown,
   fallback = 'solid' as UiButtonVariant,
 ): UiButtonVariant {
   return resolveStringProp(value, fallback)
-}
-
-export function resolveOptionalUiButtonVariant(value: unknown): UiButtonVariant | undefined {
-  return typeof value === 'string' && value.trim()
-    ? value.trim() as UiButtonVariant
-    : undefined
 }
 
 export function resolveUiPageCardVariant(
@@ -65,15 +53,6 @@ export function resolveUiFieldVariant(
   value: unknown,
   fallback = 'outline' as UiFieldVariant,
 ): UiFieldVariant {
-  return resolveStringProp(value, fallback)
-}
-
-export function resolveUiFieldNoMaterialVariant(
-  value: unknown,
-  fallback = 'outline' as UiFieldNoMaterialVariant,
-): UiFieldNoMaterialVariant {
-  if (value === 'material') return fallback
-
   return resolveStringProp(value, fallback)
 }
 

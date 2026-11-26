@@ -3,8 +3,7 @@
 `layers/theme` owns shared presentation: Nuxt UI defaults (`app/theme/nuxtUi.ts`),
 public app configuration, the rendering shell, visual Custom Elements, media,
 layout components, assets and UI composables. Projects customize it through
-Nuxt layer and app-config merging. Deprecated UI variant aliases remain in
-`app/utils/uiVariants.ts` for compatibility.
+Nuxt layer and app-config merging.
 
 ## Boundary guidance
 

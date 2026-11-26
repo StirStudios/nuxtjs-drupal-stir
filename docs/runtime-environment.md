@@ -91,7 +91,7 @@ only.
 - `NUXT_ENV` and `NUXT_INDEXABLE`: indexability, application mode and whether
   the Plausible client plugin is bundled.
 - `DRUPAL_URL`: also shapes image providers, route rules and
-  SEO proxying at build. Overriding only `NUXT_API` or the Drupal CE base URLs
+  SEO proxying at build. Overriding only the Drupal CE base URLs
   at runtime would leave those pointing at the old host, so change Drupal
   hosts with a deploy.
 - `NUXT_IMAGE_CDN`, `NUXT_SITE_NAME` (nuxt-site-config

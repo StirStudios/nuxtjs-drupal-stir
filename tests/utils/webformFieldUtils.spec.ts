@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { normalizeWebformDefinition } from '../../layers/webform/app/utils/webformFieldUtils'
 
 describe('normalizeWebformDefinition', () => {
-  it('adapts legacy wire values once into the canonical contract', () => {
+  it('coerces Drupal wire values once into the canonical contract', () => {
     const webform = normalizeWebformDefinition({
       webformId: 'contact',
       fields: {
@@ -11,9 +11,9 @@ describe('normalizeWebformDefinition', () => {
           '#name': 'event_date',
           '#required': '1',
           '#multiple': '3',
-          '#default_value': ['2026-07-20'],
-          '#input_type': 'range',
-          '#option_properties': {
+          '#defaultValue': ['2026-07-20'],
+          '#inputType': 'range',
+          '#optionProperties': {
             chef_special: {
               alreadyCamel: 'preserved',
               check_against: 'guestCount',
@@ -23,10 +23,10 @@ describe('normalizeWebformDefinition', () => {
         },
         enabled: {
           '#type': 'checkbox',
-          '#default_value': '1',
+          '#defaultValue': '1',
         },
       },
-      actions: [{ '#type': 'webform_actions', '#submit__label': 'Send' }],
+      actions: [{ '#type': 'webform_actions', '#submitLabel': 'Send' }],
     })
 
     expect(webform.fields.event_date).toMatchObject({
@@ -44,7 +44,6 @@ describe('normalizeWebformDefinition', () => {
         },
       },
     })
-    expect(webform.fields.event_date).not.toHaveProperty('#default_value')
     expect(webform.fields.enabled?.['#defaultValue']).toBe(true)
     expect(webform.actions[0]?.['#submitLabel']).toBe('Send')
   })
