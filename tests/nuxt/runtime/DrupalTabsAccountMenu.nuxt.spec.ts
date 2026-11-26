@@ -1,7 +1,7 @@
 // @vitest-environment nuxt
 import { describe, expect, it, vi } from 'vitest'
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
-import { refreshNuxtData, useNuxtApp, useState, watch } from '#imports'
+import { refreshNuxtData, useNuxtApp, useRouter, useState, watch } from '#imports'
 import DrupalTabs from '../../../layers/editorial/app/components/Drupal/Tabs.vue'
 
 describe('Drupal/Tabs account menu', () => {
@@ -42,5 +42,53 @@ describe('Drupal/Tabs account menu', () => {
 
     first.unmount()
     second.unmount()
+  })
+
+  it('asks for no menu without editorial access', async () => {
+    const nuxtApp = useNuxtApp()
+    const requests = vi.fn(() => [])
+
+    registerEndpoint('/api/menu/api/menu_items/account', requests)
+    nuxtApp.payload.data['page-account-menu-anon'] = {
+      title: 'Public page',
+      content: {},
+      current_user: { authenticated: false, capabilities: {} },
+    }
+    useState<string>('stir-page-current-key').value = 'page-account-menu-anon'
+
+    const wrapper = await mountSuspended(DrupalTabs)
+
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(requests).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('retries a failed menu on the next navigation', async () => {
+    const nuxtApp = useNuxtApp()
+    const menuKey = 'menu-account--8'
+    let calls = 0
+    const requests = vi.fn(() => {
+      calls += 1
+      if (calls === 1) throw new Error('Drupal unavailable')
+
+      return [{ title: 'My account', relative: '/user' }]
+    })
+
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    registerEndpoint('/api/menu/api/menu_items/account', requests)
+    nuxtApp.payload.data['page-account-menu-retry'] = {
+      title: 'Editor page',
+      content: {},
+      current_user: { id: 8, authenticated: true, capabilities: { editorialUi: true } },
+    }
+    useState<string>('stir-page-current-key').value = 'page-account-menu-retry'
+
+    const wrapper = await mountSuspended(DrupalTabs)
+
+    await vi.waitFor(() => expect(requests).toHaveBeenCalledTimes(1))
+    await useRouter().push('/account-menu-retry')
+    await vi.waitFor(() => expect(nuxtApp.payload.data[menuKey]).toHaveLength(1))
+    expect(requests).toHaveBeenCalledTimes(2)
+    wrapper.unmount()
   })
 })

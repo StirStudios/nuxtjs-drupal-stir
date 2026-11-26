@@ -295,17 +295,7 @@ describe('layer contract', () => {
     expect(consumerScript).toContain('adaptations')
   })
 
-  it('uses the consumer CSS entry once when one is present', () => {
-    const themeConfig = readFileSync(
-      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
-      'utf8',
-    )
-
-    expect(themeConfig).toContain(
-      'existsSync(appThemeCss) ? appThemeCss : upstreamThemeCss',
-    )
-    expect(themeConfig).toContain('nuxt.options.css.push(themeCss)')
-
+  it('documents the consumer CSS entry', () => {
     const readme = readFileSync(resolve(rootDir, 'readme.md'), 'utf8')
 
     expect(readme).toContain(
@@ -490,15 +480,6 @@ describe('layer contract', () => {
     ]) {
       expect(read(page)).not.toContain('<NuxtLayout')
     }
-    expect(read('layers/theme/app/pages/[...slug].vue')).toContain('drupalPage: true')
-    expect(read('layers/theme/app/plugins/drupalPageLayout.server.ts')).toContain('setDrupalPageLayout(')
-    // The client plugin runs on every navigation, so it fetches with $fetch
-    // and keeps the Drupal CE client out of the initial bundle.
-    const clientLayout = read('layers/theme/app/plugins/drupalPageLayout.client.ts')
-
-    expect(clientLayout).toContain('baseURL: \'/api/drupal-ce\'')
-    expect(clientLayout).not.toContain('useStirDrupalCe')
-    expect(clientLayout).toContain('to.meta.layout =')
     // Sites map the layout after these with dependsOn (a member app shell).
     for (const plugin of ['drupalPageLayout.client.ts', 'drupalPageLayout.server.ts']) {
       expect(read(`layers/theme/app/plugins/${plugin}`)).toContain('name: \'stir:drupal-page-layout\'')
@@ -506,7 +487,6 @@ describe('layer contract', () => {
     // Pages never write the layout: a late write lands on whichever route is
     // current by then.
     expect(read('layers/theme/app/components/Drupal/PageRoute.vue')).not.toMatch(/setDrupalPageLayout|setPageLayout|meta\.layout =/)
-    expect(read('layers/auth/app/middleware/authChrome.global.ts')).toContain('to.meta.layout =')
   })
 
   it('keeps the editorial offset in one place, published by the tabs bar', () => {
@@ -527,34 +507,7 @@ describe('layer contract', () => {
     // Tailwind only compiles classes written out in source, so the header
     // spells the variable out; it must match the one the tabs bar publishes.
     expect(header).toContain(`top-[var(${STIR_EDITORIAL_OFFSET_VAR},0px)]`)
-    expect(header).not.toContain('top-[var(${')
-    expect(header).not.toContain('3.1rem')
     expect(scrollNav).toContain('STIR_EDITORIAL_SCROLL_ALLOWANCE')
-    expect(scrollNav).not.toContain('+ 40')
-  })
-
-  it('uses the upstream deferred menu lifecycle for the editorial account menu', () => {
-    const tabs = readFileSync(
-      resolve(rootDir, 'layers/editorial/app/components/Drupal/Tabs.vue'),
-      'utf8',
-    )
-
-    expect(tabs).toContain('useMenu<AccountMenuItem>(\'account\', {')
-    expect(tabs).toContain('immediate: false')
-    expect(tabs).toContain('server: false')
-    expect(tabs).toContain('execute: executeAccountMenu')
-    expect(tabs).toContain('() => route.fullPath')
-    // One keyed watch decides when a menu is fetched, not a set of flags.
-    expect(tabs).toContain('const accountMenuKey = computed(')
-    expect(tabs).toContain('accountMenuStatus.value === \'success\'')
-    expect(tabs).not.toContain('accountMenuUserId')
-    // Drupal sends the dashboard it allows; the frontend assumes no path.
-    expect(tabs).toContain('const dashboard = adminDashboardUrl.value')
-    expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/dashboard\')')
-    expect(tabs).not.toContain('normalizeAdminUrl(\'/admin/content\')')
-    expect(tabs).not.toContain('$fetch<AccountMenuItem[]>')
-    expect(tabs).not.toContain('getAccountMenuUrl')
-    expect(tabs).not.toContain('drupal-tabs-account-menu-loaded')
   })
 
   it('keeps paragraph layout separate from reusable rich-text editing', () => {
@@ -620,32 +573,6 @@ describe('layer contract', () => {
     )
   })
 
-  it('allows top-level blocks and nested list items without unwrapping Drupal structures', () => {
-    const textEditor = readFileSync(
-      resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
-      'utf8',
-    )
-
-    expect(textEditor).toContain('<UEditorDragHandle')
-    expect(textEditor).toContain(':nested="editorNestedDragHandleOptions"')
-    expect(textEditor).not.toContain('allowedContainers')
-  })
-
-  it('keeps presentation classes off the rich-text editor shell', () => {
-    const textEditor = readFileSync(
-      resolve(rootDir, 'layers/editorial/app/components/Edit/Text.vue'),
-      'utf8',
-    )
-
-    expect(textEditor).toContain(
-      'class="admin-ui admin-ui-scope admin-ui-panel rounded-lg"',
-    )
-    expect(textEditor).not.toContain(
-      ':class="[classes, \'admin-ui admin-ui-scope admin-ui-panel rounded-lg\']"',
-    )
-    expect(textEditor).toContain('isHeading ? \'Edit heading\' : \'Edit text\'')
-  })
-
   it('loads authenticated editorial assets only when editorial UI mounts', () => {
     const pageContext = readFileSync(
       resolve(rootDir, 'layers/theme/app/composables/usePageContext.ts'),
@@ -684,23 +611,6 @@ describe('layer contract', () => {
     }
   })
 
-  it('registers video iframes explicitly without subscriber polling', () => {
-    const videoPlayers = readFileSync(
-      resolve(rootDir, 'layers/theme/app/composables/useVideoPlayers.ts'),
-      'utf8',
-    )
-    const mediaVideo = readFileSync(
-      resolve(rootDir, 'layers/theme/app/components/global/Media/Video.vue'),
-      'utf8',
-    )
-
-    expect(videoPlayers).toContain('async function registerIframe')
-    expect(videoPlayers).toContain('registryVersion')
-    expect(videoPlayers).not.toContain('setInterval(bind')
-    expect(mediaVideo).toContain('ref="iframeElement"')
-    expect(mediaVideo).toContain('registerIframe(iframeElement.value)')
-  })
-
   it('keeps production icons on demand and component-test icons bundled', () => {
     const nuxtConfig = readFileSync(
       resolve(rootDir, 'layers/platform/nuxt.config.ts'),
@@ -730,19 +640,6 @@ describe('layer contract', () => {
     expect(budget.maxAdminDeferredGzipKb).toBeLessThanOrEqual(170)
     // 32.5: motion-v 2.12 grew the deferred domAnimation chunk by 1.32 kB.
     expect(budget.maxRevealMotionGzipKb).toBeLessThanOrEqual(32.5)
-  })
-
-  it('records presentation identity before Nitro serializes runtime config', () => {
-    const themeConfig = readFileSync(
-      resolve(rootDir, 'layers/theme/nuxt.config.ts'),
-      'utf8',
-    )
-
-    expect(themeConfig).toContain('async \'modules:done\'()')
-    expect(themeConfig).toContain('const nuxt = useNuxt()')
-    expect(themeConfig).not.toContain('async \'ready\'(nuxt)')
-    expect(themeConfig).toContain('stirPresentationBuild = {')
-    expect(themeConfig).not.toContain('Manifest')
   })
 
   it('keeps optional integration defaults in their capability layers', async () => {

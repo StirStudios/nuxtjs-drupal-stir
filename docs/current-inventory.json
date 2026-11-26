@@ -871,15 +871,15 @@
     "serverRoutes": 33,
     "productionDependencies": 36,
     "developmentDependencies": 24,
-    "tests": 275,
+    "tests": 277,
     "testsByArea": {
       "composables": 15,
       "contracts": 2,
-      "nuxt": 125,
+      "nuxt": 126,
       "scripts": 7,
       "server": 38,
       "unit": 12,
-      "utils": 76
+      "utils": 77
     }
   },
   "tests": [
@@ -937,6 +937,7 @@
     "tests/nuxt/runtime/DrupalViewRowReveal.nuxt.spec.ts",
     "tests/nuxt/runtime/EditLinkLayout.nuxt.spec.ts",
     "tests/nuxt/runtime/EditPresentation.nuxt.spec.ts",
+    "tests/nuxt/runtime/EditText.nuxt.spec.ts",
     "tests/nuxt/runtime/EditorialFallback.nuxt.spec.ts",
     "tests/nuxt/runtime/EntityReference.nuxt.spec.ts",
     "tests/nuxt/runtime/ErrorPage.nuxt.spec.ts",
@@ -1143,6 +1144,7 @@
     "tests/utils/spacingClasses.spec.ts",
     "tests/utils/stirDrupalHeaders.spec.ts",
     "tests/utils/stirFormTheme.spec.ts",
+    "tests/utils/themeModulesDone.spec.ts",
     "tests/utils/themeTypography.spec.ts",
     "tests/utils/thirdPartyScripts.spec.ts",
     "tests/utils/transformUtils.spec.ts",
