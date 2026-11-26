@@ -120,7 +120,7 @@
     "@internationalized/date": "^3.12.4",
     "@nuxt/image": "^2.2.1",
     "@nuxt/kit": "^4.7.0",
-    "@nuxt/scripts": "^1.3.13",
+    "@nuxt/scripts": "^1.3.14",
     "@nuxt/ui": "^4.13.1",
     "@nuxtjs/plausible": "^4.1.0",
     "@nuxtjs/robots": "^7.1.0",
