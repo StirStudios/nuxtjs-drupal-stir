@@ -6,5 +6,6 @@
   "mail": "editor@example.com",
   "roles": ["authenticated", "administrator"],
   "capabilities": { "editorialUi": true, "adminMenu": true },
+  "picture": null,
   "admin_dashboard_url": "/admin/dashboard"
 }

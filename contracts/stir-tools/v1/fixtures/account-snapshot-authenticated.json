@@ -6,5 +6,6 @@
   "mail": "demo@example.com",
   "roles": ["authenticated"],
   "capabilities": { "editorialUi": false },
+  "picture": "https://cms.example.com/sites/default/files/styles/thumbnail/public/pictures/demo.jpg",
   "profile_complete": true
 }

@@ -29,6 +29,11 @@
       "type": "string",
       "minLength": 1
     },
+    "picture": {
+      "description": "Absolute URL of a small picture of the signed-in account (core's thumbnail image style), read from the user fields in stir_account.settings:account_picture_fields; null when the account has none. Sent for authenticated accounts.",
+      "type": ["string", "null"],
+      "minLength": 1
+    },
     "capabilities": {
       "description": "Frontend capabilities decided by Drupal permissions. Keys are camelCase booleans; project modules add their own through AccountSnapshotBuildEvent.",
       "type": "object",
