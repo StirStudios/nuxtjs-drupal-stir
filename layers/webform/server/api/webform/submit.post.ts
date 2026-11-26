@@ -14,14 +14,9 @@ import {
 import { readWebformBody } from '../../utils/readWebformBody'
 import type { WebformSubmissionResponse } from '../../../shared/types/webformSubmission'
 import {
-  assertStirDrupalResponseNotRedirect,
-  buildStirDrupalHeaders,
-  captureStirDrupalApiError,
   createStirDrupalUpstreamError,
-  fetchStirDrupalCsrfToken,
-  getStirDrupalApiConfig,
-  getStirForwardedCookie,
   markStirPrivateResponse,
+  stirDrupalApiFetch,
 } from '../../../../foundation/server/utils/stirDrupalApi'
 
 type SubmissionBody = Record<string, unknown>
@@ -152,34 +147,31 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const { baseUrl, apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
-    const csrfToken = await fetchStirDrupalCsrfToken(event)
-    const cookie = getStirForwardedCookie(event)
-
-    const drupalApiUrl = `${baseUrl}/api/stir_webform_rest/submit`
     const origin = getHeader(event, 'origin')
     const referer = getHeader(event, 'referer')
     const userAgent = getHeader(event, 'user-agent')
-
-    const response = await $fetch.raw<WebformSubmissionResponse>(drupalApiUrl, {
-      method: 'POST',
-      headers: {
-        ...(submission.contentType
-          ? { 'Content-Type': submission.contentType }
-          : {}),
-        Accept: 'application/json',
-        ...buildStirDrupalHeaders({ apiKey, cookie, csrfToken }),
-        ...(origin ? { Origin: origin } : {}),
-        ...(referer ? { Referer: referer } : {}),
-        ...(userAgent ? { 'User-Agent': userAgent } : {}),
+    // Same-origin is not enforced: an embedded form (the calculator widget)
+    // posts from its host site. Drupal checks the Turnstile token, and asks a
+    // signed-in visitor's request for its CSRF token.
+    const response = await stirDrupalApiFetch<WebformSubmissionResponse>(
+      event,
+      '/api/stir_webform_rest/submit',
+      {
+        method: 'POST',
+        body: submission.forwardBody,
+        headers: {
+          ...(submission.contentType ? { 'Content-Type': submission.contentType } : {}),
+          Accept: 'application/json',
+          ...(origin ? { Origin: origin } : {}),
+          ...(referer ? { Referer: referer } : {}),
+          ...(userAgent ? { 'User-Agent': userAgent } : {}),
+        },
+        enforceSameOrigin: false,
+        forwardClientIp: true,
+        forwardCookies: true,
+        ignoreResponseError: true,
       },
-      body: submission.forwardBody,
-      redirect: 'manual',
-      timeout: requestTimeoutMs,
-      ignoreResponseError: true,
-    })
-
-    assertStirDrupalResponseNotRedirect(response)
+    )
 
     if (response.status >= 400 && response.status < 500) {
       setResponseStatus(event, response.status)
@@ -192,7 +184,6 @@ export default defineEventHandler(async (event) => {
 
     return response._data
   } catch (error) {
-    captureStirDrupalApiError(event, error)
     throw createStirDrupalUpstreamError(error, 'Form submission failed. Please try again later.')
   }
 })

@@ -12,20 +12,14 @@ import {
 } from '../../utils/listingApi'
 import {
   appendStirDrupalSetCookies,
-  assertStirDrupalResponseNotRedirect,
-  buildStirDrupalHeaders,
-  captureStirDrupalApiError,
   createStirDrupalUpstreamError,
   filterStirDrupalSetCookies,
-  getStirDrupalApiConfig,
+  forwardStirDrupalCacheHeaders,
   getStirDrupalSetCookies,
   getStirForwardedCookie,
   markStirPrivateResponse,
-  stirDrupalTimeoutOptions,
+  stirDrupalApiFetch,
 } from '../../../../foundation/server/utils/stirDrupalApi'
-import { recordStirCacheTags } from '../../../../foundation/server/utils/stirCacheTags'
-
-const FORWARDED_CACHE_HEADERS = ['cache-control', 'etag', 'last-modified'] as const
 
 export default defineEventHandler(async (event) => {
   let listing: string
@@ -39,25 +33,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { apiKey, baseUrl, requestTimeoutMs } = getStirDrupalApiConfig()
-  const cookie = getStirForwardedCookie(event)
-
-  if (cookie) markStirPrivateResponse(event)
-
   try {
-    const response = await $fetch.raw<unknown>(
-      `${baseUrl}/api/stir/listings/${encodeURIComponent(listing)}`,
-      {
-        method: 'GET',
-        query: toDrupalListingQuery(getQuery(event)),
-        headers: buildStirDrupalHeaders({ apiKey, cookie }),
-        redirect: 'manual',
-        ...stirDrupalTimeoutOptions(requestTimeoutMs),
-      },
+    const response = await stirDrupalApiFetch<unknown>(
+      event,
+      `/api/stir/listings/${encodeURIComponent(listing)}`,
+      { method: 'GET', query: toDrupalListingQuery(getQuery(event)), forwardCookies: true },
     )
-
-    assertStirDrupalResponseNotRedirect(response)
-    recordStirCacheTags(event, response.headers)
     const payload = parseStirListingResponse(response._data)
     const setsSession = filterStirDrupalSetCookies(
       getStirDrupalSetCookies(response.headers),
@@ -66,17 +47,13 @@ export default defineEventHandler(async (event) => {
     appendStirDrupalSetCookies(event, response)
 
     if (isPrivateStirListingResponse({
-      hasRequestCookie: Boolean(cookie),
+      hasRequestCookie: Boolean(getStirForwardedCookie(event)),
       setsSessionCookie: setsSession,
       personalized: payload.meta.personalized,
     })) {
       markStirPrivateResponse(event)
     } else {
-      for (const header of FORWARDED_CACHE_HEADERS) {
-        const value = response.headers.get(header)
-
-        if (value) setResponseHeader(event, header, value)
-      }
+      forwardStirDrupalCacheHeaders(event, response.headers)
     }
 
     setResponseHeader(event, 'X-Stir-Listing-Contract', '1')
@@ -85,7 +62,6 @@ export default defineEventHandler(async (event) => {
     // Upstream and contract failures are operational state, not cacheable
     // listing representations. Never let a CDN retain them as public output.
     markStirPrivateResponse(event)
-    captureStirDrupalApiError(event, error)
     throw createStirDrupalUpstreamError(error, 'Failed to load Drupal listing.')
   }
 })

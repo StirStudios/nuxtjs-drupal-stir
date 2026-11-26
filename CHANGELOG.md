@@ -13,6 +13,18 @@ untouched do not need one.
 
 ## Unreleased
 
+- New `stirDrupalApiFetch()` server helper: the same request as
+  `stirDrupalApiRequest()` (API key, Drupal session, CSRF token for a signed-in
+  mutation, refused redirects, cache tags) but returning the whole response,
+  with `query`, extra `headers` and `ignoreResponseError` options. The view,
+  listing, availability, CSRF-token and webform submit routes use it instead
+  of their own copies. `forwardStirDrupalCacheHeaders()` passes Drupal's
+  `cache-control`, `etag` and `last-modified` on.
+- Webform submissions from anonymous visitors no longer fetch a CSRF token
+  first, one Drupal request fewer; Drupal only checks the token for a
+  signed-in session. The submit route also forwards the visitor's IP when
+  `drupalClientIpForwarding` is enabled, as the auth routes do.
+
 - **Breaking:** removed unused exports. No site uses them, and the consumer
   audit passed against every site:
   - the `TabContent` and `WrapArticle` components;
