@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { nextTick, reactive } from 'vue'
+import { reactive } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { WebformFieldProps, WebformState } from '../../../layers/theme/app/types'
 import FieldRenderer from '../../../layers/webform/app/components/Field/Renderer.vue'
@@ -490,11 +490,11 @@ describe('FieldRenderer (Nuxt runtime)', () => {
       '#name': 'region',
       '#title': 'Region',
       '#options': { west: 'West' },
-      '#states': {
-        disabled: {
-          ':input[name="country"]': { value: 'US' },
-        },
-      },
+      '#conditions': [{
+        state: 'disabled',
+        logic: 'and',
+        rules: [{ name: 'country', selector: ':input[name="country"]', triggers: [{ trigger: 'value', value: 'US' }] }],
+      }],
     }
 
     const wrapper = await mountSuspended(FieldRenderer, {
@@ -604,31 +604,6 @@ describe('FieldRenderer (Nuxt runtime)', () => {
     expect(wrapper.findAll('button').filter(button => button.text().startsWith('Add another'))).toHaveLength(0)
   })
 
-  it('shows a field once a camel-cased legacy condition holds', async () => {
-    const fee = canonical({
-      '#type': 'textfield',
-      '#name': 'ticket_fee',
-      '#title': 'Ticket fee',
-      '#states': { visible: { ':input[name="eventType"]': { value: 'paid_show' } } },
-    })
-    // The legacy selector resolves against the form's names.
-    const fields = normalizeWebformDefinition({
-      webformId: 'test',
-      fields: {
-        eventType: { '#type': 'radio', '#name': 'event_type', '#options': { paid_show: 'Paid' }, '#optionKeys': ['paid_show'] },
-        ticketFee: fee,
-      },
-    }).fields
-    const state = reactive<WebformState>({ event_type: '' })
-    const wrapper = await mountSuspended(FieldRenderer, {
-      props: { field: fields.ticket_fee!, fieldName: 'ticket_fee', state },
-    })
-
-    expect(wrapper.text()).not.toContain('Ticket fee')
-    state.event_type = 'paid_show'
-    await nextTick()
-    expect(wrapper.text()).toContain('Ticket fee')
-  })
 
   it('leaves a number with a minimum empty, without showing the minimum', async () => {
     // A required guest count: an empty box showing "1" looked answered.
