@@ -3,6 +3,7 @@ export type AuthSessionUser = {
   name: string
   mail: string
   roles: string[]
+  picture?: string | null
   capabilities?: { editorialUi?: boolean; adminMenu?: boolean } & Record<string, boolean>
 } & Record<string, unknown>
 

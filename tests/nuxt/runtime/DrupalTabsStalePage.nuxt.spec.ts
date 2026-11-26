@@ -64,7 +64,7 @@ describe('Drupal/Tabs page tasks', () => {
     authSession.current = {
       ready: ref(true),
       loggedIn: ref(true),
-      user: ref({ uid: 9, name: 'Session Editor', capabilities: { editorialUi: true } }),
+      user: ref({ uid: 9, name: 'Session Editor', picture: '/files/avatar.jpg', capabilities: { editorialUi: true } }),
       fetchSession: async () => {},
     }
     ;(useRouter() as unknown as Router).addRoute({ path: '/courses', name: 'courses', component: { render: () => null } })
@@ -72,6 +72,7 @@ describe('Drupal/Tabs page tasks', () => {
 
     expect(bar.text()).toContain('Session Editor')
     expect(bar.text()).not.toContain('Account')
+    expect(bar.html()).toContain('/files/avatar.jpg')
     bar.unmount()
     authSession.current = null
   })
