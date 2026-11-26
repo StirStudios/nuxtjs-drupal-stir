@@ -29,7 +29,6 @@ async function inspectPreset(name) {
     const hasAnalytics = layers.some((layer) =>
       layer.endsWith('/layers/analytics'),
     )
-    const hasScripts = layers.some((layer) => layer.endsWith('/layers/scripts'))
     const hasEditorial = layers.some((layer) =>
       layer.endsWith('/layers/editorial'),
     )
@@ -59,7 +58,6 @@ async function inspectPreset(name) {
       hasWebform,
       hasTurnstile,
       hasAnalytics,
-      hasScripts,
       hasEditorial,
       hasIntegrations,
       hasSeo,
@@ -103,10 +101,8 @@ if (minimal.hasTurnstile) {
   throw new Error('The minimal preset must not load the Turnstile layer.')
 }
 
-if (minimal.hasAnalytics || minimal.hasScripts) {
-  throw new Error(
-    'The minimal preset must not load analytics or scripts layers.',
-  )
+if (minimal.hasAnalytics) {
+  throw new Error('The minimal preset must not load the analytics layer.')
 }
 
 if (minimal.hasEditorial) {
@@ -159,8 +155,8 @@ if (!full.hasTurnstile) {
   throw new Error('The full preset must preserve the Turnstile layer.')
 }
 
-if (!full.hasAnalytics || !full.hasScripts) {
-  throw new Error('The full preset must preserve analytics and scripts layers.')
+if (!full.hasAnalytics) {
+  throw new Error('The full preset must preserve the analytics layer.')
 }
 
 if (!full.hasEditorial) {

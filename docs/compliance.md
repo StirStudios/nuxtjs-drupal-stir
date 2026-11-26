@@ -84,7 +84,7 @@ actually runs, then applies only the rules that evidence triggers:
 | Payment module plus role expiry, recurring, or subscription evidence | `dataHandling.checkoutConsentRecord`; automatic renewal and cancellation in the Terms |
 | Newsletter module, user newsletter field, or newsletter block | the list provider and newsletter copy |
 | Flag, favorites, or account tracker modules | privacy copy on saved items or activity history |
-| Enabled privacy notice or UserWay | matching storage or vendor declarations |
+| Enabled privacy notice | matching storage or vendor declarations |
 
 A brochure site therefore never inherits account, billing, or renewal rules, and
 a subscription product cannot pass without them. Declared vendors with no

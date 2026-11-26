@@ -13,6 +13,20 @@ untouched do not need one.
 
 ## Unreleased
 
+- **Breaking:** the `scripts` layer and its UserWay widget are removed, with
+  the `userway` app config key and its type. No site enabled it. A site that
+  still sets `userway` in its `app.config.ts` should delete it.
+- **Breaking:** the CE proxy (`/api/drupal-ce/**`) accepts only GET and HEAD
+  (anything else is a 405), and passes on only the visitor's `accept`,
+  `accept-language`, `if-modified-since`, `if-none-match` and `user-agent`
+  headers, beside the session cookie and API key it adds. Edits already go
+  through the editorial routes (`/api/paragraph/**`, `/api/formatted-text/**`),
+  which check the origin and send Drupal's CSRF token. No site writes through
+  the proxy.
+- A missing page asks Drupal once instead of three times: on the server a
+  failed page fetch is reused for the rest of the request by the layout
+  middleware, the page and the error render.
+
 - A Button paragraph with a document attached links to the file in a new tab
   while `stirTheme.showPdf` is off (the default). It rendered a button that
   did nothing; with `showPdf` on it still opens the PDF viewer.

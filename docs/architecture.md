@@ -319,7 +319,7 @@ Status (2026-09-25): the current runtime names and a migration proposal are in [
 
 The root config always extends `core`, `theme`, and `auth`, then always installs Nuxt UI, Scripts, Vitalizer, Turnstile, Robots, Sitemap, and Drupal CE; Plausible is present outside tests. See [`nuxt.config.ts` lines 31–33 and 199–242](https://github.com/StirStudios/nuxtjs-drupal-stir/blob/dev/nuxt.config.ts#L31-L33).
 
-`authIntegration.drupalAccounts: false` hides behavior, but the auth pages, server routes, composables, components, and three global middleware files remain registered. Similar no-op-at-runtime patterns exist for global SEO, UserWay, Plausible, privacy, popups, and editing.
+`authIntegration.drupalAccounts: false` hides behavior, but the auth pages, server routes, composables, components, and three global middleware files remain registered. Similar no-op-at-runtime patterns exist for global SEO, Plausible, privacy, popups, and editing.
 
 Recommendation: make these build-time capabilities. Applications that do not use auth, editing, analytics, or Webforms should not register their routes, middleware, plugins, types, or dependencies.
 
@@ -437,7 +437,7 @@ Use modules for installation/runtime wiring, layers for overrideable application
 | `@stir/nuxt-webform` | Optional Webform renderer, field components, validation, and submit endpoint |
 | `@stir/nuxt-auth` | Optional auth/account pages, routes, middleware, and server handlers |
 | `@stir/nuxt-editor` | Optional Tiptap/admin editing capability |
-| `@stir/nuxt-integrations` | Optional analytics, UserWay, popup/privacy, and third-party script adapters |
+| `@stir/nuxt-integrations` | Optional analytics, popup/privacy, and third-party script adapters |
 | `@stir/nuxt-preset` | Full compatibility preset matching today's layer for easy adoption |
 | `@stir/nuxt-shared` | Pure frontend types, validation, normalization, and policy functions with no Vue/Nitro imports |
 
@@ -530,7 +530,7 @@ The desired result is not merely Drupal 12 syntax compatibility. It is a smaller
 
 The redesign is not complete merely because the folders look cleaner. It should be accepted only when it produces measurable reductions without breaking the four consumers.
 
-- **Less code per application:** a minimal site must not enable Drupal Webform/account/admin/provider integrations or register Nuxt auth routes, Tiptap editing, analytics, UserWay, popup/privacy, or Webform code unless selected.
+- **Less code per application:** a minimal site must not enable Drupal Webform/account/admin/provider integrations or register Nuxt auth routes, Tiptap editing, analytics, popup/privacy, or Webform code unless selected.
 - **Less global surface:** reduce the approximately 374 auto-scanned exports to a documented, prefixed public allowlist. Internal helpers should be explicit imports and invisible to consumers.
 - **Less configuration:** replace internal DOM/Tailwind class maps with semantic variants and a much smaller stable configuration contract. Nuxt UI configuration remains the primary styling mechanism.
 - **Less duplication:** remove deprecated listing helpers, the unused core protected-access implementation, cross-layer wrapper duplication where compatibility no longer requires it, and repeated parsing/normalization policy.

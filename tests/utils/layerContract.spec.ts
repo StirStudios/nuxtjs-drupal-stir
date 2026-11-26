@@ -45,7 +45,6 @@ describe('layer contract', () => {
       'editorial',
       'integrations',
       'analytics',
-      'scripts',
       'webform',
       'auth',
     ]) {
@@ -1115,17 +1114,6 @@ describe('layer contract', () => {
     expect(themeConfig).not.toContain('Manifest')
   })
 
-  it('schedules UserWay through the Nuxt Scripts idle-timeout trigger', () => {
-    const userwayPlugin = readFileSync(
-      resolve(rootDir, 'layers/scripts/app/plugins/userway.client.ts'),
-      'utf8',
-    )
-
-    expect(userwayPlugin).toContain('useScriptTriggerIdleTimeout')
-    expect(userwayPlugin).toContain('warmupStrategy: false')
-    expect(userwayPlugin).not.toContain('requestIdleCallback')
-  })
-
   it('keeps optional integration defaults in their capability layers', () => {
     const themeConfig = readFileSync(
       resolve(rootDir, 'layers/theme/app/app.config.ts'),
@@ -1137,10 +1125,6 @@ describe('layer contract', () => {
     )
     const analyticsNuxtConfig = readFileSync(
       resolve(rootDir, 'layers/analytics/nuxt.config.ts'),
-      'utf8',
-    )
-    const scriptsConfig = readFileSync(
-      resolve(rootDir, 'layers/scripts/app/app.config.ts'),
       'utf8',
     )
     const integrationsConfig = readFileSync(
@@ -1156,7 +1140,6 @@ describe('layer contract', () => {
     expect(analyticsNuxtConfig).toContain('autoOutboundTracking: true')
     expect(analyticsNuxtConfig).toContain('fileDownloads: true')
     expect(analyticsNuxtConfig).toContain('formSubmissions: true')
-    expect(scriptsConfig).toContain('userway:')
     expect(integrationsConfig).toContain('privacyNotice:')
     expect(integrationsConfig).toContain('popup:')
   })

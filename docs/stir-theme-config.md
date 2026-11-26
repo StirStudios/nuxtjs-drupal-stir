@@ -1,6 +1,6 @@
 ## StirStudios Nuxt App Config Reference
 
-This document outlines the full structure of the StirStudios `app.config.ts` file, including all relevant options under `colorMode`, `userway`, `stirTheme`, and the extended `ui` Nuxt UI presets.
+This document outlines the full structure of the StirStudios `app.config.ts` file, including all relevant options under `colorMode`, `stirTheme`, and the extended `ui` Nuxt UI presets.
 
 ---
 
@@ -81,25 +81,6 @@ colorMode: {
   darkRoutes: ['/'],
 }
 ```
-
-### 🧑‍🦽 `userway`
-
-```ts
-userway: {
-  enabled: false,
-  account: '',
-  loadDelayMs: 5000,
-  position: 3,
-  size: 'small',
-  color: '#ffffff',
-  type: '1',
-}
-```
-
-`loadDelayMs` delays the accessibility widget until after Nuxt is ready. The
-default uses Nuxt Scripts' idle-timeout trigger to keep UserWay out of the
-initial rendering and hydration window without gating it on tracking consent.
-Connection warmup is disabled so the widget is not fetched before that trigger.
 
 ### 🔐 `protectedRoutes`
 
@@ -256,7 +237,7 @@ fails if that variable is set, so a copied staging value cannot go live.
 Calendly and Bunny PlayerJS use fixed vendor origins. PlayerJS is requested only
 when a visitor activates an embedded video and retains Bunny's official
 `playerjs-latest.min.js` URL because Bunny does not publish a supported pinned
-loader URL. UserWay remains ungated as an accessibility-essential service.
+loader URL.
 
 ### 💬 `popup`
 
@@ -392,8 +373,8 @@ privacyNotice: {
 
 In `consent` mode, Plausible, Calculator, Calendly, and Bunny PlayerJS wait for
 acceptance. In `notice` mode, or when the notice is disabled, existing loading
-behavior is preserved. Enzuzo legal content and the UserWay accessibility
-widget are treated as essential exceptions.
+behavior is preserved. Enzuzo legal content is treated as an essential
+exception.
 
 Application code can read or change the shared decision through
 `usePrivacyConsent()`. Calling `withdraw()` marks consent declined and reloads

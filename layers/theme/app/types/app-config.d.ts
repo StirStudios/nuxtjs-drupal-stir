@@ -90,16 +90,6 @@ type ThirdPartyScriptsConfig = {
   }
 } & LooseRecord
 
-type UserwayConfig = {
-  enabled?: boolean
-  account?: string
-  loadDelayMs?: number
-  position?: number
-  size?: 'small' | 'medium' | 'large'
-  color?: string
-  type?: string
-} & LooseRecord
-
 type CmsGlobalSeoConfig = {
   enabled?: boolean
   ignoredPathPrefixes?: string[]
@@ -738,7 +728,6 @@ declare module '@nuxt/schema' {
     protectedRoutes?: ProtectedRoutesConfig
     analytics?: AnalyticsConfig
     thirdPartyScripts?: ThirdPartyScriptsConfig
-    userway?: UserwayConfig
     cmsGlobalSeo?: CmsGlobalSeoConfig
     colorMode?: ColorModeConfig
     privacyNotice?: PrivacyNoticeConfig
@@ -750,7 +739,6 @@ declare module '@nuxt/schema' {
     protectedRoutes: ProtectedRoutesConfig
     analytics: AnalyticsConfig
     thirdPartyScripts: ThirdPartyScriptsConfig
-    userway: UserwayConfig
     cmsGlobalSeo: CmsGlobalSeoConfig
     colorMode: ColorModeConfig
     privacyNotice: PrivacyNoticeConfig

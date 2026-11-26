@@ -287,13 +287,6 @@ export const SERVICE_RULES = [
     inventory: { path: 'technology.browserStorage', pattern: /notice|dismiss|consent/i, reverse: false },
   },
   {
-    id: 'userway',
-    label: 'UserWay accessibility widget',
-    detect: signals => enabledInAppConfig(signals, 'userway'),
-    inventory: { path: 'technology.vendors', pattern: /userway/i },
-    disclosures: [{ document: 'accessibility', label: 'the UserWay widget', pattern: /userway|overlay|widget/i }],
-  },
-  {
     id: 'enzuzo',
     label: 'Enzuzo policy embed',
     detect: signals => modules(signals, /^stir_layout_builder_paragraph_enzuzo$/),

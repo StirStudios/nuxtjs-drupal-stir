@@ -6,7 +6,6 @@ import {
   proxyRequest,
   type H3Event,
 } from 'h3'
-import { assertStirSameOrigin } from '../../../foundation/server/utils/stirRequestSecurity'
 import {
   FIRST_ATTEMPT_TIMEOUT_MS,
   filterStirDrupalSetCookies,
@@ -23,14 +22,16 @@ interface StirDrupalCeProxyTargets {
   menuBaseUrl: string
 }
 
-const FORWARDED_HEADERS = [
-  'forwarded',
-  'x-forwarded-for',
-  'x-forwarded-host',
-  'x-forwarded-port',
-  'x-forwarded-prefix',
-  'x-forwarded-proto',
-  'x-real-ip',
+// The only visitor headers a CE page or menu read passes on: content
+// negotiation, revalidation and the client's identity. Everything else (an
+// Authorization or CSRF header, forwarding headers, any custom header) stays
+// behind; the proxy adds the session cookie and API key itself.
+const FORWARDED_REQUEST_HEADERS = [
+  'accept',
+  'accept-language',
+  'if-modified-since',
+  'if-none-match',
+  'user-agent',
 ]
 const MENU_NAME_PATTERN = '[A-Za-z0-9_-]+'
 const SHARED_REVALIDATION_CACHE_CONTROL
@@ -143,13 +144,16 @@ export const createStirDrupalProxyFetch = (
   event: H3Event,
 ): typeof globalThis.fetch => {
   return async (input, init) => {
-    const headers = new Headers(init?.headers)
+    const incoming = new Headers(init?.headers)
+    const headers = new Headers()
     const cookie = getStirForwardedCookie(event)
     const { apiKey, requestTimeoutMs } = getStirDrupalApiConfig()
 
-    headers.delete('cookie')
-    headers.delete('x-api-key')
-    FORWARDED_HEADERS.forEach(header => headers.delete(header))
+    for (const name of FORWARDED_REQUEST_HEADERS) {
+      const value = incoming.get(name)
+
+      if (value) headers.set(name, value)
+    }
 
     if (cookie) headers.set('cookie', cookie)
     if (apiKey) headers.set('x-api-key', apiKey)
@@ -298,12 +302,9 @@ export const proxyStirDrupalCeRequest = async (
   event: H3Event,
   path = '',
 ) => {
-  // Mutations reaching Drupal through this proxy must clear the same origin
-  // policy the dedicated editorial routes enforce, so the proxy cannot be used
-  // to skip that guard.
-  if (event.method !== 'GET' && event.method !== 'HEAD') {
-    assertStirSameOrigin(event)
-  }
+  // Reads only: edits go through the dedicated editorial routes, which check
+  // the origin and send Drupal's CSRF token.
+  assertMethod(event, ['GET', 'HEAD'])
 
   const { ceBaseUrl } = getStirDrupalCeProxyTargets()
   const target = assertContainedProxyTarget(
