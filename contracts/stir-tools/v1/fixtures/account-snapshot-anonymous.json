@@ -4,5 +4,6 @@
   "name": "",
   "mail": "",
   "roles": [],
-  "capabilities": { "editorialUi": false }
+  "capabilities": { "editorialUi": false },
+  "url": null
 }

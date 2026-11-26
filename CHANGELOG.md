@@ -22,6 +22,10 @@ untouched do not need one.
   `picture` URL (Stir Tools' `/api/auth/session`), and the user icon otherwise.
   `AuthSessionUser` and `useOptionalAuthSession()` gain an optional `picture`.
 
+- `AuthSessionUser` gains an optional `url`: the root-relative path of the
+  account's own profile page, which Stir Tools' session now sends (contract
+  1.43.0).
+
 - New `ContentEyebrow` component, which the Text and Hero paragraphs and
   `HeroContent` use for their eyebrow. It keeps the `eyebrow` class, so site
   styles still apply.

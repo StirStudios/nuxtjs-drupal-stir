@@ -7,5 +7,6 @@
   "roles": ["authenticated", "administrator"],
   "capabilities": { "editorialUi": true, "adminMenu": true },
   "picture": null,
+  "url": "/user/3",
   "admin_dashboard_url": "/admin/dashboard"
 }

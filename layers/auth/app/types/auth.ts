@@ -4,6 +4,8 @@ export type AuthSessionUser = {
   mail: string
   roles: string[]
   picture?: string | null
+  /** Root-relative path of the account's own profile page. */
+  url?: string | null
   capabilities?: { editorialUi?: boolean; adminMenu?: boolean } & Record<string, boolean>
 } & Record<string, unknown>
 

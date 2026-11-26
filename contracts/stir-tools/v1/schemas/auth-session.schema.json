@@ -34,6 +34,11 @@
       "type": ["string", "null"],
       "minLength": 1
     },
+    "url": {
+      "description": "Root-relative path of the account's own profile page (its path alias, else /user/{uid}); null for anonymous visitors.",
+      "type": ["string", "null"],
+      "minLength": 1
+    },
     "capabilities": {
       "description": "Frontend capabilities decided by Drupal permissions. Keys are camelCase booleans; project modules add their own through AccountSnapshotBuildEvent.",
       "type": "object",

@@ -7,5 +7,6 @@
   "roles": ["authenticated"],
   "capabilities": { "editorialUi": false },
   "picture": "https://cms.example.com/sites/default/files/styles/thumbnail/public/pictures/demo.jpg",
+  "url": "/instructors/demo-dancer",
   "profile_complete": true
 }
