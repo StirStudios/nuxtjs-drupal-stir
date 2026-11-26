@@ -43,6 +43,13 @@ const user = computed(() => page.value?.current_user || null)
 const accountLabel = computed(() =>
   user.value?.name || session?.user.value?.name || 'Account',
 )
+const accountIcon = computed(() => {
+  const picture = session?.user.value?.picture
+
+  return picture
+    ? { avatar: { src: picture, alt: '' } }
+    : { icon: 'i-lucide-circle-user' }
+})
 const {
   adminDashboardUrl,
   hasAdminMenuAccess,
@@ -322,14 +329,14 @@ const links = computed(() => {
   const accountItem = accountMenu.value.length
     ? {
         label: accountLabel.value,
-        icon: 'i-lucide-circle-user',
+        ...accountIcon.value,
         badge: baseLinks.length ? undefined : badge,
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
         label: accountLabel.value,
-        icon: 'i-lucide-circle-user',
+        ...accountIcon.value,
         badge: baseLinks.length ? undefined : badge,
         to: accountTo,
         tooltip: isCompactTabs.value,

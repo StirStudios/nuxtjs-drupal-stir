@@ -18,6 +18,10 @@ untouched do not need one.
   session's name instead of "Account". `useOptionalAuthSession()`'s user type
   gains an optional `name`.
 
+- The editor bar shows the account's picture when the auth session carries a
+  `picture` URL (Stir Tools' `/api/auth/session`), and the user icon otherwise.
+  `AuthSessionUser` and `useOptionalAuthSession()` gain an optional `picture`.
+
 - New `ContentEyebrow` component, which the Text and Hero paragraphs and
   `HeroContent` use for their eyebrow. It keeps the `eyebrow` class, so site
   styles still apply.

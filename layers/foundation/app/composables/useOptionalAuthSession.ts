@@ -9,6 +9,8 @@ export type StirAuthSessionState = {
   user: Ref<{
     uid?: number | string
     name?: string
+    /** A small picture URL, when Drupal sends one with the session. */
+    picture?: string | null
     capabilities?: { editorialUi?: boolean; adminMenu?: boolean } | null
   } | null>
   fetchSession: () => Promise<void>
