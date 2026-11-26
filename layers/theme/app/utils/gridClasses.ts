@@ -1,7 +1,6 @@
 // Structured contract mirrored from Drupal's GridItemsConfigHelper::toStructured()
 // (stir_layout_builder). Keep the breakpoint list in sync with
-// GridItemsConfigHelper's BREAKPOINT_MIN_WIDTHS and with
-// layers/theme/app/utils/responsiveGrid.ts.
+// GridItemsConfigHelper's BREAKPOINT_MIN_WIDTHS.
 export const GRID_BREAKPOINTS = ['default', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const
 
 export type GridBreakpoint = (typeof GRID_BREAKPOINTS)[number]

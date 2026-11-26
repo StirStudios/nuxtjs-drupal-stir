@@ -66,6 +66,9 @@ jobs:
       - name: Check initial bundle boundaries and enforce size budgets
         run: pnpm perf:report --no-build
 
+      - name: Typecheck the presets
+        run: pnpm test:presets
+
   consumer-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 30

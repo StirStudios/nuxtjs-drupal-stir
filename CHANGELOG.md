@@ -13,6 +13,23 @@ untouched do not need one.
 
 ## Unreleased
 
+- **Breaking:** removed unused exports. No site uses them, and the consumer
+  audit passed against every site:
+  - the `TabContent` and `WrapArticle` components;
+  - `materialVariant`, `materialVariantWithPB` and `materialVariantMuted`
+    (`utils/uiVariants.ts`); use the `material` variant of the Nuxt UI
+    component;
+  - `resolveResponsiveGridValue`, `extractFieldName`, `resolveOptionalUiColor`,
+    `resolveOptionalUiButtonVariant` and `resolveUiFieldNoMaterialVariant`;
+  - the `AppContextResponse` type alias (use `AppContextPayload`);
+  - the `btn-block` CSS utility.
+- Webform payloads are read only in the shape Stir Tools has sent since
+  October (camelCase properties, `#conditions` built in Drupal). The layer no
+  longer renames snake_case properties, rebuilds `#conditions` from `#states`
+  or accepts the old `#submit_label` spellings.
+- `resolveDrupalCeConfig()` accepts any config object, so a preset without the
+  platform layer typechecks again.
+
 - **Breaking:** the `scripts` layer and its UserWay widget are removed, with
   the `userway` app config key and its type. No site enabled it. A site that
   still sets `userway` in its `app.config.ts` should delete it.

@@ -14,7 +14,6 @@ import type {
 } from '../../shared/types/appContext'
 import { parseComponentTreeNode } from './componentTree'
 
-export type { AppContextPayload as AppContextResponse } from '../../shared/types/appContext'
 
 const emptyAppContext = (): AppContextPayload => ({
   blocks: {},

@@ -17,9 +17,3 @@
   }
 }
 
-@utility btn-block {
-  a,
-  button {
-    @apply block w-full;
-  }
-}

@@ -121,12 +121,11 @@ Use these rules for all changes.
   `<Prefix>Default` while dropping trailing segments (`Paragraph/Default.vue`
   → `ParagraphDefault`, `node--default.vue` → `NodeDefault`).
 - Custom-element components must be global (`components/global`) to resolve.
-- Default Custom Elements JSON format is `explicit`; use `legacy` only for old backends and document why.
+- The layer reads the `explicit` Custom Elements JSON format only.
 - If changed, document these module options and expected behavior:
   - `drupalBaseUrl`
   - `serverDrupalBaseUrl`
   - `ceApiEndpoint`
-  - `customElementJsonFormat`
   - menu endpoint overrides
 - Any change affecting Drupal-driven layout/block/custom-element rendering must be clearly called out in summaries.
 - If a feature requires new Drupal fields, CE config, or JSON:API include changes, document in `docs/` or `readme.md`.

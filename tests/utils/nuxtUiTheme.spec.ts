@@ -5,11 +5,6 @@ import {
   materialTextControl,
   nuxtUiTheme,
 } from '../../layers/theme/app/theme/nuxtUi'
-import {
-  materialVariant,
-  materialVariantMuted,
-  materialVariantWithPB,
-} from '../../layers/theme/app/utils/uiVariants'
 
 describe('Nuxt UI theme preset', () => {
   it('owns the Material variants for every supported control', () => {
@@ -29,12 +24,6 @@ describe('Nuxt UI theme preset', () => {
       materialSelectControl,
     )
     expect(nuxtUiTheme.button.variants.variant.material).toBe(materialButton)
-  })
-
-  it('keeps the historical helpers as compatibility aliases', () => {
-    expect(materialVariant).toBe(materialTextControl)
-    expect(materialVariantWithPB).toBe(materialSelectControl)
-    expect(materialVariantMuted).toBe(materialButton)
   })
 
   it('uses valid semantic Nuxt UI and Tailwind tokens', () => {

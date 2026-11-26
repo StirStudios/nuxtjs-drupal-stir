@@ -30,9 +30,13 @@ const normalizeEndpoint = (value: unknown): string => {
  * Layers without the platform config, and runtime overrides, may leave keys
  * out or blank.
  */
-export function resolveDrupalCeConfig(publicConfig: { drupalCe?: unknown }): DrupalCeConfig {
-  const raw = publicConfig.drupalCe && typeof publicConfig.drupalCe === 'object'
-    ? publicConfig.drupalCe as Record<string, unknown>
+// Takes any object: a preset without the platform layer has a public config
+// type with no `drupalCe` key, which a `{ drupalCe?: unknown }` parameter
+// rejects as a weak type.
+export function resolveDrupalCeConfig(publicConfig: object): DrupalCeConfig {
+  const drupalCe = (publicConfig as { drupalCe?: unknown }).drupalCe
+  const raw = drupalCe && typeof drupalCe === 'object'
+    ? drupalCe as Record<string, unknown>
     : {}
 
   return {
