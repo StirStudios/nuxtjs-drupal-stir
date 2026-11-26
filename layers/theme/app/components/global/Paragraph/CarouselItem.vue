@@ -15,22 +15,21 @@ const media = computed(() =>
   ),
 )
 const hasContent = computed(() => Boolean(props.label?.trim() || media.value.length))
+const ULink = resolveComponent('ULink')
 </script>
 
 <template>
-  <ULink
-    v-if="hasContent && linkData.url"
-    class="flex items-center gap-3 text-default no-underline"
-    :rel="linkData.external ? 'noopener noreferrer' : undefined"
-    :target="linkData.external ? '_blank' : undefined"
-    :to="linkData.url"
+  <component
+    :is="linkData.url ? ULink : 'div'"
+    v-if="hasContent"
+    v-bind="linkData.url ? {
+      class: 'flex items-center gap-3 text-default no-underline',
+      rel: linkData.external ? 'noopener noreferrer' : undefined,
+      target: linkData.external ? '_blank' : undefined,
+      to: linkData.url,
+    } : { class: 'flex items-center gap-3' }"
   >
     <component :is="node" v-for="(node, index) in media" :key="node.key ?? index" />
     <span v-if="label" class="whitespace-nowrap">{{ label }}</span>
-  </ULink>
-
-  <div v-else-if="hasContent" class="flex items-center gap-3">
-    <component :is="node" v-for="(node, index) in media" :key="node.key ?? index" />
-    <span v-if="label" class="whitespace-nowrap">{{ label }}</span>
-  </div>
+  </component>
 </template>

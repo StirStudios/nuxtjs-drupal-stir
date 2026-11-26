@@ -52,6 +52,12 @@ const btnBlock = computed(() => resolveBooleanProp(props.block))
 const alignClasses = computed(() => resolveAlignClasses(props.align))
 const widthClasses = computed(() => resolveWidthClasses(props.width, props.align))
 const iconName = computed(() => props.icon || null)
+const buttonStyle = computed(() => ({
+  block: btnBlock.value,
+  color: btnColor.value,
+  size: btnSize.value,
+  variant: btnVariant.value,
+}))
 const slotMedia = computed(() => tk.mediaItems())
 
 type MediaDocumentProps = {
@@ -120,14 +126,11 @@ const pdfUrl = computed(() =>
     <EditLink :id="id" :link="editLink" :parent-uuid="parentUuid">
       <UButton
         v-if="hasPdf"
-        :block="btnBlock"
-        :color="btnColor"
+        v-bind="buttonStyle"
         :icon="iconName ?? 'i-lucide-file-text'"
         :label="pdfTitle"
-        :size="btnSize"
         :target="theme.showPdf ? undefined : '_blank'"
         :to="theme.showPdf ? undefined : pdfUrl"
-        :variant="btnVariant"
         @click="() => { open = !!theme.showPdf }"
       />
 
@@ -135,26 +138,20 @@ const pdfUrl = computed(() =>
         v-else-if="hasVideo"
         aria-haspopup="dialog"
         :aria-label="`${videoLabel}, opens video`"
-        :block="btnBlock"
-        :color="btnColor"
+        v-bind="buttonStyle"
         :icon="iconName ?? 'i-lucide-play'"
         :label="videoLabel"
-        :size="btnSize"
-        :variant="btnVariant"
         @click="openVideo(0)"
       />
 
       <UButton
         v-else-if="hasLink"
-        :block="btnBlock"
-        :color="btnColor"
+        v-bind="buttonStyle"
         :icon="iconName"
         :label="btnLabel"
         :rel="isExternal ? 'noopener noreferrer' : undefined"
-        :size="btnSize"
         :target="isExternal ? '_blank' : undefined"
         :to="linkData.url"
-        :variant="btnVariant"
       />
     </EditLink>
   </ParagraphReveal>

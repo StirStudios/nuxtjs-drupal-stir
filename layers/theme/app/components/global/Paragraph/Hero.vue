@@ -264,7 +264,7 @@ provideRevealMotionScope(() => undefined)
             <slot name="title">
               <template v-if="isSection">
                 <div v-if="header?.trim() || eyebrow?.trim() || canEdit" class="heading-group">
-                  <p v-if="eyebrow?.trim()" class="eyebrow mt-0 mb-[var(--stir-eyebrow-gap,0.75rem)] text-sm font-semibold tracking-[0.1em] uppercase">{{ eyebrow }}</p>
+                  <ContentEyebrow :text="eyebrow" />
                 <EditableRichText
                   v-if="header?.trim() || canEdit"
                   :id="id"

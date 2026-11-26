@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSlotsToolkit } from '#stir/composables/useSlotsToolkit'
 import { useMediaModal } from '#stir/composables/useMediaModal'
+import type { VNode } from 'vue'
 import type { DrupalMediaNodeProps } from '#stir/types'
 import { normalizeDrupalMediaType } from '../../../utils/drupalMediaTypes'
 import { imageSlotKey, wrapGridSlot } from '../../../utils/imageDelivery'
@@ -130,6 +131,22 @@ const masonryStyles = computed(() =>
     ? masonryItemStyles(slotMedia.value.map(node => tk.propsOf<DrupalMediaNodeProps>(node)), props.masonry)
     : undefined,
 )
+
+// One item's props, shared by the masonry and grid layouts.
+const mediaItemProps = (node: VNode, i: number) => ({
+  deferLoad: isImageGallery.value && i >= 4,
+  direction: props.direction,
+  index: i,
+  lead: i < leadCount.value,
+  mediaHeight: props.mediaHeight,
+  node,
+  overlay: overlayEnabled.value,
+  revealMode: revealMode.value,
+  roundedClass: roundedClass.value,
+  titleDisplay: props.titleDisplay,
+  tk,
+  wrapperClass: mediaHeightClass.value,
+})
 </script>
 
 <template>
@@ -150,20 +167,9 @@ const masonryStyles = computed(() =>
             :style="masonryStyles[i]"
           >
             <LazyMediaItem
-              :defer-load="isImageGallery && i >= 4"
-              :direction="direction"
+              v-bind="mediaItemProps(node, i)"
               :edit-actions="i === 0 ? actions : undefined"
               :hydrate-on-visible="{ rootMargin: '200px' }"
-              :index="i"
-              :lead="i < leadCount"
-              :media-height="mediaHeight"
-              :node="node"
-              :overlay="overlayEnabled"
-              :reveal-mode="revealMode"
-              :rounded-class="roundedClass"
-              :title-display="titleDisplay"
-              :tk="tk"
-              :wrapper-class="mediaHeightClass"
               @edit-action-select="selectAction"
               @open="openModal"
             />
@@ -180,21 +186,8 @@ const masonryStyles = computed(() =>
         <MediaItem
           v-for="(node, i) in slotMedia"
           :key="getMediaItemKey(node, i)"
-          :defer-load="isImageGallery && i >= 4"
-          :direction="direction"
-          :edit-actions="
-            i === 0 ? actions : undefined
-          "
-          :index="i"
-          :lead="i < leadCount"
-          :media-height="mediaHeight"
-          :node="node"
-          :overlay="overlayEnabled"
-          :reveal-mode="revealMode"
-          :rounded-class="roundedClass"
-          :title-display="titleDisplay"
-          :tk="tk"
-          :wrapper-class="mediaHeightClass"
+          v-bind="mediaItemProps(node, i)"
+          :edit-actions="i === 0 ? actions : undefined"
           @edit-action-select="selectAction"
           @open="openModal"
         />

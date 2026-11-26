@@ -184,6 +184,7 @@
       "layers/theme/app/components/ButtonModal.vue",
       "layers/theme/app/components/CardGradient.vue",
       "layers/theme/app/components/Content/CompactTagList.vue",
+      "layers/theme/app/components/Content/Eyebrow.vue",
       "layers/theme/app/components/Content/InteractiveCard.vue",
       "layers/theme/app/components/Drupal/NodeDisplay.vue",
       "layers/theme/app/components/Drupal/PageRoute.vue",
@@ -584,6 +585,7 @@
         "layers/theme/app/components/ButtonModal.vue",
         "layers/theme/app/components/CardGradient.vue",
         "layers/theme/app/components/Content/CompactTagList.vue",
+        "layers/theme/app/components/Content/Eyebrow.vue",
         "layers/theme/app/components/Content/InteractiveCard.vue",
         "layers/theme/app/components/Drupal/NodeDisplay.vue",
         "layers/theme/app/components/Drupal/PageRoute.vue",
@@ -861,7 +863,7 @@
     "removalPolicy": "Search all validation consumers, document a replacement, deprecate for at least one compatible release, and remove only in a major release."
   },
   "counts": {
-    "components": 142,
+    "components": 143,
     "composables": 77,
     "utils": 82,
     "plugins": 13,
