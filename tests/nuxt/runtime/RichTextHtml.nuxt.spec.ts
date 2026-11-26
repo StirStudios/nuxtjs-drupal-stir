@@ -26,6 +26,14 @@ describe('RichTextHtml override point', () => {
     expect(output.classes()).toEqual(['lead', 'prose', 'max-w-none'])
   })
 
+  it('loads the reveal renderer only for text that reveals', async () => {
+    const still = await mountSuspended(EditableRichText, { props: { text: '<p>Still</p>' } })
+    const revealing = await mountSuspended(EditableRichText, { props: { text: '<p>Moving</p>', direction: 'fade-up' } })
+
+    expect(still.findComponent({ name: 'RevealMotion' }).exists()).toBe(false)
+    expect(revealing.findComponent({ name: 'RevealMotion' }).exists()).toBe(true)
+  })
+
   it('renders nothing for blank authored text', async () => {
     const wrapper = await mountSuspended(EditableRichText, {
       props: { text: '' },

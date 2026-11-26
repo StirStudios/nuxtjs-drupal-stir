@@ -1,0 +1,114 @@
+@reference '../../../../../theme/app/assets/css/main.css';
+
+.admin-ui-panel {
+  @apply border;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin-ui-scope .admin-ui-card-header,
+.admin-ui-scope .admin-ui-card-body,
+.admin-ui-scope .admin-ui-card-footer {
+  min-height: 0;
+  padding: 0.75rem;
+}
+
+.admin-ui-scope .admin-ui-card-title {
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+/*
+   * Popovers are teleported outside the component tree. Keep their typography
+   * and controls independent from downstream site-level element selectors.
+   */
+.admin-ui-popover {
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+
+  :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+    font-family: inherit;
+    letter-spacing: normal;
+    min-height: 0;
+    text-transform: none;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    line-height: 1.25rem;
+  }
+
+  p,
+  label,
+  button,
+  input,
+  [data-slot='label'],
+  [data-slot='item'] {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+/*
+   * Modals are teleported beside the app root, where downstream element rules
+   * would otherwise restyle their headings and controls.
+   */
+.admin-ui-modal-overlay {
+  background-color: rgb(9 9 11 / 75%);
+}
+
+.admin-ui-modal {
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+
+  :where(h1, h2, h3, h4, h5, h6, p, label, button, input) {
+    font-family: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  :where(p, label, button, input, [data-slot='label'], [data-slot='item']) {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .admin-ui-modal-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
+
+  .admin-ui-region-title {
+    min-height: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .admin-ui-layout-grid {
+    grid-template-areas: none;
+    grid-template-columns: minmax(0, 1fr);
+
+    > * {
+      grid-area: auto;
+    }
+  }
+}

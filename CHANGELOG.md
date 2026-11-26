@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+- New `ContentEyebrow` component, which the Text and Hero paragraphs and
+  `HeroContent` use for their eyebrow. It keeps the `eyebrow` class, so site
+  styles still apply.
+
 - New `stirDrupalApiFetch()` server helper: the same request as
   `stirDrupalApiRequest()` (API key, Drupal session, CSRF token for a signed-in
   mutation, refused redirects, cache tags) but returning the whole response,

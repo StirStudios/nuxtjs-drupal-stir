@@ -1,0 +1,125 @@
+@reference '../../../../../theme/app/assets/css/main.css';
+
+.admin-ui-toolbar {
+  @apply border-b;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+
+  [role='group'] > [data-slot='base'],
+  [role='toolbar'] > [data-slot='base'] {
+    color: var(--admin-text-muted);
+    background-color: transparent;
+
+    &:not(:disabled):not([aria-disabled='true']):hover,
+    &:not(:disabled):not([aria-disabled='true']):focus-visible,
+    &:not(:disabled):not([aria-disabled='true']):active {
+      color: var(--admin-text-strong);
+      background-color: color-mix(
+        in srgb,
+        var(--admin-bg-strong) 70%,
+        transparent
+      );
+    }
+
+    &[data-state='open'],
+    &[aria-pressed='true'] {
+      color: var(--admin-accent-text);
+      background-color: var(--admin-accent-bg);
+    }
+  }
+
+  [data-slot='base'] [data-slot='leadingIcon'],
+  [data-slot='base'] [data-slot='trailingIcon'] {
+    color: currentColor;
+  }
+}
+
+.admin-ui-controls {
+  @apply pointer-events-none border opacity-0;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+}
+
+.admin-ui-edit-shell {
+  @apply relative;
+
+  > :first-child,
+  > :first-child > :first-child {
+    @apply mt-0;
+  }
+
+  > :has(+ [data-admin-ui-controls]),
+  > :has(+ [data-admin-ui-controls]) > :last-child {
+    @apply mb-0;
+  }
+}
+
+.admin-ui-nav-root {
+  @apply border-b shadow-sm;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin-ui-nav-surface {
+  @apply border ring-0;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+}
+
+.admin-ui-nav-link {
+  color: var(--admin-text-muted);
+
+  &:hover {
+    color: var(--admin-text-strong);
+
+    &::before {
+      background-color: color-mix(
+        in srgb,
+        var(--admin-bg-strong) 80%,
+        transparent
+      );
+    }
+  }
+
+  &[data-state='open'],
+  &[aria-current='page'] {
+    color: var(--admin-accent-text);
+
+    &::before {
+      background-color: var(--admin-accent-bg);
+    }
+  }
+}
+
+.admin-ui-unpublished-link {
+  color: var(--admin-accent-text);
+
+  &::before {
+    background-color: var(--admin-accent-bg);
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    background-color: var(--admin-accent-bg-subtle);
+  }
+}
+
+.admin-ui-nav-child-link {
+  @apply p-2 text-sm;
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-bg-strong) 80%,
+      transparent
+    );
+    color: var(--admin-text-strong);
+  }
+
+  &[aria-current='page'] {
+    background-color: var(--admin-accent-bg-subtle);
+    color: var(--admin-accent-text);
+  }
+}

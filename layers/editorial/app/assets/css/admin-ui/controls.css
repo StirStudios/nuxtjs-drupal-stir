@@ -1,0 +1,175 @@
+@reference '../../../../../theme/app/assets/css/main.css';
+
+.admin-ui-popover-control {
+  min-height: 2rem;
+  font-family: var(--font-admin);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.admin-ui-control-value {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.admin-ui-switch-track {
+  margin-top: 0.125rem;
+}
+
+.admin-ui-scope .admin-ui-switch-track[data-state='unchecked'] {
+  background-color: var(--admin-z-400);
+  box-shadow: inset 0 0 0 1px var(--admin-border);
+}
+
+.dark .admin-ui-scope .admin-ui-switch-track[data-state='unchecked'] {
+  background-color: var(--admin-z-700);
+}
+
+.admin-ui-scope .admin-ui-switch-thumb[data-state='unchecked'] {
+  background-color: var(--admin-white);
+}
+
+.admin-ui-scope .admin-ui-switch-thumb[data-state='checked'] {
+  background-color: var(--admin-bg);
+}
+
+.admin-ui-settings-separator {
+  margin-block: 0;
+  max-width: none;
+}
+
+.admin-ui-scope .admin-ui-btn-base {
+  min-height: 0;
+  border-radius: var(--ui-radius);
+  font-family: var(--font-admin);
+  font-weight: 500;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.admin-ui-form-label {
+  color: var(--admin-text);
+}
+
+.admin-ui-form-description {
+  margin-bottom: 0;
+  color: var(--admin-text-muted);
+}
+
+.admin-ui-btn-neutral {
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: var(--admin-bg-strong);
+  }
+}
+
+.admin-ui-btn-soft {
+  @apply ring-1 ring-inset;
+  background-color: var(--admin-bg-muted);
+  border-color: var(--admin-border);
+  --tw-ring-color: var(--admin-border);
+  color: var(--admin-text-muted);
+
+  &:hover {
+    background-color: var(--admin-bg-strong);
+    color: var(--admin-text-strong);
+  }
+}
+
+.admin-ui-btn-solid {
+  background-color: var(--admin-text-strong);
+  color: var(--admin-bg);
+  border-color: var(--admin-text-strong);
+  --tw-ring-color: color-mix(
+    in srgb,
+    var(--admin-text-strong) 35%,
+    transparent
+  );
+
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--admin-text-strong) 85%,
+      white 15%
+    );
+    color: var(--admin-bg);
+  }
+}
+
+.admin-ui-field-group {
+  @apply rounded-md border shadow-lg;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+}
+
+.admin-ui-tooltip-content {
+  @apply border ring ring-inset;
+  font-family: var(--font-admin);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1rem;
+  letter-spacing: normal;
+  text-transform: none;
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  --tw-ring-color: var(--admin-border);
+  @apply z-[500];
+}
+
+.admin-ui-tooltip-text {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.admin-ui-skeleton {
+  background-color: var(--admin-bg-strong);
+}
+
+.admin-ui-loading-state {
+  display: grid;
+  min-height: 8rem;
+  place-items: center;
+  padding: 1.5rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text-muted);
+}
+
+.admin-ui-scope .admin-ui-loading-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.admin-ui-scope .admin-ui-loading-icon,
+.admin-ui-scope .admin-ui-spinner {
+  animation: admin-ui-spin 1s linear infinite;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-ui-scope .admin-ui-loading-icon,
+  .admin-ui-scope .admin-ui-spinner {
+    animation: none;
+  }
+}
+
+@keyframes admin-ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-ui-tooltip-arrow {
+  fill: var(--admin-bg-muted);
+  stroke: var(--admin-border);
+}

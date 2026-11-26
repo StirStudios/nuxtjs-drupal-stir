@@ -1,0 +1,86 @@
+@reference '../../../../../theme/app/assets/css/main.css';
+
+.admin-ui-editor-root {
+  @apply border;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+
+  .ProseMirror,
+  .tiptap {
+    color: var(--admin-text);
+  }
+}
+
+.admin-editor-media-placeholder {
+  @apply my-4 flex min-h-20 flex-col justify-center gap-1 rounded-md border border-dashed px-4 py-3;
+  border-color: var(--admin-border);
+  background-color: var(--admin-bg-muted);
+  color: var(--admin-text);
+}
+
+.admin-editor-media-placeholder-label {
+  @apply text-sm font-semibold capitalize;
+  color: var(--admin-text-strong);
+}
+
+.admin-editor-media-placeholder-description {
+  @apply text-xs;
+  color: var(--admin-text-muted);
+}
+
+.admin-ui-status-saving {
+  color: var(--admin-status-saving);
+}
+
+.admin-ui-status-error {
+  color: var(--admin-status-error);
+}
+
+.admin-editor-prose {
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    @apply py-0;
+  }
+
+  h2 {
+    @apply m-0 text-2xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply text-base;
+  }
+
+  p,
+  ul > li,
+  ol > li {
+    @apply leading-7;
+  }
+
+  .list-none > li {
+    @apply ms-0 list-none;
+  }
+
+  li > p {
+    @apply p-0;
+  }
+
+  a {
+    color: var(--admin-text-muted);
+  }
+
+  section,
+  header {
+    @apply mb-15;
+  }
+}

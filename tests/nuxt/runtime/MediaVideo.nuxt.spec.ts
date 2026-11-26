@@ -628,4 +628,31 @@ describe('MediaVideo (Nuxt runtime)', () => {
     expect(attributes.modalsizes).toBeUndefined()
     expect(attributes.modalresponsivestyle).toBeUndefined()
   })
+
+  it('registers its own Bunny iframe with Player.js when played, without polling', async () => {
+    const created: HTMLIFrameElement[] = []
+    const Player = vi.fn(function (this: Record<string, unknown>, iframe: HTMLIFrameElement) {
+      created.push(iframe)
+      this.on = vi.fn()
+      this.off = vi.fn()
+    })
+    const setIntervalSpy = vi.spyOn(window, 'setInterval')
+
+    vi.stubGlobal('playerjs', { Player })
+    // The test DOM gives a cross-origin iframe no window; a browser does.
+    vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockReturnValue(window)
+
+    const wrapper = await mountSuspended(MediaVideo, {
+      props: { mid: 'reel', mediaEmbed: 'https://iframe.mediadelivery.net/embed/1/reel', src: '/poster.jpg' },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('button').trigger('click')
+    const iframe = await vi.waitFor(() => wrapper.get('iframe[data-mid="reel"]').element as HTMLIFrameElement)
+
+    iframe.dispatchEvent(new Event('load'))
+    await vi.waitFor(() => expect(created).toContain(iframe))
+    expect(setIntervalSpy).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
 })
