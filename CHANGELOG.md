@@ -13,6 +13,11 @@ untouched do not need one.
 
 ## Unreleased
 
+- The editor bar names the signed-in account on pages a site builds in Nuxt,
+  where the page has no Drupal `current_user`: it falls back to the auth
+  session's name instead of "Account". `useOptionalAuthSession()`'s user type
+  gains an optional `name`.
+
 - New `ContentEyebrow` component, which the Text and Hero paragraphs and
   `HeroContent` use for their eyebrow. It keeps the `eyebrow` class, so site
   styles still apply.

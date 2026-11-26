@@ -8,6 +8,7 @@ export type StirAuthSessionState = {
   loggedIn: Ref<boolean>
   user: Ref<{
     uid?: number | string
+    name?: string
     capabilities?: { editorialUi?: boolean; adminMenu?: boolean } | null
   } | null>
   fetchSession: () => Promise<void>

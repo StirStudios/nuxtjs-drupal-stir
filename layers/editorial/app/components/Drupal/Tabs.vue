@@ -36,7 +36,13 @@ useHead({
   }],
 })
 
+// A page the site builds in Nuxt has no Drupal page user, so the signed-in
+// session names the account there.
+const session = useOptionalAuthSession()
 const user = computed(() => page.value?.current_user || null)
+const accountLabel = computed(() =>
+  user.value?.name || session?.user.value?.name || 'Account',
+)
 const {
   adminDashboardUrl,
   hasAdminMenuAccess,
@@ -133,7 +139,7 @@ const editorialTaskLinks = computed(() =>
 )
 
 const currentUserId = computed(() =>
-  String(user.value?.id ?? user.value?.uid ?? 'anon'),
+  String(user.value?.id ?? user.value?.uid ?? session?.user.value?.uid ?? 'anon'),
 )
 // One cached menu per editor: the key changes when Drupal's answer about who
 // is looking changes, so an account switch gets its own menu. A key already in
@@ -315,14 +321,14 @@ const links = computed(() => {
   const accountTo = normalizeAdminUrl('/user')
   const accountItem = accountMenu.value.length
     ? {
-        label: user.value?.name || 'Account',
+        label: accountLabel.value,
         icon: 'i-lucide-circle-user',
         badge: baseLinks.length ? undefined : badge,
         tooltip: isCompactTabs.value,
         children: accountMenu.value,
       }
     : {
-        label: user.value?.name || 'Account',
+        label: accountLabel.value,
         icon: 'i-lucide-circle-user',
         badge: baseLinks.length ? undefined : badge,
         to: accountTo,
