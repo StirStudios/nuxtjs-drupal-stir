@@ -13,6 +13,10 @@ untouched do not need one.
 
 ## Unreleased
 
+- Server GET requests to Drupal that get no answer within 3 s are retried once
+  with the full timeout again. Since the 5xx-retry change they failed at 3 s
+  instead. Answers, 5xx included, are still never retried.
+
 - The editor bar names the signed-in account on pages a site builds in Nuxt,
   where the page has no Drupal `current_user`: it falls back to the auth
   session's name instead of "Account". `useOptionalAuthSession()`'s user type

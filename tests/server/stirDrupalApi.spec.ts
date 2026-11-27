@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module'
+import { pathToFileURL } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   appendStirDrupalSetCookies,
@@ -541,9 +543,30 @@ describe('stirDrupalTimeoutOptions', () => {
     expect(retry).toEqual({ method: 'GET', retry: 0, signal: undefined, timeout: 10_000 })
   })
 
-  it('never repeats a request the CMS answered', () => {
-    expect(stirDrupalTimeoutOptions(10_000).retryStatusCodes).toEqual([])
-  })
+  it('retries a GET that timed out but never one the CMS answered', async () => {
+    // The ofetch release Nitro's $fetch uses.
+    const nitro = createRequire(createRequire(import.meta.url).resolve('nitropack/package.json'))
+    const { createFetch } = await import(pathToFileURL(nitro.resolve('ofetch')).href) as typeof import('ofetch')
+    let calls = 0
+    const fetch = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+      calls += 1
+      if (calls === 1) {
+        return new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(init.signal?.reason))
+        })
+      }
+
+      return Promise.resolve(Response.json({ ok: true }))
+    })
+    const answered = vi.fn(() => Promise.resolve(new Response('down', { status: 503 })))
+
+    await expect(createFetch({ fetch })('https://cms.example.com/api', stirDrupalTimeoutOptions(10_000)))
+      .resolves.toEqual({ ok: true })
+    expect(fetch).toHaveBeenCalledTimes(2)
+    await expect(createFetch({ fetch: answered })('https://cms.example.com/api', stirDrupalTimeoutOptions(10_000)))
+      .rejects.toMatchObject({ status: 503 })
+    expect(answered).toHaveBeenCalledTimes(1)
+  }, 10_000)
 
   it('keeps the full timeout for mutations and short configured timeouts', () => {
     const post = { method: 'POST' }
