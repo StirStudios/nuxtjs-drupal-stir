@@ -3,7 +3,7 @@ import type {
   GlobalSeoProducerPayload,
   GlobalSeoResponse,
 } from '../../shared/types/globalSeo'
-import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
+import { captureStirDrupalApiError, stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -52,7 +52,9 @@ export async function fetchGlobalSeo(
 
     return parseGlobalSeoResponse(response)
   }
-  catch {
+  catch (error) {
+    captureStirDrupalApiError(event, error)
+
     return {
       meta: [],
       link: [],

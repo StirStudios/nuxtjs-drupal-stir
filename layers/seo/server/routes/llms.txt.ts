@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, setResponseHeader } from 'h3'
 import { fetchAppContext } from '../../../core/server/utils/appContextApi'
-import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
+import { captureStirDrupalApiError, stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
 import {
   buildLlmsTxt,
   collectLlmsTxtLinks,
@@ -26,8 +26,16 @@ export default defineEventHandler(async (event) => {
   const [context, menu, sitemap] = await Promise.all([
     fetchAppContext(event),
     stirDrupalApiRequest<unknown>(event, '/api/menu_items/main', { method: 'GET' })
-      .catch(() => []),
-    fetchSitemap(event).catch(() => []),
+      .catch((error: unknown) => {
+        captureStirDrupalApiError(event, error)
+
+        return []
+      }),
+    fetchSitemap(event).catch((error: unknown) => {
+      captureStirDrupalApiError(event, error)
+
+      return []
+    }),
   ])
   const links = collectLlmsTxtLinks(
     Array.isArray(menu) ? menu as LlmsTxtMenuItem[] : [],

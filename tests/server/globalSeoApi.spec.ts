@@ -1,13 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { stirDrupalApiRequest } from '../../layers/foundation/server/utils/stirDrupalApi'
+import { captureStirDrupalApiError, stirDrupalApiRequest } from '../../layers/foundation/server/utils/stirDrupalApi'
 import {
   fetchGlobalSeo,
   parseGlobalSeoResponse,
 } from '../../layers/seo/server/utils/globalSeoApi'
 
 vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
+  captureStirDrupalApiError: vi.fn(),
   stirDrupalApiRequest: vi.fn(),
 }))
 
@@ -46,12 +47,15 @@ describe('globalSeoApi', () => {
   })
 
   it('preserves the stable optional-provider fallback', async () => {
-    vi.mocked(stirDrupalApiRequest).mockRejectedValue(new Error('Unavailable'))
+    const failure = new Error('Unavailable')
+
+    vi.mocked(stirDrupalApiRequest).mockRejectedValue(failure)
     const event = {} as Parameters<typeof fetchGlobalSeo>[0]
 
     await expect(fetchGlobalSeo(event)).resolves.toEqual({
       meta: [],
       link: [],
     })
+    expect(captureStirDrupalApiError).toHaveBeenCalledWith(event, failure)
   })
 })

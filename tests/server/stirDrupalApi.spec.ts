@@ -6,7 +6,6 @@ import {
   markStirPublicResponse,
   splitStirSetCookieHeader,
   stirDrupalApiRequest,
-  stirDrupalTimeoutOptions,
   throwStirDrupalApiError,
   createStirDrupalUpstreamError,
 } from '../../layers/foundation/server/utils/stirDrupalApi'
@@ -160,7 +159,8 @@ describe('Stir Drupal API boundary', () => {
           'x-api-key': 'api-key',
         },
         redirect: 'manual',
-        timeout: 3500,
+        retry: false,
+        timeout: 3000,
       }),
     )
     expect(headers.get('cache-control')).toBe('private, no-store, max-age=0')
@@ -502,7 +502,7 @@ describe('Stir Drupal API boundary', () => {
       .toHaveProperty('data', undefined)
   })
 
-  it('reports upstream failures through the Nitro error hook', async () => {
+  it('leaves reporting a thrown failure to the Nitro error hook', async () => {
     vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
       apiKey: 'api-key',
       public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
@@ -519,49 +519,36 @@ describe('Stir Drupal API boundary', () => {
 
     await expect(stirDrupalApiRequest(event, '/api/auth/session'))
       .rejects.toBe(upstreamError)
-    expect(captureError).toHaveBeenCalledWith(upstreamError, {
-      event,
-      tags: ['stir-drupal-api'],
-    })
-  })
-})
-
-describe('stirDrupalTimeoutOptions', () => {
-  const timedOut = () => AbortSignal.abort(Object.assign(new Error('timeout'), { name: 'TimeoutError' }))
-
-  it('cuts a retried GET\'s first attempt short and gives the retry the full timeout', () => {
-    const { onRequest } = stirDrupalTimeoutOptions(10_000)
-    const first = { method: 'GET' } as Parameters<typeof onRequest>[0]['options']
-    const retry = { method: 'GET', retry: 0, signal: timedOut(), timeout: 3_000 }
-
-    onRequest({ options: first })
-    onRequest({ options: retry })
-
-    expect(first.timeout).toBe(3_000)
-    expect(retry).toEqual({ method: 'GET', retry: 0, signal: undefined, timeout: 10_000 })
+    expect(captureError).not.toHaveBeenCalled()
   })
 
-  it('never repeats a request the CMS answered', () => {
-    expect(stirDrupalTimeoutOptions(10_000).retryStatusCodes).toEqual([])
+  it('keeps the Drupal failure as the cause of the route error', () => {
+    const upstream = { status: 500 }
+
+    expect(createStirDrupalUpstreamError(upstream, 'Failed')).toHaveProperty('cause', upstream)
   })
 
-  it('keeps the full timeout for mutations and short configured timeouts', () => {
-    const post = { method: 'POST' }
-    const short = { method: 'GET' }
+  it('sends a GET with no answer once more and never repeats an answer', async () => {
+    vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({
+      apiKey: 'api-key',
+      public: { drupalCe: { drupalBaseUrl: 'https://cms.example.test' } },
+    }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const timedOut = Object.assign(new Error('no response'), { name: 'FetchError', cause: { name: 'TimeoutError' } })
+    const answered = Object.assign(new Error('down'), { name: 'FetchError', status: 503 })
+    const raw = vi.fn()
+      .mockRejectedValueOnce(timedOut)
+      .mockResolvedValueOnce({ status: 200, headers: new Headers(), _data: { ok: true } })
+      .mockRejectedValueOnce(answered)
 
-    stirDrupalTimeoutOptions(10_000).onRequest({ options: post })
-    stirDrupalTimeoutOptions(2_000).onRequest({ options: short })
+    vi.stubGlobal('$fetch', { raw })
 
-    expect(post).toEqual({ method: 'POST', timeout: 10_000 })
-    expect(short).toEqual({ method: 'GET', timeout: 2_000 })
-  })
+    const { event } = createEvent()
 
-  it('keeps a caller signal that has not timed out', () => {
-    const signal = AbortSignal.abort()
-    const options = { method: 'GET', retry: 0, signal }
-
-    stirDrupalTimeoutOptions(10_000).onRequest({ options })
-
-    expect(options.signal).toBe(signal)
+    await expect(stirDrupalApiRequest(event, '/api/sitemap', { method: 'GET' })).resolves.toEqual({ ok: true })
+    expect(raw.mock.calls.map(([, options]) => [options.retry, options.timeout])).toEqual([[false, 3_000], [false, expect.any(Number)]])
+    expect(raw.mock.calls[1]?.[1].timeout).toBeGreaterThan(9_000)
+    await expect(stirDrupalApiRequest(event, '/api/sitemap', { method: 'GET' })).rejects.toBe(answered)
+    expect(raw).toHaveBeenCalledTimes(3)
   })
 })
