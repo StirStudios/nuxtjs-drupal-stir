@@ -13,9 +13,24 @@ untouched do not need one.
 
 ## Unreleased
 
-- Server GET requests to Drupal that get no answer within 3 s are retried once
-  with the full timeout again. Since the 5xx-retry change they failed at 3 s
-  instead. Answers, 5xx included, are still never retried.
+- **One send path for every server request to Drupal.** `stirDrupalApiFetch`
+  and the CE page/menu proxy now share `sendStirDrupalRequest()`: a GET or HEAD
+  with no answer after 3 s is sent once more within the same
+  `drupalRequestTimeoutMs` deadline, and any answer, 5xx included, is never
+  repeated. API GETs that timed out at 3 s failed without a retry (ofetch's
+  `retryStatusCodes: []` also blocked it), and could otherwise take up to 13 s.
+  **Removed exports:** `stirDrupalTimeoutOptions` and
+  `FIRST_ATTEMPT_TIMEOUT_MS` (no consumer used them). New export:
+  `sendStirDrupalRequest`.
+- **A Drupal failure is reported to GlitchTip once.** `stirDrupalApiFetch` no
+  longer reports every failure itself; a thrown one reaches Nitro's error
+  hook, and the route errors from `createStirDrupalUpstreamError` and
+  `throwStirDrupalApiError` now keep the Drupal failure as their `cause`, so
+  the report still shows it. Failures the layer swallows (global SEO, page
+  summaries, `llms.txt`, failed `stir:sitemap:extend` handlers, app context)
+  are reported where they are caught. **A site that catches a
+  `stirDrupalApiRequest` failure and carries on must now call
+  `captureStirDrupalApiError(event, error)` itself to keep it reported.**
 
 - The editor bar names the signed-in account on pages a site builds in Nuxt,
   where the page has no Drupal `current_user`: it falls back to the auth

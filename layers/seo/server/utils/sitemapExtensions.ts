@@ -24,6 +24,7 @@ import type {
   SitemapProducerPayload,
 } from '../../shared/types/sitemap'
 import { sitemapCanonicalKey } from '../../../../config/sitemapCanonicalKey'
+import { captureStirDrupalApiError } from '../../../foundation/server/utils/stirDrupalApi'
 
 export const STIR_SITEMAP_EXTEND_HOOK = 'stir:sitemap:extend'
 
@@ -153,6 +154,7 @@ export async function resolveSitemapExtensions(
 
     if (result.status === 'rejected') {
       warn(`Ignoring ${source}: it failed.`, result.reason)
+      captureStirDrupalApiError(event, result.reason)
 
       return []
     }

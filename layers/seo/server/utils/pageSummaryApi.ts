@@ -1,7 +1,7 @@
 import { array, maxLength, nullable, parse, pipe, startsWith, strictObject, string } from 'valibot'
 import type { H3Event } from 'h3'
 import type { PageSummary } from '../../shared/types/pageSummary'
-import { stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
+import { captureStirDrupalApiError, stirDrupalApiRequest } from '../../../foundation/server/utils/stirDrupalApi'
 
 export const PAGE_SUMMARY_BATCH = 25
 
@@ -27,7 +27,11 @@ export async function fetchPageSummaries(event: H3Event, paths: string[]): Promi
       { method: 'GET' },
     )
       .then(parsePageSummaries)
-      .catch(() => []),
+      .catch((error: unknown) => {
+        captureStirDrupalApiError(event, error)
+
+        return []
+      }),
   ))
 
   return results.flat()

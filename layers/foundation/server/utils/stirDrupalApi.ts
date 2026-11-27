@@ -149,40 +149,45 @@ export function buildStirDrupalHeaders(
   return headers
 }
 
-export const FIRST_ATTEMPT_TIMEOUT_MS = 3_000
+const FIRST_ATTEMPT_TIMEOUT_MS = 3_000
 
-interface StirDrupalFetchRequestOptions {
-  method?: string
-  retry?: number | false
-  signal?: AbortSignal | null
-  timeout?: number
+const isStirTimeoutError = (error: unknown): boolean => {
+  const candidate = error as { name?: unknown, cause?: { name?: unknown } } | null
+
+  return candidate?.name === 'TimeoutError' || candidate?.cause?.name === 'TimeoutError'
 }
 
-// ofetch retries a GET once when no response arrives, but it keeps the first
-// attempt's expired timeout signal, so the retry aborts before it is sent.
-// Each attempt gets its own signal here. A first attempt that hangs (a stalled
-// connection, which the CMS never sees) is cut short, so the retry, on another
-// connection, gets the full timeout.
-export const stirDrupalTimeoutOptions = (requestTimeoutMs: number) => ({
-  timeout: requestTimeoutMs,
-  // ofetch reports a request that got no answer as status 500, so this retries
-  // only those. An answer is never retried: onResponseError turns retries off
-  // before ofetch would repeat a GET on a 5xx, Maintenance mode's 503 included.
-  retryStatusCodes: [500],
-  onResponseError({ options }: { options: StirDrupalFetchRequestOptions }) {
-    options.retry = false
-  },
-  onRequest({ options }: { options: StirDrupalFetchRequestOptions }) {
-    if (options.signal?.reason?.name === 'TimeoutError') options.signal = undefined
+/**
+ * Sends one request to Drupal within `requestTimeoutMs`. A GET or HEAD with no
+ * answer after 3 s (a stalled connection, which the CMS never sees) is sent
+ * once more, on a fresh connection, within the same deadline. Any answer, a
+ * maintenance 503 included, is returned or thrown as it is.
+ */
+export async function sendStirDrupalRequest<T>(
+  request: { method: string, url: string, requestTimeoutMs: number, signal?: AbortSignal | null },
+  send: (timeoutMs: number) => Promise<T>,
+): Promise<T> {
+  const { method, url, requestTimeoutMs, signal } = request
+  const firstTimeoutMs = Math.min(FIRST_ATTEMPT_TIMEOUT_MS, requestTimeoutMs)
 
-    const isFirstOfRetries = options.retry === undefined
-      && (!options.method || options.method === 'GET' || options.method === 'HEAD')
+  if ((method !== 'GET' && method !== 'HEAD') || firstTimeoutMs >= requestTimeoutMs) {
+    return await send(requestTimeoutMs)
+  }
 
-    options.timeout = isFirstOfRetries
-      ? Math.min(FIRST_ATTEMPT_TIMEOUT_MS, requestTimeoutMs)
-      : requestTimeoutMs
-  },
-})
+  const startedAt = Date.now()
+
+  try {
+    return await send(firstTimeoutMs)
+  } catch (error) {
+    if (!isStirTimeoutError(error) || signal?.aborted) throw error
+
+    const { origin, pathname } = new URL(url)
+
+    console.warn(`[stir] retrying ${method} ${origin}${pathname} after ${firstTimeoutMs} ms without an answer`)
+
+    return await send(requestTimeoutMs - (Date.now() - startedAt))
+  }
+}
 
 export function getStirDrupalApiConfig() {
   const config = useRuntimeConfig()
@@ -512,6 +517,7 @@ const createStirDrupalMaintenanceError = (error: unknown) => {
     statusCode: 503,
     statusMessage: 'Service Unavailable',
     ...(message ? { data: { maintenanceMessage: message } } : {}),
+    cause: error,
   })
 }
 
@@ -533,6 +539,7 @@ export const createStirDrupalUpstreamError = (
       ? statusCode
       : 502,
     statusMessage,
+    cause: error,
   })
 }
 
@@ -566,6 +573,7 @@ export const throwStirDrupalApiError = (
     statusCode,
     statusMessage: upstreamDetail || fallbackMessage,
     ...(upstreamCode ? { data: { code: upstreamCode } } : {}),
+    cause: error,
   })
 }
 
@@ -629,10 +637,9 @@ export async function stirDrupalApiFetch<T>(
     markStirPrivateResponse(event)
   }
 
-  let response
-
-  try {
-    response = await $fetch.raw<T>(`${baseUrl}${path}`, {
+  const url = `${baseUrl}${path}`
+  const response = await sendStirDrupalRequest({ method, url, requestTimeoutMs }, timeout =>
+    $fetch.raw<T>(url, {
       method,
       body: options.body,
       query: options.query,
@@ -647,12 +654,9 @@ export async function stirDrupalApiFetch<T>(
       },
       redirect: 'manual',
       ignoreResponseError: options.ignoreResponseError,
-      ...stirDrupalTimeoutOptions(requestTimeoutMs),
-    })
-  } catch (error) {
-    captureStirDrupalApiError(event, error)
-    throw error
-  }
+      retry: false,
+      timeout,
+    }))
 
   assertStirDrupalResponseNotRedirect(response)
   recordStirCacheTags(event, response.headers)

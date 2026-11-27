@@ -12,6 +12,7 @@ import {
 import { parseSitemapExtensionEntries } from '../../layers/seo/server/utils/sitemapExtensions'
 
 vi.mock('../../layers/foundation/server/utils/stirDrupalApi', () => ({
+  captureStirDrupalApiError: vi.fn(),
   getStirDrupalApiConfig: vi.fn(),
   stirDrupalApiRequest: vi.fn(),
 }))
